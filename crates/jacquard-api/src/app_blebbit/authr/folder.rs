@@ -18,7 +18,7 @@ pub mod update_folder_relationship;
 
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use serde::{Serialize, Deserialize};
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct FolderForm<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct FolderForm<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -54,11 +54,11 @@ pub struct FolderForm<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct FolderView<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct FolderView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cuid: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -69,7 +69,7 @@ pub struct FolderView<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for FolderForm<S> {
+impl<S: BosStr> LexiconSchema for FolderForm<S> {
     fn nsid() -> &'static str {
         "app.blebbit.authr.folder.defs"
     }
@@ -84,7 +84,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for FolderForm<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for FolderView<S> {
+impl<S: BosStr> LexiconSchema for FolderView<S> {
     fn nsid() -> &'static str {
         "app.blebbit.authr.folder.defs"
     }

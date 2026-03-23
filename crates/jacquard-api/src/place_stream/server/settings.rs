@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "place.stream.server.settings",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Settings<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Settings<S: BosStr = DefaultStr> {
     ///Whether this node may archive your livestream for improving the service
     #[serde(skip_serializing_if = "Option::is_none")]
     pub debug_recording: Option<bool>,
@@ -53,18 +53,18 @@ pub struct Settings<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SettingsGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SettingsGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Settings<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Settings<S> {
+impl<S: BosStr> Settings<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, SettingsRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -77,17 +77,17 @@ pub struct SettingsRecord;
 impl XrpcResp for SettingsRecord {
     const NSID: &'static str = "place.stream.server.settings";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = SettingsGetRecordOutput<S>;
+    type Output<S: BosStr> = SettingsGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<SettingsGetRecordOutput<S>> for Settings<S> {
+impl<S: BosStr> From<SettingsGetRecordOutput<S>> for Settings<S> {
     fn from(output: SettingsGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Settings<S> {
+impl<S: BosStr> Collection for Settings<S> {
     const NSID: &'static str = "place.stream.server.settings";
     type Record = SettingsRecord;
 }
@@ -97,7 +97,7 @@ impl Collection for SettingsRecord {
     type Record = SettingsRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Settings<S> {
+impl<S: BosStr> LexiconSchema for Settings<S> {
     fn nsid() -> &'static str {
         "place.stream.server.settings"
     }
@@ -131,32 +131,32 @@ pub mod settings_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct SettingsBuilder<'a, S: settings_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct SettingsBuilder<S: BosStr, St: settings_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<bool>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Settings<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> SettingsBuilder<'a, settings_state::Empty> {
+impl<S: BosStr> Settings<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> SettingsBuilder<S, settings_state::Empty> {
         SettingsBuilder::new()
     }
 }
 
-impl<'a> SettingsBuilder<'a, settings_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> SettingsBuilder<S, settings_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SettingsBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
+impl<S: BosStr, St: settings_state::State> SettingsBuilder<S, St> {
     /// Set the `debugRecording` field (optional)
     pub fn debug_recording(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.0 = value.into();
@@ -169,22 +169,19 @@ impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
     }
 }
 
-impl<'a, S> SettingsBuilder<'a, S>
+impl<S: BosStr, St> SettingsBuilder<S, St>
 where
-    S: settings_state::State,
+    St: settings_state::State,
 {
-    /// Build the final struct
-    pub fn build(self) -> Settings<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Settings<S> {
         Settings {
             debug_recording: self._fields.0,
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Settings<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Settings<S> {
         Settings {
             debug_recording: self._fields.0,
             extra_data: Some(extra_data),

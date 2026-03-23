@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
@@ -18,19 +18,17 @@ use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct RemoveSecret<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct RemoveSecret<S: BosStr = DefaultStr> {
     pub key: S,
     pub repo: AtUri<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -39,12 +37,11 @@ pub struct RemoveSecretResponse;
 impl jacquard_common::xrpc::XrpcResp for RemoveSecretResponse {
     const NSID: &'static str = "sh.tangled.repo.removeSecret";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ();
+    type Output<S: BosStr> = ();
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for RemoveSecret<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for RemoveSecret<S> {
     const NSID: &'static str = "sh.tangled.repo.removeSecret";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -59,7 +56,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for RemoveSecretRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = RemoveSecret<S>;
+    type Request<S: BosStr> = RemoveSecret<S>;
     type Response = RemoveSecretResponse;
 }
 
@@ -73,122 +70,122 @@ pub mod remove_secret_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Key;
         type Repo;
+        type Key;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Key = Unset;
         type Repo = Unset;
-    }
-    ///State transition - sets the `key` field to Set
-    pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetKey<S> {}
-    impl<S: State> State for SetKey<S> {
-        type Key = Set<members::key>;
-        type Repo = S::Repo;
+        type Key = Unset;
     }
     ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
-        type Key = S::Key;
+    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRepo<St> {}
+    impl<St: State> State for SetRepo<St> {
         type Repo = Set<members::repo>;
+        type Key = St::Key;
+    }
+    ///State transition - sets the `key` field to Set
+    pub struct SetKey<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetKey<St> {}
+    impl<St: State> State for SetKey<St> {
+        type Repo = St::Repo;
+        type Key = Set<members::key>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `key` field
-        pub struct key(());
         ///Marker type for the `repo` field
         pub struct repo(());
+        ///Marker type for the `key` field
+        pub struct key(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct RemoveSecretBuilder<'a, S: remove_secret_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct RemoveSecretBuilder<S: BosStr, St: remove_secret_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<AtUri<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> RemoveSecret<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> RemoveSecretBuilder<'a, remove_secret_state::Empty> {
+impl<S: BosStr> RemoveSecret<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> RemoveSecretBuilder<S, remove_secret_state::Empty> {
         RemoveSecretBuilder::new()
     }
 }
 
-impl<'a> RemoveSecretBuilder<'a, remove_secret_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> RemoveSecretBuilder<S, remove_secret_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         RemoveSecretBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RemoveSecretBuilder<'a, S>
+impl<S: BosStr, St> RemoveSecretBuilder<S, St>
 where
-    S: remove_secret_state::State,
-    S::Key: remove_secret_state::IsUnset,
+    St: remove_secret_state::State,
+    St::Key: remove_secret_state::IsUnset,
 {
     /// Set the `key` field (required)
     pub fn key(
         mut self,
         value: impl Into<S>,
-    ) -> RemoveSecretBuilder<'a, remove_secret_state::SetKey<S>> {
+    ) -> RemoveSecretBuilder<S, remove_secret_state::SetKey<St>> {
         self._fields.0 = Option::Some(value.into());
         RemoveSecretBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RemoveSecretBuilder<'a, S>
+impl<S: BosStr, St> RemoveSecretBuilder<S, St>
 where
-    S: remove_secret_state::State,
-    S::Repo: remove_secret_state::IsUnset,
+    St: remove_secret_state::State,
+    St::Repo: remove_secret_state::IsUnset,
 {
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> RemoveSecretBuilder<'a, remove_secret_state::SetRepo<S>> {
+    ) -> RemoveSecretBuilder<S, remove_secret_state::SetRepo<St>> {
         self._fields.1 = Option::Some(value.into());
         RemoveSecretBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RemoveSecretBuilder<'a, S>
+impl<S: BosStr, St> RemoveSecretBuilder<S, St>
 where
-    S: remove_secret_state::State,
-    S::Key: remove_secret_state::IsSet,
-    S::Repo: remove_secret_state::IsSet,
+    St: remove_secret_state::State,
+    St::Repo: remove_secret_state::IsSet,
+    St::Key: remove_secret_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> RemoveSecret<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> RemoveSecret<S> {
         RemoveSecret {
             key: self._fields.0.unwrap(),
             repo: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> RemoveSecret<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> RemoveSecret<S> {
         RemoveSecret {
             key: self._fields.0.unwrap(),
             repo: self._fields.1.unwrap(),

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -38,11 +38,11 @@ use crate::community_lexicon::location::hthree::Hthree;
     rename = "place.atwork.listing",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Listing<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Listing<S: BosStr = DefaultStr> {
     ///URL where applicants can apply for the job.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub apply_link: Option<UriValue<S>>,
@@ -73,18 +73,18 @@ pub struct Listing<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ListingGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ListingGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Listing<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Listing<S> {
+impl<S: BosStr> Listing<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, ListingRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -97,17 +97,17 @@ pub struct ListingRecord;
 impl XrpcResp for ListingRecord {
     const NSID: &'static str = "place.atwork.listing";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ListingGetRecordOutput<S>;
+    type Output<S: BosStr> = ListingGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<ListingGetRecordOutput<S>> for Listing<S> {
+impl<S: BosStr> From<ListingGetRecordOutput<S>> for Listing<S> {
     fn from(output: ListingGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Listing<S> {
+impl<S: BosStr> Collection for Listing<S> {
     const NSID: &'static str = "place.atwork.listing";
     type Record = ListingRecord;
 }
@@ -117,7 +117,7 @@ impl Collection for ListingRecord {
     type Record = ListingRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Listing<S> {
+impl<S: BosStr> LexiconSchema for Listing<S> {
     fn nsid() -> &'static str {
         "place.atwork.listing"
     }
@@ -217,73 +217,73 @@ pub mod listing_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type NotAfter;
-        type NotBefore;
-        type Description;
         type Title;
+        type NotBefore;
+        type NotAfter;
+        type Description;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type NotAfter = Unset;
-        type NotBefore = Unset;
-        type Description = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `not_after` field to Set
-    pub struct SetNotAfter<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNotAfter<S> {}
-    impl<S: State> State for SetNotAfter<S> {
-        type NotAfter = Set<members::not_after>;
-        type NotBefore = S::NotBefore;
-        type Description = S::Description;
-        type Title = S::Title;
-    }
-    ///State transition - sets the `not_before` field to Set
-    pub struct SetNotBefore<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNotBefore<S> {}
-    impl<S: State> State for SetNotBefore<S> {
-        type NotAfter = S::NotAfter;
-        type NotBefore = Set<members::not_before>;
-        type Description = S::Description;
-        type Title = S::Title;
-    }
-    ///State transition - sets the `description` field to Set
-    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDescription<S> {}
-    impl<S: State> State for SetDescription<S> {
-        type NotAfter = S::NotAfter;
-        type NotBefore = S::NotBefore;
-        type Description = Set<members::description>;
-        type Title = S::Title;
+        type NotBefore = Unset;
+        type NotAfter = Unset;
+        type Description = Unset;
     }
     ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type NotAfter = S::NotAfter;
-        type NotBefore = S::NotBefore;
-        type Description = S::Description;
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
         type Title = Set<members::title>;
+        type NotBefore = St::NotBefore;
+        type NotAfter = St::NotAfter;
+        type Description = St::Description;
+    }
+    ///State transition - sets the `not_before` field to Set
+    pub struct SetNotBefore<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetNotBefore<St> {}
+    impl<St: State> State for SetNotBefore<St> {
+        type Title = St::Title;
+        type NotBefore = Set<members::not_before>;
+        type NotAfter = St::NotAfter;
+        type Description = St::Description;
+    }
+    ///State transition - sets the `not_after` field to Set
+    pub struct SetNotAfter<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetNotAfter<St> {}
+    impl<St: State> State for SetNotAfter<St> {
+        type Title = St::Title;
+        type NotBefore = St::NotBefore;
+        type NotAfter = Set<members::not_after>;
+        type Description = St::Description;
+    }
+    ///State transition - sets the `description` field to Set
+    pub struct SetDescription<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDescription<St> {}
+    impl<St: State> State for SetDescription<St> {
+        type Title = St::Title;
+        type NotBefore = St::NotBefore;
+        type NotAfter = St::NotAfter;
+        type Description = Set<members::description>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `not_after` field
-        pub struct not_after(());
-        ///Marker type for the `not_before` field
-        pub struct not_before(());
-        ///Marker type for the `description` field
-        pub struct description(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `not_before` field
+        pub struct not_before(());
+        ///Marker type for the `not_after` field
+        pub struct not_after(());
+        ///Marker type for the `description` field
+        pub struct description(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ListingBuilder<'a, S: listing_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ListingBuilder<S: BosStr, St: listing_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<UriValue<S>>,
         Option<BlobRef<S>>,
@@ -294,28 +294,28 @@ pub struct ListingBuilder<'a, S: listing_state::State> {
         Option<Datetime>,
         Option<S>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Listing<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ListingBuilder<'a, listing_state::Empty> {
+impl<S: BosStr> Listing<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ListingBuilder<S, listing_state::Empty> {
         ListingBuilder::new()
     }
 }
 
-impl<'a> ListingBuilder<'a, listing_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ListingBuilder<S, listing_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ListingBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: listing_state::State> ListingBuilder<'a, S> {
+impl<S: BosStr, St: listing_state::State> ListingBuilder<S, St> {
     /// Set the `applyLink` field (optional)
     pub fn apply_link(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -328,7 +328,7 @@ impl<'a, S: listing_state::State> ListingBuilder<'a, S> {
     }
 }
 
-impl<'a, S: listing_state::State> ListingBuilder<'a, S> {
+impl<S: BosStr, St: listing_state::State> ListingBuilder<S, St> {
     /// Set the `banner` field (optional)
     pub fn banner(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -341,26 +341,26 @@ impl<'a, S: listing_state::State> ListingBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ListingBuilder<'a, S>
+impl<S: BosStr, St> ListingBuilder<S, St>
 where
-    S: listing_state::State,
-    S::Description: listing_state::IsUnset,
+    St: listing_state::State,
+    St::Description: listing_state::IsUnset,
 {
     /// Set the `description` field (required)
     pub fn description(
         mut self,
         value: impl Into<S>,
-    ) -> ListingBuilder<'a, listing_state::SetDescription<S>> {
+    ) -> ListingBuilder<S, listing_state::SetDescription<St>> {
         self._fields.2 = Option::Some(value.into());
         ListingBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: listing_state::State> ListingBuilder<'a, S> {
+impl<S: BosStr, St: listing_state::State> ListingBuilder<S, St> {
     /// Set the `facets` field (optional)
     pub fn facets(mut self, value: impl Into<Option<Vec<Facet<S>>>>) -> Self {
         self._fields.3 = value.into();
@@ -373,7 +373,7 @@ impl<'a, S: listing_state::State> ListingBuilder<'a, S> {
     }
 }
 
-impl<'a, S: listing_state::State> ListingBuilder<'a, S> {
+impl<S: BosStr, St: listing_state::State> ListingBuilder<S, St> {
     /// Set the `locations` field (optional)
     pub fn locations(mut self, value: impl Into<Option<Vec<Hthree<S>>>>) -> Self {
         self._fields.4 = value.into();
@@ -386,73 +386,73 @@ impl<'a, S: listing_state::State> ListingBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ListingBuilder<'a, S>
+impl<S: BosStr, St> ListingBuilder<S, St>
 where
-    S: listing_state::State,
-    S::NotAfter: listing_state::IsUnset,
+    St: listing_state::State,
+    St::NotAfter: listing_state::IsUnset,
 {
     /// Set the `notAfter` field (required)
     pub fn not_after(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ListingBuilder<'a, listing_state::SetNotAfter<S>> {
+    ) -> ListingBuilder<S, listing_state::SetNotAfter<St>> {
         self._fields.5 = Option::Some(value.into());
         ListingBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ListingBuilder<'a, S>
+impl<S: BosStr, St> ListingBuilder<S, St>
 where
-    S: listing_state::State,
-    S::NotBefore: listing_state::IsUnset,
+    St: listing_state::State,
+    St::NotBefore: listing_state::IsUnset,
 {
     /// Set the `notBefore` field (required)
     pub fn not_before(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ListingBuilder<'a, listing_state::SetNotBefore<S>> {
+    ) -> ListingBuilder<S, listing_state::SetNotBefore<St>> {
         self._fields.6 = Option::Some(value.into());
         ListingBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ListingBuilder<'a, S>
+impl<S: BosStr, St> ListingBuilder<S, St>
 where
-    S: listing_state::State,
-    S::Title: listing_state::IsUnset,
+    St: listing_state::State,
+    St::Title: listing_state::IsUnset,
 {
     /// Set the `title` field (required)
     pub fn title(
         mut self,
         value: impl Into<S>,
-    ) -> ListingBuilder<'a, listing_state::SetTitle<S>> {
+    ) -> ListingBuilder<S, listing_state::SetTitle<St>> {
         self._fields.7 = Option::Some(value.into());
         ListingBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ListingBuilder<'a, S>
+impl<S: BosStr, St> ListingBuilder<S, St>
 where
-    S: listing_state::State,
-    S::NotAfter: listing_state::IsSet,
-    S::NotBefore: listing_state::IsSet,
-    S::Description: listing_state::IsSet,
-    S::Title: listing_state::IsSet,
+    St: listing_state::State,
+    St::Title: listing_state::IsSet,
+    St::NotBefore: listing_state::IsSet,
+    St::NotAfter: listing_state::IsSet,
+    St::Description: listing_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Listing<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Listing<S> {
         Listing {
             apply_link: self._fields.0,
             banner: self._fields.1,
@@ -465,11 +465,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Listing<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Listing<S> {
         Listing {
             apply_link: self._fields.0,
             banner: self._fields.1,

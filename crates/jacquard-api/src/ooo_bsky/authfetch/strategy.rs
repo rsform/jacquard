@@ -7,7 +7,7 @@
 
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,11 +26,11 @@ use serde::{Serialize, Deserialize};
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Strategy<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Strategy<S: BosStr = DefaultStr> {
     /**The name that identifies the strategy. The following strategies are supported:
 1. `nobody` - Only the author
 2. `author-follows` - Accounts the author follows
@@ -50,7 +50,7 @@ Of course, many of these strategies depend on the specifics of `app.bsky.graph.f
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Strategy<S> {
+impl<S: BosStr> LexiconSchema for Strategy<S> {
     fn nsid() -> &'static str {
         "ooo.bsky.authfetch.strategy"
     }

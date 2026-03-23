@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "garden.goals.category",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Category<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Category<S: BosStr = DefaultStr> {
     ///Unique identifier for the category (UUID)
     pub category_id: S,
     ///Timestamp when the category was created
@@ -56,18 +56,18 @@ pub struct Category<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CategoryGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CategoryGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Category<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Category<S> {
+impl<S: BosStr> Category<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, CategoryRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -80,17 +80,17 @@ pub struct CategoryRecord;
 impl XrpcResp for CategoryRecord {
     const NSID: &'static str = "garden.goals.category";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = CategoryGetRecordOutput<S>;
+    type Output<S: BosStr> = CategoryGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<CategoryGetRecordOutput<S>> for Category<S> {
+impl<S: BosStr> From<CategoryGetRecordOutput<S>> for Category<S> {
     fn from(output: CategoryGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Category<S> {
+impl<S: BosStr> Collection for Category<S> {
     const NSID: &'static str = "garden.goals.category";
     type Record = CategoryRecord;
 }
@@ -100,7 +100,7 @@ impl Collection for CategoryRecord {
     type Record = CategoryRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Category<S> {
+impl<S: BosStr> LexiconSchema for Category<S> {
     fn nsid() -> &'static str {
         "garden.goals.category"
     }
@@ -147,145 +147,145 @@ pub mod category_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CategoryId;
         type CreatedAt;
+        type CategoryId;
         type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CategoryId = Unset;
         type CreatedAt = Unset;
+        type CategoryId = Unset;
         type Name = Unset;
     }
-    ///State transition - sets the `category_id` field to Set
-    pub struct SetCategoryId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCategoryId<S> {}
-    impl<S: State> State for SetCategoryId<S> {
-        type CategoryId = Set<members::category_id>;
-        type CreatedAt = S::CreatedAt;
-        type Name = S::Name;
-    }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CategoryId = S::CategoryId;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
-        type Name = S::Name;
+        type CategoryId = St::CategoryId;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `category_id` field to Set
+    pub struct SetCategoryId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCategoryId<St> {}
+    impl<St: State> State for SetCategoryId<St> {
+        type CreatedAt = St::CreatedAt;
+        type CategoryId = Set<members::category_id>;
+        type Name = St::Name;
     }
     ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type CategoryId = S::CategoryId;
-        type CreatedAt = S::CreatedAt;
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type CreatedAt = St::CreatedAt;
+        type CategoryId = St::CategoryId;
         type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `category_id` field
-        pub struct category_id(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `category_id` field
+        pub struct category_id(());
         ///Marker type for the `name` field
         pub struct name(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct CategoryBuilder<'a, S: category_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct CategoryBuilder<S: BosStr, St: category_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<Datetime>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Category<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> CategoryBuilder<'a, category_state::Empty> {
+impl<S: BosStr> Category<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> CategoryBuilder<S, category_state::Empty> {
         CategoryBuilder::new()
     }
 }
 
-impl<'a> CategoryBuilder<'a, category_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> CategoryBuilder<S, category_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         CategoryBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CategoryBuilder<'a, S>
+impl<S: BosStr, St> CategoryBuilder<S, St>
 where
-    S: category_state::State,
-    S::CategoryId: category_state::IsUnset,
+    St: category_state::State,
+    St::CategoryId: category_state::IsUnset,
 {
     /// Set the `categoryId` field (required)
     pub fn category_id(
         mut self,
         value: impl Into<S>,
-    ) -> CategoryBuilder<'a, category_state::SetCategoryId<S>> {
+    ) -> CategoryBuilder<S, category_state::SetCategoryId<St>> {
         self._fields.0 = Option::Some(value.into());
         CategoryBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CategoryBuilder<'a, S>
+impl<S: BosStr, St> CategoryBuilder<S, St>
 where
-    S: category_state::State,
-    S::CreatedAt: category_state::IsUnset,
+    St: category_state::State,
+    St::CreatedAt: category_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> CategoryBuilder<'a, category_state::SetCreatedAt<S>> {
+    ) -> CategoryBuilder<S, category_state::SetCreatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         CategoryBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CategoryBuilder<'a, S>
+impl<S: BosStr, St> CategoryBuilder<S, St>
 where
-    S: category_state::State,
-    S::Name: category_state::IsUnset,
+    St: category_state::State,
+    St::Name: category_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> CategoryBuilder<'a, category_state::SetName<S>> {
+    ) -> CategoryBuilder<S, category_state::SetName<St>> {
         self._fields.2 = Option::Some(value.into());
         CategoryBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CategoryBuilder<'a, S>
+impl<S: BosStr, St> CategoryBuilder<S, St>
 where
-    S: category_state::State,
-    S::CategoryId: category_state::IsSet,
-    S::CreatedAt: category_state::IsSet,
-    S::Name: category_state::IsSet,
+    St: category_state::State,
+    St::CreatedAt: category_state::IsSet,
+    St::CategoryId: category_state::IsSet,
+    St::Name: category_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Category<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Category<S> {
         Category {
             category_id: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
@@ -293,11 +293,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Category<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Category<S> {
         Category {
             category_id: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),

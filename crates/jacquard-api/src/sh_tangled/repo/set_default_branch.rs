@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
@@ -18,19 +18,17 @@ use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SetDefaultBranch<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SetDefaultBranch<S: BosStr = DefaultStr> {
     pub default_branch: S,
     pub repo: AtUri<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -39,12 +37,11 @@ pub struct SetDefaultBranchResponse;
 impl jacquard_common::xrpc::XrpcResp for SetDefaultBranchResponse {
     const NSID: &'static str = "sh.tangled.repo.setDefaultBranch";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ();
+    type Output<S: BosStr> = ();
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for SetDefaultBranch<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for SetDefaultBranch<S> {
     const NSID: &'static str = "sh.tangled.repo.setDefaultBranch";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -59,7 +56,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for SetDefaultBranchRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = SetDefaultBranch<S>;
+    type Request<S: BosStr> = SetDefaultBranch<S>;
     type Response = SetDefaultBranchResponse;
 }
 
@@ -84,17 +81,17 @@ pub mod set_default_branch_state {
         type DefaultBranch = Unset;
     }
     ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
+    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRepo<St> {}
+    impl<St: State> State for SetRepo<St> {
         type Repo = Set<members::repo>;
-        type DefaultBranch = S::DefaultBranch;
+        type DefaultBranch = St::DefaultBranch;
     }
     ///State transition - sets the `default_branch` field to Set
-    pub struct SetDefaultBranch<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDefaultBranch<S> {}
-    impl<S: State> State for SetDefaultBranch<S> {
-        type Repo = S::Repo;
+    pub struct SetDefaultBranch<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDefaultBranch<St> {}
+    impl<St: State> State for SetDefaultBranch<St> {
+        type Repo = St::Repo;
         type DefaultBranch = Set<members::default_branch>;
     }
     /// Marker types for field names
@@ -107,88 +104,88 @@ pub mod set_default_branch_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct SetDefaultBranchBuilder<'a, S: set_default_branch_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct SetDefaultBranchBuilder<S: BosStr, St: set_default_branch_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<AtUri<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> SetDefaultBranch<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> SetDefaultBranchBuilder<'a, set_default_branch_state::Empty> {
+impl<S: BosStr> SetDefaultBranch<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> SetDefaultBranchBuilder<S, set_default_branch_state::Empty> {
         SetDefaultBranchBuilder::new()
     }
 }
 
-impl<'a> SetDefaultBranchBuilder<'a, set_default_branch_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> SetDefaultBranchBuilder<S, set_default_branch_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SetDefaultBranchBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SetDefaultBranchBuilder<'a, S>
+impl<S: BosStr, St> SetDefaultBranchBuilder<S, St>
 where
-    S: set_default_branch_state::State,
-    S::DefaultBranch: set_default_branch_state::IsUnset,
+    St: set_default_branch_state::State,
+    St::DefaultBranch: set_default_branch_state::IsUnset,
 {
     /// Set the `defaultBranch` field (required)
     pub fn default_branch(
         mut self,
         value: impl Into<S>,
-    ) -> SetDefaultBranchBuilder<'a, set_default_branch_state::SetDefaultBranch<S>> {
+    ) -> SetDefaultBranchBuilder<S, set_default_branch_state::SetDefaultBranch<St>> {
         self._fields.0 = Option::Some(value.into());
         SetDefaultBranchBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SetDefaultBranchBuilder<'a, S>
+impl<S: BosStr, St> SetDefaultBranchBuilder<S, St>
 where
-    S: set_default_branch_state::State,
-    S::Repo: set_default_branch_state::IsUnset,
+    St: set_default_branch_state::State,
+    St::Repo: set_default_branch_state::IsUnset,
 {
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> SetDefaultBranchBuilder<'a, set_default_branch_state::SetRepo<S>> {
+    ) -> SetDefaultBranchBuilder<S, set_default_branch_state::SetRepo<St>> {
         self._fields.1 = Option::Some(value.into());
         SetDefaultBranchBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SetDefaultBranchBuilder<'a, S>
+impl<S: BosStr, St> SetDefaultBranchBuilder<S, St>
 where
-    S: set_default_branch_state::State,
-    S::Repo: set_default_branch_state::IsSet,
-    S::DefaultBranch: set_default_branch_state::IsSet,
+    St: set_default_branch_state::State,
+    St::Repo: set_default_branch_state::IsSet,
+    St::DefaultBranch: set_default_branch_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> SetDefaultBranch<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> SetDefaultBranch<S> {
         SetDefaultBranch {
             default_branch: self._fields.0.unwrap(),
             repo: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> SetDefaultBranch<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> SetDefaultBranch<S> {
         SetDefaultBranch {
             default_branch: self._fields.0.unwrap(),
             repo: self._fields.1.unwrap(),

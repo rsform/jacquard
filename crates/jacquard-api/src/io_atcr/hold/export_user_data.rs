@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -30,11 +30,11 @@ use crate::io_atcr::hold::export_user_data;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CrewExport<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CrewExport<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub added_at: Option<Datetime>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -52,11 +52,11 @@ pub struct CrewExport<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct LayerExport<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct LayerExport<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -77,14 +77,14 @@ pub struct LayerExport<S: Bos<str> + AsRef<str> = DefaultStr> {
 pub struct ExportUserData;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ExportUserDataOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ExportUserDataOutput<S: BosStr = DefaultStr> {
     ///Bluesky posts that mention the user
     pub bluesky_posts: Vec<export_user_data::PostExport<S>>,
     ///User's crew record (if they are a crew member)
@@ -102,9 +102,7 @@ pub struct ExportUserDataOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub stats_records: Vec<export_user_data::StatsExport<S>>,
     ///DID of the user whose data was exported
     pub user_did: Did<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -155,11 +153,11 @@ impl core::fmt::Display for ExportUserDataError {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct PostExport<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct PostExport<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -175,11 +173,11 @@ pub struct PostExport<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct StatsExport<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct StatsExport<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_pull: Option<Datetime>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -196,7 +194,7 @@ pub struct StatsExport<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for CrewExport<S> {
+impl<S: BosStr> LexiconSchema for CrewExport<S> {
     fn nsid() -> &'static str {
         "io.atcr.hold.exportUserData"
     }
@@ -231,7 +229,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for CrewExport<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for LayerExport<S> {
+impl<S: BosStr> LexiconSchema for LayerExport<S> {
     fn nsid() -> &'static str {
         "io.atcr.hold.exportUserData"
     }
@@ -271,7 +269,7 @@ pub struct ExportUserDataResponse;
 impl jacquard_common::xrpc::XrpcResp for ExportUserDataResponse {
     const NSID: &'static str = "io.atcr.hold.exportUserData";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ExportUserDataOutput<S>;
+    type Output<S: BosStr> = ExportUserDataOutput<S>;
     type Err = ExportUserDataError;
 }
 
@@ -286,11 +284,11 @@ pub struct ExportUserDataRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ExportUserDataRequest {
     const PATH: &'static str = "/xrpc/io.atcr.hold.exportUserData";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = ExportUserData;
+    type Request<S: BosStr> = ExportUserData;
     type Response = ExportUserDataResponse;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for PostExport<S> {
+impl<S: BosStr> LexiconSchema for PostExport<S> {
     fn nsid() -> &'static str {
         "io.atcr.hold.exportUserData"
     }
@@ -327,7 +325,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for PostExport<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for StatsExport<S> {
+impl<S: BosStr> LexiconSchema for StatsExport<S> {
     fn nsid() -> &'static str {
         "io.atcr.hold.exportUserData"
     }

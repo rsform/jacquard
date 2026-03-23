@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -30,11 +30,11 @@ use crate::org_custorium::temp::jsonfg::coord_ref_sys;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct MultiRefSys<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct MultiRefSys<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ref_sys: Option<Vec<coord_ref_sys::SingleRefSys<S>>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -46,11 +46,11 @@ pub struct MultiRefSys<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct RefSysByRef<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct RefSysByRef<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub epoch: Option<i64>,
     pub href: UriValue<S>,
@@ -63,11 +63,11 @@ pub struct RefSysByRef<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct RefSysCustom<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct RefSysCustom<S: BosStr = DefaultStr> {
     ///Value should not be reference
     pub r#type: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -79,11 +79,11 @@ pub struct RefSysCustom<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct RefSysSimpleRef<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct RefSysSimpleRef<S: BosStr = DefaultStr> {
     ///The value is either a URI or a CURIE.
     pub uri: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -95,11 +95,11 @@ pub struct RefSysSimpleRef<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SingleRefSys<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SingleRefSys<S: BosStr = DefaultStr> {
     pub ref_sys: SingleRefSysRefSys<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -111,11 +111,11 @@ pub struct SingleRefSys<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum SingleRefSysRefSys<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum SingleRefSysRefSys<S: BosStr = DefaultStr> {
     #[serde(rename = "org.custorium.temp.jsonfg.coordRefSys#refSysSimpleRef")]
     RefSysSimpleRef(Box<coord_ref_sys::RefSysSimpleRef<S>>),
     #[serde(rename = "org.custorium.temp.jsonfg.coordRefSys#refSysByRef")]
@@ -124,7 +124,7 @@ pub enum SingleRefSysRefSys<S: Bos<str> + AsRef<str> = DefaultStr> {
     RefSysCustom(Box<coord_ref_sys::RefSysCustom<S>>),
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for MultiRefSys<S> {
+impl<S: BosStr> LexiconSchema for MultiRefSys<S> {
     fn nsid() -> &'static str {
         "org.custorium.temp.jsonfg.coordRefSys"
     }
@@ -149,7 +149,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for MultiRefSys<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for RefSysByRef<S> {
+impl<S: BosStr> LexiconSchema for RefSysByRef<S> {
     fn nsid() -> &'static str {
         "org.custorium.temp.jsonfg.coordRefSys"
     }
@@ -164,7 +164,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for RefSysByRef<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for RefSysCustom<S> {
+impl<S: BosStr> LexiconSchema for RefSysCustom<S> {
     fn nsid() -> &'static str {
         "org.custorium.temp.jsonfg.coordRefSys"
     }
@@ -179,7 +179,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for RefSysCustom<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for RefSysSimpleRef<S> {
+impl<S: BosStr> LexiconSchema for RefSysSimpleRef<S> {
     fn nsid() -> &'static str {
         "org.custorium.temp.jsonfg.coordRefSys"
     }
@@ -194,7 +194,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for RefSysSimpleRef<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for SingleRefSys<S> {
+impl<S: BosStr> LexiconSchema for SingleRefSys<S> {
     fn nsid() -> &'static str {
         "org.custorium.temp.jsonfg.coordRefSys"
     }
@@ -356,9 +356,9 @@ pub mod ref_sys_by_ref_state {
         type Href = Unset;
     }
     ///State transition - sets the `href` field to Set
-    pub struct SetHref<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHref<S> {}
-    impl<S: State> State for SetHref<S> {
+    pub struct SetHref<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHref<St> {}
+    impl<St: State> State for SetHref<St> {
         type Href = Set<members::href>;
     }
     /// Marker types for field names
@@ -369,32 +369,32 @@ pub mod ref_sys_by_ref_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct RefSysByRefBuilder<'a, S: ref_sys_by_ref_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct RefSysByRefBuilder<S: BosStr, St: ref_sys_by_ref_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<UriValue<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> RefSysByRef<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> RefSysByRefBuilder<'a, ref_sys_by_ref_state::Empty> {
+impl<S: BosStr> RefSysByRef<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> RefSysByRefBuilder<S, ref_sys_by_ref_state::Empty> {
         RefSysByRefBuilder::new()
     }
 }
 
-impl<'a> RefSysByRefBuilder<'a, ref_sys_by_ref_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> RefSysByRefBuilder<S, ref_sys_by_ref_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         RefSysByRefBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: ref_sys_by_ref_state::State> RefSysByRefBuilder<'a, S> {
+impl<S: BosStr, St: ref_sys_by_ref_state::State> RefSysByRefBuilder<S, St> {
     /// Set the `epoch` field (optional)
     pub fn epoch(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
@@ -407,43 +407,43 @@ impl<'a, S: ref_sys_by_ref_state::State> RefSysByRefBuilder<'a, S> {
     }
 }
 
-impl<'a, S> RefSysByRefBuilder<'a, S>
+impl<S: BosStr, St> RefSysByRefBuilder<S, St>
 where
-    S: ref_sys_by_ref_state::State,
-    S::Href: ref_sys_by_ref_state::IsUnset,
+    St: ref_sys_by_ref_state::State,
+    St::Href: ref_sys_by_ref_state::IsUnset,
 {
     /// Set the `href` field (required)
     pub fn href(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> RefSysByRefBuilder<'a, ref_sys_by_ref_state::SetHref<S>> {
+    ) -> RefSysByRefBuilder<S, ref_sys_by_ref_state::SetHref<St>> {
         self._fields.1 = Option::Some(value.into());
         RefSysByRefBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RefSysByRefBuilder<'a, S>
+impl<S: BosStr, St> RefSysByRefBuilder<S, St>
 where
-    S: ref_sys_by_ref_state::State,
-    S::Href: ref_sys_by_ref_state::IsSet,
+    St: ref_sys_by_ref_state::State,
+    St::Href: ref_sys_by_ref_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> RefSysByRef<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> RefSysByRef<S> {
         RefSysByRef {
             epoch: self._fields.0,
             href: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> RefSysByRef<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> RefSysByRef<S> {
         RefSysByRef {
             epoch: self._fields.0,
             href: self._fields.1.unwrap(),
@@ -471,9 +471,9 @@ pub mod single_ref_sys_state {
         type RefSys = Unset;
     }
     ///State transition - sets the `ref_sys` field to Set
-    pub struct SetRefSys<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRefSys<S> {}
-    impl<S: State> State for SetRefSys<S> {
+    pub struct SetRefSys<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRefSys<St> {}
+    impl<St: State> State for SetRefSys<St> {
         type RefSys = Set<members::ref_sys>;
     }
     /// Marker types for field names
@@ -484,67 +484,67 @@ pub mod single_ref_sys_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct SingleRefSysBuilder<'a, S: single_ref_sys_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct SingleRefSysBuilder<S: BosStr, St: single_ref_sys_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<SingleRefSysRefSys<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> SingleRefSys<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> SingleRefSysBuilder<'a, single_ref_sys_state::Empty> {
+impl<S: BosStr> SingleRefSys<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> SingleRefSysBuilder<S, single_ref_sys_state::Empty> {
         SingleRefSysBuilder::new()
     }
 }
 
-impl<'a> SingleRefSysBuilder<'a, single_ref_sys_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> SingleRefSysBuilder<S, single_ref_sys_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SingleRefSysBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SingleRefSysBuilder<'a, S>
+impl<S: BosStr, St> SingleRefSysBuilder<S, St>
 where
-    S: single_ref_sys_state::State,
-    S::RefSys: single_ref_sys_state::IsUnset,
+    St: single_ref_sys_state::State,
+    St::RefSys: single_ref_sys_state::IsUnset,
 {
     /// Set the `refSys` field (required)
     pub fn ref_sys(
         mut self,
         value: impl Into<SingleRefSysRefSys<S>>,
-    ) -> SingleRefSysBuilder<'a, single_ref_sys_state::SetRefSys<S>> {
+    ) -> SingleRefSysBuilder<S, single_ref_sys_state::SetRefSys<St>> {
         self._fields.0 = Option::Some(value.into());
         SingleRefSysBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SingleRefSysBuilder<'a, S>
+impl<S: BosStr, St> SingleRefSysBuilder<S, St>
 where
-    S: single_ref_sys_state::State,
-    S::RefSys: single_ref_sys_state::IsSet,
+    St: single_ref_sys_state::State,
+    St::RefSys: single_ref_sys_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> SingleRefSys<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> SingleRefSys<S> {
         SingleRefSys {
             ref_sys: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> SingleRefSys<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> SingleRefSys<S> {
         SingleRefSys {
             ref_sys: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

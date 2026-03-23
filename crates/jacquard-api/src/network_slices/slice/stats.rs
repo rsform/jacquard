@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -30,11 +30,11 @@ use crate::network_slices::slice::stats;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CollectionStats<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CollectionStats<S: BosStr = DefaultStr> {
     ///Collection NSID
     pub collection: Nsid<S>,
     ///Number of records in this collection
@@ -47,28 +47,27 @@ pub struct CollectionStats<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Stats<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct Stats<S: BosStr = DefaultStr> {
     pub slice: S,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct StatsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct StatsOutput<S: BosStr = DefaultStr> {
     ///Per-collection statistics
     pub collection_stats: Vec<stats::CollectionStats<S>>,
     ///List of collection NSIDs indexed in this slice
@@ -79,13 +78,11 @@ pub struct StatsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub total_lexicons: i64,
     ///Total number of records indexed in this slice
     pub total_records: i64,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for CollectionStats<S> {
+impl<S: BosStr> LexiconSchema for CollectionStats<S> {
     fn nsid() -> &'static str {
         "network.slices.slice.stats"
     }
@@ -105,12 +102,11 @@ pub struct StatsResponse;
 impl jacquard_common::xrpc::XrpcResp for StatsResponse {
     const NSID: &'static str = "network.slices.slice.stats";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = StatsOutput<S>;
+    type Output<S: BosStr> = StatsOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for Stats<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Stats<S> {
     const NSID: &'static str = "network.slices.slice.stats";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = StatsResponse;
@@ -121,7 +117,7 @@ pub struct StatsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for StatsRequest {
     const PATH: &'static str = "/xrpc/network.slices.slice.stats";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = Stats<S>;
+    type Request<S: BosStr> = Stats<S>;
     type Response = StatsResponse;
 }
 
@@ -148,27 +144,27 @@ pub mod collection_stats_state {
         type UniqueActors = Unset;
     }
     ///State transition - sets the `record_count` field to Set
-    pub struct SetRecordCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRecordCount<S> {}
-    impl<S: State> State for SetRecordCount<S> {
+    pub struct SetRecordCount<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRecordCount<St> {}
+    impl<St: State> State for SetRecordCount<St> {
         type RecordCount = Set<members::record_count>;
-        type Collection = S::Collection;
-        type UniqueActors = S::UniqueActors;
+        type Collection = St::Collection;
+        type UniqueActors = St::UniqueActors;
     }
     ///State transition - sets the `collection` field to Set
-    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCollection<S> {}
-    impl<S: State> State for SetCollection<S> {
-        type RecordCount = S::RecordCount;
+    pub struct SetCollection<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCollection<St> {}
+    impl<St: State> State for SetCollection<St> {
+        type RecordCount = St::RecordCount;
         type Collection = Set<members::collection>;
-        type UniqueActors = S::UniqueActors;
+        type UniqueActors = St::UniqueActors;
     }
     ///State transition - sets the `unique_actors` field to Set
-    pub struct SetUniqueActors<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUniqueActors<S> {}
-    impl<S: State> State for SetUniqueActors<S> {
-        type RecordCount = S::RecordCount;
-        type Collection = S::Collection;
+    pub struct SetUniqueActors<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUniqueActors<St> {}
+    impl<St: State> State for SetUniqueActors<St> {
+        type RecordCount = St::RecordCount;
+        type Collection = St::Collection;
         type UniqueActors = Set<members::unique_actors>;
     }
     /// Marker types for field names
@@ -183,97 +179,97 @@ pub mod collection_stats_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct CollectionStatsBuilder<'a, S: collection_stats_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct CollectionStatsBuilder<S: BosStr, St: collection_stats_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Nsid<S>>, Option<i64>, Option<i64>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> CollectionStats<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> CollectionStatsBuilder<'a, collection_stats_state::Empty> {
+impl<S: BosStr> CollectionStats<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> CollectionStatsBuilder<S, collection_stats_state::Empty> {
         CollectionStatsBuilder::new()
     }
 }
 
-impl<'a> CollectionStatsBuilder<'a, collection_stats_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> CollectionStatsBuilder<S, collection_stats_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         CollectionStatsBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CollectionStatsBuilder<'a, S>
+impl<S: BosStr, St> CollectionStatsBuilder<S, St>
 where
-    S: collection_stats_state::State,
-    S::Collection: collection_stats_state::IsUnset,
+    St: collection_stats_state::State,
+    St::Collection: collection_stats_state::IsUnset,
 {
     /// Set the `collection` field (required)
     pub fn collection(
         mut self,
         value: impl Into<Nsid<S>>,
-    ) -> CollectionStatsBuilder<'a, collection_stats_state::SetCollection<S>> {
+    ) -> CollectionStatsBuilder<S, collection_stats_state::SetCollection<St>> {
         self._fields.0 = Option::Some(value.into());
         CollectionStatsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CollectionStatsBuilder<'a, S>
+impl<S: BosStr, St> CollectionStatsBuilder<S, St>
 where
-    S: collection_stats_state::State,
-    S::RecordCount: collection_stats_state::IsUnset,
+    St: collection_stats_state::State,
+    St::RecordCount: collection_stats_state::IsUnset,
 {
     /// Set the `recordCount` field (required)
     pub fn record_count(
         mut self,
         value: impl Into<i64>,
-    ) -> CollectionStatsBuilder<'a, collection_stats_state::SetRecordCount<S>> {
+    ) -> CollectionStatsBuilder<S, collection_stats_state::SetRecordCount<St>> {
         self._fields.1 = Option::Some(value.into());
         CollectionStatsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CollectionStatsBuilder<'a, S>
+impl<S: BosStr, St> CollectionStatsBuilder<S, St>
 where
-    S: collection_stats_state::State,
-    S::UniqueActors: collection_stats_state::IsUnset,
+    St: collection_stats_state::State,
+    St::UniqueActors: collection_stats_state::IsUnset,
 {
     /// Set the `uniqueActors` field (required)
     pub fn unique_actors(
         mut self,
         value: impl Into<i64>,
-    ) -> CollectionStatsBuilder<'a, collection_stats_state::SetUniqueActors<S>> {
+    ) -> CollectionStatsBuilder<S, collection_stats_state::SetUniqueActors<St>> {
         self._fields.2 = Option::Some(value.into());
         CollectionStatsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CollectionStatsBuilder<'a, S>
+impl<S: BosStr, St> CollectionStatsBuilder<S, St>
 where
-    S: collection_stats_state::State,
-    S::RecordCount: collection_stats_state::IsSet,
-    S::Collection: collection_stats_state::IsSet,
-    S::UniqueActors: collection_stats_state::IsSet,
+    St: collection_stats_state::State,
+    St::RecordCount: collection_stats_state::IsSet,
+    St::Collection: collection_stats_state::IsSet,
+    St::UniqueActors: collection_stats_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> CollectionStats<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> CollectionStats<S> {
         CollectionStats {
             collection: self._fields.0.unwrap(),
             record_count: self._fields.1.unwrap(),
@@ -281,11 +277,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> CollectionStats<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> CollectionStats<S> {
         CollectionStats {
             collection: self._fields.0.unwrap(),
             record_count: self._fields.1.unwrap(),
@@ -396,9 +392,9 @@ pub mod stats_state {
         type Slice = Unset;
     }
     ///State transition - sets the `slice` field to Set
-    pub struct SetSlice<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSlice<S> {}
-    impl<S: State> State for SetSlice<S> {
+    pub struct SetSlice<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSlice<St> {}
+    impl<St: State> State for SetSlice<St> {
         type Slice = Set<members::slice>;
     }
     /// Marker types for field names
@@ -409,57 +405,57 @@ pub mod stats_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct StatsBuilder<'a, S: stats_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct StatsBuilder<S: BosStr, St: stats_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Stats<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> StatsBuilder<'a, stats_state::Empty> {
+impl<S: BosStr> Stats<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> StatsBuilder<S, stats_state::Empty> {
         StatsBuilder::new()
     }
 }
 
-impl<'a> StatsBuilder<'a, stats_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> StatsBuilder<S, stats_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         StatsBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> StatsBuilder<'a, S>
+impl<S: BosStr, St> StatsBuilder<S, St>
 where
-    S: stats_state::State,
-    S::Slice: stats_state::IsUnset,
+    St: stats_state::State,
+    St::Slice: stats_state::IsUnset,
 {
     /// Set the `slice` field (required)
     pub fn slice(
         mut self,
         value: impl Into<S>,
-    ) -> StatsBuilder<'a, stats_state::SetSlice<S>> {
+    ) -> StatsBuilder<S, stats_state::SetSlice<St>> {
         self._fields.0 = Option::Some(value.into());
         StatsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> StatsBuilder<'a, S>
+impl<S: BosStr, St> StatsBuilder<S, St>
 where
-    S: stats_state::State,
-    S::Slice: stats_state::IsSet,
+    St: stats_state::State,
+    St::Slice: stats_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Stats<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Stats<S> {
         Stats {
             slice: self._fields.0.unwrap(),
         }

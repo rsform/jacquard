@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "social.drydown.fragrance",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Fragrance<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Fragrance<S: BosStr = DefaultStr> {
     ///Timestamp when fragrance was created
     pub created_at: Datetime,
     ///AT URI reference to house record (at://did/social.drydown.house/rkey)
@@ -62,18 +62,18 @@ pub struct Fragrance<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct FragranceGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct FragranceGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Fragrance<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Fragrance<S> {
+impl<S: BosStr> Fragrance<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, FragranceRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -86,17 +86,17 @@ pub struct FragranceRecord;
 impl XrpcResp for FragranceRecord {
     const NSID: &'static str = "social.drydown.fragrance";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = FragranceGetRecordOutput<S>;
+    type Output<S: BosStr> = FragranceGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<FragranceGetRecordOutput<S>> for Fragrance<S> {
+impl<S: BosStr> From<FragranceGetRecordOutput<S>> for Fragrance<S> {
     fn from(output: FragranceGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Fragrance<S> {
+impl<S: BosStr> Collection for Fragrance<S> {
     const NSID: &'static str = "social.drydown.fragrance";
     type Record = FragranceRecord;
 }
@@ -106,7 +106,7 @@ impl Collection for FragranceRecord {
     type Record = FragranceRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Fragrance<S> {
+impl<S: BosStr> LexiconSchema for Fragrance<S> {
     fn nsid() -> &'static str {
         "social.drydown.fragrance"
     }
@@ -171,57 +171,57 @@ pub mod fragrance_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
         type Name;
         type House;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
         type Name = Unset;
         type House = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type House = S::House;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `house` field to Set
-    pub struct SetHouse<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHouse<S> {}
-    impl<S: State> State for SetHouse<S> {
-        type Name = S::Name;
-        type House = Set<members::house>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Name = S::Name;
-        type House = S::House;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
+        type Name = St::Name;
+        type House = St::House;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type CreatedAt = St::CreatedAt;
+        type Name = Set<members::name>;
+        type House = St::House;
+    }
+    ///State transition - sets the `house` field to Set
+    pub struct SetHouse<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHouse<St> {}
+    impl<St: State> State for SetHouse<St> {
+        type CreatedAt = St::CreatedAt;
+        type Name = St::Name;
+        type House = Set<members::house>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `house` field
         pub struct house(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct FragranceBuilder<'a, S: fragrance_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct FragranceBuilder<S: BosStr, St: fragrance_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
         Option<AtUri<S>>,
@@ -229,85 +229,85 @@ pub struct FragranceBuilder<'a, S: fragrance_state::State> {
         Option<Datetime>,
         Option<i64>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Fragrance<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> FragranceBuilder<'a, fragrance_state::Empty> {
+impl<S: BosStr> Fragrance<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> FragranceBuilder<S, fragrance_state::Empty> {
         FragranceBuilder::new()
     }
 }
 
-impl<'a> FragranceBuilder<'a, fragrance_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> FragranceBuilder<S, fragrance_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         FragranceBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> FragranceBuilder<'a, S>
+impl<S: BosStr, St> FragranceBuilder<S, St>
 where
-    S: fragrance_state::State,
-    S::CreatedAt: fragrance_state::IsUnset,
+    St: fragrance_state::State,
+    St::CreatedAt: fragrance_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> FragranceBuilder<'a, fragrance_state::SetCreatedAt<S>> {
+    ) -> FragranceBuilder<S, fragrance_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         FragranceBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> FragranceBuilder<'a, S>
+impl<S: BosStr, St> FragranceBuilder<S, St>
 where
-    S: fragrance_state::State,
-    S::House: fragrance_state::IsUnset,
+    St: fragrance_state::State,
+    St::House: fragrance_state::IsUnset,
 {
     /// Set the `house` field (required)
     pub fn house(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> FragranceBuilder<'a, fragrance_state::SetHouse<S>> {
+    ) -> FragranceBuilder<S, fragrance_state::SetHouse<St>> {
         self._fields.1 = Option::Some(value.into());
         FragranceBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> FragranceBuilder<'a, S>
+impl<S: BosStr, St> FragranceBuilder<S, St>
 where
-    S: fragrance_state::State,
-    S::Name: fragrance_state::IsUnset,
+    St: fragrance_state::State,
+    St::Name: fragrance_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> FragranceBuilder<'a, fragrance_state::SetName<S>> {
+    ) -> FragranceBuilder<S, fragrance_state::SetName<St>> {
         self._fields.2 = Option::Some(value.into());
         FragranceBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: fragrance_state::State> FragranceBuilder<'a, S> {
+impl<S: BosStr, St: fragrance_state::State> FragranceBuilder<S, St> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.3 = value.into();
@@ -320,7 +320,7 @@ impl<'a, S: fragrance_state::State> FragranceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: fragrance_state::State> FragranceBuilder<'a, S> {
+impl<S: BosStr, St: fragrance_state::State> FragranceBuilder<S, St> {
     /// Set the `year` field (optional)
     pub fn year(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.4 = value.into();
@@ -333,15 +333,15 @@ impl<'a, S: fragrance_state::State> FragranceBuilder<'a, S> {
     }
 }
 
-impl<'a, S> FragranceBuilder<'a, S>
+impl<S: BosStr, St> FragranceBuilder<S, St>
 where
-    S: fragrance_state::State,
-    S::Name: fragrance_state::IsSet,
-    S::House: fragrance_state::IsSet,
-    S::CreatedAt: fragrance_state::IsSet,
+    St: fragrance_state::State,
+    St::CreatedAt: fragrance_state::IsSet,
+    St::Name: fragrance_state::IsSet,
+    St::House: fragrance_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Fragrance<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Fragrance<S> {
         Fragrance {
             created_at: self._fields.0.unwrap(),
             house: self._fields.1.unwrap(),
@@ -351,11 +351,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Fragrance<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Fragrance<S> {
         Fragrance {
             created_at: self._fields.0.unwrap(),
             house: self._fields.1.unwrap(),

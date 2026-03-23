@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use crate::at_inlay::component;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct BodyExternal<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct BodyExternal<S: BosStr = DefaultStr> {
     ///DID of the service hosting this component
     pub did: Did<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -52,11 +52,11 @@ pub struct BodyExternal<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct BodyTemplate<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct BodyTemplate<S: BosStr = DefaultStr> {
     ///Serialized element tree with bindings
     pub node: Data<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -71,11 +71,11 @@ pub struct BodyTemplate<S: Bos<str> + AsRef<str> = DefaultStr> {
     rename = "at.inlay.component",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Component<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Component<S: BosStr = DefaultStr> {
     ///How this component is rendered. Omit for primitives rendered by the host.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub body: Option<ComponentBody<S>>,
@@ -107,11 +107,11 @@ pub struct Component<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ComponentBody<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ComponentBody<S: BosStr = DefaultStr> {
     #[serde(rename = "at.inlay.component#bodyExternal")]
     BodyExternal(Box<component::BodyExternal<S>>),
     #[serde(rename = "at.inlay.component#bodyTemplate")]
@@ -124,11 +124,11 @@ pub enum ComponentBody<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ComponentGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ComponentGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
@@ -141,11 +141,11 @@ pub struct ComponentGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct View<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct View<S: BosStr = DefaultStr> {
     ///Data types this view accepts.
     pub accepts: Vec<ViewAcceptsItem<S>>,
     ///Which component prop receives the view data.
@@ -160,11 +160,11 @@ pub struct View<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ViewAcceptsItem<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ViewAcceptsItem<S: BosStr = DefaultStr> {
     #[serde(rename = "at.inlay.component#viewRecord")]
     ViewRecord(Box<component::ViewRecord<S>>),
     #[serde(rename = "at.inlay.component#viewPrimitive")]
@@ -177,11 +177,11 @@ pub enum ViewAcceptsItem<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ViewPrimitive<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ViewPrimitive<S: BosStr = DefaultStr> {
     ///String format constraint. Only applies when type is 'string'.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub format: Option<ViewPrimitiveFormat<S>>,
@@ -194,7 +194,7 @@ pub struct ViewPrimitive<S: Bos<str> + AsRef<str> = DefaultStr> {
 /// String format constraint. Only applies when type is 'string'.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ViewPrimitiveFormat<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ViewPrimitiveFormat<S: BosStr = DefaultStr> {
     AtUri,
     Did,
     Datetime,
@@ -209,7 +209,7 @@ pub enum ViewPrimitiveFormat<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> ViewPrimitiveFormat<S> {
+impl<S: BosStr> ViewPrimitiveFormat<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::AtUri => "at-uri",
@@ -245,19 +245,19 @@ impl<S: Bos<str> + AsRef<str>> ViewPrimitiveFormat<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ViewPrimitiveFormat<S> {
+impl<S: BosStr> core::fmt::Display for ViewPrimitiveFormat<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for ViewPrimitiveFormat<S> {
+impl<S: BosStr> AsRef<str> for ViewPrimitiveFormat<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for ViewPrimitiveFormat<S> {
+impl<S: BosStr> Serialize for ViewPrimitiveFormat<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -266,8 +266,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for ViewPrimitiveFormat<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for ViewPrimitiveFormat<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ViewPrimitiveFormat<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -277,14 +276,18 @@ for ViewPrimitiveFormat<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for ViewPrimitiveFormat<S> {
+impl<S: BosStr + Default> Default for ViewPrimitiveFormat<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for ViewPrimitiveFormat<S> {
-    type Output = ViewPrimitiveFormat<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for ViewPrimitiveFormat<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ViewPrimitiveFormat<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             ViewPrimitiveFormat::AtUri => ViewPrimitiveFormat::AtUri,
@@ -306,7 +309,7 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for ViewPrimitiveFormat<S> {
 /// Lexicon primitive type.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ViewPrimitiveType<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ViewPrimitiveType<S: BosStr = DefaultStr> {
     String,
     Integer,
     Boolean,
@@ -316,7 +319,7 @@ pub enum ViewPrimitiveType<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> ViewPrimitiveType<S> {
+impl<S: BosStr> ViewPrimitiveType<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::String => "string",
@@ -342,19 +345,19 @@ impl<S: Bos<str> + AsRef<str>> ViewPrimitiveType<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ViewPrimitiveType<S> {
+impl<S: BosStr> core::fmt::Display for ViewPrimitiveType<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for ViewPrimitiveType<S> {
+impl<S: BosStr> AsRef<str> for ViewPrimitiveType<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for ViewPrimitiveType<S> {
+impl<S: BosStr> Serialize for ViewPrimitiveType<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -363,8 +366,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for ViewPrimitiveType<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for ViewPrimitiveType<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ViewPrimitiveType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -374,14 +376,18 @@ for ViewPrimitiveType<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for ViewPrimitiveType<S> {
+impl<S: BosStr + Default> Default for ViewPrimitiveType<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for ViewPrimitiveType<S> {
-    type Output = ViewPrimitiveType<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for ViewPrimitiveType<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ViewPrimitiveType<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             ViewPrimitiveType::String => ViewPrimitiveType::String,
@@ -401,11 +407,11 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for ViewPrimitiveType<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ViewRecord<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ViewRecord<S: BosStr = DefaultStr> {
     ///The collection this component views. Omit for any-collection.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub collection: Option<Nsid<S>>,
@@ -416,13 +422,13 @@ pub struct ViewRecord<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Component<S> {
+impl<S: BosStr> Component<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, ComponentRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for BodyExternal<S> {
+impl<S: BosStr> LexiconSchema for BodyExternal<S> {
     fn nsid() -> &'static str {
         "at.inlay.component"
     }
@@ -437,7 +443,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for BodyExternal<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for BodyTemplate<S> {
+impl<S: BosStr> LexiconSchema for BodyTemplate<S> {
     fn nsid() -> &'static str {
         "at.inlay.component"
     }
@@ -459,17 +465,17 @@ pub struct ComponentRecord;
 impl XrpcResp for ComponentRecord {
     const NSID: &'static str = "at.inlay.component";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ComponentGetRecordOutput<S>;
+    type Output<S: BosStr> = ComponentGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<ComponentGetRecordOutput<S>> for Component<S> {
+impl<S: BosStr> From<ComponentGetRecordOutput<S>> for Component<S> {
     fn from(output: ComponentGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Component<S> {
+impl<S: BosStr> Collection for Component<S> {
     const NSID: &'static str = "at.inlay.component";
     type Record = ComponentRecord;
 }
@@ -479,7 +485,7 @@ impl Collection for ComponentRecord {
     type Record = ComponentRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Component<S> {
+impl<S: BosStr> LexiconSchema for Component<S> {
     fn nsid() -> &'static str {
         "at.inlay.component"
     }
@@ -516,7 +522,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Component<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for View<S> {
+impl<S: BosStr> LexiconSchema for View<S> {
     fn nsid() -> &'static str {
         "at.inlay.component"
     }
@@ -553,7 +559,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for View<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ViewPrimitive<S> {
+impl<S: BosStr> LexiconSchema for ViewPrimitive<S> {
     fn nsid() -> &'static str {
         "at.inlay.component"
     }
@@ -589,7 +595,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for ViewPrimitive<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ViewRecord<S> {
+impl<S: BosStr> LexiconSchema for ViewRecord<S> {
     fn nsid() -> &'static str {
         "at.inlay.component"
     }
@@ -633,9 +639,9 @@ pub mod body_external_state {
         type Did = Unset;
     }
     ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
         type Did = Set<members::did>;
     }
     /// Marker types for field names
@@ -646,67 +652,67 @@ pub mod body_external_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct BodyExternalBuilder<'a, S: body_external_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct BodyExternalBuilder<S: BosStr, St: body_external_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> BodyExternal<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> BodyExternalBuilder<'a, body_external_state::Empty> {
+impl<S: BosStr> BodyExternal<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> BodyExternalBuilder<S, body_external_state::Empty> {
         BodyExternalBuilder::new()
     }
 }
 
-impl<'a> BodyExternalBuilder<'a, body_external_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> BodyExternalBuilder<S, body_external_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         BodyExternalBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BodyExternalBuilder<'a, S>
+impl<S: BosStr, St> BodyExternalBuilder<S, St>
 where
-    S: body_external_state::State,
-    S::Did: body_external_state::IsUnset,
+    St: body_external_state::State,
+    St::Did: body_external_state::IsUnset,
 {
     /// Set the `did` field (required)
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> BodyExternalBuilder<'a, body_external_state::SetDid<S>> {
+    ) -> BodyExternalBuilder<S, body_external_state::SetDid<St>> {
         self._fields.0 = Option::Some(value.into());
         BodyExternalBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BodyExternalBuilder<'a, S>
+impl<S: BosStr, St> BodyExternalBuilder<S, St>
 where
-    S: body_external_state::State,
-    S::Did: body_external_state::IsSet,
+    St: body_external_state::State,
+    St::Did: body_external_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> BodyExternal<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> BodyExternal<S> {
         BodyExternal {
             did: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> BodyExternal<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> BodyExternal<S> {
         BodyExternal {
             did: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -1033,9 +1039,9 @@ pub mod body_template_state {
         type Node = Unset;
     }
     ///State transition - sets the `node` field to Set
-    pub struct SetNode<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNode<S> {}
-    impl<S: State> State for SetNode<S> {
+    pub struct SetNode<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetNode<St> {}
+    impl<St: State> State for SetNode<St> {
         type Node = Set<members::node>;
     }
     /// Marker types for field names
@@ -1046,67 +1052,67 @@ pub mod body_template_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct BodyTemplateBuilder<'a, S: body_template_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct BodyTemplateBuilder<S: BosStr, St: body_template_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Data<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> BodyTemplate<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> BodyTemplateBuilder<'a, body_template_state::Empty> {
+impl<S: BosStr> BodyTemplate<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> BodyTemplateBuilder<S, body_template_state::Empty> {
         BodyTemplateBuilder::new()
     }
 }
 
-impl<'a> BodyTemplateBuilder<'a, body_template_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> BodyTemplateBuilder<S, body_template_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         BodyTemplateBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BodyTemplateBuilder<'a, S>
+impl<S: BosStr, St> BodyTemplateBuilder<S, St>
 where
-    S: body_template_state::State,
-    S::Node: body_template_state::IsUnset,
+    St: body_template_state::State,
+    St::Node: body_template_state::IsUnset,
 {
     /// Set the `node` field (required)
     pub fn node(
         mut self,
         value: impl Into<Data<S>>,
-    ) -> BodyTemplateBuilder<'a, body_template_state::SetNode<S>> {
+    ) -> BodyTemplateBuilder<S, body_template_state::SetNode<St>> {
         self._fields.0 = Option::Some(value.into());
         BodyTemplateBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BodyTemplateBuilder<'a, S>
+impl<S: BosStr, St> BodyTemplateBuilder<S, St>
 where
-    S: body_template_state::State,
-    S::Node: body_template_state::IsSet,
+    St: body_template_state::State,
+    St::Node: body_template_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> BodyTemplate<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> BodyTemplate<S> {
         BodyTemplate {
             node: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> BodyTemplate<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> BodyTemplate<S> {
         BodyTemplate {
             node: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -1133,9 +1139,9 @@ pub mod component_state {
         type Type = Unset;
     }
     ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
+    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetType<St> {}
+    impl<St: State> State for SetType<St> {
         type Type = Set<members::r#type>;
     }
     /// Marker types for field names
@@ -1146,9 +1152,9 @@ pub mod component_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ComponentBuilder<'a, S: component_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ComponentBuilder<S: BosStr, St: component_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<ComponentBody<S>>,
         Option<Datetime>,
@@ -1159,28 +1165,28 @@ pub struct ComponentBuilder<'a, S: component_state::State> {
         Option<ViaValtown<S>>,
         Option<component::View<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Component<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ComponentBuilder<'a, component_state::Empty> {
+impl<S: BosStr> Component<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ComponentBuilder<S, component_state::Empty> {
         ComponentBuilder::new()
     }
 }
 
-impl<'a> ComponentBuilder<'a, component_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ComponentBuilder<S, component_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ComponentBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: component_state::State> ComponentBuilder<'a, S> {
+impl<S: BosStr, St: component_state::State> ComponentBuilder<S, St> {
     /// Set the `body` field (optional)
     pub fn body(mut self, value: impl Into<Option<ComponentBody<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -1193,7 +1199,7 @@ impl<'a, S: component_state::State> ComponentBuilder<'a, S> {
     }
 }
 
-impl<'a, S: component_state::State> ComponentBuilder<'a, S> {
+impl<S: BosStr, St: component_state::State> ComponentBuilder<S, St> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.1 = value.into();
@@ -1206,7 +1212,7 @@ impl<'a, S: component_state::State> ComponentBuilder<'a, S> {
     }
 }
 
-impl<'a, S: component_state::State> ComponentBuilder<'a, S> {
+impl<S: BosStr, St: component_state::State> ComponentBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -1219,7 +1225,7 @@ impl<'a, S: component_state::State> ComponentBuilder<'a, S> {
     }
 }
 
-impl<'a, S: component_state::State> ComponentBuilder<'a, S> {
+impl<S: BosStr, St: component_state::State> ComponentBuilder<S, St> {
     /// Set the `imports` field (optional)
     pub fn imports(mut self, value: impl Into<Option<Vec<AtUri<S>>>>) -> Self {
         self._fields.3 = value.into();
@@ -1232,26 +1238,26 @@ impl<'a, S: component_state::State> ComponentBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ComponentBuilder<'a, S>
+impl<S: BosStr, St> ComponentBuilder<S, St>
 where
-    S: component_state::State,
-    S::Type: component_state::IsUnset,
+    St: component_state::State,
+    St::Type: component_state::IsUnset,
 {
     /// Set the `type` field (required)
     pub fn r#type(
         mut self,
         value: impl Into<Nsid<S>>,
-    ) -> ComponentBuilder<'a, component_state::SetType<S>> {
+    ) -> ComponentBuilder<S, component_state::SetType<St>> {
         self._fields.4 = Option::Some(value.into());
         ComponentBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: component_state::State> ComponentBuilder<'a, S> {
+impl<S: BosStr, St: component_state::State> ComponentBuilder<S, St> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.5 = value.into();
@@ -1264,7 +1270,7 @@ impl<'a, S: component_state::State> ComponentBuilder<'a, S> {
     }
 }
 
-impl<'a, S: component_state::State> ComponentBuilder<'a, S> {
+impl<S: BosStr, St: component_state::State> ComponentBuilder<S, St> {
     /// Set the `via` field (optional)
     pub fn via(mut self, value: impl Into<Option<ViaValtown<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -1277,7 +1283,7 @@ impl<'a, S: component_state::State> ComponentBuilder<'a, S> {
     }
 }
 
-impl<'a, S: component_state::State> ComponentBuilder<'a, S> {
+impl<S: BosStr, St: component_state::State> ComponentBuilder<S, St> {
     /// Set the `view` field (optional)
     pub fn view(mut self, value: impl Into<Option<component::View<S>>>) -> Self {
         self._fields.7 = value.into();
@@ -1290,13 +1296,13 @@ impl<'a, S: component_state::State> ComponentBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ComponentBuilder<'a, S>
+impl<S: BosStr, St> ComponentBuilder<S, St>
 where
-    S: component_state::State,
-    S::Type: component_state::IsSet,
+    St: component_state::State,
+    St::Type: component_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Component<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Component<S> {
         Component {
             body: self._fields.0,
             created_at: self._fields.1,
@@ -1309,11 +1315,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Component<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Component<S> {
         Component {
             body: self._fields.0,
             created_at: self._fields.1,
@@ -1338,119 +1344,119 @@ pub mod view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Prop;
         type Accepts;
+        type Prop;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Prop = Unset;
         type Accepts = Unset;
-    }
-    ///State transition - sets the `prop` field to Set
-    pub struct SetProp<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetProp<S> {}
-    impl<S: State> State for SetProp<S> {
-        type Prop = Set<members::prop>;
-        type Accepts = S::Accepts;
+        type Prop = Unset;
     }
     ///State transition - sets the `accepts` field to Set
-    pub struct SetAccepts<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAccepts<S> {}
-    impl<S: State> State for SetAccepts<S> {
-        type Prop = S::Prop;
+    pub struct SetAccepts<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAccepts<St> {}
+    impl<St: State> State for SetAccepts<St> {
         type Accepts = Set<members::accepts>;
+        type Prop = St::Prop;
+    }
+    ///State transition - sets the `prop` field to Set
+    pub struct SetProp<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetProp<St> {}
+    impl<St: State> State for SetProp<St> {
+        type Accepts = St::Accepts;
+        type Prop = Set<members::prop>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `prop` field
-        pub struct prop(());
         ///Marker type for the `accepts` field
         pub struct accepts(());
+        ///Marker type for the `prop` field
+        pub struct prop(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ViewBuilder<'a, S: view_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ViewBuilder<S: BosStr, St: view_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<ViewAcceptsItem<S>>>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> View<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ViewBuilder<'a, view_state::Empty> {
+impl<S: BosStr> View<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ViewBuilder<S, view_state::Empty> {
         ViewBuilder::new()
     }
 }
 
-impl<'a> ViewBuilder<'a, view_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ViewBuilder<S, view_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ViewBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ViewBuilder<'a, S>
+impl<S: BosStr, St> ViewBuilder<S, St>
 where
-    S: view_state::State,
-    S::Accepts: view_state::IsUnset,
+    St: view_state::State,
+    St::Accepts: view_state::IsUnset,
 {
     /// Set the `accepts` field (required)
     pub fn accepts(
         mut self,
         value: impl Into<Vec<ViewAcceptsItem<S>>>,
-    ) -> ViewBuilder<'a, view_state::SetAccepts<S>> {
+    ) -> ViewBuilder<S, view_state::SetAccepts<St>> {
         self._fields.0 = Option::Some(value.into());
         ViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ViewBuilder<'a, S>
+impl<S: BosStr, St> ViewBuilder<S, St>
 where
-    S: view_state::State,
-    S::Prop: view_state::IsUnset,
+    St: view_state::State,
+    St::Prop: view_state::IsUnset,
 {
     /// Set the `prop` field (required)
     pub fn prop(
         mut self,
         value: impl Into<S>,
-    ) -> ViewBuilder<'a, view_state::SetProp<S>> {
+    ) -> ViewBuilder<S, view_state::SetProp<St>> {
         self._fields.1 = Option::Some(value.into());
         ViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ViewBuilder<'a, S>
+impl<S: BosStr, St> ViewBuilder<S, St>
 where
-    S: view_state::State,
-    S::Prop: view_state::IsSet,
-    S::Accepts: view_state::IsSet,
+    St: view_state::State,
+    St::Accepts: view_state::IsSet,
+    St::Prop: view_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> View<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> View<S> {
         View {
             accepts: self._fields.0.unwrap(),
             prop: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> View<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> View<S> {
         View {
             accepts: self._fields.0.unwrap(),
             prop: self._fields.1.unwrap(),

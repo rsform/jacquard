@@ -16,7 +16,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use serde::{Serialize, Deserialize};
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SyncStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SyncStatus<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     ///A XXH3 hash of the record to tell if anything has changed
     pub hash: S,
@@ -52,7 +52,7 @@ pub struct SyncStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for SyncStatus<S> {
+impl<S: BosStr> LexiconSchema for SyncStatus<S> {
     fn nsid() -> &'static str {
         "blue.2048.defs"
     }
@@ -81,181 +81,181 @@ pub mod sync_status_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type UpdatedAt;
         type CreatedAt;
         type SyncedWithAtRepo;
         type Hash;
+        type UpdatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type UpdatedAt = Unset;
         type CreatedAt = Unset;
         type SyncedWithAtRepo = Unset;
         type Hash = Unset;
-    }
-    ///State transition - sets the `updated_at` field to Set
-    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
-    impl<S: State> State for SetUpdatedAt<S> {
-        type UpdatedAt = Set<members::updated_at>;
-        type CreatedAt = S::CreatedAt;
-        type SyncedWithAtRepo = S::SyncedWithAtRepo;
-        type Hash = S::Hash;
+        type UpdatedAt = Unset;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type UpdatedAt = S::UpdatedAt;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
-        type SyncedWithAtRepo = S::SyncedWithAtRepo;
-        type Hash = S::Hash;
+        type SyncedWithAtRepo = St::SyncedWithAtRepo;
+        type Hash = St::Hash;
+        type UpdatedAt = St::UpdatedAt;
     }
     ///State transition - sets the `synced_with_at_repo` field to Set
-    pub struct SetSyncedWithAtRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSyncedWithAtRepo<S> {}
-    impl<S: State> State for SetSyncedWithAtRepo<S> {
-        type UpdatedAt = S::UpdatedAt;
-        type CreatedAt = S::CreatedAt;
+    pub struct SetSyncedWithAtRepo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSyncedWithAtRepo<St> {}
+    impl<St: State> State for SetSyncedWithAtRepo<St> {
+        type CreatedAt = St::CreatedAt;
         type SyncedWithAtRepo = Set<members::synced_with_at_repo>;
-        type Hash = S::Hash;
+        type Hash = St::Hash;
+        type UpdatedAt = St::UpdatedAt;
     }
     ///State transition - sets the `hash` field to Set
-    pub struct SetHash<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHash<S> {}
-    impl<S: State> State for SetHash<S> {
-        type UpdatedAt = S::UpdatedAt;
-        type CreatedAt = S::CreatedAt;
-        type SyncedWithAtRepo = S::SyncedWithAtRepo;
+    pub struct SetHash<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHash<St> {}
+    impl<St: State> State for SetHash<St> {
+        type CreatedAt = St::CreatedAt;
+        type SyncedWithAtRepo = St::SyncedWithAtRepo;
         type Hash = Set<members::hash>;
+        type UpdatedAt = St::UpdatedAt;
+    }
+    ///State transition - sets the `updated_at` field to Set
+    pub struct SetUpdatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUpdatedAt<St> {}
+    impl<St: State> State for SetUpdatedAt<St> {
+        type CreatedAt = St::CreatedAt;
+        type SyncedWithAtRepo = St::SyncedWithAtRepo;
+        type Hash = St::Hash;
+        type UpdatedAt = Set<members::updated_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `updated_at` field
-        pub struct updated_at(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `synced_with_at_repo` field
         pub struct synced_with_at_repo(());
         ///Marker type for the `hash` field
         pub struct hash(());
+        ///Marker type for the `updated_at` field
+        pub struct updated_at(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct SyncStatusBuilder<'a, S: sync_status_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct SyncStatusBuilder<S: BosStr, St: sync_status_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<S>, Option<bool>, Option<Datetime>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> SyncStatus<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> SyncStatusBuilder<'a, sync_status_state::Empty> {
+impl<S: BosStr> SyncStatus<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> SyncStatusBuilder<S, sync_status_state::Empty> {
         SyncStatusBuilder::new()
     }
 }
 
-impl<'a> SyncStatusBuilder<'a, sync_status_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> SyncStatusBuilder<S, sync_status_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SyncStatusBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SyncStatusBuilder<'a, S>
+impl<S: BosStr, St> SyncStatusBuilder<S, St>
 where
-    S: sync_status_state::State,
-    S::CreatedAt: sync_status_state::IsUnset,
+    St: sync_status_state::State,
+    St::CreatedAt: sync_status_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> SyncStatusBuilder<'a, sync_status_state::SetCreatedAt<S>> {
+    ) -> SyncStatusBuilder<S, sync_status_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         SyncStatusBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SyncStatusBuilder<'a, S>
+impl<S: BosStr, St> SyncStatusBuilder<S, St>
 where
-    S: sync_status_state::State,
-    S::Hash: sync_status_state::IsUnset,
+    St: sync_status_state::State,
+    St::Hash: sync_status_state::IsUnset,
 {
     /// Set the `hash` field (required)
     pub fn hash(
         mut self,
         value: impl Into<S>,
-    ) -> SyncStatusBuilder<'a, sync_status_state::SetHash<S>> {
+    ) -> SyncStatusBuilder<S, sync_status_state::SetHash<St>> {
         self._fields.1 = Option::Some(value.into());
         SyncStatusBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SyncStatusBuilder<'a, S>
+impl<S: BosStr, St> SyncStatusBuilder<S, St>
 where
-    S: sync_status_state::State,
-    S::SyncedWithAtRepo: sync_status_state::IsUnset,
+    St: sync_status_state::State,
+    St::SyncedWithAtRepo: sync_status_state::IsUnset,
 {
     /// Set the `syncedWithATRepo` field (required)
     pub fn synced_with_at_repo(
         mut self,
         value: impl Into<bool>,
-    ) -> SyncStatusBuilder<'a, sync_status_state::SetSyncedWithAtRepo<S>> {
+    ) -> SyncStatusBuilder<S, sync_status_state::SetSyncedWithAtRepo<St>> {
         self._fields.2 = Option::Some(value.into());
         SyncStatusBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SyncStatusBuilder<'a, S>
+impl<S: BosStr, St> SyncStatusBuilder<S, St>
 where
-    S: sync_status_state::State,
-    S::UpdatedAt: sync_status_state::IsUnset,
+    St: sync_status_state::State,
+    St::UpdatedAt: sync_status_state::IsUnset,
 {
     /// Set the `updatedAt` field (required)
     pub fn updated_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> SyncStatusBuilder<'a, sync_status_state::SetUpdatedAt<S>> {
+    ) -> SyncStatusBuilder<S, sync_status_state::SetUpdatedAt<St>> {
         self._fields.3 = Option::Some(value.into());
         SyncStatusBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SyncStatusBuilder<'a, S>
+impl<S: BosStr, St> SyncStatusBuilder<S, St>
 where
-    S: sync_status_state::State,
-    S::UpdatedAt: sync_status_state::IsSet,
-    S::CreatedAt: sync_status_state::IsSet,
-    S::SyncedWithAtRepo: sync_status_state::IsSet,
-    S::Hash: sync_status_state::IsSet,
+    St: sync_status_state::State,
+    St::CreatedAt: sync_status_state::IsSet,
+    St::SyncedWithAtRepo: sync_status_state::IsSet,
+    St::Hash: sync_status_state::IsSet,
+    St::UpdatedAt: sync_status_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> SyncStatus<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> SyncStatus<S> {
         SyncStatus {
             created_at: self._fields.0.unwrap(),
             hash: self._fields.1.unwrap(),
@@ -264,11 +264,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> SyncStatus<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> SyncStatus<S> {
         SyncStatus {
             created_at: self._fields.0.unwrap(),
             hash: self._fields.1.unwrap(),

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "sh.weaver.graph.followGate",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct FollowGate<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct FollowGate<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     ///If true, previously auto-accepted follows are invalidated when requireApproval is enabled. Appview should treat followAccept records created before this gate's createdAt as invalid.  Defaults to `false`.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -59,18 +59,18 @@ pub struct FollowGate<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct FollowGateGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct FollowGateGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: FollowGate<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> FollowGate<S> {
+impl<S: BosStr> FollowGate<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, FollowGateRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -83,17 +83,17 @@ pub struct FollowGateRecord;
 impl XrpcResp for FollowGateRecord {
     const NSID: &'static str = "sh.weaver.graph.followGate";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = FollowGateGetRecordOutput<S>;
+    type Output<S: BosStr> = FollowGateGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<FollowGateGetRecordOutput<S>> for FollowGate<S> {
+impl<S: BosStr> From<FollowGateGetRecordOutput<S>> for FollowGate<S> {
     fn from(output: FollowGateGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for FollowGate<S> {
+impl<S: BosStr> Collection for FollowGate<S> {
     const NSID: &'static str = "sh.weaver.graph.followGate";
     type Record = FollowGateRecord;
 }
@@ -103,7 +103,7 @@ impl Collection for FollowGateRecord {
     type Record = FollowGateRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for FollowGate<S> {
+impl<S: BosStr> LexiconSchema for FollowGate<S> {
     fn nsid() -> &'static str {
         "sh.weaver.graph.followGate"
     }
@@ -145,9 +145,9 @@ pub mod follow_gate_state {
         type CreatedAt = Unset;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
@@ -158,51 +158,51 @@ pub mod follow_gate_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct FollowGateBuilder<'a, S: follow_gate_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct FollowGateBuilder<S: BosStr, St: follow_gate_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<bool>, Option<bool>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> FollowGate<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> FollowGateBuilder<'a, follow_gate_state::Empty> {
+impl<S: BosStr> FollowGate<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> FollowGateBuilder<S, follow_gate_state::Empty> {
         FollowGateBuilder::new()
     }
 }
 
-impl<'a> FollowGateBuilder<'a, follow_gate_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> FollowGateBuilder<S, follow_gate_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         FollowGateBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> FollowGateBuilder<'a, S>
+impl<S: BosStr, St> FollowGateBuilder<S, St>
 where
-    S: follow_gate_state::State,
-    S::CreatedAt: follow_gate_state::IsUnset,
+    St: follow_gate_state::State,
+    St::CreatedAt: follow_gate_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> FollowGateBuilder<'a, follow_gate_state::SetCreatedAt<S>> {
+    ) -> FollowGateBuilder<S, follow_gate_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         FollowGateBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: follow_gate_state::State> FollowGateBuilder<'a, S> {
+impl<S: BosStr, St: follow_gate_state::State> FollowGateBuilder<S, St> {
     /// Set the `invalidatePrior` field (optional)
     pub fn invalidate_prior(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.1 = value.into();
@@ -215,7 +215,7 @@ impl<'a, S: follow_gate_state::State> FollowGateBuilder<'a, S> {
     }
 }
 
-impl<'a, S: follow_gate_state::State> FollowGateBuilder<'a, S> {
+impl<S: BosStr, St: follow_gate_state::State> FollowGateBuilder<S, St> {
     /// Set the `requireApproval` field (optional)
     pub fn require_approval(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.2 = value.into();
@@ -228,13 +228,13 @@ impl<'a, S: follow_gate_state::State> FollowGateBuilder<'a, S> {
     }
 }
 
-impl<'a, S> FollowGateBuilder<'a, S>
+impl<S: BosStr, St> FollowGateBuilder<S, St>
 where
-    S: follow_gate_state::State,
-    S::CreatedAt: follow_gate_state::IsSet,
+    St: follow_gate_state::State,
+    St::CreatedAt: follow_gate_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> FollowGate<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> FollowGate<S> {
         FollowGate {
             created_at: self._fields.0.unwrap(),
             invalidate_prior: self._fields.1.or_else(|| Some(false)),
@@ -242,11 +242,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> FollowGate<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> FollowGate<S> {
         FollowGate {
             created_at: self._fields.0.unwrap(),
             invalidate_prior: self._fields.1.or_else(|| Some(false)),

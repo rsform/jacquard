@@ -6,52 +6,47 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[allow(unused_imports)]
+use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
+use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::app_rocksky::player::CurrentlyPlayingViewDetailed;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetCurrentlyPlaying<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetCurrentlyPlaying<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub actor: Option<AtIdentifier<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub player_id: Option<S>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetCurrentlyPlayingOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetCurrentlyPlayingOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
-    #[serde(borrow)]
     pub value: CurrentlyPlayingViewDetailed<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
-    pub extra_data: Option<
-        alloc::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<S>,
-        >,
-    >,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for app.rocksky.player.getCurrentlyPlaying
@@ -59,12 +54,11 @@ pub struct GetCurrentlyPlayingResponse;
 impl jacquard_common::xrpc::XrpcResp for GetCurrentlyPlayingResponse {
     const NSID: &'static str = "app.rocksky.player.getCurrentlyPlaying";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetCurrentlyPlayingOutput<S>;
+    type Output<S: BosStr> = GetCurrentlyPlayingOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetCurrentlyPlaying<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetCurrentlyPlaying<S> {
     const NSID: &'static str = "app.rocksky.player.getCurrentlyPlaying";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetCurrentlyPlayingResponse;
@@ -75,7 +69,7 @@ pub struct GetCurrentlyPlayingRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetCurrentlyPlayingRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.player.getCurrentlyPlaying";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetCurrentlyPlaying<S>;
+    type Request<S: BosStr> = GetCurrentlyPlaying<S>;
     type Response = GetCurrentlyPlayingResponse;
 }
 
@@ -98,32 +92,38 @@ pub mod get_currently_playing_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetCurrentlyPlayingBuilder<'a, S: get_currently_playing_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetCurrentlyPlayingBuilder<
+    S: BosStr,
+    St: get_currently_playing_state::State,
+> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtIdentifier<S>>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetCurrentlyPlaying<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetCurrentlyPlayingBuilder<'a, get_currently_playing_state::Empty> {
+impl<S: BosStr> GetCurrentlyPlaying<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetCurrentlyPlayingBuilder<S, get_currently_playing_state::Empty> {
         GetCurrentlyPlayingBuilder::new()
     }
 }
 
-impl<'a> GetCurrentlyPlayingBuilder<'a, get_currently_playing_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetCurrentlyPlayingBuilder<S, get_currently_playing_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetCurrentlyPlayingBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: get_currently_playing_state::State> GetCurrentlyPlayingBuilder<'a, S> {
+impl<
+    S: BosStr,
+    St: get_currently_playing_state::State,
+> GetCurrentlyPlayingBuilder<S, St> {
     /// Set the `actor` field (optional)
     pub fn actor(mut self, value: impl Into<Option<AtIdentifier<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -136,7 +136,10 @@ impl<'a, S: get_currently_playing_state::State> GetCurrentlyPlayingBuilder<'a, S
     }
 }
 
-impl<'a, S: get_currently_playing_state::State> GetCurrentlyPlayingBuilder<'a, S> {
+impl<
+    S: BosStr,
+    St: get_currently_playing_state::State,
+> GetCurrentlyPlayingBuilder<S, St> {
     /// Set the `playerId` field (optional)
     pub fn player_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -149,12 +152,12 @@ impl<'a, S: get_currently_playing_state::State> GetCurrentlyPlayingBuilder<'a, S
     }
 }
 
-impl<'a, S> GetCurrentlyPlayingBuilder<'a, S>
+impl<S: BosStr, St> GetCurrentlyPlayingBuilder<S, St>
 where
-    S: get_currently_playing_state::State,
+    St: get_currently_playing_state::State,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetCurrentlyPlaying<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetCurrentlyPlaying<S> {
         GetCurrentlyPlaying {
             actor: self._fields.0,
             player_id: self._fields.1,

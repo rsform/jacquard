@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -37,11 +37,11 @@ use crate::app_certified::actor::organization;
     rename = "app.certified.actor.organization",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Organization<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Organization<S: BosStr = DefaultStr> {
     ///Client-declared timestamp when this record was originally created.
     pub created_at: Datetime,
     ///When the organization was established. Stored as datetime per ATProto conventions (no date-only format exists). Clients should use midnight UTC (e.g., '2005-01-01T00:00:00.000Z'); consumers should treat only the date portion as canonical.
@@ -66,11 +66,11 @@ pub struct Organization<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct OrganizationGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct OrganizationGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
@@ -83,11 +83,11 @@ pub struct OrganizationGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct UrlItem<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct UrlItem<S: BosStr = DefaultStr> {
     ///Optional human-readable label for this URL (e.g. 'Support page', 'Donation page').
     #[serde(skip_serializing_if = "Option::is_none")]
     pub label: Option<S>,
@@ -97,7 +97,7 @@ pub struct UrlItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Organization<S> {
+impl<S: BosStr> Organization<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, OrganizationRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -110,17 +110,17 @@ pub struct OrganizationRecord;
 impl XrpcResp for OrganizationRecord {
     const NSID: &'static str = "app.certified.actor.organization";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = OrganizationGetRecordOutput<S>;
+    type Output<S: BosStr> = OrganizationGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<OrganizationGetRecordOutput<S>> for Organization<S> {
+impl<S: BosStr> From<OrganizationGetRecordOutput<S>> for Organization<S> {
     fn from(output: OrganizationGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Organization<S> {
+impl<S: BosStr> Collection for Organization<S> {
     const NSID: &'static str = "app.certified.actor.organization";
     type Record = OrganizationRecord;
 }
@@ -130,7 +130,7 @@ impl Collection for OrganizationRecord {
     type Record = OrganizationRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Organization<S> {
+impl<S: BosStr> LexiconSchema for Organization<S> {
     fn nsid() -> &'static str {
         "app.certified.actor.organization"
     }
@@ -155,7 +155,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Organization<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for UrlItem<S> {
+impl<S: BosStr> LexiconSchema for UrlItem<S> {
     fn nsid() -> &'static str {
         "app.certified.actor.organization"
     }
@@ -235,9 +235,9 @@ pub mod organization_state {
         type CreatedAt = Unset;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
@@ -248,9 +248,9 @@ pub mod organization_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct OrganizationBuilder<'a, S: organization_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct OrganizationBuilder<S: BosStr, St: organization_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
         Option<Datetime>,
@@ -258,47 +258,47 @@ pub struct OrganizationBuilder<'a, S: organization_state::State> {
         Option<Vec<S>>,
         Option<Vec<organization::UrlItem<S>>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Organization<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> OrganizationBuilder<'a, organization_state::Empty> {
+impl<S: BosStr> Organization<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> OrganizationBuilder<S, organization_state::Empty> {
         OrganizationBuilder::new()
     }
 }
 
-impl<'a> OrganizationBuilder<'a, organization_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> OrganizationBuilder<S, organization_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         OrganizationBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> OrganizationBuilder<'a, S>
+impl<S: BosStr, St> OrganizationBuilder<S, St>
 where
-    S: organization_state::State,
-    S::CreatedAt: organization_state::IsUnset,
+    St: organization_state::State,
+    St::CreatedAt: organization_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> OrganizationBuilder<'a, organization_state::SetCreatedAt<S>> {
+    ) -> OrganizationBuilder<S, organization_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         OrganizationBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
+impl<S: BosStr, St: organization_state::State> OrganizationBuilder<S, St> {
     /// Set the `foundedDate` field (optional)
     pub fn founded_date(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.1 = value.into();
@@ -311,7 +311,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
     }
 }
 
-impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
+impl<S: BosStr, St: organization_state::State> OrganizationBuilder<S, St> {
     /// Set the `location` field (optional)
     pub fn location(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -324,7 +324,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
     }
 }
 
-impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
+impl<S: BosStr, St: organization_state::State> OrganizationBuilder<S, St> {
     /// Set the `organizationType` field (optional)
     pub fn organization_type(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -337,7 +337,7 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
     }
 }
 
-impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
+impl<S: BosStr, St: organization_state::State> OrganizationBuilder<S, St> {
     /// Set the `urls` field (optional)
     pub fn urls(
         mut self,
@@ -353,13 +353,13 @@ impl<'a, S: organization_state::State> OrganizationBuilder<'a, S> {
     }
 }
 
-impl<'a, S> OrganizationBuilder<'a, S>
+impl<S: BosStr, St> OrganizationBuilder<S, St>
 where
-    S: organization_state::State,
-    S::CreatedAt: organization_state::IsSet,
+    St: organization_state::State,
+    St::CreatedAt: organization_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Organization<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Organization<S> {
         Organization {
             created_at: self._fields.0.unwrap(),
             founded_date: self._fields.1,
@@ -369,11 +369,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Organization<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Organization<S> {
         Organization {
             created_at: self._fields.0.unwrap(),
             founded_date: self._fields.1,
@@ -540,9 +540,9 @@ pub mod url_item_state {
         type Url = Unset;
     }
     ///State transition - sets the `url` field to Set
-    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrl<S> {}
-    impl<S: State> State for SetUrl<S> {
+    pub struct SetUrl<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUrl<St> {}
+    impl<St: State> State for SetUrl<St> {
         type Url = Set<members::url>;
     }
     /// Marker types for field names
@@ -553,32 +553,32 @@ pub mod url_item_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct UrlItemBuilder<'a, S: url_item_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct UrlItemBuilder<S: BosStr, St: url_item_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<UriValue<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> UrlItem<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> UrlItemBuilder<'a, url_item_state::Empty> {
+impl<S: BosStr> UrlItem<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> UrlItemBuilder<S, url_item_state::Empty> {
         UrlItemBuilder::new()
     }
 }
 
-impl<'a> UrlItemBuilder<'a, url_item_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> UrlItemBuilder<S, url_item_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         UrlItemBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: url_item_state::State> UrlItemBuilder<'a, S> {
+impl<S: BosStr, St: url_item_state::State> UrlItemBuilder<S, St> {
     /// Set the `label` field (optional)
     pub fn label(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -591,43 +591,40 @@ impl<'a, S: url_item_state::State> UrlItemBuilder<'a, S> {
     }
 }
 
-impl<'a, S> UrlItemBuilder<'a, S>
+impl<S: BosStr, St> UrlItemBuilder<S, St>
 where
-    S: url_item_state::State,
-    S::Url: url_item_state::IsUnset,
+    St: url_item_state::State,
+    St::Url: url_item_state::IsUnset,
 {
     /// Set the `url` field (required)
     pub fn url(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> UrlItemBuilder<'a, url_item_state::SetUrl<S>> {
+    ) -> UrlItemBuilder<S, url_item_state::SetUrl<St>> {
         self._fields.1 = Option::Some(value.into());
         UrlItemBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> UrlItemBuilder<'a, S>
+impl<S: BosStr, St> UrlItemBuilder<S, St>
 where
-    S: url_item_state::State,
-    S::Url: url_item_state::IsSet,
+    St: url_item_state::State,
+    St::Url: url_item_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> UrlItem<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> UrlItem<S> {
         UrlItem {
             label: self._fields.0,
             url: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> UrlItem<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> UrlItem<S> {
         UrlItem {
             label: self._fields.0,
             url: self._fields.1.unwrap(),

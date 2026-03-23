@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "uk.ewancroft.kofi.supporter",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Supporter<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Supporter<S: BosStr = DefaultStr> {
     ///Display name from Ko-fi.
     pub name: S,
     ///Subscription tier name, if applicable.
@@ -57,18 +57,18 @@ pub struct Supporter<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SupporterGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SupporterGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Supporter<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Supporter<S> {
+impl<S: BosStr> Supporter<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, SupporterRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -81,17 +81,17 @@ pub struct SupporterRecord;
 impl XrpcResp for SupporterRecord {
     const NSID: &'static str = "uk.ewancroft.kofi.supporter";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = SupporterGetRecordOutput<S>;
+    type Output<S: BosStr> = SupporterGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<SupporterGetRecordOutput<S>> for Supporter<S> {
+impl<S: BosStr> From<SupporterGetRecordOutput<S>> for Supporter<S> {
     fn from(output: SupporterGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Supporter<S> {
+impl<S: BosStr> Collection for Supporter<S> {
     const NSID: &'static str = "uk.ewancroft.kofi.supporter";
     type Record = SupporterRecord;
 }
@@ -101,7 +101,7 @@ impl Collection for SupporterRecord {
     type Record = SupporterRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Supporter<S> {
+impl<S: BosStr> LexiconSchema for Supporter<S> {
     fn nsid() -> &'static str {
         "uk.ewancroft.kofi.supporter"
     }
@@ -126,85 +126,85 @@ pub mod supporter_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Type;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Type = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Type = S::Type;
+        type Name = Unset;
     }
     ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type Name = S::Name;
+    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetType<St> {}
+    impl<St: State> State for SetType<St> {
         type Type = Set<members::r#type>;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Type = St::Type;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `type` field
         pub struct r#type(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct SupporterBuilder<'a, S: supporter_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct SupporterBuilder<S: BosStr, St: supporter_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Supporter<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> SupporterBuilder<'a, supporter_state::Empty> {
+impl<S: BosStr> Supporter<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> SupporterBuilder<S, supporter_state::Empty> {
         SupporterBuilder::new()
     }
 }
 
-impl<'a> SupporterBuilder<'a, supporter_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> SupporterBuilder<S, supporter_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SupporterBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SupporterBuilder<'a, S>
+impl<S: BosStr, St> SupporterBuilder<S, St>
 where
-    S: supporter_state::State,
-    S::Name: supporter_state::IsUnset,
+    St: supporter_state::State,
+    St::Name: supporter_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> SupporterBuilder<'a, supporter_state::SetName<S>> {
+    ) -> SupporterBuilder<S, supporter_state::SetName<St>> {
         self._fields.0 = Option::Some(value.into());
         SupporterBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: supporter_state::State> SupporterBuilder<'a, S> {
+impl<S: BosStr, St: supporter_state::State> SupporterBuilder<S, St> {
     /// Set the `tier` field (optional)
     pub fn tier(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -217,33 +217,33 @@ impl<'a, S: supporter_state::State> SupporterBuilder<'a, S> {
     }
 }
 
-impl<'a, S> SupporterBuilder<'a, S>
+impl<S: BosStr, St> SupporterBuilder<S, St>
 where
-    S: supporter_state::State,
-    S::Type: supporter_state::IsUnset,
+    St: supporter_state::State,
+    St::Type: supporter_state::IsUnset,
 {
     /// Set the `type` field (required)
     pub fn r#type(
         mut self,
         value: impl Into<S>,
-    ) -> SupporterBuilder<'a, supporter_state::SetType<S>> {
+    ) -> SupporterBuilder<S, supporter_state::SetType<St>> {
         self._fields.2 = Option::Some(value.into());
         SupporterBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SupporterBuilder<'a, S>
+impl<S: BosStr, St> SupporterBuilder<S, St>
 where
-    S: supporter_state::State,
-    S::Name: supporter_state::IsSet,
-    S::Type: supporter_state::IsSet,
+    St: supporter_state::State,
+    St::Type: supporter_state::IsSet,
+    St::Name: supporter_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Supporter<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Supporter<S> {
         Supporter {
             name: self._fields.0.unwrap(),
             tier: self._fields.1,
@@ -251,11 +251,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Supporter<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Supporter<S> {
         Supporter {
             name: self._fields.0.unwrap(),
             tier: self._fields.1,

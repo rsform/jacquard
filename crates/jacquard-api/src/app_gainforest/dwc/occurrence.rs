@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "app.gainforest.dwc.occurrence",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Occurrence<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Occurrence<S: BosStr = DefaultStr> {
     ///Identifiers (URIs) of media associated with the occurrence. Pipe-delimited for multiple.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub associated_media: Option<S>,
@@ -283,18 +283,18 @@ pub struct Occurrence<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct OccurrenceGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct OccurrenceGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Occurrence<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Occurrence<S> {
+impl<S: BosStr> Occurrence<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, OccurrenceRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -307,17 +307,17 @@ pub struct OccurrenceRecord;
 impl XrpcResp for OccurrenceRecord {
     const NSID: &'static str = "app.gainforest.dwc.occurrence";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = OccurrenceGetRecordOutput<S>;
+    type Output<S: BosStr> = OccurrenceGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<OccurrenceGetRecordOutput<S>> for Occurrence<S> {
+impl<S: BosStr> From<OccurrenceGetRecordOutput<S>> for Occurrence<S> {
     fn from(output: OccurrenceGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Occurrence<S> {
+impl<S: BosStr> Collection for Occurrence<S> {
     const NSID: &'static str = "app.gainforest.dwc.occurrence";
     type Record = OccurrenceRecord;
 }
@@ -327,7 +327,7 @@ impl Collection for OccurrenceRecord {
     type Record = OccurrenceRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Occurrence<S> {
+impl<S: BosStr> LexiconSchema for Occurrence<S> {
     fn nsid() -> &'static str {
         "app.gainforest.dwc.occurrence"
     }
@@ -1191,73 +1191,73 @@ pub mod occurrence_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type BasisOfRecord;
-        type ScientificName;
-        type CreatedAt;
         type EventDate;
+        type CreatedAt;
+        type ScientificName;
+        type BasisOfRecord;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type BasisOfRecord = Unset;
-        type ScientificName = Unset;
-        type CreatedAt = Unset;
         type EventDate = Unset;
-    }
-    ///State transition - sets the `basis_of_record` field to Set
-    pub struct SetBasisOfRecord<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBasisOfRecord<S> {}
-    impl<S: State> State for SetBasisOfRecord<S> {
-        type BasisOfRecord = Set<members::basis_of_record>;
-        type ScientificName = S::ScientificName;
-        type CreatedAt = S::CreatedAt;
-        type EventDate = S::EventDate;
-    }
-    ///State transition - sets the `scientific_name` field to Set
-    pub struct SetScientificName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetScientificName<S> {}
-    impl<S: State> State for SetScientificName<S> {
-        type BasisOfRecord = S::BasisOfRecord;
-        type ScientificName = Set<members::scientific_name>;
-        type CreatedAt = S::CreatedAt;
-        type EventDate = S::EventDate;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type BasisOfRecord = S::BasisOfRecord;
-        type ScientificName = S::ScientificName;
-        type CreatedAt = Set<members::created_at>;
-        type EventDate = S::EventDate;
+        type CreatedAt = Unset;
+        type ScientificName = Unset;
+        type BasisOfRecord = Unset;
     }
     ///State transition - sets the `event_date` field to Set
-    pub struct SetEventDate<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEventDate<S> {}
-    impl<S: State> State for SetEventDate<S> {
-        type BasisOfRecord = S::BasisOfRecord;
-        type ScientificName = S::ScientificName;
-        type CreatedAt = S::CreatedAt;
+    pub struct SetEventDate<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetEventDate<St> {}
+    impl<St: State> State for SetEventDate<St> {
         type EventDate = Set<members::event_date>;
+        type CreatedAt = St::CreatedAt;
+        type ScientificName = St::ScientificName;
+        type BasisOfRecord = St::BasisOfRecord;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type EventDate = St::EventDate;
+        type CreatedAt = Set<members::created_at>;
+        type ScientificName = St::ScientificName;
+        type BasisOfRecord = St::BasisOfRecord;
+    }
+    ///State transition - sets the `scientific_name` field to Set
+    pub struct SetScientificName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetScientificName<St> {}
+    impl<St: State> State for SetScientificName<St> {
+        type EventDate = St::EventDate;
+        type CreatedAt = St::CreatedAt;
+        type ScientificName = Set<members::scientific_name>;
+        type BasisOfRecord = St::BasisOfRecord;
+    }
+    ///State transition - sets the `basis_of_record` field to Set
+    pub struct SetBasisOfRecord<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBasisOfRecord<St> {}
+    impl<St: State> State for SetBasisOfRecord<St> {
+        type EventDate = St::EventDate;
+        type CreatedAt = St::CreatedAt;
+        type ScientificName = St::ScientificName;
+        type BasisOfRecord = Set<members::basis_of_record>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `basis_of_record` field
-        pub struct basis_of_record(());
-        ///Marker type for the `scientific_name` field
-        pub struct scientific_name(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `event_date` field
         pub struct event_date(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `scientific_name` field
+        pub struct scientific_name(());
+        ///Marker type for the `basis_of_record` field
+        pub struct basis_of_record(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct OccurrenceBuilder<'a, S: occurrence_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct OccurrenceBuilder<S: BosStr, St: occurrence_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
         Option<S>,
@@ -1339,18 +1339,18 @@ pub struct OccurrenceBuilder<'a, S: occurrence_state::State> {
         Option<S>,
         Option<Data<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Occurrence<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> OccurrenceBuilder<'a, occurrence_state::Empty> {
+impl<S: BosStr> Occurrence<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> OccurrenceBuilder<S, occurrence_state::Empty> {
         OccurrenceBuilder::new()
     }
 }
 
-impl<'a> OccurrenceBuilder<'a, occurrence_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> OccurrenceBuilder<S, occurrence_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         OccurrenceBuilder {
             _state: PhantomData,
@@ -1435,12 +1435,12 @@ impl<'a> OccurrenceBuilder<'a, occurrence_state::Empty> {
                 None,
                 None,
             ),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `associatedMedia` field (optional)
     pub fn associated_media(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -1453,7 +1453,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `associatedOccurrences` field (optional)
     pub fn associated_occurrences(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -1466,7 +1466,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `associatedReferences` field (optional)
     pub fn associated_references(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -1479,7 +1479,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `associatedSequences` field (optional)
     pub fn associated_sequences(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -1492,7 +1492,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `audioEvidence` field (optional)
     pub fn audio_evidence(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -1505,26 +1505,26 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S> OccurrenceBuilder<'a, S>
+impl<S: BosStr, St> OccurrenceBuilder<S, St>
 where
-    S: occurrence_state::State,
-    S::BasisOfRecord: occurrence_state::IsUnset,
+    St: occurrence_state::State,
+    St::BasisOfRecord: occurrence_state::IsUnset,
 {
     /// Set the `basisOfRecord` field (required)
     pub fn basis_of_record(
         mut self,
         value: impl Into<S>,
-    ) -> OccurrenceBuilder<'a, occurrence_state::SetBasisOfRecord<S>> {
+    ) -> OccurrenceBuilder<S, occurrence_state::SetBasisOfRecord<St>> {
         self._fields.5 = Option::Some(value.into());
         OccurrenceBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `behavior` field (optional)
     pub fn behavior(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.6 = value.into();
@@ -1537,7 +1537,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `class` field (optional)
     pub fn class(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.7 = value.into();
@@ -1550,7 +1550,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `collectionCode` field (optional)
     pub fn collection_code(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.8 = value.into();
@@ -1563,7 +1563,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `coordinateUncertaintyInMeters` field (optional)
     pub fn coordinate_uncertainty_in_meters(
         mut self,
@@ -1579,7 +1579,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `country` field (optional)
     pub fn country(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.10 = value.into();
@@ -1592,7 +1592,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `countryCode` field (optional)
     pub fn country_code(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.11 = value.into();
@@ -1605,7 +1605,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `county` field (optional)
     pub fn county(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.12 = value.into();
@@ -1618,26 +1618,26 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S> OccurrenceBuilder<'a, S>
+impl<S: BosStr, St> OccurrenceBuilder<S, St>
 where
-    S: occurrence_state::State,
-    S::CreatedAt: occurrence_state::IsUnset,
+    St: occurrence_state::State,
+    St::CreatedAt: occurrence_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> OccurrenceBuilder<'a, occurrence_state::SetCreatedAt<S>> {
+    ) -> OccurrenceBuilder<S, occurrence_state::SetCreatedAt<St>> {
         self._fields.13 = Option::Some(value.into());
         OccurrenceBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `dataGeneralizations` field (optional)
     pub fn data_generalizations(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.14 = value.into();
@@ -1650,7 +1650,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `datasetName` field (optional)
     pub fn dataset_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.15 = value.into();
@@ -1663,7 +1663,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `dateIdentified` field (optional)
     pub fn date_identified(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.16 = value.into();
@@ -1676,7 +1676,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `dcType` field (optional)
     pub fn dc_type(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.17 = value.into();
@@ -1689,7 +1689,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `decimalLatitude` field (optional)
     pub fn decimal_latitude(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.18 = value.into();
@@ -1702,7 +1702,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `decimalLongitude` field (optional)
     pub fn decimal_longitude(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.19 = value.into();
@@ -1715,7 +1715,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `dynamicProperties` field (optional)
     pub fn dynamic_properties(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.20 = value.into();
@@ -1728,26 +1728,26 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S> OccurrenceBuilder<'a, S>
+impl<S: BosStr, St> OccurrenceBuilder<S, St>
 where
-    S: occurrence_state::State,
-    S::EventDate: occurrence_state::IsUnset,
+    St: occurrence_state::State,
+    St::EventDate: occurrence_state::IsUnset,
 {
     /// Set the `eventDate` field (required)
     pub fn event_date(
         mut self,
         value: impl Into<S>,
-    ) -> OccurrenceBuilder<'a, occurrence_state::SetEventDate<S>> {
+    ) -> OccurrenceBuilder<S, occurrence_state::SetEventDate<St>> {
         self._fields.21 = Option::Some(value.into());
         OccurrenceBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `eventID` field (optional)
     pub fn event_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.22 = value.into();
@@ -1760,7 +1760,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `eventRef` field (optional)
     pub fn event_ref(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.23 = value.into();
@@ -1773,7 +1773,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `eventTime` field (optional)
     pub fn event_time(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.24 = value.into();
@@ -1786,7 +1786,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `family` field (optional)
     pub fn family(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.25 = value.into();
@@ -1799,7 +1799,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `fieldNotes` field (optional)
     pub fn field_notes(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.26 = value.into();
@@ -1812,7 +1812,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `gbifTaxonKey` field (optional)
     pub fn gbif_taxon_key(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.27 = value.into();
@@ -1825,7 +1825,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `genus` field (optional)
     pub fn genus(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.28 = value.into();
@@ -1838,7 +1838,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `geodeticDatum` field (optional)
     pub fn geodetic_datum(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.29 = value.into();
@@ -1851,7 +1851,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `habitat` field (optional)
     pub fn habitat(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.30 = value.into();
@@ -1864,7 +1864,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `higherClassification` field (optional)
     pub fn higher_classification(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.31 = value.into();
@@ -1877,7 +1877,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `identificationQualifier` field (optional)
     pub fn identification_qualifier(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.32 = value.into();
@@ -1890,7 +1890,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `identificationRemarks` field (optional)
     pub fn identification_remarks(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.33 = value.into();
@@ -1903,7 +1903,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `identifiedBy` field (optional)
     pub fn identified_by(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.34 = value.into();
@@ -1916,7 +1916,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `identifiedByID` field (optional)
     pub fn identified_by_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.35 = value.into();
@@ -1929,7 +1929,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `imageEvidence` field (optional)
     pub fn image_evidence(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.36 = value.into();
@@ -1942,7 +1942,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `individualCount` field (optional)
     pub fn individual_count(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.37 = value.into();
@@ -1955,7 +1955,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `informationWithheld` field (optional)
     pub fn information_withheld(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.38 = value.into();
@@ -1968,7 +1968,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `infraspecificEpithet` field (optional)
     pub fn infraspecific_epithet(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.39 = value.into();
@@ -1981,7 +1981,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `institutionCode` field (optional)
     pub fn institution_code(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.40 = value.into();
@@ -1994,7 +1994,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `kingdom` field (optional)
     pub fn kingdom(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.41 = value.into();
@@ -2007,7 +2007,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `license` field (optional)
     pub fn license(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.42 = value.into();
@@ -2020,7 +2020,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `lifeStage` field (optional)
     pub fn life_stage(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.43 = value.into();
@@ -2033,7 +2033,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `locality` field (optional)
     pub fn locality(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.44 = value.into();
@@ -2046,7 +2046,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `locationID` field (optional)
     pub fn location_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.45 = value.into();
@@ -2059,7 +2059,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `locationRemarks` field (optional)
     pub fn location_remarks(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.46 = value.into();
@@ -2072,7 +2072,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `maximumDepthInMeters` field (optional)
     pub fn maximum_depth_in_meters(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.47 = value.into();
@@ -2085,7 +2085,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `maximumElevationInMeters` field (optional)
     pub fn maximum_elevation_in_meters(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.48 = value.into();
@@ -2098,7 +2098,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `minimumDepthInMeters` field (optional)
     pub fn minimum_depth_in_meters(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.49 = value.into();
@@ -2111,7 +2111,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `minimumElevationInMeters` field (optional)
     pub fn minimum_elevation_in_meters(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.50 = value.into();
@@ -2124,7 +2124,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `municipality` field (optional)
     pub fn municipality(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.51 = value.into();
@@ -2137,7 +2137,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `nomenclaturalCode` field (optional)
     pub fn nomenclatural_code(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.52 = value.into();
@@ -2150,7 +2150,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `occurrenceID` field (optional)
     pub fn occurrence_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.53 = value.into();
@@ -2163,7 +2163,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `occurrenceRemarks` field (optional)
     pub fn occurrence_remarks(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.54 = value.into();
@@ -2176,7 +2176,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `occurrenceStatus` field (optional)
     pub fn occurrence_status(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.55 = value.into();
@@ -2189,7 +2189,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `order` field (optional)
     pub fn order(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.56 = value.into();
@@ -2202,7 +2202,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `organismQuantity` field (optional)
     pub fn organism_quantity(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.57 = value.into();
@@ -2215,7 +2215,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `organismQuantityType` field (optional)
     pub fn organism_quantity_type(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.58 = value.into();
@@ -2228,7 +2228,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `phylum` field (optional)
     pub fn phylum(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.59 = value.into();
@@ -2241,7 +2241,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `previousIdentifications` field (optional)
     pub fn previous_identifications(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.60 = value.into();
@@ -2254,7 +2254,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `recordedBy` field (optional)
     pub fn recorded_by(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.61 = value.into();
@@ -2267,7 +2267,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `recordedByID` field (optional)
     pub fn recorded_by_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.62 = value.into();
@@ -2280,7 +2280,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `references` field (optional)
     pub fn references(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.63 = value.into();
@@ -2293,7 +2293,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `reproductiveCondition` field (optional)
     pub fn reproductive_condition(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.64 = value.into();
@@ -2306,7 +2306,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `rightsHolder` field (optional)
     pub fn rights_holder(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.65 = value.into();
@@ -2319,7 +2319,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `samplingEffort` field (optional)
     pub fn sampling_effort(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.66 = value.into();
@@ -2332,7 +2332,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `samplingProtocol` field (optional)
     pub fn sampling_protocol(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.67 = value.into();
@@ -2345,26 +2345,26 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S> OccurrenceBuilder<'a, S>
+impl<S: BosStr, St> OccurrenceBuilder<S, St>
 where
-    S: occurrence_state::State,
-    S::ScientificName: occurrence_state::IsUnset,
+    St: occurrence_state::State,
+    St::ScientificName: occurrence_state::IsUnset,
 {
     /// Set the `scientificName` field (required)
     pub fn scientific_name(
         mut self,
         value: impl Into<S>,
-    ) -> OccurrenceBuilder<'a, occurrence_state::SetScientificName<S>> {
+    ) -> OccurrenceBuilder<S, occurrence_state::SetScientificName<St>> {
         self._fields.68 = Option::Some(value.into());
         OccurrenceBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `scientificNameAuthorship` field (optional)
     pub fn scientific_name_authorship(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.69 = value.into();
@@ -2377,7 +2377,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `sex` field (optional)
     pub fn sex(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.70 = value.into();
@@ -2390,7 +2390,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `specificEpithet` field (optional)
     pub fn specific_epithet(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.71 = value.into();
@@ -2403,7 +2403,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `spectrogramEvidence` field (optional)
     pub fn spectrogram_evidence(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.72 = value.into();
@@ -2416,7 +2416,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `stateProvince` field (optional)
     pub fn state_province(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.73 = value.into();
@@ -2429,7 +2429,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `taxonRank` field (optional)
     pub fn taxon_rank(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.74 = value.into();
@@ -2442,7 +2442,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `taxonomicStatus` field (optional)
     pub fn taxonomic_status(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.75 = value.into();
@@ -2455,7 +2455,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `verbatimLocality` field (optional)
     pub fn verbatim_locality(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.76 = value.into();
@@ -2468,7 +2468,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `vernacularName` field (optional)
     pub fn vernacular_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.77 = value.into();
@@ -2481,7 +2481,7 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
+impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
     /// Set the `videoEvidence` field (optional)
     pub fn video_evidence(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.78 = value.into();
@@ -2494,16 +2494,16 @@ impl<'a, S: occurrence_state::State> OccurrenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S> OccurrenceBuilder<'a, S>
+impl<S: BosStr, St> OccurrenceBuilder<S, St>
 where
-    S: occurrence_state::State,
-    S::BasisOfRecord: occurrence_state::IsSet,
-    S::ScientificName: occurrence_state::IsSet,
-    S::CreatedAt: occurrence_state::IsSet,
-    S::EventDate: occurrence_state::IsSet,
+    St: occurrence_state::State,
+    St::EventDate: occurrence_state::IsSet,
+    St::CreatedAt: occurrence_state::IsSet,
+    St::ScientificName: occurrence_state::IsSet,
+    St::BasisOfRecord: occurrence_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Occurrence<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Occurrence<S> {
         Occurrence {
             associated_media: self._fields.0,
             associated_occurrences: self._fields.1,
@@ -2587,11 +2587,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Occurrence<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Occurrence<S> {
         Occurrence {
             associated_media: self._fields.0,
             associated_occurrences: self._fields.1,

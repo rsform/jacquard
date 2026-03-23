@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,11 +34,11 @@ use serde::{Serialize, Deserialize};
     rename = "com.crabdance.nandi.post",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Post<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Post<S: BosStr = DefaultStr> {
     ///The main content of the blog post in markdown
     pub content: S,
     pub created_at: Datetime,
@@ -66,18 +66,18 @@ pub struct Post<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct PostGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct PostGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Post<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Post<S> {
+impl<S: BosStr> Post<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, PostRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -90,17 +90,17 @@ pub struct PostRecord;
 impl XrpcResp for PostRecord {
     const NSID: &'static str = "com.crabdance.nandi.post";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = PostGetRecordOutput<S>;
+    type Output<S: BosStr> = PostGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<PostGetRecordOutput<S>> for Post<S> {
+impl<S: BosStr> From<PostGetRecordOutput<S>> for Post<S> {
     fn from(output: PostGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Post<S> {
+impl<S: BosStr> Collection for Post<S> {
     const NSID: &'static str = "com.crabdance.nandi.post";
     type Record = PostRecord;
 }
@@ -110,7 +110,7 @@ impl Collection for PostRecord {
     type Record = PostRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Post<S> {
+impl<S: BosStr> LexiconSchema for Post<S> {
     fn nsid() -> &'static str {
         "com.crabdance.nandi.post"
     }
@@ -216,27 +216,27 @@ pub mod post_state {
         type Title = Unset;
     }
     ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
+    pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetContent<St> {}
+    impl<St: State> State for SetContent<St> {
         type Content = Set<members::content>;
-        type CreatedAt = S::CreatedAt;
-        type Title = S::Title;
+        type CreatedAt = St::CreatedAt;
+        type Title = St::Title;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Content = S::Content;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Content = St::Content;
         type CreatedAt = Set<members::created_at>;
-        type Title = S::Title;
+        type Title = St::Title;
     }
     ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Content = S::Content;
-        type CreatedAt = S::CreatedAt;
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
+        type Content = St::Content;
+        type CreatedAt = St::CreatedAt;
         type Title = Set<members::title>;
     }
     /// Marker types for field names
@@ -251,9 +251,9 @@ pub mod post_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct PostBuilder<'a, S: post_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct PostBuilder<S: BosStr, St: post_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
         Option<Datetime>,
@@ -263,66 +263,66 @@ pub struct PostBuilder<'a, S: post_state::State> {
         Option<S>,
         Option<Datetime>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Post<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> PostBuilder<'a, post_state::Empty> {
+impl<S: BosStr> Post<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> PostBuilder<S, post_state::Empty> {
         PostBuilder::new()
     }
 }
 
-impl<'a> PostBuilder<'a, post_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> PostBuilder<S, post_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         PostBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PostBuilder<'a, S>
+impl<S: BosStr, St> PostBuilder<S, St>
 where
-    S: post_state::State,
-    S::Content: post_state::IsUnset,
+    St: post_state::State,
+    St::Content: post_state::IsUnset,
 {
     /// Set the `content` field (required)
     pub fn content(
         mut self,
         value: impl Into<S>,
-    ) -> PostBuilder<'a, post_state::SetContent<S>> {
+    ) -> PostBuilder<S, post_state::SetContent<St>> {
         self._fields.0 = Option::Some(value.into());
         PostBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PostBuilder<'a, S>
+impl<S: BosStr, St> PostBuilder<S, St>
 where
-    S: post_state::State,
-    S::CreatedAt: post_state::IsUnset,
+    St: post_state::State,
+    St::CreatedAt: post_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> PostBuilder<'a, post_state::SetCreatedAt<S>> {
+    ) -> PostBuilder<S, post_state::SetCreatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         PostBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: post_state::State> PostBuilder<'a, S> {
+impl<S: BosStr, St: post_state::State> PostBuilder<S, St> {
     /// Set the `published` field (optional)
     pub fn published(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.2 = value.into();
@@ -335,7 +335,7 @@ impl<'a, S: post_state::State> PostBuilder<'a, S> {
     }
 }
 
-impl<'a, S: post_state::State> PostBuilder<'a, S> {
+impl<S: BosStr, St: post_state::State> PostBuilder<S, St> {
     /// Set the `summary` field (optional)
     pub fn summary(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -348,7 +348,7 @@ impl<'a, S: post_state::State> PostBuilder<'a, S> {
     }
 }
 
-impl<'a, S: post_state::State> PostBuilder<'a, S> {
+impl<S: BosStr, St: post_state::State> PostBuilder<S, St> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -361,26 +361,26 @@ impl<'a, S: post_state::State> PostBuilder<'a, S> {
     }
 }
 
-impl<'a, S> PostBuilder<'a, S>
+impl<S: BosStr, St> PostBuilder<S, St>
 where
-    S: post_state::State,
-    S::Title: post_state::IsUnset,
+    St: post_state::State,
+    St::Title: post_state::IsUnset,
 {
     /// Set the `title` field (required)
     pub fn title(
         mut self,
         value: impl Into<S>,
-    ) -> PostBuilder<'a, post_state::SetTitle<S>> {
+    ) -> PostBuilder<S, post_state::SetTitle<St>> {
         self._fields.5 = Option::Some(value.into());
         PostBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: post_state::State> PostBuilder<'a, S> {
+impl<S: BosStr, St: post_state::State> PostBuilder<S, St> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.6 = value.into();
@@ -393,15 +393,15 @@ impl<'a, S: post_state::State> PostBuilder<'a, S> {
     }
 }
 
-impl<'a, S> PostBuilder<'a, S>
+impl<S: BosStr, St> PostBuilder<S, St>
 where
-    S: post_state::State,
-    S::Content: post_state::IsSet,
-    S::CreatedAt: post_state::IsSet,
-    S::Title: post_state::IsSet,
+    St: post_state::State,
+    St::Content: post_state::IsSet,
+    St::CreatedAt: post_state::IsSet,
+    St::Title: post_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Post<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Post<S> {
         Post {
             content: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
@@ -413,8 +413,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Post<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Post<S> {
         Post {
             content: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),

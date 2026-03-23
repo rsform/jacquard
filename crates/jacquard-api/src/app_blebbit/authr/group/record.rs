@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,11 +34,11 @@ use serde::{Serialize, Deserialize};
     rename = "app.blebbit.authr.group.record",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Record<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Record<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cuid: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -59,18 +59,18 @@ pub struct Record<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct RecordGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct RecordGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Record<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Record<S> {
+impl<S: BosStr> Record<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, RecordRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -83,17 +83,17 @@ pub struct RecordRecord;
 impl XrpcResp for RecordRecord {
     const NSID: &'static str = "app.blebbit.authr.group.record";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = RecordGetRecordOutput<S>;
+    type Output<S: BosStr> = RecordGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<RecordGetRecordOutput<S>> for Record<S> {
+impl<S: BosStr> From<RecordGetRecordOutput<S>> for Record<S> {
     fn from(output: RecordGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Record<S> {
+impl<S: BosStr> Collection for Record<S> {
     const NSID: &'static str = "app.blebbit.authr.group.record";
     type Record = RecordRecord;
 }
@@ -103,7 +103,7 @@ impl Collection for RecordRecord {
     type Record = RecordRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Record<S> {
+impl<S: BosStr> LexiconSchema for Record<S> {
     fn nsid() -> &'static str {
         "app.blebbit.authr.group.record"
     }
@@ -137,32 +137,32 @@ pub mod record_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct RecordBuilder<'a, S: record_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct RecordBuilder<S: BosStr, St: record_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>, Option<S>, Option<S>, Option<bool>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Record<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> RecordBuilder<'a, record_state::Empty> {
+impl<S: BosStr> Record<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> RecordBuilder<S, record_state::Empty> {
         RecordBuilder::new()
     }
 }
 
-impl<'a> RecordBuilder<'a, record_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> RecordBuilder<S, record_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         RecordBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: record_state::State> RecordBuilder<'a, S> {
+impl<S: BosStr, St: record_state::State> RecordBuilder<S, St> {
     /// Set the `cuid` field (optional)
     pub fn cuid(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -175,7 +175,7 @@ impl<'a, S: record_state::State> RecordBuilder<'a, S> {
     }
 }
 
-impl<'a, S: record_state::State> RecordBuilder<'a, S> {
+impl<S: BosStr, St: record_state::State> RecordBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -188,7 +188,7 @@ impl<'a, S: record_state::State> RecordBuilder<'a, S> {
     }
 }
 
-impl<'a, S: record_state::State> RecordBuilder<'a, S> {
+impl<S: BosStr, St: record_state::State> RecordBuilder<S, St> {
     /// Set the `display` field (optional)
     pub fn display(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -201,7 +201,7 @@ impl<'a, S: record_state::State> RecordBuilder<'a, S> {
     }
 }
 
-impl<'a, S: record_state::State> RecordBuilder<'a, S> {
+impl<S: BosStr, St: record_state::State> RecordBuilder<S, St> {
     /// Set the `name` field (optional)
     pub fn name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -214,7 +214,7 @@ impl<'a, S: record_state::State> RecordBuilder<'a, S> {
     }
 }
 
-impl<'a, S: record_state::State> RecordBuilder<'a, S> {
+impl<S: BosStr, St: record_state::State> RecordBuilder<S, St> {
     /// Set the `public` field (optional)
     pub fn public(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.4 = value.into();
@@ -227,12 +227,12 @@ impl<'a, S: record_state::State> RecordBuilder<'a, S> {
     }
 }
 
-impl<'a, S> RecordBuilder<'a, S>
+impl<S: BosStr, St> RecordBuilder<S, St>
 where
-    S: record_state::State,
+    St: record_state::State,
 {
-    /// Build the final struct
-    pub fn build(self) -> Record<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Record<S> {
         Record {
             cuid: self._fields.0,
             description: self._fields.1,
@@ -242,8 +242,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Record<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Record<S> {
         Record {
             cuid: self._fields.0,
             description: self._fields.1,

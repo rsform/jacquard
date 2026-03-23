@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use serde::{Serialize, Deserialize};
     rename = "actor.rpg.sprite",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Sprite<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Sprite<S: BosStr = DefaultStr> {
     ///Milliseconds per frame for animation playback  Defaults to `200`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_sprite_animation_speed")]
@@ -85,7 +85,7 @@ pub struct Sprite<S: Bos<str> + AsRef<str> = DefaultStr> {
 /// The game engine format this sprite is designed for. Determines animation interpretation.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum SpriteEngine<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum SpriteEngine<S: BosStr = DefaultStr> {
     Rmmz,
     Rmmv,
     Rpgmaker2003,
@@ -93,7 +93,7 @@ pub enum SpriteEngine<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> SpriteEngine<S> {
+impl<S: BosStr> SpriteEngine<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Rmmz => "rmmz",
@@ -115,19 +115,19 @@ impl<S: Bos<str> + AsRef<str>> SpriteEngine<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for SpriteEngine<S> {
+impl<S: BosStr> core::fmt::Display for SpriteEngine<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for SpriteEngine<S> {
+impl<S: BosStr> AsRef<str> for SpriteEngine<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for SpriteEngine<S> {
+impl<S: BosStr> Serialize for SpriteEngine<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -136,8 +136,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for SpriteEngine<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for SpriteEngine<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for SpriteEngine<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -147,14 +146,18 @@ for SpriteEngine<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for SpriteEngine<S> {
+impl<S: BosStr + Default> Default for SpriteEngine<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for SpriteEngine<S> {
-    type Output = SpriteEngine<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for SpriteEngine<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = SpriteEngine<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             SpriteEngine::Rmmz => SpriteEngine::Rmmz,
@@ -172,18 +175,18 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for SpriteEngine<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SpriteGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SpriteGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Sprite<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Sprite<S> {
+impl<S: BosStr> Sprite<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, SpriteRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -196,17 +199,17 @@ pub struct SpriteRecord;
 impl XrpcResp for SpriteRecord {
     const NSID: &'static str = "actor.rpg.sprite";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = SpriteGetRecordOutput<S>;
+    type Output<S: BosStr> = SpriteGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<SpriteGetRecordOutput<S>> for Sprite<S> {
+impl<S: BosStr> From<SpriteGetRecordOutput<S>> for Sprite<S> {
     fn from(output: SpriteGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Sprite<S> {
+impl<S: BosStr> Collection for Sprite<S> {
     const NSID: &'static str = "actor.rpg.sprite";
     type Record = SpriteRecord;
 }
@@ -216,7 +219,7 @@ impl Collection for SpriteRecord {
     type Record = SpriteRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Sprite<S> {
+impl<S: BosStr> LexiconSchema for Sprite<S> {
     fn nsid() -> &'static str {
         "actor.rpg.sprite"
     }
@@ -451,57 +454,57 @@ pub mod sprite_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type SpriteSheet;
         type Engine;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type SpriteSheet = Unset;
         type Engine = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type SpriteSheet = S::SpriteSheet;
-        type Engine = S::Engine;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `sprite_sheet` field to Set
-    pub struct SetSpriteSheet<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSpriteSheet<S> {}
-    impl<S: State> State for SetSpriteSheet<S> {
-        type CreatedAt = S::CreatedAt;
+    pub struct SetSpriteSheet<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSpriteSheet<St> {}
+    impl<St: State> State for SetSpriteSheet<St> {
         type SpriteSheet = Set<members::sprite_sheet>;
-        type Engine = S::Engine;
+        type Engine = St::Engine;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `engine` field to Set
-    pub struct SetEngine<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEngine<S> {}
-    impl<S: State> State for SetEngine<S> {
-        type CreatedAt = S::CreatedAt;
-        type SpriteSheet = S::SpriteSheet;
+    pub struct SetEngine<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetEngine<St> {}
+    impl<St: State> State for SetEngine<St> {
+        type SpriteSheet = St::SpriteSheet;
         type Engine = Set<members::engine>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type SpriteSheet = St::SpriteSheet;
+        type Engine = St::Engine;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `sprite_sheet` field
         pub struct sprite_sheet(());
         ///Marker type for the `engine` field
         pub struct engine(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct SpriteBuilder<'a, S: sprite_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct SpriteBuilder<S: BosStr, St: sprite_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<i64>,
         Option<i64>,
@@ -517,18 +520,18 @@ pub struct SpriteBuilder<'a, S: sprite_state::State> {
         Option<Datetime>,
         Option<i64>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Sprite<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> SpriteBuilder<'a, sprite_state::Empty> {
+impl<S: BosStr> Sprite<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> SpriteBuilder<S, sprite_state::Empty> {
         SpriteBuilder::new()
     }
 }
 
-impl<'a> SpriteBuilder<'a, sprite_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> SpriteBuilder<S, sprite_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SpriteBuilder {
             _state: PhantomData,
@@ -547,12 +550,12 @@ impl<'a> SpriteBuilder<'a, sprite_state::Empty> {
                 None,
                 None,
             ),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
+impl<S: BosStr, St: sprite_state::State> SpriteBuilder<S, St> {
     /// Set the `animationSpeed` field (optional)
     pub fn animation_speed(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
@@ -565,7 +568,7 @@ impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
     }
 }
 
-impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
+impl<S: BosStr, St: sprite_state::State> SpriteBuilder<S, St> {
     /// Set the `columns` field (optional)
     pub fn columns(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -578,45 +581,45 @@ impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
     }
 }
 
-impl<'a, S> SpriteBuilder<'a, S>
+impl<S: BosStr, St> SpriteBuilder<S, St>
 where
-    S: sprite_state::State,
-    S::CreatedAt: sprite_state::IsUnset,
+    St: sprite_state::State,
+    St::CreatedAt: sprite_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> SpriteBuilder<'a, sprite_state::SetCreatedAt<S>> {
+    ) -> SpriteBuilder<S, sprite_state::SetCreatedAt<St>> {
         self._fields.2 = Option::Some(value.into());
         SpriteBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SpriteBuilder<'a, S>
+impl<S: BosStr, St> SpriteBuilder<S, St>
 where
-    S: sprite_state::State,
-    S::Engine: sprite_state::IsUnset,
+    St: sprite_state::State,
+    St::Engine: sprite_state::IsUnset,
 {
     /// Set the `engine` field (required)
     pub fn engine(
         mut self,
         value: impl Into<SpriteEngine<S>>,
-    ) -> SpriteBuilder<'a, sprite_state::SetEngine<S>> {
+    ) -> SpriteBuilder<S, sprite_state::SetEngine<St>> {
         self._fields.3 = Option::Some(value.into());
         SpriteBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
+impl<S: BosStr, St: sprite_state::State> SpriteBuilder<S, St> {
     /// Set the `frameHeight` field (optional)
     pub fn frame_height(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.4 = value.into();
@@ -629,7 +632,7 @@ impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
     }
 }
 
-impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
+impl<S: BosStr, St: sprite_state::State> SpriteBuilder<S, St> {
     /// Set the `frameWidth` field (optional)
     pub fn frame_width(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.5 = value.into();
@@ -642,7 +645,7 @@ impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
     }
 }
 
-impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
+impl<S: BosStr, St: sprite_state::State> SpriteBuilder<S, St> {
     /// Set the `frames` field (optional)
     pub fn frames(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.6 = value.into();
@@ -655,7 +658,7 @@ impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
     }
 }
 
-impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
+impl<S: BosStr, St: sprite_state::State> SpriteBuilder<S, St> {
     /// Set the `height` field (optional)
     pub fn height(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.7 = value.into();
@@ -668,7 +671,7 @@ impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
     }
 }
 
-impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
+impl<S: BosStr, St: sprite_state::State> SpriteBuilder<S, St> {
     /// Set the `name` field (optional)
     pub fn name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.8 = value.into();
@@ -681,7 +684,7 @@ impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
     }
 }
 
-impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
+impl<S: BosStr, St: sprite_state::State> SpriteBuilder<S, St> {
     /// Set the `rows` field (optional)
     pub fn rows(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.9 = value.into();
@@ -694,26 +697,26 @@ impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
     }
 }
 
-impl<'a, S> SpriteBuilder<'a, S>
+impl<S: BosStr, St> SpriteBuilder<S, St>
 where
-    S: sprite_state::State,
-    S::SpriteSheet: sprite_state::IsUnset,
+    St: sprite_state::State,
+    St::SpriteSheet: sprite_state::IsUnset,
 {
     /// Set the `spriteSheet` field (required)
     pub fn sprite_sheet(
         mut self,
         value: impl Into<BlobRef<S>>,
-    ) -> SpriteBuilder<'a, sprite_state::SetSpriteSheet<S>> {
+    ) -> SpriteBuilder<S, sprite_state::SetSpriteSheet<St>> {
         self._fields.10 = Option::Some(value.into());
         SpriteBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
+impl<S: BosStr, St: sprite_state::State> SpriteBuilder<S, St> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.11 = value.into();
@@ -726,7 +729,7 @@ impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
     }
 }
 
-impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
+impl<S: BosStr, St: sprite_state::State> SpriteBuilder<S, St> {
     /// Set the `width` field (optional)
     pub fn width(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.12 = value.into();
@@ -739,15 +742,15 @@ impl<'a, S: sprite_state::State> SpriteBuilder<'a, S> {
     }
 }
 
-impl<'a, S> SpriteBuilder<'a, S>
+impl<S: BosStr, St> SpriteBuilder<S, St>
 where
-    S: sprite_state::State,
-    S::CreatedAt: sprite_state::IsSet,
-    S::SpriteSheet: sprite_state::IsSet,
-    S::Engine: sprite_state::IsSet,
+    St: sprite_state::State,
+    St::SpriteSheet: sprite_state::IsSet,
+    St::Engine: sprite_state::IsSet,
+    St::CreatedAt: sprite_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Sprite<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Sprite<S> {
         Sprite {
             animation_speed: self._fields.0.or_else(|| Some(200i64)),
             columns: self._fields.1,
@@ -765,8 +768,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Sprite<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Sprite<S> {
         Sprite {
             animation_speed: self._fields.0.or_else(|| Some(200i64)),
             columns: self._fields.1,

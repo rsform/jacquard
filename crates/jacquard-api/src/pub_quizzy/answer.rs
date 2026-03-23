@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
     rename = "pub.quizzy.answer",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Answer<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Answer<S: BosStr = DefaultStr> {
     ///How certain the person is about this answer
     pub certainty: AnswerCertainty<S>,
     ///Reference to the question being answered
@@ -56,7 +56,7 @@ pub struct Answer<S: Bos<str> + AsRef<str> = DefaultStr> {
 /// How certain the person is about this answer
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum AnswerCertainty<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum AnswerCertainty<S: BosStr = DefaultStr> {
     DeadCertain,
     FairlySure,
     EducatedGuess,
@@ -64,7 +64,7 @@ pub enum AnswerCertainty<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> AnswerCertainty<S> {
+impl<S: BosStr> AnswerCertainty<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::DeadCertain => "deadCertain",
@@ -86,19 +86,19 @@ impl<S: Bos<str> + AsRef<str>> AnswerCertainty<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for AnswerCertainty<S> {
+impl<S: BosStr> core::fmt::Display for AnswerCertainty<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for AnswerCertainty<S> {
+impl<S: BosStr> AsRef<str> for AnswerCertainty<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for AnswerCertainty<S> {
+impl<S: BosStr> Serialize for AnswerCertainty<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -107,8 +107,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for AnswerCertainty<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for AnswerCertainty<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for AnswerCertainty<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -118,14 +117,18 @@ for AnswerCertainty<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for AnswerCertainty<S> {
+impl<S: BosStr + Default> Default for AnswerCertainty<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for AnswerCertainty<S> {
-    type Output = AnswerCertainty<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for AnswerCertainty<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = AnswerCertainty<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             AnswerCertainty::DeadCertain => AnswerCertainty::DeadCertain,
@@ -143,18 +146,18 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for AnswerCertainty<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct AnswerGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct AnswerGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Answer<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Answer<S> {
+impl<S: BosStr> Answer<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, AnswerRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -167,17 +170,17 @@ pub struct AnswerRecord;
 impl XrpcResp for AnswerRecord {
     const NSID: &'static str = "pub.quizzy.answer";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = AnswerGetRecordOutput<S>;
+    type Output<S: BosStr> = AnswerGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<AnswerGetRecordOutput<S>> for Answer<S> {
+impl<S: BosStr> From<AnswerGetRecordOutput<S>> for Answer<S> {
     fn from(output: AnswerGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Answer<S> {
+impl<S: BosStr> Collection for Answer<S> {
     const NSID: &'static str = "pub.quizzy.answer";
     type Record = AnswerRecord;
 }
@@ -187,7 +190,7 @@ impl Collection for AnswerRecord {
     type Record = AnswerRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Answer<S> {
+impl<S: BosStr> LexiconSchema for Answer<S> {
     fn nsid() -> &'static str {
         "pub.quizzy.answer"
     }
@@ -237,185 +240,185 @@ pub mod answer_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Certainty;
-        type Question;
-        type Text;
         type Timestamp;
+        type Text;
+        type Question;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Certainty = Unset;
-        type Question = Unset;
-        type Text = Unset;
         type Timestamp = Unset;
+        type Text = Unset;
+        type Question = Unset;
     }
     ///State transition - sets the `certainty` field to Set
-    pub struct SetCertainty<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCertainty<S> {}
-    impl<S: State> State for SetCertainty<S> {
+    pub struct SetCertainty<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCertainty<St> {}
+    impl<St: State> State for SetCertainty<St> {
         type Certainty = Set<members::certainty>;
-        type Question = S::Question;
-        type Text = S::Text;
-        type Timestamp = S::Timestamp;
-    }
-    ///State transition - sets the `question` field to Set
-    pub struct SetQuestion<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetQuestion<S> {}
-    impl<S: State> State for SetQuestion<S> {
-        type Certainty = S::Certainty;
-        type Question = Set<members::question>;
-        type Text = S::Text;
-        type Timestamp = S::Timestamp;
-    }
-    ///State transition - sets the `text` field to Set
-    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetText<S> {}
-    impl<S: State> State for SetText<S> {
-        type Certainty = S::Certainty;
-        type Question = S::Question;
-        type Text = Set<members::text>;
-        type Timestamp = S::Timestamp;
+        type Timestamp = St::Timestamp;
+        type Text = St::Text;
+        type Question = St::Question;
     }
     ///State transition - sets the `timestamp` field to Set
-    pub struct SetTimestamp<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTimestamp<S> {}
-    impl<S: State> State for SetTimestamp<S> {
-        type Certainty = S::Certainty;
-        type Question = S::Question;
-        type Text = S::Text;
+    pub struct SetTimestamp<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTimestamp<St> {}
+    impl<St: State> State for SetTimestamp<St> {
+        type Certainty = St::Certainty;
         type Timestamp = Set<members::timestamp>;
+        type Text = St::Text;
+        type Question = St::Question;
+    }
+    ///State transition - sets the `text` field to Set
+    pub struct SetText<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetText<St> {}
+    impl<St: State> State for SetText<St> {
+        type Certainty = St::Certainty;
+        type Timestamp = St::Timestamp;
+        type Text = Set<members::text>;
+        type Question = St::Question;
+    }
+    ///State transition - sets the `question` field to Set
+    pub struct SetQuestion<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetQuestion<St> {}
+    impl<St: State> State for SetQuestion<St> {
+        type Certainty = St::Certainty;
+        type Timestamp = St::Timestamp;
+        type Text = St::Text;
+        type Question = Set<members::question>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `certainty` field
         pub struct certainty(());
-        ///Marker type for the `question` field
-        pub struct question(());
-        ///Marker type for the `text` field
-        pub struct text(());
         ///Marker type for the `timestamp` field
         pub struct timestamp(());
+        ///Marker type for the `text` field
+        pub struct text(());
+        ///Marker type for the `question` field
+        pub struct question(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct AnswerBuilder<'a, S: answer_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct AnswerBuilder<S: BosStr, St: answer_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<AnswerCertainty<S>>,
         Option<StrongRef<S>>,
         Option<S>,
         Option<Datetime>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Answer<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> AnswerBuilder<'a, answer_state::Empty> {
+impl<S: BosStr> Answer<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> AnswerBuilder<S, answer_state::Empty> {
         AnswerBuilder::new()
     }
 }
 
-impl<'a> AnswerBuilder<'a, answer_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> AnswerBuilder<S, answer_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         AnswerBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AnswerBuilder<'a, S>
+impl<S: BosStr, St> AnswerBuilder<S, St>
 where
-    S: answer_state::State,
-    S::Certainty: answer_state::IsUnset,
+    St: answer_state::State,
+    St::Certainty: answer_state::IsUnset,
 {
     /// Set the `certainty` field (required)
     pub fn certainty(
         mut self,
         value: impl Into<AnswerCertainty<S>>,
-    ) -> AnswerBuilder<'a, answer_state::SetCertainty<S>> {
+    ) -> AnswerBuilder<S, answer_state::SetCertainty<St>> {
         self._fields.0 = Option::Some(value.into());
         AnswerBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AnswerBuilder<'a, S>
+impl<S: BosStr, St> AnswerBuilder<S, St>
 where
-    S: answer_state::State,
-    S::Question: answer_state::IsUnset,
+    St: answer_state::State,
+    St::Question: answer_state::IsUnset,
 {
     /// Set the `question` field (required)
     pub fn question(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> AnswerBuilder<'a, answer_state::SetQuestion<S>> {
+    ) -> AnswerBuilder<S, answer_state::SetQuestion<St>> {
         self._fields.1 = Option::Some(value.into());
         AnswerBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AnswerBuilder<'a, S>
+impl<S: BosStr, St> AnswerBuilder<S, St>
 where
-    S: answer_state::State,
-    S::Text: answer_state::IsUnset,
+    St: answer_state::State,
+    St::Text: answer_state::IsUnset,
 {
     /// Set the `text` field (required)
     pub fn text(
         mut self,
         value: impl Into<S>,
-    ) -> AnswerBuilder<'a, answer_state::SetText<S>> {
+    ) -> AnswerBuilder<S, answer_state::SetText<St>> {
         self._fields.2 = Option::Some(value.into());
         AnswerBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AnswerBuilder<'a, S>
+impl<S: BosStr, St> AnswerBuilder<S, St>
 where
-    S: answer_state::State,
-    S::Timestamp: answer_state::IsUnset,
+    St: answer_state::State,
+    St::Timestamp: answer_state::IsUnset,
 {
     /// Set the `timestamp` field (required)
     pub fn timestamp(
         mut self,
         value: impl Into<Datetime>,
-    ) -> AnswerBuilder<'a, answer_state::SetTimestamp<S>> {
+    ) -> AnswerBuilder<S, answer_state::SetTimestamp<St>> {
         self._fields.3 = Option::Some(value.into());
         AnswerBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AnswerBuilder<'a, S>
+impl<S: BosStr, St> AnswerBuilder<S, St>
 where
-    S: answer_state::State,
-    S::Certainty: answer_state::IsSet,
-    S::Question: answer_state::IsSet,
-    S::Text: answer_state::IsSet,
-    S::Timestamp: answer_state::IsSet,
+    St: answer_state::State,
+    St::Certainty: answer_state::IsSet,
+    St::Timestamp: answer_state::IsSet,
+    St::Text: answer_state::IsSet,
+    St::Question: answer_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Answer<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Answer<S> {
         Answer {
             certainty: self._fields.0.unwrap(),
             question: self._fields.1.unwrap(),
@@ -424,8 +427,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Answer<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Answer<S> {
         Answer {
             certainty: self._fields.0.unwrap(),
             question: self._fields.1.unwrap(),

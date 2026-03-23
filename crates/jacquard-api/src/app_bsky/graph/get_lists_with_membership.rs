@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -33,11 +33,11 @@ use crate::app_bsky::graph::get_lists_with_membership;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ListWithMembership<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ListWithMembership<S: BosStr = DefaultStr> {
     pub list: ListView<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub list_item: Option<ListItemView<S>>,
@@ -47,48 +47,43 @@ pub struct ListWithMembership<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetListsWithMembership<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct GetListsWithMembership<S: BosStr = DefaultStr> {
     pub actor: AtIdentifier<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub cursor: Option<S>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub purposes: Option<Vec<S>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetListsWithMembershipOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetListsWithMembershipOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
     pub lists_with_membership: Vec<get_lists_with_membership::ListWithMembership<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ListWithMembership<S> {
+impl<S: BosStr> LexiconSchema for ListWithMembership<S> {
     fn nsid() -> &'static str {
         "app.bsky.graph.getListsWithMembership"
     }
@@ -108,12 +103,11 @@ pub struct GetListsWithMembershipResponse;
 impl jacquard_common::xrpc::XrpcResp for GetListsWithMembershipResponse {
     const NSID: &'static str = "app.bsky.graph.getListsWithMembership";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetListsWithMembershipOutput<S>;
+    type Output<S: BosStr> = GetListsWithMembershipOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetListsWithMembership<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetListsWithMembership<S> {
     const NSID: &'static str = "app.bsky.graph.getListsWithMembership";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetListsWithMembershipResponse;
@@ -124,7 +118,7 @@ pub struct GetListsWithMembershipRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetListsWithMembershipRequest {
     const PATH: &'static str = "/xrpc/app.bsky.graph.getListsWithMembership";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetListsWithMembership<S>;
+    type Request<S: BosStr> = GetListsWithMembership<S>;
     type Response = GetListsWithMembershipResponse;
 }
 
@@ -147,9 +141,9 @@ pub mod list_with_membership_state {
         type List = Unset;
     }
     ///State transition - sets the `list` field to Set
-    pub struct SetList<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetList<S> {}
-    impl<S: State> State for SetList<S> {
+    pub struct SetList<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetList<St> {}
+    impl<St: State> State for SetList<St> {
         type List = Set<members::list>;
     }
     /// Marker types for field names
@@ -160,51 +154,51 @@ pub mod list_with_membership_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ListWithMembershipBuilder<'a, S: list_with_membership_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ListWithMembershipBuilder<S: BosStr, St: list_with_membership_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<ListView<S>>, Option<ListItemView<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ListWithMembership<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ListWithMembershipBuilder<'a, list_with_membership_state::Empty> {
+impl<S: BosStr> ListWithMembership<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ListWithMembershipBuilder<S, list_with_membership_state::Empty> {
         ListWithMembershipBuilder::new()
     }
 }
 
-impl<'a> ListWithMembershipBuilder<'a, list_with_membership_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ListWithMembershipBuilder<S, list_with_membership_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ListWithMembershipBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ListWithMembershipBuilder<'a, S>
+impl<S: BosStr, St> ListWithMembershipBuilder<S, St>
 where
-    S: list_with_membership_state::State,
-    S::List: list_with_membership_state::IsUnset,
+    St: list_with_membership_state::State,
+    St::List: list_with_membership_state::IsUnset,
 {
     /// Set the `list` field (required)
     pub fn list(
         mut self,
         value: impl Into<ListView<S>>,
-    ) -> ListWithMembershipBuilder<'a, list_with_membership_state::SetList<S>> {
+    ) -> ListWithMembershipBuilder<S, list_with_membership_state::SetList<St>> {
         self._fields.0 = Option::Some(value.into());
         ListWithMembershipBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: list_with_membership_state::State> ListWithMembershipBuilder<'a, S> {
+impl<S: BosStr, St: list_with_membership_state::State> ListWithMembershipBuilder<S, St> {
     /// Set the `listItem` field (optional)
     pub fn list_item(mut self, value: impl Into<Option<ListItemView<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -217,24 +211,24 @@ impl<'a, S: list_with_membership_state::State> ListWithMembershipBuilder<'a, S> 
     }
 }
 
-impl<'a, S> ListWithMembershipBuilder<'a, S>
+impl<S: BosStr, St> ListWithMembershipBuilder<S, St>
 where
-    S: list_with_membership_state::State,
-    S::List: list_with_membership_state::IsSet,
+    St: list_with_membership_state::State,
+    St::List: list_with_membership_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ListWithMembership<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ListWithMembership<S> {
         ListWithMembership {
             list: self._fields.0.unwrap(),
             list_item: self._fields.1,
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> ListWithMembership<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ListWithMembership<S> {
         ListWithMembership {
             list: self._fields.0.unwrap(),
             list_item: self._fields.1,
@@ -365,9 +359,9 @@ pub mod get_lists_with_membership_state {
         type Actor = Unset;
     }
     ///State transition - sets the `actor` field to Set
-    pub struct SetActor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetActor<S> {}
-    impl<S: State> State for SetActor<S> {
+    pub struct SetActor<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetActor<St> {}
+    impl<St: State> State for SetActor<St> {
         type Actor = Set<members::actor>;
     }
     /// Marker types for field names
@@ -378,60 +372,65 @@ pub mod get_lists_with_membership_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetListsWithMembershipBuilder<'a, S: get_lists_with_membership_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetListsWithMembershipBuilder<
+    S: BosStr,
+    St: get_lists_with_membership_state::State,
+> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtIdentifier<S>>, Option<S>, Option<i64>, Option<Vec<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetListsWithMembership<'a> {
-    /// Create a new builder for this type
+impl<S: BosStr> GetListsWithMembership<S> {
+    /// Create a new builder for this type.
     pub fn new() -> GetListsWithMembershipBuilder<
-        'a,
+        S,
         get_lists_with_membership_state::Empty,
     > {
         GetListsWithMembershipBuilder::new()
     }
 }
 
-impl<'a> GetListsWithMembershipBuilder<'a, get_lists_with_membership_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<
+    S: BosStr,
+> GetListsWithMembershipBuilder<S, get_lists_with_membership_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetListsWithMembershipBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetListsWithMembershipBuilder<'a, S>
+impl<S: BosStr, St> GetListsWithMembershipBuilder<S, St>
 where
-    S: get_lists_with_membership_state::State,
-    S::Actor: get_lists_with_membership_state::IsUnset,
+    St: get_lists_with_membership_state::State,
+    St::Actor: get_lists_with_membership_state::IsUnset,
 {
     /// Set the `actor` field (required)
     pub fn actor(
         mut self,
         value: impl Into<AtIdentifier<S>>,
     ) -> GetListsWithMembershipBuilder<
-        'a,
-        get_lists_with_membership_state::SetActor<S>,
+        S,
+        get_lists_with_membership_state::SetActor<St>,
     > {
         self._fields.0 = Option::Some(value.into());
         GetListsWithMembershipBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
 impl<
-    'a,
-    S: get_lists_with_membership_state::State,
-> GetListsWithMembershipBuilder<'a, S> {
+    S: BosStr,
+    St: get_lists_with_membership_state::State,
+> GetListsWithMembershipBuilder<S, St> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -445,9 +444,9 @@ impl<
 }
 
 impl<
-    'a,
-    S: get_lists_with_membership_state::State,
-> GetListsWithMembershipBuilder<'a, S> {
+    S: BosStr,
+    St: get_lists_with_membership_state::State,
+> GetListsWithMembershipBuilder<S, St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -461,9 +460,9 @@ impl<
 }
 
 impl<
-    'a,
-    S: get_lists_with_membership_state::State,
-> GetListsWithMembershipBuilder<'a, S> {
+    S: BosStr,
+    St: get_lists_with_membership_state::State,
+> GetListsWithMembershipBuilder<S, St> {
     /// Set the `purposes` field (optional)
     pub fn purposes(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -476,13 +475,13 @@ impl<
     }
 }
 
-impl<'a, S> GetListsWithMembershipBuilder<'a, S>
+impl<S: BosStr, St> GetListsWithMembershipBuilder<S, St>
 where
-    S: get_lists_with_membership_state::State,
-    S::Actor: get_lists_with_membership_state::IsSet,
+    St: get_lists_with_membership_state::State,
+    St::Actor: get_lists_with_membership_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetListsWithMembership<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetListsWithMembership<S> {
         GetListsWithMembership {
             actor: self._fields.0.unwrap(),
             cursor: self._fields.1,

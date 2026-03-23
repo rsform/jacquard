@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "place.stream.broadcast.origin",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Origin<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Origin<S: BosStr = DefaultStr> {
     ///did of the broadcaster that operates the server syndicating the livestream
     #[serde(skip_serializing_if = "Option::is_none")]
     pub broadcaster: Option<Did<S>>,
@@ -65,18 +65,18 @@ pub struct Origin<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct OriginGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct OriginGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Origin<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Origin<S> {
+impl<S: BosStr> Origin<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, OriginRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -89,17 +89,17 @@ pub struct OriginRecord;
 impl XrpcResp for OriginRecord {
     const NSID: &'static str = "place.stream.broadcast.origin";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = OriginGetRecordOutput<S>;
+    type Output<S: BosStr> = OriginGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<OriginGetRecordOutput<S>> for Origin<S> {
+impl<S: BosStr> From<OriginGetRecordOutput<S>> for Origin<S> {
     fn from(output: OriginGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Origin<S> {
+impl<S: BosStr> Collection for Origin<S> {
     const NSID: &'static str = "place.stream.broadcast.origin";
     type Record = OriginRecord;
 }
@@ -109,7 +109,7 @@ impl Collection for OriginRecord {
     type Record = OriginRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Origin<S> {
+impl<S: BosStr> LexiconSchema for Origin<S> {
     fn nsid() -> &'static str {
         "place.stream.broadcast.origin"
     }
@@ -144,57 +144,57 @@ pub mod origin_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Streamer;
         type Server;
         type UpdatedAt;
+        type Streamer;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Streamer = Unset;
         type Server = Unset;
         type UpdatedAt = Unset;
-    }
-    ///State transition - sets the `streamer` field to Set
-    pub struct SetStreamer<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStreamer<S> {}
-    impl<S: State> State for SetStreamer<S> {
-        type Streamer = Set<members::streamer>;
-        type Server = S::Server;
-        type UpdatedAt = S::UpdatedAt;
+        type Streamer = Unset;
     }
     ///State transition - sets the `server` field to Set
-    pub struct SetServer<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetServer<S> {}
-    impl<S: State> State for SetServer<S> {
-        type Streamer = S::Streamer;
+    pub struct SetServer<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetServer<St> {}
+    impl<St: State> State for SetServer<St> {
         type Server = Set<members::server>;
-        type UpdatedAt = S::UpdatedAt;
+        type UpdatedAt = St::UpdatedAt;
+        type Streamer = St::Streamer;
     }
     ///State transition - sets the `updated_at` field to Set
-    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
-    impl<S: State> State for SetUpdatedAt<S> {
-        type Streamer = S::Streamer;
-        type Server = S::Server;
+    pub struct SetUpdatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUpdatedAt<St> {}
+    impl<St: State> State for SetUpdatedAt<St> {
+        type Server = St::Server;
         type UpdatedAt = Set<members::updated_at>;
+        type Streamer = St::Streamer;
+    }
+    ///State transition - sets the `streamer` field to Set
+    pub struct SetStreamer<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStreamer<St> {}
+    impl<St: State> State for SetStreamer<St> {
+        type Server = St::Server;
+        type UpdatedAt = St::UpdatedAt;
+        type Streamer = Set<members::streamer>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `streamer` field
-        pub struct streamer(());
         ///Marker type for the `server` field
         pub struct server(());
         ///Marker type for the `updated_at` field
         pub struct updated_at(());
+        ///Marker type for the `streamer` field
+        pub struct streamer(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct OriginBuilder<'a, S: origin_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct OriginBuilder<S: BosStr, St: origin_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Did<S>>,
         Option<S>,
@@ -203,28 +203,28 @@ pub struct OriginBuilder<'a, S: origin_state::State> {
         Option<Datetime>,
         Option<UriValue<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Origin<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> OriginBuilder<'a, origin_state::Empty> {
+impl<S: BosStr> Origin<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> OriginBuilder<S, origin_state::Empty> {
         OriginBuilder::new()
     }
 }
 
-impl<'a> OriginBuilder<'a, origin_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> OriginBuilder<S, origin_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         OriginBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: origin_state::State> OriginBuilder<'a, S> {
+impl<S: BosStr, St: origin_state::State> OriginBuilder<S, St> {
     /// Set the `broadcaster` field (optional)
     pub fn broadcaster(mut self, value: impl Into<Option<Did<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -237,7 +237,7 @@ impl<'a, S: origin_state::State> OriginBuilder<'a, S> {
     }
 }
 
-impl<'a, S: origin_state::State> OriginBuilder<'a, S> {
+impl<S: BosStr, St: origin_state::State> OriginBuilder<S, St> {
     /// Set the `irohTicket` field (optional)
     pub fn iroh_ticket(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -250,64 +250,64 @@ impl<'a, S: origin_state::State> OriginBuilder<'a, S> {
     }
 }
 
-impl<'a, S> OriginBuilder<'a, S>
+impl<S: BosStr, St> OriginBuilder<S, St>
 where
-    S: origin_state::State,
-    S::Server: origin_state::IsUnset,
+    St: origin_state::State,
+    St::Server: origin_state::IsUnset,
 {
     /// Set the `server` field (required)
     pub fn server(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> OriginBuilder<'a, origin_state::SetServer<S>> {
+    ) -> OriginBuilder<S, origin_state::SetServer<St>> {
         self._fields.2 = Option::Some(value.into());
         OriginBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> OriginBuilder<'a, S>
+impl<S: BosStr, St> OriginBuilder<S, St>
 where
-    S: origin_state::State,
-    S::Streamer: origin_state::IsUnset,
+    St: origin_state::State,
+    St::Streamer: origin_state::IsUnset,
 {
     /// Set the `streamer` field (required)
     pub fn streamer(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> OriginBuilder<'a, origin_state::SetStreamer<S>> {
+    ) -> OriginBuilder<S, origin_state::SetStreamer<St>> {
         self._fields.3 = Option::Some(value.into());
         OriginBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> OriginBuilder<'a, S>
+impl<S: BosStr, St> OriginBuilder<S, St>
 where
-    S: origin_state::State,
-    S::UpdatedAt: origin_state::IsUnset,
+    St: origin_state::State,
+    St::UpdatedAt: origin_state::IsUnset,
 {
     /// Set the `updatedAt` field (required)
     pub fn updated_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> OriginBuilder<'a, origin_state::SetUpdatedAt<S>> {
+    ) -> OriginBuilder<S, origin_state::SetUpdatedAt<St>> {
         self._fields.4 = Option::Some(value.into());
         OriginBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: origin_state::State> OriginBuilder<'a, S> {
+impl<S: BosStr, St: origin_state::State> OriginBuilder<S, St> {
     /// Set the `websocketURL` field (optional)
     pub fn websocket_url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -320,15 +320,15 @@ impl<'a, S: origin_state::State> OriginBuilder<'a, S> {
     }
 }
 
-impl<'a, S> OriginBuilder<'a, S>
+impl<S: BosStr, St> OriginBuilder<S, St>
 where
-    S: origin_state::State,
-    S::Streamer: origin_state::IsSet,
-    S::Server: origin_state::IsSet,
-    S::UpdatedAt: origin_state::IsSet,
+    St: origin_state::State,
+    St::Server: origin_state::IsSet,
+    St::UpdatedAt: origin_state::IsSet,
+    St::Streamer: origin_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Origin<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Origin<S> {
         Origin {
             broadcaster: self._fields.0,
             iroh_ticket: self._fields.1,
@@ -339,8 +339,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Origin<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Origin<S> {
         Origin {
             broadcaster: self._fields.0,
             iroh_ticket: self._fields.1,

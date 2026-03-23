@@ -6,29 +6,32 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[allow(unused_imports)]
+use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Branches<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Branches<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub cursor: Option<S>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
-    #[serde(borrow)]
     pub repo: S,
 }
 
@@ -55,16 +58,13 @@ pub struct BranchesOutput {
 pub enum BranchesError {
     /// Repository not found or access denied
     #[serde(rename = "RepoNotFound")]
-    RepoNotFound(Option<jacquard_common::deps::smol_str::SmolStr>),
+    RepoNotFound(Option<SmolStr>),
     /// Invalid request parameters
     #[serde(rename = "InvalidRequest")]
-    InvalidRequest(Option<jacquard_common::deps::smol_str::SmolStr>),
+    InvalidRequest(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: jacquard_common::deps::smol_str::SmolStr,
-        message: Option<jacquard_common::deps::smol_str::SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for BranchesError {
@@ -100,9 +100,9 @@ pub struct BranchesResponse;
 impl jacquard_common::xrpc::XrpcResp for BranchesResponse {
     const NSID: &'static str = "sh.tangled.repo.branches";
     const ENCODING: &'static str = "*/*";
-    type Output<S: Bos<str> + AsRef<str>> = BranchesOutput;
+    type Output<S: BosStr> = BranchesOutput;
     type Err = BranchesError;
-    fn encode_output<S: Bos<str> + AsRef<str>>(
+    fn encode_output<S: BosStr>(
         output: &Self::Output<S>,
     ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError>
     where
@@ -114,7 +114,7 @@ impl jacquard_common::xrpc::XrpcResp for BranchesResponse {
         body: &'de [u8],
     ) -> Result<Self::Output<S>, jacquard_common::error::DecodeError>
     where
-        S: Bos<str> + AsRef<str> + Deserialize<'de>,
+        S: BosStr + Deserialize<'de>,
         Self::Output<S>: Deserialize<'de>,
     {
         Ok(BranchesOutput {
@@ -123,8 +123,7 @@ impl jacquard_common::xrpc::XrpcResp for BranchesResponse {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for Branches<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Branches<S> {
     const NSID: &'static str = "sh.tangled.repo.branches";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = BranchesResponse;
@@ -135,7 +134,7 @@ pub struct BranchesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for BranchesRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.repo.branches";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = Branches<S>;
+    type Request<S: BosStr> = Branches<S>;
     type Response = BranchesResponse;
 }
 
@@ -162,9 +161,9 @@ pub mod branches_state {
         type Repo = Unset;
     }
     ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
+    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRepo<St> {}
+    impl<St: State> State for SetRepo<St> {
         type Repo = Set<members::repo>;
     }
     /// Marker types for field names
@@ -175,32 +174,32 @@ pub mod branches_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct BranchesBuilder<'a, S: branches_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct BranchesBuilder<S: BosStr, St: branches_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Branches<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> BranchesBuilder<'a, branches_state::Empty> {
+impl<S: BosStr> Branches<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> BranchesBuilder<S, branches_state::Empty> {
         BranchesBuilder::new()
     }
 }
 
-impl<'a> BranchesBuilder<'a, branches_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> BranchesBuilder<S, branches_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         BranchesBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: branches_state::State> BranchesBuilder<'a, S> {
+impl<S: BosStr, St: branches_state::State> BranchesBuilder<S, St> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -213,7 +212,7 @@ impl<'a, S: branches_state::State> BranchesBuilder<'a, S> {
     }
 }
 
-impl<'a, S: branches_state::State> BranchesBuilder<'a, S> {
+impl<S: BosStr, St: branches_state::State> BranchesBuilder<S, St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -226,32 +225,32 @@ impl<'a, S: branches_state::State> BranchesBuilder<'a, S> {
     }
 }
 
-impl<'a, S> BranchesBuilder<'a, S>
+impl<S: BosStr, St> BranchesBuilder<S, St>
 where
-    S: branches_state::State,
-    S::Repo: branches_state::IsUnset,
+    St: branches_state::State,
+    St::Repo: branches_state::IsUnset,
 {
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
         value: impl Into<S>,
-    ) -> BranchesBuilder<'a, branches_state::SetRepo<S>> {
+    ) -> BranchesBuilder<S, branches_state::SetRepo<St>> {
         self._fields.2 = Option::Some(value.into());
         BranchesBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BranchesBuilder<'a, S>
+impl<S: BosStr, St> BranchesBuilder<S, St>
 where
-    S: branches_state::State,
-    S::Repo: branches_state::IsSet,
+    St: branches_state::State,
+    St::Repo: branches_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Branches<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Branches<S> {
         Branches {
             cursor: self._fields.0,
             limit: self._fields.1,

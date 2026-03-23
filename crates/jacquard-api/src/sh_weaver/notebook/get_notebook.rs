@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
@@ -20,33 +20,30 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::sh_weaver::notebook::NotebookView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetNotebook<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct GetNotebook<S: BosStr = DefaultStr> {
     pub notebook: AtUri<S>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetNotebookOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetNotebookOutput<S: BosStr = DefaultStr> {
     pub entries: Vec<StrongRef<S>>,
     pub notebook: NotebookView<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -55,12 +52,11 @@ pub struct GetNotebookResponse;
 impl jacquard_common::xrpc::XrpcResp for GetNotebookResponse {
     const NSID: &'static str = "sh.weaver.notebook.getNotebook";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetNotebookOutput<S>;
+    type Output<S: BosStr> = GetNotebookOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetNotebook<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetNotebook<S> {
     const NSID: &'static str = "sh.weaver.notebook.getNotebook";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetNotebookResponse;
@@ -71,7 +67,7 @@ pub struct GetNotebookRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetNotebookRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.notebook.getNotebook";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetNotebook<S>;
+    type Request<S: BosStr> = GetNotebook<S>;
     type Response = GetNotebookResponse;
 }
 
@@ -94,9 +90,9 @@ pub mod get_notebook_state {
         type Notebook = Unset;
     }
     ///State transition - sets the `notebook` field to Set
-    pub struct SetNotebook<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNotebook<S> {}
-    impl<S: State> State for SetNotebook<S> {
+    pub struct SetNotebook<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetNotebook<St> {}
+    impl<St: State> State for SetNotebook<St> {
         type Notebook = Set<members::notebook>;
     }
     /// Marker types for field names
@@ -107,57 +103,57 @@ pub mod get_notebook_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetNotebookBuilder<'a, S: get_notebook_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetNotebookBuilder<S: BosStr, St: get_notebook_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetNotebook<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetNotebookBuilder<'a, get_notebook_state::Empty> {
+impl<S: BosStr> GetNotebook<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetNotebookBuilder<S, get_notebook_state::Empty> {
         GetNotebookBuilder::new()
     }
 }
 
-impl<'a> GetNotebookBuilder<'a, get_notebook_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetNotebookBuilder<S, get_notebook_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetNotebookBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetNotebookBuilder<'a, S>
+impl<S: BosStr, St> GetNotebookBuilder<S, St>
 where
-    S: get_notebook_state::State,
-    S::Notebook: get_notebook_state::IsUnset,
+    St: get_notebook_state::State,
+    St::Notebook: get_notebook_state::IsUnset,
 {
     /// Set the `notebook` field (required)
     pub fn notebook(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> GetNotebookBuilder<'a, get_notebook_state::SetNotebook<S>> {
+    ) -> GetNotebookBuilder<S, get_notebook_state::SetNotebook<St>> {
         self._fields.0 = Option::Some(value.into());
         GetNotebookBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetNotebookBuilder<'a, S>
+impl<S: BosStr, St> GetNotebookBuilder<S, St>
 where
-    S: get_notebook_state::State,
-    S::Notebook: get_notebook_state::IsSet,
+    St: get_notebook_state::State,
+    St::Notebook: get_notebook_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetNotebook<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetNotebook<S> {
         GetNotebook {
             notebook: self._fields.0.unwrap(),
         }

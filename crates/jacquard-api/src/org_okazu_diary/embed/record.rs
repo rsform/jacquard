@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -29,17 +29,17 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Record<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Record<S: BosStr = DefaultStr> {
     pub record: StrongRef<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Record<S> {
+impl<S: BosStr> LexiconSchema for Record<S> {
     fn nsid() -> &'static str {
         "org.okazu-diary.embed.record"
     }
@@ -73,9 +73,9 @@ pub mod record_state {
         type Record = Unset;
     }
     ///State transition - sets the `record` field to Set
-    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRecord<S> {}
-    impl<S: State> State for SetRecord<S> {
+    pub struct SetRecord<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRecord<St> {}
+    impl<St: State> State for SetRecord<St> {
         type Record = Set<members::record>;
     }
     /// Marker types for field names
@@ -86,64 +86,64 @@ pub mod record_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct RecordBuilder<'a, S: record_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct RecordBuilder<S: BosStr, St: record_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<StrongRef<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Record<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> RecordBuilder<'a, record_state::Empty> {
+impl<S: BosStr> Record<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> RecordBuilder<S, record_state::Empty> {
         RecordBuilder::new()
     }
 }
 
-impl<'a> RecordBuilder<'a, record_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> RecordBuilder<S, record_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         RecordBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RecordBuilder<'a, S>
+impl<S: BosStr, St> RecordBuilder<S, St>
 where
-    S: record_state::State,
-    S::Record: record_state::IsUnset,
+    St: record_state::State,
+    St::Record: record_state::IsUnset,
 {
     /// Set the `record` field (required)
     pub fn record(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> RecordBuilder<'a, record_state::SetRecord<S>> {
+    ) -> RecordBuilder<S, record_state::SetRecord<St>> {
         self._fields.0 = Option::Some(value.into());
         RecordBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RecordBuilder<'a, S>
+impl<S: BosStr, St> RecordBuilder<S, St>
 where
-    S: record_state::State,
-    S::Record: record_state::IsSet,
+    St: record_state::State,
+    St::Record: record_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Record<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Record<S> {
         Record {
             record: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Record<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Record<S> {
         Record {
             record: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

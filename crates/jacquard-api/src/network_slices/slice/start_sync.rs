@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, Nsid};
 use jacquard_common::types::value::Data;
@@ -18,14 +18,14 @@ use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct StartSync<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct StartSync<S: BosStr = DefaultStr> {
     ///List of collection NSIDs to sync (primary collections matching slice domain)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub collections: Option<Vec<Nsid<S>>>,
@@ -44,29 +44,25 @@ pub struct StartSync<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub skip_validation: Option<bool>,
     ///AT-URI of the slice to sync data into
     pub slice: S,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct StartSyncOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct StartSyncOutput<S: BosStr = DefaultStr> {
     ///UUID of the enqueued sync job
     pub job_id: S,
     ///Success message confirming job enqueue
     pub message: S,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -75,12 +71,11 @@ pub struct StartSyncResponse;
 impl jacquard_common::xrpc::XrpcResp for StartSyncResponse {
     const NSID: &'static str = "network.slices.slice.startSync";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = StartSyncOutput<S>;
+    type Output<S: BosStr> = StartSyncOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for StartSync<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for StartSync<S> {
     const NSID: &'static str = "network.slices.slice.startSync";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -95,7 +90,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for StartSyncRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = StartSync<S>;
+    type Request<S: BosStr> = StartSync<S>;
     type Response = StartSyncResponse;
 }
 

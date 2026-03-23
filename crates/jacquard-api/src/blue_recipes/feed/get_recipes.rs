@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::value::Data;
@@ -19,19 +19,17 @@ use serde::{Serialize, Deserialize};
 use crate::blue_recipes::feed::RecipeView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetRecipes<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetRecipes<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub author: Option<AtIdentifier<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub cursor: Option<S>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
@@ -41,19 +39,17 @@ pub struct GetRecipes<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetRecipesOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetRecipesOutput<S: BosStr = DefaultStr> {
     pub next_cursor: S,
     pub recipes: Vec<RecipeView<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -62,12 +58,11 @@ pub struct GetRecipesResponse;
 impl jacquard_common::xrpc::XrpcResp for GetRecipesResponse {
     const NSID: &'static str = "blue.recipes.feed.getRecipes";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetRecipesOutput<S>;
+    type Output<S: BosStr> = GetRecipesOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetRecipes<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetRecipes<S> {
     const NSID: &'static str = "blue.recipes.feed.getRecipes";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetRecipesResponse;
@@ -78,7 +73,7 @@ pub struct GetRecipesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetRecipesRequest {
     const PATH: &'static str = "/xrpc/blue.recipes.feed.getRecipes";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetRecipes<S>;
+    type Request<S: BosStr> = GetRecipes<S>;
     type Response = GetRecipesResponse;
 }
 
@@ -105,32 +100,32 @@ pub mod get_recipes_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetRecipesBuilder<'a, S: get_recipes_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetRecipesBuilder<S: BosStr, St: get_recipes_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtIdentifier<S>>, Option<S>, Option<i64>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetRecipes<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetRecipesBuilder<'a, get_recipes_state::Empty> {
+impl<S: BosStr> GetRecipes<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetRecipesBuilder<S, get_recipes_state::Empty> {
         GetRecipesBuilder::new()
     }
 }
 
-impl<'a> GetRecipesBuilder<'a, get_recipes_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetRecipesBuilder<S, get_recipes_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetRecipesBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: get_recipes_state::State> GetRecipesBuilder<'a, S> {
+impl<S: BosStr, St: get_recipes_state::State> GetRecipesBuilder<S, St> {
     /// Set the `author` field (optional)
     pub fn author(mut self, value: impl Into<Option<AtIdentifier<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -143,7 +138,7 @@ impl<'a, S: get_recipes_state::State> GetRecipesBuilder<'a, S> {
     }
 }
 
-impl<'a, S: get_recipes_state::State> GetRecipesBuilder<'a, S> {
+impl<S: BosStr, St: get_recipes_state::State> GetRecipesBuilder<S, St> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -156,7 +151,7 @@ impl<'a, S: get_recipes_state::State> GetRecipesBuilder<'a, S> {
     }
 }
 
-impl<'a, S: get_recipes_state::State> GetRecipesBuilder<'a, S> {
+impl<S: BosStr, St: get_recipes_state::State> GetRecipesBuilder<S, St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -169,12 +164,12 @@ impl<'a, S: get_recipes_state::State> GetRecipesBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GetRecipesBuilder<'a, S>
+impl<S: BosStr, St> GetRecipesBuilder<S, St>
 where
-    S: get_recipes_state::State,
+    St: get_recipes_state::State,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetRecipes<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetRecipes<S> {
         GetRecipes {
             author: self._fields.0,
             cursor: self._fields.1,

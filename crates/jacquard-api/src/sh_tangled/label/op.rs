@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use crate::sh_tangled::label::op;
     rename = "sh.tangled.label.op",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Op<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Op<S: BosStr = DefaultStr> {
     pub add: Vec<op::Operand<S>>,
     pub delete: Vec<op::Operand<S>>,
     pub performed_at: Datetime,
@@ -55,11 +55,11 @@ pub struct Op<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct OpGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct OpGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
@@ -71,11 +71,11 @@ pub struct OpGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Operand<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Operand<S: BosStr = DefaultStr> {
     ///ATURI to the label definition
     pub key: AtUri<S>,
     ///Stringified value of the label. This is first unstringed by appviews and then interpreted as a concrete value.
@@ -84,7 +84,7 @@ pub struct Operand<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Op<S> {
+impl<S: BosStr> Op<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, OpRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -97,17 +97,17 @@ pub struct OpRecord;
 impl XrpcResp for OpRecord {
     const NSID: &'static str = "sh.tangled.label.op";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = OpGetRecordOutput<S>;
+    type Output<S: BosStr> = OpGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<OpGetRecordOutput<S>> for Op<S> {
+impl<S: BosStr> From<OpGetRecordOutput<S>> for Op<S> {
     fn from(output: OpGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Op<S> {
+impl<S: BosStr> Collection for Op<S> {
     const NSID: &'static str = "sh.tangled.label.op";
     type Record = OpRecord;
 }
@@ -117,7 +117,7 @@ impl Collection for OpRecord {
     type Record = OpRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Op<S> {
+impl<S: BosStr> LexiconSchema for Op<S> {
     fn nsid() -> &'static str {
         "sh.tangled.label.op"
     }
@@ -132,7 +132,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Op<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Operand<S> {
+impl<S: BosStr> LexiconSchema for Operand<S> {
     fn nsid() -> &'static str {
         "sh.tangled.label.op"
     }
@@ -157,186 +157,186 @@ pub mod op_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Add;
         type Delete;
-        type PerformedAt;
+        type Add;
         type Subject;
+        type PerformedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Add = Unset;
         type Delete = Unset;
-        type PerformedAt = Unset;
+        type Add = Unset;
         type Subject = Unset;
-    }
-    ///State transition - sets the `add` field to Set
-    pub struct SetAdd<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAdd<S> {}
-    impl<S: State> State for SetAdd<S> {
-        type Add = Set<members::add>;
-        type Delete = S::Delete;
-        type PerformedAt = S::PerformedAt;
-        type Subject = S::Subject;
+        type PerformedAt = Unset;
     }
     ///State transition - sets the `delete` field to Set
-    pub struct SetDelete<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDelete<S> {}
-    impl<S: State> State for SetDelete<S> {
-        type Add = S::Add;
+    pub struct SetDelete<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDelete<St> {}
+    impl<St: State> State for SetDelete<St> {
         type Delete = Set<members::delete>;
-        type PerformedAt = S::PerformedAt;
-        type Subject = S::Subject;
+        type Add = St::Add;
+        type Subject = St::Subject;
+        type PerformedAt = St::PerformedAt;
     }
-    ///State transition - sets the `performed_at` field to Set
-    pub struct SetPerformedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPerformedAt<S> {}
-    impl<S: State> State for SetPerformedAt<S> {
-        type Add = S::Add;
-        type Delete = S::Delete;
-        type PerformedAt = Set<members::performed_at>;
-        type Subject = S::Subject;
+    ///State transition - sets the `add` field to Set
+    pub struct SetAdd<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAdd<St> {}
+    impl<St: State> State for SetAdd<St> {
+        type Delete = St::Delete;
+        type Add = Set<members::add>;
+        type Subject = St::Subject;
+        type PerformedAt = St::PerformedAt;
     }
     ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type Add = S::Add;
-        type Delete = S::Delete;
-        type PerformedAt = S::PerformedAt;
+    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubject<St> {}
+    impl<St: State> State for SetSubject<St> {
+        type Delete = St::Delete;
+        type Add = St::Add;
         type Subject = Set<members::subject>;
+        type PerformedAt = St::PerformedAt;
+    }
+    ///State transition - sets the `performed_at` field to Set
+    pub struct SetPerformedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPerformedAt<St> {}
+    impl<St: State> State for SetPerformedAt<St> {
+        type Delete = St::Delete;
+        type Add = St::Add;
+        type Subject = St::Subject;
+        type PerformedAt = Set<members::performed_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `add` field
-        pub struct add(());
         ///Marker type for the `delete` field
         pub struct delete(());
-        ///Marker type for the `performed_at` field
-        pub struct performed_at(());
+        ///Marker type for the `add` field
+        pub struct add(());
         ///Marker type for the `subject` field
         pub struct subject(());
+        ///Marker type for the `performed_at` field
+        pub struct performed_at(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct OpBuilder<'a, S: op_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct OpBuilder<S: BosStr, St: op_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<op::Operand<S>>>,
         Option<Vec<op::Operand<S>>>,
         Option<Datetime>,
         Option<AtUri<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Op<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> OpBuilder<'a, op_state::Empty> {
+impl<S: BosStr> Op<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> OpBuilder<S, op_state::Empty> {
         OpBuilder::new()
     }
 }
 
-impl<'a> OpBuilder<'a, op_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> OpBuilder<S, op_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         OpBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> OpBuilder<'a, S>
+impl<S: BosStr, St> OpBuilder<S, St>
 where
-    S: op_state::State,
-    S::Add: op_state::IsUnset,
+    St: op_state::State,
+    St::Add: op_state::IsUnset,
 {
     /// Set the `add` field (required)
     pub fn add(
         mut self,
         value: impl Into<Vec<op::Operand<S>>>,
-    ) -> OpBuilder<'a, op_state::SetAdd<S>> {
+    ) -> OpBuilder<S, op_state::SetAdd<St>> {
         self._fields.0 = Option::Some(value.into());
         OpBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> OpBuilder<'a, S>
+impl<S: BosStr, St> OpBuilder<S, St>
 where
-    S: op_state::State,
-    S::Delete: op_state::IsUnset,
+    St: op_state::State,
+    St::Delete: op_state::IsUnset,
 {
     /// Set the `delete` field (required)
     pub fn delete(
         mut self,
         value: impl Into<Vec<op::Operand<S>>>,
-    ) -> OpBuilder<'a, op_state::SetDelete<S>> {
+    ) -> OpBuilder<S, op_state::SetDelete<St>> {
         self._fields.1 = Option::Some(value.into());
         OpBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> OpBuilder<'a, S>
+impl<S: BosStr, St> OpBuilder<S, St>
 where
-    S: op_state::State,
-    S::PerformedAt: op_state::IsUnset,
+    St: op_state::State,
+    St::PerformedAt: op_state::IsUnset,
 {
     /// Set the `performedAt` field (required)
     pub fn performed_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> OpBuilder<'a, op_state::SetPerformedAt<S>> {
+    ) -> OpBuilder<S, op_state::SetPerformedAt<St>> {
         self._fields.2 = Option::Some(value.into());
         OpBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> OpBuilder<'a, S>
+impl<S: BosStr, St> OpBuilder<S, St>
 where
-    S: op_state::State,
-    S::Subject: op_state::IsUnset,
+    St: op_state::State,
+    St::Subject: op_state::IsUnset,
 {
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> OpBuilder<'a, op_state::SetSubject<S>> {
+    ) -> OpBuilder<S, op_state::SetSubject<St>> {
         self._fields.3 = Option::Some(value.into());
         OpBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> OpBuilder<'a, S>
+impl<S: BosStr, St> OpBuilder<S, St>
 where
-    S: op_state::State,
-    S::Add: op_state::IsSet,
-    S::Delete: op_state::IsSet,
-    S::PerformedAt: op_state::IsSet,
-    S::Subject: op_state::IsSet,
+    St: op_state::State,
+    St::Delete: op_state::IsSet,
+    St::Add: op_state::IsSet,
+    St::Subject: op_state::IsSet,
+    St::PerformedAt: op_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Op<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Op<S> {
         Op {
             add: self._fields.0.unwrap(),
             delete: self._fields.1.unwrap(),
@@ -345,8 +345,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Op<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Op<S> {
         Op {
             add: self._fields.0.unwrap(),
             delete: self._fields.1.unwrap(),
@@ -479,122 +479,119 @@ pub mod operand_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Key;
         type Value;
+        type Key;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Key = Unset;
         type Value = Unset;
-    }
-    ///State transition - sets the `key` field to Set
-    pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetKey<S> {}
-    impl<S: State> State for SetKey<S> {
-        type Key = Set<members::key>;
-        type Value = S::Value;
+        type Key = Unset;
     }
     ///State transition - sets the `value` field to Set
-    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValue<S> {}
-    impl<S: State> State for SetValue<S> {
-        type Key = S::Key;
+    pub struct SetValue<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetValue<St> {}
+    impl<St: State> State for SetValue<St> {
         type Value = Set<members::value>;
+        type Key = St::Key;
+    }
+    ///State transition - sets the `key` field to Set
+    pub struct SetKey<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetKey<St> {}
+    impl<St: State> State for SetKey<St> {
+        type Value = St::Value;
+        type Key = Set<members::key>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `key` field
-        pub struct key(());
         ///Marker type for the `value` field
         pub struct value(());
+        ///Marker type for the `key` field
+        pub struct key(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct OperandBuilder<'a, S: operand_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct OperandBuilder<S: BosStr, St: operand_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Operand<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> OperandBuilder<'a, operand_state::Empty> {
+impl<S: BosStr> Operand<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> OperandBuilder<S, operand_state::Empty> {
         OperandBuilder::new()
     }
 }
 
-impl<'a> OperandBuilder<'a, operand_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> OperandBuilder<S, operand_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         OperandBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> OperandBuilder<'a, S>
+impl<S: BosStr, St> OperandBuilder<S, St>
 where
-    S: operand_state::State,
-    S::Key: operand_state::IsUnset,
+    St: operand_state::State,
+    St::Key: operand_state::IsUnset,
 {
     /// Set the `key` field (required)
     pub fn key(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> OperandBuilder<'a, operand_state::SetKey<S>> {
+    ) -> OperandBuilder<S, operand_state::SetKey<St>> {
         self._fields.0 = Option::Some(value.into());
         OperandBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> OperandBuilder<'a, S>
+impl<S: BosStr, St> OperandBuilder<S, St>
 where
-    S: operand_state::State,
-    S::Value: operand_state::IsUnset,
+    St: operand_state::State,
+    St::Value: operand_state::IsUnset,
 {
     /// Set the `value` field (required)
     pub fn value(
         mut self,
         value: impl Into<S>,
-    ) -> OperandBuilder<'a, operand_state::SetValue<S>> {
+    ) -> OperandBuilder<S, operand_state::SetValue<St>> {
         self._fields.1 = Option::Some(value.into());
         OperandBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> OperandBuilder<'a, S>
+impl<S: BosStr, St> OperandBuilder<S, St>
 where
-    S: operand_state::State,
-    S::Key: operand_state::IsSet,
-    S::Value: operand_state::IsSet,
+    St: operand_state::State,
+    St::Value: operand_state::IsSet,
+    St::Key: operand_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Operand<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Operand<S> {
         Operand {
             key: self._fields.0.unwrap(),
             value: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Operand<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Operand<S> {
         Operand {
             key: self._fields.0.unwrap(),
             value: self._fields.1.unwrap(),

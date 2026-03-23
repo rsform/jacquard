@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "ch.indiemusi.social.song",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Song<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Song<S: BosStr = DefaultStr> {
     ///Number of joiners needed to start the full listening experience
     pub joiners_needed: i64,
     ///Name of the song
@@ -54,18 +54,18 @@ pub struct Song<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SongGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SongGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Song<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Song<S> {
+impl<S: BosStr> Song<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, SongRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -78,17 +78,17 @@ pub struct SongRecord;
 impl XrpcResp for SongRecord {
     const NSID: &'static str = "ch.indiemusi.social.song";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = SongGetRecordOutput<S>;
+    type Output<S: BosStr> = SongGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<SongGetRecordOutput<S>> for Song<S> {
+impl<S: BosStr> From<SongGetRecordOutput<S>> for Song<S> {
     fn from(output: SongGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Song<S> {
+impl<S: BosStr> Collection for Song<S> {
     const NSID: &'static str = "ch.indiemusi.social.song";
     type Record = SongRecord;
 }
@@ -98,7 +98,7 @@ impl Collection for SongRecord {
     type Record = SongRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Song<S> {
+impl<S: BosStr> LexiconSchema for Song<S> {
     fn nsid() -> &'static str {
         "ch.indiemusi.social.song"
     }
@@ -168,119 +168,119 @@ pub mod song_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type JoinersNeeded;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type JoinersNeeded = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type JoinersNeeded = S::JoinersNeeded;
+        type Name = Unset;
     }
     ///State transition - sets the `joiners_needed` field to Set
-    pub struct SetJoinersNeeded<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetJoinersNeeded<S> {}
-    impl<S: State> State for SetJoinersNeeded<S> {
-        type Name = S::Name;
+    pub struct SetJoinersNeeded<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetJoinersNeeded<St> {}
+    impl<St: State> State for SetJoinersNeeded<St> {
         type JoinersNeeded = Set<members::joiners_needed>;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type JoinersNeeded = St::JoinersNeeded;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `joiners_needed` field
         pub struct joiners_needed(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct SongBuilder<'a, S: song_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct SongBuilder<S: BosStr, St: song_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Song<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> SongBuilder<'a, song_state::Empty> {
+impl<S: BosStr> Song<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> SongBuilder<S, song_state::Empty> {
         SongBuilder::new()
     }
 }
 
-impl<'a> SongBuilder<'a, song_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> SongBuilder<S, song_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SongBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SongBuilder<'a, S>
+impl<S: BosStr, St> SongBuilder<S, St>
 where
-    S: song_state::State,
-    S::JoinersNeeded: song_state::IsUnset,
+    St: song_state::State,
+    St::JoinersNeeded: song_state::IsUnset,
 {
     /// Set the `joinersNeeded` field (required)
     pub fn joiners_needed(
         mut self,
         value: impl Into<i64>,
-    ) -> SongBuilder<'a, song_state::SetJoinersNeeded<S>> {
+    ) -> SongBuilder<S, song_state::SetJoinersNeeded<St>> {
         self._fields.0 = Option::Some(value.into());
         SongBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SongBuilder<'a, S>
+impl<S: BosStr, St> SongBuilder<S, St>
 where
-    S: song_state::State,
-    S::Name: song_state::IsUnset,
+    St: song_state::State,
+    St::Name: song_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> SongBuilder<'a, song_state::SetName<S>> {
+    ) -> SongBuilder<S, song_state::SetName<St>> {
         self._fields.1 = Option::Some(value.into());
         SongBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SongBuilder<'a, S>
+impl<S: BosStr, St> SongBuilder<S, St>
 where
-    S: song_state::State,
-    S::Name: song_state::IsSet,
-    S::JoinersNeeded: song_state::IsSet,
+    St: song_state::State,
+    St::JoinersNeeded: song_state::IsSet,
+    St::Name: song_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Song<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Song<S> {
         Song {
             joiners_needed: self._fields.0.unwrap(),
             name: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Song<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Song<S> {
         Song {
             joiners_needed: self._fields.0.unwrap(),
             name: self._fields.1.unwrap(),

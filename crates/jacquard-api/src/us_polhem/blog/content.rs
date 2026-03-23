@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "us.polhem.blog.content",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Content<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Content<S: BosStr = DefaultStr> {
     pub content: S,
     pub created_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -55,18 +55,18 @@ pub struct Content<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ContentGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ContentGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Content<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Content<S> {
+impl<S: BosStr> Content<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, ContentRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -79,17 +79,17 @@ pub struct ContentRecord;
 impl XrpcResp for ContentRecord {
     const NSID: &'static str = "us.polhem.blog.content";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ContentGetRecordOutput<S>;
+    type Output<S: BosStr> = ContentGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<ContentGetRecordOutput<S>> for Content<S> {
+impl<S: BosStr> From<ContentGetRecordOutput<S>> for Content<S> {
     fn from(output: ContentGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Content<S> {
+impl<S: BosStr> Collection for Content<S> {
     const NSID: &'static str = "us.polhem.blog.content";
     type Record = ContentRecord;
 }
@@ -99,7 +99,7 @@ impl Collection for ContentRecord {
     type Record = ContentRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Content<S> {
+impl<S: BosStr> LexiconSchema for Content<S> {
     fn nsid() -> &'static str {
         "us.polhem.blog.content"
     }
@@ -146,118 +146,118 @@ pub mod content_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Content;
-        type Slug;
         type CreatedAt;
+        type Slug;
+        type Content;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Content = Unset;
-        type Slug = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type Content = Set<members::content>;
-        type Slug = S::Slug;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `slug` field to Set
-    pub struct SetSlug<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSlug<S> {}
-    impl<S: State> State for SetSlug<S> {
-        type Content = S::Content;
-        type Slug = Set<members::slug>;
-        type CreatedAt = S::CreatedAt;
+        type Slug = Unset;
+        type Content = Unset;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Content = S::Content;
-        type Slug = S::Slug;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
+        type Slug = St::Slug;
+        type Content = St::Content;
+    }
+    ///State transition - sets the `slug` field to Set
+    pub struct SetSlug<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSlug<St> {}
+    impl<St: State> State for SetSlug<St> {
+        type CreatedAt = St::CreatedAt;
+        type Slug = Set<members::slug>;
+        type Content = St::Content;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetContent<St> {}
+    impl<St: State> State for SetContent<St> {
+        type CreatedAt = St::CreatedAt;
+        type Slug = St::Slug;
+        type Content = Set<members::content>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `content` field
-        pub struct content(());
-        ///Marker type for the `slug` field
-        pub struct slug(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `slug` field
+        pub struct slug(());
+        ///Marker type for the `content` field
+        pub struct content(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ContentBuilder<'a, S: content_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ContentBuilder<S: BosStr, St: content_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<Datetime>, Option<Vec<Data<S>>>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Content<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ContentBuilder<'a, content_state::Empty> {
+impl<S: BosStr> Content<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ContentBuilder<S, content_state::Empty> {
         ContentBuilder::new()
     }
 }
 
-impl<'a> ContentBuilder<'a, content_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ContentBuilder<S, content_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ContentBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ContentBuilder<'a, S>
+impl<S: BosStr, St> ContentBuilder<S, St>
 where
-    S: content_state::State,
-    S::Content: content_state::IsUnset,
+    St: content_state::State,
+    St::Content: content_state::IsUnset,
 {
     /// Set the `content` field (required)
     pub fn content(
         mut self,
         value: impl Into<S>,
-    ) -> ContentBuilder<'a, content_state::SetContent<S>> {
+    ) -> ContentBuilder<S, content_state::SetContent<St>> {
         self._fields.0 = Option::Some(value.into());
         ContentBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ContentBuilder<'a, S>
+impl<S: BosStr, St> ContentBuilder<S, St>
 where
-    S: content_state::State,
-    S::CreatedAt: content_state::IsUnset,
+    St: content_state::State,
+    St::CreatedAt: content_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ContentBuilder<'a, content_state::SetCreatedAt<S>> {
+    ) -> ContentBuilder<S, content_state::SetCreatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         ContentBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: content_state::State> ContentBuilder<'a, S> {
+impl<S: BosStr, St: content_state::State> ContentBuilder<S, St> {
     /// Set the `images` field (optional)
     pub fn images(mut self, value: impl Into<Option<Vec<Data<S>>>>) -> Self {
         self._fields.2 = value.into();
@@ -270,34 +270,34 @@ impl<'a, S: content_state::State> ContentBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ContentBuilder<'a, S>
+impl<S: BosStr, St> ContentBuilder<S, St>
 where
-    S: content_state::State,
-    S::Slug: content_state::IsUnset,
+    St: content_state::State,
+    St::Slug: content_state::IsUnset,
 {
     /// Set the `slug` field (required)
     pub fn slug(
         mut self,
         value: impl Into<S>,
-    ) -> ContentBuilder<'a, content_state::SetSlug<S>> {
+    ) -> ContentBuilder<S, content_state::SetSlug<St>> {
         self._fields.3 = Option::Some(value.into());
         ContentBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ContentBuilder<'a, S>
+impl<S: BosStr, St> ContentBuilder<S, St>
 where
-    S: content_state::State,
-    S::Content: content_state::IsSet,
-    S::Slug: content_state::IsSet,
-    S::CreatedAt: content_state::IsSet,
+    St: content_state::State,
+    St::CreatedAt: content_state::IsSet,
+    St::Slug: content_state::IsSet,
+    St::Content: content_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Content<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Content<S> {
         Content {
             content: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
@@ -306,11 +306,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Content<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Content<S> {
         Content {
             content: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),

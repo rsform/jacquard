@@ -6,22 +6,26 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[allow(unused_imports)]
+use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SeekParams<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SeekParams<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub player_id: Option<S>,
     pub position: i64,
 }
@@ -35,7 +39,7 @@ pub struct SeekResponse;
 impl jacquard_common::xrpc::XrpcResp for SeekResponse {
     const NSID: &'static str = "app.rocksky.player.seek";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ();
+    type Output<S: BosStr> = ();
     type Err = jacquard_common::xrpc::GenericError;
 }
 
@@ -54,7 +58,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for SeekRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = Seek;
+    type Request<S: BosStr> = Seek;
     type Response = SeekResponse;
 }
 
@@ -77,9 +81,9 @@ pub mod seek_params_state {
         type Position = Unset;
     }
     ///State transition - sets the `position` field to Set
-    pub struct SetPosition<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPosition<S> {}
-    impl<S: State> State for SetPosition<S> {
+    pub struct SetPosition<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPosition<St> {}
+    impl<St: State> State for SetPosition<St> {
         type Position = Set<members::position>;
     }
     /// Marker types for field names
@@ -90,32 +94,32 @@ pub mod seek_params_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct SeekParamsBuilder<'a, S: seek_params_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct SeekParamsBuilder<S: BosStr, St: seek_params_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> SeekParams<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> SeekParamsBuilder<'a, seek_params_state::Empty> {
+impl<S: BosStr> SeekParams<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> SeekParamsBuilder<S, seek_params_state::Empty> {
         SeekParamsBuilder::new()
     }
 }
 
-impl<'a> SeekParamsBuilder<'a, seek_params_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> SeekParamsBuilder<S, seek_params_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SeekParamsBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: seek_params_state::State> SeekParamsBuilder<'a, S> {
+impl<S: BosStr, St: seek_params_state::State> SeekParamsBuilder<S, St> {
     /// Set the `playerId` field (optional)
     pub fn player_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -128,32 +132,32 @@ impl<'a, S: seek_params_state::State> SeekParamsBuilder<'a, S> {
     }
 }
 
-impl<'a, S> SeekParamsBuilder<'a, S>
+impl<S: BosStr, St> SeekParamsBuilder<S, St>
 where
-    S: seek_params_state::State,
-    S::Position: seek_params_state::IsUnset,
+    St: seek_params_state::State,
+    St::Position: seek_params_state::IsUnset,
 {
     /// Set the `position` field (required)
     pub fn position(
         mut self,
         value: impl Into<i64>,
-    ) -> SeekParamsBuilder<'a, seek_params_state::SetPosition<S>> {
+    ) -> SeekParamsBuilder<S, seek_params_state::SetPosition<St>> {
         self._fields.1 = Option::Some(value.into());
         SeekParamsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SeekParamsBuilder<'a, S>
+impl<S: BosStr, St> SeekParamsBuilder<S, St>
 where
-    S: seek_params_state::State,
-    S::Position: seek_params_state::IsSet,
+    St: seek_params_state::State,
+    St::Position: seek_params_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> SeekParams<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> SeekParams<S> {
         SeekParams {
             player_id: self._fields.0,
             position: self._fields.1.unwrap(),

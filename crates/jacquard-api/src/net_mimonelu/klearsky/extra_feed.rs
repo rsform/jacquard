@@ -5,19 +5,17 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 /// Extra feed type for Klearsky. Used as an extension in app.bsky.actor.defs#savedFeedsPrefV2 items.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ExtraFeed<
-    S: jacquard_common::Bos<str> + AsRef<str> = jacquard_common::DefaultStr,
-> {
+pub enum ExtraFeed<S: BosStr = DefaultStr> {
     Trending,
     Globalline,
     Other(S),
 }
 
-impl<S: jacquard_common::Bos<str> + AsRef<str>> ExtraFeed<S> {
+impl<S: BosStr> ExtraFeed<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Trending => "trending",
@@ -35,19 +33,19 @@ impl<S: jacquard_common::Bos<str> + AsRef<str>> ExtraFeed<S> {
     }
 }
 
-impl<S: jacquard_common::Bos<str> + AsRef<str>> AsRef<str> for ExtraFeed<S> {
+impl<S: BosStr> AsRef<str> for ExtraFeed<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: jacquard_common::Bos<str> + AsRef<str>> core::fmt::Display for ExtraFeed<S> {
+impl<S: BosStr> core::fmt::Display for ExtraFeed<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: jacquard_common::Bos<str> + AsRef<str>> serde::Serialize for ExtraFeed<S> {
+impl<S: BosStr> serde::Serialize for ExtraFeed<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -56,10 +54,7 @@ impl<S: jacquard_common::Bos<str> + AsRef<str>> serde::Serialize for ExtraFeed<S
     }
 }
 
-impl<
-    'de,
-    S: serde::Deserialize<'de> + jacquard_common::Bos<str> + AsRef<str>,
-> serde::Deserialize<'de> for ExtraFeed<S> {
+impl<'de, S: serde::Deserialize<'de> + BosStr> serde::Deserialize<'de> for ExtraFeed<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -69,9 +64,12 @@ impl<
     }
 }
 
-impl<S: jacquard_common::Bos<str> + AsRef<str>> jacquard_derive::IntoStatic
-for ExtraFeed<S> {
-    type Output = ExtraFeed<jacquard_common::DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for ExtraFeed<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ExtraFeed<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             ExtraFeed::Trending => ExtraFeed::Trending,

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
@@ -19,38 +19,33 @@ use crate::at_inlay::Element;
 use crate::at_inlay::Response;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Loading<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Loading<S: BosStr = DefaultStr> {
     pub children: Data<S>,
     pub fallback: Element<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct LoadingOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct LoadingOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
-    #[serde(borrow)]
     pub value: Response<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -59,12 +54,11 @@ pub struct LoadingResponse;
 impl jacquard_common::xrpc::XrpcResp for LoadingResponse {
     const NSID: &'static str = "at.inlay.Loading";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = LoadingOutput<S>;
+    type Output<S: BosStr> = LoadingOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for Loading<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Loading<S> {
     const NSID: &'static str = "at.inlay.Loading";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -79,7 +73,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for LoadingRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = Loading<S>;
+    type Request<S: BosStr> = Loading<S>;
     type Response = LoadingResponse;
 }
 
@@ -93,122 +87,119 @@ pub mod loading_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Children;
         type Fallback;
+        type Children;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Children = Unset;
         type Fallback = Unset;
-    }
-    ///State transition - sets the `children` field to Set
-    pub struct SetChildren<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetChildren<S> {}
-    impl<S: State> State for SetChildren<S> {
-        type Children = Set<members::children>;
-        type Fallback = S::Fallback;
+        type Children = Unset;
     }
     ///State transition - sets the `fallback` field to Set
-    pub struct SetFallback<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFallback<S> {}
-    impl<S: State> State for SetFallback<S> {
-        type Children = S::Children;
+    pub struct SetFallback<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetFallback<St> {}
+    impl<St: State> State for SetFallback<St> {
         type Fallback = Set<members::fallback>;
+        type Children = St::Children;
+    }
+    ///State transition - sets the `children` field to Set
+    pub struct SetChildren<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetChildren<St> {}
+    impl<St: State> State for SetChildren<St> {
+        type Fallback = St::Fallback;
+        type Children = Set<members::children>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `children` field
-        pub struct children(());
         ///Marker type for the `fallback` field
         pub struct fallback(());
+        ///Marker type for the `children` field
+        pub struct children(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct LoadingBuilder<'a, S: loading_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct LoadingBuilder<S: BosStr, St: loading_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Data<S>>, Option<Element<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Loading<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> LoadingBuilder<'a, loading_state::Empty> {
+impl<S: BosStr> Loading<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> LoadingBuilder<S, loading_state::Empty> {
         LoadingBuilder::new()
     }
 }
 
-impl<'a> LoadingBuilder<'a, loading_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> LoadingBuilder<S, loading_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         LoadingBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LoadingBuilder<'a, S>
+impl<S: BosStr, St> LoadingBuilder<S, St>
 where
-    S: loading_state::State,
-    S::Children: loading_state::IsUnset,
+    St: loading_state::State,
+    St::Children: loading_state::IsUnset,
 {
     /// Set the `children` field (required)
     pub fn children(
         mut self,
         value: impl Into<Data<S>>,
-    ) -> LoadingBuilder<'a, loading_state::SetChildren<S>> {
+    ) -> LoadingBuilder<S, loading_state::SetChildren<St>> {
         self._fields.0 = Option::Some(value.into());
         LoadingBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LoadingBuilder<'a, S>
+impl<S: BosStr, St> LoadingBuilder<S, St>
 where
-    S: loading_state::State,
-    S::Fallback: loading_state::IsUnset,
+    St: loading_state::State,
+    St::Fallback: loading_state::IsUnset,
 {
     /// Set the `fallback` field (required)
     pub fn fallback(
         mut self,
         value: impl Into<Element<S>>,
-    ) -> LoadingBuilder<'a, loading_state::SetFallback<S>> {
+    ) -> LoadingBuilder<S, loading_state::SetFallback<St>> {
         self._fields.1 = Option::Some(value.into());
         LoadingBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LoadingBuilder<'a, S>
+impl<S: BosStr, St> LoadingBuilder<S, St>
 where
-    S: loading_state::State,
-    S::Children: loading_state::IsSet,
-    S::Fallback: loading_state::IsSet,
+    St: loading_state::State,
+    St::Fallback: loading_state::IsSet,
+    St::Children: loading_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Loading<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Loading<S> {
         Loading {
             children: self._fields.0.unwrap(),
             fallback: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Loading<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Loading<S> {
         Loading {
             children: self._fields.0.unwrap(),
             fallback: self._fields.1.unwrap(),

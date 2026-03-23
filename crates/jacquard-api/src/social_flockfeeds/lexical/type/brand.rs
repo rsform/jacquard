@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use crate::social_flockfeeds::lexical::r#type::image_object;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Embedded<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Embedded<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub additional_type: Option<EmbeddedAdditionalType<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -82,77 +82,77 @@ pub struct Embedded<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedAdditionalType<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedAdditionalType<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedAggregateRating<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedAggregateRating<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedAlternateName<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedAlternateName<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedDescription<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedDescription<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedDisambiguatingDescription<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedDisambiguatingDescription<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedIdentifier<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedIdentifier<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedImage<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum EmbeddedImage<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
@@ -163,11 +163,11 @@ pub enum EmbeddedImage<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedLogo<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum EmbeddedLogo<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
@@ -178,77 +178,77 @@ pub enum EmbeddedLogo<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedMainEntityOfPage<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedMainEntityOfPage<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedName<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedName<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedPotentialAction<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedPotentialAction<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedReview<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedReview<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedSameAs<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedSameAs<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedSlogan<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedSlogan<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedSubjectOf<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum EmbeddedSubjectOf<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
@@ -259,11 +259,11 @@ pub enum EmbeddedSubjectOf<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedUrl<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedUrl<S: BosStr = DefaultStr> {}
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -271,11 +271,11 @@ pub enum EmbeddedUrl<S: Bos<str> + AsRef<str> = DefaultStr> {}
     rename = "social.flockfeeds.lexical.type.Brand",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Brand<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Brand<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub additional_type: Option<BrandAdditionalType<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -318,77 +318,77 @@ pub struct Brand<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum BrandAdditionalType<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum BrandAdditionalType<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum BrandAggregateRating<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum BrandAggregateRating<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum BrandAlternateName<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum BrandAlternateName<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum BrandDescription<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum BrandDescription<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum BrandDisambiguatingDescription<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum BrandDisambiguatingDescription<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum BrandIdentifier<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum BrandIdentifier<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum BrandImage<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum BrandImage<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
@@ -399,11 +399,11 @@ pub enum BrandImage<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum BrandLogo<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum BrandLogo<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
@@ -414,77 +414,77 @@ pub enum BrandLogo<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum BrandMainEntityOfPage<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum BrandMainEntityOfPage<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum BrandName<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum BrandName<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum BrandPotentialAction<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum BrandPotentialAction<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum BrandReview<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum BrandReview<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum BrandSameAs<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum BrandSameAs<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum BrandSlogan<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum BrandSlogan<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum BrandSubjectOf<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum BrandSubjectOf<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
@@ -495,35 +495,35 @@ pub enum BrandSubjectOf<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum BrandUrl<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum BrandUrl<S: BosStr = DefaultStr> {}
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct BrandGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct BrandGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Brand<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Brand<S> {
+impl<S: BosStr> Brand<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, BrandRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Embedded<S> {
+impl<S: BosStr> LexiconSchema for Embedded<S> {
     fn nsid() -> &'static str {
         "social.flockfeeds.lexical.type.Brand"
     }
@@ -545,17 +545,17 @@ pub struct BrandRecord;
 impl XrpcResp for BrandRecord {
     const NSID: &'static str = "social.flockfeeds.lexical.type.Brand";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = BrandGetRecordOutput<S>;
+    type Output<S: BosStr> = BrandGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<BrandGetRecordOutput<S>> for Brand<S> {
+impl<S: BosStr> From<BrandGetRecordOutput<S>> for Brand<S> {
     fn from(output: BrandGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Brand<S> {
+impl<S: BosStr> Collection for Brand<S> {
     const NSID: &'static str = "social.flockfeeds.lexical.type.Brand";
     type Record = BrandRecord;
 }
@@ -565,7 +565,7 @@ impl Collection for BrandRecord {
     type Record = BrandRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Brand<S> {
+impl<S: BosStr> LexiconSchema for Brand<S> {
     fn nsid() -> &'static str {
         "social.flockfeeds.lexical.type.Brand"
     }
@@ -983,9 +983,9 @@ pub mod brand_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct BrandBuilder<'a, S: brand_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct BrandBuilder<S: BosStr, St: brand_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<BrandAdditionalType<S>>,
         Option<BrandAggregateRating<S>>,
@@ -1004,18 +1004,18 @@ pub struct BrandBuilder<'a, S: brand_state::State> {
         Option<BrandSubjectOf<S>>,
         Option<BrandUrl<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Brand<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> BrandBuilder<'a, brand_state::Empty> {
+impl<S: BosStr> Brand<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> BrandBuilder<S, brand_state::Empty> {
         BrandBuilder::new()
     }
 }
 
-impl<'a> BrandBuilder<'a, brand_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> BrandBuilder<S, brand_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         BrandBuilder {
             _state: PhantomData,
@@ -1037,12 +1037,12 @@ impl<'a> BrandBuilder<'a, brand_state::Empty> {
                 None,
                 None,
             ),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: brand_state::State> BrandBuilder<'a, S> {
+impl<S: BosStr, St: brand_state::State> BrandBuilder<S, St> {
     /// Set the `additionalType` field (optional)
     pub fn additional_type(
         mut self,
@@ -1061,7 +1061,7 @@ impl<'a, S: brand_state::State> BrandBuilder<'a, S> {
     }
 }
 
-impl<'a, S: brand_state::State> BrandBuilder<'a, S> {
+impl<S: BosStr, St: brand_state::State> BrandBuilder<S, St> {
     /// Set the `aggregateRating` field (optional)
     pub fn aggregate_rating(
         mut self,
@@ -1080,7 +1080,7 @@ impl<'a, S: brand_state::State> BrandBuilder<'a, S> {
     }
 }
 
-impl<'a, S: brand_state::State> BrandBuilder<'a, S> {
+impl<S: BosStr, St: brand_state::State> BrandBuilder<S, St> {
     /// Set the `alternateName` field (optional)
     pub fn alternate_name(
         mut self,
@@ -1096,7 +1096,7 @@ impl<'a, S: brand_state::State> BrandBuilder<'a, S> {
     }
 }
 
-impl<'a, S: brand_state::State> BrandBuilder<'a, S> {
+impl<S: BosStr, St: brand_state::State> BrandBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<BrandDescription<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -1109,7 +1109,7 @@ impl<'a, S: brand_state::State> BrandBuilder<'a, S> {
     }
 }
 
-impl<'a, S: brand_state::State> BrandBuilder<'a, S> {
+impl<S: BosStr, St: brand_state::State> BrandBuilder<S, St> {
     /// Set the `disambiguatingDescription` field (optional)
     pub fn disambiguating_description(
         mut self,
@@ -1128,7 +1128,7 @@ impl<'a, S: brand_state::State> BrandBuilder<'a, S> {
     }
 }
 
-impl<'a, S: brand_state::State> BrandBuilder<'a, S> {
+impl<S: BosStr, St: brand_state::State> BrandBuilder<S, St> {
     /// Set the `identifier` field (optional)
     pub fn identifier(mut self, value: impl Into<Option<BrandIdentifier<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -1141,7 +1141,7 @@ impl<'a, S: brand_state::State> BrandBuilder<'a, S> {
     }
 }
 
-impl<'a, S: brand_state::State> BrandBuilder<'a, S> {
+impl<S: BosStr, St: brand_state::State> BrandBuilder<S, St> {
     /// Set the `image` field (optional)
     pub fn image(mut self, value: impl Into<Option<BrandImage<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -1154,7 +1154,7 @@ impl<'a, S: brand_state::State> BrandBuilder<'a, S> {
     }
 }
 
-impl<'a, S: brand_state::State> BrandBuilder<'a, S> {
+impl<S: BosStr, St: brand_state::State> BrandBuilder<S, St> {
     /// Set the `logo` field (optional)
     pub fn logo(mut self, value: impl Into<Option<BrandLogo<S>>>) -> Self {
         self._fields.7 = value.into();
@@ -1167,7 +1167,7 @@ impl<'a, S: brand_state::State> BrandBuilder<'a, S> {
     }
 }
 
-impl<'a, S: brand_state::State> BrandBuilder<'a, S> {
+impl<S: BosStr, St: brand_state::State> BrandBuilder<S, St> {
     /// Set the `mainEntityOfPage` field (optional)
     pub fn main_entity_of_page(
         mut self,
@@ -1186,7 +1186,7 @@ impl<'a, S: brand_state::State> BrandBuilder<'a, S> {
     }
 }
 
-impl<'a, S: brand_state::State> BrandBuilder<'a, S> {
+impl<S: BosStr, St: brand_state::State> BrandBuilder<S, St> {
     /// Set the `name` field (optional)
     pub fn name(mut self, value: impl Into<Option<BrandName<S>>>) -> Self {
         self._fields.9 = value.into();
@@ -1199,7 +1199,7 @@ impl<'a, S: brand_state::State> BrandBuilder<'a, S> {
     }
 }
 
-impl<'a, S: brand_state::State> BrandBuilder<'a, S> {
+impl<S: BosStr, St: brand_state::State> BrandBuilder<S, St> {
     /// Set the `potentialAction` field (optional)
     pub fn potential_action(
         mut self,
@@ -1218,7 +1218,7 @@ impl<'a, S: brand_state::State> BrandBuilder<'a, S> {
     }
 }
 
-impl<'a, S: brand_state::State> BrandBuilder<'a, S> {
+impl<S: BosStr, St: brand_state::State> BrandBuilder<S, St> {
     /// Set the `review` field (optional)
     pub fn review(mut self, value: impl Into<Option<BrandReview<S>>>) -> Self {
         self._fields.11 = value.into();
@@ -1231,7 +1231,7 @@ impl<'a, S: brand_state::State> BrandBuilder<'a, S> {
     }
 }
 
-impl<'a, S: brand_state::State> BrandBuilder<'a, S> {
+impl<S: BosStr, St: brand_state::State> BrandBuilder<S, St> {
     /// Set the `sameAs` field (optional)
     pub fn same_as(mut self, value: impl Into<Option<BrandSameAs<S>>>) -> Self {
         self._fields.12 = value.into();
@@ -1244,7 +1244,7 @@ impl<'a, S: brand_state::State> BrandBuilder<'a, S> {
     }
 }
 
-impl<'a, S: brand_state::State> BrandBuilder<'a, S> {
+impl<S: BosStr, St: brand_state::State> BrandBuilder<S, St> {
     /// Set the `slogan` field (optional)
     pub fn slogan(mut self, value: impl Into<Option<BrandSlogan<S>>>) -> Self {
         self._fields.13 = value.into();
@@ -1257,7 +1257,7 @@ impl<'a, S: brand_state::State> BrandBuilder<'a, S> {
     }
 }
 
-impl<'a, S: brand_state::State> BrandBuilder<'a, S> {
+impl<S: BosStr, St: brand_state::State> BrandBuilder<S, St> {
     /// Set the `subjectOf` field (optional)
     pub fn subject_of(mut self, value: impl Into<Option<BrandSubjectOf<S>>>) -> Self {
         self._fields.14 = value.into();
@@ -1270,7 +1270,7 @@ impl<'a, S: brand_state::State> BrandBuilder<'a, S> {
     }
 }
 
-impl<'a, S: brand_state::State> BrandBuilder<'a, S> {
+impl<S: BosStr, St: brand_state::State> BrandBuilder<S, St> {
     /// Set the `url` field (optional)
     pub fn url(mut self, value: impl Into<Option<BrandUrl<S>>>) -> Self {
         self._fields.15 = value.into();
@@ -1283,12 +1283,12 @@ impl<'a, S: brand_state::State> BrandBuilder<'a, S> {
     }
 }
 
-impl<'a, S> BrandBuilder<'a, S>
+impl<S: BosStr, St> BrandBuilder<S, St>
 where
-    S: brand_state::State,
+    St: brand_state::State,
 {
-    /// Build the final struct
-    pub fn build(self) -> Brand<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Brand<S> {
         Brand {
             additional_type: self._fields.0,
             aggregate_rating: self._fields.1,
@@ -1309,8 +1309,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Brand<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Brand<S> {
         Brand {
             additional_type: self._fields.0,
             aggregate_rating: self._fields.1,

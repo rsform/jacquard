@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
@@ -18,28 +18,27 @@ use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetQuota<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct GetQuota<S: BosStr = DefaultStr> {
     pub user_did: Did<S>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetQuotaOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetQuotaOutput<S: BosStr = DefaultStr> {
     ///Storage limit in bytes (absent if unlimited)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
@@ -52,9 +51,7 @@ pub struct GetQuotaOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub unique_blobs: i64,
     ///DID of the user
     pub user_did: Did<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -105,12 +102,11 @@ pub struct GetQuotaResponse;
 impl jacquard_common::xrpc::XrpcResp for GetQuotaResponse {
     const NSID: &'static str = "io.atcr.hold.getQuota";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetQuotaOutput<S>;
+    type Output<S: BosStr> = GetQuotaOutput<S>;
     type Err = GetQuotaError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetQuota<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetQuota<S> {
     const NSID: &'static str = "io.atcr.hold.getQuota";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetQuotaResponse;
@@ -121,7 +117,7 @@ pub struct GetQuotaRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetQuotaRequest {
     const PATH: &'static str = "/xrpc/io.atcr.hold.getQuota";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetQuota<S>;
+    type Request<S: BosStr> = GetQuota<S>;
     type Response = GetQuotaResponse;
 }
 
@@ -144,9 +140,9 @@ pub mod get_quota_state {
         type UserDid = Unset;
     }
     ///State transition - sets the `user_did` field to Set
-    pub struct SetUserDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUserDid<S> {}
-    impl<S: State> State for SetUserDid<S> {
+    pub struct SetUserDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUserDid<St> {}
+    impl<St: State> State for SetUserDid<St> {
         type UserDid = Set<members::user_did>;
     }
     /// Marker types for field names
@@ -157,57 +153,57 @@ pub mod get_quota_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetQuotaBuilder<'a, S: get_quota_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetQuotaBuilder<S: BosStr, St: get_quota_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetQuota<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetQuotaBuilder<'a, get_quota_state::Empty> {
+impl<S: BosStr> GetQuota<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetQuotaBuilder<S, get_quota_state::Empty> {
         GetQuotaBuilder::new()
     }
 }
 
-impl<'a> GetQuotaBuilder<'a, get_quota_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetQuotaBuilder<S, get_quota_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetQuotaBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetQuotaBuilder<'a, S>
+impl<S: BosStr, St> GetQuotaBuilder<S, St>
 where
-    S: get_quota_state::State,
-    S::UserDid: get_quota_state::IsUnset,
+    St: get_quota_state::State,
+    St::UserDid: get_quota_state::IsUnset,
 {
     /// Set the `userDid` field (required)
     pub fn user_did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> GetQuotaBuilder<'a, get_quota_state::SetUserDid<S>> {
+    ) -> GetQuotaBuilder<S, get_quota_state::SetUserDid<St>> {
         self._fields.0 = Option::Some(value.into());
         GetQuotaBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetQuotaBuilder<'a, S>
+impl<S: BosStr, St> GetQuotaBuilder<S, St>
 where
-    S: get_quota_state::State,
-    S::UserDid: get_quota_state::IsSet,
+    St: get_quota_state::State,
+    St::UserDid: get_quota_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetQuota<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetQuota<S> {
         GetQuota {
             user_did: self._fields.0.unwrap(),
         }

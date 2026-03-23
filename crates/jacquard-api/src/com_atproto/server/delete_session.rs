@@ -6,8 +6,13 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[allow(unused_imports)]
+use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
@@ -25,15 +30,12 @@ use serde::{Serialize, Deserialize};
 #[serde(tag = "error", content = "message")]
 pub enum DeleteSessionError {
     #[serde(rename = "InvalidToken")]
-    InvalidToken(Option<jacquard_common::deps::smol_str::SmolStr>),
+    InvalidToken(Option<SmolStr>),
     #[serde(rename = "ExpiredToken")]
-    ExpiredToken(Option<jacquard_common::deps::smol_str::SmolStr>),
+    ExpiredToken(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: jacquard_common::deps::smol_str::SmolStr,
-        message: Option<jacquard_common::deps::smol_str::SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for DeleteSessionError {
@@ -73,7 +75,7 @@ pub struct DeleteSessionResponse;
 impl jacquard_common::xrpc::XrpcResp for DeleteSessionResponse {
     const NSID: &'static str = "com.atproto.server.deleteSession";
     const ENCODING: &'static str = "application/json";
-    type Output<S: jacquard_common::Bos<str> + AsRef<str>> = ();
+    type Output<S: BosStr> = ();
     type Err = DeleteSessionError;
 }
 
@@ -92,6 +94,6 @@ impl jacquard_common::xrpc::XrpcEndpoint for DeleteSessionRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: jacquard_common::Bos<str> + AsRef<str>> = DeleteSession;
+    type Request<S: BosStr> = DeleteSession;
     type Response = DeleteSessionResponse;
 }

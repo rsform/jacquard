@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "app.protoimsg.chat.allowlist",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Allowlist<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Allowlist<S: BosStr = DefaultStr> {
     ///Timestamp of allowlist entry creation.
     pub created_at: Datetime,
     ///AT-URI of the room the allowlist entry applies to.
@@ -56,18 +56,18 @@ pub struct Allowlist<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct AllowlistGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct AllowlistGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Allowlist<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Allowlist<S> {
+impl<S: BosStr> Allowlist<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, AllowlistRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -80,17 +80,17 @@ pub struct AllowlistRecord;
 impl XrpcResp for AllowlistRecord {
     const NSID: &'static str = "app.protoimsg.chat.allowlist";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = AllowlistGetRecordOutput<S>;
+    type Output<S: BosStr> = AllowlistGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<AllowlistGetRecordOutput<S>> for Allowlist<S> {
+impl<S: BosStr> From<AllowlistGetRecordOutput<S>> for Allowlist<S> {
     fn from(output: AllowlistGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Allowlist<S> {
+impl<S: BosStr> Collection for Allowlist<S> {
     const NSID: &'static str = "app.protoimsg.chat.allowlist";
     type Record = AllowlistRecord;
 }
@@ -100,7 +100,7 @@ impl Collection for AllowlistRecord {
     type Record = AllowlistRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Allowlist<S> {
+impl<S: BosStr> LexiconSchema for Allowlist<S> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.allowlist"
     }
@@ -126,144 +126,144 @@ pub mod allowlist_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CreatedAt;
-        type Room;
         type Subject;
+        type Room;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CreatedAt = Unset;
-        type Room = Unset;
         type Subject = Unset;
+        type Room = Unset;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
-        type Room = S::Room;
-        type Subject = S::Subject;
-    }
-    ///State transition - sets the `room` field to Set
-    pub struct SetRoom<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRoom<S> {}
-    impl<S: State> State for SetRoom<S> {
-        type CreatedAt = S::CreatedAt;
-        type Room = Set<members::room>;
-        type Subject = S::Subject;
+        type Subject = St::Subject;
+        type Room = St::Room;
     }
     ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type CreatedAt = S::CreatedAt;
-        type Room = S::Room;
+    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubject<St> {}
+    impl<St: State> State for SetSubject<St> {
+        type CreatedAt = St::CreatedAt;
         type Subject = Set<members::subject>;
+        type Room = St::Room;
+    }
+    ///State transition - sets the `room` field to Set
+    pub struct SetRoom<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRoom<St> {}
+    impl<St: State> State for SetRoom<St> {
+        type CreatedAt = St::CreatedAt;
+        type Subject = St::Subject;
+        type Room = Set<members::room>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `room` field
-        pub struct room(());
         ///Marker type for the `subject` field
         pub struct subject(());
+        ///Marker type for the `room` field
+        pub struct room(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct AllowlistBuilder<'a, S: allowlist_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct AllowlistBuilder<S: BosStr, St: allowlist_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<AtUri<S>>, Option<Did<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Allowlist<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> AllowlistBuilder<'a, allowlist_state::Empty> {
+impl<S: BosStr> Allowlist<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> AllowlistBuilder<S, allowlist_state::Empty> {
         AllowlistBuilder::new()
     }
 }
 
-impl<'a> AllowlistBuilder<'a, allowlist_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> AllowlistBuilder<S, allowlist_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         AllowlistBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AllowlistBuilder<'a, S>
+impl<S: BosStr, St> AllowlistBuilder<S, St>
 where
-    S: allowlist_state::State,
-    S::CreatedAt: allowlist_state::IsUnset,
+    St: allowlist_state::State,
+    St::CreatedAt: allowlist_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> AllowlistBuilder<'a, allowlist_state::SetCreatedAt<S>> {
+    ) -> AllowlistBuilder<S, allowlist_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         AllowlistBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AllowlistBuilder<'a, S>
+impl<S: BosStr, St> AllowlistBuilder<S, St>
 where
-    S: allowlist_state::State,
-    S::Room: allowlist_state::IsUnset,
+    St: allowlist_state::State,
+    St::Room: allowlist_state::IsUnset,
 {
     /// Set the `room` field (required)
     pub fn room(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> AllowlistBuilder<'a, allowlist_state::SetRoom<S>> {
+    ) -> AllowlistBuilder<S, allowlist_state::SetRoom<St>> {
         self._fields.1 = Option::Some(value.into());
         AllowlistBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AllowlistBuilder<'a, S>
+impl<S: BosStr, St> AllowlistBuilder<S, St>
 where
-    S: allowlist_state::State,
-    S::Subject: allowlist_state::IsUnset,
+    St: allowlist_state::State,
+    St::Subject: allowlist_state::IsUnset,
 {
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> AllowlistBuilder<'a, allowlist_state::SetSubject<S>> {
+    ) -> AllowlistBuilder<S, allowlist_state::SetSubject<St>> {
         self._fields.2 = Option::Some(value.into());
         AllowlistBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AllowlistBuilder<'a, S>
+impl<S: BosStr, St> AllowlistBuilder<S, St>
 where
-    S: allowlist_state::State,
-    S::CreatedAt: allowlist_state::IsSet,
-    S::Room: allowlist_state::IsSet,
-    S::Subject: allowlist_state::IsSet,
+    St: allowlist_state::State,
+    St::CreatedAt: allowlist_state::IsSet,
+    St::Subject: allowlist_state::IsSet,
+    St::Room: allowlist_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Allowlist<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Allowlist<S> {
         Allowlist {
             created_at: self._fields.0.unwrap(),
             room: self._fields.1.unwrap(),
@@ -271,11 +271,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Allowlist<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Allowlist<S> {
         Allowlist {
             created_at: self._fields.0.unwrap(),
             room: self._fields.1.unwrap(),

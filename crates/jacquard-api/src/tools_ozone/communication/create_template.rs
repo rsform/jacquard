@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, Language};
 use jacquard_common::types::value::Data;
@@ -19,14 +19,14 @@ use serde::{Serialize, Deserialize};
 use crate::tools_ozone::communication::TemplateView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CreateTemplate<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CreateTemplate<S: BosStr = DefaultStr> {
     ///Content of the template, markdown supported, can contain variable placeholders.
     pub content_markdown: S,
     ///DID of the user who is creating the template.
@@ -39,28 +39,23 @@ pub struct CreateTemplate<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub name: S,
     ///Subject of the message, used in emails.
     pub subject: S,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CreateTemplateOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CreateTemplateOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
-    #[serde(borrow)]
     pub value: TemplateView<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -111,12 +106,11 @@ pub struct CreateTemplateResponse;
 impl jacquard_common::xrpc::XrpcResp for CreateTemplateResponse {
     const NSID: &'static str = "tools.ozone.communication.createTemplate";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = CreateTemplateOutput<S>;
+    type Output<S: BosStr> = CreateTemplateOutput<S>;
     type Err = CreateTemplateError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for CreateTemplate<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for CreateTemplate<S> {
     const NSID: &'static str = "tools.ozone.communication.createTemplate";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -131,6 +125,6 @@ impl jacquard_common::xrpc::XrpcEndpoint for CreateTemplateRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = CreateTemplate<S>;
+    type Request<S: BosStr> = CreateTemplate<S>;
     type Response = CreateTemplateResponse;
 }

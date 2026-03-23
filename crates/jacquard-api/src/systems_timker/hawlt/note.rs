@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use crate::systems_timker::hawlt::note;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Attachment<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Attachment<S: BosStr = DefaultStr> {
     ///Alt text for the image. Required for accessibility.
     pub alt: S,
     ///The image blob. Max 5MB.
@@ -56,11 +56,11 @@ pub struct Attachment<S: Bos<str> + AsRef<str> = DefaultStr> {
     rename = "systems.timker.hawlt.note",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Note<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Note<S: BosStr = DefaultStr> {
     ///Images attached to the note. Max 4 attachments, 5MB each
     #[serde(skip_serializing_if = "Option::is_none")]
     pub attachments: Option<Vec<note::Attachment<S>>>,
@@ -88,24 +88,24 @@ Note: large string limit is intentional for diary-style entries.*/
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct NoteGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct NoteGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Note<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Note<S> {
+impl<S: BosStr> Note<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, NoteRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Attachment<S> {
+impl<S: BosStr> LexiconSchema for Attachment<S> {
     fn nsid() -> &'static str {
         "systems.timker.hawlt.note"
     }
@@ -191,17 +191,17 @@ pub struct NoteRecord;
 impl XrpcResp for NoteRecord {
     const NSID: &'static str = "systems.timker.hawlt.note";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = NoteGetRecordOutput<S>;
+    type Output<S: BosStr> = NoteGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<NoteGetRecordOutput<S>> for Note<S> {
+impl<S: BosStr> From<NoteGetRecordOutput<S>> for Note<S> {
     fn from(output: NoteGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Note<S> {
+impl<S: BosStr> Collection for Note<S> {
     const NSID: &'static str = "systems.timker.hawlt.note";
     type Record = NoteRecord;
 }
@@ -211,7 +211,7 @@ impl Collection for NoteRecord {
     type Record = NoteRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Note<S> {
+impl<S: BosStr> LexiconSchema for Note<S> {
     fn nsid() -> &'static str {
         "systems.timker.hawlt.note"
     }
@@ -312,122 +312,122 @@ pub mod attachment_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Alt;
         type Image;
+        type Alt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Alt = Unset;
         type Image = Unset;
-    }
-    ///State transition - sets the `alt` field to Set
-    pub struct SetAlt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAlt<S> {}
-    impl<S: State> State for SetAlt<S> {
-        type Alt = Set<members::alt>;
-        type Image = S::Image;
+        type Alt = Unset;
     }
     ///State transition - sets the `image` field to Set
-    pub struct SetImage<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetImage<S> {}
-    impl<S: State> State for SetImage<S> {
-        type Alt = S::Alt;
+    pub struct SetImage<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetImage<St> {}
+    impl<St: State> State for SetImage<St> {
         type Image = Set<members::image>;
+        type Alt = St::Alt;
+    }
+    ///State transition - sets the `alt` field to Set
+    pub struct SetAlt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAlt<St> {}
+    impl<St: State> State for SetAlt<St> {
+        type Image = St::Image;
+        type Alt = Set<members::alt>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `alt` field
-        pub struct alt(());
         ///Marker type for the `image` field
         pub struct image(());
+        ///Marker type for the `alt` field
+        pub struct alt(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct AttachmentBuilder<'a, S: attachment_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct AttachmentBuilder<S: BosStr, St: attachment_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<BlobRef<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Attachment<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> AttachmentBuilder<'a, attachment_state::Empty> {
+impl<S: BosStr> Attachment<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> AttachmentBuilder<S, attachment_state::Empty> {
         AttachmentBuilder::new()
     }
 }
 
-impl<'a> AttachmentBuilder<'a, attachment_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> AttachmentBuilder<S, attachment_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         AttachmentBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AttachmentBuilder<'a, S>
+impl<S: BosStr, St> AttachmentBuilder<S, St>
 where
-    S: attachment_state::State,
-    S::Alt: attachment_state::IsUnset,
+    St: attachment_state::State,
+    St::Alt: attachment_state::IsUnset,
 {
     /// Set the `alt` field (required)
     pub fn alt(
         mut self,
         value: impl Into<S>,
-    ) -> AttachmentBuilder<'a, attachment_state::SetAlt<S>> {
+    ) -> AttachmentBuilder<S, attachment_state::SetAlt<St>> {
         self._fields.0 = Option::Some(value.into());
         AttachmentBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AttachmentBuilder<'a, S>
+impl<S: BosStr, St> AttachmentBuilder<S, St>
 where
-    S: attachment_state::State,
-    S::Image: attachment_state::IsUnset,
+    St: attachment_state::State,
+    St::Image: attachment_state::IsUnset,
 {
     /// Set the `image` field (required)
     pub fn image(
         mut self,
         value: impl Into<BlobRef<S>>,
-    ) -> AttachmentBuilder<'a, attachment_state::SetImage<S>> {
+    ) -> AttachmentBuilder<S, attachment_state::SetImage<St>> {
         self._fields.1 = Option::Some(value.into());
         AttachmentBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AttachmentBuilder<'a, S>
+impl<S: BosStr, St> AttachmentBuilder<S, St>
 where
-    S: attachment_state::State,
-    S::Alt: attachment_state::IsSet,
-    S::Image: attachment_state::IsSet,
+    St: attachment_state::State,
+    St::Image: attachment_state::IsSet,
+    St::Alt: attachment_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Attachment<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Attachment<S> {
         Attachment {
             alt: self._fields.0.unwrap(),
             image: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Attachment<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Attachment<S> {
         Attachment {
             alt: self._fields.0.unwrap(),
             image: self._fields.1.unwrap(),
@@ -623,17 +623,17 @@ pub mod note_state {
         type Content = Unset;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
-        type Content = S::Content;
+        type Content = St::Content;
     }
     ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type CreatedAt = S::CreatedAt;
+    pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetContent<St> {}
+    impl<St: State> State for SetContent<St> {
+        type CreatedAt = St::CreatedAt;
         type Content = Set<members::content>;
     }
     /// Marker types for field names
@@ -646,9 +646,9 @@ pub mod note_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct NoteBuilder<'a, S: note_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct NoteBuilder<S: BosStr, St: note_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<note::Attachment<S>>>,
         Option<S>,
@@ -657,28 +657,28 @@ pub struct NoteBuilder<'a, S: note_state::State> {
         Option<Vec<Language>>,
         Option<Vec<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Note<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> NoteBuilder<'a, note_state::Empty> {
+impl<S: BosStr> Note<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> NoteBuilder<S, note_state::Empty> {
         NoteBuilder::new()
     }
 }
 
-impl<'a> NoteBuilder<'a, note_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> NoteBuilder<S, note_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         NoteBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: note_state::State> NoteBuilder<'a, S> {
+impl<S: BosStr, St: note_state::State> NoteBuilder<S, St> {
     /// Set the `attachments` field (optional)
     pub fn attachments(
         mut self,
@@ -694,26 +694,26 @@ impl<'a, S: note_state::State> NoteBuilder<'a, S> {
     }
 }
 
-impl<'a, S> NoteBuilder<'a, S>
+impl<S: BosStr, St> NoteBuilder<S, St>
 where
-    S: note_state::State,
-    S::Content: note_state::IsUnset,
+    St: note_state::State,
+    St::Content: note_state::IsUnset,
 {
     /// Set the `content` field (required)
     pub fn content(
         mut self,
         value: impl Into<S>,
-    ) -> NoteBuilder<'a, note_state::SetContent<S>> {
+    ) -> NoteBuilder<S, note_state::SetContent<St>> {
         self._fields.1 = Option::Some(value.into());
         NoteBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: note_state::State> NoteBuilder<'a, S> {
+impl<S: BosStr, St: note_state::State> NoteBuilder<S, St> {
     /// Set the `contentWarning` field (optional)
     pub fn content_warning(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -726,26 +726,26 @@ impl<'a, S: note_state::State> NoteBuilder<'a, S> {
     }
 }
 
-impl<'a, S> NoteBuilder<'a, S>
+impl<S: BosStr, St> NoteBuilder<S, St>
 where
-    S: note_state::State,
-    S::CreatedAt: note_state::IsUnset,
+    St: note_state::State,
+    St::CreatedAt: note_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> NoteBuilder<'a, note_state::SetCreatedAt<S>> {
+    ) -> NoteBuilder<S, note_state::SetCreatedAt<St>> {
         self._fields.3 = Option::Some(value.into());
         NoteBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: note_state::State> NoteBuilder<'a, S> {
+impl<S: BosStr, St: note_state::State> NoteBuilder<S, St> {
     /// Set the `langs` field (optional)
     pub fn langs(mut self, value: impl Into<Option<Vec<Language>>>) -> Self {
         self._fields.4 = value.into();
@@ -758,7 +758,7 @@ impl<'a, S: note_state::State> NoteBuilder<'a, S> {
     }
 }
 
-impl<'a, S: note_state::State> NoteBuilder<'a, S> {
+impl<S: BosStr, St: note_state::State> NoteBuilder<S, St> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -771,14 +771,14 @@ impl<'a, S: note_state::State> NoteBuilder<'a, S> {
     }
 }
 
-impl<'a, S> NoteBuilder<'a, S>
+impl<S: BosStr, St> NoteBuilder<S, St>
 where
-    S: note_state::State,
-    S::CreatedAt: note_state::IsSet,
-    S::Content: note_state::IsSet,
+    St: note_state::State,
+    St::CreatedAt: note_state::IsSet,
+    St::Content: note_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Note<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Note<S> {
         Note {
             attachments: self._fields.0,
             content: self._fields.1.unwrap(),
@@ -789,8 +789,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Note<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Note<S> {
         Note {
             attachments: self._fields.0,
             content: self._fields.1.unwrap(),

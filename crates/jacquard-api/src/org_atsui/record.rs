@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
@@ -19,38 +19,33 @@ use serde::{Serialize, Deserialize};
 use crate::at_inlay::Response;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Record<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Record<S: BosStr = DefaultStr> {
     ///AT-URI of the record to display
     pub uri: AtUri<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct RecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct RecordOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
-    #[serde(borrow)]
     pub value: Response<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -59,12 +54,11 @@ pub struct RecordResponse;
 impl jacquard_common::xrpc::XrpcResp for RecordResponse {
     const NSID: &'static str = "org.atsui.Record";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = RecordOutput<S>;
+    type Output<S: BosStr> = RecordOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for Record<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Record<S> {
     const NSID: &'static str = "org.atsui.Record";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -79,7 +73,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for RecordRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = Record<S>;
+    type Request<S: BosStr> = Record<S>;
     type Response = RecordResponse;
 }
 
@@ -102,9 +96,9 @@ pub mod record_state {
         type Uri = Unset;
     }
     ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
         type Uri = Set<members::uri>;
     }
     /// Marker types for field names
@@ -115,64 +109,64 @@ pub mod record_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct RecordBuilder<'a, S: record_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct RecordBuilder<S: BosStr, St: record_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Record<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> RecordBuilder<'a, record_state::Empty> {
+impl<S: BosStr> Record<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> RecordBuilder<S, record_state::Empty> {
         RecordBuilder::new()
     }
 }
 
-impl<'a> RecordBuilder<'a, record_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> RecordBuilder<S, record_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         RecordBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RecordBuilder<'a, S>
+impl<S: BosStr, St> RecordBuilder<S, St>
 where
-    S: record_state::State,
-    S::Uri: record_state::IsUnset,
+    St: record_state::State,
+    St::Uri: record_state::IsUnset,
 {
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> RecordBuilder<'a, record_state::SetUri<S>> {
+    ) -> RecordBuilder<S, record_state::SetUri<St>> {
         self._fields.0 = Option::Some(value.into());
         RecordBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RecordBuilder<'a, S>
+impl<S: BosStr, St> RecordBuilder<S, St>
 where
-    S: record_state::State,
-    S::Uri: record_state::IsSet,
+    St: record_state::State,
+    St::Uri: record_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Record<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Record<S> {
         Record {
             uri: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Record<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Record<S> {
         Record {
             uri: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

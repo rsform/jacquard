@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
@@ -18,16 +18,15 @@ use serde::{Serialize, Deserialize};
 use crate::app_bsky::actor::ProfileView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetSuggestedOnboardingUsers<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetSuggestedOnboardingUsers<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub category: Option<S>,
     ///Defaults to `25`. Min: 1. Max: 50.
     #[serde(default = "_default_limit")]
@@ -37,14 +36,14 @@ pub struct GetSuggestedOnboardingUsers<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetSuggestedOnboardingUsersOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetSuggestedOnboardingUsersOutput<S: BosStr = DefaultStr> {
     pub actors: Vec<ProfileView<S>>,
     ///DEPRECATED: use recIdStr instead.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -52,9 +51,7 @@ pub struct GetSuggestedOnboardingUsersOutput<S: Bos<str> + AsRef<str> = DefaultS
     ///Snowflake for this recommendation, use when submitting recommendation events.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub rec_id_str: Option<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -63,12 +60,11 @@ pub struct GetSuggestedOnboardingUsersResponse;
 impl jacquard_common::xrpc::XrpcResp for GetSuggestedOnboardingUsersResponse {
     const NSID: &'static str = "app.bsky.unspecced.getSuggestedOnboardingUsers";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetSuggestedOnboardingUsersOutput<S>;
+    type Output<S: BosStr> = GetSuggestedOnboardingUsersOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetSuggestedOnboardingUsers<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetSuggestedOnboardingUsers<S> {
     const NSID: &'static str = "app.bsky.unspecced.getSuggestedOnboardingUsers";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetSuggestedOnboardingUsersResponse;
@@ -79,7 +75,7 @@ pub struct GetSuggestedOnboardingUsersRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetSuggestedOnboardingUsersRequest {
     const PATH: &'static str = "/xrpc/app.bsky.unspecced.getSuggestedOnboardingUsers";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetSuggestedOnboardingUsers<S>;
+    type Request<S: BosStr> = GetSuggestedOnboardingUsers<S>;
     type Response = GetSuggestedOnboardingUsersResponse;
 }
 
@@ -106,20 +102,20 @@ pub mod get_suggested_onboarding_users_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
+/// Builder for constructing an instance of this type.
 pub struct GetSuggestedOnboardingUsersBuilder<
-    'a,
-    S: get_suggested_onboarding_users_state::State,
+    S: BosStr,
+    St: get_suggested_onboarding_users_state::State,
 > {
-    _state: PhantomData<fn() -> S>,
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetSuggestedOnboardingUsers<'a> {
-    /// Create a new builder for this type
+impl<S: BosStr> GetSuggestedOnboardingUsers<S> {
+    /// Create a new builder for this type.
     pub fn new() -> GetSuggestedOnboardingUsersBuilder<
-        'a,
+        S,
         get_suggested_onboarding_users_state::Empty,
     > {
         GetSuggestedOnboardingUsersBuilder::new()
@@ -127,22 +123,22 @@ impl<'a> GetSuggestedOnboardingUsers<'a> {
 }
 
 impl<
-    'a,
-> GetSuggestedOnboardingUsersBuilder<'a, get_suggested_onboarding_users_state::Empty> {
-    /// Create a new builder with all fields unset
+    S: BosStr,
+> GetSuggestedOnboardingUsersBuilder<S, get_suggested_onboarding_users_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetSuggestedOnboardingUsersBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
 impl<
-    'a,
-    S: get_suggested_onboarding_users_state::State,
-> GetSuggestedOnboardingUsersBuilder<'a, S> {
+    S: BosStr,
+    St: get_suggested_onboarding_users_state::State,
+> GetSuggestedOnboardingUsersBuilder<S, St> {
     /// Set the `category` field (optional)
     pub fn category(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -156,9 +152,9 @@ impl<
 }
 
 impl<
-    'a,
-    S: get_suggested_onboarding_users_state::State,
-> GetSuggestedOnboardingUsersBuilder<'a, S> {
+    S: BosStr,
+    St: get_suggested_onboarding_users_state::State,
+> GetSuggestedOnboardingUsersBuilder<S, St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -171,12 +167,12 @@ impl<
     }
 }
 
-impl<'a, S> GetSuggestedOnboardingUsersBuilder<'a, S>
+impl<S: BosStr, St> GetSuggestedOnboardingUsersBuilder<S, St>
 where
-    S: get_suggested_onboarding_users_state::State,
+    St: get_suggested_onboarding_users_state::State,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetSuggestedOnboardingUsers<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetSuggestedOnboardingUsers<S> {
         GetSuggestedOnboardingUsers {
             category: self._fields.0,
             limit: self._fields.1,

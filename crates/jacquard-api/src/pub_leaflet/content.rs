@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -31,11 +31,11 @@ use crate::pub_leaflet::pages::linear_document::LinearDocument;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Content<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Content<S: BosStr = DefaultStr> {
     pub pages: Vec<ContentPagesItem<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -47,18 +47,18 @@ pub struct Content<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ContentPagesItem<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ContentPagesItem<S: BosStr = DefaultStr> {
     #[serde(rename = "pub.leaflet.pages.linearDocument")]
     LinearDocument(Box<LinearDocument<S>>),
     #[serde(rename = "pub.leaflet.pages.canvas")]
     Canvas(Box<Canvas<S>>),
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Content<S> {
+impl<S: BosStr> LexiconSchema for Content<S> {
     fn nsid() -> &'static str {
         "pub.leaflet.content"
     }
@@ -92,9 +92,9 @@ pub mod content_state {
         type Pages = Unset;
     }
     ///State transition - sets the `pages` field to Set
-    pub struct SetPages<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPages<S> {}
-    impl<S: State> State for SetPages<S> {
+    pub struct SetPages<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPages<St> {}
+    impl<St: State> State for SetPages<St> {
         type Pages = Set<members::pages>;
     }
     /// Marker types for field names
@@ -105,67 +105,64 @@ pub mod content_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ContentBuilder<'a, S: content_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ContentBuilder<S: BosStr, St: content_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<ContentPagesItem<S>>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Content<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ContentBuilder<'a, content_state::Empty> {
+impl<S: BosStr> Content<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ContentBuilder<S, content_state::Empty> {
         ContentBuilder::new()
     }
 }
 
-impl<'a> ContentBuilder<'a, content_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ContentBuilder<S, content_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ContentBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ContentBuilder<'a, S>
+impl<S: BosStr, St> ContentBuilder<S, St>
 where
-    S: content_state::State,
-    S::Pages: content_state::IsUnset,
+    St: content_state::State,
+    St::Pages: content_state::IsUnset,
 {
     /// Set the `pages` field (required)
     pub fn pages(
         mut self,
         value: impl Into<Vec<ContentPagesItem<S>>>,
-    ) -> ContentBuilder<'a, content_state::SetPages<S>> {
+    ) -> ContentBuilder<S, content_state::SetPages<St>> {
         self._fields.0 = Option::Some(value.into());
         ContentBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ContentBuilder<'a, S>
+impl<S: BosStr, St> ContentBuilder<S, St>
 where
-    S: content_state::State,
-    S::Pages: content_state::IsSet,
+    St: content_state::State,
+    St::Pages: content_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Content<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Content<S> {
         Content {
             pages: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Content<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Content<S> {
         Content {
             pages: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

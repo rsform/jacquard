@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -30,11 +30,11 @@ use crate::pub_leaflet::blocks::image;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct AspectRatio<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct AspectRatio<S: BosStr = DefaultStr> {
     pub height: i64,
     pub width: i64,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -46,11 +46,11 @@ pub struct AspectRatio<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Image<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Image<S: BosStr = DefaultStr> {
     ///Alt text description of the image, for accessibility.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub alt: Option<S>,
@@ -60,7 +60,7 @@ pub struct Image<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for AspectRatio<S> {
+impl<S: BosStr> LexiconSchema for AspectRatio<S> {
     fn nsid() -> &'static str {
         "pub.leaflet.blocks.image"
     }
@@ -75,7 +75,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for AspectRatio<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Image<S> {
+impl<S: BosStr> LexiconSchema for Image<S> {
     fn nsid() -> &'static str {
         "pub.leaflet.blocks.image"
     }
@@ -151,17 +151,17 @@ pub mod aspect_ratio_state {
         type Height = Unset;
     }
     ///State transition - sets the `width` field to Set
-    pub struct SetWidth<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWidth<S> {}
-    impl<S: State> State for SetWidth<S> {
+    pub struct SetWidth<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetWidth<St> {}
+    impl<St: State> State for SetWidth<St> {
         type Width = Set<members::width>;
-        type Height = S::Height;
+        type Height = St::Height;
     }
     ///State transition - sets the `height` field to Set
-    pub struct SetHeight<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHeight<S> {}
-    impl<S: State> State for SetHeight<S> {
-        type Width = S::Width;
+    pub struct SetHeight<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHeight<St> {}
+    impl<St: State> State for SetHeight<St> {
+        type Width = St::Width;
         type Height = Set<members::height>;
     }
     /// Marker types for field names
@@ -174,88 +174,88 @@ pub mod aspect_ratio_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct AspectRatioBuilder<'a, S: aspect_ratio_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct AspectRatioBuilder<S: BosStr, St: aspect_ratio_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<i64>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> AspectRatio<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> AspectRatioBuilder<'a, aspect_ratio_state::Empty> {
+impl<S: BosStr> AspectRatio<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> AspectRatioBuilder<S, aspect_ratio_state::Empty> {
         AspectRatioBuilder::new()
     }
 }
 
-impl<'a> AspectRatioBuilder<'a, aspect_ratio_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> AspectRatioBuilder<S, aspect_ratio_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         AspectRatioBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AspectRatioBuilder<'a, S>
+impl<S: BosStr, St> AspectRatioBuilder<S, St>
 where
-    S: aspect_ratio_state::State,
-    S::Height: aspect_ratio_state::IsUnset,
+    St: aspect_ratio_state::State,
+    St::Height: aspect_ratio_state::IsUnset,
 {
     /// Set the `height` field (required)
     pub fn height(
         mut self,
         value: impl Into<i64>,
-    ) -> AspectRatioBuilder<'a, aspect_ratio_state::SetHeight<S>> {
+    ) -> AspectRatioBuilder<S, aspect_ratio_state::SetHeight<St>> {
         self._fields.0 = Option::Some(value.into());
         AspectRatioBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AspectRatioBuilder<'a, S>
+impl<S: BosStr, St> AspectRatioBuilder<S, St>
 where
-    S: aspect_ratio_state::State,
-    S::Width: aspect_ratio_state::IsUnset,
+    St: aspect_ratio_state::State,
+    St::Width: aspect_ratio_state::IsUnset,
 {
     /// Set the `width` field (required)
     pub fn width(
         mut self,
         value: impl Into<i64>,
-    ) -> AspectRatioBuilder<'a, aspect_ratio_state::SetWidth<S>> {
+    ) -> AspectRatioBuilder<S, aspect_ratio_state::SetWidth<St>> {
         self._fields.1 = Option::Some(value.into());
         AspectRatioBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AspectRatioBuilder<'a, S>
+impl<S: BosStr, St> AspectRatioBuilder<S, St>
 where
-    S: aspect_ratio_state::State,
-    S::Width: aspect_ratio_state::IsSet,
-    S::Height: aspect_ratio_state::IsSet,
+    St: aspect_ratio_state::State,
+    St::Width: aspect_ratio_state::IsSet,
+    St::Height: aspect_ratio_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> AspectRatio<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> AspectRatio<S> {
         AspectRatio {
             height: self._fields.0.unwrap(),
             width: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> AspectRatio<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> AspectRatio<S> {
         AspectRatio {
             height: self._fields.0.unwrap(),
             width: self._fields.1.unwrap(),
@@ -366,17 +366,17 @@ pub mod image_state {
         type Image = Unset;
     }
     ///State transition - sets the `aspect_ratio` field to Set
-    pub struct SetAspectRatio<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAspectRatio<S> {}
-    impl<S: State> State for SetAspectRatio<S> {
+    pub struct SetAspectRatio<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAspectRatio<St> {}
+    impl<St: State> State for SetAspectRatio<St> {
         type AspectRatio = Set<members::aspect_ratio>;
-        type Image = S::Image;
+        type Image = St::Image;
     }
     ///State transition - sets the `image` field to Set
-    pub struct SetImage<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetImage<S> {}
-    impl<S: State> State for SetImage<S> {
-        type AspectRatio = S::AspectRatio;
+    pub struct SetImage<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetImage<St> {}
+    impl<St: State> State for SetImage<St> {
+        type AspectRatio = St::AspectRatio;
         type Image = Set<members::image>;
     }
     /// Marker types for field names
@@ -389,32 +389,32 @@ pub mod image_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ImageBuilder<'a, S: image_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ImageBuilder<S: BosStr, St: image_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<image::AspectRatio<S>>, Option<BlobRef<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Image<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ImageBuilder<'a, image_state::Empty> {
+impl<S: BosStr> Image<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ImageBuilder<S, image_state::Empty> {
         ImageBuilder::new()
     }
 }
 
-impl<'a> ImageBuilder<'a, image_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ImageBuilder<S, image_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ImageBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: image_state::State> ImageBuilder<'a, S> {
+impl<S: BosStr, St: image_state::State> ImageBuilder<S, St> {
     /// Set the `alt` field (optional)
     pub fn alt(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -427,52 +427,52 @@ impl<'a, S: image_state::State> ImageBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ImageBuilder<'a, S>
+impl<S: BosStr, St> ImageBuilder<S, St>
 where
-    S: image_state::State,
-    S::AspectRatio: image_state::IsUnset,
+    St: image_state::State,
+    St::AspectRatio: image_state::IsUnset,
 {
     /// Set the `aspectRatio` field (required)
     pub fn aspect_ratio(
         mut self,
         value: impl Into<image::AspectRatio<S>>,
-    ) -> ImageBuilder<'a, image_state::SetAspectRatio<S>> {
+    ) -> ImageBuilder<S, image_state::SetAspectRatio<St>> {
         self._fields.1 = Option::Some(value.into());
         ImageBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ImageBuilder<'a, S>
+impl<S: BosStr, St> ImageBuilder<S, St>
 where
-    S: image_state::State,
-    S::Image: image_state::IsUnset,
+    St: image_state::State,
+    St::Image: image_state::IsUnset,
 {
     /// Set the `image` field (required)
     pub fn image(
         mut self,
         value: impl Into<BlobRef<S>>,
-    ) -> ImageBuilder<'a, image_state::SetImage<S>> {
+    ) -> ImageBuilder<S, image_state::SetImage<St>> {
         self._fields.2 = Option::Some(value.into());
         ImageBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ImageBuilder<'a, S>
+impl<S: BosStr, St> ImageBuilder<S, St>
 where
-    S: image_state::State,
-    S::AspectRatio: image_state::IsSet,
-    S::Image: image_state::IsSet,
+    St: image_state::State,
+    St::AspectRatio: image_state::IsSet,
+    St::Image: image_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Image<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Image<S> {
         Image {
             alt: self._fields.0,
             aspect_ratio: self._fields.1.unwrap(),
@@ -480,8 +480,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Image<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Image<S> {
         Image {
             alt: self._fields.0,
             aspect_ratio: self._fields.1.unwrap(),

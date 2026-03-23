@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,11 +34,11 @@ use crate::place_stream::chat::profile;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Color<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Color<S: BosStr = DefaultStr> {
     pub blue: i64,
     pub green: i64,
     pub red: i64,
@@ -54,11 +54,11 @@ pub struct Color<S: Bos<str> + AsRef<str> = DefaultStr> {
     rename = "place.stream.chat.profile",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Profile<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Profile<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub color: Option<profile::Color<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -71,24 +71,24 @@ pub struct Profile<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ProfileGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ProfileGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Profile<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Profile<S> {
+impl<S: BosStr> Profile<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, ProfileRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Color<S> {
+impl<S: BosStr> LexiconSchema for Color<S> {
     fn nsid() -> &'static str {
         "place.stream.chat.profile"
     }
@@ -170,17 +170,17 @@ pub struct ProfileRecord;
 impl XrpcResp for ProfileRecord {
     const NSID: &'static str = "place.stream.chat.profile";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ProfileGetRecordOutput<S>;
+    type Output<S: BosStr> = ProfileGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<ProfileGetRecordOutput<S>> for Profile<S> {
+impl<S: BosStr> From<ProfileGetRecordOutput<S>> for Profile<S> {
     fn from(output: ProfileGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Profile<S> {
+impl<S: BosStr> Collection for Profile<S> {
     const NSID: &'static str = "place.stream.chat.profile";
     type Record = ProfileRecord;
 }
@@ -190,7 +190,7 @@ impl Collection for ProfileRecord {
     type Record = ProfileRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Profile<S> {
+impl<S: BosStr> LexiconSchema for Profile<S> {
     fn nsid() -> &'static str {
         "place.stream.chat.profile"
     }
@@ -228,27 +228,27 @@ pub mod color_state {
         type Blue = Unset;
     }
     ///State transition - sets the `red` field to Set
-    pub struct SetRed<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRed<S> {}
-    impl<S: State> State for SetRed<S> {
+    pub struct SetRed<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRed<St> {}
+    impl<St: State> State for SetRed<St> {
         type Red = Set<members::red>;
-        type Green = S::Green;
-        type Blue = S::Blue;
+        type Green = St::Green;
+        type Blue = St::Blue;
     }
     ///State transition - sets the `green` field to Set
-    pub struct SetGreen<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGreen<S> {}
-    impl<S: State> State for SetGreen<S> {
-        type Red = S::Red;
+    pub struct SetGreen<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetGreen<St> {}
+    impl<St: State> State for SetGreen<St> {
+        type Red = St::Red;
         type Green = Set<members::green>;
-        type Blue = S::Blue;
+        type Blue = St::Blue;
     }
     ///State transition - sets the `blue` field to Set
-    pub struct SetBlue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBlue<S> {}
-    impl<S: State> State for SetBlue<S> {
-        type Red = S::Red;
-        type Green = S::Green;
+    pub struct SetBlue<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBlue<St> {}
+    impl<St: State> State for SetBlue<St> {
+        type Red = St::Red;
+        type Green = St::Green;
         type Blue = Set<members::blue>;
     }
     /// Marker types for field names
@@ -263,97 +263,97 @@ pub mod color_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ColorBuilder<'a, S: color_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ColorBuilder<S: BosStr, St: color_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<i64>, Option<i64>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Color<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ColorBuilder<'a, color_state::Empty> {
+impl<S: BosStr> Color<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ColorBuilder<S, color_state::Empty> {
         ColorBuilder::new()
     }
 }
 
-impl<'a> ColorBuilder<'a, color_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ColorBuilder<S, color_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ColorBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ColorBuilder<'a, S>
+impl<S: BosStr, St> ColorBuilder<S, St>
 where
-    S: color_state::State,
-    S::Blue: color_state::IsUnset,
+    St: color_state::State,
+    St::Blue: color_state::IsUnset,
 {
     /// Set the `blue` field (required)
     pub fn blue(
         mut self,
         value: impl Into<i64>,
-    ) -> ColorBuilder<'a, color_state::SetBlue<S>> {
+    ) -> ColorBuilder<S, color_state::SetBlue<St>> {
         self._fields.0 = Option::Some(value.into());
         ColorBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ColorBuilder<'a, S>
+impl<S: BosStr, St> ColorBuilder<S, St>
 where
-    S: color_state::State,
-    S::Green: color_state::IsUnset,
+    St: color_state::State,
+    St::Green: color_state::IsUnset,
 {
     /// Set the `green` field (required)
     pub fn green(
         mut self,
         value: impl Into<i64>,
-    ) -> ColorBuilder<'a, color_state::SetGreen<S>> {
+    ) -> ColorBuilder<S, color_state::SetGreen<St>> {
         self._fields.1 = Option::Some(value.into());
         ColorBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ColorBuilder<'a, S>
+impl<S: BosStr, St> ColorBuilder<S, St>
 where
-    S: color_state::State,
-    S::Red: color_state::IsUnset,
+    St: color_state::State,
+    St::Red: color_state::IsUnset,
 {
     /// Set the `red` field (required)
     pub fn red(
         mut self,
         value: impl Into<i64>,
-    ) -> ColorBuilder<'a, color_state::SetRed<S>> {
+    ) -> ColorBuilder<S, color_state::SetRed<St>> {
         self._fields.2 = Option::Some(value.into());
         ColorBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ColorBuilder<'a, S>
+impl<S: BosStr, St> ColorBuilder<S, St>
 where
-    S: color_state::State,
-    S::Red: color_state::IsSet,
-    S::Green: color_state::IsSet,
-    S::Blue: color_state::IsSet,
+    St: color_state::State,
+    St::Red: color_state::IsSet,
+    St::Green: color_state::IsSet,
+    St::Blue: color_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Color<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Color<S> {
         Color {
             blue: self._fields.0.unwrap(),
             green: self._fields.1.unwrap(),
@@ -361,8 +361,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Color<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Color<S> {
         Color {
             blue: self._fields.0.unwrap(),
             green: self._fields.1.unwrap(),
@@ -480,32 +480,32 @@ pub mod profile_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct ProfileBuilder<'a, S: profile_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ProfileBuilder<S: BosStr, St: profile_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<profile::Color<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Profile<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ProfileBuilder<'a, profile_state::Empty> {
+impl<S: BosStr> Profile<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ProfileBuilder<S, profile_state::Empty> {
         ProfileBuilder::new()
     }
 }
 
-impl<'a> ProfileBuilder<'a, profile_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ProfileBuilder<S, profile_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ProfileBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
+impl<S: BosStr, St: profile_state::State> ProfileBuilder<S, St> {
     /// Set the `color` field (optional)
     pub fn color(mut self, value: impl Into<Option<profile::Color<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -518,22 +518,19 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ProfileBuilder<'a, S>
+impl<S: BosStr, St> ProfileBuilder<S, St>
 where
-    S: profile_state::State,
+    St: profile_state::State,
 {
-    /// Build the final struct
-    pub fn build(self) -> Profile<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Profile<S> {
         Profile {
             color: self._fields.0,
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Profile<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Profile<S> {
         Profile {
             color: self._fields.0,
             extra_data: Some(extra_data),

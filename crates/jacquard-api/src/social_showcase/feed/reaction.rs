@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use crate::social_showcase::ReactionSubject;
     rename = "social.showcase.feed.reaction",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Reaction<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Reaction<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     pub subject: ReactionSubject<S>,
     ///Emoji reaction shortcode (e.g., :heart:, :fire:, :star:)
@@ -55,18 +55,18 @@ pub struct Reaction<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ReactionGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ReactionGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Reaction<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Reaction<S> {
+impl<S: BosStr> Reaction<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, ReactionRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -79,17 +79,17 @@ pub struct ReactionRecord;
 impl XrpcResp for ReactionRecord {
     const NSID: &'static str = "social.showcase.feed.reaction";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ReactionGetRecordOutput<S>;
+    type Output<S: BosStr> = ReactionGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<ReactionGetRecordOutput<S>> for Reaction<S> {
+impl<S: BosStr> From<ReactionGetRecordOutput<S>> for Reaction<S> {
     fn from(output: ReactionGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Reaction<S> {
+impl<S: BosStr> Collection for Reaction<S> {
     const NSID: &'static str = "social.showcase.feed.reaction";
     type Record = ReactionRecord;
 }
@@ -99,7 +99,7 @@ impl Collection for ReactionRecord {
     type Record = ReactionRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Reaction<S> {
+impl<S: BosStr> LexiconSchema for Reaction<S> {
     fn nsid() -> &'static str {
         "social.showcase.feed.reaction"
     }
@@ -135,145 +135,145 @@ pub mod reaction_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Subject;
         type Type;
         type CreatedAt;
-        type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Subject = Unset;
         type Type = Unset;
         type CreatedAt = Unset;
-        type Subject = Unset;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type Type = Set<members::r#type>;
-        type CreatedAt = S::CreatedAt;
-        type Subject = S::Subject;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Type = S::Type;
-        type CreatedAt = Set<members::created_at>;
-        type Subject = S::Subject;
     }
     ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type Type = S::Type;
-        type CreatedAt = S::CreatedAt;
+    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubject<St> {}
+    impl<St: State> State for SetSubject<St> {
         type Subject = Set<members::subject>;
+        type Type = St::Type;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetType<St> {}
+    impl<St: State> State for SetType<St> {
+        type Subject = St::Subject;
+        type Type = Set<members::r#type>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Subject = St::Subject;
+        type Type = St::Type;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `subject` field
+        pub struct subject(());
         ///Marker type for the `type` field
         pub struct r#type(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `subject` field
-        pub struct subject(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ReactionBuilder<'a, S: reaction_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ReactionBuilder<S: BosStr, St: reaction_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<ReactionSubject<S>>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Reaction<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ReactionBuilder<'a, reaction_state::Empty> {
+impl<S: BosStr> Reaction<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ReactionBuilder<S, reaction_state::Empty> {
         ReactionBuilder::new()
     }
 }
 
-impl<'a> ReactionBuilder<'a, reaction_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ReactionBuilder<S, reaction_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ReactionBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ReactionBuilder<'a, S>
+impl<S: BosStr, St> ReactionBuilder<S, St>
 where
-    S: reaction_state::State,
-    S::CreatedAt: reaction_state::IsUnset,
+    St: reaction_state::State,
+    St::CreatedAt: reaction_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ReactionBuilder<'a, reaction_state::SetCreatedAt<S>> {
+    ) -> ReactionBuilder<S, reaction_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         ReactionBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ReactionBuilder<'a, S>
+impl<S: BosStr, St> ReactionBuilder<S, St>
 where
-    S: reaction_state::State,
-    S::Subject: reaction_state::IsUnset,
+    St: reaction_state::State,
+    St::Subject: reaction_state::IsUnset,
 {
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
         value: impl Into<ReactionSubject<S>>,
-    ) -> ReactionBuilder<'a, reaction_state::SetSubject<S>> {
+    ) -> ReactionBuilder<S, reaction_state::SetSubject<St>> {
         self._fields.1 = Option::Some(value.into());
         ReactionBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ReactionBuilder<'a, S>
+impl<S: BosStr, St> ReactionBuilder<S, St>
 where
-    S: reaction_state::State,
-    S::Type: reaction_state::IsUnset,
+    St: reaction_state::State,
+    St::Type: reaction_state::IsUnset,
 {
     /// Set the `type` field (required)
     pub fn r#type(
         mut self,
         value: impl Into<S>,
-    ) -> ReactionBuilder<'a, reaction_state::SetType<S>> {
+    ) -> ReactionBuilder<S, reaction_state::SetType<St>> {
         self._fields.2 = Option::Some(value.into());
         ReactionBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ReactionBuilder<'a, S>
+impl<S: BosStr, St> ReactionBuilder<S, St>
 where
-    S: reaction_state::State,
-    S::Type: reaction_state::IsSet,
-    S::CreatedAt: reaction_state::IsSet,
-    S::Subject: reaction_state::IsSet,
+    St: reaction_state::State,
+    St::Subject: reaction_state::IsSet,
+    St::Type: reaction_state::IsSet,
+    St::CreatedAt: reaction_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Reaction<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Reaction<S> {
         Reaction {
             created_at: self._fields.0.unwrap(),
             subject: self._fields.1.unwrap(),
@@ -281,11 +281,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Reaction<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Reaction<S> {
         Reaction {
             created_at: self._fields.0.unwrap(),
             subject: self._fields.1.unwrap(),

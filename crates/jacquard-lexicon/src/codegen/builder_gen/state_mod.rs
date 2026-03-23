@@ -136,18 +136,18 @@ fn generate_transition_types(required_fields: &[RequiredField]) -> TokenStream {
             } else {
                 // Other fields preserve their state from S
                 quote! {
-                    type #other_pascal = S::#other_pascal;
+                    type #other_pascal = St::#other_pascal;
                 }
             }
         });
 
         quote! {
             #[doc = #doc]
-            pub struct #struct_name<S: State = Empty>(PhantomData<fn() -> S>);
+            pub struct #struct_name<St: State = Empty>(PhantomData<fn() -> St>);
 
-            impl<S: State> sealed::Sealed for #struct_name<S> {}
+            impl<St: State> sealed::Sealed for #struct_name<St> {}
 
-            impl<S: State> State for #struct_name<S> {
+            impl<St: State> State for #struct_name<St> {
                 #( #field_impls )*
             }
         }

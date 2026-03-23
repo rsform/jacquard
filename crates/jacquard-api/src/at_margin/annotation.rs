@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use crate::at_margin::annotation;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Body<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Body<S: BosStr = DefaultStr> {
     ///MIME type of the body content  Defaults to `"text/plain"`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_body_format")]
@@ -63,11 +63,11 @@ pub struct Body<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CssSelector<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CssSelector<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub r#type: Option<S>,
     ///CSS selector string
@@ -82,11 +82,11 @@ pub struct CssSelector<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct FragmentSelector<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct FragmentSelector<S: BosStr = DefaultStr> {
     ///Specification the fragment conforms to
     #[serde(skip_serializing_if = "Option::is_none")]
     pub conforms_to: Option<UriValue<S>>,
@@ -104,11 +104,11 @@ pub struct FragmentSelector<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Generator<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Generator<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub homepage: Option<UriValue<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -127,11 +127,11 @@ pub struct Generator<S: Bos<str> + AsRef<str> = DefaultStr> {
     rename = "at.margin.annotation",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Annotation<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Annotation<S: BosStr = DefaultStr> {
     ///The annotation content (text or reference)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub body: Option<annotation::Body<S>>,
@@ -160,7 +160,7 @@ pub struct Annotation<S: Bos<str> + AsRef<str> = DefaultStr> {
 /// W3C motivation for the annotation
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum AnnotationMotivation<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum AnnotationMotivation<S: BosStr = DefaultStr> {
     Commenting,
     Highlighting,
     Bookmarking,
@@ -174,7 +174,7 @@ pub enum AnnotationMotivation<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> AnnotationMotivation<S> {
+impl<S: BosStr> AnnotationMotivation<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Commenting => "commenting",
@@ -208,19 +208,19 @@ impl<S: Bos<str> + AsRef<str>> AnnotationMotivation<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for AnnotationMotivation<S> {
+impl<S: BosStr> core::fmt::Display for AnnotationMotivation<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for AnnotationMotivation<S> {
+impl<S: BosStr> AsRef<str> for AnnotationMotivation<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for AnnotationMotivation<S> {
+impl<S: BosStr> Serialize for AnnotationMotivation<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -229,8 +229,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for AnnotationMotivation<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for AnnotationMotivation<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for AnnotationMotivation<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -240,14 +239,18 @@ for AnnotationMotivation<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for AnnotationMotivation<S> {
+impl<S: BosStr + Default> Default for AnnotationMotivation<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for AnnotationMotivation<S> {
-    type Output = AnnotationMotivation<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for AnnotationMotivation<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = AnnotationMotivation<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             AnnotationMotivation::Commenting => AnnotationMotivation::Commenting,
@@ -273,11 +276,11 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for AnnotationMotivation<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct AnnotationGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct AnnotationGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
@@ -290,11 +293,11 @@ pub struct AnnotationGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct RangeSelector<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct RangeSelector<S: BosStr = DefaultStr> {
     ///Selector for range end
     pub end_selector: RangeSelectorEndSelector<S>,
     ///Selector for range start
@@ -311,11 +314,11 @@ pub struct RangeSelector<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RangeSelectorEndSelector<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum RangeSelectorEndSelector<S: BosStr = DefaultStr> {
     #[serde(rename = "at.margin.annotation#textQuoteSelector")]
     TextQuoteSelector(Box<annotation::TextQuoteSelector<S>>),
     #[serde(rename = "at.margin.annotation#textPositionSelector")]
@@ -332,11 +335,11 @@ pub enum RangeSelectorEndSelector<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RangeSelectorStartSelector<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum RangeSelectorStartSelector<S: BosStr = DefaultStr> {
     #[serde(rename = "at.margin.annotation#textQuoteSelector")]
     TextQuoteSelector(Box<annotation::TextQuoteSelector<S>>),
     #[serde(rename = "at.margin.annotation#textPositionSelector")]
@@ -353,11 +356,11 @@ pub enum RangeSelectorStartSelector<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Target<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Target<S: BosStr = DefaultStr> {
     ///Selector to identify the specific segment
     #[serde(skip_serializing_if = "Option::is_none")]
     pub selector: Option<TargetSelector<S>>,
@@ -382,11 +385,11 @@ pub struct Target<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum TargetSelector<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum TargetSelector<S: BosStr = DefaultStr> {
     #[serde(rename = "at.margin.annotation#textQuoteSelector")]
     TextQuoteSelector(Box<annotation::TextQuoteSelector<S>>),
     #[serde(rename = "at.margin.annotation#textPositionSelector")]
@@ -407,11 +410,11 @@ pub enum TargetSelector<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct TextPositionSelector<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct TextPositionSelector<S: BosStr = DefaultStr> {
     ///Ending character position (exclusive)
     pub end: i64,
     ///Starting character position (0-indexed, inclusive)
@@ -428,11 +431,11 @@ pub struct TextPositionSelector<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct TextQuoteSelector<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct TextQuoteSelector<S: BosStr = DefaultStr> {
     ///The exact text to match
     pub exact: S,
     ///Text immediately before the selection
@@ -453,11 +456,11 @@ pub struct TextQuoteSelector<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct TimeState<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct TimeState<S: BosStr = DefaultStr> {
     ///URL to cached/archived version
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cached: Option<UriValue<S>>,
@@ -474,11 +477,11 @@ pub struct TimeState<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct XpathSelector<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct XpathSelector<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub r#type: Option<S>,
     ///XPath expression
@@ -487,13 +490,13 @@ pub struct XpathSelector<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Annotation<S> {
+impl<S: BosStr> Annotation<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, AnnotationRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Body<S> {
+impl<S: BosStr> LexiconSchema for Body<S> {
     fn nsid() -> &'static str {
         "at.margin.annotation"
     }
@@ -530,7 +533,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Body<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for CssSelector<S> {
+impl<S: BosStr> LexiconSchema for CssSelector<S> {
     fn nsid() -> &'static str {
         "at.margin.annotation"
     }
@@ -556,7 +559,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for CssSelector<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for FragmentSelector<S> {
+impl<S: BosStr> LexiconSchema for FragmentSelector<S> {
     fn nsid() -> &'static str {
         "at.margin.annotation"
     }
@@ -582,7 +585,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for FragmentSelector<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Generator<S> {
+impl<S: BosStr> LexiconSchema for Generator<S> {
     fn nsid() -> &'static str {
         "at.margin.annotation"
     }
@@ -604,17 +607,17 @@ pub struct AnnotationRecord;
 impl XrpcResp for AnnotationRecord {
     const NSID: &'static str = "at.margin.annotation";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = AnnotationGetRecordOutput<S>;
+    type Output<S: BosStr> = AnnotationGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<AnnotationGetRecordOutput<S>> for Annotation<S> {
+impl<S: BosStr> From<AnnotationGetRecordOutput<S>> for Annotation<S> {
     fn from(output: AnnotationGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Annotation<S> {
+impl<S: BosStr> Collection for Annotation<S> {
     const NSID: &'static str = "at.margin.annotation";
     type Record = AnnotationRecord;
 }
@@ -624,7 +627,7 @@ impl Collection for AnnotationRecord {
     type Record = AnnotationRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Annotation<S> {
+impl<S: BosStr> LexiconSchema for Annotation<S> {
     fn nsid() -> &'static str {
         "at.margin.annotation"
     }
@@ -649,7 +652,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Annotation<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for RangeSelector<S> {
+impl<S: BosStr> LexiconSchema for RangeSelector<S> {
     fn nsid() -> &'static str {
         "at.margin.annotation"
     }
@@ -664,7 +667,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for RangeSelector<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Target<S> {
+impl<S: BosStr> LexiconSchema for Target<S> {
     fn nsid() -> &'static str {
         "at.margin.annotation"
     }
@@ -689,7 +692,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Target<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for TextPositionSelector<S> {
+impl<S: BosStr> LexiconSchema for TextPositionSelector<S> {
     fn nsid() -> &'static str {
         "at.margin.annotation"
     }
@@ -724,7 +727,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for TextPositionSelector<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for TextQuoteSelector<S> {
+impl<S: BosStr> LexiconSchema for TextQuoteSelector<S> {
     fn nsid() -> &'static str {
         "at.margin.annotation"
     }
@@ -807,7 +810,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for TextQuoteSelector<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for TimeState<S> {
+impl<S: BosStr> LexiconSchema for TimeState<S> {
     fn nsid() -> &'static str {
         "at.margin.annotation"
     }
@@ -822,7 +825,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for TimeState<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for XpathSelector<S> {
+impl<S: BosStr> LexiconSchema for XpathSelector<S> {
     fn nsid() -> &'static str {
         "at.margin.annotation"
     }
@@ -848,8 +851,8 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for XpathSelector<S> {
     }
 }
 
-fn _default_body_format<S: From<&'static str>>() -> ::core::option::Option<S> {
-    Some(S::from("text/plain"))
+fn _default_body_format<S: FromStaticStr>() -> ::core::option::Option<S> {
+    Some(S::from_static("text/plain"))
 }
 
 impl Default for Body {
@@ -1443,17 +1446,17 @@ pub mod annotation_state {
         type CreatedAt = Unset;
     }
     ///State transition - sets the `target` field to Set
-    pub struct SetTarget<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTarget<S> {}
-    impl<S: State> State for SetTarget<S> {
+    pub struct SetTarget<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTarget<St> {}
+    impl<St: State> State for SetTarget<St> {
         type Target = Set<members::target>;
-        type CreatedAt = S::CreatedAt;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Target = S::Target;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Target = St::Target;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
@@ -1466,9 +1469,9 @@ pub mod annotation_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct AnnotationBuilder<'a, S: annotation_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct AnnotationBuilder<S: BosStr, St: annotation_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<annotation::Body<S>>,
         Option<Datetime>,
@@ -1479,28 +1482,28 @@ pub struct AnnotationBuilder<'a, S: annotation_state::State> {
         Option<Vec<S>>,
         Option<annotation::Target<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Annotation<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> AnnotationBuilder<'a, annotation_state::Empty> {
+impl<S: BosStr> Annotation<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> AnnotationBuilder<S, annotation_state::Empty> {
         AnnotationBuilder::new()
     }
 }
 
-impl<'a> AnnotationBuilder<'a, annotation_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> AnnotationBuilder<S, annotation_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         AnnotationBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: annotation_state::State> AnnotationBuilder<'a, S> {
+impl<S: BosStr, St: annotation_state::State> AnnotationBuilder<S, St> {
     /// Set the `body` field (optional)
     pub fn body(mut self, value: impl Into<Option<annotation::Body<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -1513,26 +1516,26 @@ impl<'a, S: annotation_state::State> AnnotationBuilder<'a, S> {
     }
 }
 
-impl<'a, S> AnnotationBuilder<'a, S>
+impl<S: BosStr, St> AnnotationBuilder<S, St>
 where
-    S: annotation_state::State,
-    S::CreatedAt: annotation_state::IsUnset,
+    St: annotation_state::State,
+    St::CreatedAt: annotation_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> AnnotationBuilder<'a, annotation_state::SetCreatedAt<S>> {
+    ) -> AnnotationBuilder<S, annotation_state::SetCreatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         AnnotationBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: annotation_state::State> AnnotationBuilder<'a, S> {
+impl<S: BosStr, St: annotation_state::State> AnnotationBuilder<S, St> {
     /// Set the `generator` field (optional)
     pub fn generator(
         mut self,
@@ -1548,7 +1551,7 @@ impl<'a, S: annotation_state::State> AnnotationBuilder<'a, S> {
     }
 }
 
-impl<'a, S: annotation_state::State> AnnotationBuilder<'a, S> {
+impl<S: BosStr, St: annotation_state::State> AnnotationBuilder<S, St> {
     /// Set the `labels` field (optional)
     pub fn labels(mut self, value: impl Into<Option<SelfLabels<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -1561,7 +1564,7 @@ impl<'a, S: annotation_state::State> AnnotationBuilder<'a, S> {
     }
 }
 
-impl<'a, S: annotation_state::State> AnnotationBuilder<'a, S> {
+impl<S: BosStr, St: annotation_state::State> AnnotationBuilder<S, St> {
     /// Set the `motivation` field (optional)
     pub fn motivation(
         mut self,
@@ -1577,7 +1580,7 @@ impl<'a, S: annotation_state::State> AnnotationBuilder<'a, S> {
     }
 }
 
-impl<'a, S: annotation_state::State> AnnotationBuilder<'a, S> {
+impl<S: BosStr, St: annotation_state::State> AnnotationBuilder<S, St> {
     /// Set the `rights` field (optional)
     pub fn rights(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -1590,7 +1593,7 @@ impl<'a, S: annotation_state::State> AnnotationBuilder<'a, S> {
     }
 }
 
-impl<'a, S: annotation_state::State> AnnotationBuilder<'a, S> {
+impl<S: BosStr, St: annotation_state::State> AnnotationBuilder<S, St> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -1603,33 +1606,33 @@ impl<'a, S: annotation_state::State> AnnotationBuilder<'a, S> {
     }
 }
 
-impl<'a, S> AnnotationBuilder<'a, S>
+impl<S: BosStr, St> AnnotationBuilder<S, St>
 where
-    S: annotation_state::State,
-    S::Target: annotation_state::IsUnset,
+    St: annotation_state::State,
+    St::Target: annotation_state::IsUnset,
 {
     /// Set the `target` field (required)
     pub fn target(
         mut self,
         value: impl Into<annotation::Target<S>>,
-    ) -> AnnotationBuilder<'a, annotation_state::SetTarget<S>> {
+    ) -> AnnotationBuilder<S, annotation_state::SetTarget<St>> {
         self._fields.7 = Option::Some(value.into());
         AnnotationBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AnnotationBuilder<'a, S>
+impl<S: BosStr, St> AnnotationBuilder<S, St>
 where
-    S: annotation_state::State,
-    S::Target: annotation_state::IsSet,
-    S::CreatedAt: annotation_state::IsSet,
+    St: annotation_state::State,
+    St::Target: annotation_state::IsSet,
+    St::CreatedAt: annotation_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Annotation<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Annotation<S> {
         Annotation {
             body: self._fields.0,
             created_at: self._fields.1.unwrap(),
@@ -1642,11 +1645,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Annotation<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Annotation<S> {
         Annotation {
             body: self._fields.0,
             created_at: self._fields.1.unwrap(),
@@ -1682,17 +1685,17 @@ pub mod range_selector_state {
         type StartSelector = Unset;
     }
     ///State transition - sets the `end_selector` field to Set
-    pub struct SetEndSelector<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEndSelector<S> {}
-    impl<S: State> State for SetEndSelector<S> {
+    pub struct SetEndSelector<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetEndSelector<St> {}
+    impl<St: State> State for SetEndSelector<St> {
         type EndSelector = Set<members::end_selector>;
-        type StartSelector = S::StartSelector;
+        type StartSelector = St::StartSelector;
     }
     ///State transition - sets the `start_selector` field to Set
-    pub struct SetStartSelector<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStartSelector<S> {}
-    impl<S: State> State for SetStartSelector<S> {
-        type EndSelector = S::EndSelector;
+    pub struct SetStartSelector<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStartSelector<St> {}
+    impl<St: State> State for SetStartSelector<St> {
+        type EndSelector = St::EndSelector;
         type StartSelector = Set<members::start_selector>;
     }
     /// Marker types for field names
@@ -1705,74 +1708,74 @@ pub mod range_selector_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct RangeSelectorBuilder<'a, S: range_selector_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct RangeSelectorBuilder<S: BosStr, St: range_selector_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<RangeSelectorEndSelector<S>>,
         Option<RangeSelectorStartSelector<S>>,
         Option<S>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> RangeSelector<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> RangeSelectorBuilder<'a, range_selector_state::Empty> {
+impl<S: BosStr> RangeSelector<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> RangeSelectorBuilder<S, range_selector_state::Empty> {
         RangeSelectorBuilder::new()
     }
 }
 
-impl<'a> RangeSelectorBuilder<'a, range_selector_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> RangeSelectorBuilder<S, range_selector_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         RangeSelectorBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RangeSelectorBuilder<'a, S>
+impl<S: BosStr, St> RangeSelectorBuilder<S, St>
 where
-    S: range_selector_state::State,
-    S::EndSelector: range_selector_state::IsUnset,
+    St: range_selector_state::State,
+    St::EndSelector: range_selector_state::IsUnset,
 {
     /// Set the `endSelector` field (required)
     pub fn end_selector(
         mut self,
         value: impl Into<RangeSelectorEndSelector<S>>,
-    ) -> RangeSelectorBuilder<'a, range_selector_state::SetEndSelector<S>> {
+    ) -> RangeSelectorBuilder<S, range_selector_state::SetEndSelector<St>> {
         self._fields.0 = Option::Some(value.into());
         RangeSelectorBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RangeSelectorBuilder<'a, S>
+impl<S: BosStr, St> RangeSelectorBuilder<S, St>
 where
-    S: range_selector_state::State,
-    S::StartSelector: range_selector_state::IsUnset,
+    St: range_selector_state::State,
+    St::StartSelector: range_selector_state::IsUnset,
 {
     /// Set the `startSelector` field (required)
     pub fn start_selector(
         mut self,
         value: impl Into<RangeSelectorStartSelector<S>>,
-    ) -> RangeSelectorBuilder<'a, range_selector_state::SetStartSelector<S>> {
+    ) -> RangeSelectorBuilder<S, range_selector_state::SetStartSelector<St>> {
         self._fields.1 = Option::Some(value.into());
         RangeSelectorBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: range_selector_state::State> RangeSelectorBuilder<'a, S> {
+impl<S: BosStr, St: range_selector_state::State> RangeSelectorBuilder<S, St> {
     /// Set the `type` field (optional)
     pub fn r#type(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -1785,14 +1788,14 @@ impl<'a, S: range_selector_state::State> RangeSelectorBuilder<'a, S> {
     }
 }
 
-impl<'a, S> RangeSelectorBuilder<'a, S>
+impl<S: BosStr, St> RangeSelectorBuilder<S, St>
 where
-    S: range_selector_state::State,
-    S::EndSelector: range_selector_state::IsSet,
-    S::StartSelector: range_selector_state::IsSet,
+    St: range_selector_state::State,
+    St::EndSelector: range_selector_state::IsSet,
+    St::StartSelector: range_selector_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> RangeSelector<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> RangeSelector<S> {
         RangeSelector {
             end_selector: self._fields.0.unwrap(),
             start_selector: self._fields.1.unwrap(),
@@ -1800,11 +1803,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> RangeSelector<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> RangeSelector<S> {
         RangeSelector {
             end_selector: self._fields.0.unwrap(),
             start_selector: self._fields.1.unwrap(),
@@ -1833,9 +1836,9 @@ pub mod target_state {
         type Source = Unset;
     }
     ///State transition - sets the `source` field to Set
-    pub struct SetSource<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSource<S> {}
-    impl<S: State> State for SetSource<S> {
+    pub struct SetSource<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSource<St> {}
+    impl<St: State> State for SetSource<St> {
         type Source = Set<members::source>;
     }
     /// Marker types for field names
@@ -1846,9 +1849,9 @@ pub mod target_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct TargetBuilder<'a, S: target_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct TargetBuilder<S: BosStr, St: target_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<TargetSelector<S>>,
         Option<UriValue<S>>,
@@ -1856,28 +1859,28 @@ pub struct TargetBuilder<'a, S: target_state::State> {
         Option<annotation::TimeState<S>>,
         Option<S>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Target<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> TargetBuilder<'a, target_state::Empty> {
+impl<S: BosStr> Target<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> TargetBuilder<S, target_state::Empty> {
         TargetBuilder::new()
     }
 }
 
-impl<'a> TargetBuilder<'a, target_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> TargetBuilder<S, target_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         TargetBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: target_state::State> TargetBuilder<'a, S> {
+impl<S: BosStr, St: target_state::State> TargetBuilder<S, St> {
     /// Set the `selector` field (optional)
     pub fn selector(mut self, value: impl Into<Option<TargetSelector<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -1890,26 +1893,26 @@ impl<'a, S: target_state::State> TargetBuilder<'a, S> {
     }
 }
 
-impl<'a, S> TargetBuilder<'a, S>
+impl<S: BosStr, St> TargetBuilder<S, St>
 where
-    S: target_state::State,
-    S::Source: target_state::IsUnset,
+    St: target_state::State,
+    St::Source: target_state::IsUnset,
 {
     /// Set the `source` field (required)
     pub fn source(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> TargetBuilder<'a, target_state::SetSource<S>> {
+    ) -> TargetBuilder<S, target_state::SetSource<St>> {
         self._fields.1 = Option::Some(value.into());
         TargetBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: target_state::State> TargetBuilder<'a, S> {
+impl<S: BosStr, St: target_state::State> TargetBuilder<S, St> {
     /// Set the `sourceHash` field (optional)
     pub fn source_hash(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -1922,7 +1925,7 @@ impl<'a, S: target_state::State> TargetBuilder<'a, S> {
     }
 }
 
-impl<'a, S: target_state::State> TargetBuilder<'a, S> {
+impl<S: BosStr, St: target_state::State> TargetBuilder<S, St> {
     /// Set the `state` field (optional)
     pub fn state(mut self, value: impl Into<Option<annotation::TimeState<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -1935,7 +1938,7 @@ impl<'a, S: target_state::State> TargetBuilder<'a, S> {
     }
 }
 
-impl<'a, S: target_state::State> TargetBuilder<'a, S> {
+impl<S: BosStr, St: target_state::State> TargetBuilder<S, St> {
     /// Set the `title` field (optional)
     pub fn title(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
@@ -1948,13 +1951,13 @@ impl<'a, S: target_state::State> TargetBuilder<'a, S> {
     }
 }
 
-impl<'a, S> TargetBuilder<'a, S>
+impl<S: BosStr, St> TargetBuilder<S, St>
 where
-    S: target_state::State,
-    S::Source: target_state::IsSet,
+    St: target_state::State,
+    St::Source: target_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Target<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Target<S> {
         Target {
             selector: self._fields.0,
             source: self._fields.1.unwrap(),
@@ -1964,8 +1967,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Target<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Target<S> {
         Target {
             selector: self._fields.0,
             source: self._fields.1.unwrap(),
@@ -1998,17 +2001,17 @@ pub mod text_position_selector_state {
         type End = Unset;
     }
     ///State transition - sets the `start` field to Set
-    pub struct SetStart<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStart<S> {}
-    impl<S: State> State for SetStart<S> {
+    pub struct SetStart<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStart<St> {}
+    impl<St: State> State for SetStart<St> {
         type Start = Set<members::start>;
-        type End = S::End;
+        type End = St::End;
     }
     ///State transition - sets the `end` field to Set
-    pub struct SetEnd<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEnd<S> {}
-    impl<S: State> State for SetEnd<S> {
-        type Start = S::Start;
+    pub struct SetEnd<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetEnd<St> {}
+    impl<St: State> State for SetEnd<St> {
+        type Start = St::Start;
         type End = Set<members::end>;
     }
     /// Marker types for field names
@@ -2021,73 +2024,76 @@ pub mod text_position_selector_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct TextPositionSelectorBuilder<'a, S: text_position_selector_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct TextPositionSelectorBuilder<
+    S: BosStr,
+    St: text_position_selector_state::State,
+> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<i64>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> TextPositionSelector<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> TextPositionSelectorBuilder<
-        'a,
-        text_position_selector_state::Empty,
-    > {
+impl<S: BosStr> TextPositionSelector<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> TextPositionSelectorBuilder<S, text_position_selector_state::Empty> {
         TextPositionSelectorBuilder::new()
     }
 }
 
-impl<'a> TextPositionSelectorBuilder<'a, text_position_selector_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> TextPositionSelectorBuilder<S, text_position_selector_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         TextPositionSelectorBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> TextPositionSelectorBuilder<'a, S>
+impl<S: BosStr, St> TextPositionSelectorBuilder<S, St>
 where
-    S: text_position_selector_state::State,
-    S::End: text_position_selector_state::IsUnset,
+    St: text_position_selector_state::State,
+    St::End: text_position_selector_state::IsUnset,
 {
     /// Set the `end` field (required)
     pub fn end(
         mut self,
         value: impl Into<i64>,
-    ) -> TextPositionSelectorBuilder<'a, text_position_selector_state::SetEnd<S>> {
+    ) -> TextPositionSelectorBuilder<S, text_position_selector_state::SetEnd<St>> {
         self._fields.0 = Option::Some(value.into());
         TextPositionSelectorBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> TextPositionSelectorBuilder<'a, S>
+impl<S: BosStr, St> TextPositionSelectorBuilder<S, St>
 where
-    S: text_position_selector_state::State,
-    S::Start: text_position_selector_state::IsUnset,
+    St: text_position_selector_state::State,
+    St::Start: text_position_selector_state::IsUnset,
 {
     /// Set the `start` field (required)
     pub fn start(
         mut self,
         value: impl Into<i64>,
-    ) -> TextPositionSelectorBuilder<'a, text_position_selector_state::SetStart<S>> {
+    ) -> TextPositionSelectorBuilder<S, text_position_selector_state::SetStart<St>> {
         self._fields.1 = Option::Some(value.into());
         TextPositionSelectorBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: text_position_selector_state::State> TextPositionSelectorBuilder<'a, S> {
+impl<
+    S: BosStr,
+    St: text_position_selector_state::State,
+> TextPositionSelectorBuilder<S, St> {
     /// Set the `type` field (optional)
     pub fn r#type(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -2100,14 +2106,14 @@ impl<'a, S: text_position_selector_state::State> TextPositionSelectorBuilder<'a,
     }
 }
 
-impl<'a, S> TextPositionSelectorBuilder<'a, S>
+impl<S: BosStr, St> TextPositionSelectorBuilder<S, St>
 where
-    S: text_position_selector_state::State,
-    S::Start: text_position_selector_state::IsSet,
-    S::End: text_position_selector_state::IsSet,
+    St: text_position_selector_state::State,
+    St::Start: text_position_selector_state::IsSet,
+    St::End: text_position_selector_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> TextPositionSelector<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> TextPositionSelector<S> {
         TextPositionSelector {
             end: self._fields.0.unwrap(),
             start: self._fields.1.unwrap(),
@@ -2115,11 +2121,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> TextPositionSelector<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> TextPositionSelector<S> {
         TextPositionSelector {
             end: self._fields.0.unwrap(),
             start: self._fields.1.unwrap(),

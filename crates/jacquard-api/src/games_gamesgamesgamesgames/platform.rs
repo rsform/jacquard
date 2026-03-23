@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -39,11 +39,11 @@ use crate::games_gamesgamesgamesgames::Website;
     rename = "games.gamesgamesgamesgames.platform",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Platform<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Platform<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub abbreviation: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -74,18 +74,18 @@ pub struct Platform<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct PlatformGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct PlatformGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Platform<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Platform<S> {
+impl<S: BosStr> Platform<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, PlatformRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -98,17 +98,17 @@ pub struct PlatformRecord;
 impl XrpcResp for PlatformRecord {
     const NSID: &'static str = "games.gamesgamesgamesgames.platform";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = PlatformGetRecordOutput<S>;
+    type Output<S: BosStr> = PlatformGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<PlatformGetRecordOutput<S>> for Platform<S> {
+impl<S: BosStr> From<PlatformGetRecordOutput<S>> for Platform<S> {
     fn from(output: PlatformGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Platform<S> {
+impl<S: BosStr> Collection for Platform<S> {
     const NSID: &'static str = "games.gamesgamesgamesgames.platform";
     type Record = PlatformRecord;
 }
@@ -118,7 +118,7 @@ impl Collection for PlatformRecord {
     type Record = PlatformRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Platform<S> {
+impl<S: BosStr> LexiconSchema for Platform<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.platform"
     }
@@ -143,43 +143,43 @@ pub mod platform_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type CreatedAt;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type CreatedAt = S::CreatedAt;
+        type Name = Unset;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Name = S::Name;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type CreatedAt = St::CreatedAt;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct PlatformBuilder<'a, S: platform_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct PlatformBuilder<S: BosStr, St: platform_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
         Option<S>,
@@ -193,28 +193,28 @@ pub struct PlatformBuilder<'a, S: platform_state::State> {
         Option<Vec<PlatformVersion<S>>>,
         Option<Vec<Website<S>>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Platform<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> PlatformBuilder<'a, platform_state::Empty> {
+impl<S: BosStr> Platform<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> PlatformBuilder<S, platform_state::Empty> {
         PlatformBuilder::new()
     }
 }
 
-impl<'a> PlatformBuilder<'a, platform_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> PlatformBuilder<S, platform_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         PlatformBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: platform_state::State> PlatformBuilder<'a, S> {
+impl<S: BosStr, St: platform_state::State> PlatformBuilder<S, St> {
     /// Set the `abbreviation` field (optional)
     pub fn abbreviation(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -227,7 +227,7 @@ impl<'a, S: platform_state::State> PlatformBuilder<'a, S> {
     }
 }
 
-impl<'a, S: platform_state::State> PlatformBuilder<'a, S> {
+impl<S: BosStr, St: platform_state::State> PlatformBuilder<S, St> {
     /// Set the `alternativeName` field (optional)
     pub fn alternative_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -240,7 +240,7 @@ impl<'a, S: platform_state::State> PlatformBuilder<'a, S> {
     }
 }
 
-impl<'a, S: platform_state::State> PlatformBuilder<'a, S> {
+impl<S: BosStr, St: platform_state::State> PlatformBuilder<S, St> {
     /// Set the `category` field (optional)
     pub fn category(mut self, value: impl Into<Option<PlatformCategory<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -253,26 +253,26 @@ impl<'a, S: platform_state::State> PlatformBuilder<'a, S> {
     }
 }
 
-impl<'a, S> PlatformBuilder<'a, S>
+impl<S: BosStr, St> PlatformBuilder<S, St>
 where
-    S: platform_state::State,
-    S::CreatedAt: platform_state::IsUnset,
+    St: platform_state::State,
+    St::CreatedAt: platform_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> PlatformBuilder<'a, platform_state::SetCreatedAt<S>> {
+    ) -> PlatformBuilder<S, platform_state::SetCreatedAt<St>> {
         self._fields.3 = Option::Some(value.into());
         PlatformBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: platform_state::State> PlatformBuilder<'a, S> {
+impl<S: BosStr, St: platform_state::State> PlatformBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
@@ -285,7 +285,7 @@ impl<'a, S: platform_state::State> PlatformBuilder<'a, S> {
     }
 }
 
-impl<'a, S: platform_state::State> PlatformBuilder<'a, S> {
+impl<S: BosStr, St: platform_state::State> PlatformBuilder<S, St> {
     /// Set the `family` field (optional)
     pub fn family(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -298,7 +298,7 @@ impl<'a, S: platform_state::State> PlatformBuilder<'a, S> {
     }
 }
 
-impl<'a, S: platform_state::State> PlatformBuilder<'a, S> {
+impl<S: BosStr, St: platform_state::State> PlatformBuilder<S, St> {
     /// Set the `generation` field (optional)
     pub fn generation(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.6 = value.into();
@@ -311,7 +311,7 @@ impl<'a, S: platform_state::State> PlatformBuilder<'a, S> {
     }
 }
 
-impl<'a, S: platform_state::State> PlatformBuilder<'a, S> {
+impl<S: BosStr, St: platform_state::State> PlatformBuilder<S, St> {
     /// Set the `media` field (optional)
     pub fn media(mut self, value: impl Into<Option<Vec<MediaItem<S>>>>) -> Self {
         self._fields.7 = value.into();
@@ -324,26 +324,26 @@ impl<'a, S: platform_state::State> PlatformBuilder<'a, S> {
     }
 }
 
-impl<'a, S> PlatformBuilder<'a, S>
+impl<S: BosStr, St> PlatformBuilder<S, St>
 where
-    S: platform_state::State,
-    S::Name: platform_state::IsUnset,
+    St: platform_state::State,
+    St::Name: platform_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> PlatformBuilder<'a, platform_state::SetName<S>> {
+    ) -> PlatformBuilder<S, platform_state::SetName<St>> {
         self._fields.8 = Option::Some(value.into());
         PlatformBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: platform_state::State> PlatformBuilder<'a, S> {
+impl<S: BosStr, St: platform_state::State> PlatformBuilder<S, St> {
     /// Set the `versions` field (optional)
     pub fn versions(
         mut self,
@@ -359,7 +359,7 @@ impl<'a, S: platform_state::State> PlatformBuilder<'a, S> {
     }
 }
 
-impl<'a, S: platform_state::State> PlatformBuilder<'a, S> {
+impl<S: BosStr, St: platform_state::State> PlatformBuilder<S, St> {
     /// Set the `websites` field (optional)
     pub fn websites(mut self, value: impl Into<Option<Vec<Website<S>>>>) -> Self {
         self._fields.10 = value.into();
@@ -372,14 +372,14 @@ impl<'a, S: platform_state::State> PlatformBuilder<'a, S> {
     }
 }
 
-impl<'a, S> PlatformBuilder<'a, S>
+impl<S: BosStr, St> PlatformBuilder<S, St>
 where
-    S: platform_state::State,
-    S::Name: platform_state::IsSet,
-    S::CreatedAt: platform_state::IsSet,
+    St: platform_state::State,
+    St::CreatedAt: platform_state::IsSet,
+    St::Name: platform_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Platform<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Platform<S> {
         Platform {
             abbreviation: self._fields.0,
             alternative_name: self._fields.1,
@@ -395,11 +395,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Platform<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Platform<S> {
         Platform {
             abbreviation: self._fields.0,
             alternative_name: self._fields.1,

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -29,18 +29,18 @@ use serde::{Serialize, Deserialize};
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Gallery<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Gallery<S: BosStr = DefaultStr> {
     ///Reference to a blog.pckt.gallery record
     pub r#ref: AtUri<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Gallery<S> {
+impl<S: BosStr> LexiconSchema for Gallery<S> {
     fn nsid() -> &'static str {
         "blog.pckt.block.gallery"
     }
@@ -74,9 +74,9 @@ pub mod gallery_state {
         type Ref = Unset;
     }
     ///State transition - sets the `ref` field to Set
-    pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRef<S> {}
-    impl<S: State> State for SetRef<S> {
+    pub struct SetRef<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRef<St> {}
+    impl<St: State> State for SetRef<St> {
         type Ref = Set<members::r#ref>;
     }
     /// Marker types for field names
@@ -87,67 +87,64 @@ pub mod gallery_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GalleryBuilder<'a, S: gallery_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GalleryBuilder<S: BosStr, St: gallery_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Gallery<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GalleryBuilder<'a, gallery_state::Empty> {
+impl<S: BosStr> Gallery<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GalleryBuilder<S, gallery_state::Empty> {
         GalleryBuilder::new()
     }
 }
 
-impl<'a> GalleryBuilder<'a, gallery_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GalleryBuilder<S, gallery_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GalleryBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GalleryBuilder<'a, S>
+impl<S: BosStr, St> GalleryBuilder<S, St>
 where
-    S: gallery_state::State,
-    S::Ref: gallery_state::IsUnset,
+    St: gallery_state::State,
+    St::Ref: gallery_state::IsUnset,
 {
     /// Set the `ref` field (required)
     pub fn r#ref(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> GalleryBuilder<'a, gallery_state::SetRef<S>> {
+    ) -> GalleryBuilder<S, gallery_state::SetRef<St>> {
         self._fields.0 = Option::Some(value.into());
         GalleryBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GalleryBuilder<'a, S>
+impl<S: BosStr, St> GalleryBuilder<S, St>
 where
-    S: gallery_state::State,
-    S::Ref: gallery_state::IsSet,
+    St: gallery_state::State,
+    St::Ref: gallery_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Gallery<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Gallery<S> {
         Gallery {
             r#ref: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Gallery<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Gallery<S> {
         Gallery {
             r#ref: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

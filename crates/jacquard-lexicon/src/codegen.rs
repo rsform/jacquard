@@ -8,7 +8,6 @@ pub(crate) mod builder_gen;
 pub(crate) mod builder_heuristics;
 pub(crate) mod collect;
 pub(crate) mod names;
-pub(crate) mod nsid_utils;
 pub(crate) mod output;
 pub(crate) mod prettify;
 pub(crate) mod schema_impl;
@@ -87,10 +86,10 @@ impl<'c> CodeGenerator<'c> {
 
     /// Track namespace dependency when a ref crosses namespace boundaries
     pub(crate) fn track_ref_namespace_dep(&self, current_nsid: &str, ref_str: &str) {
-        use nsid_utils::NsidPath;
+        use crate::ref_utils::{NsidPath, RefPath};
 
         let current_path = NsidPath::parse(current_nsid);
-        let ref_path = nsid_utils::RefPath::parse(ref_str, None);
+        let ref_path = RefPath::parse(ref_str, None);
         let ref_nsid_path = NsidPath::parse(ref_path.nsid());
 
         let current_ns = current_path.namespace();
@@ -149,9 +148,9 @@ impl<'c> CodeGenerator<'c> {
 
         // Generate lightweight trait impl that calls shared function.
         let type_ident = syn::Ident::new(type_name, proc_macro2::Span::call_site());
-        let bos_tok = resolved.external_type_tokens(&prettify::ExternalImport::Bos);
+        let bosstr_tok = resolved.external_type_tokens(&prettify::ExternalImport::BosStr);
         let (impl_generics, type_generics) = if has_lifetime {
-            (quote! { <S: #bos_tok<str> + AsRef<str>> }, quote! { <S> })
+            (quote! { <S: #bosstr_tok> }, quote! { <S> })
         } else {
             (quote! {}, quote! {})
         };
@@ -238,9 +237,19 @@ impl<'c> CodeGenerator<'c> {
                 let ident = syn::Ident::new(&type_name, proc_macro2::Span::call_site());
                 let rust_type = self.string_to_rust_type(s, resolved);
                 let doc = self.generate_doc_comment(s.description.as_ref());
-                let tokens = quote! {
-                    #doc
-                    pub type #ident<'a> = #rust_type;
+                let needs_param = self.string_needs_type_param(s);
+                let bosstr_path = resolved.external_type_tokens(&prettify::ExternalImport::BosStr);
+                let default_str_path = resolved.external_type_tokens(&prettify::ExternalImport::DefaultStr);
+                let tokens = if needs_param {
+                    quote! {
+                        #doc
+                        pub type #ident<S: #bosstr_path = #default_str_path> = #rust_type;
+                    }
+                } else {
+                    quote! {
+                        #doc
+                        pub type #ident = #rust_type;
+                    }
                 };
                 Ok(GeneratedCode::type_only(tokens))
             }
@@ -269,10 +278,12 @@ impl<'c> CodeGenerator<'c> {
 
                     let union_ident = syn::Ident::new(&union_name, proc_macro2::Span::call_site());
                     let union_tokens = union_generated.into_tokens();
+                    let bosstr_path = resolved.external_type_tokens(&prettify::ExternalImport::BosStr);
+                    let default_str_path = resolved.external_type_tokens(&prettify::ExternalImport::DefaultStr);
                     let type_alias = if needs_lifetime {
                         quote! {
                             #doc
-                            pub type #ident<'a> = Vec<#union_ident<'a>>;
+                            pub type #ident<S: #bosstr_path = #default_str_path> = Vec<#union_ident<S>>;
                         }
                     } else {
                         quote! {
@@ -290,10 +301,12 @@ impl<'c> CodeGenerator<'c> {
                 } else {
                     // Regular array item type
                     let item_type = self.array_item_to_rust_type(nsid, &array.items, resolved)?;
+                    let bosstr_path = resolved.external_type_tokens(&prettify::ExternalImport::BosStr);
+                    let default_str_path = resolved.external_type_tokens(&prettify::ExternalImport::DefaultStr);
                     let tokens = if needs_lifetime {
                         quote! {
                             #doc
-                            pub type #ident<'a> = Vec<#item_type>;
+                            pub type #ident<S: #bosstr_path = #default_str_path> = Vec<#item_type>;
                         }
                     } else {
                         quote! {
@@ -327,9 +340,11 @@ impl<'c> CodeGenerator<'c> {
                     }
                     _ => unreachable!(),
                 };
+                let bosstr_path = resolved.external_type_tokens(&prettify::ExternalImport::BosStr);
+                let default_str_path = resolved.external_type_tokens(&prettify::ExternalImport::DefaultStr);
                 let tokens = if needs_lifetime {
                     quote! {
-                        pub type #ident<'a> = #rust_type;
+                        pub type #ident<S: #bosstr_path = #default_str_path> = #rust_type;
                     }
                 } else {
                     quote! {
@@ -437,7 +452,7 @@ mod tests {
         assert!(formatted.contains("Images"));
         assert!(formatted.contains("Video"));
         assert!(formatted.contains("External"));
-        assert!(formatted.contains("#[serde(tag = \"$type\")]"));
+        assert!(formatted.contains("tag = \"$type\""));
         assert!(formatted.contains("#[jacquard_derive::open_union]"));
     }
 
@@ -742,8 +757,8 @@ mod tests {
         let formatted = prettyplease::unparse(&file);
         println!("\n{}\n", formatted);
 
-        // Empty objects should generate type alias to Data<'a>
-        assert!(formatted.contains("type EmptyDef") || formatted.contains("Data<'a>"));
+        // Empty objects should generate type alias to Data<S>.
+        assert!(formatted.contains("type EmptyDef") || formatted.contains("Data<S>"));
     }
 
     #[test]

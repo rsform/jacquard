@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -32,11 +32,11 @@ use crate::science_alt::dataset::storage_http;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct StorageHttp<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct StorageHttp<S: BosStr = DefaultStr> {
     ///Array of shard entries with URL and integrity checksum
     pub shards: Vec<storage_http::ShardEntry<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -49,11 +49,11 @@ pub struct StorageHttp<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ShardEntry<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ShardEntry<S: BosStr = DefaultStr> {
     ///Content hash for integrity verification
     pub checksum: ShardChecksum<S>,
     ///HTTP/HTTPS URL for this WebDataset tar shard
@@ -62,7 +62,7 @@ pub struct ShardEntry<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for StorageHttp<S> {
+impl<S: BosStr> LexiconSchema for StorageHttp<S> {
     fn nsid() -> &'static str {
         "science.alt.dataset.storageHttp"
     }
@@ -88,7 +88,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for StorageHttp<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ShardEntry<S> {
+impl<S: BosStr> LexiconSchema for ShardEntry<S> {
     fn nsid() -> &'static str {
         "science.alt.dataset.storageHttp"
     }
@@ -133,9 +133,9 @@ pub mod storage_http_state {
         type Shards = Unset;
     }
     ///State transition - sets the `shards` field to Set
-    pub struct SetShards<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetShards<S> {}
-    impl<S: State> State for SetShards<S> {
+    pub struct SetShards<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetShards<St> {}
+    impl<St: State> State for SetShards<St> {
         type Shards = Set<members::shards>;
     }
     /// Marker types for field names
@@ -146,67 +146,67 @@ pub mod storage_http_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct StorageHttpBuilder<'a, S: storage_http_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct StorageHttpBuilder<S: BosStr, St: storage_http_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<storage_http::ShardEntry<S>>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> StorageHttp<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> StorageHttpBuilder<'a, storage_http_state::Empty> {
+impl<S: BosStr> StorageHttp<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> StorageHttpBuilder<S, storage_http_state::Empty> {
         StorageHttpBuilder::new()
     }
 }
 
-impl<'a> StorageHttpBuilder<'a, storage_http_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> StorageHttpBuilder<S, storage_http_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         StorageHttpBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> StorageHttpBuilder<'a, S>
+impl<S: BosStr, St> StorageHttpBuilder<S, St>
 where
-    S: storage_http_state::State,
-    S::Shards: storage_http_state::IsUnset,
+    St: storage_http_state::State,
+    St::Shards: storage_http_state::IsUnset,
 {
     /// Set the `shards` field (required)
     pub fn shards(
         mut self,
         value: impl Into<Vec<storage_http::ShardEntry<S>>>,
-    ) -> StorageHttpBuilder<'a, storage_http_state::SetShards<S>> {
+    ) -> StorageHttpBuilder<S, storage_http_state::SetShards<St>> {
         self._fields.0 = Option::Some(value.into());
         StorageHttpBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> StorageHttpBuilder<'a, S>
+impl<S: BosStr, St> StorageHttpBuilder<S, St>
 where
-    S: storage_http_state::State,
-    S::Shards: storage_http_state::IsSet,
+    St: storage_http_state::State,
+    St::Shards: storage_http_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> StorageHttp<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> StorageHttp<S> {
         StorageHttp {
             shards: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> StorageHttp<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> StorageHttp<S> {
         StorageHttp {
             shards: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -325,17 +325,17 @@ pub mod shard_entry_state {
         type Checksum = Unset;
     }
     ///State transition - sets the `url` field to Set
-    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrl<S> {}
-    impl<S: State> State for SetUrl<S> {
+    pub struct SetUrl<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUrl<St> {}
+    impl<St: State> State for SetUrl<St> {
         type Url = Set<members::url>;
-        type Checksum = S::Checksum;
+        type Checksum = St::Checksum;
     }
     ///State transition - sets the `checksum` field to Set
-    pub struct SetChecksum<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetChecksum<S> {}
-    impl<S: State> State for SetChecksum<S> {
-        type Url = S::Url;
+    pub struct SetChecksum<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetChecksum<St> {}
+    impl<St: State> State for SetChecksum<St> {
+        type Url = St::Url;
         type Checksum = Set<members::checksum>;
     }
     /// Marker types for field names
@@ -348,88 +348,88 @@ pub mod shard_entry_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ShardEntryBuilder<'a, S: shard_entry_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ShardEntryBuilder<S: BosStr, St: shard_entry_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<ShardChecksum<S>>, Option<UriValue<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ShardEntry<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ShardEntryBuilder<'a, shard_entry_state::Empty> {
+impl<S: BosStr> ShardEntry<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ShardEntryBuilder<S, shard_entry_state::Empty> {
         ShardEntryBuilder::new()
     }
 }
 
-impl<'a> ShardEntryBuilder<'a, shard_entry_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ShardEntryBuilder<S, shard_entry_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ShardEntryBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ShardEntryBuilder<'a, S>
+impl<S: BosStr, St> ShardEntryBuilder<S, St>
 where
-    S: shard_entry_state::State,
-    S::Checksum: shard_entry_state::IsUnset,
+    St: shard_entry_state::State,
+    St::Checksum: shard_entry_state::IsUnset,
 {
     /// Set the `checksum` field (required)
     pub fn checksum(
         mut self,
         value: impl Into<ShardChecksum<S>>,
-    ) -> ShardEntryBuilder<'a, shard_entry_state::SetChecksum<S>> {
+    ) -> ShardEntryBuilder<S, shard_entry_state::SetChecksum<St>> {
         self._fields.0 = Option::Some(value.into());
         ShardEntryBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ShardEntryBuilder<'a, S>
+impl<S: BosStr, St> ShardEntryBuilder<S, St>
 where
-    S: shard_entry_state::State,
-    S::Url: shard_entry_state::IsUnset,
+    St: shard_entry_state::State,
+    St::Url: shard_entry_state::IsUnset,
 {
     /// Set the `url` field (required)
     pub fn url(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> ShardEntryBuilder<'a, shard_entry_state::SetUrl<S>> {
+    ) -> ShardEntryBuilder<S, shard_entry_state::SetUrl<St>> {
         self._fields.1 = Option::Some(value.into());
         ShardEntryBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ShardEntryBuilder<'a, S>
+impl<S: BosStr, St> ShardEntryBuilder<S, St>
 where
-    S: shard_entry_state::State,
-    S::Url: shard_entry_state::IsSet,
-    S::Checksum: shard_entry_state::IsSet,
+    St: shard_entry_state::State,
+    St::Url: shard_entry_state::IsSet,
+    St::Checksum: shard_entry_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ShardEntry<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ShardEntry<S> {
         ShardEntry {
             checksum: self._fields.0.unwrap(),
             url: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> ShardEntry<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ShardEntry<S> {
         ShardEntry {
             checksum: self._fields.0.unwrap(),
             url: self._fields.1.unwrap(),

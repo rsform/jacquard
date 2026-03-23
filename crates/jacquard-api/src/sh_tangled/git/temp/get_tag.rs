@@ -6,25 +6,28 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[allow(unused_imports)]
+use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
+use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetTag<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct GetTag<S: BosStr = DefaultStr> {
     pub repo: AtUri<S>,
-    #[serde(borrow)]
     pub tag: S,
 }
 
@@ -51,19 +54,16 @@ pub struct GetTagOutput {
 pub enum GetTagError {
     /// Repository not found or access denied
     #[serde(rename = "RepoNotFound")]
-    RepoNotFound(Option<jacquard_common::deps::smol_str::SmolStr>),
+    RepoNotFound(Option<SmolStr>),
     /// Tag not found
     #[serde(rename = "TagNotFound")]
-    TagNotFound(Option<jacquard_common::deps::smol_str::SmolStr>),
+    TagNotFound(Option<SmolStr>),
     /// Invalid request parameters
     #[serde(rename = "InvalidRequest")]
-    InvalidRequest(Option<jacquard_common::deps::smol_str::SmolStr>),
+    InvalidRequest(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: jacquard_common::deps::smol_str::SmolStr,
-        message: Option<jacquard_common::deps::smol_str::SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for GetTagError {
@@ -106,9 +106,9 @@ pub struct GetTagResponse;
 impl jacquard_common::xrpc::XrpcResp for GetTagResponse {
     const NSID: &'static str = "sh.tangled.git.temp.getTag";
     const ENCODING: &'static str = "*/*";
-    type Output<S: Bos<str> + AsRef<str>> = GetTagOutput;
+    type Output<S: BosStr> = GetTagOutput;
     type Err = GetTagError;
-    fn encode_output<S: Bos<str> + AsRef<str>>(
+    fn encode_output<S: BosStr>(
         output: &Self::Output<S>,
     ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError>
     where
@@ -120,7 +120,7 @@ impl jacquard_common::xrpc::XrpcResp for GetTagResponse {
         body: &'de [u8],
     ) -> Result<Self::Output<S>, jacquard_common::error::DecodeError>
     where
-        S: Bos<str> + AsRef<str> + Deserialize<'de>,
+        S: BosStr + Deserialize<'de>,
         Self::Output<S>: Deserialize<'de>,
     {
         Ok(GetTagOutput {
@@ -129,8 +129,7 @@ impl jacquard_common::xrpc::XrpcResp for GetTagResponse {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetTag<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetTag<S> {
     const NSID: &'static str = "sh.tangled.git.temp.getTag";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetTagResponse;
@@ -141,7 +140,7 @@ pub struct GetTagRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetTagRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.git.temp.getTag";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetTag<S>;
+    type Request<S: BosStr> = GetTag<S>;
     type Response = GetTagResponse;
 }
 
@@ -166,17 +165,17 @@ pub mod get_tag_state {
         type Tag = Unset;
     }
     ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
+    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRepo<St> {}
+    impl<St: State> State for SetRepo<St> {
         type Repo = Set<members::repo>;
-        type Tag = S::Tag;
+        type Tag = St::Tag;
     }
     ///State transition - sets the `tag` field to Set
-    pub struct SetTag<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTag<S> {}
-    impl<S: State> State for SetTag<S> {
-        type Repo = S::Repo;
+    pub struct SetTag<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTag<St> {}
+    impl<St: State> State for SetTag<St> {
+        type Repo = St::Repo;
         type Tag = Set<members::tag>;
     }
     /// Marker types for field names
@@ -189,77 +188,77 @@ pub mod get_tag_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetTagBuilder<'a, S: get_tag_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetTagBuilder<S: BosStr, St: get_tag_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetTag<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetTagBuilder<'a, get_tag_state::Empty> {
+impl<S: BosStr> GetTag<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetTagBuilder<S, get_tag_state::Empty> {
         GetTagBuilder::new()
     }
 }
 
-impl<'a> GetTagBuilder<'a, get_tag_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetTagBuilder<S, get_tag_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetTagBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetTagBuilder<'a, S>
+impl<S: BosStr, St> GetTagBuilder<S, St>
 where
-    S: get_tag_state::State,
-    S::Repo: get_tag_state::IsUnset,
+    St: get_tag_state::State,
+    St::Repo: get_tag_state::IsUnset,
 {
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> GetTagBuilder<'a, get_tag_state::SetRepo<S>> {
+    ) -> GetTagBuilder<S, get_tag_state::SetRepo<St>> {
         self._fields.0 = Option::Some(value.into());
         GetTagBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetTagBuilder<'a, S>
+impl<S: BosStr, St> GetTagBuilder<S, St>
 where
-    S: get_tag_state::State,
-    S::Tag: get_tag_state::IsUnset,
+    St: get_tag_state::State,
+    St::Tag: get_tag_state::IsUnset,
 {
     /// Set the `tag` field (required)
     pub fn tag(
         mut self,
         value: impl Into<S>,
-    ) -> GetTagBuilder<'a, get_tag_state::SetTag<S>> {
+    ) -> GetTagBuilder<S, get_tag_state::SetTag<St>> {
         self._fields.1 = Option::Some(value.into());
         GetTagBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetTagBuilder<'a, S>
+impl<S: BosStr, St> GetTagBuilder<S, St>
 where
-    S: get_tag_state::State,
-    S::Repo: get_tag_state::IsSet,
-    S::Tag: get_tag_state::IsSet,
+    St: get_tag_state::State,
+    St::Repo: get_tag_state::IsSet,
+    St::Tag: get_tag_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetTag<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetTag<S> {
         GetTag {
             repo: self._fields.0.unwrap(),
             tag: self._fields.1.unwrap(),

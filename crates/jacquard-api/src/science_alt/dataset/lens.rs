@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use crate::science_alt::dataset::lens;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CodeReference<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CodeReference<S: BosStr = DefaultStr> {
     ///Optional branch name (for reference, commit hash is authoritative)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub branch: Option<S>,
@@ -62,11 +62,11 @@ pub struct CodeReference<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct LensMetadata<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct LensMetadata<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
@@ -79,11 +79,11 @@ pub struct LensMetadata<S: Bos<str> + AsRef<str> = DefaultStr> {
     rename = "science.alt.dataset.lens",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Lens<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Lens<S: BosStr = DefaultStr> {
     ///Timestamp when this lens was created
     pub created_at: Datetime,
     ///What this transformation does
@@ -121,24 +121,24 @@ pub struct Lens<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct LensGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct LensGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Lens<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Lens<S> {
+impl<S: BosStr> Lens<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, LensRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for CodeReference<S> {
+impl<S: BosStr> LexiconSchema for CodeReference<S> {
     fn nsid() -> &'static str {
         "science.alt.dataset.lens"
     }
@@ -196,7 +196,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for CodeReference<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for LensMetadata<S> {
+impl<S: BosStr> LexiconSchema for LensMetadata<S> {
     fn nsid() -> &'static str {
         "science.alt.dataset.lens"
     }
@@ -218,17 +218,17 @@ pub struct LensRecord;
 impl XrpcResp for LensRecord {
     const NSID: &'static str = "science.alt.dataset.lens";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = LensGetRecordOutput<S>;
+    type Output<S: BosStr> = LensGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<LensGetRecordOutput<S>> for Lens<S> {
+impl<S: BosStr> From<LensGetRecordOutput<S>> for Lens<S> {
     fn from(output: LensGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Lens<S> {
+impl<S: BosStr> Collection for Lens<S> {
     const NSID: &'static str = "science.alt.dataset.lens";
     type Record = LensRecord;
 }
@@ -238,7 +238,7 @@ impl Collection for LensRecord {
     type Record = LensRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Lens<S> {
+impl<S: BosStr> LexiconSchema for Lens<S> {
     fn nsid() -> &'static str {
         "science.alt.dataset.lens"
     }
@@ -584,111 +584,111 @@ pub mod lens_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type SourceSchema;
+        type TargetSchema;
+        type GetterCode;
+        type PutterCode;
         type CreatedAt;
         type Name;
-        type GetterCode;
-        type TargetSchema;
-        type PutterCode;
+        type SourceSchema;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type SourceSchema = Unset;
+        type TargetSchema = Unset;
+        type GetterCode = Unset;
+        type PutterCode = Unset;
         type CreatedAt = Unset;
         type Name = Unset;
-        type GetterCode = Unset;
-        type TargetSchema = Unset;
-        type PutterCode = Unset;
-    }
-    ///State transition - sets the `source_schema` field to Set
-    pub struct SetSourceSchema<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSourceSchema<S> {}
-    impl<S: State> State for SetSourceSchema<S> {
-        type SourceSchema = Set<members::source_schema>;
-        type CreatedAt = S::CreatedAt;
-        type Name = S::Name;
-        type GetterCode = S::GetterCode;
-        type TargetSchema = S::TargetSchema;
-        type PutterCode = S::PutterCode;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type SourceSchema = S::SourceSchema;
-        type CreatedAt = Set<members::created_at>;
-        type Name = S::Name;
-        type GetterCode = S::GetterCode;
-        type TargetSchema = S::TargetSchema;
-        type PutterCode = S::PutterCode;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type SourceSchema = S::SourceSchema;
-        type CreatedAt = S::CreatedAt;
-        type Name = Set<members::name>;
-        type GetterCode = S::GetterCode;
-        type TargetSchema = S::TargetSchema;
-        type PutterCode = S::PutterCode;
-    }
-    ///State transition - sets the `getter_code` field to Set
-    pub struct SetGetterCode<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGetterCode<S> {}
-    impl<S: State> State for SetGetterCode<S> {
-        type SourceSchema = S::SourceSchema;
-        type CreatedAt = S::CreatedAt;
-        type Name = S::Name;
-        type GetterCode = Set<members::getter_code>;
-        type TargetSchema = S::TargetSchema;
-        type PutterCode = S::PutterCode;
+        type SourceSchema = Unset;
     }
     ///State transition - sets the `target_schema` field to Set
-    pub struct SetTargetSchema<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTargetSchema<S> {}
-    impl<S: State> State for SetTargetSchema<S> {
-        type SourceSchema = S::SourceSchema;
-        type CreatedAt = S::CreatedAt;
-        type Name = S::Name;
-        type GetterCode = S::GetterCode;
+    pub struct SetTargetSchema<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTargetSchema<St> {}
+    impl<St: State> State for SetTargetSchema<St> {
         type TargetSchema = Set<members::target_schema>;
-        type PutterCode = S::PutterCode;
+        type GetterCode = St::GetterCode;
+        type PutterCode = St::PutterCode;
+        type CreatedAt = St::CreatedAt;
+        type Name = St::Name;
+        type SourceSchema = St::SourceSchema;
+    }
+    ///State transition - sets the `getter_code` field to Set
+    pub struct SetGetterCode<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetGetterCode<St> {}
+    impl<St: State> State for SetGetterCode<St> {
+        type TargetSchema = St::TargetSchema;
+        type GetterCode = Set<members::getter_code>;
+        type PutterCode = St::PutterCode;
+        type CreatedAt = St::CreatedAt;
+        type Name = St::Name;
+        type SourceSchema = St::SourceSchema;
     }
     ///State transition - sets the `putter_code` field to Set
-    pub struct SetPutterCode<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPutterCode<S> {}
-    impl<S: State> State for SetPutterCode<S> {
-        type SourceSchema = S::SourceSchema;
-        type CreatedAt = S::CreatedAt;
-        type Name = S::Name;
-        type GetterCode = S::GetterCode;
-        type TargetSchema = S::TargetSchema;
+    pub struct SetPutterCode<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPutterCode<St> {}
+    impl<St: State> State for SetPutterCode<St> {
+        type TargetSchema = St::TargetSchema;
+        type GetterCode = St::GetterCode;
         type PutterCode = Set<members::putter_code>;
+        type CreatedAt = St::CreatedAt;
+        type Name = St::Name;
+        type SourceSchema = St::SourceSchema;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type TargetSchema = St::TargetSchema;
+        type GetterCode = St::GetterCode;
+        type PutterCode = St::PutterCode;
+        type CreatedAt = Set<members::created_at>;
+        type Name = St::Name;
+        type SourceSchema = St::SourceSchema;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type TargetSchema = St::TargetSchema;
+        type GetterCode = St::GetterCode;
+        type PutterCode = St::PutterCode;
+        type CreatedAt = St::CreatedAt;
+        type Name = Set<members::name>;
+        type SourceSchema = St::SourceSchema;
+    }
+    ///State transition - sets the `source_schema` field to Set
+    pub struct SetSourceSchema<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSourceSchema<St> {}
+    impl<St: State> State for SetSourceSchema<St> {
+        type TargetSchema = St::TargetSchema;
+        type GetterCode = St::GetterCode;
+        type PutterCode = St::PutterCode;
+        type CreatedAt = St::CreatedAt;
+        type Name = St::Name;
+        type SourceSchema = Set<members::source_schema>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `source_schema` field
-        pub struct source_schema(());
+        ///Marker type for the `target_schema` field
+        pub struct target_schema(());
+        ///Marker type for the `getter_code` field
+        pub struct getter_code(());
+        ///Marker type for the `putter_code` field
+        pub struct putter_code(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `name` field
         pub struct name(());
-        ///Marker type for the `getter_code` field
-        pub struct getter_code(());
-        ///Marker type for the `target_schema` field
-        pub struct target_schema(());
-        ///Marker type for the `putter_code` field
-        pub struct putter_code(());
+        ///Marker type for the `source_schema` field
+        pub struct source_schema(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct LensBuilder<'a, S: lens_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct LensBuilder<S: BosStr, St: lens_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
         Option<S>,
@@ -702,47 +702,47 @@ pub struct LensBuilder<'a, S: lens_state::State> {
         Option<AtUri<S>>,
         Option<S>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Lens<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> LensBuilder<'a, lens_state::Empty> {
+impl<S: BosStr> Lens<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> LensBuilder<S, lens_state::Empty> {
         LensBuilder::new()
     }
 }
 
-impl<'a> LensBuilder<'a, lens_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> LensBuilder<S, lens_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         LensBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LensBuilder<'a, S>
+impl<S: BosStr, St> LensBuilder<S, St>
 where
-    S: lens_state::State,
-    S::CreatedAt: lens_state::IsUnset,
+    St: lens_state::State,
+    St::CreatedAt: lens_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> LensBuilder<'a, lens_state::SetCreatedAt<S>> {
+    ) -> LensBuilder<S, lens_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         LensBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: lens_state::State> LensBuilder<'a, S> {
+impl<S: BosStr, St: lens_state::State> LensBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -755,26 +755,26 @@ impl<'a, S: lens_state::State> LensBuilder<'a, S> {
     }
 }
 
-impl<'a, S> LensBuilder<'a, S>
+impl<S: BosStr, St> LensBuilder<S, St>
 where
-    S: lens_state::State,
-    S::GetterCode: lens_state::IsUnset,
+    St: lens_state::State,
+    St::GetterCode: lens_state::IsUnset,
 {
     /// Set the `getterCode` field (required)
     pub fn getter_code(
         mut self,
         value: impl Into<lens::CodeReference<S>>,
-    ) -> LensBuilder<'a, lens_state::SetGetterCode<S>> {
+    ) -> LensBuilder<S, lens_state::SetGetterCode<St>> {
         self._fields.2 = Option::Some(value.into());
         LensBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: lens_state::State> LensBuilder<'a, S> {
+impl<S: BosStr, St: lens_state::State> LensBuilder<S, St> {
     /// Set the `language` field (optional)
     pub fn language(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -787,7 +787,7 @@ impl<'a, S: lens_state::State> LensBuilder<'a, S> {
     }
 }
 
-impl<'a, S: lens_state::State> LensBuilder<'a, S> {
+impl<S: BosStr, St: lens_state::State> LensBuilder<S, St> {
     /// Set the `metadata` field (optional)
     pub fn metadata(mut self, value: impl Into<Option<lens::LensMetadata<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -800,64 +800,64 @@ impl<'a, S: lens_state::State> LensBuilder<'a, S> {
     }
 }
 
-impl<'a, S> LensBuilder<'a, S>
+impl<S: BosStr, St> LensBuilder<S, St>
 where
-    S: lens_state::State,
-    S::Name: lens_state::IsUnset,
+    St: lens_state::State,
+    St::Name: lens_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> LensBuilder<'a, lens_state::SetName<S>> {
+    ) -> LensBuilder<S, lens_state::SetName<St>> {
         self._fields.5 = Option::Some(value.into());
         LensBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LensBuilder<'a, S>
+impl<S: BosStr, St> LensBuilder<S, St>
 where
-    S: lens_state::State,
-    S::PutterCode: lens_state::IsUnset,
+    St: lens_state::State,
+    St::PutterCode: lens_state::IsUnset,
 {
     /// Set the `putterCode` field (required)
     pub fn putter_code(
         mut self,
         value: impl Into<lens::CodeReference<S>>,
-    ) -> LensBuilder<'a, lens_state::SetPutterCode<S>> {
+    ) -> LensBuilder<S, lens_state::SetPutterCode<St>> {
         self._fields.6 = Option::Some(value.into());
         LensBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LensBuilder<'a, S>
+impl<S: BosStr, St> LensBuilder<S, St>
 where
-    S: lens_state::State,
-    S::SourceSchema: lens_state::IsUnset,
+    St: lens_state::State,
+    St::SourceSchema: lens_state::IsUnset,
 {
     /// Set the `sourceSchema` field (required)
     pub fn source_schema(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> LensBuilder<'a, lens_state::SetSourceSchema<S>> {
+    ) -> LensBuilder<S, lens_state::SetSourceSchema<St>> {
         self._fields.7 = Option::Some(value.into());
         LensBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: lens_state::State> LensBuilder<'a, S> {
+impl<S: BosStr, St: lens_state::State> LensBuilder<S, St> {
     /// Set the `sourceSchemaVersion` field (optional)
     pub fn source_schema_version(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.8 = value.into();
@@ -870,26 +870,26 @@ impl<'a, S: lens_state::State> LensBuilder<'a, S> {
     }
 }
 
-impl<'a, S> LensBuilder<'a, S>
+impl<S: BosStr, St> LensBuilder<S, St>
 where
-    S: lens_state::State,
-    S::TargetSchema: lens_state::IsUnset,
+    St: lens_state::State,
+    St::TargetSchema: lens_state::IsUnset,
 {
     /// Set the `targetSchema` field (required)
     pub fn target_schema(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> LensBuilder<'a, lens_state::SetTargetSchema<S>> {
+    ) -> LensBuilder<S, lens_state::SetTargetSchema<St>> {
         self._fields.9 = Option::Some(value.into());
         LensBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: lens_state::State> LensBuilder<'a, S> {
+impl<S: BosStr, St: lens_state::State> LensBuilder<S, St> {
     /// Set the `targetSchemaVersion` field (optional)
     pub fn target_schema_version(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.10 = value.into();
@@ -902,18 +902,18 @@ impl<'a, S: lens_state::State> LensBuilder<'a, S> {
     }
 }
 
-impl<'a, S> LensBuilder<'a, S>
+impl<S: BosStr, St> LensBuilder<S, St>
 where
-    S: lens_state::State,
-    S::SourceSchema: lens_state::IsSet,
-    S::CreatedAt: lens_state::IsSet,
-    S::Name: lens_state::IsSet,
-    S::GetterCode: lens_state::IsSet,
-    S::TargetSchema: lens_state::IsSet,
-    S::PutterCode: lens_state::IsSet,
+    St: lens_state::State,
+    St::TargetSchema: lens_state::IsSet,
+    St::GetterCode: lens_state::IsSet,
+    St::PutterCode: lens_state::IsSet,
+    St::CreatedAt: lens_state::IsSet,
+    St::Name: lens_state::IsSet,
+    St::SourceSchema: lens_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Lens<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Lens<S> {
         Lens {
             created_at: self._fields.0.unwrap(),
             description: self._fields.1,
@@ -929,8 +929,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Lens<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Lens<S> {
         Lens {
             created_at: self._fields.0.unwrap(),
             description: self._fields.1,

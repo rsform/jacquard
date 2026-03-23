@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
     rename = "sh.weaver.graph.followAccept",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct FollowAccept<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct FollowAccept<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     ///Reference to the follow record being accepted.
     pub follow: StrongRef<S>,
@@ -54,18 +54,18 @@ pub struct FollowAccept<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct FollowAcceptGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct FollowAcceptGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: FollowAccept<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> FollowAccept<S> {
+impl<S: BosStr> FollowAccept<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, FollowAcceptRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -78,17 +78,17 @@ pub struct FollowAcceptRecord;
 impl XrpcResp for FollowAcceptRecord {
     const NSID: &'static str = "sh.weaver.graph.followAccept";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = FollowAcceptGetRecordOutput<S>;
+    type Output<S: BosStr> = FollowAcceptGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<FollowAcceptGetRecordOutput<S>> for FollowAccept<S> {
+impl<S: BosStr> From<FollowAcceptGetRecordOutput<S>> for FollowAccept<S> {
     fn from(output: FollowAcceptGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for FollowAccept<S> {
+impl<S: BosStr> Collection for FollowAccept<S> {
     const NSID: &'static str = "sh.weaver.graph.followAccept";
     type Record = FollowAcceptRecord;
 }
@@ -98,7 +98,7 @@ impl Collection for FollowAcceptRecord {
     type Record = FollowAcceptRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for FollowAccept<S> {
+impl<S: BosStr> LexiconSchema for FollowAccept<S> {
     fn nsid() -> &'static str {
         "sh.weaver.graph.followAccept"
     }
@@ -123,122 +123,122 @@ pub mod follow_accept_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Follow;
         type CreatedAt;
+        type Follow;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Follow = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `follow` field to Set
-    pub struct SetFollow<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFollow<S> {}
-    impl<S: State> State for SetFollow<S> {
-        type Follow = Set<members::follow>;
-        type CreatedAt = S::CreatedAt;
+        type Follow = Unset;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Follow = S::Follow;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
+        type Follow = St::Follow;
+    }
+    ///State transition - sets the `follow` field to Set
+    pub struct SetFollow<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetFollow<St> {}
+    impl<St: State> State for SetFollow<St> {
+        type CreatedAt = St::CreatedAt;
+        type Follow = Set<members::follow>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `follow` field
-        pub struct follow(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `follow` field
+        pub struct follow(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct FollowAcceptBuilder<'a, S: follow_accept_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct FollowAcceptBuilder<S: BosStr, St: follow_accept_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<StrongRef<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> FollowAccept<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> FollowAcceptBuilder<'a, follow_accept_state::Empty> {
+impl<S: BosStr> FollowAccept<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> FollowAcceptBuilder<S, follow_accept_state::Empty> {
         FollowAcceptBuilder::new()
     }
 }
 
-impl<'a> FollowAcceptBuilder<'a, follow_accept_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> FollowAcceptBuilder<S, follow_accept_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         FollowAcceptBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> FollowAcceptBuilder<'a, S>
+impl<S: BosStr, St> FollowAcceptBuilder<S, St>
 where
-    S: follow_accept_state::State,
-    S::CreatedAt: follow_accept_state::IsUnset,
+    St: follow_accept_state::State,
+    St::CreatedAt: follow_accept_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> FollowAcceptBuilder<'a, follow_accept_state::SetCreatedAt<S>> {
+    ) -> FollowAcceptBuilder<S, follow_accept_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         FollowAcceptBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> FollowAcceptBuilder<'a, S>
+impl<S: BosStr, St> FollowAcceptBuilder<S, St>
 where
-    S: follow_accept_state::State,
-    S::Follow: follow_accept_state::IsUnset,
+    St: follow_accept_state::State,
+    St::Follow: follow_accept_state::IsUnset,
 {
     /// Set the `follow` field (required)
     pub fn follow(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> FollowAcceptBuilder<'a, follow_accept_state::SetFollow<S>> {
+    ) -> FollowAcceptBuilder<S, follow_accept_state::SetFollow<St>> {
         self._fields.1 = Option::Some(value.into());
         FollowAcceptBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> FollowAcceptBuilder<'a, S>
+impl<S: BosStr, St> FollowAcceptBuilder<S, St>
 where
-    S: follow_accept_state::State,
-    S::Follow: follow_accept_state::IsSet,
-    S::CreatedAt: follow_accept_state::IsSet,
+    St: follow_accept_state::State,
+    St::CreatedAt: follow_accept_state::IsSet,
+    St::Follow: follow_accept_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> FollowAccept<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> FollowAccept<S> {
         FollowAccept {
             created_at: self._fields.0.unwrap(),
             follow: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> FollowAccept<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> FollowAccept<S> {
         FollowAccept {
             created_at: self._fields.0.unwrap(),
             follow: self._fields.1.unwrap(),

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "place.stream.key",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Key<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Key<S: BosStr = DefaultStr> {
     ///Client-declared timestamp when this key was created.
     pub created_at: Datetime,
     ///The name of the client that created this key.
@@ -57,18 +57,18 @@ pub struct Key<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct KeyGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct KeyGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Key<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Key<S> {
+impl<S: BosStr> Key<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, KeyRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -81,17 +81,17 @@ pub struct KeyRecord;
 impl XrpcResp for KeyRecord {
     const NSID: &'static str = "place.stream.key";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = KeyGetRecordOutput<S>;
+    type Output<S: BosStr> = KeyGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<KeyGetRecordOutput<S>> for Key<S> {
+impl<S: BosStr> From<KeyGetRecordOutput<S>> for Key<S> {
     fn from(output: KeyGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Key<S> {
+impl<S: BosStr> Collection for Key<S> {
     const NSID: &'static str = "place.stream.key";
     type Record = KeyRecord;
 }
@@ -101,7 +101,7 @@ impl Collection for KeyRecord {
     type Record = KeyRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Key<S> {
+impl<S: BosStr> LexiconSchema for Key<S> {
     fn nsid() -> &'static str {
         "place.stream.key"
     }
@@ -148,85 +148,85 @@ pub mod key_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type SigningKey;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type SigningKey = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type SigningKey = S::SigningKey;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `signing_key` field to Set
-    pub struct SetSigningKey<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSigningKey<S> {}
-    impl<S: State> State for SetSigningKey<S> {
-        type CreatedAt = S::CreatedAt;
+    pub struct SetSigningKey<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSigningKey<St> {}
+    impl<St: State> State for SetSigningKey<St> {
         type SigningKey = Set<members::signing_key>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type SigningKey = St::SigningKey;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `signing_key` field
         pub struct signing_key(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct KeyBuilder<'a, S: key_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct KeyBuilder<S: BosStr, St: key_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<S>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Key<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> KeyBuilder<'a, key_state::Empty> {
+impl<S: BosStr> Key<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> KeyBuilder<S, key_state::Empty> {
         KeyBuilder::new()
     }
 }
 
-impl<'a> KeyBuilder<'a, key_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> KeyBuilder<S, key_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         KeyBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> KeyBuilder<'a, S>
+impl<S: BosStr, St> KeyBuilder<S, St>
 where
-    S: key_state::State,
-    S::CreatedAt: key_state::IsUnset,
+    St: key_state::State,
+    St::CreatedAt: key_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> KeyBuilder<'a, key_state::SetCreatedAt<S>> {
+    ) -> KeyBuilder<S, key_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         KeyBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: key_state::State> KeyBuilder<'a, S> {
+impl<S: BosStr, St: key_state::State> KeyBuilder<S, St> {
     /// Set the `createdBy` field (optional)
     pub fn created_by(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -239,33 +239,33 @@ impl<'a, S: key_state::State> KeyBuilder<'a, S> {
     }
 }
 
-impl<'a, S> KeyBuilder<'a, S>
+impl<S: BosStr, St> KeyBuilder<S, St>
 where
-    S: key_state::State,
-    S::SigningKey: key_state::IsUnset,
+    St: key_state::State,
+    St::SigningKey: key_state::IsUnset,
 {
     /// Set the `signingKey` field (required)
     pub fn signing_key(
         mut self,
         value: impl Into<S>,
-    ) -> KeyBuilder<'a, key_state::SetSigningKey<S>> {
+    ) -> KeyBuilder<S, key_state::SetSigningKey<St>> {
         self._fields.2 = Option::Some(value.into());
         KeyBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> KeyBuilder<'a, S>
+impl<S: BosStr, St> KeyBuilder<S, St>
 where
-    S: key_state::State,
-    S::CreatedAt: key_state::IsSet,
-    S::SigningKey: key_state::IsSet,
+    St: key_state::State,
+    St::SigningKey: key_state::IsSet,
+    St::CreatedAt: key_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Key<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Key<S> {
         Key {
             created_at: self._fields.0.unwrap(),
             created_by: self._fields.1,
@@ -273,8 +273,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Key<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Key<S> {
         Key {
             created_at: self._fields.0.unwrap(),
             created_by: self._fields.1,

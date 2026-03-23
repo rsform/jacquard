@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
@@ -18,14 +18,14 @@ use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ProfileTab<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ProfileTab<S: BosStr = DefaultStr> {
     /// Defaults to `10`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_profile_tab_limit")]
@@ -33,21 +33,19 @@ pub struct ProfileTab<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tab: Option<ProfileTabTab<S>>,
     pub uri: AtUri<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ProfileTabTab<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ProfileTabTab<S: BosStr = DefaultStr> {
     PostsAndAuthorThreads,
     PostsAndReplies,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> ProfileTabTab<S> {
+impl<S: BosStr> ProfileTabTab<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::PostsAndAuthorThreads => "posts_and_author_threads",
@@ -65,19 +63,19 @@ impl<S: Bos<str> + AsRef<str>> ProfileTabTab<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ProfileTabTab<S> {
+impl<S: BosStr> core::fmt::Display for ProfileTabTab<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for ProfileTabTab<S> {
+impl<S: BosStr> AsRef<str> for ProfileTabTab<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for ProfileTabTab<S> {
+impl<S: BosStr> Serialize for ProfileTabTab<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -86,8 +84,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for ProfileTabTab<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for ProfileTabTab<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ProfileTabTab<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -97,14 +94,18 @@ for ProfileTabTab<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for ProfileTabTab<S> {
+impl<S: BosStr + Default> Default for ProfileTabTab<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for ProfileTabTab<S> {
-    type Output = ProfileTabTab<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for ProfileTabTab<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ProfileTabTab<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             ProfileTabTab::PostsAndAuthorThreads => ProfileTabTab::PostsAndAuthorThreads,
@@ -116,20 +117,17 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for ProfileTabTab<S> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ProfileTabOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ProfileTabOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
-    #[serde(borrow)]
     pub value: Data<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -138,12 +136,11 @@ pub struct ProfileTabResponse;
 impl jacquard_common::xrpc::XrpcResp for ProfileTabResponse {
     const NSID: &'static str = "mov.danabra.ProfileTab";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ProfileTabOutput<S>;
+    type Output<S: BosStr> = ProfileTabOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for ProfileTab<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ProfileTab<S> {
     const NSID: &'static str = "mov.danabra.ProfileTab";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -158,7 +155,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for ProfileTabRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = ProfileTab<S>;
+    type Request<S: BosStr> = ProfileTab<S>;
     type Response = ProfileTabResponse;
 }
 
@@ -185,9 +182,9 @@ pub mod profile_tab_state {
         type Uri = Unset;
     }
     ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
         type Uri = Set<members::uri>;
     }
     /// Marker types for field names
@@ -198,32 +195,32 @@ pub mod profile_tab_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ProfileTabBuilder<'a, S: profile_tab_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ProfileTabBuilder<S: BosStr, St: profile_tab_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<ProfileTabTab<S>>, Option<AtUri<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ProfileTab<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ProfileTabBuilder<'a, profile_tab_state::Empty> {
+impl<S: BosStr> ProfileTab<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ProfileTabBuilder<S, profile_tab_state::Empty> {
         ProfileTabBuilder::new()
     }
 }
 
-impl<'a> ProfileTabBuilder<'a, profile_tab_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ProfileTabBuilder<S, profile_tab_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ProfileTabBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: profile_tab_state::State> ProfileTabBuilder<'a, S> {
+impl<S: BosStr, St: profile_tab_state::State> ProfileTabBuilder<S, St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
@@ -236,7 +233,7 @@ impl<'a, S: profile_tab_state::State> ProfileTabBuilder<'a, S> {
     }
 }
 
-impl<'a, S: profile_tab_state::State> ProfileTabBuilder<'a, S> {
+impl<S: BosStr, St: profile_tab_state::State> ProfileTabBuilder<S, St> {
     /// Set the `tab` field (optional)
     pub fn tab(mut self, value: impl Into<Option<ProfileTabTab<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -249,32 +246,32 @@ impl<'a, S: profile_tab_state::State> ProfileTabBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ProfileTabBuilder<'a, S>
+impl<S: BosStr, St> ProfileTabBuilder<S, St>
 where
-    S: profile_tab_state::State,
-    S::Uri: profile_tab_state::IsUnset,
+    St: profile_tab_state::State,
+    St::Uri: profile_tab_state::IsUnset,
 {
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> ProfileTabBuilder<'a, profile_tab_state::SetUri<S>> {
+    ) -> ProfileTabBuilder<S, profile_tab_state::SetUri<St>> {
         self._fields.2 = Option::Some(value.into());
         ProfileTabBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ProfileTabBuilder<'a, S>
+impl<S: BosStr, St> ProfileTabBuilder<S, St>
 where
-    S: profile_tab_state::State,
-    S::Uri: profile_tab_state::IsSet,
+    St: profile_tab_state::State,
+    St::Uri: profile_tab_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ProfileTab<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ProfileTab<S> {
         ProfileTab {
             limit: self._fields.0.or_else(|| Some(10i64)),
             tab: self._fields.1,
@@ -282,11 +279,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> ProfileTab<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ProfileTab<S> {
         ProfileTab {
             limit: self._fields.0.or_else(|| Some(10i64)),
             tab: self._fields.1,

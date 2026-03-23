@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "net.asadaame5121.at-circle.ring",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Ring<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Ring<S: BosStr = DefaultStr> {
     ///How new members are accepted
     #[serde(skip_serializing_if = "Option::is_none")]
     pub acceptance_policy: Option<RingAcceptancePolicy<S>>,
@@ -58,13 +58,13 @@ pub struct Ring<S: Bos<str> + AsRef<str> = DefaultStr> {
 /// How new members are accepted
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum RingAcceptancePolicy<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum RingAcceptancePolicy<S: BosStr = DefaultStr> {
     Automatic,
     Manual,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> RingAcceptancePolicy<S> {
+impl<S: BosStr> RingAcceptancePolicy<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Automatic => "automatic",
@@ -82,19 +82,19 @@ impl<S: Bos<str> + AsRef<str>> RingAcceptancePolicy<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for RingAcceptancePolicy<S> {
+impl<S: BosStr> core::fmt::Display for RingAcceptancePolicy<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for RingAcceptancePolicy<S> {
+impl<S: BosStr> AsRef<str> for RingAcceptancePolicy<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for RingAcceptancePolicy<S> {
+impl<S: BosStr> Serialize for RingAcceptancePolicy<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -103,8 +103,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for RingAcceptancePolicy<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for RingAcceptancePolicy<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for RingAcceptancePolicy<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -114,14 +113,18 @@ for RingAcceptancePolicy<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for RingAcceptancePolicy<S> {
+impl<S: BosStr + Default> Default for RingAcceptancePolicy<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for RingAcceptancePolicy<S> {
-    type Output = RingAcceptancePolicy<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for RingAcceptancePolicy<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = RingAcceptancePolicy<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             RingAcceptancePolicy::Automatic => RingAcceptancePolicy::Automatic,
@@ -136,13 +139,13 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for RingAcceptancePolicy<S> {
 /// Recruitment status
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum RingStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum RingStatus<S: BosStr = DefaultStr> {
     Open,
     Closed,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> RingStatus<S> {
+impl<S: BosStr> RingStatus<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Open => "open",
@@ -160,19 +163,19 @@ impl<S: Bos<str> + AsRef<str>> RingStatus<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for RingStatus<S> {
+impl<S: BosStr> core::fmt::Display for RingStatus<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for RingStatus<S> {
+impl<S: BosStr> AsRef<str> for RingStatus<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for RingStatus<S> {
+impl<S: BosStr> Serialize for RingStatus<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -181,8 +184,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for RingStatus<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for RingStatus<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for RingStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -192,14 +194,18 @@ for RingStatus<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for RingStatus<S> {
+impl<S: BosStr + Default> Default for RingStatus<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for RingStatus<S> {
-    type Output = RingStatus<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for RingStatus<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = RingStatus<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             RingStatus::Open => RingStatus::Open,
@@ -215,18 +221,18 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for RingStatus<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct RingGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct RingGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Ring<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Ring<S> {
+impl<S: BosStr> Ring<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, RingRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -239,17 +245,17 @@ pub struct RingRecord;
 impl XrpcResp for RingRecord {
     const NSID: &'static str = "net.asadaame5121.at-circle.ring";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = RingGetRecordOutput<S>;
+    type Output<S: BosStr> = RingGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<RingGetRecordOutput<S>> for Ring<S> {
+impl<S: BosStr> From<RingGetRecordOutput<S>> for Ring<S> {
     fn from(output: RingGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Ring<S> {
+impl<S: BosStr> Collection for Ring<S> {
     const NSID: &'static str = "net.asadaame5121.at-circle.ring";
     type Record = RingRecord;
 }
@@ -259,7 +265,7 @@ impl Collection for RingRecord {
     type Record = RingRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Ring<S> {
+impl<S: BosStr> LexiconSchema for Ring<S> {
     fn nsid() -> &'static str {
         "net.asadaame5121.at-circle.ring"
     }
@@ -351,57 +357,57 @@ pub mod ring_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Title;
         type Status;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Title = Unset;
         type Status = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Title = S::Title;
-        type Status = S::Status;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type CreatedAt = S::CreatedAt;
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
         type Title = Set<members::title>;
-        type Status = S::Status;
+        type Status = St::Status;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `status` field to Set
-    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStatus<S> {}
-    impl<S: State> State for SetStatus<S> {
-        type CreatedAt = S::CreatedAt;
-        type Title = S::Title;
+    pub struct SetStatus<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStatus<St> {}
+    impl<St: State> State for SetStatus<St> {
+        type Title = St::Title;
         type Status = Set<members::status>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Title = St::Title;
+        type Status = St::Status;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `title` field
         pub struct title(());
         ///Marker type for the `status` field
         pub struct status(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct RingBuilder<'a, S: ring_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct RingBuilder<S: BosStr, St: ring_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<RingAcceptancePolicy<S>>,
         Option<Datetime>,
@@ -409,28 +415,28 @@ pub struct RingBuilder<'a, S: ring_state::State> {
         Option<RingStatus<S>>,
         Option<S>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Ring<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> RingBuilder<'a, ring_state::Empty> {
+impl<S: BosStr> Ring<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> RingBuilder<S, ring_state::Empty> {
         RingBuilder::new()
     }
 }
 
-impl<'a> RingBuilder<'a, ring_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> RingBuilder<S, ring_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         RingBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: ring_state::State> RingBuilder<'a, S> {
+impl<S: BosStr, St: ring_state::State> RingBuilder<S, St> {
     /// Set the `acceptancePolicy` field (optional)
     pub fn acceptance_policy(
         mut self,
@@ -449,26 +455,26 @@ impl<'a, S: ring_state::State> RingBuilder<'a, S> {
     }
 }
 
-impl<'a, S> RingBuilder<'a, S>
+impl<S: BosStr, St> RingBuilder<S, St>
 where
-    S: ring_state::State,
-    S::CreatedAt: ring_state::IsUnset,
+    St: ring_state::State,
+    St::CreatedAt: ring_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> RingBuilder<'a, ring_state::SetCreatedAt<S>> {
+    ) -> RingBuilder<S, ring_state::SetCreatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         RingBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: ring_state::State> RingBuilder<'a, S> {
+impl<S: BosStr, St: ring_state::State> RingBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -481,53 +487,53 @@ impl<'a, S: ring_state::State> RingBuilder<'a, S> {
     }
 }
 
-impl<'a, S> RingBuilder<'a, S>
+impl<S: BosStr, St> RingBuilder<S, St>
 where
-    S: ring_state::State,
-    S::Status: ring_state::IsUnset,
+    St: ring_state::State,
+    St::Status: ring_state::IsUnset,
 {
     /// Set the `status` field (required)
     pub fn status(
         mut self,
         value: impl Into<RingStatus<S>>,
-    ) -> RingBuilder<'a, ring_state::SetStatus<S>> {
+    ) -> RingBuilder<S, ring_state::SetStatus<St>> {
         self._fields.3 = Option::Some(value.into());
         RingBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RingBuilder<'a, S>
+impl<S: BosStr, St> RingBuilder<S, St>
 where
-    S: ring_state::State,
-    S::Title: ring_state::IsUnset,
+    St: ring_state::State,
+    St::Title: ring_state::IsUnset,
 {
     /// Set the `title` field (required)
     pub fn title(
         mut self,
         value: impl Into<S>,
-    ) -> RingBuilder<'a, ring_state::SetTitle<S>> {
+    ) -> RingBuilder<S, ring_state::SetTitle<St>> {
         self._fields.4 = Option::Some(value.into());
         RingBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RingBuilder<'a, S>
+impl<S: BosStr, St> RingBuilder<S, St>
 where
-    S: ring_state::State,
-    S::CreatedAt: ring_state::IsSet,
-    S::Title: ring_state::IsSet,
-    S::Status: ring_state::IsSet,
+    St: ring_state::State,
+    St::Title: ring_state::IsSet,
+    St::Status: ring_state::IsSet,
+    St::CreatedAt: ring_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Ring<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Ring<S> {
         Ring {
             acceptance_policy: self._fields.0,
             created_at: self._fields.1.unwrap(),
@@ -537,8 +543,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Ring<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Ring<S> {
         Ring {
             acceptance_policy: self._fields.0,
             created_at: self._fields.1.unwrap(),

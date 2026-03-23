@@ -10,38 +10,36 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct UpdateAllRead<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct UpdateAllRead<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub status: Option<UpdateAllReadStatus<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum UpdateAllReadStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum UpdateAllReadStatus<S: BosStr = DefaultStr> {
     Request,
     Accepted,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> UpdateAllReadStatus<S> {
+impl<S: BosStr> UpdateAllReadStatus<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Request => "request",
@@ -59,19 +57,19 @@ impl<S: Bos<str> + AsRef<str>> UpdateAllReadStatus<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for UpdateAllReadStatus<S> {
+impl<S: BosStr> core::fmt::Display for UpdateAllReadStatus<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for UpdateAllReadStatus<S> {
+impl<S: BosStr> AsRef<str> for UpdateAllReadStatus<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for UpdateAllReadStatus<S> {
+impl<S: BosStr> Serialize for UpdateAllReadStatus<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -80,8 +78,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for UpdateAllReadStatus<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for UpdateAllReadStatus<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for UpdateAllReadStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -91,14 +88,18 @@ for UpdateAllReadStatus<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for UpdateAllReadStatus<S> {
+impl<S: BosStr + Default> Default for UpdateAllReadStatus<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for UpdateAllReadStatus<S> {
-    type Output = UpdateAllReadStatus<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for UpdateAllReadStatus<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = UpdateAllReadStatus<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             UpdateAllReadStatus::Request => UpdateAllReadStatus::Request,
@@ -110,19 +111,17 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for UpdateAllReadStatus<S> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct UpdateAllReadOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct UpdateAllReadOutput<S: BosStr = DefaultStr> {
     ///The count of updated convos.
     pub updated_count: i64,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -131,12 +130,11 @@ pub struct UpdateAllReadResponse;
 impl jacquard_common::xrpc::XrpcResp for UpdateAllReadResponse {
     const NSID: &'static str = "chat.bsky.convo.updateAllRead";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = UpdateAllReadOutput<S>;
+    type Output<S: BosStr> = UpdateAllReadOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for UpdateAllRead<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UpdateAllRead<S> {
     const NSID: &'static str = "chat.bsky.convo.updateAllRead";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -151,6 +149,6 @@ impl jacquard_common::xrpc::XrpcEndpoint for UpdateAllReadRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = UpdateAllRead<S>;
+    type Request<S: BosStr> = UpdateAllRead<S>;
     type Response = UpdateAllReadResponse;
 }

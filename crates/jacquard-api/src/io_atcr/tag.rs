@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "io.atcr.tag",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Tag<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Tag<S: BosStr = DefaultStr> {
     ///AT-URI of the manifest this tag points to (e.g., 'at://did:plc:xyz/io.atcr.manifest/abc123'). Preferred over manifestDigest for new records.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub manifest: Option<AtUri<S>>,
@@ -63,18 +63,18 @@ pub struct Tag<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct TagGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct TagGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Tag<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Tag<S> {
+impl<S: BosStr> Tag<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, TagRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -87,17 +87,17 @@ pub struct TagRecord;
 impl XrpcResp for TagRecord {
     const NSID: &'static str = "io.atcr.tag";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = TagGetRecordOutput<S>;
+    type Output<S: BosStr> = TagGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<TagGetRecordOutput<S>> for Tag<S> {
+impl<S: BosStr> From<TagGetRecordOutput<S>> for Tag<S> {
     fn from(output: TagGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Tag<S> {
+impl<S: BosStr> Collection for Tag<S> {
     const NSID: &'static str = "io.atcr.tag";
     type Record = TagRecord;
 }
@@ -107,7 +107,7 @@ impl Collection for TagRecord {
     type Record = TagRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Tag<S> {
+impl<S: BosStr> LexiconSchema for Tag<S> {
     fn nsid() -> &'static str {
         "io.atcr.tag"
     }
@@ -164,66 +164,66 @@ pub mod tag_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Tag;
         type Repository;
+        type Tag;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Tag = Unset;
         type Repository = Unset;
-    }
-    ///State transition - sets the `tag` field to Set
-    pub struct SetTag<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTag<S> {}
-    impl<S: State> State for SetTag<S> {
-        type Tag = Set<members::tag>;
-        type Repository = S::Repository;
+        type Tag = Unset;
     }
     ///State transition - sets the `repository` field to Set
-    pub struct SetRepository<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepository<S> {}
-    impl<S: State> State for SetRepository<S> {
-        type Tag = S::Tag;
+    pub struct SetRepository<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRepository<St> {}
+    impl<St: State> State for SetRepository<St> {
         type Repository = Set<members::repository>;
+        type Tag = St::Tag;
+    }
+    ///State transition - sets the `tag` field to Set
+    pub struct SetTag<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTag<St> {}
+    impl<St: State> State for SetTag<St> {
+        type Repository = St::Repository;
+        type Tag = Set<members::tag>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `tag` field
-        pub struct tag(());
         ///Marker type for the `repository` field
         pub struct repository(());
+        ///Marker type for the `tag` field
+        pub struct tag(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct TagBuilder<'a, S: tag_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct TagBuilder<S: BosStr, St: tag_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>, Option<S>, Option<S>, Option<S>, Option<Datetime>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Tag<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> TagBuilder<'a, tag_state::Empty> {
+impl<S: BosStr> Tag<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> TagBuilder<S, tag_state::Empty> {
         TagBuilder::new()
     }
 }
 
-impl<'a> TagBuilder<'a, tag_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> TagBuilder<S, tag_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         TagBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: tag_state::State> TagBuilder<'a, S> {
+impl<S: BosStr, St: tag_state::State> TagBuilder<S, St> {
     /// Set the `manifest` field (optional)
     pub fn manifest(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -236,7 +236,7 @@ impl<'a, S: tag_state::State> TagBuilder<'a, S> {
     }
 }
 
-impl<'a, S: tag_state::State> TagBuilder<'a, S> {
+impl<S: BosStr, St: tag_state::State> TagBuilder<S, St> {
     /// Set the `manifestDigest` field (optional)
     pub fn manifest_digest(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -249,42 +249,42 @@ impl<'a, S: tag_state::State> TagBuilder<'a, S> {
     }
 }
 
-impl<'a, S> TagBuilder<'a, S>
+impl<S: BosStr, St> TagBuilder<S, St>
 where
-    S: tag_state::State,
-    S::Repository: tag_state::IsUnset,
+    St: tag_state::State,
+    St::Repository: tag_state::IsUnset,
 {
     /// Set the `repository` field (required)
     pub fn repository(
         mut self,
         value: impl Into<S>,
-    ) -> TagBuilder<'a, tag_state::SetRepository<S>> {
+    ) -> TagBuilder<S, tag_state::SetRepository<St>> {
         self._fields.2 = Option::Some(value.into());
         TagBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> TagBuilder<'a, S>
+impl<S: BosStr, St> TagBuilder<S, St>
 where
-    S: tag_state::State,
-    S::Tag: tag_state::IsUnset,
+    St: tag_state::State,
+    St::Tag: tag_state::IsUnset,
 {
     /// Set the `tag` field (required)
-    pub fn tag(mut self, value: impl Into<S>) -> TagBuilder<'a, tag_state::SetTag<S>> {
+    pub fn tag(mut self, value: impl Into<S>) -> TagBuilder<S, tag_state::SetTag<St>> {
         self._fields.3 = Option::Some(value.into());
         TagBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: tag_state::State> TagBuilder<'a, S> {
+impl<S: BosStr, St: tag_state::State> TagBuilder<S, St> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.4 = value.into();
@@ -297,14 +297,14 @@ impl<'a, S: tag_state::State> TagBuilder<'a, S> {
     }
 }
 
-impl<'a, S> TagBuilder<'a, S>
+impl<S: BosStr, St> TagBuilder<S, St>
 where
-    S: tag_state::State,
-    S::Tag: tag_state::IsSet,
-    S::Repository: tag_state::IsSet,
+    St: tag_state::State,
+    St::Repository: tag_state::IsSet,
+    St::Tag: tag_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Tag<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Tag<S> {
         Tag {
             manifest: self._fields.0,
             manifest_digest: self._fields.1,
@@ -314,8 +314,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Tag<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Tag<S> {
         Tag {
             manifest: self._fields.0,
             manifest_digest: self._fields.1,

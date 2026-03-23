@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -30,11 +30,11 @@ use crate::games_gamesgamesgamesgames::feed::describe_feed_generator;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Feed<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Feed<S: BosStr = DefaultStr> {
     pub uri: AtUri<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -45,11 +45,11 @@ pub struct Feed<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Links<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Links<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub privacy_policy: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -60,25 +60,23 @@ pub struct Links<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DescribeFeedGeneratorOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DescribeFeedGeneratorOutput<S: BosStr = DefaultStr> {
     pub did: Did<S>,
     pub feeds: Vec<describe_feed_generator::Feed<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub links: Option<describe_feed_generator::Links<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Feed<S> {
+impl<S: BosStr> LexiconSchema for Feed<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.feed.describeFeedGenerator"
     }
@@ -93,7 +91,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Feed<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Links<S> {
+impl<S: BosStr> LexiconSchema for Links<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.feed.describeFeedGenerator"
     }
@@ -117,7 +115,7 @@ pub struct DescribeFeedGeneratorResponse;
 impl jacquard_common::xrpc::XrpcResp for DescribeFeedGeneratorResponse {
     const NSID: &'static str = "games.gamesgamesgamesgames.feed.describeFeedGenerator";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = DescribeFeedGeneratorOutput<S>;
+    type Output<S: BosStr> = DescribeFeedGeneratorOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
@@ -132,7 +130,7 @@ pub struct DescribeFeedGeneratorRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DescribeFeedGeneratorRequest {
     const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.feed.describeFeedGenerator";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = DescribeFeedGenerator;
+    type Request<S: BosStr> = DescribeFeedGenerator;
     type Response = DescribeFeedGeneratorResponse;
 }
 
@@ -155,9 +153,9 @@ pub mod feed_state {
         type Uri = Unset;
     }
     ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
         type Uri = Set<members::uri>;
     }
     /// Marker types for field names
@@ -168,64 +166,64 @@ pub mod feed_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct FeedBuilder<'a, S: feed_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct FeedBuilder<S: BosStr, St: feed_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Feed<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> FeedBuilder<'a, feed_state::Empty> {
+impl<S: BosStr> Feed<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> FeedBuilder<S, feed_state::Empty> {
         FeedBuilder::new()
     }
 }
 
-impl<'a> FeedBuilder<'a, feed_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> FeedBuilder<S, feed_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         FeedBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> FeedBuilder<'a, S>
+impl<S: BosStr, St> FeedBuilder<S, St>
 where
-    S: feed_state::State,
-    S::Uri: feed_state::IsUnset,
+    St: feed_state::State,
+    St::Uri: feed_state::IsUnset,
 {
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> FeedBuilder<'a, feed_state::SetUri<S>> {
+    ) -> FeedBuilder<S, feed_state::SetUri<St>> {
         self._fields.0 = Option::Some(value.into());
         FeedBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> FeedBuilder<'a, S>
+impl<S: BosStr, St> FeedBuilder<S, St>
 where
-    S: feed_state::State,
-    S::Uri: feed_state::IsSet,
+    St: feed_state::State,
+    St::Uri: feed_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Feed<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Feed<S> {
         Feed {
             uri: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Feed<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Feed<S> {
         Feed {
             uri: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

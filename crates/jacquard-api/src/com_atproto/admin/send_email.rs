@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
@@ -18,14 +18,14 @@ use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SendEmail<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SendEmail<S: BosStr = DefaultStr> {
     ///Additional comment by the sender that won't be used in the email itself but helpful to provide more context for moderators/reviewers
     #[serde(skip_serializing_if = "Option::is_none")]
     pub comment: Option<S>,
@@ -34,26 +34,22 @@ pub struct SendEmail<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub sender_did: Did<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub subject: Option<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SendEmailOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SendEmailOutput<S: BosStr = DefaultStr> {
     pub sent: bool,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -62,12 +58,11 @@ pub struct SendEmailResponse;
 impl jacquard_common::xrpc::XrpcResp for SendEmailResponse {
     const NSID: &'static str = "com.atproto.admin.sendEmail";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = SendEmailOutput<S>;
+    type Output<S: BosStr> = SendEmailOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for SendEmail<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for SendEmail<S> {
     const NSID: &'static str = "com.atproto.admin.sendEmail";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -82,7 +77,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for SendEmailRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = SendEmail<S>;
+    type Request<S: BosStr> = SendEmail<S>;
     type Response = SendEmailResponse;
 }
 
@@ -96,80 +91,80 @@ pub mod send_email_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type SenderDid;
         type RecipientDid;
         type Content;
-        type SenderDid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type SenderDid = Unset;
         type RecipientDid = Unset;
         type Content = Unset;
-        type SenderDid = Unset;
-    }
-    ///State transition - sets the `recipient_did` field to Set
-    pub struct SetRecipientDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRecipientDid<S> {}
-    impl<S: State> State for SetRecipientDid<S> {
-        type RecipientDid = Set<members::recipient_did>;
-        type Content = S::Content;
-        type SenderDid = S::SenderDid;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type RecipientDid = S::RecipientDid;
-        type Content = Set<members::content>;
-        type SenderDid = S::SenderDid;
     }
     ///State transition - sets the `sender_did` field to Set
-    pub struct SetSenderDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSenderDid<S> {}
-    impl<S: State> State for SetSenderDid<S> {
-        type RecipientDid = S::RecipientDid;
-        type Content = S::Content;
+    pub struct SetSenderDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSenderDid<St> {}
+    impl<St: State> State for SetSenderDid<St> {
         type SenderDid = Set<members::sender_did>;
+        type RecipientDid = St::RecipientDid;
+        type Content = St::Content;
+    }
+    ///State transition - sets the `recipient_did` field to Set
+    pub struct SetRecipientDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRecipientDid<St> {}
+    impl<St: State> State for SetRecipientDid<St> {
+        type SenderDid = St::SenderDid;
+        type RecipientDid = Set<members::recipient_did>;
+        type Content = St::Content;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetContent<St> {}
+    impl<St: State> State for SetContent<St> {
+        type SenderDid = St::SenderDid;
+        type RecipientDid = St::RecipientDid;
+        type Content = Set<members::content>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `sender_did` field
+        pub struct sender_did(());
         ///Marker type for the `recipient_did` field
         pub struct recipient_did(());
         ///Marker type for the `content` field
         pub struct content(());
-        ///Marker type for the `sender_did` field
-        pub struct sender_did(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct SendEmailBuilder<'a, S: send_email_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct SendEmailBuilder<S: BosStr, St: send_email_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>, Option<Did<S>>, Option<Did<S>>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> SendEmail<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> SendEmailBuilder<'a, send_email_state::Empty> {
+impl<S: BosStr> SendEmail<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> SendEmailBuilder<S, send_email_state::Empty> {
         SendEmailBuilder::new()
     }
 }
 
-impl<'a> SendEmailBuilder<'a, send_email_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> SendEmailBuilder<S, send_email_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SendEmailBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: send_email_state::State> SendEmailBuilder<'a, S> {
+impl<S: BosStr, St: send_email_state::State> SendEmailBuilder<S, St> {
     /// Set the `comment` field (optional)
     pub fn comment(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -182,64 +177,64 @@ impl<'a, S: send_email_state::State> SendEmailBuilder<'a, S> {
     }
 }
 
-impl<'a, S> SendEmailBuilder<'a, S>
+impl<S: BosStr, St> SendEmailBuilder<S, St>
 where
-    S: send_email_state::State,
-    S::Content: send_email_state::IsUnset,
+    St: send_email_state::State,
+    St::Content: send_email_state::IsUnset,
 {
     /// Set the `content` field (required)
     pub fn content(
         mut self,
         value: impl Into<S>,
-    ) -> SendEmailBuilder<'a, send_email_state::SetContent<S>> {
+    ) -> SendEmailBuilder<S, send_email_state::SetContent<St>> {
         self._fields.1 = Option::Some(value.into());
         SendEmailBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SendEmailBuilder<'a, S>
+impl<S: BosStr, St> SendEmailBuilder<S, St>
 where
-    S: send_email_state::State,
-    S::RecipientDid: send_email_state::IsUnset,
+    St: send_email_state::State,
+    St::RecipientDid: send_email_state::IsUnset,
 {
     /// Set the `recipientDid` field (required)
     pub fn recipient_did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> SendEmailBuilder<'a, send_email_state::SetRecipientDid<S>> {
+    ) -> SendEmailBuilder<S, send_email_state::SetRecipientDid<St>> {
         self._fields.2 = Option::Some(value.into());
         SendEmailBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SendEmailBuilder<'a, S>
+impl<S: BosStr, St> SendEmailBuilder<S, St>
 where
-    S: send_email_state::State,
-    S::SenderDid: send_email_state::IsUnset,
+    St: send_email_state::State,
+    St::SenderDid: send_email_state::IsUnset,
 {
     /// Set the `senderDid` field (required)
     pub fn sender_did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> SendEmailBuilder<'a, send_email_state::SetSenderDid<S>> {
+    ) -> SendEmailBuilder<S, send_email_state::SetSenderDid<St>> {
         self._fields.3 = Option::Some(value.into());
         SendEmailBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: send_email_state::State> SendEmailBuilder<'a, S> {
+impl<S: BosStr, St: send_email_state::State> SendEmailBuilder<S, St> {
     /// Set the `subject` field (optional)
     pub fn subject(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
@@ -252,15 +247,15 @@ impl<'a, S: send_email_state::State> SendEmailBuilder<'a, S> {
     }
 }
 
-impl<'a, S> SendEmailBuilder<'a, S>
+impl<S: BosStr, St> SendEmailBuilder<S, St>
 where
-    S: send_email_state::State,
-    S::RecipientDid: send_email_state::IsSet,
-    S::Content: send_email_state::IsSet,
-    S::SenderDid: send_email_state::IsSet,
+    St: send_email_state::State,
+    St::SenderDid: send_email_state::IsSet,
+    St::RecipientDid: send_email_state::IsSet,
+    St::Content: send_email_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> SendEmail<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> SendEmail<S> {
         SendEmail {
             comment: self._fields.0,
             content: self._fields.1.unwrap(),
@@ -270,11 +265,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> SendEmail<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> SendEmail<S> {
         SendEmail {
             comment: self._fields.0,
             content: self._fields.1.unwrap(),

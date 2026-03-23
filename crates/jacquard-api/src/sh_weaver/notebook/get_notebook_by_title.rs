@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::value::Data;
@@ -20,35 +20,31 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::sh_weaver::notebook::NotebookView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetNotebookByTitle<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct GetNotebookByTitle<S: BosStr = DefaultStr> {
     pub actor: AtIdentifier<S>,
-    #[serde(borrow)]
     pub title: S,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetNotebookByTitleOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetNotebookByTitleOutput<S: BosStr = DefaultStr> {
     pub entries: Vec<StrongRef<S>>,
     pub notebook: NotebookView<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -99,12 +95,11 @@ pub struct GetNotebookByTitleResponse;
 impl jacquard_common::xrpc::XrpcResp for GetNotebookByTitleResponse {
     const NSID: &'static str = "sh.weaver.notebook.getNotebookByTitle";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetNotebookByTitleOutput<S>;
+    type Output<S: BosStr> = GetNotebookByTitleOutput<S>;
     type Err = GetNotebookByTitleError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetNotebookByTitle<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetNotebookByTitle<S> {
     const NSID: &'static str = "sh.weaver.notebook.getNotebookByTitle";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetNotebookByTitleResponse;
@@ -115,7 +110,7 @@ pub struct GetNotebookByTitleRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetNotebookByTitleRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.notebook.getNotebookByTitle";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetNotebookByTitle<S>;
+    type Request<S: BosStr> = GetNotebookByTitle<S>;
     type Response = GetNotebookByTitleResponse;
 }
 
@@ -129,111 +124,111 @@ pub mod get_notebook_by_title_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Actor;
         type Title;
+        type Actor;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Actor = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `actor` field to Set
-    pub struct SetActor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetActor<S> {}
-    impl<S: State> State for SetActor<S> {
-        type Actor = Set<members::actor>;
-        type Title = S::Title;
+        type Actor = Unset;
     }
     ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Actor = S::Actor;
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
         type Title = Set<members::title>;
+        type Actor = St::Actor;
+    }
+    ///State transition - sets the `actor` field to Set
+    pub struct SetActor<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetActor<St> {}
+    impl<St: State> State for SetActor<St> {
+        type Title = St::Title;
+        type Actor = Set<members::actor>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `actor` field
-        pub struct actor(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `actor` field
+        pub struct actor(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetNotebookByTitleBuilder<'a, S: get_notebook_by_title_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetNotebookByTitleBuilder<S: BosStr, St: get_notebook_by_title_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtIdentifier<S>>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetNotebookByTitle<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetNotebookByTitleBuilder<'a, get_notebook_by_title_state::Empty> {
+impl<S: BosStr> GetNotebookByTitle<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetNotebookByTitleBuilder<S, get_notebook_by_title_state::Empty> {
         GetNotebookByTitleBuilder::new()
     }
 }
 
-impl<'a> GetNotebookByTitleBuilder<'a, get_notebook_by_title_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetNotebookByTitleBuilder<S, get_notebook_by_title_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetNotebookByTitleBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetNotebookByTitleBuilder<'a, S>
+impl<S: BosStr, St> GetNotebookByTitleBuilder<S, St>
 where
-    S: get_notebook_by_title_state::State,
-    S::Actor: get_notebook_by_title_state::IsUnset,
+    St: get_notebook_by_title_state::State,
+    St::Actor: get_notebook_by_title_state::IsUnset,
 {
     /// Set the `actor` field (required)
     pub fn actor(
         mut self,
         value: impl Into<AtIdentifier<S>>,
-    ) -> GetNotebookByTitleBuilder<'a, get_notebook_by_title_state::SetActor<S>> {
+    ) -> GetNotebookByTitleBuilder<S, get_notebook_by_title_state::SetActor<St>> {
         self._fields.0 = Option::Some(value.into());
         GetNotebookByTitleBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetNotebookByTitleBuilder<'a, S>
+impl<S: BosStr, St> GetNotebookByTitleBuilder<S, St>
 where
-    S: get_notebook_by_title_state::State,
-    S::Title: get_notebook_by_title_state::IsUnset,
+    St: get_notebook_by_title_state::State,
+    St::Title: get_notebook_by_title_state::IsUnset,
 {
     /// Set the `title` field (required)
     pub fn title(
         mut self,
         value: impl Into<S>,
-    ) -> GetNotebookByTitleBuilder<'a, get_notebook_by_title_state::SetTitle<S>> {
+    ) -> GetNotebookByTitleBuilder<S, get_notebook_by_title_state::SetTitle<St>> {
         self._fields.1 = Option::Some(value.into());
         GetNotebookByTitleBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetNotebookByTitleBuilder<'a, S>
+impl<S: BosStr, St> GetNotebookByTitleBuilder<S, St>
 where
-    S: get_notebook_by_title_state::State,
-    S::Actor: get_notebook_by_title_state::IsSet,
-    S::Title: get_notebook_by_title_state::IsSet,
+    St: get_notebook_by_title_state::State,
+    St::Title: get_notebook_by_title_state::IsSet,
+    St::Actor: get_notebook_by_title_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetNotebookByTitle<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetNotebookByTitle<S> {
         GetNotebookByTitle {
             actor: self._fields.0.unwrap(),
             title: self._fields.1.unwrap(),

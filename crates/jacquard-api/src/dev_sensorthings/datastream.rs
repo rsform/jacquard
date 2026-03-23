@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use crate::dev_sensorthings::datastream;
     rename = "dev.sensorthings.datastream",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Datastream<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Datastream<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
@@ -73,11 +73,11 @@ pub struct Datastream<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DatastreamGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DatastreamGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
@@ -90,11 +90,11 @@ pub struct DatastreamGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct UnitOfMeasurement<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct UnitOfMeasurement<S: BosStr = DefaultStr> {
     ///URI from QUDT, UCUM, or similar unit ontology
     #[serde(skip_serializing_if = "Option::is_none")]
     pub definition: Option<UriValue<S>>,
@@ -104,7 +104,7 @@ pub struct UnitOfMeasurement<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Datastream<S> {
+impl<S: BosStr> Datastream<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, DatastreamRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -117,17 +117,17 @@ pub struct DatastreamRecord;
 impl XrpcResp for DatastreamRecord {
     const NSID: &'static str = "dev.sensorthings.datastream";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = DatastreamGetRecordOutput<S>;
+    type Output<S: BosStr> = DatastreamGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<DatastreamGetRecordOutput<S>> for Datastream<S> {
+impl<S: BosStr> From<DatastreamGetRecordOutput<S>> for Datastream<S> {
     fn from(output: DatastreamGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Datastream<S> {
+impl<S: BosStr> Collection for Datastream<S> {
     const NSID: &'static str = "dev.sensorthings.datastream";
     type Record = DatastreamRecord;
 }
@@ -137,7 +137,7 @@ impl Collection for DatastreamRecord {
     type Record = DatastreamRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Datastream<S> {
+impl<S: BosStr> LexiconSchema for Datastream<S> {
     fn nsid() -> &'static str {
         "dev.sensorthings.datastream"
     }
@@ -183,7 +183,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Datastream<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for UnitOfMeasurement<S> {
+impl<S: BosStr> LexiconSchema for UnitOfMeasurement<S> {
     fn nsid() -> &'static str {
         "dev.sensorthings.datastream"
     }
@@ -232,11 +232,11 @@ pub mod datastream_state {
     pub trait State: sealed::Sealed {
         type ObservationType;
         type CreatedAt;
-        type Sensor;
-        type ObservedProperty;
-        type Name;
         type Thing;
         type UnitOfMeasurement;
+        type Name;
+        type ObservedProperty;
+        type Sensor;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -244,95 +244,95 @@ pub mod datastream_state {
     impl State for Empty {
         type ObservationType = Unset;
         type CreatedAt = Unset;
-        type Sensor = Unset;
-        type ObservedProperty = Unset;
-        type Name = Unset;
         type Thing = Unset;
         type UnitOfMeasurement = Unset;
+        type Name = Unset;
+        type ObservedProperty = Unset;
+        type Sensor = Unset;
     }
     ///State transition - sets the `observation_type` field to Set
-    pub struct SetObservationType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetObservationType<S> {}
-    impl<S: State> State for SetObservationType<S> {
+    pub struct SetObservationType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetObservationType<St> {}
+    impl<St: State> State for SetObservationType<St> {
         type ObservationType = Set<members::observation_type>;
-        type CreatedAt = S::CreatedAt;
-        type Sensor = S::Sensor;
-        type ObservedProperty = S::ObservedProperty;
-        type Name = S::Name;
-        type Thing = S::Thing;
-        type UnitOfMeasurement = S::UnitOfMeasurement;
+        type CreatedAt = St::CreatedAt;
+        type Thing = St::Thing;
+        type UnitOfMeasurement = St::UnitOfMeasurement;
+        type Name = St::Name;
+        type ObservedProperty = St::ObservedProperty;
+        type Sensor = St::Sensor;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type ObservationType = S::ObservationType;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type ObservationType = St::ObservationType;
         type CreatedAt = Set<members::created_at>;
-        type Sensor = S::Sensor;
-        type ObservedProperty = S::ObservedProperty;
-        type Name = S::Name;
-        type Thing = S::Thing;
-        type UnitOfMeasurement = S::UnitOfMeasurement;
-    }
-    ///State transition - sets the `sensor` field to Set
-    pub struct SetSensor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSensor<S> {}
-    impl<S: State> State for SetSensor<S> {
-        type ObservationType = S::ObservationType;
-        type CreatedAt = S::CreatedAt;
-        type Sensor = Set<members::sensor>;
-        type ObservedProperty = S::ObservedProperty;
-        type Name = S::Name;
-        type Thing = S::Thing;
-        type UnitOfMeasurement = S::UnitOfMeasurement;
-    }
-    ///State transition - sets the `observed_property` field to Set
-    pub struct SetObservedProperty<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetObservedProperty<S> {}
-    impl<S: State> State for SetObservedProperty<S> {
-        type ObservationType = S::ObservationType;
-        type CreatedAt = S::CreatedAt;
-        type Sensor = S::Sensor;
-        type ObservedProperty = Set<members::observed_property>;
-        type Name = S::Name;
-        type Thing = S::Thing;
-        type UnitOfMeasurement = S::UnitOfMeasurement;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type ObservationType = S::ObservationType;
-        type CreatedAt = S::CreatedAt;
-        type Sensor = S::Sensor;
-        type ObservedProperty = S::ObservedProperty;
-        type Name = Set<members::name>;
-        type Thing = S::Thing;
-        type UnitOfMeasurement = S::UnitOfMeasurement;
+        type Thing = St::Thing;
+        type UnitOfMeasurement = St::UnitOfMeasurement;
+        type Name = St::Name;
+        type ObservedProperty = St::ObservedProperty;
+        type Sensor = St::Sensor;
     }
     ///State transition - sets the `thing` field to Set
-    pub struct SetThing<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetThing<S> {}
-    impl<S: State> State for SetThing<S> {
-        type ObservationType = S::ObservationType;
-        type CreatedAt = S::CreatedAt;
-        type Sensor = S::Sensor;
-        type ObservedProperty = S::ObservedProperty;
-        type Name = S::Name;
+    pub struct SetThing<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetThing<St> {}
+    impl<St: State> State for SetThing<St> {
+        type ObservationType = St::ObservationType;
+        type CreatedAt = St::CreatedAt;
         type Thing = Set<members::thing>;
-        type UnitOfMeasurement = S::UnitOfMeasurement;
+        type UnitOfMeasurement = St::UnitOfMeasurement;
+        type Name = St::Name;
+        type ObservedProperty = St::ObservedProperty;
+        type Sensor = St::Sensor;
     }
     ///State transition - sets the `unit_of_measurement` field to Set
-    pub struct SetUnitOfMeasurement<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUnitOfMeasurement<S> {}
-    impl<S: State> State for SetUnitOfMeasurement<S> {
-        type ObservationType = S::ObservationType;
-        type CreatedAt = S::CreatedAt;
-        type Sensor = S::Sensor;
-        type ObservedProperty = S::ObservedProperty;
-        type Name = S::Name;
-        type Thing = S::Thing;
+    pub struct SetUnitOfMeasurement<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUnitOfMeasurement<St> {}
+    impl<St: State> State for SetUnitOfMeasurement<St> {
+        type ObservationType = St::ObservationType;
+        type CreatedAt = St::CreatedAt;
+        type Thing = St::Thing;
         type UnitOfMeasurement = Set<members::unit_of_measurement>;
+        type Name = St::Name;
+        type ObservedProperty = St::ObservedProperty;
+        type Sensor = St::Sensor;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type ObservationType = St::ObservationType;
+        type CreatedAt = St::CreatedAt;
+        type Thing = St::Thing;
+        type UnitOfMeasurement = St::UnitOfMeasurement;
+        type Name = Set<members::name>;
+        type ObservedProperty = St::ObservedProperty;
+        type Sensor = St::Sensor;
+    }
+    ///State transition - sets the `observed_property` field to Set
+    pub struct SetObservedProperty<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetObservedProperty<St> {}
+    impl<St: State> State for SetObservedProperty<St> {
+        type ObservationType = St::ObservationType;
+        type CreatedAt = St::CreatedAt;
+        type Thing = St::Thing;
+        type UnitOfMeasurement = St::UnitOfMeasurement;
+        type Name = St::Name;
+        type ObservedProperty = Set<members::observed_property>;
+        type Sensor = St::Sensor;
+    }
+    ///State transition - sets the `sensor` field to Set
+    pub struct SetSensor<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSensor<St> {}
+    impl<St: State> State for SetSensor<St> {
+        type ObservationType = St::ObservationType;
+        type CreatedAt = St::CreatedAt;
+        type Thing = St::Thing;
+        type UnitOfMeasurement = St::UnitOfMeasurement;
+        type Name = St::Name;
+        type ObservedProperty = St::ObservedProperty;
+        type Sensor = Set<members::sensor>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -341,22 +341,22 @@ pub mod datastream_state {
         pub struct observation_type(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `sensor` field
-        pub struct sensor(());
-        ///Marker type for the `observed_property` field
-        pub struct observed_property(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `thing` field
         pub struct thing(());
         ///Marker type for the `unit_of_measurement` field
         pub struct unit_of_measurement(());
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `observed_property` field
+        pub struct observed_property(());
+        ///Marker type for the `sensor` field
+        pub struct sensor(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct DatastreamBuilder<'a, S: datastream_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct DatastreamBuilder<S: BosStr, St: datastream_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
         Option<S>,
@@ -370,47 +370,47 @@ pub struct DatastreamBuilder<'a, S: datastream_state::State> {
         Option<datastream::UnitOfMeasurement<S>>,
         Option<S>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Datastream<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> DatastreamBuilder<'a, datastream_state::Empty> {
+impl<S: BosStr> Datastream<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> DatastreamBuilder<S, datastream_state::Empty> {
         DatastreamBuilder::new()
     }
 }
 
-impl<'a> DatastreamBuilder<'a, datastream_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> DatastreamBuilder<S, datastream_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         DatastreamBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DatastreamBuilder<'a, S>
+impl<S: BosStr, St> DatastreamBuilder<S, St>
 where
-    S: datastream_state::State,
-    S::CreatedAt: datastream_state::IsUnset,
+    St: datastream_state::State,
+    St::CreatedAt: datastream_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> DatastreamBuilder<'a, datastream_state::SetCreatedAt<S>> {
+    ) -> DatastreamBuilder<S, datastream_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         DatastreamBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: datastream_state::State> DatastreamBuilder<'a, S> {
+impl<S: BosStr, St: datastream_state::State> DatastreamBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -423,45 +423,45 @@ impl<'a, S: datastream_state::State> DatastreamBuilder<'a, S> {
     }
 }
 
-impl<'a, S> DatastreamBuilder<'a, S>
+impl<S: BosStr, St> DatastreamBuilder<S, St>
 where
-    S: datastream_state::State,
-    S::Name: datastream_state::IsUnset,
+    St: datastream_state::State,
+    St::Name: datastream_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> DatastreamBuilder<'a, datastream_state::SetName<S>> {
+    ) -> DatastreamBuilder<S, datastream_state::SetName<St>> {
         self._fields.2 = Option::Some(value.into());
         DatastreamBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DatastreamBuilder<'a, S>
+impl<S: BosStr, St> DatastreamBuilder<S, St>
 where
-    S: datastream_state::State,
-    S::ObservationType: datastream_state::IsUnset,
+    St: datastream_state::State,
+    St::ObservationType: datastream_state::IsUnset,
 {
     /// Set the `observationType` field (required)
     pub fn observation_type(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> DatastreamBuilder<'a, datastream_state::SetObservationType<S>> {
+    ) -> DatastreamBuilder<S, datastream_state::SetObservationType<St>> {
         self._fields.3 = Option::Some(value.into());
         DatastreamBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: datastream_state::State> DatastreamBuilder<'a, S> {
+impl<S: BosStr, St: datastream_state::State> DatastreamBuilder<S, St> {
     /// Set the `observedArea` field (optional)
     pub fn observed_area(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -474,26 +474,26 @@ impl<'a, S: datastream_state::State> DatastreamBuilder<'a, S> {
     }
 }
 
-impl<'a, S> DatastreamBuilder<'a, S>
+impl<S: BosStr, St> DatastreamBuilder<S, St>
 where
-    S: datastream_state::State,
-    S::ObservedProperty: datastream_state::IsUnset,
+    St: datastream_state::State,
+    St::ObservedProperty: datastream_state::IsUnset,
 {
     /// Set the `observedProperty` field (required)
     pub fn observed_property(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> DatastreamBuilder<'a, datastream_state::SetObservedProperty<S>> {
+    ) -> DatastreamBuilder<S, datastream_state::SetObservedProperty<St>> {
         self._fields.5 = Option::Some(value.into());
         DatastreamBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: datastream_state::State> DatastreamBuilder<'a, S> {
+impl<S: BosStr, St: datastream_state::State> DatastreamBuilder<S, St> {
     /// Set the `resultScaleFactor` field (optional)
     pub fn result_scale_factor(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.6 = value.into();
@@ -506,64 +506,64 @@ impl<'a, S: datastream_state::State> DatastreamBuilder<'a, S> {
     }
 }
 
-impl<'a, S> DatastreamBuilder<'a, S>
+impl<S: BosStr, St> DatastreamBuilder<S, St>
 where
-    S: datastream_state::State,
-    S::Sensor: datastream_state::IsUnset,
+    St: datastream_state::State,
+    St::Sensor: datastream_state::IsUnset,
 {
     /// Set the `sensor` field (required)
     pub fn sensor(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> DatastreamBuilder<'a, datastream_state::SetSensor<S>> {
+    ) -> DatastreamBuilder<S, datastream_state::SetSensor<St>> {
         self._fields.7 = Option::Some(value.into());
         DatastreamBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DatastreamBuilder<'a, S>
+impl<S: BosStr, St> DatastreamBuilder<S, St>
 where
-    S: datastream_state::State,
-    S::Thing: datastream_state::IsUnset,
+    St: datastream_state::State,
+    St::Thing: datastream_state::IsUnset,
 {
     /// Set the `thing` field (required)
     pub fn thing(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> DatastreamBuilder<'a, datastream_state::SetThing<S>> {
+    ) -> DatastreamBuilder<S, datastream_state::SetThing<St>> {
         self._fields.8 = Option::Some(value.into());
         DatastreamBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DatastreamBuilder<'a, S>
+impl<S: BosStr, St> DatastreamBuilder<S, St>
 where
-    S: datastream_state::State,
-    S::UnitOfMeasurement: datastream_state::IsUnset,
+    St: datastream_state::State,
+    St::UnitOfMeasurement: datastream_state::IsUnset,
 {
     /// Set the `unitOfMeasurement` field (required)
     pub fn unit_of_measurement(
         mut self,
         value: impl Into<datastream::UnitOfMeasurement<S>>,
-    ) -> DatastreamBuilder<'a, datastream_state::SetUnitOfMeasurement<S>> {
+    ) -> DatastreamBuilder<S, datastream_state::SetUnitOfMeasurement<St>> {
         self._fields.9 = Option::Some(value.into());
         DatastreamBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: datastream_state::State> DatastreamBuilder<'a, S> {
+impl<S: BosStr, St: datastream_state::State> DatastreamBuilder<S, St> {
     /// Set the `verticalDatum` field (optional)
     pub fn vertical_datum(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.10 = value.into();
@@ -576,19 +576,19 @@ impl<'a, S: datastream_state::State> DatastreamBuilder<'a, S> {
     }
 }
 
-impl<'a, S> DatastreamBuilder<'a, S>
+impl<S: BosStr, St> DatastreamBuilder<S, St>
 where
-    S: datastream_state::State,
-    S::ObservationType: datastream_state::IsSet,
-    S::CreatedAt: datastream_state::IsSet,
-    S::Sensor: datastream_state::IsSet,
-    S::ObservedProperty: datastream_state::IsSet,
-    S::Name: datastream_state::IsSet,
-    S::Thing: datastream_state::IsSet,
-    S::UnitOfMeasurement: datastream_state::IsSet,
+    St: datastream_state::State,
+    St::ObservationType: datastream_state::IsSet,
+    St::CreatedAt: datastream_state::IsSet,
+    St::Thing: datastream_state::IsSet,
+    St::UnitOfMeasurement: datastream_state::IsSet,
+    St::Name: datastream_state::IsSet,
+    St::ObservedProperty: datastream_state::IsSet,
+    St::Sensor: datastream_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Datastream<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Datastream<S> {
         Datastream {
             created_at: self._fields.0.unwrap(),
             description: self._fields.1,
@@ -604,11 +604,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Datastream<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Datastream<S> {
         Datastream {
             created_at: self._fields.0.unwrap(),
             description: self._fields.1,

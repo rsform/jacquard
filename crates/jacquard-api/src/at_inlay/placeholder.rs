@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
@@ -19,38 +19,33 @@ use crate::at_inlay::Element;
 use crate::at_inlay::Response;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Placeholder<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Placeholder<S: BosStr = DefaultStr> {
     pub children: Vec<Element<S>>,
     pub fallback: Element<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct PlaceholderOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct PlaceholderOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
-    #[serde(borrow)]
     pub value: Response<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -59,12 +54,11 @@ pub struct PlaceholderResponse;
 impl jacquard_common::xrpc::XrpcResp for PlaceholderResponse {
     const NSID: &'static str = "at.inlay.Placeholder";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = PlaceholderOutput<S>;
+    type Output<S: BosStr> = PlaceholderOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for Placeholder<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Placeholder<S> {
     const NSID: &'static str = "at.inlay.Placeholder";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -79,7 +73,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for PlaceholderRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = Placeholder<S>;
+    type Request<S: BosStr> = Placeholder<S>;
     type Response = PlaceholderResponse;
 }
 
@@ -104,17 +98,17 @@ pub mod placeholder_state {
         type Children = Unset;
     }
     ///State transition - sets the `fallback` field to Set
-    pub struct SetFallback<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFallback<S> {}
-    impl<S: State> State for SetFallback<S> {
+    pub struct SetFallback<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetFallback<St> {}
+    impl<St: State> State for SetFallback<St> {
         type Fallback = Set<members::fallback>;
-        type Children = S::Children;
+        type Children = St::Children;
     }
     ///State transition - sets the `children` field to Set
-    pub struct SetChildren<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetChildren<S> {}
-    impl<S: State> State for SetChildren<S> {
-        type Fallback = S::Fallback;
+    pub struct SetChildren<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetChildren<St> {}
+    impl<St: State> State for SetChildren<St> {
+        type Fallback = St::Fallback;
         type Children = Set<members::children>;
     }
     /// Marker types for field names
@@ -127,88 +121,88 @@ pub mod placeholder_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct PlaceholderBuilder<'a, S: placeholder_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct PlaceholderBuilder<S: BosStr, St: placeholder_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<Element<S>>>, Option<Element<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Placeholder<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> PlaceholderBuilder<'a, placeholder_state::Empty> {
+impl<S: BosStr> Placeholder<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> PlaceholderBuilder<S, placeholder_state::Empty> {
         PlaceholderBuilder::new()
     }
 }
 
-impl<'a> PlaceholderBuilder<'a, placeholder_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> PlaceholderBuilder<S, placeholder_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         PlaceholderBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PlaceholderBuilder<'a, S>
+impl<S: BosStr, St> PlaceholderBuilder<S, St>
 where
-    S: placeholder_state::State,
-    S::Children: placeholder_state::IsUnset,
+    St: placeholder_state::State,
+    St::Children: placeholder_state::IsUnset,
 {
     /// Set the `children` field (required)
     pub fn children(
         mut self,
         value: impl Into<Vec<Element<S>>>,
-    ) -> PlaceholderBuilder<'a, placeholder_state::SetChildren<S>> {
+    ) -> PlaceholderBuilder<S, placeholder_state::SetChildren<St>> {
         self._fields.0 = Option::Some(value.into());
         PlaceholderBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PlaceholderBuilder<'a, S>
+impl<S: BosStr, St> PlaceholderBuilder<S, St>
 where
-    S: placeholder_state::State,
-    S::Fallback: placeholder_state::IsUnset,
+    St: placeholder_state::State,
+    St::Fallback: placeholder_state::IsUnset,
 {
     /// Set the `fallback` field (required)
     pub fn fallback(
         mut self,
         value: impl Into<Element<S>>,
-    ) -> PlaceholderBuilder<'a, placeholder_state::SetFallback<S>> {
+    ) -> PlaceholderBuilder<S, placeholder_state::SetFallback<St>> {
         self._fields.1 = Option::Some(value.into());
         PlaceholderBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PlaceholderBuilder<'a, S>
+impl<S: BosStr, St> PlaceholderBuilder<S, St>
 where
-    S: placeholder_state::State,
-    S::Fallback: placeholder_state::IsSet,
-    S::Children: placeholder_state::IsSet,
+    St: placeholder_state::State,
+    St::Fallback: placeholder_state::IsSet,
+    St::Children: placeholder_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Placeholder<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Placeholder<S> {
         Placeholder {
             children: self._fields.0.unwrap(),
             fallback: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Placeholder<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Placeholder<S> {
         Placeholder {
             children: self._fields.0.unwrap(),
             fallback: self._fields.1.unwrap(),

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use crate::blog_pckt::block::image::ImageAttrs;
     rename = "blog.pckt.gallery",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Gallery<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Gallery<S: BosStr = DefaultStr> {
     ///Optional caption for the entire gallery
     #[serde(skip_serializing_if = "Option::is_none")]
     pub caption: Option<S>,
@@ -61,18 +61,18 @@ pub struct Gallery<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GalleryGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GalleryGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Gallery<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Gallery<S> {
+impl<S: BosStr> Gallery<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, GalleryRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -85,17 +85,17 @@ pub struct GalleryRecord;
 impl XrpcResp for GalleryRecord {
     const NSID: &'static str = "blog.pckt.gallery";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GalleryGetRecordOutput<S>;
+    type Output<S: BosStr> = GalleryGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<GalleryGetRecordOutput<S>> for Gallery<S> {
+impl<S: BosStr> From<GalleryGetRecordOutput<S>> for Gallery<S> {
     fn from(output: GalleryGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Gallery<S> {
+impl<S: BosStr> Collection for Gallery<S> {
     const NSID: &'static str = "blog.pckt.gallery";
     type Record = GalleryRecord;
 }
@@ -105,7 +105,7 @@ impl Collection for GalleryRecord {
     type Record = GalleryRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Gallery<S> {
+impl<S: BosStr> LexiconSchema for Gallery<S> {
     fn nsid() -> &'static str {
         "blog.pckt.gallery"
     }
@@ -203,9 +203,9 @@ pub mod gallery_state {
         type Images = Unset;
     }
     ///State transition - sets the `images` field to Set
-    pub struct SetImages<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetImages<S> {}
-    impl<S: State> State for SetImages<S> {
+    pub struct SetImages<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetImages<St> {}
+    impl<St: State> State for SetImages<St> {
         type Images = Set<members::images>;
     }
     /// Marker types for field names
@@ -216,32 +216,32 @@ pub mod gallery_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GalleryBuilder<'a, S: gallery_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GalleryBuilder<S: BosStr, St: gallery_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<Vec<ImageAttrs<S>>>, Option<S>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Gallery<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GalleryBuilder<'a, gallery_state::Empty> {
+impl<S: BosStr> Gallery<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GalleryBuilder<S, gallery_state::Empty> {
         GalleryBuilder::new()
     }
 }
 
-impl<'a> GalleryBuilder<'a, gallery_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GalleryBuilder<S, gallery_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GalleryBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: gallery_state::State> GalleryBuilder<'a, S> {
+impl<S: BosStr, St: gallery_state::State> GalleryBuilder<S, St> {
     /// Set the `caption` field (optional)
     pub fn caption(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -254,26 +254,26 @@ impl<'a, S: gallery_state::State> GalleryBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GalleryBuilder<'a, S>
+impl<S: BosStr, St> GalleryBuilder<S, St>
 where
-    S: gallery_state::State,
-    S::Images: gallery_state::IsUnset,
+    St: gallery_state::State,
+    St::Images: gallery_state::IsUnset,
 {
     /// Set the `images` field (required)
     pub fn images(
         mut self,
         value: impl Into<Vec<ImageAttrs<S>>>,
-    ) -> GalleryBuilder<'a, gallery_state::SetImages<S>> {
+    ) -> GalleryBuilder<S, gallery_state::SetImages<St>> {
         self._fields.1 = Option::Some(value.into());
         GalleryBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: gallery_state::State> GalleryBuilder<'a, S> {
+impl<S: BosStr, St: gallery_state::State> GalleryBuilder<S, St> {
     /// Set the `layout` field (optional)
     pub fn layout(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -286,7 +286,7 @@ impl<'a, S: gallery_state::State> GalleryBuilder<'a, S> {
     }
 }
 
-impl<'a, S: gallery_state::State> GalleryBuilder<'a, S> {
+impl<S: BosStr, St: gallery_state::State> GalleryBuilder<S, St> {
     /// Set the `title` field (optional)
     pub fn title(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -299,13 +299,13 @@ impl<'a, S: gallery_state::State> GalleryBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GalleryBuilder<'a, S>
+impl<S: BosStr, St> GalleryBuilder<S, St>
 where
-    S: gallery_state::State,
-    S::Images: gallery_state::IsSet,
+    St: gallery_state::State,
+    St::Images: gallery_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Gallery<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Gallery<S> {
         Gallery {
             caption: self._fields.0,
             images: self._fields.1.unwrap(),
@@ -314,11 +314,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Gallery<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Gallery<S> {
         Gallery {
             caption: self._fields.0,
             images: self._fields.1.unwrap(),

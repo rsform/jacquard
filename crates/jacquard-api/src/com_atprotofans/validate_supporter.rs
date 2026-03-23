@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
@@ -19,40 +19,35 @@ use serde::{Serialize, Deserialize};
 use crate::com_atprotofans::hydrated_profile::HydratedProfile;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ValidateSupporter<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct ValidateSupporter<S: BosStr = DefaultStr> {
     pub signer: Did<S>,
-    #[serde(borrow)]
     pub subject: Did<S>,
-    #[serde(borrow)]
     pub supporter: Did<S>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ValidateSupporterOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ValidateSupporterOutput<S: BosStr = DefaultStr> {
     ///Hydrated profile of the supporter, if available.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub profile: Option<HydratedProfile<S>>,
     ///Whether the supporter relationship exists and the required attestation is valid.
     pub valid: bool,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -104,12 +99,11 @@ pub struct ValidateSupporterResponse;
 impl jacquard_common::xrpc::XrpcResp for ValidateSupporterResponse {
     const NSID: &'static str = "com.atprotofans.validateSupporter";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ValidateSupporterOutput<S>;
+    type Output<S: BosStr> = ValidateSupporterOutput<S>;
     type Err = ValidateSupporterError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for ValidateSupporter<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ValidateSupporter<S> {
     const NSID: &'static str = "com.atprotofans.validateSupporter";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ValidateSupporterResponse;
@@ -120,7 +114,7 @@ pub struct ValidateSupporterRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ValidateSupporterRequest {
     const PATH: &'static str = "/xrpc/com.atprotofans.validateSupporter";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = ValidateSupporter<S>;
+    type Request<S: BosStr> = ValidateSupporter<S>;
     type Response = ValidateSupporterResponse;
 }
 
@@ -147,27 +141,27 @@ pub mod validate_supporter_state {
         type Subject = Unset;
     }
     ///State transition - sets the `signer` field to Set
-    pub struct SetSigner<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSigner<S> {}
-    impl<S: State> State for SetSigner<S> {
+    pub struct SetSigner<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSigner<St> {}
+    impl<St: State> State for SetSigner<St> {
         type Signer = Set<members::signer>;
-        type Supporter = S::Supporter;
-        type Subject = S::Subject;
+        type Supporter = St::Supporter;
+        type Subject = St::Subject;
     }
     ///State transition - sets the `supporter` field to Set
-    pub struct SetSupporter<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSupporter<S> {}
-    impl<S: State> State for SetSupporter<S> {
-        type Signer = S::Signer;
+    pub struct SetSupporter<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSupporter<St> {}
+    impl<St: State> State for SetSupporter<St> {
+        type Signer = St::Signer;
         type Supporter = Set<members::supporter>;
-        type Subject = S::Subject;
+        type Subject = St::Subject;
     }
     ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type Signer = S::Signer;
-        type Supporter = S::Supporter;
+    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubject<St> {}
+    impl<St: State> State for SetSubject<St> {
+        type Signer = St::Signer;
+        type Supporter = St::Supporter;
         type Subject = Set<members::subject>;
     }
     /// Marker types for field names
@@ -182,97 +176,97 @@ pub mod validate_supporter_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ValidateSupporterBuilder<'a, S: validate_supporter_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ValidateSupporterBuilder<S: BosStr, St: validate_supporter_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>, Option<Did<S>>, Option<Did<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ValidateSupporter<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ValidateSupporterBuilder<'a, validate_supporter_state::Empty> {
+impl<S: BosStr> ValidateSupporter<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ValidateSupporterBuilder<S, validate_supporter_state::Empty> {
         ValidateSupporterBuilder::new()
     }
 }
 
-impl<'a> ValidateSupporterBuilder<'a, validate_supporter_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ValidateSupporterBuilder<S, validate_supporter_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ValidateSupporterBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ValidateSupporterBuilder<'a, S>
+impl<S: BosStr, St> ValidateSupporterBuilder<S, St>
 where
-    S: validate_supporter_state::State,
-    S::Signer: validate_supporter_state::IsUnset,
+    St: validate_supporter_state::State,
+    St::Signer: validate_supporter_state::IsUnset,
 {
     /// Set the `signer` field (required)
     pub fn signer(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> ValidateSupporterBuilder<'a, validate_supporter_state::SetSigner<S>> {
+    ) -> ValidateSupporterBuilder<S, validate_supporter_state::SetSigner<St>> {
         self._fields.0 = Option::Some(value.into());
         ValidateSupporterBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ValidateSupporterBuilder<'a, S>
+impl<S: BosStr, St> ValidateSupporterBuilder<S, St>
 where
-    S: validate_supporter_state::State,
-    S::Subject: validate_supporter_state::IsUnset,
+    St: validate_supporter_state::State,
+    St::Subject: validate_supporter_state::IsUnset,
 {
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> ValidateSupporterBuilder<'a, validate_supporter_state::SetSubject<S>> {
+    ) -> ValidateSupporterBuilder<S, validate_supporter_state::SetSubject<St>> {
         self._fields.1 = Option::Some(value.into());
         ValidateSupporterBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ValidateSupporterBuilder<'a, S>
+impl<S: BosStr, St> ValidateSupporterBuilder<S, St>
 where
-    S: validate_supporter_state::State,
-    S::Supporter: validate_supporter_state::IsUnset,
+    St: validate_supporter_state::State,
+    St::Supporter: validate_supporter_state::IsUnset,
 {
     /// Set the `supporter` field (required)
     pub fn supporter(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> ValidateSupporterBuilder<'a, validate_supporter_state::SetSupporter<S>> {
+    ) -> ValidateSupporterBuilder<S, validate_supporter_state::SetSupporter<St>> {
         self._fields.2 = Option::Some(value.into());
         ValidateSupporterBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ValidateSupporterBuilder<'a, S>
+impl<S: BosStr, St> ValidateSupporterBuilder<S, St>
 where
-    S: validate_supporter_state::State,
-    S::Signer: validate_supporter_state::IsSet,
-    S::Supporter: validate_supporter_state::IsSet,
-    S::Subject: validate_supporter_state::IsSet,
+    St: validate_supporter_state::State,
+    St::Signer: validate_supporter_state::IsSet,
+    St::Supporter: validate_supporter_state::IsSet,
+    St::Subject: validate_supporter_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ValidateSupporter<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ValidateSupporter<S> {
         ValidateSupporter {
             signer: self._fields.0.unwrap(),
             subject: self._fields.1.unwrap(),

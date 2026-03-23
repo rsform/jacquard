@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
@@ -27,18 +27,16 @@ pub struct GetContinueReading {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetContinueReadingOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetContinueReadingOutput<S: BosStr = DefaultStr> {
     pub items: Vec<Data<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -47,7 +45,7 @@ pub struct GetContinueReadingResponse;
 impl jacquard_common::xrpc::XrpcResp for GetContinueReadingResponse {
     const NSID: &'static str = "sh.weaver.notebook.getContinueReading";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetContinueReadingOutput<S>;
+    type Output<S: BosStr> = GetContinueReadingOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
@@ -62,7 +60,7 @@ pub struct GetContinueReadingRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetContinueReadingRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.notebook.getContinueReading";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetContinueReading;
+    type Request<S: BosStr> = GetContinueReading;
     type Response = GetContinueReadingResponse;
 }
 
@@ -89,21 +87,21 @@ pub mod get_continue_reading_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetContinueReadingBuilder<S: get_continue_reading_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetContinueReadingBuilder<St: get_continue_reading_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>,),
 }
 
 impl GetContinueReading {
-    /// Create a new builder for this type
+    /// Create a new builder for this type.
     pub fn new() -> GetContinueReadingBuilder<get_continue_reading_state::Empty> {
         GetContinueReadingBuilder::new()
     }
 }
 
 impl GetContinueReadingBuilder<get_continue_reading_state::Empty> {
-    /// Create a new builder with all fields unset
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetContinueReadingBuilder {
             _state: PhantomData,
@@ -112,7 +110,7 @@ impl GetContinueReadingBuilder<get_continue_reading_state::Empty> {
     }
 }
 
-impl<S: get_continue_reading_state::State> GetContinueReadingBuilder<S> {
+impl<St: get_continue_reading_state::State> GetContinueReadingBuilder<St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
@@ -125,11 +123,11 @@ impl<S: get_continue_reading_state::State> GetContinueReadingBuilder<S> {
     }
 }
 
-impl<S> GetContinueReadingBuilder<S>
+impl<St> GetContinueReadingBuilder<St>
 where
-    S: get_continue_reading_state::State,
+    St: get_continue_reading_state::State,
 {
-    /// Build the final struct
+    /// Build the final struct.
     pub fn build(self) -> GetContinueReading {
         GetContinueReading {
             limit: self._fields.0,

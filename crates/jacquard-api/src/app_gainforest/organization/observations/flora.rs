@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "app.gainforest.organization.observations.flora",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Flora<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Flora<S: BosStr = DefaultStr> {
     ///The date and time of the creation of the record
     pub created_at: Datetime,
     ///An array of GBIF taxon keys for each flora observation
@@ -54,18 +54,18 @@ pub struct Flora<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct FloraGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct FloraGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Flora<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Flora<S> {
+impl<S: BosStr> Flora<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, FloraRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -78,17 +78,17 @@ pub struct FloraRecord;
 impl XrpcResp for FloraRecord {
     const NSID: &'static str = "app.gainforest.organization.observations.flora";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = FloraGetRecordOutput<S>;
+    type Output<S: BosStr> = FloraGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<FloraGetRecordOutput<S>> for Flora<S> {
+impl<S: BosStr> From<FloraGetRecordOutput<S>> for Flora<S> {
     fn from(output: FloraGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Flora<S> {
+impl<S: BosStr> Collection for Flora<S> {
     const NSID: &'static str = "app.gainforest.organization.observations.flora";
     type Record = FloraRecord;
 }
@@ -98,7 +98,7 @@ impl Collection for FloraRecord {
     type Record = FloraRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Flora<S> {
+impl<S: BosStr> LexiconSchema for Flora<S> {
     fn nsid() -> &'static str {
         "app.gainforest.organization.observations.flora"
     }
@@ -123,119 +123,119 @@ pub mod flora_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type GbifTaxonKeys;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type GbifTaxonKeys = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type GbifTaxonKeys = S::GbifTaxonKeys;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `gbif_taxon_keys` field to Set
-    pub struct SetGbifTaxonKeys<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGbifTaxonKeys<S> {}
-    impl<S: State> State for SetGbifTaxonKeys<S> {
-        type CreatedAt = S::CreatedAt;
+    pub struct SetGbifTaxonKeys<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetGbifTaxonKeys<St> {}
+    impl<St: State> State for SetGbifTaxonKeys<St> {
         type GbifTaxonKeys = Set<members::gbif_taxon_keys>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type GbifTaxonKeys = St::GbifTaxonKeys;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `gbif_taxon_keys` field
         pub struct gbif_taxon_keys(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct FloraBuilder<'a, S: flora_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct FloraBuilder<S: BosStr, St: flora_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<Vec<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Flora<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> FloraBuilder<'a, flora_state::Empty> {
+impl<S: BosStr> Flora<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> FloraBuilder<S, flora_state::Empty> {
         FloraBuilder::new()
     }
 }
 
-impl<'a> FloraBuilder<'a, flora_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> FloraBuilder<S, flora_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         FloraBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> FloraBuilder<'a, S>
+impl<S: BosStr, St> FloraBuilder<S, St>
 where
-    S: flora_state::State,
-    S::CreatedAt: flora_state::IsUnset,
+    St: flora_state::State,
+    St::CreatedAt: flora_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> FloraBuilder<'a, flora_state::SetCreatedAt<S>> {
+    ) -> FloraBuilder<S, flora_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         FloraBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> FloraBuilder<'a, S>
+impl<S: BosStr, St> FloraBuilder<S, St>
 where
-    S: flora_state::State,
-    S::GbifTaxonKeys: flora_state::IsUnset,
+    St: flora_state::State,
+    St::GbifTaxonKeys: flora_state::IsUnset,
 {
     /// Set the `gbifTaxonKeys` field (required)
     pub fn gbif_taxon_keys(
         mut self,
         value: impl Into<Vec<S>>,
-    ) -> FloraBuilder<'a, flora_state::SetGbifTaxonKeys<S>> {
+    ) -> FloraBuilder<S, flora_state::SetGbifTaxonKeys<St>> {
         self._fields.1 = Option::Some(value.into());
         FloraBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> FloraBuilder<'a, S>
+impl<S: BosStr, St> FloraBuilder<S, St>
 where
-    S: flora_state::State,
-    S::CreatedAt: flora_state::IsSet,
-    S::GbifTaxonKeys: flora_state::IsSet,
+    St: flora_state::State,
+    St::GbifTaxonKeys: flora_state::IsSet,
+    St::CreatedAt: flora_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Flora<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Flora<S> {
         Flora {
             created_at: self._fields.0.unwrap(),
             gbif_taxon_keys: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Flora<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Flora<S> {
         Flora {
             created_at: self._fields.0.unwrap(),
             gbif_taxon_keys: self._fields.1.unwrap(),

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, Tid, Cid};
 use jacquard_common::types::value::Data;
@@ -18,18 +18,16 @@ use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ListBlobs<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ListBlobs<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub cursor: Option<S>,
-    #[serde(borrow)]
     pub did: Did<S>,
     ///Defaults to `500`. Min: 1. Max: 1000.
     #[serde(default = "_default_limit")]
@@ -41,20 +39,18 @@ pub struct ListBlobs<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ListBlobsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ListBlobsOutput<S: BosStr = DefaultStr> {
     pub cids: Vec<Cid<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -132,12 +128,11 @@ pub struct ListBlobsResponse;
 impl jacquard_common::xrpc::XrpcResp for ListBlobsResponse {
     const NSID: &'static str = "com.atproto.sync.listBlobs";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ListBlobsOutput<S>;
+    type Output<S: BosStr> = ListBlobsOutput<S>;
     type Err = ListBlobsError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for ListBlobs<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ListBlobs<S> {
     const NSID: &'static str = "com.atproto.sync.listBlobs";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ListBlobsResponse;
@@ -148,7 +143,7 @@ pub struct ListBlobsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListBlobsRequest {
     const PATH: &'static str = "/xrpc/com.atproto.sync.listBlobs";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = ListBlobs<S>;
+    type Request<S: BosStr> = ListBlobs<S>;
     type Response = ListBlobsResponse;
 }
 
@@ -175,9 +170,9 @@ pub mod list_blobs_state {
         type Did = Unset;
     }
     ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
         type Did = Set<members::did>;
     }
     /// Marker types for field names
@@ -188,32 +183,32 @@ pub mod list_blobs_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ListBlobsBuilder<'a, S: list_blobs_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ListBlobsBuilder<S: BosStr, St: list_blobs_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<Did<S>>, Option<i64>, Option<Tid>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ListBlobs<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ListBlobsBuilder<'a, list_blobs_state::Empty> {
+impl<S: BosStr> ListBlobs<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ListBlobsBuilder<S, list_blobs_state::Empty> {
         ListBlobsBuilder::new()
     }
 }
 
-impl<'a> ListBlobsBuilder<'a, list_blobs_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ListBlobsBuilder<S, list_blobs_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ListBlobsBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: list_blobs_state::State> ListBlobsBuilder<'a, S> {
+impl<S: BosStr, St: list_blobs_state::State> ListBlobsBuilder<S, St> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -226,26 +221,26 @@ impl<'a, S: list_blobs_state::State> ListBlobsBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ListBlobsBuilder<'a, S>
+impl<S: BosStr, St> ListBlobsBuilder<S, St>
 where
-    S: list_blobs_state::State,
-    S::Did: list_blobs_state::IsUnset,
+    St: list_blobs_state::State,
+    St::Did: list_blobs_state::IsUnset,
 {
     /// Set the `did` field (required)
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> ListBlobsBuilder<'a, list_blobs_state::SetDid<S>> {
+    ) -> ListBlobsBuilder<S, list_blobs_state::SetDid<St>> {
         self._fields.1 = Option::Some(value.into());
         ListBlobsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: list_blobs_state::State> ListBlobsBuilder<'a, S> {
+impl<S: BosStr, St: list_blobs_state::State> ListBlobsBuilder<S, St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -258,7 +253,7 @@ impl<'a, S: list_blobs_state::State> ListBlobsBuilder<'a, S> {
     }
 }
 
-impl<'a, S: list_blobs_state::State> ListBlobsBuilder<'a, S> {
+impl<S: BosStr, St: list_blobs_state::State> ListBlobsBuilder<S, St> {
     /// Set the `since` field (optional)
     pub fn since(mut self, value: impl Into<Option<Tid>>) -> Self {
         self._fields.3 = value.into();
@@ -271,13 +266,13 @@ impl<'a, S: list_blobs_state::State> ListBlobsBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ListBlobsBuilder<'a, S>
+impl<S: BosStr, St> ListBlobsBuilder<S, St>
 where
-    S: list_blobs_state::State,
-    S::Did: list_blobs_state::IsSet,
+    St: list_blobs_state::State,
+    St::Did: list_blobs_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ListBlobs<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ListBlobs<S> {
         ListBlobs {
             cursor: self._fields.0,
             did: self._fields.1.unwrap(),

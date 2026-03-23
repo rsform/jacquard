@@ -20,7 +20,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -38,11 +38,11 @@ use serde::{Serialize, Deserialize};
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SpriteSettings<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SpriteSettings<S: BosStr = DefaultStr> {
     ///0=right, 1=back, 2=left, 3=front
     #[serde(skip_serializing_if = "Option::is_none")]
     pub current_anim_direction: Option<i64>,
@@ -55,7 +55,7 @@ pub struct SpriteSettings<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for SpriteSettings<S> {
+impl<S: BosStr> LexiconSchema for SpriteSettings<S> {
     fn nsid() -> &'static str {
         "org.simocracy.defs"
     }
@@ -89,9 +89,9 @@ pub mod sprite_settings_state {
         type SelectedOptions = Unset;
     }
     ///State transition - sets the `selected_options` field to Set
-    pub struct SetSelectedOptions<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSelectedOptions<S> {}
-    impl<S: State> State for SetSelectedOptions<S> {
+    pub struct SetSelectedOptions<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSelectedOptions<St> {}
+    impl<St: State> State for SetSelectedOptions<St> {
         type SelectedOptions = Set<members::selected_options>;
     }
     /// Marker types for field names
@@ -102,32 +102,32 @@ pub mod sprite_settings_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct SpriteSettingsBuilder<'a, S: sprite_settings_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct SpriteSettingsBuilder<S: BosStr, St: sprite_settings_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<Data<S>>, Option<Data<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> SpriteSettings<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> SpriteSettingsBuilder<'a, sprite_settings_state::Empty> {
+impl<S: BosStr> SpriteSettings<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> SpriteSettingsBuilder<S, sprite_settings_state::Empty> {
         SpriteSettingsBuilder::new()
     }
 }
 
-impl<'a> SpriteSettingsBuilder<'a, sprite_settings_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> SpriteSettingsBuilder<S, sprite_settings_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SpriteSettingsBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: sprite_settings_state::State> SpriteSettingsBuilder<'a, S> {
+impl<S: BosStr, St: sprite_settings_state::State> SpriteSettingsBuilder<S, St> {
     /// Set the `currentAnimDirection` field (optional)
     pub fn current_anim_direction(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
@@ -140,7 +140,7 @@ impl<'a, S: sprite_settings_state::State> SpriteSettingsBuilder<'a, S> {
     }
 }
 
-impl<'a, S: sprite_settings_state::State> SpriteSettingsBuilder<'a, S> {
+impl<S: BosStr, St: sprite_settings_state::State> SpriteSettingsBuilder<S, St> {
     /// Set the `partColorSettings` field (optional)
     pub fn part_color_settings(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -153,32 +153,32 @@ impl<'a, S: sprite_settings_state::State> SpriteSettingsBuilder<'a, S> {
     }
 }
 
-impl<'a, S> SpriteSettingsBuilder<'a, S>
+impl<S: BosStr, St> SpriteSettingsBuilder<S, St>
 where
-    S: sprite_settings_state::State,
-    S::SelectedOptions: sprite_settings_state::IsUnset,
+    St: sprite_settings_state::State,
+    St::SelectedOptions: sprite_settings_state::IsUnset,
 {
     /// Set the `selectedOptions` field (required)
     pub fn selected_options(
         mut self,
         value: impl Into<Data<S>>,
-    ) -> SpriteSettingsBuilder<'a, sprite_settings_state::SetSelectedOptions<S>> {
+    ) -> SpriteSettingsBuilder<S, sprite_settings_state::SetSelectedOptions<St>> {
         self._fields.2 = Option::Some(value.into());
         SpriteSettingsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SpriteSettingsBuilder<'a, S>
+impl<S: BosStr, St> SpriteSettingsBuilder<S, St>
 where
-    S: sprite_settings_state::State,
-    S::SelectedOptions: sprite_settings_state::IsSet,
+    St: sprite_settings_state::State,
+    St::SelectedOptions: sprite_settings_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> SpriteSettings<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> SpriteSettings<S> {
         SpriteSettings {
             current_anim_direction: self._fields.0,
             part_color_settings: self._fields.1,
@@ -186,11 +186,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> SpriteSettings<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> SpriteSettings<S> {
         SpriteSettings {
             current_anim_direction: self._fields.0,
             part_color_settings: self._fields.1,

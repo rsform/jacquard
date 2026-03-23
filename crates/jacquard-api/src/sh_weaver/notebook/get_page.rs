@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
@@ -20,33 +20,30 @@ use crate::sh_weaver::notebook::EntryView;
 use crate::sh_weaver::notebook::PageView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetPage<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct GetPage<S: BosStr = DefaultStr> {
     pub page: AtUri<S>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetPageOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetPageOutput<S: BosStr = DefaultStr> {
     pub entries: Vec<EntryView<S>>,
     pub page: PageView<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -97,12 +94,11 @@ pub struct GetPageResponse;
 impl jacquard_common::xrpc::XrpcResp for GetPageResponse {
     const NSID: &'static str = "sh.weaver.notebook.getPage";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetPageOutput<S>;
+    type Output<S: BosStr> = GetPageOutput<S>;
     type Err = GetPageError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetPage<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetPage<S> {
     const NSID: &'static str = "sh.weaver.notebook.getPage";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetPageResponse;
@@ -113,7 +109,7 @@ pub struct GetPageRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetPageRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.notebook.getPage";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetPage<S>;
+    type Request<S: BosStr> = GetPage<S>;
     type Response = GetPageResponse;
 }
 
@@ -136,9 +132,9 @@ pub mod get_page_state {
         type Page = Unset;
     }
     ///State transition - sets the `page` field to Set
-    pub struct SetPage<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPage<S> {}
-    impl<S: State> State for SetPage<S> {
+    pub struct SetPage<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPage<St> {}
+    impl<St: State> State for SetPage<St> {
         type Page = Set<members::page>;
     }
     /// Marker types for field names
@@ -149,57 +145,57 @@ pub mod get_page_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetPageBuilder<'a, S: get_page_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetPageBuilder<S: BosStr, St: get_page_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetPage<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetPageBuilder<'a, get_page_state::Empty> {
+impl<S: BosStr> GetPage<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetPageBuilder<S, get_page_state::Empty> {
         GetPageBuilder::new()
     }
 }
 
-impl<'a> GetPageBuilder<'a, get_page_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetPageBuilder<S, get_page_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetPageBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetPageBuilder<'a, S>
+impl<S: BosStr, St> GetPageBuilder<S, St>
 where
-    S: get_page_state::State,
-    S::Page: get_page_state::IsUnset,
+    St: get_page_state::State,
+    St::Page: get_page_state::IsUnset,
 {
     /// Set the `page` field (required)
     pub fn page(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> GetPageBuilder<'a, get_page_state::SetPage<S>> {
+    ) -> GetPageBuilder<S, get_page_state::SetPage<St>> {
         self._fields.0 = Option::Some(value.into());
         GetPageBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetPageBuilder<'a, S>
+impl<S: BosStr, St> GetPageBuilder<S, St>
 where
-    S: get_page_state::State,
-    S::Page: get_page_state::IsSet,
+    St: get_page_state::State,
+    St::Page: get_page_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetPage<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetPage<S> {
         GetPage {
             page: self._fields.0.unwrap(),
         }

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "network.cosmik.connection",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Connection<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Connection<S: BosStr = DefaultStr> {
     ///Optional type of connection
     #[serde(skip_serializing_if = "Option::is_none")]
     pub connection_type: Option<S>,
@@ -66,18 +66,18 @@ pub struct Connection<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ConnectionGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ConnectionGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Connection<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Connection<S> {
+impl<S: BosStr> Connection<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, ConnectionRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -90,17 +90,17 @@ pub struct ConnectionRecord;
 impl XrpcResp for ConnectionRecord {
     const NSID: &'static str = "network.cosmik.connection";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ConnectionGetRecordOutput<S>;
+    type Output<S: BosStr> = ConnectionGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<ConnectionGetRecordOutput<S>> for Connection<S> {
+impl<S: BosStr> From<ConnectionGetRecordOutput<S>> for Connection<S> {
     fn from(output: ConnectionGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Connection<S> {
+impl<S: BosStr> Collection for Connection<S> {
     const NSID: &'static str = "network.cosmik.connection";
     type Record = ConnectionRecord;
 }
@@ -110,7 +110,7 @@ impl Collection for ConnectionRecord {
     type Record = ConnectionRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Connection<S> {
+impl<S: BosStr> LexiconSchema for Connection<S> {
     fn nsid() -> &'static str {
         "network.cosmik.connection"
     }
@@ -145,43 +145,43 @@ pub mod connection_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Target;
         type Source;
+        type Target;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Target = Unset;
         type Source = Unset;
-    }
-    ///State transition - sets the `target` field to Set
-    pub struct SetTarget<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTarget<S> {}
-    impl<S: State> State for SetTarget<S> {
-        type Target = Set<members::target>;
-        type Source = S::Source;
+        type Target = Unset;
     }
     ///State transition - sets the `source` field to Set
-    pub struct SetSource<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSource<S> {}
-    impl<S: State> State for SetSource<S> {
-        type Target = S::Target;
+    pub struct SetSource<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSource<St> {}
+    impl<St: State> State for SetSource<St> {
         type Source = Set<members::source>;
+        type Target = St::Target;
+    }
+    ///State transition - sets the `target` field to Set
+    pub struct SetTarget<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTarget<St> {}
+    impl<St: State> State for SetTarget<St> {
+        type Source = St::Source;
+        type Target = Set<members::target>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `target` field
-        pub struct target(());
         ///Marker type for the `source` field
         pub struct source(());
+        ///Marker type for the `target` field
+        pub struct target(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ConnectionBuilder<'a, S: connection_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ConnectionBuilder<S: BosStr, St: connection_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
         Option<Datetime>,
@@ -190,28 +190,28 @@ pub struct ConnectionBuilder<'a, S: connection_state::State> {
         Option<S>,
         Option<Datetime>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Connection<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ConnectionBuilder<'a, connection_state::Empty> {
+impl<S: BosStr> Connection<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ConnectionBuilder<S, connection_state::Empty> {
         ConnectionBuilder::new()
     }
 }
 
-impl<'a> ConnectionBuilder<'a, connection_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ConnectionBuilder<S, connection_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ConnectionBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: connection_state::State> ConnectionBuilder<'a, S> {
+impl<S: BosStr, St: connection_state::State> ConnectionBuilder<S, St> {
     /// Set the `connectionType` field (optional)
     pub fn connection_type(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -224,7 +224,7 @@ impl<'a, S: connection_state::State> ConnectionBuilder<'a, S> {
     }
 }
 
-impl<'a, S: connection_state::State> ConnectionBuilder<'a, S> {
+impl<S: BosStr, St: connection_state::State> ConnectionBuilder<S, St> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.1 = value.into();
@@ -237,7 +237,7 @@ impl<'a, S: connection_state::State> ConnectionBuilder<'a, S> {
     }
 }
 
-impl<'a, S: connection_state::State> ConnectionBuilder<'a, S> {
+impl<S: BosStr, St: connection_state::State> ConnectionBuilder<S, St> {
     /// Set the `note` field (optional)
     pub fn note(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -250,45 +250,45 @@ impl<'a, S: connection_state::State> ConnectionBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ConnectionBuilder<'a, S>
+impl<S: BosStr, St> ConnectionBuilder<S, St>
 where
-    S: connection_state::State,
-    S::Source: connection_state::IsUnset,
+    St: connection_state::State,
+    St::Source: connection_state::IsUnset,
 {
     /// Set the `source` field (required)
     pub fn source(
         mut self,
         value: impl Into<S>,
-    ) -> ConnectionBuilder<'a, connection_state::SetSource<S>> {
+    ) -> ConnectionBuilder<S, connection_state::SetSource<St>> {
         self._fields.3 = Option::Some(value.into());
         ConnectionBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ConnectionBuilder<'a, S>
+impl<S: BosStr, St> ConnectionBuilder<S, St>
 where
-    S: connection_state::State,
-    S::Target: connection_state::IsUnset,
+    St: connection_state::State,
+    St::Target: connection_state::IsUnset,
 {
     /// Set the `target` field (required)
     pub fn target(
         mut self,
         value: impl Into<S>,
-    ) -> ConnectionBuilder<'a, connection_state::SetTarget<S>> {
+    ) -> ConnectionBuilder<S, connection_state::SetTarget<St>> {
         self._fields.4 = Option::Some(value.into());
         ConnectionBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: connection_state::State> ConnectionBuilder<'a, S> {
+impl<S: BosStr, St: connection_state::State> ConnectionBuilder<S, St> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.5 = value.into();
@@ -301,14 +301,14 @@ impl<'a, S: connection_state::State> ConnectionBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ConnectionBuilder<'a, S>
+impl<S: BosStr, St> ConnectionBuilder<S, St>
 where
-    S: connection_state::State,
-    S::Target: connection_state::IsSet,
-    S::Source: connection_state::IsSet,
+    St: connection_state::State,
+    St::Source: connection_state::IsSet,
+    St::Target: connection_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Connection<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Connection<S> {
         Connection {
             connection_type: self._fields.0,
             created_at: self._fields.1,
@@ -319,11 +319,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Connection<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Connection<S> {
         Connection {
             connection_type: self._fields.0,
             created_at: self._fields.1,

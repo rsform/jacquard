@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -30,11 +30,11 @@ use crate::app_bsky::unspecced::get_config;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct LiveNowConfig<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct LiveNowConfig<S: BosStr = DefaultStr> {
     pub did: Did<S>,
     pub domains: Vec<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -43,25 +43,23 @@ pub struct LiveNowConfig<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetConfigOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetConfigOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub check_email_confirmed: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub live_now: Option<Vec<get_config::LiveNowConfig<S>>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for LiveNowConfig<S> {
+impl<S: BosStr> LexiconSchema for LiveNowConfig<S> {
     fn nsid() -> &'static str {
         "app.bsky.unspecced.getConfig"
     }
@@ -85,7 +83,7 @@ pub struct GetConfigResponse;
 impl jacquard_common::xrpc::XrpcResp for GetConfigResponse {
     const NSID: &'static str = "app.bsky.unspecced.getConfig";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetConfigOutput<S>;
+    type Output<S: BosStr> = GetConfigOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
@@ -100,7 +98,7 @@ pub struct GetConfigRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetConfigRequest {
     const PATH: &'static str = "/xrpc/app.bsky.unspecced.getConfig";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetConfig;
+    type Request<S: BosStr> = GetConfig;
     type Response = GetConfigResponse;
 }
 
@@ -114,122 +112,122 @@ pub mod live_now_config_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Domains;
         type Did;
+        type Domains;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Domains = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `domains` field to Set
-    pub struct SetDomains<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDomains<S> {}
-    impl<S: State> State for SetDomains<S> {
-        type Domains = Set<members::domains>;
-        type Did = S::Did;
+        type Domains = Unset;
     }
     ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Domains = S::Domains;
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
         type Did = Set<members::did>;
+        type Domains = St::Domains;
+    }
+    ///State transition - sets the `domains` field to Set
+    pub struct SetDomains<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDomains<St> {}
+    impl<St: State> State for SetDomains<St> {
+        type Did = St::Did;
+        type Domains = Set<members::domains>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `domains` field
-        pub struct domains(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `domains` field
+        pub struct domains(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct LiveNowConfigBuilder<'a, S: live_now_config_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct LiveNowConfigBuilder<S: BosStr, St: live_now_config_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>, Option<Vec<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> LiveNowConfig<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> LiveNowConfigBuilder<'a, live_now_config_state::Empty> {
+impl<S: BosStr> LiveNowConfig<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> LiveNowConfigBuilder<S, live_now_config_state::Empty> {
         LiveNowConfigBuilder::new()
     }
 }
 
-impl<'a> LiveNowConfigBuilder<'a, live_now_config_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> LiveNowConfigBuilder<S, live_now_config_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         LiveNowConfigBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LiveNowConfigBuilder<'a, S>
+impl<S: BosStr, St> LiveNowConfigBuilder<S, St>
 where
-    S: live_now_config_state::State,
-    S::Did: live_now_config_state::IsUnset,
+    St: live_now_config_state::State,
+    St::Did: live_now_config_state::IsUnset,
 {
     /// Set the `did` field (required)
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> LiveNowConfigBuilder<'a, live_now_config_state::SetDid<S>> {
+    ) -> LiveNowConfigBuilder<S, live_now_config_state::SetDid<St>> {
         self._fields.0 = Option::Some(value.into());
         LiveNowConfigBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LiveNowConfigBuilder<'a, S>
+impl<S: BosStr, St> LiveNowConfigBuilder<S, St>
 where
-    S: live_now_config_state::State,
-    S::Domains: live_now_config_state::IsUnset,
+    St: live_now_config_state::State,
+    St::Domains: live_now_config_state::IsUnset,
 {
     /// Set the `domains` field (required)
     pub fn domains(
         mut self,
         value: impl Into<Vec<S>>,
-    ) -> LiveNowConfigBuilder<'a, live_now_config_state::SetDomains<S>> {
+    ) -> LiveNowConfigBuilder<S, live_now_config_state::SetDomains<St>> {
         self._fields.1 = Option::Some(value.into());
         LiveNowConfigBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LiveNowConfigBuilder<'a, S>
+impl<S: BosStr, St> LiveNowConfigBuilder<S, St>
 where
-    S: live_now_config_state::State,
-    S::Domains: live_now_config_state::IsSet,
-    S::Did: live_now_config_state::IsSet,
+    St: live_now_config_state::State,
+    St::Did: live_now_config_state::IsSet,
+    St::Domains: live_now_config_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> LiveNowConfig<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> LiveNowConfig<S> {
         LiveNowConfig {
             did: self._fields.0.unwrap(),
             domains: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> LiveNowConfig<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> LiveNowConfig<S> {
         LiveNowConfig {
             did: self._fields.0.unwrap(),
             domains: self._fields.1.unwrap(),

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -32,11 +32,11 @@ use crate::science_alt::dataset::storage_s3;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct StorageS3<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct StorageS3<S: BosStr = DefaultStr> {
     ///S3 bucket name
     pub bucket: S,
     ///Custom S3-compatible endpoint URL (e.g., for MinIO, Cloudflare R2). Omit for standard AWS S3.
@@ -57,11 +57,11 @@ pub struct StorageS3<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ShardEntry<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ShardEntry<S: BosStr = DefaultStr> {
     ///Content hash for integrity verification
     pub checksum: ShardChecksum<S>,
     ///S3 object key for this WebDataset tar shard
@@ -70,7 +70,7 @@ pub struct ShardEntry<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for StorageS3<S> {
+impl<S: BosStr> LexiconSchema for StorageS3<S> {
     fn nsid() -> &'static str {
         "science.alt.dataset.storageS3"
     }
@@ -127,7 +127,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for StorageS3<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ShardEntry<S> {
+impl<S: BosStr> LexiconSchema for ShardEntry<S> {
     fn nsid() -> &'static str {
         "science.alt.dataset.storageS3"
     }
@@ -174,17 +174,17 @@ pub mod storage_s3_state {
         type Shards = Unset;
     }
     ///State transition - sets the `bucket` field to Set
-    pub struct SetBucket<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBucket<S> {}
-    impl<S: State> State for SetBucket<S> {
+    pub struct SetBucket<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBucket<St> {}
+    impl<St: State> State for SetBucket<St> {
         type Bucket = Set<members::bucket>;
-        type Shards = S::Shards;
+        type Shards = St::Shards;
     }
     ///State transition - sets the `shards` field to Set
-    pub struct SetShards<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetShards<S> {}
-    impl<S: State> State for SetShards<S> {
-        type Bucket = S::Bucket;
+    pub struct SetShards<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetShards<St> {}
+    impl<St: State> State for SetShards<St> {
+        type Bucket = St::Bucket;
         type Shards = Set<members::shards>;
     }
     /// Marker types for field names
@@ -197,56 +197,56 @@ pub mod storage_s3_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct StorageS3Builder<'a, S: storage_s3_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct StorageS3Builder<S: BosStr, St: storage_s3_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
         Option<UriValue<S>>,
         Option<S>,
         Option<Vec<storage_s3::ShardEntry<S>>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> StorageS3<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> StorageS3Builder<'a, storage_s3_state::Empty> {
+impl<S: BosStr> StorageS3<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> StorageS3Builder<S, storage_s3_state::Empty> {
         StorageS3Builder::new()
     }
 }
 
-impl<'a> StorageS3Builder<'a, storage_s3_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> StorageS3Builder<S, storage_s3_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         StorageS3Builder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> StorageS3Builder<'a, S>
+impl<S: BosStr, St> StorageS3Builder<S, St>
 where
-    S: storage_s3_state::State,
-    S::Bucket: storage_s3_state::IsUnset,
+    St: storage_s3_state::State,
+    St::Bucket: storage_s3_state::IsUnset,
 {
     /// Set the `bucket` field (required)
     pub fn bucket(
         mut self,
         value: impl Into<S>,
-    ) -> StorageS3Builder<'a, storage_s3_state::SetBucket<S>> {
+    ) -> StorageS3Builder<S, storage_s3_state::SetBucket<St>> {
         self._fields.0 = Option::Some(value.into());
         StorageS3Builder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: storage_s3_state::State> StorageS3Builder<'a, S> {
+impl<S: BosStr, St: storage_s3_state::State> StorageS3Builder<S, St> {
     /// Set the `endpoint` field (optional)
     pub fn endpoint(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -259,7 +259,7 @@ impl<'a, S: storage_s3_state::State> StorageS3Builder<'a, S> {
     }
 }
 
-impl<'a, S: storage_s3_state::State> StorageS3Builder<'a, S> {
+impl<S: BosStr, St: storage_s3_state::State> StorageS3Builder<S, St> {
     /// Set the `region` field (optional)
     pub fn region(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -272,33 +272,33 @@ impl<'a, S: storage_s3_state::State> StorageS3Builder<'a, S> {
     }
 }
 
-impl<'a, S> StorageS3Builder<'a, S>
+impl<S: BosStr, St> StorageS3Builder<S, St>
 where
-    S: storage_s3_state::State,
-    S::Shards: storage_s3_state::IsUnset,
+    St: storage_s3_state::State,
+    St::Shards: storage_s3_state::IsUnset,
 {
     /// Set the `shards` field (required)
     pub fn shards(
         mut self,
         value: impl Into<Vec<storage_s3::ShardEntry<S>>>,
-    ) -> StorageS3Builder<'a, storage_s3_state::SetShards<S>> {
+    ) -> StorageS3Builder<S, storage_s3_state::SetShards<St>> {
         self._fields.3 = Option::Some(value.into());
         StorageS3Builder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> StorageS3Builder<'a, S>
+impl<S: BosStr, St> StorageS3Builder<S, St>
 where
-    S: storage_s3_state::State,
-    S::Bucket: storage_s3_state::IsSet,
-    S::Shards: storage_s3_state::IsSet,
+    St: storage_s3_state::State,
+    St::Bucket: storage_s3_state::IsSet,
+    St::Shards: storage_s3_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> StorageS3<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> StorageS3<S> {
         StorageS3 {
             bucket: self._fields.0.unwrap(),
             endpoint: self._fields.1,
@@ -307,11 +307,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> StorageS3<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> StorageS3<S> {
         StorageS3 {
             bucket: self._fields.0.unwrap(),
             endpoint: self._fields.1,
@@ -469,17 +469,17 @@ pub mod shard_entry_state {
         type Key = Unset;
     }
     ///State transition - sets the `checksum` field to Set
-    pub struct SetChecksum<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetChecksum<S> {}
-    impl<S: State> State for SetChecksum<S> {
+    pub struct SetChecksum<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetChecksum<St> {}
+    impl<St: State> State for SetChecksum<St> {
         type Checksum = Set<members::checksum>;
-        type Key = S::Key;
+        type Key = St::Key;
     }
     ///State transition - sets the `key` field to Set
-    pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetKey<S> {}
-    impl<S: State> State for SetKey<S> {
-        type Checksum = S::Checksum;
+    pub struct SetKey<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetKey<St> {}
+    impl<St: State> State for SetKey<St> {
+        type Checksum = St::Checksum;
         type Key = Set<members::key>;
     }
     /// Marker types for field names
@@ -492,88 +492,88 @@ pub mod shard_entry_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ShardEntryBuilder<'a, S: shard_entry_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ShardEntryBuilder<S: BosStr, St: shard_entry_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<ShardChecksum<S>>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ShardEntry<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ShardEntryBuilder<'a, shard_entry_state::Empty> {
+impl<S: BosStr> ShardEntry<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ShardEntryBuilder<S, shard_entry_state::Empty> {
         ShardEntryBuilder::new()
     }
 }
 
-impl<'a> ShardEntryBuilder<'a, shard_entry_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ShardEntryBuilder<S, shard_entry_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ShardEntryBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ShardEntryBuilder<'a, S>
+impl<S: BosStr, St> ShardEntryBuilder<S, St>
 where
-    S: shard_entry_state::State,
-    S::Checksum: shard_entry_state::IsUnset,
+    St: shard_entry_state::State,
+    St::Checksum: shard_entry_state::IsUnset,
 {
     /// Set the `checksum` field (required)
     pub fn checksum(
         mut self,
         value: impl Into<ShardChecksum<S>>,
-    ) -> ShardEntryBuilder<'a, shard_entry_state::SetChecksum<S>> {
+    ) -> ShardEntryBuilder<S, shard_entry_state::SetChecksum<St>> {
         self._fields.0 = Option::Some(value.into());
         ShardEntryBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ShardEntryBuilder<'a, S>
+impl<S: BosStr, St> ShardEntryBuilder<S, St>
 where
-    S: shard_entry_state::State,
-    S::Key: shard_entry_state::IsUnset,
+    St: shard_entry_state::State,
+    St::Key: shard_entry_state::IsUnset,
 {
     /// Set the `key` field (required)
     pub fn key(
         mut self,
         value: impl Into<S>,
-    ) -> ShardEntryBuilder<'a, shard_entry_state::SetKey<S>> {
+    ) -> ShardEntryBuilder<S, shard_entry_state::SetKey<St>> {
         self._fields.1 = Option::Some(value.into());
         ShardEntryBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ShardEntryBuilder<'a, S>
+impl<S: BosStr, St> ShardEntryBuilder<S, St>
 where
-    S: shard_entry_state::State,
-    S::Checksum: shard_entry_state::IsSet,
-    S::Key: shard_entry_state::IsSet,
+    St: shard_entry_state::State,
+    St::Checksum: shard_entry_state::IsSet,
+    St::Key: shard_entry_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ShardEntry<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ShardEntry<S> {
         ShardEntry {
             checksum: self._fields.0.unwrap(),
             key: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> ShardEntry<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ShardEntry<S> {
         ShardEntry {
             checksum: self._fields.0.unwrap(),
             key: self._fields.1.unwrap(),

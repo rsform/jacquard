@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,11 +34,11 @@ use serde::{Serialize, Deserialize};
     rename = "diy.razorgirl.winter.fact",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Fact<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Fact<S: BosStr = DefaultStr> {
     pub args: Vec<S>,
     ///0.0-1.0 as string (Soufflé compat)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -65,18 +65,18 @@ pub struct Fact<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct FactGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct FactGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Fact<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Fact<S> {
+impl<S: BosStr> Fact<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, FactRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -89,17 +89,17 @@ pub struct FactRecord;
 impl XrpcResp for FactRecord {
     const NSID: &'static str = "diy.razorgirl.winter.fact";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = FactGetRecordOutput<S>;
+    type Output<S: BosStr> = FactGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<FactGetRecordOutput<S>> for Fact<S> {
+impl<S: BosStr> From<FactGetRecordOutput<S>> for Fact<S> {
     fn from(output: FactGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Fact<S> {
+impl<S: BosStr> Collection for Fact<S> {
     const NSID: &'static str = "diy.razorgirl.winter.fact";
     type Record = FactRecord;
 }
@@ -109,7 +109,7 @@ impl Collection for FactRecord {
     type Record = FactRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Fact<S> {
+impl<S: BosStr> LexiconSchema for Fact<S> {
     fn nsid() -> &'static str {
         "diy.razorgirl.winter.fact"
     }
@@ -167,56 +167,56 @@ pub mod fact_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Predicate;
-        type Args;
         type CreatedAt;
+        type Args;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Predicate = Unset;
-        type Args = Unset;
         type CreatedAt = Unset;
+        type Args = Unset;
     }
     ///State transition - sets the `predicate` field to Set
-    pub struct SetPredicate<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPredicate<S> {}
-    impl<S: State> State for SetPredicate<S> {
+    pub struct SetPredicate<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPredicate<St> {}
+    impl<St: State> State for SetPredicate<St> {
         type Predicate = Set<members::predicate>;
-        type Args = S::Args;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `args` field to Set
-    pub struct SetArgs<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetArgs<S> {}
-    impl<S: State> State for SetArgs<S> {
-        type Predicate = S::Predicate;
-        type Args = Set<members::args>;
-        type CreatedAt = S::CreatedAt;
+        type CreatedAt = St::CreatedAt;
+        type Args = St::Args;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Predicate = S::Predicate;
-        type Args = S::Args;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Predicate = St::Predicate;
         type CreatedAt = Set<members::created_at>;
+        type Args = St::Args;
+    }
+    ///State transition - sets the `args` field to Set
+    pub struct SetArgs<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetArgs<St> {}
+    impl<St: State> State for SetArgs<St> {
+        type Predicate = St::Predicate;
+        type CreatedAt = St::CreatedAt;
+        type Args = Set<members::args>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `predicate` field
         pub struct predicate(());
-        ///Marker type for the `args` field
-        pub struct args(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `args` field
+        pub struct args(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct FactBuilder<'a, S: fact_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct FactBuilder<S: BosStr, St: fact_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<S>>,
         Option<S>,
@@ -227,47 +227,47 @@ pub struct FactBuilder<'a, S: fact_state::State> {
         Option<S>,
         Option<Vec<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Fact<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> FactBuilder<'a, fact_state::Empty> {
+impl<S: BosStr> Fact<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> FactBuilder<S, fact_state::Empty> {
         FactBuilder::new()
     }
 }
 
-impl<'a> FactBuilder<'a, fact_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> FactBuilder<S, fact_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         FactBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> FactBuilder<'a, S>
+impl<S: BosStr, St> FactBuilder<S, St>
 where
-    S: fact_state::State,
-    S::Args: fact_state::IsUnset,
+    St: fact_state::State,
+    St::Args: fact_state::IsUnset,
 {
     /// Set the `args` field (required)
     pub fn args(
         mut self,
         value: impl Into<Vec<S>>,
-    ) -> FactBuilder<'a, fact_state::SetArgs<S>> {
+    ) -> FactBuilder<S, fact_state::SetArgs<St>> {
         self._fields.0 = Option::Some(value.into());
         FactBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: fact_state::State> FactBuilder<'a, S> {
+impl<S: BosStr, St: fact_state::State> FactBuilder<S, St> {
     /// Set the `confidence` field (optional)
     pub fn confidence(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -280,26 +280,26 @@ impl<'a, S: fact_state::State> FactBuilder<'a, S> {
     }
 }
 
-impl<'a, S> FactBuilder<'a, S>
+impl<S: BosStr, St> FactBuilder<S, St>
 where
-    S: fact_state::State,
-    S::CreatedAt: fact_state::IsUnset,
+    St: fact_state::State,
+    St::CreatedAt: fact_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> FactBuilder<'a, fact_state::SetCreatedAt<S>> {
+    ) -> FactBuilder<S, fact_state::SetCreatedAt<St>> {
         self._fields.2 = Option::Some(value.into());
         FactBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: fact_state::State> FactBuilder<'a, S> {
+impl<S: BosStr, St: fact_state::State> FactBuilder<S, St> {
     /// Set the `expiresAt` field (optional)
     pub fn expires_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.3 = value.into();
@@ -312,26 +312,26 @@ impl<'a, S: fact_state::State> FactBuilder<'a, S> {
     }
 }
 
-impl<'a, S> FactBuilder<'a, S>
+impl<S: BosStr, St> FactBuilder<S, St>
 where
-    S: fact_state::State,
-    S::Predicate: fact_state::IsUnset,
+    St: fact_state::State,
+    St::Predicate: fact_state::IsUnset,
 {
     /// Set the `predicate` field (required)
     pub fn predicate(
         mut self,
         value: impl Into<S>,
-    ) -> FactBuilder<'a, fact_state::SetPredicate<S>> {
+    ) -> FactBuilder<S, fact_state::SetPredicate<St>> {
         self._fields.4 = Option::Some(value.into());
         FactBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: fact_state::State> FactBuilder<'a, S> {
+impl<S: BosStr, St: fact_state::State> FactBuilder<S, St> {
     /// Set the `source` field (optional)
     pub fn source(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
@@ -344,7 +344,7 @@ impl<'a, S: fact_state::State> FactBuilder<'a, S> {
     }
 }
 
-impl<'a, S: fact_state::State> FactBuilder<'a, S> {
+impl<S: BosStr, St: fact_state::State> FactBuilder<S, St> {
     /// Set the `supersedes` field (optional)
     pub fn supersedes(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.6 = value.into();
@@ -357,7 +357,7 @@ impl<'a, S: fact_state::State> FactBuilder<'a, S> {
     }
 }
 
-impl<'a, S: fact_state::State> FactBuilder<'a, S> {
+impl<S: BosStr, St: fact_state::State> FactBuilder<S, St> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.7 = value.into();
@@ -370,15 +370,15 @@ impl<'a, S: fact_state::State> FactBuilder<'a, S> {
     }
 }
 
-impl<'a, S> FactBuilder<'a, S>
+impl<S: BosStr, St> FactBuilder<S, St>
 where
-    S: fact_state::State,
-    S::Predicate: fact_state::IsSet,
-    S::Args: fact_state::IsSet,
-    S::CreatedAt: fact_state::IsSet,
+    St: fact_state::State,
+    St::Predicate: fact_state::IsSet,
+    St::CreatedAt: fact_state::IsSet,
+    St::Args: fact_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Fact<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Fact<S> {
         Fact {
             args: self._fields.0.unwrap(),
             confidence: self._fields.1,
@@ -391,8 +391,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Fact<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Fact<S> {
         Fact {
             args: self._fields.0.unwrap(),
             confidence: self._fields.1,

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{RecordKey, Rkey};
 use jacquard_common::types::value::Data;
@@ -18,35 +18,31 @@ use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DeleteTarget<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DeleteTarget<S: BosStr = DefaultStr> {
     ///The Record Key of the target to delete.
     pub rkey: RecordKey<Rkey<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DeleteTargetOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+pub struct DeleteTargetOutput<S: BosStr = DefaultStr> {
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -88,12 +84,11 @@ pub struct DeleteTargetResponse;
 impl jacquard_common::xrpc::XrpcResp for DeleteTargetResponse {
     const NSID: &'static str = "place.stream.multistream.deleteTarget";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = DeleteTargetOutput<S>;
+    type Output<S: BosStr> = DeleteTargetOutput<S>;
     type Err = DeleteTargetError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for DeleteTarget<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for DeleteTarget<S> {
     const NSID: &'static str = "place.stream.multistream.deleteTarget";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -108,7 +103,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for DeleteTargetRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = DeleteTarget<S>;
+    type Request<S: BosStr> = DeleteTarget<S>;
     type Response = DeleteTargetResponse;
 }
 
@@ -131,9 +126,9 @@ pub mod delete_target_state {
         type Rkey = Unset;
     }
     ///State transition - sets the `rkey` field to Set
-    pub struct SetRkey<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRkey<S> {}
-    impl<S: State> State for SetRkey<S> {
+    pub struct SetRkey<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRkey<St> {}
+    impl<St: State> State for SetRkey<St> {
         type Rkey = Set<members::rkey>;
     }
     /// Marker types for field names
@@ -144,67 +139,67 @@ pub mod delete_target_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct DeleteTargetBuilder<'a, S: delete_target_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct DeleteTargetBuilder<S: BosStr, St: delete_target_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<RecordKey<Rkey<S>>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> DeleteTarget<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> DeleteTargetBuilder<'a, delete_target_state::Empty> {
+impl<S: BosStr> DeleteTarget<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> DeleteTargetBuilder<S, delete_target_state::Empty> {
         DeleteTargetBuilder::new()
     }
 }
 
-impl<'a> DeleteTargetBuilder<'a, delete_target_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> DeleteTargetBuilder<S, delete_target_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         DeleteTargetBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DeleteTargetBuilder<'a, S>
+impl<S: BosStr, St> DeleteTargetBuilder<S, St>
 where
-    S: delete_target_state::State,
-    S::Rkey: delete_target_state::IsUnset,
+    St: delete_target_state::State,
+    St::Rkey: delete_target_state::IsUnset,
 {
     /// Set the `rkey` field (required)
     pub fn rkey(
         mut self,
         value: impl Into<RecordKey<Rkey<S>>>,
-    ) -> DeleteTargetBuilder<'a, delete_target_state::SetRkey<S>> {
+    ) -> DeleteTargetBuilder<S, delete_target_state::SetRkey<St>> {
         self._fields.0 = Option::Some(value.into());
         DeleteTargetBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DeleteTargetBuilder<'a, S>
+impl<S: BosStr, St> DeleteTargetBuilder<S, St>
 where
-    S: delete_target_state::State,
-    S::Rkey: delete_target_state::IsSet,
+    St: delete_target_state::State,
+    St::Rkey: delete_target_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> DeleteTarget<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> DeleteTarget<S> {
         DeleteTarget {
             rkey: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> DeleteTarget<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> DeleteTarget<S> {
         DeleteTarget {
             rkey: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

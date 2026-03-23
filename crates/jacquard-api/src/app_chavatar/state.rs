@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "app.chavatar.state",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct State<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct State<S: BosStr = DefaultStr> {
     ///TID (ID) of the currently active avatar in the settings array.
     pub cursor: S,
     ///When the avatar was last rotated.
@@ -54,18 +54,18 @@ pub struct State<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct StateGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct StateGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: State<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> State<S> {
+impl<S: BosStr> State<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, StateRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -78,17 +78,17 @@ pub struct StateRecord;
 impl XrpcResp for StateRecord {
     const NSID: &'static str = "app.chavatar.state";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = StateGetRecordOutput<S>;
+    type Output<S: BosStr> = StateGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<StateGetRecordOutput<S>> for State<S> {
+impl<S: BosStr> From<StateGetRecordOutput<S>> for State<S> {
     fn from(output: StateGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for State<S> {
+impl<S: BosStr> Collection for State<S> {
     const NSID: &'static str = "app.chavatar.state";
     type Record = StateRecord;
 }
@@ -98,7 +98,7 @@ impl Collection for StateRecord {
     type Record = StateRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for State<S> {
+impl<S: BosStr> LexiconSchema for State<S> {
     fn nsid() -> &'static str {
         "app.chavatar.state"
     }
@@ -145,17 +145,17 @@ pub mod state_state {
         type LastUpdated = Unset;
     }
     ///State transition - sets the `cursor` field to Set
-    pub struct SetCursor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCursor<S> {}
-    impl<S: State> State for SetCursor<S> {
+    pub struct SetCursor<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCursor<St> {}
+    impl<St: State> State for SetCursor<St> {
         type Cursor = Set<members::cursor>;
-        type LastUpdated = S::LastUpdated;
+        type LastUpdated = St::LastUpdated;
     }
     ///State transition - sets the `last_updated` field to Set
-    pub struct SetLastUpdated<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLastUpdated<S> {}
-    impl<S: State> State for SetLastUpdated<S> {
-        type Cursor = S::Cursor;
+    pub struct SetLastUpdated<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLastUpdated<St> {}
+    impl<St: State> State for SetLastUpdated<St> {
+        type Cursor = St::Cursor;
         type LastUpdated = Set<members::last_updated>;
     }
     /// Marker types for field names
@@ -168,85 +168,85 @@ pub mod state_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct StateBuilder<'a, S: state_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct StateBuilder<S: BosStr, St: state_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<Datetime>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> State<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> StateBuilder<'a, state_state::Empty> {
+impl<S: BosStr> State<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> StateBuilder<S, state_state::Empty> {
         StateBuilder::new()
     }
 }
 
-impl<'a> StateBuilder<'a, state_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> StateBuilder<S, state_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         StateBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> StateBuilder<'a, S>
+impl<S: BosStr, St> StateBuilder<S, St>
 where
-    S: state_state::State,
-    S::Cursor: state_state::IsUnset,
+    St: state_state::State,
+    St::Cursor: state_state::IsUnset,
 {
     /// Set the `cursor` field (required)
     pub fn cursor(
         mut self,
         value: impl Into<S>,
-    ) -> StateBuilder<'a, state_state::SetCursor<S>> {
+    ) -> StateBuilder<S, state_state::SetCursor<St>> {
         self._fields.0 = Option::Some(value.into());
         StateBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> StateBuilder<'a, S>
+impl<S: BosStr, St> StateBuilder<S, St>
 where
-    S: state_state::State,
-    S::LastUpdated: state_state::IsUnset,
+    St: state_state::State,
+    St::LastUpdated: state_state::IsUnset,
 {
     /// Set the `lastUpdated` field (required)
     pub fn last_updated(
         mut self,
         value: impl Into<Datetime>,
-    ) -> StateBuilder<'a, state_state::SetLastUpdated<S>> {
+    ) -> StateBuilder<S, state_state::SetLastUpdated<St>> {
         self._fields.1 = Option::Some(value.into());
         StateBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> StateBuilder<'a, S>
+impl<S: BosStr, St> StateBuilder<S, St>
 where
-    S: state_state::State,
-    S::Cursor: state_state::IsSet,
-    S::LastUpdated: state_state::IsSet,
+    St: state_state::State,
+    St::Cursor: state_state::IsSet,
+    St::LastUpdated: state_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> State<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> State<S> {
         State {
             cursor: self._fields.0.unwrap(),
             last_updated: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> State<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> State<S> {
         State {
             cursor: self._fields.0.unwrap(),
             last_updated: self._fields.1.unwrap(),

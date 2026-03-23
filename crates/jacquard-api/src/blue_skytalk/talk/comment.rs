@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use serde::{Serialize, Deserialize};
     rename = "blue.skytalk.talk.comment",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Comment<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Comment<S: BosStr = DefaultStr> {
     ///Optional attached media (image or audio)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub blobs: Option<Vec<BlobRef<S>>>,
@@ -60,18 +60,18 @@ pub struct Comment<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CommentGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CommentGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Comment<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Comment<S> {
+impl<S: BosStr> Comment<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, CommentRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -84,17 +84,17 @@ pub struct CommentRecord;
 impl XrpcResp for CommentRecord {
     const NSID: &'static str = "blue.skytalk.talk.comment";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = CommentGetRecordOutput<S>;
+    type Output<S: BosStr> = CommentGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<CommentGetRecordOutput<S>> for Comment<S> {
+impl<S: BosStr> From<CommentGetRecordOutput<S>> for Comment<S> {
     fn from(output: CommentGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Comment<S> {
+impl<S: BosStr> Collection for Comment<S> {
     const NSID: &'static str = "blue.skytalk.talk.comment";
     type Record = CommentRecord;
 }
@@ -104,7 +104,7 @@ impl Collection for CommentRecord {
     type Record = CommentRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Comment<S> {
+impl<S: BosStr> LexiconSchema for Comment<S> {
     fn nsid() -> &'static str {
         "blue.skytalk.talk.comment"
     }
@@ -164,79 +164,79 @@ pub mod comment_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Text;
-        type CreatedAt;
         type ThreadUri;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Text = Unset;
-        type CreatedAt = Unset;
         type ThreadUri = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `text` field to Set
-    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetText<S> {}
-    impl<S: State> State for SetText<S> {
+    pub struct SetText<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetText<St> {}
+    impl<St: State> State for SetText<St> {
         type Text = Set<members::text>;
-        type CreatedAt = S::CreatedAt;
-        type ThreadUri = S::ThreadUri;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Text = S::Text;
-        type CreatedAt = Set<members::created_at>;
-        type ThreadUri = S::ThreadUri;
+        type ThreadUri = St::ThreadUri;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `thread_uri` field to Set
-    pub struct SetThreadUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetThreadUri<S> {}
-    impl<S: State> State for SetThreadUri<S> {
-        type Text = S::Text;
-        type CreatedAt = S::CreatedAt;
+    pub struct SetThreadUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetThreadUri<St> {}
+    impl<St: State> State for SetThreadUri<St> {
+        type Text = St::Text;
         type ThreadUri = Set<members::thread_uri>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Text = St::Text;
+        type ThreadUri = St::ThreadUri;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `text` field
         pub struct text(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `thread_uri` field
         pub struct thread_uri(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct CommentBuilder<'a, S: comment_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct CommentBuilder<S: BosStr, St: comment_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<BlobRef<S>>>, Option<Datetime>, Option<S>, Option<AtUri<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Comment<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> CommentBuilder<'a, comment_state::Empty> {
+impl<S: BosStr> Comment<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> CommentBuilder<S, comment_state::Empty> {
         CommentBuilder::new()
     }
 }
 
-impl<'a> CommentBuilder<'a, comment_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> CommentBuilder<S, comment_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         CommentBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: comment_state::State> CommentBuilder<'a, S> {
+impl<S: BosStr, St: comment_state::State> CommentBuilder<S, St> {
     /// Set the `blobs` field (optional)
     pub fn blobs(mut self, value: impl Into<Option<Vec<BlobRef<S>>>>) -> Self {
         self._fields.0 = value.into();
@@ -249,72 +249,72 @@ impl<'a, S: comment_state::State> CommentBuilder<'a, S> {
     }
 }
 
-impl<'a, S> CommentBuilder<'a, S>
+impl<S: BosStr, St> CommentBuilder<S, St>
 where
-    S: comment_state::State,
-    S::CreatedAt: comment_state::IsUnset,
+    St: comment_state::State,
+    St::CreatedAt: comment_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> CommentBuilder<'a, comment_state::SetCreatedAt<S>> {
+    ) -> CommentBuilder<S, comment_state::SetCreatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         CommentBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CommentBuilder<'a, S>
+impl<S: BosStr, St> CommentBuilder<S, St>
 where
-    S: comment_state::State,
-    S::Text: comment_state::IsUnset,
+    St: comment_state::State,
+    St::Text: comment_state::IsUnset,
 {
     /// Set the `text` field (required)
     pub fn text(
         mut self,
         value: impl Into<S>,
-    ) -> CommentBuilder<'a, comment_state::SetText<S>> {
+    ) -> CommentBuilder<S, comment_state::SetText<St>> {
         self._fields.2 = Option::Some(value.into());
         CommentBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CommentBuilder<'a, S>
+impl<S: BosStr, St> CommentBuilder<S, St>
 where
-    S: comment_state::State,
-    S::ThreadUri: comment_state::IsUnset,
+    St: comment_state::State,
+    St::ThreadUri: comment_state::IsUnset,
 {
     /// Set the `threadUri` field (required)
     pub fn thread_uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> CommentBuilder<'a, comment_state::SetThreadUri<S>> {
+    ) -> CommentBuilder<S, comment_state::SetThreadUri<St>> {
         self._fields.3 = Option::Some(value.into());
         CommentBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CommentBuilder<'a, S>
+impl<S: BosStr, St> CommentBuilder<S, St>
 where
-    S: comment_state::State,
-    S::Text: comment_state::IsSet,
-    S::CreatedAt: comment_state::IsSet,
-    S::ThreadUri: comment_state::IsSet,
+    St: comment_state::State,
+    St::Text: comment_state::IsSet,
+    St::ThreadUri: comment_state::IsSet,
+    St::CreatedAt: comment_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Comment<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Comment<S> {
         Comment {
             blobs: self._fields.0,
             created_at: self._fields.1.unwrap(),
@@ -323,11 +323,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Comment<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Comment<S> {
         Comment {
             blobs: self._fields.0,
             created_at: self._fields.1.unwrap(),

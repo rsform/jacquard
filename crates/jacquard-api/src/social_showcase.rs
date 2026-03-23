@@ -17,7 +17,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -39,11 +39,11 @@ use crate::social_showcase;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ActivitySettings<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ActivitySettings<S: BosStr = DefaultStr> {
     ///Activity retention period  Defaults to `90`.
     #[serde(default = "_default_activity_settings_retention_days")]
     pub retention_days: i64,
@@ -58,14 +58,14 @@ pub struct ActivitySettings<S: Bos<str> + AsRef<str> = DefaultStr> {
 /// Who sees your activity feed
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ActivitySettingsShareActivity<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ActivitySettingsShareActivity<S: BosStr = DefaultStr> {
     All,
     Followers,
     None,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> ActivitySettingsShareActivity<S> {
+impl<S: BosStr> ActivitySettingsShareActivity<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::All => "all",
@@ -85,19 +85,19 @@ impl<S: Bos<str> + AsRef<str>> ActivitySettingsShareActivity<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ActivitySettingsShareActivity<S> {
+impl<S: BosStr> core::fmt::Display for ActivitySettingsShareActivity<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for ActivitySettingsShareActivity<S> {
+impl<S: BosStr> AsRef<str> for ActivitySettingsShareActivity<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for ActivitySettingsShareActivity<S> {
+impl<S: BosStr> Serialize for ActivitySettingsShareActivity<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -106,7 +106,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for ActivitySettingsShareActivity<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
 for ActivitySettingsShareActivity<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
@@ -117,14 +117,18 @@ for ActivitySettingsShareActivity<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for ActivitySettingsShareActivity<S> {
+impl<S: BosStr + Default> Default for ActivitySettingsShareActivity<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for ActivitySettingsShareActivity<S> {
-    type Output = ActivitySettingsShareActivity<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for ActivitySettingsShareActivity<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ActivitySettingsShareActivity<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             ActivitySettingsShareActivity::All => ActivitySettingsShareActivity::All,
@@ -145,11 +149,11 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for ActivitySettingsShareActivity<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct AspectRatio<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct AspectRatio<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub height: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -164,11 +168,11 @@ pub struct AspectRatio<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CollectionItem<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CollectionItem<S: BosStr = DefaultStr> {
     pub added_at: Datetime,
     ///For custom sorting
     pub order: i64,
@@ -184,11 +188,11 @@ pub struct CollectionItem<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CollectionView<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CollectionView<S: BosStr = DefaultStr> {
     pub author: social_showcase::ProfileView<S>,
     pub cid: Cid<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -217,11 +221,11 @@ pub struct CollectionView<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DisplaySettings<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DisplaySettings<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub grid_layout: Option<DisplaySettingsGridLayout<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -232,13 +236,13 @@ pub struct DisplaySettings<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum DisplaySettingsGridLayout<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum DisplaySettingsGridLayout<S: BosStr = DefaultStr> {
     Compact,
     Spacious,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> DisplaySettingsGridLayout<S> {
+impl<S: BosStr> DisplaySettingsGridLayout<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Compact => "compact",
@@ -256,19 +260,19 @@ impl<S: Bos<str> + AsRef<str>> DisplaySettingsGridLayout<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for DisplaySettingsGridLayout<S> {
+impl<S: BosStr> core::fmt::Display for DisplaySettingsGridLayout<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for DisplaySettingsGridLayout<S> {
+impl<S: BosStr> AsRef<str> for DisplaySettingsGridLayout<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for DisplaySettingsGridLayout<S> {
+impl<S: BosStr> Serialize for DisplaySettingsGridLayout<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -277,7 +281,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for DisplaySettingsGridLayout<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
 for DisplaySettingsGridLayout<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
@@ -288,14 +292,18 @@ for DisplaySettingsGridLayout<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for DisplaySettingsGridLayout<S> {
+impl<S: BosStr + Default> Default for DisplaySettingsGridLayout<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for DisplaySettingsGridLayout<S> {
-    type Output = DisplaySettingsGridLayout<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for DisplaySettingsGridLayout<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = DisplaySettingsGridLayout<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             DisplaySettingsGridLayout::Compact => DisplaySettingsGridLayout::Compact,
@@ -309,14 +317,14 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for DisplaySettingsGridLayout<S> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum DisplaySettingsTheme<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum DisplaySettingsTheme<S: BosStr = DefaultStr> {
     Light,
     Dark,
     Auto,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> DisplaySettingsTheme<S> {
+impl<S: BosStr> DisplaySettingsTheme<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Light => "light",
@@ -336,19 +344,19 @@ impl<S: Bos<str> + AsRef<str>> DisplaySettingsTheme<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for DisplaySettingsTheme<S> {
+impl<S: BosStr> core::fmt::Display for DisplaySettingsTheme<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for DisplaySettingsTheme<S> {
+impl<S: BosStr> AsRef<str> for DisplaySettingsTheme<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for DisplaySettingsTheme<S> {
+impl<S: BosStr> Serialize for DisplaySettingsTheme<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -357,8 +365,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for DisplaySettingsTheme<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for DisplaySettingsTheme<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for DisplaySettingsTheme<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -368,14 +375,18 @@ for DisplaySettingsTheme<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for DisplaySettingsTheme<S> {
+impl<S: BosStr + Default> Default for DisplaySettingsTheme<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for DisplaySettingsTheme<S> {
-    type Output = DisplaySettingsTheme<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for DisplaySettingsTheme<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = DisplaySettingsTheme<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             DisplaySettingsTheme::Light => DisplaySettingsTheme::Light,
@@ -394,11 +405,11 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for DisplaySettingsTheme<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ItemImage<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ItemImage<S: BosStr = DefaultStr> {
     ///Alt text for accessibility
     #[serde(skip_serializing_if = "Option::is_none")]
     pub alt: Option<S>,
@@ -415,11 +426,11 @@ pub struct ItemImage<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ItemView<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ItemView<S: BosStr = DefaultStr> {
     pub author: social_showcase::ProfileView<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub category: Option<S>,
@@ -450,11 +461,11 @@ pub struct ItemView<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct NotificationSettings<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct NotificationSettings<S: BosStr = DefaultStr> {
     pub comments: bool,
     pub follows: bool,
     pub reactions: bool,
@@ -468,11 +479,11 @@ pub struct NotificationSettings<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct PrivacySettings<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct PrivacySettings<S: BosStr = DefaultStr> {
     ///Let others comment
     pub allow_comments: bool,
     ///Let others react to your items
@@ -489,11 +500,11 @@ pub struct PrivacySettings<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ProfileView<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ProfileView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avatar: Option<BlobRef<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -514,11 +525,11 @@ pub struct ProfileView<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ReactionSubject<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ReactionSubject<S: BosStr = DefaultStr> {
     pub cid: Cid<S>,
     pub uri: AtUri<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -531,11 +542,11 @@ pub struct ReactionSubject<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ReactionView<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ReactionView<S: BosStr = DefaultStr> {
     pub actor: social_showcase::ProfileView<S>,
     pub created_at: Datetime,
     pub subject: social_showcase::ReactionSubject<S>,
@@ -552,11 +563,11 @@ pub struct ReactionView<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ShowcaseItem<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ShowcaseItem<S: BosStr = DefaultStr> {
     pub added_at: Datetime,
     ///Display order (0 = first)
     pub order: i64,
@@ -572,11 +583,11 @@ pub struct ShowcaseItem<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct VisibilitySettings<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct VisibilitySettings<S: BosStr = DefaultStr> {
     pub default_collection_visibility: VisibilitySettingsDefaultCollectionVisibility<S>,
     pub default_item_visibility: VisibilitySettingsDefaultItemVisibility<S>,
     pub profile_visibility: VisibilitySettingsProfileVisibility<S>,
@@ -586,15 +597,13 @@ pub struct VisibilitySettings<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum VisibilitySettingsDefaultCollectionVisibility<
-    S: Bos<str> + AsRef<str> = DefaultStr,
-> {
+pub enum VisibilitySettingsDefaultCollectionVisibility<S: BosStr = DefaultStr> {
     Public,
     Private,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> VisibilitySettingsDefaultCollectionVisibility<S> {
+impl<S: BosStr> VisibilitySettingsDefaultCollectionVisibility<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Public => "public",
@@ -612,22 +621,19 @@ impl<S: Bos<str> + AsRef<str>> VisibilitySettingsDefaultCollectionVisibility<S> 
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display
-for VisibilitySettingsDefaultCollectionVisibility<S> {
+impl<S: BosStr> core::fmt::Display for VisibilitySettingsDefaultCollectionVisibility<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str>
-for VisibilitySettingsDefaultCollectionVisibility<S> {
+impl<S: BosStr> AsRef<str> for VisibilitySettingsDefaultCollectionVisibility<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize
-for VisibilitySettingsDefaultCollectionVisibility<S> {
+impl<S: BosStr> Serialize for VisibilitySettingsDefaultCollectionVisibility<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -636,7 +642,7 @@ for VisibilitySettingsDefaultCollectionVisibility<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
 for VisibilitySettingsDefaultCollectionVisibility<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
@@ -647,16 +653,19 @@ for VisibilitySettingsDefaultCollectionVisibility<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default
-for VisibilitySettingsDefaultCollectionVisibility<S> {
+impl<S: BosStr + Default> Default for VisibilitySettingsDefaultCollectionVisibility<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic
-for VisibilitySettingsDefaultCollectionVisibility<S> {
-    type Output = VisibilitySettingsDefaultCollectionVisibility<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic
+for VisibilitySettingsDefaultCollectionVisibility<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = VisibilitySettingsDefaultCollectionVisibility<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             VisibilitySettingsDefaultCollectionVisibility::Public => {
@@ -674,14 +683,14 @@ for VisibilitySettingsDefaultCollectionVisibility<S> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum VisibilitySettingsDefaultItemVisibility<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum VisibilitySettingsDefaultItemVisibility<S: BosStr = DefaultStr> {
     Public,
     Unlisted,
     Private,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> VisibilitySettingsDefaultItemVisibility<S> {
+impl<S: BosStr> VisibilitySettingsDefaultItemVisibility<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Public => "public",
@@ -701,21 +710,19 @@ impl<S: Bos<str> + AsRef<str>> VisibilitySettingsDefaultItemVisibility<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display
-for VisibilitySettingsDefaultItemVisibility<S> {
+impl<S: BosStr> core::fmt::Display for VisibilitySettingsDefaultItemVisibility<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str>
-for VisibilitySettingsDefaultItemVisibility<S> {
+impl<S: BosStr> AsRef<str> for VisibilitySettingsDefaultItemVisibility<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for VisibilitySettingsDefaultItemVisibility<S> {
+impl<S: BosStr> Serialize for VisibilitySettingsDefaultItemVisibility<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -724,7 +731,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for VisibilitySettingsDefaultItemVisibi
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
 for VisibilitySettingsDefaultItemVisibility<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
@@ -735,16 +742,19 @@ for VisibilitySettingsDefaultItemVisibility<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default
-for VisibilitySettingsDefaultItemVisibility<S> {
+impl<S: BosStr + Default> Default for VisibilitySettingsDefaultItemVisibility<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic
-for VisibilitySettingsDefaultItemVisibility<S> {
-    type Output = VisibilitySettingsDefaultItemVisibility<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic
+for VisibilitySettingsDefaultItemVisibility<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = VisibilitySettingsDefaultItemVisibility<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             VisibilitySettingsDefaultItemVisibility::Public => {
@@ -765,14 +775,14 @@ for VisibilitySettingsDefaultItemVisibility<S> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum VisibilitySettingsProfileVisibility<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum VisibilitySettingsProfileVisibility<S: BosStr = DefaultStr> {
     Public,
     Unlisted,
     Private,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> VisibilitySettingsProfileVisibility<S> {
+impl<S: BosStr> VisibilitySettingsProfileVisibility<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Public => "public",
@@ -792,20 +802,19 @@ impl<S: Bos<str> + AsRef<str>> VisibilitySettingsProfileVisibility<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display
-for VisibilitySettingsProfileVisibility<S> {
+impl<S: BosStr> core::fmt::Display for VisibilitySettingsProfileVisibility<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for VisibilitySettingsProfileVisibility<S> {
+impl<S: BosStr> AsRef<str> for VisibilitySettingsProfileVisibility<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for VisibilitySettingsProfileVisibility<S> {
+impl<S: BosStr> Serialize for VisibilitySettingsProfileVisibility<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -814,7 +823,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for VisibilitySettingsProfileVisibility
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
 for VisibilitySettingsProfileVisibility<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
@@ -825,15 +834,18 @@ for VisibilitySettingsProfileVisibility<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default
-for VisibilitySettingsProfileVisibility<S> {
+impl<S: BosStr + Default> Default for VisibilitySettingsProfileVisibility<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for VisibilitySettingsProfileVisibility<S> {
-    type Output = VisibilitySettingsProfileVisibility<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for VisibilitySettingsProfileVisibility<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = VisibilitySettingsProfileVisibility<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             VisibilitySettingsProfileVisibility::Public => {
@@ -852,7 +864,7 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for VisibilitySettingsProfileVisibilit
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ActivitySettings<S> {
+impl<S: BosStr> LexiconSchema for ActivitySettings<S> {
     fn nsid() -> &'static str {
         "social.showcase.defs"
     }
@@ -878,7 +890,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for ActivitySettings<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for AspectRatio<S> {
+impl<S: BosStr> LexiconSchema for AspectRatio<S> {
     fn nsid() -> &'static str {
         "social.showcase.defs"
     }
@@ -911,7 +923,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for AspectRatio<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for CollectionItem<S> {
+impl<S: BosStr> LexiconSchema for CollectionItem<S> {
     fn nsid() -> &'static str {
         "social.showcase.defs"
     }
@@ -937,7 +949,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for CollectionItem<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for CollectionView<S> {
+impl<S: BosStr> LexiconSchema for CollectionView<S> {
     fn nsid() -> &'static str {
         "social.showcase.defs"
     }
@@ -995,7 +1007,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for CollectionView<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for DisplaySettings<S> {
+impl<S: BosStr> LexiconSchema for DisplaySettings<S> {
     fn nsid() -> &'static str {
         "social.showcase.defs"
     }
@@ -1030,7 +1042,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for DisplaySettings<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ItemImage<S> {
+impl<S: BosStr> LexiconSchema for ItemImage<S> {
     fn nsid() -> &'static str {
         "social.showcase.defs"
     }
@@ -1098,7 +1110,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for ItemImage<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ItemView<S> {
+impl<S: BosStr> LexiconSchema for ItemView<S> {
     fn nsid() -> &'static str {
         "social.showcase.defs"
     }
@@ -1165,7 +1177,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for ItemView<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for NotificationSettings<S> {
+impl<S: BosStr> LexiconSchema for NotificationSettings<S> {
     fn nsid() -> &'static str {
         "social.showcase.defs"
     }
@@ -1180,7 +1192,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for NotificationSettings<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for PrivacySettings<S> {
+impl<S: BosStr> LexiconSchema for PrivacySettings<S> {
     fn nsid() -> &'static str {
         "social.showcase.defs"
     }
@@ -1195,7 +1207,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for PrivacySettings<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ProfileView<S> {
+impl<S: BosStr> LexiconSchema for ProfileView<S> {
     fn nsid() -> &'static str {
         "social.showcase.defs"
     }
@@ -1242,7 +1254,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for ProfileView<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ReactionSubject<S> {
+impl<S: BosStr> LexiconSchema for ReactionSubject<S> {
     fn nsid() -> &'static str {
         "social.showcase.defs"
     }
@@ -1257,7 +1269,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for ReactionSubject<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ReactionView<S> {
+impl<S: BosStr> LexiconSchema for ReactionView<S> {
     fn nsid() -> &'static str {
         "social.showcase.defs"
     }
@@ -1283,7 +1295,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for ReactionView<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ShowcaseItem<S> {
+impl<S: BosStr> LexiconSchema for ShowcaseItem<S> {
     fn nsid() -> &'static str {
         "social.showcase.defs"
     }
@@ -1298,7 +1310,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for ShowcaseItem<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for VisibilitySettings<S> {
+impl<S: BosStr> LexiconSchema for VisibilitySettings<S> {
     fn nsid() -> &'static str {
         "social.showcase.defs"
     }
@@ -1360,145 +1372,145 @@ pub mod activity_settings_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type RetentionDays;
         type ShareNewItems;
         type ShareActivity;
+        type RetentionDays;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type RetentionDays = Unset;
         type ShareNewItems = Unset;
         type ShareActivity = Unset;
-    }
-    ///State transition - sets the `retention_days` field to Set
-    pub struct SetRetentionDays<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRetentionDays<S> {}
-    impl<S: State> State for SetRetentionDays<S> {
-        type RetentionDays = Set<members::retention_days>;
-        type ShareNewItems = S::ShareNewItems;
-        type ShareActivity = S::ShareActivity;
+        type RetentionDays = Unset;
     }
     ///State transition - sets the `share_new_items` field to Set
-    pub struct SetShareNewItems<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetShareNewItems<S> {}
-    impl<S: State> State for SetShareNewItems<S> {
-        type RetentionDays = S::RetentionDays;
+    pub struct SetShareNewItems<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetShareNewItems<St> {}
+    impl<St: State> State for SetShareNewItems<St> {
         type ShareNewItems = Set<members::share_new_items>;
-        type ShareActivity = S::ShareActivity;
+        type ShareActivity = St::ShareActivity;
+        type RetentionDays = St::RetentionDays;
     }
     ///State transition - sets the `share_activity` field to Set
-    pub struct SetShareActivity<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetShareActivity<S> {}
-    impl<S: State> State for SetShareActivity<S> {
-        type RetentionDays = S::RetentionDays;
-        type ShareNewItems = S::ShareNewItems;
+    pub struct SetShareActivity<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetShareActivity<St> {}
+    impl<St: State> State for SetShareActivity<St> {
+        type ShareNewItems = St::ShareNewItems;
         type ShareActivity = Set<members::share_activity>;
+        type RetentionDays = St::RetentionDays;
+    }
+    ///State transition - sets the `retention_days` field to Set
+    pub struct SetRetentionDays<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRetentionDays<St> {}
+    impl<St: State> State for SetRetentionDays<St> {
+        type ShareNewItems = St::ShareNewItems;
+        type ShareActivity = St::ShareActivity;
+        type RetentionDays = Set<members::retention_days>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `retention_days` field
-        pub struct retention_days(());
         ///Marker type for the `share_new_items` field
         pub struct share_new_items(());
         ///Marker type for the `share_activity` field
         pub struct share_activity(());
+        ///Marker type for the `retention_days` field
+        pub struct retention_days(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ActivitySettingsBuilder<'a, S: activity_settings_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ActivitySettingsBuilder<S: BosStr, St: activity_settings_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<ActivitySettingsShareActivity<S>>, Option<bool>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ActivitySettings<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ActivitySettingsBuilder<'a, activity_settings_state::Empty> {
+impl<S: BosStr> ActivitySettings<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ActivitySettingsBuilder<S, activity_settings_state::Empty> {
         ActivitySettingsBuilder::new()
     }
 }
 
-impl<'a> ActivitySettingsBuilder<'a, activity_settings_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ActivitySettingsBuilder<S, activity_settings_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ActivitySettingsBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ActivitySettingsBuilder<'a, S>
+impl<S: BosStr, St> ActivitySettingsBuilder<S, St>
 where
-    S: activity_settings_state::State,
-    S::RetentionDays: activity_settings_state::IsUnset,
+    St: activity_settings_state::State,
+    St::RetentionDays: activity_settings_state::IsUnset,
 {
     /// Set the `retentionDays` field (required)
     pub fn retention_days(
         mut self,
         value: impl Into<i64>,
-    ) -> ActivitySettingsBuilder<'a, activity_settings_state::SetRetentionDays<S>> {
+    ) -> ActivitySettingsBuilder<S, activity_settings_state::SetRetentionDays<St>> {
         self._fields.0 = Option::Some(value.into());
         ActivitySettingsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ActivitySettingsBuilder<'a, S>
+impl<S: BosStr, St> ActivitySettingsBuilder<S, St>
 where
-    S: activity_settings_state::State,
-    S::ShareActivity: activity_settings_state::IsUnset,
+    St: activity_settings_state::State,
+    St::ShareActivity: activity_settings_state::IsUnset,
 {
     /// Set the `shareActivity` field (required)
     pub fn share_activity(
         mut self,
         value: impl Into<ActivitySettingsShareActivity<S>>,
-    ) -> ActivitySettingsBuilder<'a, activity_settings_state::SetShareActivity<S>> {
+    ) -> ActivitySettingsBuilder<S, activity_settings_state::SetShareActivity<St>> {
         self._fields.1 = Option::Some(value.into());
         ActivitySettingsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ActivitySettingsBuilder<'a, S>
+impl<S: BosStr, St> ActivitySettingsBuilder<S, St>
 where
-    S: activity_settings_state::State,
-    S::ShareNewItems: activity_settings_state::IsUnset,
+    St: activity_settings_state::State,
+    St::ShareNewItems: activity_settings_state::IsUnset,
 {
     /// Set the `shareNewItems` field (required)
     pub fn share_new_items(
         mut self,
         value: impl Into<bool>,
-    ) -> ActivitySettingsBuilder<'a, activity_settings_state::SetShareNewItems<S>> {
+    ) -> ActivitySettingsBuilder<S, activity_settings_state::SetShareNewItems<St>> {
         self._fields.2 = Option::Some(value.into());
         ActivitySettingsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ActivitySettingsBuilder<'a, S>
+impl<S: BosStr, St> ActivitySettingsBuilder<S, St>
 where
-    S: activity_settings_state::State,
-    S::RetentionDays: activity_settings_state::IsSet,
-    S::ShareNewItems: activity_settings_state::IsSet,
-    S::ShareActivity: activity_settings_state::IsSet,
+    St: activity_settings_state::State,
+    St::ShareNewItems: activity_settings_state::IsSet,
+    St::ShareActivity: activity_settings_state::IsSet,
+    St::RetentionDays: activity_settings_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ActivitySettings<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ActivitySettings<S> {
         ActivitySettings {
             retention_days: self._fields.0.unwrap(),
             share_activity: self._fields.1.unwrap(),
@@ -1506,11 +1518,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> ActivitySettings<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ActivitySettings<S> {
         ActivitySettings {
             retention_days: self._fields.0.unwrap(),
             share_activity: self._fields.1.unwrap(),
@@ -2265,145 +2277,145 @@ pub mod collection_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
         type AddedAt;
+        type Uri;
         type Order;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
         type AddedAt = Unset;
+        type Uri = Unset;
         type Order = Unset;
     }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Uri = Set<members::uri>;
-        type AddedAt = S::AddedAt;
-        type Order = S::Order;
-    }
     ///State transition - sets the `added_at` field to Set
-    pub struct SetAddedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAddedAt<S> {}
-    impl<S: State> State for SetAddedAt<S> {
-        type Uri = S::Uri;
+    pub struct SetAddedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAddedAt<St> {}
+    impl<St: State> State for SetAddedAt<St> {
         type AddedAt = Set<members::added_at>;
-        type Order = S::Order;
+        type Uri = St::Uri;
+        type Order = St::Order;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type AddedAt = St::AddedAt;
+        type Uri = Set<members::uri>;
+        type Order = St::Order;
     }
     ///State transition - sets the `order` field to Set
-    pub struct SetOrder<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetOrder<S> {}
-    impl<S: State> State for SetOrder<S> {
-        type Uri = S::Uri;
-        type AddedAt = S::AddedAt;
+    pub struct SetOrder<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetOrder<St> {}
+    impl<St: State> State for SetOrder<St> {
+        type AddedAt = St::AddedAt;
+        type Uri = St::Uri;
         type Order = Set<members::order>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `added_at` field
         pub struct added_at(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
         ///Marker type for the `order` field
         pub struct order(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct CollectionItemBuilder<'a, S: collection_item_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct CollectionItemBuilder<S: BosStr, St: collection_item_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<i64>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> CollectionItem<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> CollectionItemBuilder<'a, collection_item_state::Empty> {
+impl<S: BosStr> CollectionItem<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> CollectionItemBuilder<S, collection_item_state::Empty> {
         CollectionItemBuilder::new()
     }
 }
 
-impl<'a> CollectionItemBuilder<'a, collection_item_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> CollectionItemBuilder<S, collection_item_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         CollectionItemBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CollectionItemBuilder<'a, S>
+impl<S: BosStr, St> CollectionItemBuilder<S, St>
 where
-    S: collection_item_state::State,
-    S::AddedAt: collection_item_state::IsUnset,
+    St: collection_item_state::State,
+    St::AddedAt: collection_item_state::IsUnset,
 {
     /// Set the `addedAt` field (required)
     pub fn added_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> CollectionItemBuilder<'a, collection_item_state::SetAddedAt<S>> {
+    ) -> CollectionItemBuilder<S, collection_item_state::SetAddedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         CollectionItemBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CollectionItemBuilder<'a, S>
+impl<S: BosStr, St> CollectionItemBuilder<S, St>
 where
-    S: collection_item_state::State,
-    S::Order: collection_item_state::IsUnset,
+    St: collection_item_state::State,
+    St::Order: collection_item_state::IsUnset,
 {
     /// Set the `order` field (required)
     pub fn order(
         mut self,
         value: impl Into<i64>,
-    ) -> CollectionItemBuilder<'a, collection_item_state::SetOrder<S>> {
+    ) -> CollectionItemBuilder<S, collection_item_state::SetOrder<St>> {
         self._fields.1 = Option::Some(value.into());
         CollectionItemBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CollectionItemBuilder<'a, S>
+impl<S: BosStr, St> CollectionItemBuilder<S, St>
 where
-    S: collection_item_state::State,
-    S::Uri: collection_item_state::IsUnset,
+    St: collection_item_state::State,
+    St::Uri: collection_item_state::IsUnset,
 {
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
         value: impl Into<S>,
-    ) -> CollectionItemBuilder<'a, collection_item_state::SetUri<S>> {
+    ) -> CollectionItemBuilder<S, collection_item_state::SetUri<St>> {
         self._fields.2 = Option::Some(value.into());
         CollectionItemBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CollectionItemBuilder<'a, S>
+impl<S: BosStr, St> CollectionItemBuilder<S, St>
 where
-    S: collection_item_state::State,
-    S::Uri: collection_item_state::IsSet,
-    S::AddedAt: collection_item_state::IsSet,
-    S::Order: collection_item_state::IsSet,
+    St: collection_item_state::State,
+    St::AddedAt: collection_item_state::IsSet,
+    St::Uri: collection_item_state::IsSet,
+    St::Order: collection_item_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> CollectionItem<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> CollectionItem<S> {
         CollectionItem {
             added_at: self._fields.0.unwrap(),
             order: self._fields.1.unwrap(),
@@ -2411,11 +2423,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> CollectionItem<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> CollectionItem<S> {
         CollectionItem {
             added_at: self._fields.0.unwrap(),
             order: self._fields.1.unwrap(),
@@ -2435,157 +2447,157 @@ pub mod collection_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Visibility;
-        type CreatedAt;
-        type Author;
         type Cid;
+        type CreatedAt;
         type Name;
         type Uri;
-        type Type;
         type Tags;
+        type Type;
+        type Visibility;
+        type Author;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Visibility = Unset;
-        type CreatedAt = Unset;
-        type Author = Unset;
         type Cid = Unset;
+        type CreatedAt = Unset;
         type Name = Unset;
         type Uri = Unset;
-        type Type = Unset;
         type Tags = Unset;
-    }
-    ///State transition - sets the `visibility` field to Set
-    pub struct SetVisibility<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVisibility<S> {}
-    impl<S: State> State for SetVisibility<S> {
-        type Visibility = Set<members::visibility>;
-        type CreatedAt = S::CreatedAt;
-        type Author = S::Author;
-        type Cid = S::Cid;
-        type Name = S::Name;
-        type Uri = S::Uri;
-        type Type = S::Type;
-        type Tags = S::Tags;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Visibility = S::Visibility;
-        type CreatedAt = Set<members::created_at>;
-        type Author = S::Author;
-        type Cid = S::Cid;
-        type Name = S::Name;
-        type Uri = S::Uri;
-        type Type = S::Type;
-        type Tags = S::Tags;
-    }
-    ///State transition - sets the `author` field to Set
-    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthor<S> {}
-    impl<S: State> State for SetAuthor<S> {
-        type Visibility = S::Visibility;
-        type CreatedAt = S::CreatedAt;
-        type Author = Set<members::author>;
-        type Cid = S::Cid;
-        type Name = S::Name;
-        type Uri = S::Uri;
-        type Type = S::Type;
-        type Tags = S::Tags;
+        type Type = Unset;
+        type Visibility = Unset;
+        type Author = Unset;
     }
     ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Visibility = S::Visibility;
-        type CreatedAt = S::CreatedAt;
-        type Author = S::Author;
+    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCid<St> {}
+    impl<St: State> State for SetCid<St> {
         type Cid = Set<members::cid>;
-        type Name = S::Name;
-        type Uri = S::Uri;
-        type Type = S::Type;
-        type Tags = S::Tags;
+        type CreatedAt = St::CreatedAt;
+        type Name = St::Name;
+        type Uri = St::Uri;
+        type Tags = St::Tags;
+        type Type = St::Type;
+        type Visibility = St::Visibility;
+        type Author = St::Author;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Cid = St::Cid;
+        type CreatedAt = Set<members::created_at>;
+        type Name = St::Name;
+        type Uri = St::Uri;
+        type Tags = St::Tags;
+        type Type = St::Type;
+        type Visibility = St::Visibility;
+        type Author = St::Author;
     }
     ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Visibility = S::Visibility;
-        type CreatedAt = S::CreatedAt;
-        type Author = S::Author;
-        type Cid = S::Cid;
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Cid = St::Cid;
+        type CreatedAt = St::CreatedAt;
         type Name = Set<members::name>;
-        type Uri = S::Uri;
-        type Type = S::Type;
-        type Tags = S::Tags;
+        type Uri = St::Uri;
+        type Tags = St::Tags;
+        type Type = St::Type;
+        type Visibility = St::Visibility;
+        type Author = St::Author;
     }
     ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Visibility = S::Visibility;
-        type CreatedAt = S::CreatedAt;
-        type Author = S::Author;
-        type Cid = S::Cid;
-        type Name = S::Name;
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Cid = St::Cid;
+        type CreatedAt = St::CreatedAt;
+        type Name = St::Name;
         type Uri = Set<members::uri>;
-        type Type = S::Type;
-        type Tags = S::Tags;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type Visibility = S::Visibility;
-        type CreatedAt = S::CreatedAt;
-        type Author = S::Author;
-        type Cid = S::Cid;
-        type Name = S::Name;
-        type Uri = S::Uri;
-        type Type = Set<members::r#type>;
-        type Tags = S::Tags;
+        type Tags = St::Tags;
+        type Type = St::Type;
+        type Visibility = St::Visibility;
+        type Author = St::Author;
     }
     ///State transition - sets the `tags` field to Set
-    pub struct SetTags<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTags<S> {}
-    impl<S: State> State for SetTags<S> {
-        type Visibility = S::Visibility;
-        type CreatedAt = S::CreatedAt;
-        type Author = S::Author;
-        type Cid = S::Cid;
-        type Name = S::Name;
-        type Uri = S::Uri;
-        type Type = S::Type;
+    pub struct SetTags<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTags<St> {}
+    impl<St: State> State for SetTags<St> {
+        type Cid = St::Cid;
+        type CreatedAt = St::CreatedAt;
+        type Name = St::Name;
+        type Uri = St::Uri;
         type Tags = Set<members::tags>;
+        type Type = St::Type;
+        type Visibility = St::Visibility;
+        type Author = St::Author;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetType<St> {}
+    impl<St: State> State for SetType<St> {
+        type Cid = St::Cid;
+        type CreatedAt = St::CreatedAt;
+        type Name = St::Name;
+        type Uri = St::Uri;
+        type Tags = St::Tags;
+        type Type = Set<members::r#type>;
+        type Visibility = St::Visibility;
+        type Author = St::Author;
+    }
+    ///State transition - sets the `visibility` field to Set
+    pub struct SetVisibility<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetVisibility<St> {}
+    impl<St: State> State for SetVisibility<St> {
+        type Cid = St::Cid;
+        type CreatedAt = St::CreatedAt;
+        type Name = St::Name;
+        type Uri = St::Uri;
+        type Tags = St::Tags;
+        type Type = St::Type;
+        type Visibility = Set<members::visibility>;
+        type Author = St::Author;
+    }
+    ///State transition - sets the `author` field to Set
+    pub struct SetAuthor<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAuthor<St> {}
+    impl<St: State> State for SetAuthor<St> {
+        type Cid = St::Cid;
+        type CreatedAt = St::CreatedAt;
+        type Name = St::Name;
+        type Uri = St::Uri;
+        type Tags = St::Tags;
+        type Type = St::Type;
+        type Visibility = St::Visibility;
+        type Author = Set<members::author>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `visibility` field
-        pub struct visibility(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `author` field
-        pub struct author(());
         ///Marker type for the `cid` field
         pub struct cid(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `uri` field
         pub struct uri(());
-        ///Marker type for the `type` field
-        pub struct r#type(());
         ///Marker type for the `tags` field
         pub struct tags(());
+        ///Marker type for the `type` field
+        pub struct r#type(());
+        ///Marker type for the `visibility` field
+        pub struct visibility(());
+        ///Marker type for the `author` field
+        pub struct author(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct CollectionViewBuilder<'a, S: collection_view_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct CollectionViewBuilder<S: BosStr, St: collection_view_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<social_showcase::ProfileView<S>>,
         Option<Cid<S>>,
@@ -2601,18 +2613,18 @@ pub struct CollectionViewBuilder<'a, S: collection_view_state::State> {
         Option<AtUri<S>>,
         Option<S>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> CollectionView<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> CollectionViewBuilder<'a, collection_view_state::Empty> {
+impl<S: BosStr> CollectionView<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> CollectionViewBuilder<S, collection_view_state::Empty> {
         CollectionViewBuilder::new()
     }
 }
 
-impl<'a> CollectionViewBuilder<'a, collection_view_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> CollectionViewBuilder<S, collection_view_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         CollectionViewBuilder {
             _state: PhantomData,
@@ -2631,50 +2643,50 @@ impl<'a> CollectionViewBuilder<'a, collection_view_state::Empty> {
                 None,
                 None,
             ),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CollectionViewBuilder<'a, S>
+impl<S: BosStr, St> CollectionViewBuilder<S, St>
 where
-    S: collection_view_state::State,
-    S::Author: collection_view_state::IsUnset,
+    St: collection_view_state::State,
+    St::Author: collection_view_state::IsUnset,
 {
     /// Set the `author` field (required)
     pub fn author(
         mut self,
         value: impl Into<social_showcase::ProfileView<S>>,
-    ) -> CollectionViewBuilder<'a, collection_view_state::SetAuthor<S>> {
+    ) -> CollectionViewBuilder<S, collection_view_state::SetAuthor<St>> {
         self._fields.0 = Option::Some(value.into());
         CollectionViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CollectionViewBuilder<'a, S>
+impl<S: BosStr, St> CollectionViewBuilder<S, St>
 where
-    S: collection_view_state::State,
-    S::Cid: collection_view_state::IsUnset,
+    St: collection_view_state::State,
+    St::Cid: collection_view_state::IsUnset,
 {
     /// Set the `cid` field (required)
     pub fn cid(
         mut self,
         value: impl Into<Cid<S>>,
-    ) -> CollectionViewBuilder<'a, collection_view_state::SetCid<S>> {
+    ) -> CollectionViewBuilder<S, collection_view_state::SetCid<St>> {
         self._fields.1 = Option::Some(value.into());
         CollectionViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: collection_view_state::State> CollectionViewBuilder<'a, S> {
+impl<S: BosStr, St: collection_view_state::State> CollectionViewBuilder<S, St> {
     /// Set the `coverImage` field (optional)
     pub fn cover_image(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -2687,26 +2699,26 @@ impl<'a, S: collection_view_state::State> CollectionViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S> CollectionViewBuilder<'a, S>
+impl<S: BosStr, St> CollectionViewBuilder<S, St>
 where
-    S: collection_view_state::State,
-    S::CreatedAt: collection_view_state::IsUnset,
+    St: collection_view_state::State,
+    St::CreatedAt: collection_view_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> CollectionViewBuilder<'a, collection_view_state::SetCreatedAt<S>> {
+    ) -> CollectionViewBuilder<S, collection_view_state::SetCreatedAt<St>> {
         self._fields.3 = Option::Some(value.into());
         CollectionViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: collection_view_state::State> CollectionViewBuilder<'a, S> {
+impl<S: BosStr, St: collection_view_state::State> CollectionViewBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
@@ -2719,7 +2731,7 @@ impl<'a, S: collection_view_state::State> CollectionViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: collection_view_state::State> CollectionViewBuilder<'a, S> {
+impl<S: BosStr, St: collection_view_state::State> CollectionViewBuilder<S, St> {
     /// Set the `itemCount` field (optional)
     pub fn item_count(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.5 = value.into();
@@ -2732,7 +2744,7 @@ impl<'a, S: collection_view_state::State> CollectionViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: collection_view_state::State> CollectionViewBuilder<'a, S> {
+impl<S: BosStr, St: collection_view_state::State> CollectionViewBuilder<S, St> {
     /// Set the `items` field (optional)
     pub fn items(
         mut self,
@@ -2751,64 +2763,64 @@ impl<'a, S: collection_view_state::State> CollectionViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S> CollectionViewBuilder<'a, S>
+impl<S: BosStr, St> CollectionViewBuilder<S, St>
 where
-    S: collection_view_state::State,
-    S::Name: collection_view_state::IsUnset,
+    St: collection_view_state::State,
+    St::Name: collection_view_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> CollectionViewBuilder<'a, collection_view_state::SetName<S>> {
+    ) -> CollectionViewBuilder<S, collection_view_state::SetName<St>> {
         self._fields.7 = Option::Some(value.into());
         CollectionViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CollectionViewBuilder<'a, S>
+impl<S: BosStr, St> CollectionViewBuilder<S, St>
 where
-    S: collection_view_state::State,
-    S::Tags: collection_view_state::IsUnset,
+    St: collection_view_state::State,
+    St::Tags: collection_view_state::IsUnset,
 {
     /// Set the `tags` field (required)
     pub fn tags(
         mut self,
         value: impl Into<Vec<S>>,
-    ) -> CollectionViewBuilder<'a, collection_view_state::SetTags<S>> {
+    ) -> CollectionViewBuilder<S, collection_view_state::SetTags<St>> {
         self._fields.8 = Option::Some(value.into());
         CollectionViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CollectionViewBuilder<'a, S>
+impl<S: BosStr, St> CollectionViewBuilder<S, St>
 where
-    S: collection_view_state::State,
-    S::Type: collection_view_state::IsUnset,
+    St: collection_view_state::State,
+    St::Type: collection_view_state::IsUnset,
 {
     /// Set the `type` field (required)
     pub fn r#type(
         mut self,
         value: impl Into<S>,
-    ) -> CollectionViewBuilder<'a, collection_view_state::SetType<S>> {
+    ) -> CollectionViewBuilder<S, collection_view_state::SetType<St>> {
         self._fields.9 = Option::Some(value.into());
         CollectionViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: collection_view_state::State> CollectionViewBuilder<'a, S> {
+impl<S: BosStr, St: collection_view_state::State> CollectionViewBuilder<S, St> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.10 = value.into();
@@ -2821,58 +2833,58 @@ impl<'a, S: collection_view_state::State> CollectionViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S> CollectionViewBuilder<'a, S>
+impl<S: BosStr, St> CollectionViewBuilder<S, St>
 where
-    S: collection_view_state::State,
-    S::Uri: collection_view_state::IsUnset,
+    St: collection_view_state::State,
+    St::Uri: collection_view_state::IsUnset,
 {
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> CollectionViewBuilder<'a, collection_view_state::SetUri<S>> {
+    ) -> CollectionViewBuilder<S, collection_view_state::SetUri<St>> {
         self._fields.11 = Option::Some(value.into());
         CollectionViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CollectionViewBuilder<'a, S>
+impl<S: BosStr, St> CollectionViewBuilder<S, St>
 where
-    S: collection_view_state::State,
-    S::Visibility: collection_view_state::IsUnset,
+    St: collection_view_state::State,
+    St::Visibility: collection_view_state::IsUnset,
 {
     /// Set the `visibility` field (required)
     pub fn visibility(
         mut self,
         value: impl Into<S>,
-    ) -> CollectionViewBuilder<'a, collection_view_state::SetVisibility<S>> {
+    ) -> CollectionViewBuilder<S, collection_view_state::SetVisibility<St>> {
         self._fields.12 = Option::Some(value.into());
         CollectionViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CollectionViewBuilder<'a, S>
+impl<S: BosStr, St> CollectionViewBuilder<S, St>
 where
-    S: collection_view_state::State,
-    S::Visibility: collection_view_state::IsSet,
-    S::CreatedAt: collection_view_state::IsSet,
-    S::Author: collection_view_state::IsSet,
-    S::Cid: collection_view_state::IsSet,
-    S::Name: collection_view_state::IsSet,
-    S::Uri: collection_view_state::IsSet,
-    S::Type: collection_view_state::IsSet,
-    S::Tags: collection_view_state::IsSet,
+    St: collection_view_state::State,
+    St::Cid: collection_view_state::IsSet,
+    St::CreatedAt: collection_view_state::IsSet,
+    St::Name: collection_view_state::IsSet,
+    St::Uri: collection_view_state::IsSet,
+    St::Tags: collection_view_state::IsSet,
+    St::Type: collection_view_state::IsSet,
+    St::Visibility: collection_view_state::IsSet,
+    St::Author: collection_view_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> CollectionView<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> CollectionView<S> {
         CollectionView {
             author: self._fields.0.unwrap(),
             cid: self._fields.1.unwrap(),
@@ -2890,11 +2902,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> CollectionView<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> CollectionView<S> {
         CollectionView {
             author: self._fields.0.unwrap(),
             cid: self._fields.1.unwrap(),
@@ -2933,9 +2945,9 @@ pub mod item_image_state {
         type Blob = Unset;
     }
     ///State transition - sets the `blob` field to Set
-    pub struct SetBlob<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBlob<S> {}
-    impl<S: State> State for SetBlob<S> {
+    pub struct SetBlob<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBlob<St> {}
+    impl<St: State> State for SetBlob<St> {
         type Blob = Set<members::blob>;
     }
     /// Marker types for field names
@@ -2946,32 +2958,32 @@ pub mod item_image_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ItemImageBuilder<'a, S: item_image_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ItemImageBuilder<S: BosStr, St: item_image_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<social_showcase::AspectRatio<S>>, Option<BlobRef<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ItemImage<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ItemImageBuilder<'a, item_image_state::Empty> {
+impl<S: BosStr> ItemImage<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ItemImageBuilder<S, item_image_state::Empty> {
         ItemImageBuilder::new()
     }
 }
 
-impl<'a> ItemImageBuilder<'a, item_image_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ItemImageBuilder<S, item_image_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ItemImageBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: item_image_state::State> ItemImageBuilder<'a, S> {
+impl<S: BosStr, St: item_image_state::State> ItemImageBuilder<S, St> {
     /// Set the `alt` field (optional)
     pub fn alt(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -2984,7 +2996,7 @@ impl<'a, S: item_image_state::State> ItemImageBuilder<'a, S> {
     }
 }
 
-impl<'a, S: item_image_state::State> ItemImageBuilder<'a, S> {
+impl<S: BosStr, St: item_image_state::State> ItemImageBuilder<S, St> {
     /// Set the `aspectRatio` field (optional)
     pub fn aspect_ratio(
         mut self,
@@ -3003,32 +3015,32 @@ impl<'a, S: item_image_state::State> ItemImageBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ItemImageBuilder<'a, S>
+impl<S: BosStr, St> ItemImageBuilder<S, St>
 where
-    S: item_image_state::State,
-    S::Blob: item_image_state::IsUnset,
+    St: item_image_state::State,
+    St::Blob: item_image_state::IsUnset,
 {
     /// Set the `blob` field (required)
     pub fn blob(
         mut self,
         value: impl Into<BlobRef<S>>,
-    ) -> ItemImageBuilder<'a, item_image_state::SetBlob<S>> {
+    ) -> ItemImageBuilder<S, item_image_state::SetBlob<St>> {
         self._fields.2 = Option::Some(value.into());
         ItemImageBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ItemImageBuilder<'a, S>
+impl<S: BosStr, St> ItemImageBuilder<S, St>
 where
-    S: item_image_state::State,
-    S::Blob: item_image_state::IsSet,
+    St: item_image_state::State,
+    St::Blob: item_image_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ItemImage<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ItemImage<S> {
         ItemImage {
             alt: self._fields.0,
             aspect_ratio: self._fields.1,
@@ -3036,11 +3048,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> ItemImage<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ItemImage<S> {
         ItemImage {
             alt: self._fields.0,
             aspect_ratio: self._fields.1,
@@ -3060,157 +3072,157 @@ pub mod item_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
-        type CreatedAt;
-        type Cid;
-        type Tags;
         type Visibility;
-        type Images;
+        type Cid;
         type Title;
+        type CreatedAt;
+        type Tags;
+        type Uri;
+        type Images;
         type Author;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
-        type CreatedAt = Unset;
-        type Cid = Unset;
-        type Tags = Unset;
         type Visibility = Unset;
-        type Images = Unset;
+        type Cid = Unset;
         type Title = Unset;
+        type CreatedAt = Unset;
+        type Tags = Unset;
+        type Uri = Unset;
+        type Images = Unset;
         type Author = Unset;
     }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Uri = Set<members::uri>;
-        type CreatedAt = S::CreatedAt;
-        type Cid = S::Cid;
-        type Tags = S::Tags;
-        type Visibility = S::Visibility;
-        type Images = S::Images;
-        type Title = S::Title;
-        type Author = S::Author;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Uri = S::Uri;
-        type CreatedAt = Set<members::created_at>;
-        type Cid = S::Cid;
-        type Tags = S::Tags;
-        type Visibility = S::Visibility;
-        type Images = S::Images;
-        type Title = S::Title;
-        type Author = S::Author;
+    ///State transition - sets the `visibility` field to Set
+    pub struct SetVisibility<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetVisibility<St> {}
+    impl<St: State> State for SetVisibility<St> {
+        type Visibility = Set<members::visibility>;
+        type Cid = St::Cid;
+        type Title = St::Title;
+        type CreatedAt = St::CreatedAt;
+        type Tags = St::Tags;
+        type Uri = St::Uri;
+        type Images = St::Images;
+        type Author = St::Author;
     }
     ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Uri = S::Uri;
-        type CreatedAt = S::CreatedAt;
+    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCid<St> {}
+    impl<St: State> State for SetCid<St> {
+        type Visibility = St::Visibility;
         type Cid = Set<members::cid>;
-        type Tags = S::Tags;
-        type Visibility = S::Visibility;
-        type Images = S::Images;
-        type Title = S::Title;
-        type Author = S::Author;
-    }
-    ///State transition - sets the `tags` field to Set
-    pub struct SetTags<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTags<S> {}
-    impl<S: State> State for SetTags<S> {
-        type Uri = S::Uri;
-        type CreatedAt = S::CreatedAt;
-        type Cid = S::Cid;
-        type Tags = Set<members::tags>;
-        type Visibility = S::Visibility;
-        type Images = S::Images;
-        type Title = S::Title;
-        type Author = S::Author;
-    }
-    ///State transition - sets the `visibility` field to Set
-    pub struct SetVisibility<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVisibility<S> {}
-    impl<S: State> State for SetVisibility<S> {
-        type Uri = S::Uri;
-        type CreatedAt = S::CreatedAt;
-        type Cid = S::Cid;
-        type Tags = S::Tags;
-        type Visibility = Set<members::visibility>;
-        type Images = S::Images;
-        type Title = S::Title;
-        type Author = S::Author;
-    }
-    ///State transition - sets the `images` field to Set
-    pub struct SetImages<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetImages<S> {}
-    impl<S: State> State for SetImages<S> {
-        type Uri = S::Uri;
-        type CreatedAt = S::CreatedAt;
-        type Cid = S::Cid;
-        type Tags = S::Tags;
-        type Visibility = S::Visibility;
-        type Images = Set<members::images>;
-        type Title = S::Title;
-        type Author = S::Author;
+        type Title = St::Title;
+        type CreatedAt = St::CreatedAt;
+        type Tags = St::Tags;
+        type Uri = St::Uri;
+        type Images = St::Images;
+        type Author = St::Author;
     }
     ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Uri = S::Uri;
-        type CreatedAt = S::CreatedAt;
-        type Cid = S::Cid;
-        type Tags = S::Tags;
-        type Visibility = S::Visibility;
-        type Images = S::Images;
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
+        type Visibility = St::Visibility;
+        type Cid = St::Cid;
         type Title = Set<members::title>;
-        type Author = S::Author;
+        type CreatedAt = St::CreatedAt;
+        type Tags = St::Tags;
+        type Uri = St::Uri;
+        type Images = St::Images;
+        type Author = St::Author;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Visibility = St::Visibility;
+        type Cid = St::Cid;
+        type Title = St::Title;
+        type CreatedAt = Set<members::created_at>;
+        type Tags = St::Tags;
+        type Uri = St::Uri;
+        type Images = St::Images;
+        type Author = St::Author;
+    }
+    ///State transition - sets the `tags` field to Set
+    pub struct SetTags<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTags<St> {}
+    impl<St: State> State for SetTags<St> {
+        type Visibility = St::Visibility;
+        type Cid = St::Cid;
+        type Title = St::Title;
+        type CreatedAt = St::CreatedAt;
+        type Tags = Set<members::tags>;
+        type Uri = St::Uri;
+        type Images = St::Images;
+        type Author = St::Author;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Visibility = St::Visibility;
+        type Cid = St::Cid;
+        type Title = St::Title;
+        type CreatedAt = St::CreatedAt;
+        type Tags = St::Tags;
+        type Uri = Set<members::uri>;
+        type Images = St::Images;
+        type Author = St::Author;
+    }
+    ///State transition - sets the `images` field to Set
+    pub struct SetImages<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetImages<St> {}
+    impl<St: State> State for SetImages<St> {
+        type Visibility = St::Visibility;
+        type Cid = St::Cid;
+        type Title = St::Title;
+        type CreatedAt = St::CreatedAt;
+        type Tags = St::Tags;
+        type Uri = St::Uri;
+        type Images = Set<members::images>;
+        type Author = St::Author;
     }
     ///State transition - sets the `author` field to Set
-    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthor<S> {}
-    impl<S: State> State for SetAuthor<S> {
-        type Uri = S::Uri;
-        type CreatedAt = S::CreatedAt;
-        type Cid = S::Cid;
-        type Tags = S::Tags;
-        type Visibility = S::Visibility;
-        type Images = S::Images;
-        type Title = S::Title;
+    pub struct SetAuthor<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAuthor<St> {}
+    impl<St: State> State for SetAuthor<St> {
+        type Visibility = St::Visibility;
+        type Cid = St::Cid;
+        type Title = St::Title;
+        type CreatedAt = St::CreatedAt;
+        type Tags = St::Tags;
+        type Uri = St::Uri;
+        type Images = St::Images;
         type Author = Set<members::author>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
-        ///Marker type for the `tags` field
-        pub struct tags(());
         ///Marker type for the `visibility` field
         pub struct visibility(());
-        ///Marker type for the `images` field
-        pub struct images(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `tags` field
+        pub struct tags(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `images` field
+        pub struct images(());
         ///Marker type for the `author` field
         pub struct author(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ItemViewBuilder<'a, S: item_view_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ItemViewBuilder<S: BosStr, St: item_view_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<social_showcase::ProfileView<S>>,
         Option<S>,
@@ -3227,18 +3239,18 @@ pub struct ItemViewBuilder<'a, S: item_view_state::State> {
         Option<AtUri<S>>,
         Option<S>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ItemView<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ItemViewBuilder<'a, item_view_state::Empty> {
+impl<S: BosStr> ItemView<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ItemViewBuilder<S, item_view_state::Empty> {
         ItemViewBuilder::new()
     }
 }
 
-impl<'a> ItemViewBuilder<'a, item_view_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ItemViewBuilder<S, item_view_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ItemViewBuilder {
             _state: PhantomData,
@@ -3258,31 +3270,31 @@ impl<'a> ItemViewBuilder<'a, item_view_state::Empty> {
                 None,
                 None,
             ),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ItemViewBuilder<'a, S>
+impl<S: BosStr, St> ItemViewBuilder<S, St>
 where
-    S: item_view_state::State,
-    S::Author: item_view_state::IsUnset,
+    St: item_view_state::State,
+    St::Author: item_view_state::IsUnset,
 {
     /// Set the `author` field (required)
     pub fn author(
         mut self,
         value: impl Into<social_showcase::ProfileView<S>>,
-    ) -> ItemViewBuilder<'a, item_view_state::SetAuthor<S>> {
+    ) -> ItemViewBuilder<S, item_view_state::SetAuthor<St>> {
         self._fields.0 = Option::Some(value.into());
         ItemViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: item_view_state::State> ItemViewBuilder<'a, S> {
+impl<S: BosStr, St: item_view_state::State> ItemViewBuilder<S, St> {
     /// Set the `category` field (optional)
     pub fn category(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -3295,45 +3307,45 @@ impl<'a, S: item_view_state::State> ItemViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ItemViewBuilder<'a, S>
+impl<S: BosStr, St> ItemViewBuilder<S, St>
 where
-    S: item_view_state::State,
-    S::Cid: item_view_state::IsUnset,
+    St: item_view_state::State,
+    St::Cid: item_view_state::IsUnset,
 {
     /// Set the `cid` field (required)
     pub fn cid(
         mut self,
         value: impl Into<Cid<S>>,
-    ) -> ItemViewBuilder<'a, item_view_state::SetCid<S>> {
+    ) -> ItemViewBuilder<S, item_view_state::SetCid<St>> {
         self._fields.2 = Option::Some(value.into());
         ItemViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ItemViewBuilder<'a, S>
+impl<S: BosStr, St> ItemViewBuilder<S, St>
 where
-    S: item_view_state::State,
-    S::CreatedAt: item_view_state::IsUnset,
+    St: item_view_state::State,
+    St::CreatedAt: item_view_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ItemViewBuilder<'a, item_view_state::SetCreatedAt<S>> {
+    ) -> ItemViewBuilder<S, item_view_state::SetCreatedAt<St>> {
         self._fields.3 = Option::Some(value.into());
         ItemViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: item_view_state::State> ItemViewBuilder<'a, S> {
+impl<S: BosStr, St: item_view_state::State> ItemViewBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
@@ -3346,7 +3358,7 @@ impl<'a, S: item_view_state::State> ItemViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: item_view_state::State> ItemViewBuilder<'a, S> {
+impl<S: BosStr, St: item_view_state::State> ItemViewBuilder<S, St> {
     /// Set the `externalLink` field (optional)
     pub fn external_link(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -3359,26 +3371,26 @@ impl<'a, S: item_view_state::State> ItemViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ItemViewBuilder<'a, S>
+impl<S: BosStr, St> ItemViewBuilder<S, St>
 where
-    S: item_view_state::State,
-    S::Images: item_view_state::IsUnset,
+    St: item_view_state::State,
+    St::Images: item_view_state::IsUnset,
 {
     /// Set the `images` field (required)
     pub fn images(
         mut self,
         value: impl Into<Vec<social_showcase::ItemImage<S>>>,
-    ) -> ItemViewBuilder<'a, item_view_state::SetImages<S>> {
+    ) -> ItemViewBuilder<S, item_view_state::SetImages<St>> {
         self._fields.6 = Option::Some(value.into());
         ItemViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: item_view_state::State> ItemViewBuilder<'a, S> {
+impl<S: BosStr, St: item_view_state::State> ItemViewBuilder<S, St> {
     /// Set the `metadata` field (optional)
     pub fn metadata(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.7 = value.into();
@@ -3391,7 +3403,7 @@ impl<'a, S: item_view_state::State> ItemViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: item_view_state::State> ItemViewBuilder<'a, S> {
+impl<S: BosStr, St: item_view_state::State> ItemViewBuilder<S, St> {
     /// Set the `reactionCount` field (optional)
     pub fn reaction_count(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.8 = value.into();
@@ -3404,45 +3416,45 @@ impl<'a, S: item_view_state::State> ItemViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ItemViewBuilder<'a, S>
+impl<S: BosStr, St> ItemViewBuilder<S, St>
 where
-    S: item_view_state::State,
-    S::Tags: item_view_state::IsUnset,
+    St: item_view_state::State,
+    St::Tags: item_view_state::IsUnset,
 {
     /// Set the `tags` field (required)
     pub fn tags(
         mut self,
         value: impl Into<Vec<S>>,
-    ) -> ItemViewBuilder<'a, item_view_state::SetTags<S>> {
+    ) -> ItemViewBuilder<S, item_view_state::SetTags<St>> {
         self._fields.9 = Option::Some(value.into());
         ItemViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ItemViewBuilder<'a, S>
+impl<S: BosStr, St> ItemViewBuilder<S, St>
 where
-    S: item_view_state::State,
-    S::Title: item_view_state::IsUnset,
+    St: item_view_state::State,
+    St::Title: item_view_state::IsUnset,
 {
     /// Set the `title` field (required)
     pub fn title(
         mut self,
         value: impl Into<S>,
-    ) -> ItemViewBuilder<'a, item_view_state::SetTitle<S>> {
+    ) -> ItemViewBuilder<S, item_view_state::SetTitle<St>> {
         self._fields.10 = Option::Some(value.into());
         ItemViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: item_view_state::State> ItemViewBuilder<'a, S> {
+impl<S: BosStr, St: item_view_state::State> ItemViewBuilder<S, St> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.11 = value.into();
@@ -3455,58 +3467,58 @@ impl<'a, S: item_view_state::State> ItemViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ItemViewBuilder<'a, S>
+impl<S: BosStr, St> ItemViewBuilder<S, St>
 where
-    S: item_view_state::State,
-    S::Uri: item_view_state::IsUnset,
+    St: item_view_state::State,
+    St::Uri: item_view_state::IsUnset,
 {
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> ItemViewBuilder<'a, item_view_state::SetUri<S>> {
+    ) -> ItemViewBuilder<S, item_view_state::SetUri<St>> {
         self._fields.12 = Option::Some(value.into());
         ItemViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ItemViewBuilder<'a, S>
+impl<S: BosStr, St> ItemViewBuilder<S, St>
 where
-    S: item_view_state::State,
-    S::Visibility: item_view_state::IsUnset,
+    St: item_view_state::State,
+    St::Visibility: item_view_state::IsUnset,
 {
     /// Set the `visibility` field (required)
     pub fn visibility(
         mut self,
         value: impl Into<S>,
-    ) -> ItemViewBuilder<'a, item_view_state::SetVisibility<S>> {
+    ) -> ItemViewBuilder<S, item_view_state::SetVisibility<St>> {
         self._fields.13 = Option::Some(value.into());
         ItemViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ItemViewBuilder<'a, S>
+impl<S: BosStr, St> ItemViewBuilder<S, St>
 where
-    S: item_view_state::State,
-    S::Uri: item_view_state::IsSet,
-    S::CreatedAt: item_view_state::IsSet,
-    S::Cid: item_view_state::IsSet,
-    S::Tags: item_view_state::IsSet,
-    S::Visibility: item_view_state::IsSet,
-    S::Images: item_view_state::IsSet,
-    S::Title: item_view_state::IsSet,
-    S::Author: item_view_state::IsSet,
+    St: item_view_state::State,
+    St::Visibility: item_view_state::IsSet,
+    St::Cid: item_view_state::IsSet,
+    St::Title: item_view_state::IsSet,
+    St::CreatedAt: item_view_state::IsSet,
+    St::Tags: item_view_state::IsSet,
+    St::Uri: item_view_state::IsSet,
+    St::Images: item_view_state::IsSet,
+    St::Author: item_view_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ItemView<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ItemView<S> {
         ItemView {
             author: self._fields.0.unwrap(),
             category: self._fields.1,
@@ -3525,11 +3537,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> ItemView<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ItemView<S> {
         ItemView {
             author: self._fields.0.unwrap(),
             category: self._fields.1,
@@ -3561,144 +3570,147 @@ pub mod notification_settings_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Follows;
-        type Reactions;
         type Comments;
+        type Reactions;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Follows = Unset;
-        type Reactions = Unset;
         type Comments = Unset;
+        type Reactions = Unset;
     }
     ///State transition - sets the `follows` field to Set
-    pub struct SetFollows<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFollows<S> {}
-    impl<S: State> State for SetFollows<S> {
+    pub struct SetFollows<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetFollows<St> {}
+    impl<St: State> State for SetFollows<St> {
         type Follows = Set<members::follows>;
-        type Reactions = S::Reactions;
-        type Comments = S::Comments;
-    }
-    ///State transition - sets the `reactions` field to Set
-    pub struct SetReactions<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetReactions<S> {}
-    impl<S: State> State for SetReactions<S> {
-        type Follows = S::Follows;
-        type Reactions = Set<members::reactions>;
-        type Comments = S::Comments;
+        type Comments = St::Comments;
+        type Reactions = St::Reactions;
     }
     ///State transition - sets the `comments` field to Set
-    pub struct SetComments<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetComments<S> {}
-    impl<S: State> State for SetComments<S> {
-        type Follows = S::Follows;
-        type Reactions = S::Reactions;
+    pub struct SetComments<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetComments<St> {}
+    impl<St: State> State for SetComments<St> {
+        type Follows = St::Follows;
         type Comments = Set<members::comments>;
+        type Reactions = St::Reactions;
+    }
+    ///State transition - sets the `reactions` field to Set
+    pub struct SetReactions<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetReactions<St> {}
+    impl<St: State> State for SetReactions<St> {
+        type Follows = St::Follows;
+        type Comments = St::Comments;
+        type Reactions = Set<members::reactions>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `follows` field
         pub struct follows(());
-        ///Marker type for the `reactions` field
-        pub struct reactions(());
         ///Marker type for the `comments` field
         pub struct comments(());
+        ///Marker type for the `reactions` field
+        pub struct reactions(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct NotificationSettingsBuilder<'a, S: notification_settings_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct NotificationSettingsBuilder<
+    S: BosStr,
+    St: notification_settings_state::State,
+> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<bool>, Option<bool>, Option<bool>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> NotificationSettings<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> NotificationSettingsBuilder<'a, notification_settings_state::Empty> {
+impl<S: BosStr> NotificationSettings<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> NotificationSettingsBuilder<S, notification_settings_state::Empty> {
         NotificationSettingsBuilder::new()
     }
 }
 
-impl<'a> NotificationSettingsBuilder<'a, notification_settings_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> NotificationSettingsBuilder<S, notification_settings_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         NotificationSettingsBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> NotificationSettingsBuilder<'a, S>
+impl<S: BosStr, St> NotificationSettingsBuilder<S, St>
 where
-    S: notification_settings_state::State,
-    S::Comments: notification_settings_state::IsUnset,
+    St: notification_settings_state::State,
+    St::Comments: notification_settings_state::IsUnset,
 {
     /// Set the `comments` field (required)
     pub fn comments(
         mut self,
         value: impl Into<bool>,
-    ) -> NotificationSettingsBuilder<'a, notification_settings_state::SetComments<S>> {
+    ) -> NotificationSettingsBuilder<S, notification_settings_state::SetComments<St>> {
         self._fields.0 = Option::Some(value.into());
         NotificationSettingsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> NotificationSettingsBuilder<'a, S>
+impl<S: BosStr, St> NotificationSettingsBuilder<S, St>
 where
-    S: notification_settings_state::State,
-    S::Follows: notification_settings_state::IsUnset,
+    St: notification_settings_state::State,
+    St::Follows: notification_settings_state::IsUnset,
 {
     /// Set the `follows` field (required)
     pub fn follows(
         mut self,
         value: impl Into<bool>,
-    ) -> NotificationSettingsBuilder<'a, notification_settings_state::SetFollows<S>> {
+    ) -> NotificationSettingsBuilder<S, notification_settings_state::SetFollows<St>> {
         self._fields.1 = Option::Some(value.into());
         NotificationSettingsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> NotificationSettingsBuilder<'a, S>
+impl<S: BosStr, St> NotificationSettingsBuilder<S, St>
 where
-    S: notification_settings_state::State,
-    S::Reactions: notification_settings_state::IsUnset,
+    St: notification_settings_state::State,
+    St::Reactions: notification_settings_state::IsUnset,
 {
     /// Set the `reactions` field (required)
     pub fn reactions(
         mut self,
         value: impl Into<bool>,
-    ) -> NotificationSettingsBuilder<'a, notification_settings_state::SetReactions<S>> {
+    ) -> NotificationSettingsBuilder<S, notification_settings_state::SetReactions<St>> {
         self._fields.2 = Option::Some(value.into());
         NotificationSettingsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> NotificationSettingsBuilder<'a, S>
+impl<S: BosStr, St> NotificationSettingsBuilder<S, St>
 where
-    S: notification_settings_state::State,
-    S::Follows: notification_settings_state::IsSet,
-    S::Reactions: notification_settings_state::IsSet,
-    S::Comments: notification_settings_state::IsSet,
+    St: notification_settings_state::State,
+    St::Follows: notification_settings_state::IsSet,
+    St::Comments: notification_settings_state::IsSet,
+    St::Reactions: notification_settings_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> NotificationSettings<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> NotificationSettings<S> {
         NotificationSettings {
             comments: self._fields.0.unwrap(),
             follows: self._fields.1.unwrap(),
@@ -3706,11 +3718,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> NotificationSettings<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> NotificationSettings<S> {
         NotificationSettings {
             comments: self._fields.0.unwrap(),
             follows: self._fields.1.unwrap(),
@@ -3730,145 +3742,145 @@ pub mod privacy_settings_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type AllowComments;
         type Indexable;
         type AllowReactions;
-        type AllowComments;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type AllowComments = Unset;
         type Indexable = Unset;
         type AllowReactions = Unset;
-        type AllowComments = Unset;
-    }
-    ///State transition - sets the `indexable` field to Set
-    pub struct SetIndexable<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIndexable<S> {}
-    impl<S: State> State for SetIndexable<S> {
-        type Indexable = Set<members::indexable>;
-        type AllowReactions = S::AllowReactions;
-        type AllowComments = S::AllowComments;
-    }
-    ///State transition - sets the `allow_reactions` field to Set
-    pub struct SetAllowReactions<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAllowReactions<S> {}
-    impl<S: State> State for SetAllowReactions<S> {
-        type Indexable = S::Indexable;
-        type AllowReactions = Set<members::allow_reactions>;
-        type AllowComments = S::AllowComments;
     }
     ///State transition - sets the `allow_comments` field to Set
-    pub struct SetAllowComments<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAllowComments<S> {}
-    impl<S: State> State for SetAllowComments<S> {
-        type Indexable = S::Indexable;
-        type AllowReactions = S::AllowReactions;
+    pub struct SetAllowComments<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAllowComments<St> {}
+    impl<St: State> State for SetAllowComments<St> {
         type AllowComments = Set<members::allow_comments>;
+        type Indexable = St::Indexable;
+        type AllowReactions = St::AllowReactions;
+    }
+    ///State transition - sets the `indexable` field to Set
+    pub struct SetIndexable<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIndexable<St> {}
+    impl<St: State> State for SetIndexable<St> {
+        type AllowComments = St::AllowComments;
+        type Indexable = Set<members::indexable>;
+        type AllowReactions = St::AllowReactions;
+    }
+    ///State transition - sets the `allow_reactions` field to Set
+    pub struct SetAllowReactions<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAllowReactions<St> {}
+    impl<St: State> State for SetAllowReactions<St> {
+        type AllowComments = St::AllowComments;
+        type Indexable = St::Indexable;
+        type AllowReactions = Set<members::allow_reactions>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `allow_comments` field
+        pub struct allow_comments(());
         ///Marker type for the `indexable` field
         pub struct indexable(());
         ///Marker type for the `allow_reactions` field
         pub struct allow_reactions(());
-        ///Marker type for the `allow_comments` field
-        pub struct allow_comments(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct PrivacySettingsBuilder<'a, S: privacy_settings_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct PrivacySettingsBuilder<S: BosStr, St: privacy_settings_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<bool>, Option<bool>, Option<bool>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> PrivacySettings<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> PrivacySettingsBuilder<'a, privacy_settings_state::Empty> {
+impl<S: BosStr> PrivacySettings<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> PrivacySettingsBuilder<S, privacy_settings_state::Empty> {
         PrivacySettingsBuilder::new()
     }
 }
 
-impl<'a> PrivacySettingsBuilder<'a, privacy_settings_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> PrivacySettingsBuilder<S, privacy_settings_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         PrivacySettingsBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PrivacySettingsBuilder<'a, S>
+impl<S: BosStr, St> PrivacySettingsBuilder<S, St>
 where
-    S: privacy_settings_state::State,
-    S::AllowComments: privacy_settings_state::IsUnset,
+    St: privacy_settings_state::State,
+    St::AllowComments: privacy_settings_state::IsUnset,
 {
     /// Set the `allowComments` field (required)
     pub fn allow_comments(
         mut self,
         value: impl Into<bool>,
-    ) -> PrivacySettingsBuilder<'a, privacy_settings_state::SetAllowComments<S>> {
+    ) -> PrivacySettingsBuilder<S, privacy_settings_state::SetAllowComments<St>> {
         self._fields.0 = Option::Some(value.into());
         PrivacySettingsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PrivacySettingsBuilder<'a, S>
+impl<S: BosStr, St> PrivacySettingsBuilder<S, St>
 where
-    S: privacy_settings_state::State,
-    S::AllowReactions: privacy_settings_state::IsUnset,
+    St: privacy_settings_state::State,
+    St::AllowReactions: privacy_settings_state::IsUnset,
 {
     /// Set the `allowReactions` field (required)
     pub fn allow_reactions(
         mut self,
         value: impl Into<bool>,
-    ) -> PrivacySettingsBuilder<'a, privacy_settings_state::SetAllowReactions<S>> {
+    ) -> PrivacySettingsBuilder<S, privacy_settings_state::SetAllowReactions<St>> {
         self._fields.1 = Option::Some(value.into());
         PrivacySettingsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PrivacySettingsBuilder<'a, S>
+impl<S: BosStr, St> PrivacySettingsBuilder<S, St>
 where
-    S: privacy_settings_state::State,
-    S::Indexable: privacy_settings_state::IsUnset,
+    St: privacy_settings_state::State,
+    St::Indexable: privacy_settings_state::IsUnset,
 {
     /// Set the `indexable` field (required)
     pub fn indexable(
         mut self,
         value: impl Into<bool>,
-    ) -> PrivacySettingsBuilder<'a, privacy_settings_state::SetIndexable<S>> {
+    ) -> PrivacySettingsBuilder<S, privacy_settings_state::SetIndexable<St>> {
         self._fields.2 = Option::Some(value.into());
         PrivacySettingsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PrivacySettingsBuilder<'a, S>
+impl<S: BosStr, St> PrivacySettingsBuilder<S, St>
 where
-    S: privacy_settings_state::State,
-    S::Indexable: privacy_settings_state::IsSet,
-    S::AllowReactions: privacy_settings_state::IsSet,
-    S::AllowComments: privacy_settings_state::IsSet,
+    St: privacy_settings_state::State,
+    St::AllowComments: privacy_settings_state::IsSet,
+    St::Indexable: privacy_settings_state::IsSet,
+    St::AllowReactions: privacy_settings_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> PrivacySettings<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> PrivacySettings<S> {
         PrivacySettings {
             allow_comments: self._fields.0.unwrap(),
             allow_reactions: self._fields.1.unwrap(),
@@ -3876,11 +3888,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> PrivacySettings<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> PrivacySettings<S> {
         PrivacySettings {
             allow_comments: self._fields.0.unwrap(),
             allow_reactions: self._fields.1.unwrap(),
@@ -3900,122 +3912,122 @@ pub mod reaction_subject_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Cid;
         type Uri;
+        type Cid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Cid = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Cid = Set<members::cid>;
-        type Uri = S::Uri;
+        type Cid = Unset;
     }
     ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Cid = S::Cid;
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
         type Uri = Set<members::uri>;
+        type Cid = St::Cid;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCid<St> {}
+    impl<St: State> State for SetCid<St> {
+        type Uri = St::Uri;
+        type Cid = Set<members::cid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ReactionSubjectBuilder<'a, S: reaction_subject_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ReactionSubjectBuilder<S: BosStr, St: reaction_subject_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Cid<S>>, Option<AtUri<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ReactionSubject<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ReactionSubjectBuilder<'a, reaction_subject_state::Empty> {
+impl<S: BosStr> ReactionSubject<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ReactionSubjectBuilder<S, reaction_subject_state::Empty> {
         ReactionSubjectBuilder::new()
     }
 }
 
-impl<'a> ReactionSubjectBuilder<'a, reaction_subject_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ReactionSubjectBuilder<S, reaction_subject_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ReactionSubjectBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ReactionSubjectBuilder<'a, S>
+impl<S: BosStr, St> ReactionSubjectBuilder<S, St>
 where
-    S: reaction_subject_state::State,
-    S::Cid: reaction_subject_state::IsUnset,
+    St: reaction_subject_state::State,
+    St::Cid: reaction_subject_state::IsUnset,
 {
     /// Set the `cid` field (required)
     pub fn cid(
         mut self,
         value: impl Into<Cid<S>>,
-    ) -> ReactionSubjectBuilder<'a, reaction_subject_state::SetCid<S>> {
+    ) -> ReactionSubjectBuilder<S, reaction_subject_state::SetCid<St>> {
         self._fields.0 = Option::Some(value.into());
         ReactionSubjectBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ReactionSubjectBuilder<'a, S>
+impl<S: BosStr, St> ReactionSubjectBuilder<S, St>
 where
-    S: reaction_subject_state::State,
-    S::Uri: reaction_subject_state::IsUnset,
+    St: reaction_subject_state::State,
+    St::Uri: reaction_subject_state::IsUnset,
 {
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> ReactionSubjectBuilder<'a, reaction_subject_state::SetUri<S>> {
+    ) -> ReactionSubjectBuilder<S, reaction_subject_state::SetUri<St>> {
         self._fields.1 = Option::Some(value.into());
         ReactionSubjectBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ReactionSubjectBuilder<'a, S>
+impl<S: BosStr, St> ReactionSubjectBuilder<S, St>
 where
-    S: reaction_subject_state::State,
-    S::Cid: reaction_subject_state::IsSet,
-    S::Uri: reaction_subject_state::IsSet,
+    St: reaction_subject_state::State,
+    St::Uri: reaction_subject_state::IsSet,
+    St::Cid: reaction_subject_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ReactionSubject<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ReactionSubject<S> {
         ReactionSubject {
             cid: self._fields.0.unwrap(),
             uri: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> ReactionSubject<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ReactionSubject<S> {
         ReactionSubject {
             cid: self._fields.0.unwrap(),
             uri: self._fields.1.unwrap(),
@@ -4034,91 +4046,91 @@ pub mod reaction_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
         type Actor;
+        type CreatedAt;
+        type Uri;
         type Subject;
         type Type;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
         type Actor = Unset;
+        type CreatedAt = Unset;
+        type Uri = Unset;
         type Subject = Unset;
         type Type = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Uri = Set<members::uri>;
-        type Actor = S::Actor;
-        type Subject = S::Subject;
-        type Type = S::Type;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `actor` field to Set
-    pub struct SetActor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetActor<S> {}
-    impl<S: State> State for SetActor<S> {
-        type Uri = S::Uri;
+    pub struct SetActor<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetActor<St> {}
+    impl<St: State> State for SetActor<St> {
         type Actor = Set<members::actor>;
-        type Subject = S::Subject;
-        type Type = S::Type;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type Uri = S::Uri;
-        type Actor = S::Actor;
-        type Subject = Set<members::subject>;
-        type Type = S::Type;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type Uri = S::Uri;
-        type Actor = S::Actor;
-        type Subject = S::Subject;
-        type Type = Set<members::r#type>;
-        type CreatedAt = S::CreatedAt;
+        type CreatedAt = St::CreatedAt;
+        type Uri = St::Uri;
+        type Subject = St::Subject;
+        type Type = St::Type;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Uri = S::Uri;
-        type Actor = S::Actor;
-        type Subject = S::Subject;
-        type Type = S::Type;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Actor = St::Actor;
         type CreatedAt = Set<members::created_at>;
+        type Uri = St::Uri;
+        type Subject = St::Subject;
+        type Type = St::Type;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Actor = St::Actor;
+        type CreatedAt = St::CreatedAt;
+        type Uri = Set<members::uri>;
+        type Subject = St::Subject;
+        type Type = St::Type;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubject<St> {}
+    impl<St: State> State for SetSubject<St> {
+        type Actor = St::Actor;
+        type CreatedAt = St::CreatedAt;
+        type Uri = St::Uri;
+        type Subject = Set<members::subject>;
+        type Type = St::Type;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetType<St> {}
+    impl<St: State> State for SetType<St> {
+        type Actor = St::Actor;
+        type CreatedAt = St::CreatedAt;
+        type Uri = St::Uri;
+        type Subject = St::Subject;
+        type Type = Set<members::r#type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `actor` field
         pub struct actor(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
         ///Marker type for the `subject` field
         pub struct subject(());
         ///Marker type for the `type` field
         pub struct r#type(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ReactionViewBuilder<'a, S: reaction_view_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ReactionViewBuilder<S: BosStr, St: reaction_view_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<social_showcase::ProfileView<S>>,
         Option<Datetime>,
@@ -4126,133 +4138,133 @@ pub struct ReactionViewBuilder<'a, S: reaction_view_state::State> {
         Option<S>,
         Option<AtUri<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ReactionView<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ReactionViewBuilder<'a, reaction_view_state::Empty> {
+impl<S: BosStr> ReactionView<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ReactionViewBuilder<S, reaction_view_state::Empty> {
         ReactionViewBuilder::new()
     }
 }
 
-impl<'a> ReactionViewBuilder<'a, reaction_view_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ReactionViewBuilder<S, reaction_view_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ReactionViewBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ReactionViewBuilder<'a, S>
+impl<S: BosStr, St> ReactionViewBuilder<S, St>
 where
-    S: reaction_view_state::State,
-    S::Actor: reaction_view_state::IsUnset,
+    St: reaction_view_state::State,
+    St::Actor: reaction_view_state::IsUnset,
 {
     /// Set the `actor` field (required)
     pub fn actor(
         mut self,
         value: impl Into<social_showcase::ProfileView<S>>,
-    ) -> ReactionViewBuilder<'a, reaction_view_state::SetActor<S>> {
+    ) -> ReactionViewBuilder<S, reaction_view_state::SetActor<St>> {
         self._fields.0 = Option::Some(value.into());
         ReactionViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ReactionViewBuilder<'a, S>
+impl<S: BosStr, St> ReactionViewBuilder<S, St>
 where
-    S: reaction_view_state::State,
-    S::CreatedAt: reaction_view_state::IsUnset,
+    St: reaction_view_state::State,
+    St::CreatedAt: reaction_view_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ReactionViewBuilder<'a, reaction_view_state::SetCreatedAt<S>> {
+    ) -> ReactionViewBuilder<S, reaction_view_state::SetCreatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         ReactionViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ReactionViewBuilder<'a, S>
+impl<S: BosStr, St> ReactionViewBuilder<S, St>
 where
-    S: reaction_view_state::State,
-    S::Subject: reaction_view_state::IsUnset,
+    St: reaction_view_state::State,
+    St::Subject: reaction_view_state::IsUnset,
 {
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
         value: impl Into<social_showcase::ReactionSubject<S>>,
-    ) -> ReactionViewBuilder<'a, reaction_view_state::SetSubject<S>> {
+    ) -> ReactionViewBuilder<S, reaction_view_state::SetSubject<St>> {
         self._fields.2 = Option::Some(value.into());
         ReactionViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ReactionViewBuilder<'a, S>
+impl<S: BosStr, St> ReactionViewBuilder<S, St>
 where
-    S: reaction_view_state::State,
-    S::Type: reaction_view_state::IsUnset,
+    St: reaction_view_state::State,
+    St::Type: reaction_view_state::IsUnset,
 {
     /// Set the `type` field (required)
     pub fn r#type(
         mut self,
         value: impl Into<S>,
-    ) -> ReactionViewBuilder<'a, reaction_view_state::SetType<S>> {
+    ) -> ReactionViewBuilder<S, reaction_view_state::SetType<St>> {
         self._fields.3 = Option::Some(value.into());
         ReactionViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ReactionViewBuilder<'a, S>
+impl<S: BosStr, St> ReactionViewBuilder<S, St>
 where
-    S: reaction_view_state::State,
-    S::Uri: reaction_view_state::IsUnset,
+    St: reaction_view_state::State,
+    St::Uri: reaction_view_state::IsUnset,
 {
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> ReactionViewBuilder<'a, reaction_view_state::SetUri<S>> {
+    ) -> ReactionViewBuilder<S, reaction_view_state::SetUri<St>> {
         self._fields.4 = Option::Some(value.into());
         ReactionViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ReactionViewBuilder<'a, S>
+impl<S: BosStr, St> ReactionViewBuilder<S, St>
 where
-    S: reaction_view_state::State,
-    S::Uri: reaction_view_state::IsSet,
-    S::Actor: reaction_view_state::IsSet,
-    S::Subject: reaction_view_state::IsSet,
-    S::Type: reaction_view_state::IsSet,
-    S::CreatedAt: reaction_view_state::IsSet,
+    St: reaction_view_state::State,
+    St::Actor: reaction_view_state::IsSet,
+    St::CreatedAt: reaction_view_state::IsSet,
+    St::Uri: reaction_view_state::IsSet,
+    St::Subject: reaction_view_state::IsSet,
+    St::Type: reaction_view_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ReactionView<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ReactionView<S> {
         ReactionView {
             actor: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
@@ -4262,11 +4274,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> ReactionView<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ReactionView<S> {
         ReactionView {
             actor: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
@@ -4301,27 +4313,27 @@ pub mod showcase_item_state {
         type Order = Unset;
     }
     ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
         type Uri = Set<members::uri>;
-        type AddedAt = S::AddedAt;
-        type Order = S::Order;
+        type AddedAt = St::AddedAt;
+        type Order = St::Order;
     }
     ///State transition - sets the `added_at` field to Set
-    pub struct SetAddedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAddedAt<S> {}
-    impl<S: State> State for SetAddedAt<S> {
-        type Uri = S::Uri;
+    pub struct SetAddedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAddedAt<St> {}
+    impl<St: State> State for SetAddedAt<St> {
+        type Uri = St::Uri;
         type AddedAt = Set<members::added_at>;
-        type Order = S::Order;
+        type Order = St::Order;
     }
     ///State transition - sets the `order` field to Set
-    pub struct SetOrder<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetOrder<S> {}
-    impl<S: State> State for SetOrder<S> {
-        type Uri = S::Uri;
-        type AddedAt = S::AddedAt;
+    pub struct SetOrder<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetOrder<St> {}
+    impl<St: State> State for SetOrder<St> {
+        type Uri = St::Uri;
+        type AddedAt = St::AddedAt;
         type Order = Set<members::order>;
     }
     /// Marker types for field names
@@ -4336,97 +4348,97 @@ pub mod showcase_item_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ShowcaseItemBuilder<'a, S: showcase_item_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ShowcaseItemBuilder<S: BosStr, St: showcase_item_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<i64>, Option<AtUri<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ShowcaseItem<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ShowcaseItemBuilder<'a, showcase_item_state::Empty> {
+impl<S: BosStr> ShowcaseItem<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ShowcaseItemBuilder<S, showcase_item_state::Empty> {
         ShowcaseItemBuilder::new()
     }
 }
 
-impl<'a> ShowcaseItemBuilder<'a, showcase_item_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ShowcaseItemBuilder<S, showcase_item_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ShowcaseItemBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ShowcaseItemBuilder<'a, S>
+impl<S: BosStr, St> ShowcaseItemBuilder<S, St>
 where
-    S: showcase_item_state::State,
-    S::AddedAt: showcase_item_state::IsUnset,
+    St: showcase_item_state::State,
+    St::AddedAt: showcase_item_state::IsUnset,
 {
     /// Set the `addedAt` field (required)
     pub fn added_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ShowcaseItemBuilder<'a, showcase_item_state::SetAddedAt<S>> {
+    ) -> ShowcaseItemBuilder<S, showcase_item_state::SetAddedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         ShowcaseItemBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ShowcaseItemBuilder<'a, S>
+impl<S: BosStr, St> ShowcaseItemBuilder<S, St>
 where
-    S: showcase_item_state::State,
-    S::Order: showcase_item_state::IsUnset,
+    St: showcase_item_state::State,
+    St::Order: showcase_item_state::IsUnset,
 {
     /// Set the `order` field (required)
     pub fn order(
         mut self,
         value: impl Into<i64>,
-    ) -> ShowcaseItemBuilder<'a, showcase_item_state::SetOrder<S>> {
+    ) -> ShowcaseItemBuilder<S, showcase_item_state::SetOrder<St>> {
         self._fields.1 = Option::Some(value.into());
         ShowcaseItemBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ShowcaseItemBuilder<'a, S>
+impl<S: BosStr, St> ShowcaseItemBuilder<S, St>
 where
-    S: showcase_item_state::State,
-    S::Uri: showcase_item_state::IsUnset,
+    St: showcase_item_state::State,
+    St::Uri: showcase_item_state::IsUnset,
 {
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> ShowcaseItemBuilder<'a, showcase_item_state::SetUri<S>> {
+    ) -> ShowcaseItemBuilder<S, showcase_item_state::SetUri<St>> {
         self._fields.2 = Option::Some(value.into());
         ShowcaseItemBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ShowcaseItemBuilder<'a, S>
+impl<S: BosStr, St> ShowcaseItemBuilder<S, St>
 where
-    S: showcase_item_state::State,
-    S::Uri: showcase_item_state::IsSet,
-    S::AddedAt: showcase_item_state::IsSet,
-    S::Order: showcase_item_state::IsSet,
+    St: showcase_item_state::State,
+    St::Uri: showcase_item_state::IsSet,
+    St::AddedAt: showcase_item_state::IsSet,
+    St::Order: showcase_item_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ShowcaseItem<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ShowcaseItem<S> {
         ShowcaseItem {
             added_at: self._fields.0.unwrap(),
             order: self._fields.1.unwrap(),
@@ -4434,11 +4446,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> ShowcaseItem<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ShowcaseItem<S> {
         ShowcaseItem {
             added_at: self._fields.0.unwrap(),
             order: self._fields.1.unwrap(),

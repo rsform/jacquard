@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::value::Data;
@@ -19,37 +19,32 @@ use serde::{Serialize, Deserialize};
 use crate::com_atproto::identity::IdentityInfo;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct RefreshIdentity<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct RefreshIdentity<S: BosStr = DefaultStr> {
     pub identifier: AtIdentifier<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct RefreshIdentityOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct RefreshIdentityOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
-    #[serde(borrow)]
     pub value: IdentityInfo<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -121,12 +116,11 @@ pub struct RefreshIdentityResponse;
 impl jacquard_common::xrpc::XrpcResp for RefreshIdentityResponse {
     const NSID: &'static str = "com.atproto.identity.refreshIdentity";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = RefreshIdentityOutput<S>;
+    type Output<S: BosStr> = RefreshIdentityOutput<S>;
     type Err = RefreshIdentityError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for RefreshIdentity<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for RefreshIdentity<S> {
     const NSID: &'static str = "com.atproto.identity.refreshIdentity";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -141,7 +135,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for RefreshIdentityRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = RefreshIdentity<S>;
+    type Request<S: BosStr> = RefreshIdentity<S>;
     type Response = RefreshIdentityResponse;
 }
 
@@ -164,9 +158,9 @@ pub mod refresh_identity_state {
         type Identifier = Unset;
     }
     ///State transition - sets the `identifier` field to Set
-    pub struct SetIdentifier<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIdentifier<S> {}
-    impl<S: State> State for SetIdentifier<S> {
+    pub struct SetIdentifier<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIdentifier<St> {}
+    impl<St: State> State for SetIdentifier<St> {
         type Identifier = Set<members::identifier>;
     }
     /// Marker types for field names
@@ -177,67 +171,67 @@ pub mod refresh_identity_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct RefreshIdentityBuilder<'a, S: refresh_identity_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct RefreshIdentityBuilder<S: BosStr, St: refresh_identity_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtIdentifier<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> RefreshIdentity<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> RefreshIdentityBuilder<'a, refresh_identity_state::Empty> {
+impl<S: BosStr> RefreshIdentity<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> RefreshIdentityBuilder<S, refresh_identity_state::Empty> {
         RefreshIdentityBuilder::new()
     }
 }
 
-impl<'a> RefreshIdentityBuilder<'a, refresh_identity_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> RefreshIdentityBuilder<S, refresh_identity_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         RefreshIdentityBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RefreshIdentityBuilder<'a, S>
+impl<S: BosStr, St> RefreshIdentityBuilder<S, St>
 where
-    S: refresh_identity_state::State,
-    S::Identifier: refresh_identity_state::IsUnset,
+    St: refresh_identity_state::State,
+    St::Identifier: refresh_identity_state::IsUnset,
 {
     /// Set the `identifier` field (required)
     pub fn identifier(
         mut self,
         value: impl Into<AtIdentifier<S>>,
-    ) -> RefreshIdentityBuilder<'a, refresh_identity_state::SetIdentifier<S>> {
+    ) -> RefreshIdentityBuilder<S, refresh_identity_state::SetIdentifier<St>> {
         self._fields.0 = Option::Some(value.into());
         RefreshIdentityBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RefreshIdentityBuilder<'a, S>
+impl<S: BosStr, St> RefreshIdentityBuilder<S, St>
 where
-    S: refresh_identity_state::State,
-    S::Identifier: refresh_identity_state::IsSet,
+    St: refresh_identity_state::State,
+    St::Identifier: refresh_identity_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> RefreshIdentity<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> RefreshIdentity<S> {
         RefreshIdentity {
             identifier: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> RefreshIdentity<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> RefreshIdentity<S> {
         RefreshIdentity {
             identifier: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

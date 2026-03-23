@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
@@ -21,14 +21,14 @@ use crate::app_bsky::notification::Preference;
 use crate::app_bsky::notification::Preferences;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct PutPreferencesV2<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct PutPreferencesV2<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub chat: Option<ChatPreference<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -55,26 +55,22 @@ pub struct PutPreferencesV2<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub unverified: Option<Preference<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub verified: Option<Preference<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct PutPreferencesV2Output<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct PutPreferencesV2Output<S: BosStr = DefaultStr> {
     pub preferences: Preferences<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -83,12 +79,11 @@ pub struct PutPreferencesV2Response;
 impl jacquard_common::xrpc::XrpcResp for PutPreferencesV2Response {
     const NSID: &'static str = "app.bsky.notification.putPreferencesV2";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = PutPreferencesV2Output<S>;
+    type Output<S: BosStr> = PutPreferencesV2Output<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for PutPreferencesV2<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for PutPreferencesV2<S> {
     const NSID: &'static str = "app.bsky.notification.putPreferencesV2";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -103,6 +98,6 @@ impl jacquard_common::xrpc::XrpcEndpoint for PutPreferencesV2Request {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = PutPreferencesV2<S>;
+    type Request<S: BosStr> = PutPreferencesV2<S>;
     type Response = PutPreferencesV2Response;
 }

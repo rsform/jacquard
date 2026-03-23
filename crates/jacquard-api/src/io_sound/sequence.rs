@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
 
 #[allow(unused_imports)]
@@ -39,11 +39,11 @@ use crate::io_sound::sequence;
     rename = "io.sound.sequence",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Sequence<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Sequence<S: BosStr = DefaultStr> {
     ///Strong reference to a Bluesky post. Useful to keep track of comments off-platform.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub bsky_post_ref: Option<StrongRef<S>>,
@@ -87,18 +87,18 @@ pub struct Sequence<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SequenceGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SequenceGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Sequence<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Sequence<S> {
+impl<S: BosStr> Sequence<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, SequenceRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -111,17 +111,17 @@ pub struct SequenceRecord;
 impl XrpcResp for SequenceRecord {
     const NSID: &'static str = "io.sound.sequence";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = SequenceGetRecordOutput<S>;
+    type Output<S: BosStr> = SequenceGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<SequenceGetRecordOutput<S>> for Sequence<S> {
+impl<S: BosStr> From<SequenceGetRecordOutput<S>> for Sequence<S> {
     fn from(output: SequenceGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Sequence<S> {
+impl<S: BosStr> Collection for Sequence<S> {
     const NSID: &'static str = "io.sound.sequence";
     type Record = SequenceRecord;
 }
@@ -131,7 +131,7 @@ impl Collection for SequenceRecord {
     type Record = SequenceRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Sequence<S> {
+impl<S: BosStr> LexiconSchema for Sequence<S> {
     fn nsid() -> &'static str {
         "io.sound.sequence"
     }
@@ -206,9 +206,9 @@ pub mod sequence_state {
         type Events = Unset;
     }
     ///State transition - sets the `events` field to Set
-    pub struct SetEvents<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEvents<S> {}
-    impl<S: State> State for SetEvents<S> {
+    pub struct SetEvents<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetEvents<St> {}
+    impl<St: State> State for SetEvents<St> {
         type Events = Set<members::events>;
     }
     /// Marker types for field names
@@ -219,9 +219,9 @@ pub mod sequence_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct SequenceBuilder<'a, S: sequence_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct SequenceBuilder<S: BosStr, St: sequence_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<StrongRef<S>>,
         Option<Vec<Credit<S>>>,
@@ -235,28 +235,28 @@ pub struct SequenceBuilder<'a, S: sequence_state::State> {
         Option<UriValue<S>>,
         Option<i64>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Sequence<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> SequenceBuilder<'a, sequence_state::Empty> {
+impl<S: BosStr> Sequence<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> SequenceBuilder<S, sequence_state::Empty> {
         SequenceBuilder::new()
     }
 }
 
-impl<'a> SequenceBuilder<'a, sequence_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> SequenceBuilder<S, sequence_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SequenceBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
+impl<S: BosStr, St: sequence_state::State> SequenceBuilder<S, St> {
     /// Set the `bskyPostRef` field (optional)
     pub fn bsky_post_ref(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -269,7 +269,7 @@ impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
+impl<S: BosStr, St: sequence_state::State> SequenceBuilder<S, St> {
     /// Set the `credits` field (optional)
     pub fn credits(mut self, value: impl Into<Option<Vec<Credit<S>>>>) -> Self {
         self._fields.1 = value.into();
@@ -282,26 +282,26 @@ impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S> SequenceBuilder<'a, S>
+impl<S: BosStr, St> SequenceBuilder<S, St>
 where
-    S: sequence_state::State,
-    S::Events: sequence_state::IsUnset,
+    St: sequence_state::State,
+    St::Events: sequence_state::IsUnset,
 {
     /// Set the `events` field (required)
     pub fn events(
         mut self,
         value: impl Into<Bytes>,
-    ) -> SequenceBuilder<'a, sequence_state::SetEvents<S>> {
+    ) -> SequenceBuilder<S, sequence_state::SetEvents<St>> {
         self._fields.2 = Option::Some(value.into());
         SequenceBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
+impl<S: BosStr, St: sequence_state::State> SequenceBuilder<S, St> {
     /// Set the `id` field (optional)
     pub fn id(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.3 = value.into();
@@ -314,7 +314,7 @@ impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
+impl<S: BosStr, St: sequence_state::State> SequenceBuilder<S, St> {
     /// Set the `name` field (optional)
     pub fn name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
@@ -327,7 +327,7 @@ impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
+impl<S: BosStr, St: sequence_state::State> SequenceBuilder<S, St> {
     /// Set the `publishedAt` field (optional)
     pub fn published_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.5 = value.into();
@@ -340,7 +340,7 @@ impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
+impl<S: BosStr, St: sequence_state::State> SequenceBuilder<S, St> {
     /// Set the `sequences` field (optional)
     pub fn sequences(
         mut self,
@@ -356,7 +356,7 @@ impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
+impl<S: BosStr, St: sequence_state::State> SequenceBuilder<S, St> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.7 = value.into();
@@ -369,7 +369,7 @@ impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
+impl<S: BosStr, St: sequence_state::State> SequenceBuilder<S, St> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.8 = value.into();
@@ -382,7 +382,7 @@ impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
+impl<S: BosStr, St: sequence_state::State> SequenceBuilder<S, St> {
     /// Set the `url` field (optional)
     pub fn url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.9 = value.into();
@@ -395,7 +395,7 @@ impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
+impl<S: BosStr, St: sequence_state::State> SequenceBuilder<S, St> {
     /// Set the `version` field (optional)
     pub fn version(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.10 = value.into();
@@ -408,13 +408,13 @@ impl<'a, S: sequence_state::State> SequenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S> SequenceBuilder<'a, S>
+impl<S: BosStr, St> SequenceBuilder<S, St>
 where
-    S: sequence_state::State,
-    S::Events: sequence_state::IsSet,
+    St: sequence_state::State,
+    St::Events: sequence_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Sequence<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Sequence<S> {
         Sequence {
             bsky_post_ref: self._fields.0,
             credits: self._fields.1,
@@ -430,11 +430,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Sequence<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Sequence<S> {
         Sequence {
             bsky_post_ref: self._fields.0,
             credits: self._fields.1,

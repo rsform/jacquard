@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -30,11 +30,11 @@ use crate::app_offprint::block::task_list;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct TaskList<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct TaskList<S: BosStr = DefaultStr> {
     ///Task items
     pub children: Vec<task_list::TaskItem<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -46,11 +46,11 @@ pub struct TaskList<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct TaskItem<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct TaskItem<S: BosStr = DefaultStr> {
     ///Whether the task is completed
     pub checked: bool,
     ///Nested task items
@@ -62,7 +62,7 @@ pub struct TaskItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for TaskList<S> {
+impl<S: BosStr> LexiconSchema for TaskList<S> {
     fn nsid() -> &'static str {
         "app.offprint.block.taskList"
     }
@@ -77,7 +77,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for TaskList<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for TaskItem<S> {
+impl<S: BosStr> LexiconSchema for TaskItem<S> {
     fn nsid() -> &'static str {
         "app.offprint.block.taskList"
     }
@@ -111,9 +111,9 @@ pub mod task_list_state {
         type Children = Unset;
     }
     ///State transition - sets the `children` field to Set
-    pub struct SetChildren<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetChildren<S> {}
-    impl<S: State> State for SetChildren<S> {
+    pub struct SetChildren<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetChildren<St> {}
+    impl<St: State> State for SetChildren<St> {
         type Children = Set<members::children>;
     }
     /// Marker types for field names
@@ -124,67 +124,64 @@ pub mod task_list_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct TaskListBuilder<'a, S: task_list_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct TaskListBuilder<S: BosStr, St: task_list_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<task_list::TaskItem<S>>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> TaskList<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> TaskListBuilder<'a, task_list_state::Empty> {
+impl<S: BosStr> TaskList<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> TaskListBuilder<S, task_list_state::Empty> {
         TaskListBuilder::new()
     }
 }
 
-impl<'a> TaskListBuilder<'a, task_list_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> TaskListBuilder<S, task_list_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         TaskListBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> TaskListBuilder<'a, S>
+impl<S: BosStr, St> TaskListBuilder<S, St>
 where
-    S: task_list_state::State,
-    S::Children: task_list_state::IsUnset,
+    St: task_list_state::State,
+    St::Children: task_list_state::IsUnset,
 {
     /// Set the `children` field (required)
     pub fn children(
         mut self,
         value: impl Into<Vec<task_list::TaskItem<S>>>,
-    ) -> TaskListBuilder<'a, task_list_state::SetChildren<S>> {
+    ) -> TaskListBuilder<S, task_list_state::SetChildren<St>> {
         self._fields.0 = Option::Some(value.into());
         TaskListBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> TaskListBuilder<'a, S>
+impl<S: BosStr, St> TaskListBuilder<S, St>
 where
-    S: task_list_state::State,
-    S::Children: task_list_state::IsSet,
+    St: task_list_state::State,
+    St::Children: task_list_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> TaskList<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> TaskList<S> {
         TaskList {
             children: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> TaskList<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> TaskList<S> {
         TaskList {
             children: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -293,17 +290,17 @@ pub mod task_item_state {
         type Content = Unset;
     }
     ///State transition - sets the `checked` field to Set
-    pub struct SetChecked<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetChecked<S> {}
-    impl<S: State> State for SetChecked<S> {
+    pub struct SetChecked<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetChecked<St> {}
+    impl<St: State> State for SetChecked<St> {
         type Checked = Set<members::checked>;
-        type Content = S::Content;
+        type Content = St::Content;
     }
     ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type Checked = S::Checked;
+    pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetContent<St> {}
+    impl<St: State> State for SetContent<St> {
+        type Checked = St::Checked;
         type Content = Set<members::content>;
     }
     /// Marker types for field names
@@ -316,51 +313,51 @@ pub mod task_item_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct TaskItemBuilder<'a, S: task_item_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct TaskItemBuilder<S: BosStr, St: task_item_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<bool>, Option<Vec<task_list::TaskItem<S>>>, Option<Text<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> TaskItem<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> TaskItemBuilder<'a, task_item_state::Empty> {
+impl<S: BosStr> TaskItem<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> TaskItemBuilder<S, task_item_state::Empty> {
         TaskItemBuilder::new()
     }
 }
 
-impl<'a> TaskItemBuilder<'a, task_item_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> TaskItemBuilder<S, task_item_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         TaskItemBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> TaskItemBuilder<'a, S>
+impl<S: BosStr, St> TaskItemBuilder<S, St>
 where
-    S: task_item_state::State,
-    S::Checked: task_item_state::IsUnset,
+    St: task_item_state::State,
+    St::Checked: task_item_state::IsUnset,
 {
     /// Set the `checked` field (required)
     pub fn checked(
         mut self,
         value: impl Into<bool>,
-    ) -> TaskItemBuilder<'a, task_item_state::SetChecked<S>> {
+    ) -> TaskItemBuilder<S, task_item_state::SetChecked<St>> {
         self._fields.0 = Option::Some(value.into());
         TaskItemBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: task_item_state::State> TaskItemBuilder<'a, S> {
+impl<S: BosStr, St: task_item_state::State> TaskItemBuilder<S, St> {
     /// Set the `children` field (optional)
     pub fn children(
         mut self,
@@ -376,33 +373,33 @@ impl<'a, S: task_item_state::State> TaskItemBuilder<'a, S> {
     }
 }
 
-impl<'a, S> TaskItemBuilder<'a, S>
+impl<S: BosStr, St> TaskItemBuilder<S, St>
 where
-    S: task_item_state::State,
-    S::Content: task_item_state::IsUnset,
+    St: task_item_state::State,
+    St::Content: task_item_state::IsUnset,
 {
     /// Set the `content` field (required)
     pub fn content(
         mut self,
         value: impl Into<Text<S>>,
-    ) -> TaskItemBuilder<'a, task_item_state::SetContent<S>> {
+    ) -> TaskItemBuilder<S, task_item_state::SetContent<St>> {
         self._fields.2 = Option::Some(value.into());
         TaskItemBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> TaskItemBuilder<'a, S>
+impl<S: BosStr, St> TaskItemBuilder<S, St>
 where
-    S: task_item_state::State,
-    S::Checked: task_item_state::IsSet,
-    S::Content: task_item_state::IsSet,
+    St: task_item_state::State,
+    St::Checked: task_item_state::IsSet,
+    St::Content: task_item_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> TaskItem<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> TaskItem<S> {
         TaskItem {
             checked: self._fields.0.unwrap(),
             children: self._fields.1,
@@ -410,11 +407,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> TaskItem<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> TaskItem<S> {
         TaskItem {
             checked: self._fields.0.unwrap(),
             children: self._fields.1,

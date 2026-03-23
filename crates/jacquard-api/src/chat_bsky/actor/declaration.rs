@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "chat.bsky.actor.declaration",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Declaration<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Declaration<S: BosStr = DefaultStr> {
     pub allow_incoming: DeclarationAllowIncoming<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -47,14 +47,14 @@ pub struct Declaration<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum DeclarationAllowIncoming<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum DeclarationAllowIncoming<S: BosStr = DefaultStr> {
     All,
     None,
     Following,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> DeclarationAllowIncoming<S> {
+impl<S: BosStr> DeclarationAllowIncoming<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::All => "all",
@@ -74,19 +74,19 @@ impl<S: Bos<str> + AsRef<str>> DeclarationAllowIncoming<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for DeclarationAllowIncoming<S> {
+impl<S: BosStr> core::fmt::Display for DeclarationAllowIncoming<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for DeclarationAllowIncoming<S> {
+impl<S: BosStr> AsRef<str> for DeclarationAllowIncoming<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for DeclarationAllowIncoming<S> {
+impl<S: BosStr> Serialize for DeclarationAllowIncoming<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -95,7 +95,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for DeclarationAllowIncoming<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
 for DeclarationAllowIncoming<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
@@ -106,14 +106,18 @@ for DeclarationAllowIncoming<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for DeclarationAllowIncoming<S> {
+impl<S: BosStr + Default> Default for DeclarationAllowIncoming<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for DeclarationAllowIncoming<S> {
-    type Output = DeclarationAllowIncoming<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for DeclarationAllowIncoming<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = DeclarationAllowIncoming<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             DeclarationAllowIncoming::All => DeclarationAllowIncoming::All,
@@ -132,18 +136,18 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for DeclarationAllowIncoming<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DeclarationGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DeclarationGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Declaration<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Declaration<S> {
+impl<S: BosStr> Declaration<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, DeclarationRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -156,17 +160,17 @@ pub struct DeclarationRecord;
 impl XrpcResp for DeclarationRecord {
     const NSID: &'static str = "chat.bsky.actor.declaration";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = DeclarationGetRecordOutput<S>;
+    type Output<S: BosStr> = DeclarationGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<DeclarationGetRecordOutput<S>> for Declaration<S> {
+impl<S: BosStr> From<DeclarationGetRecordOutput<S>> for Declaration<S> {
     fn from(output: DeclarationGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Declaration<S> {
+impl<S: BosStr> Collection for Declaration<S> {
     const NSID: &'static str = "chat.bsky.actor.declaration";
     type Record = DeclarationRecord;
 }
@@ -176,7 +180,7 @@ impl Collection for DeclarationRecord {
     type Record = DeclarationRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Declaration<S> {
+impl<S: BosStr> LexiconSchema for Declaration<S> {
     fn nsid() -> &'static str {
         "chat.bsky.actor.declaration"
     }
@@ -210,9 +214,9 @@ pub mod declaration_state {
         type AllowIncoming = Unset;
     }
     ///State transition - sets the `allow_incoming` field to Set
-    pub struct SetAllowIncoming<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAllowIncoming<S> {}
-    impl<S: State> State for SetAllowIncoming<S> {
+    pub struct SetAllowIncoming<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAllowIncoming<St> {}
+    impl<St: State> State for SetAllowIncoming<St> {
         type AllowIncoming = Set<members::allow_incoming>;
     }
     /// Marker types for field names
@@ -223,67 +227,67 @@ pub mod declaration_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct DeclarationBuilder<'a, S: declaration_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct DeclarationBuilder<S: BosStr, St: declaration_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<DeclarationAllowIncoming<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Declaration<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> DeclarationBuilder<'a, declaration_state::Empty> {
+impl<S: BosStr> Declaration<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> DeclarationBuilder<S, declaration_state::Empty> {
         DeclarationBuilder::new()
     }
 }
 
-impl<'a> DeclarationBuilder<'a, declaration_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> DeclarationBuilder<S, declaration_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         DeclarationBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DeclarationBuilder<'a, S>
+impl<S: BosStr, St> DeclarationBuilder<S, St>
 where
-    S: declaration_state::State,
-    S::AllowIncoming: declaration_state::IsUnset,
+    St: declaration_state::State,
+    St::AllowIncoming: declaration_state::IsUnset,
 {
     /// Set the `allowIncoming` field (required)
     pub fn allow_incoming(
         mut self,
         value: impl Into<DeclarationAllowIncoming<S>>,
-    ) -> DeclarationBuilder<'a, declaration_state::SetAllowIncoming<S>> {
+    ) -> DeclarationBuilder<S, declaration_state::SetAllowIncoming<St>> {
         self._fields.0 = Option::Some(value.into());
         DeclarationBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DeclarationBuilder<'a, S>
+impl<S: BosStr, St> DeclarationBuilder<S, St>
 where
-    S: declaration_state::State,
-    S::AllowIncoming: declaration_state::IsSet,
+    St: declaration_state::State,
+    St::AllowIncoming: declaration_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Declaration<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Declaration<S> {
         Declaration {
             allow_incoming: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Declaration<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Declaration<S> {
         Declaration {
             allow_incoming: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

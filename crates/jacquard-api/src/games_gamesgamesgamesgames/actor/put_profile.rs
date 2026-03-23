@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::string::{AtUri, Datetime};
@@ -21,14 +21,14 @@ use crate::app_bsky::richtext::facet::Facet;
 use crate::games_gamesgamesgamesgames::Website;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct PutProfile<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct PutProfile<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avatar: Option<BlobRef<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -44,27 +44,23 @@ pub struct PutProfile<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub pronouns: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub websites: Option<Vec<Website<S>>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct PutProfileOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct PutProfileOutput<S: BosStr = DefaultStr> {
     pub cid: S,
     pub uri: AtUri<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -73,12 +69,11 @@ pub struct PutProfileResponse;
 impl jacquard_common::xrpc::XrpcResp for PutProfileResponse {
     const NSID: &'static str = "games.gamesgamesgamesgames.actor.putProfile";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = PutProfileOutput<S>;
+    type Output<S: BosStr> = PutProfileOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for PutProfile<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for PutProfile<S> {
     const NSID: &'static str = "games.gamesgamesgamesgames.actor.putProfile";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -93,6 +88,6 @@ impl jacquard_common::xrpc::XrpcEndpoint for PutProfileRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = PutProfile<S>;
+    type Request<S: BosStr> = PutProfile<S>;
     type Response = PutProfileResponse;
 }

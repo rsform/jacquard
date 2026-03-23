@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -31,11 +31,11 @@ use crate::st_lifepo::profile;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct LifeEvent<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct LifeEvent<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -48,38 +48,35 @@ pub struct LifeEvent<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Profile<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct Profile<S: BosStr = DefaultStr> {
     pub actor: S,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ProfileOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ProfileOutput<S: BosStr = DefaultStr> {
     pub bio: S,
     pub handle: S,
     pub life_events: Vec<profile::LifeEvent<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for LifeEvent<S> {
+impl<S: BosStr> LexiconSchema for LifeEvent<S> {
     fn nsid() -> &'static str {
         "st.lifepo.profile"
     }
@@ -99,12 +96,11 @@ pub struct ProfileResponse;
 impl jacquard_common::xrpc::XrpcResp for ProfileResponse {
     const NSID: &'static str = "st.lifepo.profile";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ProfileOutput<S>;
+    type Output<S: BosStr> = ProfileOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for Profile<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Profile<S> {
     const NSID: &'static str = "st.lifepo.profile";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ProfileResponse;
@@ -115,7 +111,7 @@ pub struct ProfileRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ProfileRequest {
     const PATH: &'static str = "/xrpc/st.lifepo.profile";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = Profile<S>;
+    type Request<S: BosStr> = Profile<S>;
     type Response = ProfileResponse;
 }
 
@@ -140,17 +136,17 @@ pub mod life_event_state {
         type StartDate = Unset;
     }
     ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
         type Title = Set<members::title>;
-        type StartDate = S::StartDate;
+        type StartDate = St::StartDate;
     }
     ///State transition - sets the `start_date` field to Set
-    pub struct SetStartDate<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStartDate<S> {}
-    impl<S: State> State for SetStartDate<S> {
-        type Title = S::Title;
+    pub struct SetStartDate<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStartDate<St> {}
+    impl<St: State> State for SetStartDate<St> {
+        type Title = St::Title;
         type StartDate = Set<members::start_date>;
     }
     /// Marker types for field names
@@ -163,32 +159,32 @@ pub mod life_event_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct LifeEventBuilder<'a, S: life_event_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct LifeEventBuilder<S: BosStr, St: life_event_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<Datetime>, Option<Datetime>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> LifeEvent<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> LifeEventBuilder<'a, life_event_state::Empty> {
+impl<S: BosStr> LifeEvent<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> LifeEventBuilder<S, life_event_state::Empty> {
         LifeEventBuilder::new()
     }
 }
 
-impl<'a> LifeEventBuilder<'a, life_event_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> LifeEventBuilder<S, life_event_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         LifeEventBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: life_event_state::State> LifeEventBuilder<'a, S> {
+impl<S: BosStr, St: life_event_state::State> LifeEventBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -201,7 +197,7 @@ impl<'a, S: life_event_state::State> LifeEventBuilder<'a, S> {
     }
 }
 
-impl<'a, S: life_event_state::State> LifeEventBuilder<'a, S> {
+impl<S: BosStr, St: life_event_state::State> LifeEventBuilder<S, St> {
     /// Set the `endDate` field (optional)
     pub fn end_date(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.1 = value.into();
@@ -214,52 +210,52 @@ impl<'a, S: life_event_state::State> LifeEventBuilder<'a, S> {
     }
 }
 
-impl<'a, S> LifeEventBuilder<'a, S>
+impl<S: BosStr, St> LifeEventBuilder<S, St>
 where
-    S: life_event_state::State,
-    S::StartDate: life_event_state::IsUnset,
+    St: life_event_state::State,
+    St::StartDate: life_event_state::IsUnset,
 {
     /// Set the `startDate` field (required)
     pub fn start_date(
         mut self,
         value: impl Into<Datetime>,
-    ) -> LifeEventBuilder<'a, life_event_state::SetStartDate<S>> {
+    ) -> LifeEventBuilder<S, life_event_state::SetStartDate<St>> {
         self._fields.2 = Option::Some(value.into());
         LifeEventBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LifeEventBuilder<'a, S>
+impl<S: BosStr, St> LifeEventBuilder<S, St>
 where
-    S: life_event_state::State,
-    S::Title: life_event_state::IsUnset,
+    St: life_event_state::State,
+    St::Title: life_event_state::IsUnset,
 {
     /// Set the `title` field (required)
     pub fn title(
         mut self,
         value: impl Into<S>,
-    ) -> LifeEventBuilder<'a, life_event_state::SetTitle<S>> {
+    ) -> LifeEventBuilder<S, life_event_state::SetTitle<St>> {
         self._fields.3 = Option::Some(value.into());
         LifeEventBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LifeEventBuilder<'a, S>
+impl<S: BosStr, St> LifeEventBuilder<S, St>
 where
-    S: life_event_state::State,
-    S::Title: life_event_state::IsSet,
-    S::StartDate: life_event_state::IsSet,
+    St: life_event_state::State,
+    St::Title: life_event_state::IsSet,
+    St::StartDate: life_event_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> LifeEvent<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> LifeEvent<S> {
         LifeEvent {
             description: self._fields.0,
             end_date: self._fields.1,
@@ -268,11 +264,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> LifeEvent<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> LifeEvent<S> {
         LifeEvent {
             description: self._fields.0,
             end_date: self._fields.1,
@@ -384,9 +380,9 @@ pub mod profile_state {
         type Actor = Unset;
     }
     ///State transition - sets the `actor` field to Set
-    pub struct SetActor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetActor<S> {}
-    impl<S: State> State for SetActor<S> {
+    pub struct SetActor<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetActor<St> {}
+    impl<St: State> State for SetActor<St> {
         type Actor = Set<members::actor>;
     }
     /// Marker types for field names
@@ -397,57 +393,57 @@ pub mod profile_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ProfileBuilder<'a, S: profile_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ProfileBuilder<S: BosStr, St: profile_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Profile<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ProfileBuilder<'a, profile_state::Empty> {
+impl<S: BosStr> Profile<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ProfileBuilder<S, profile_state::Empty> {
         ProfileBuilder::new()
     }
 }
 
-impl<'a> ProfileBuilder<'a, profile_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ProfileBuilder<S, profile_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ProfileBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ProfileBuilder<'a, S>
+impl<S: BosStr, St> ProfileBuilder<S, St>
 where
-    S: profile_state::State,
-    S::Actor: profile_state::IsUnset,
+    St: profile_state::State,
+    St::Actor: profile_state::IsUnset,
 {
     /// Set the `actor` field (required)
     pub fn actor(
         mut self,
         value: impl Into<S>,
-    ) -> ProfileBuilder<'a, profile_state::SetActor<S>> {
+    ) -> ProfileBuilder<S, profile_state::SetActor<St>> {
         self._fields.0 = Option::Some(value.into());
         ProfileBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ProfileBuilder<'a, S>
+impl<S: BosStr, St> ProfileBuilder<S, St>
 where
-    S: profile_state::State,
-    S::Actor: profile_state::IsSet,
+    St: profile_state::State,
+    St::Actor: profile_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Profile<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Profile<S> {
         Profile {
             actor: self._fields.0.unwrap(),
         }

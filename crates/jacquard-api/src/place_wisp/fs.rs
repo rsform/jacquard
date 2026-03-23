@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,11 +34,11 @@ use crate::place_wisp::fs;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Directory<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Directory<S: BosStr = DefaultStr> {
     pub entries: Vec<fs::Entry<S>>,
     pub r#type: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -50,11 +50,11 @@ pub struct Directory<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Entry<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Entry<S: BosStr = DefaultStr> {
     pub name: S,
     pub node: EntryNode<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -67,11 +67,11 @@ pub struct Entry<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EntryNode<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum EntryNode<S: BosStr = DefaultStr> {
     #[serde(rename = "place.wisp.fs#file")]
     File(Box<fs::File<S>>),
     #[serde(rename = "place.wisp.fs#directory")]
@@ -85,11 +85,11 @@ pub enum EntryNode<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct File<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct File<S: BosStr = DefaultStr> {
     ///True if blob content is base64-encoded (used to bypass PDS content sniffing)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub base64: Option<bool>,
@@ -114,11 +114,11 @@ pub struct File<S: Bos<str> + AsRef<str> = DefaultStr> {
     rename = "place.wisp.fs",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Fs<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Fs<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub file_count: Option<i64>,
@@ -134,11 +134,11 @@ pub struct Fs<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct FsGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct FsGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
@@ -150,11 +150,11 @@ pub struct FsGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Subfs<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Subfs<S: BosStr = DefaultStr> {
     ///If true, the subfs record's root entries are merged (flattened) into the parent directory, replacing the subfs entry. If false (default), the subfs entries are placed in a subdirectory with the subfs entry's name. Flat merging is useful for splitting large directories across multiple records while maintaining a flat structure.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub flat: Option<bool>,
@@ -165,13 +165,13 @@ pub struct Subfs<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Fs<S> {
+impl<S: BosStr> Fs<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, FsRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Directory<S> {
+impl<S: BosStr> LexiconSchema for Directory<S> {
     fn nsid() -> &'static str {
         "place.wisp.fs"
     }
@@ -197,7 +197,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Directory<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Entry<S> {
+impl<S: BosStr> LexiconSchema for Entry<S> {
     fn nsid() -> &'static str {
         "place.wisp.fs"
     }
@@ -223,7 +223,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Entry<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for File<S> {
+impl<S: BosStr> LexiconSchema for File<S> {
     fn nsid() -> &'static str {
         "place.wisp.fs"
     }
@@ -285,17 +285,17 @@ pub struct FsRecord;
 impl XrpcResp for FsRecord {
     const NSID: &'static str = "place.wisp.fs";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = FsGetRecordOutput<S>;
+    type Output<S: BosStr> = FsGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<FsGetRecordOutput<S>> for Fs<S> {
+impl<S: BosStr> From<FsGetRecordOutput<S>> for Fs<S> {
     fn from(output: FsGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Fs<S> {
+impl<S: BosStr> Collection for Fs<S> {
     const NSID: &'static str = "place.wisp.fs";
     type Record = FsRecord;
 }
@@ -305,7 +305,7 @@ impl Collection for FsRecord {
     type Record = FsRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Fs<S> {
+impl<S: BosStr> LexiconSchema for Fs<S> {
     fn nsid() -> &'static str {
         "place.wisp.fs"
     }
@@ -338,7 +338,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Fs<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Subfs<S> {
+impl<S: BosStr> LexiconSchema for Subfs<S> {
     fn nsid() -> &'static str {
         "place.wisp.fs"
     }
@@ -363,122 +363,122 @@ pub mod directory_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Entries;
         type Type;
+        type Entries;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Entries = Unset;
         type Type = Unset;
-    }
-    ///State transition - sets the `entries` field to Set
-    pub struct SetEntries<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEntries<S> {}
-    impl<S: State> State for SetEntries<S> {
-        type Entries = Set<members::entries>;
-        type Type = S::Type;
+        type Entries = Unset;
     }
     ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type Entries = S::Entries;
+    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetType<St> {}
+    impl<St: State> State for SetType<St> {
         type Type = Set<members::r#type>;
+        type Entries = St::Entries;
+    }
+    ///State transition - sets the `entries` field to Set
+    pub struct SetEntries<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetEntries<St> {}
+    impl<St: State> State for SetEntries<St> {
+        type Type = St::Type;
+        type Entries = Set<members::entries>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `entries` field
-        pub struct entries(());
         ///Marker type for the `type` field
         pub struct r#type(());
+        ///Marker type for the `entries` field
+        pub struct entries(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct DirectoryBuilder<'a, S: directory_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct DirectoryBuilder<S: BosStr, St: directory_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<fs::Entry<S>>>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Directory<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> DirectoryBuilder<'a, directory_state::Empty> {
+impl<S: BosStr> Directory<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> DirectoryBuilder<S, directory_state::Empty> {
         DirectoryBuilder::new()
     }
 }
 
-impl<'a> DirectoryBuilder<'a, directory_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> DirectoryBuilder<S, directory_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         DirectoryBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DirectoryBuilder<'a, S>
+impl<S: BosStr, St> DirectoryBuilder<S, St>
 where
-    S: directory_state::State,
-    S::Entries: directory_state::IsUnset,
+    St: directory_state::State,
+    St::Entries: directory_state::IsUnset,
 {
     /// Set the `entries` field (required)
     pub fn entries(
         mut self,
         value: impl Into<Vec<fs::Entry<S>>>,
-    ) -> DirectoryBuilder<'a, directory_state::SetEntries<S>> {
+    ) -> DirectoryBuilder<S, directory_state::SetEntries<St>> {
         self._fields.0 = Option::Some(value.into());
         DirectoryBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DirectoryBuilder<'a, S>
+impl<S: BosStr, St> DirectoryBuilder<S, St>
 where
-    S: directory_state::State,
-    S::Type: directory_state::IsUnset,
+    St: directory_state::State,
+    St::Type: directory_state::IsUnset,
 {
     /// Set the `type` field (required)
     pub fn r#type(
         mut self,
         value: impl Into<S>,
-    ) -> DirectoryBuilder<'a, directory_state::SetType<S>> {
+    ) -> DirectoryBuilder<S, directory_state::SetType<St>> {
         self._fields.1 = Option::Some(value.into());
         DirectoryBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DirectoryBuilder<'a, S>
+impl<S: BosStr, St> DirectoryBuilder<S, St>
 where
-    S: directory_state::State,
-    S::Entries: directory_state::IsSet,
-    S::Type: directory_state::IsSet,
+    St: directory_state::State,
+    St::Type: directory_state::IsSet,
+    St::Entries: directory_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Directory<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Directory<S> {
         Directory {
             entries: self._fields.0.unwrap(),
             r#type: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Directory<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Directory<S> {
         Directory {
             entries: self._fields.0.unwrap(),
             r#type: self._fields.1.unwrap(),
@@ -709,119 +709,119 @@ pub mod entry_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Node;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Node = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Node = S::Node;
+        type Name = Unset;
     }
     ///State transition - sets the `node` field to Set
-    pub struct SetNode<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNode<S> {}
-    impl<S: State> State for SetNode<S> {
-        type Name = S::Name;
+    pub struct SetNode<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetNode<St> {}
+    impl<St: State> State for SetNode<St> {
         type Node = Set<members::node>;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Node = St::Node;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `node` field
         pub struct node(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct EntryBuilder<'a, S: entry_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct EntryBuilder<S: BosStr, St: entry_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<EntryNode<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Entry<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> EntryBuilder<'a, entry_state::Empty> {
+impl<S: BosStr> Entry<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> EntryBuilder<S, entry_state::Empty> {
         EntryBuilder::new()
     }
 }
 
-impl<'a> EntryBuilder<'a, entry_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> EntryBuilder<S, entry_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         EntryBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> EntryBuilder<'a, S>
+impl<S: BosStr, St> EntryBuilder<S, St>
 where
-    S: entry_state::State,
-    S::Name: entry_state::IsUnset,
+    St: entry_state::State,
+    St::Name: entry_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> EntryBuilder<'a, entry_state::SetName<S>> {
+    ) -> EntryBuilder<S, entry_state::SetName<St>> {
         self._fields.0 = Option::Some(value.into());
         EntryBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> EntryBuilder<'a, S>
+impl<S: BosStr, St> EntryBuilder<S, St>
 where
-    S: entry_state::State,
-    S::Node: entry_state::IsUnset,
+    St: entry_state::State,
+    St::Node: entry_state::IsUnset,
 {
     /// Set the `node` field (required)
     pub fn node(
         mut self,
         value: impl Into<EntryNode<S>>,
-    ) -> EntryBuilder<'a, entry_state::SetNode<S>> {
+    ) -> EntryBuilder<S, entry_state::SetNode<St>> {
         self._fields.1 = Option::Some(value.into());
         EntryBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> EntryBuilder<'a, S>
+impl<S: BosStr, St> EntryBuilder<S, St>
 where
-    S: entry_state::State,
-    S::Name: entry_state::IsSet,
-    S::Node: entry_state::IsSet,
+    St: entry_state::State,
+    St::Node: entry_state::IsSet,
+    St::Name: entry_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Entry<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Entry<S> {
         Entry {
             name: self._fields.0.unwrap(),
             node: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Entry<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Entry<S> {
         Entry {
             name: self._fields.0.unwrap(),
             node: self._fields.1.unwrap(),
@@ -851,17 +851,17 @@ pub mod file_state {
         type Type = Unset;
     }
     ///State transition - sets the `blob` field to Set
-    pub struct SetBlob<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBlob<S> {}
-    impl<S: State> State for SetBlob<S> {
+    pub struct SetBlob<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBlob<St> {}
+    impl<St: State> State for SetBlob<St> {
         type Blob = Set<members::blob>;
-        type Type = S::Type;
+        type Type = St::Type;
     }
     ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type Blob = S::Blob;
+    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetType<St> {}
+    impl<St: State> State for SetType<St> {
+        type Blob = St::Blob;
         type Type = Set<members::r#type>;
     }
     /// Marker types for field names
@@ -874,32 +874,32 @@ pub mod file_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct FileBuilder<'a, S: file_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct FileBuilder<S: BosStr, St: file_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<bool>, Option<BlobRef<S>>, Option<S>, Option<S>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> File<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> FileBuilder<'a, file_state::Empty> {
+impl<S: BosStr> File<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> FileBuilder<S, file_state::Empty> {
         FileBuilder::new()
     }
 }
 
-impl<'a> FileBuilder<'a, file_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> FileBuilder<S, file_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         FileBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: file_state::State> FileBuilder<'a, S> {
+impl<S: BosStr, St: file_state::State> FileBuilder<S, St> {
     /// Set the `base64` field (optional)
     pub fn base64(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.0 = value.into();
@@ -912,26 +912,26 @@ impl<'a, S: file_state::State> FileBuilder<'a, S> {
     }
 }
 
-impl<'a, S> FileBuilder<'a, S>
+impl<S: BosStr, St> FileBuilder<S, St>
 where
-    S: file_state::State,
-    S::Blob: file_state::IsUnset,
+    St: file_state::State,
+    St::Blob: file_state::IsUnset,
 {
     /// Set the `blob` field (required)
     pub fn blob(
         mut self,
         value: impl Into<BlobRef<S>>,
-    ) -> FileBuilder<'a, file_state::SetBlob<S>> {
+    ) -> FileBuilder<S, file_state::SetBlob<St>> {
         self._fields.1 = Option::Some(value.into());
         FileBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: file_state::State> FileBuilder<'a, S> {
+impl<S: BosStr, St: file_state::State> FileBuilder<S, St> {
     /// Set the `encoding` field (optional)
     pub fn encoding(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -944,7 +944,7 @@ impl<'a, S: file_state::State> FileBuilder<'a, S> {
     }
 }
 
-impl<'a, S: file_state::State> FileBuilder<'a, S> {
+impl<S: BosStr, St: file_state::State> FileBuilder<S, St> {
     /// Set the `mimeType` field (optional)
     pub fn mime_type(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -957,33 +957,33 @@ impl<'a, S: file_state::State> FileBuilder<'a, S> {
     }
 }
 
-impl<'a, S> FileBuilder<'a, S>
+impl<S: BosStr, St> FileBuilder<S, St>
 where
-    S: file_state::State,
-    S::Type: file_state::IsUnset,
+    St: file_state::State,
+    St::Type: file_state::IsUnset,
 {
     /// Set the `type` field (required)
     pub fn r#type(
         mut self,
         value: impl Into<S>,
-    ) -> FileBuilder<'a, file_state::SetType<S>> {
+    ) -> FileBuilder<S, file_state::SetType<St>> {
         self._fields.4 = Option::Some(value.into());
         FileBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> FileBuilder<'a, S>
+impl<S: BosStr, St> FileBuilder<S, St>
 where
-    S: file_state::State,
-    S::Blob: file_state::IsSet,
-    S::Type: file_state::IsSet,
+    St: file_state::State,
+    St::Blob: file_state::IsSet,
+    St::Type: file_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> File<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> File<S> {
         File {
             base64: self._fields.0,
             blob: self._fields.1.unwrap(),
@@ -993,8 +993,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> File<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> File<S> {
         File {
             base64: self._fields.0,
             blob: self._fields.1.unwrap(),
@@ -1016,99 +1016,99 @@ pub mod fs_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Root;
         type CreatedAt;
+        type Root;
         type Site;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Root = Unset;
         type CreatedAt = Unset;
+        type Root = Unset;
         type Site = Unset;
     }
-    ///State transition - sets the `root` field to Set
-    pub struct SetRoot<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRoot<S> {}
-    impl<S: State> State for SetRoot<S> {
-        type Root = Set<members::root>;
-        type CreatedAt = S::CreatedAt;
-        type Site = S::Site;
-    }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Root = S::Root;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
-        type Site = S::Site;
+        type Root = St::Root;
+        type Site = St::Site;
+    }
+    ///State transition - sets the `root` field to Set
+    pub struct SetRoot<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRoot<St> {}
+    impl<St: State> State for SetRoot<St> {
+        type CreatedAt = St::CreatedAt;
+        type Root = Set<members::root>;
+        type Site = St::Site;
     }
     ///State transition - sets the `site` field to Set
-    pub struct SetSite<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSite<S> {}
-    impl<S: State> State for SetSite<S> {
-        type Root = S::Root;
-        type CreatedAt = S::CreatedAt;
+    pub struct SetSite<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSite<St> {}
+    impl<St: State> State for SetSite<St> {
+        type CreatedAt = St::CreatedAt;
+        type Root = St::Root;
         type Site = Set<members::site>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `root` field
-        pub struct root(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `root` field
+        pub struct root(());
         ///Marker type for the `site` field
         pub struct site(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct FsBuilder<'a, S: fs_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct FsBuilder<S: BosStr, St: fs_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<i64>, Option<fs::Directory<S>>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Fs<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> FsBuilder<'a, fs_state::Empty> {
+impl<S: BosStr> Fs<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> FsBuilder<S, fs_state::Empty> {
         FsBuilder::new()
     }
 }
 
-impl<'a> FsBuilder<'a, fs_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> FsBuilder<S, fs_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         FsBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> FsBuilder<'a, S>
+impl<S: BosStr, St> FsBuilder<S, St>
 where
-    S: fs_state::State,
-    S::CreatedAt: fs_state::IsUnset,
+    St: fs_state::State,
+    St::CreatedAt: fs_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> FsBuilder<'a, fs_state::SetCreatedAt<S>> {
+    ) -> FsBuilder<S, fs_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         FsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: fs_state::State> FsBuilder<'a, S> {
+impl<S: BosStr, St: fs_state::State> FsBuilder<S, St> {
     /// Set the `fileCount` field (optional)
     pub fn file_count(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -1121,50 +1121,50 @@ impl<'a, S: fs_state::State> FsBuilder<'a, S> {
     }
 }
 
-impl<'a, S> FsBuilder<'a, S>
+impl<S: BosStr, St> FsBuilder<S, St>
 where
-    S: fs_state::State,
-    S::Root: fs_state::IsUnset,
+    St: fs_state::State,
+    St::Root: fs_state::IsUnset,
 {
     /// Set the `root` field (required)
     pub fn root(
         mut self,
         value: impl Into<fs::Directory<S>>,
-    ) -> FsBuilder<'a, fs_state::SetRoot<S>> {
+    ) -> FsBuilder<S, fs_state::SetRoot<St>> {
         self._fields.2 = Option::Some(value.into());
         FsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> FsBuilder<'a, S>
+impl<S: BosStr, St> FsBuilder<S, St>
 where
-    S: fs_state::State,
-    S::Site: fs_state::IsUnset,
+    St: fs_state::State,
+    St::Site: fs_state::IsUnset,
 {
     /// Set the `site` field (required)
-    pub fn site(mut self, value: impl Into<S>) -> FsBuilder<'a, fs_state::SetSite<S>> {
+    pub fn site(mut self, value: impl Into<S>) -> FsBuilder<S, fs_state::SetSite<St>> {
         self._fields.3 = Option::Some(value.into());
         FsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> FsBuilder<'a, S>
+impl<S: BosStr, St> FsBuilder<S, St>
 where
-    S: fs_state::State,
-    S::Root: fs_state::IsSet,
-    S::CreatedAt: fs_state::IsSet,
-    S::Site: fs_state::IsSet,
+    St: fs_state::State,
+    St::CreatedAt: fs_state::IsSet,
+    St::Root: fs_state::IsSet,
+    St::Site: fs_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Fs<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Fs<S> {
         Fs {
             created_at: self._fields.0.unwrap(),
             file_count: self._fields.1,
@@ -1173,8 +1173,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Fs<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Fs<S> {
         Fs {
             created_at: self._fields.0.unwrap(),
             file_count: self._fields.1,
@@ -1195,66 +1195,66 @@ pub mod subfs_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Subject;
         type Type;
+        type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Subject = Unset;
         type Type = Unset;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type Subject = Set<members::subject>;
-        type Type = S::Type;
+        type Subject = Unset;
     }
     ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type Subject = S::Subject;
+    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetType<St> {}
+    impl<St: State> State for SetType<St> {
         type Type = Set<members::r#type>;
+        type Subject = St::Subject;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubject<St> {}
+    impl<St: State> State for SetSubject<St> {
+        type Type = St::Type;
+        type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `subject` field
-        pub struct subject(());
         ///Marker type for the `type` field
         pub struct r#type(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct SubfsBuilder<'a, S: subfs_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct SubfsBuilder<S: BosStr, St: subfs_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<bool>, Option<AtUri<S>>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Subfs<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> SubfsBuilder<'a, subfs_state::Empty> {
+impl<S: BosStr> Subfs<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> SubfsBuilder<S, subfs_state::Empty> {
         SubfsBuilder::new()
     }
 }
 
-impl<'a> SubfsBuilder<'a, subfs_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> SubfsBuilder<S, subfs_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SubfsBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: subfs_state::State> SubfsBuilder<'a, S> {
+impl<S: BosStr, St: subfs_state::State> SubfsBuilder<S, St> {
     /// Set the `flat` field (optional)
     pub fn flat(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.0 = value.into();
@@ -1267,52 +1267,52 @@ impl<'a, S: subfs_state::State> SubfsBuilder<'a, S> {
     }
 }
 
-impl<'a, S> SubfsBuilder<'a, S>
+impl<S: BosStr, St> SubfsBuilder<S, St>
 where
-    S: subfs_state::State,
-    S::Subject: subfs_state::IsUnset,
+    St: subfs_state::State,
+    St::Subject: subfs_state::IsUnset,
 {
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> SubfsBuilder<'a, subfs_state::SetSubject<S>> {
+    ) -> SubfsBuilder<S, subfs_state::SetSubject<St>> {
         self._fields.1 = Option::Some(value.into());
         SubfsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SubfsBuilder<'a, S>
+impl<S: BosStr, St> SubfsBuilder<S, St>
 where
-    S: subfs_state::State,
-    S::Type: subfs_state::IsUnset,
+    St: subfs_state::State,
+    St::Type: subfs_state::IsUnset,
 {
     /// Set the `type` field (required)
     pub fn r#type(
         mut self,
         value: impl Into<S>,
-    ) -> SubfsBuilder<'a, subfs_state::SetType<S>> {
+    ) -> SubfsBuilder<S, subfs_state::SetType<St>> {
         self._fields.2 = Option::Some(value.into());
         SubfsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SubfsBuilder<'a, S>
+impl<S: BosStr, St> SubfsBuilder<S, St>
 where
-    S: subfs_state::State,
-    S::Subject: subfs_state::IsSet,
-    S::Type: subfs_state::IsSet,
+    St: subfs_state::State,
+    St::Type: subfs_state::IsSet,
+    St::Subject: subfs_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Subfs<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Subfs<S> {
         Subfs {
             flat: self._fields.0,
             subject: self._fields.1.unwrap(),
@@ -1320,8 +1320,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Subfs<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Subfs<S> {
         Subfs {
             flat: self._fields.0,
             subject: self._fields.1.unwrap(),

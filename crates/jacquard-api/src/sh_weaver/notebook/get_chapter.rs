@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
@@ -20,18 +20,16 @@ use crate::sh_weaver::notebook::ChapterEntryView;
 use crate::sh_weaver::notebook::ChapterView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetChapter<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct GetChapter<S: BosStr = DefaultStr> {
     pub chapter: AtUri<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub entry_cursor: Option<S>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_entry_limit")]
@@ -41,21 +39,19 @@ pub struct GetChapter<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetChapterOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetChapterOutput<S: BosStr = DefaultStr> {
     pub chapter: ChapterView<S>,
     pub entries: Vec<ChapterEntryView<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub entry_cursor: Option<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -106,12 +102,11 @@ pub struct GetChapterResponse;
 impl jacquard_common::xrpc::XrpcResp for GetChapterResponse {
     const NSID: &'static str = "sh.weaver.notebook.getChapter";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetChapterOutput<S>;
+    type Output<S: BosStr> = GetChapterOutput<S>;
     type Err = GetChapterError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetChapter<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetChapter<S> {
     const NSID: &'static str = "sh.weaver.notebook.getChapter";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetChapterResponse;
@@ -122,7 +117,7 @@ pub struct GetChapterRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetChapterRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.notebook.getChapter";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetChapter<S>;
+    type Request<S: BosStr> = GetChapter<S>;
     type Response = GetChapterResponse;
 }
 
@@ -149,9 +144,9 @@ pub mod get_chapter_state {
         type Chapter = Unset;
     }
     ///State transition - sets the `chapter` field to Set
-    pub struct SetChapter<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetChapter<S> {}
-    impl<S: State> State for SetChapter<S> {
+    pub struct SetChapter<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetChapter<St> {}
+    impl<St: State> State for SetChapter<St> {
         type Chapter = Set<members::chapter>;
     }
     /// Marker types for field names
@@ -162,51 +157,51 @@ pub mod get_chapter_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetChapterBuilder<'a, S: get_chapter_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetChapterBuilder<S: BosStr, St: get_chapter_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>, Option<S>, Option<i64>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetChapter<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetChapterBuilder<'a, get_chapter_state::Empty> {
+impl<S: BosStr> GetChapter<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetChapterBuilder<S, get_chapter_state::Empty> {
         GetChapterBuilder::new()
     }
 }
 
-impl<'a> GetChapterBuilder<'a, get_chapter_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetChapterBuilder<S, get_chapter_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetChapterBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetChapterBuilder<'a, S>
+impl<S: BosStr, St> GetChapterBuilder<S, St>
 where
-    S: get_chapter_state::State,
-    S::Chapter: get_chapter_state::IsUnset,
+    St: get_chapter_state::State,
+    St::Chapter: get_chapter_state::IsUnset,
 {
     /// Set the `chapter` field (required)
     pub fn chapter(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> GetChapterBuilder<'a, get_chapter_state::SetChapter<S>> {
+    ) -> GetChapterBuilder<S, get_chapter_state::SetChapter<St>> {
         self._fields.0 = Option::Some(value.into());
         GetChapterBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: get_chapter_state::State> GetChapterBuilder<'a, S> {
+impl<S: BosStr, St: get_chapter_state::State> GetChapterBuilder<S, St> {
     /// Set the `entryCursor` field (optional)
     pub fn entry_cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -219,7 +214,7 @@ impl<'a, S: get_chapter_state::State> GetChapterBuilder<'a, S> {
     }
 }
 
-impl<'a, S: get_chapter_state::State> GetChapterBuilder<'a, S> {
+impl<S: BosStr, St: get_chapter_state::State> GetChapterBuilder<S, St> {
     /// Set the `entryLimit` field (optional)
     pub fn entry_limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -232,13 +227,13 @@ impl<'a, S: get_chapter_state::State> GetChapterBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GetChapterBuilder<'a, S>
+impl<S: BosStr, St> GetChapterBuilder<S, St>
 where
-    S: get_chapter_state::State,
-    S::Chapter: get_chapter_state::IsSet,
+    St: get_chapter_state::State,
+    St::Chapter: get_chapter_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetChapter<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetChapter<S> {
         GetChapter {
             chapter: self._fields.0.unwrap(),
             entry_cursor: self._fields.1,

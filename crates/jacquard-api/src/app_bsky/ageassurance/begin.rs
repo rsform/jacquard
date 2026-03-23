@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
@@ -18,14 +18,14 @@ use serde::{Serialize, Deserialize};
 use crate::app_bsky::ageassurance::State;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Begin<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Begin<S: BosStr = DefaultStr> {
     ///An ISO 3166-1 alpha-2 code of the user's location.
     pub country_code: S,
     ///The user's email address to receive Age Assurance instructions.
@@ -35,28 +35,23 @@ pub struct Begin<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///An optional ISO 3166-2 code of the user's region or state within the country.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub region_code: Option<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct BeginOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct BeginOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
-    #[serde(borrow)]
     pub value: State<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -134,12 +129,11 @@ pub struct BeginResponse;
 impl jacquard_common::xrpc::XrpcResp for BeginResponse {
     const NSID: &'static str = "app.bsky.ageassurance.begin";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = BeginOutput<S>;
+    type Output<S: BosStr> = BeginOutput<S>;
     type Err = BeginError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for Begin<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Begin<S> {
     const NSID: &'static str = "app.bsky.ageassurance.begin";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -154,6 +148,6 @@ impl jacquard_common::xrpc::XrpcEndpoint for BeginRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = Begin<S>;
+    type Request<S: BosStr> = Begin<S>;
     type Response = BeginResponse;
 }

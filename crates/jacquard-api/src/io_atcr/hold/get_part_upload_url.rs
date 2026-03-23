@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::UriValue;
 use jacquard_common::types::value::Data;
@@ -18,34 +18,32 @@ use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetPartUploadUrl<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetPartUploadUrl<S: BosStr = DefaultStr> {
     ///Part sequence number (1-indexed)
     pub part_number: i64,
     ///Upload session ID from initiateUpload
     pub upload_id: S,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetPartUploadUrlOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetPartUploadUrlOutput<S: BosStr = DefaultStr> {
     ///Additional headers required for the request (e.g., content-type)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub headers: Option<Data<S>>,
@@ -55,9 +53,7 @@ pub struct GetPartUploadUrlOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub method: Option<S>,
     ///URL to PUT the part data to
     pub url: UriValue<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -117,12 +113,11 @@ pub struct GetPartUploadUrlResponse;
 impl jacquard_common::xrpc::XrpcResp for GetPartUploadUrlResponse {
     const NSID: &'static str = "io.atcr.hold.getPartUploadUrl";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetPartUploadUrlOutput<S>;
+    type Output<S: BosStr> = GetPartUploadUrlOutput<S>;
     type Err = GetPartUploadUrlError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetPartUploadUrl<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetPartUploadUrl<S> {
     const NSID: &'static str = "io.atcr.hold.getPartUploadUrl";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -137,7 +132,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetPartUploadUrlRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = GetPartUploadUrl<S>;
+    type Request<S: BosStr> = GetPartUploadUrl<S>;
     type Response = GetPartUploadUrlResponse;
 }
 
@@ -151,122 +146,122 @@ pub mod get_part_upload_url_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type UploadId;
         type PartNumber;
+        type UploadId;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type UploadId = Unset;
         type PartNumber = Unset;
-    }
-    ///State transition - sets the `upload_id` field to Set
-    pub struct SetUploadId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUploadId<S> {}
-    impl<S: State> State for SetUploadId<S> {
-        type UploadId = Set<members::upload_id>;
-        type PartNumber = S::PartNumber;
+        type UploadId = Unset;
     }
     ///State transition - sets the `part_number` field to Set
-    pub struct SetPartNumber<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPartNumber<S> {}
-    impl<S: State> State for SetPartNumber<S> {
-        type UploadId = S::UploadId;
+    pub struct SetPartNumber<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPartNumber<St> {}
+    impl<St: State> State for SetPartNumber<St> {
         type PartNumber = Set<members::part_number>;
+        type UploadId = St::UploadId;
+    }
+    ///State transition - sets the `upload_id` field to Set
+    pub struct SetUploadId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUploadId<St> {}
+    impl<St: State> State for SetUploadId<St> {
+        type PartNumber = St::PartNumber;
+        type UploadId = Set<members::upload_id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `upload_id` field
-        pub struct upload_id(());
         ///Marker type for the `part_number` field
         pub struct part_number(());
+        ///Marker type for the `upload_id` field
+        pub struct upload_id(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetPartUploadUrlBuilder<'a, S: get_part_upload_url_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetPartUploadUrlBuilder<S: BosStr, St: get_part_upload_url_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetPartUploadUrl<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetPartUploadUrlBuilder<'a, get_part_upload_url_state::Empty> {
+impl<S: BosStr> GetPartUploadUrl<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetPartUploadUrlBuilder<S, get_part_upload_url_state::Empty> {
         GetPartUploadUrlBuilder::new()
     }
 }
 
-impl<'a> GetPartUploadUrlBuilder<'a, get_part_upload_url_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetPartUploadUrlBuilder<S, get_part_upload_url_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetPartUploadUrlBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetPartUploadUrlBuilder<'a, S>
+impl<S: BosStr, St> GetPartUploadUrlBuilder<S, St>
 where
-    S: get_part_upload_url_state::State,
-    S::PartNumber: get_part_upload_url_state::IsUnset,
+    St: get_part_upload_url_state::State,
+    St::PartNumber: get_part_upload_url_state::IsUnset,
 {
     /// Set the `partNumber` field (required)
     pub fn part_number(
         mut self,
         value: impl Into<i64>,
-    ) -> GetPartUploadUrlBuilder<'a, get_part_upload_url_state::SetPartNumber<S>> {
+    ) -> GetPartUploadUrlBuilder<S, get_part_upload_url_state::SetPartNumber<St>> {
         self._fields.0 = Option::Some(value.into());
         GetPartUploadUrlBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetPartUploadUrlBuilder<'a, S>
+impl<S: BosStr, St> GetPartUploadUrlBuilder<S, St>
 where
-    S: get_part_upload_url_state::State,
-    S::UploadId: get_part_upload_url_state::IsUnset,
+    St: get_part_upload_url_state::State,
+    St::UploadId: get_part_upload_url_state::IsUnset,
 {
     /// Set the `uploadId` field (required)
     pub fn upload_id(
         mut self,
         value: impl Into<S>,
-    ) -> GetPartUploadUrlBuilder<'a, get_part_upload_url_state::SetUploadId<S>> {
+    ) -> GetPartUploadUrlBuilder<S, get_part_upload_url_state::SetUploadId<St>> {
         self._fields.1 = Option::Some(value.into());
         GetPartUploadUrlBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetPartUploadUrlBuilder<'a, S>
+impl<S: BosStr, St> GetPartUploadUrlBuilder<S, St>
 where
-    S: get_part_upload_url_state::State,
-    S::UploadId: get_part_upload_url_state::IsSet,
-    S::PartNumber: get_part_upload_url_state::IsSet,
+    St: get_part_upload_url_state::State,
+    St::PartNumber: get_part_upload_url_state::IsSet,
+    St::UploadId: get_part_upload_url_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetPartUploadUrl<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetPartUploadUrl<S> {
         GetPartUploadUrl {
             part_number: self._fields.0.unwrap(),
             upload_id: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> GetPartUploadUrl<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> GetPartUploadUrl<S> {
         GetPartUploadUrl {
             part_number: self._fields.0.unwrap(),
             upload_id: self._fields.1.unwrap(),
@@ -275,8 +270,8 @@ where
     }
 }
 
-fn _default_get_part_upload_url_output_method<S: From<&'static str>>() -> ::core::option::Option<
+fn _default_get_part_upload_url_output_method<S: FromStaticStr>() -> ::core::option::Option<
     S,
 > {
-    Some(S::from("PUT"))
+    Some(S::from_static("PUT"))
 }

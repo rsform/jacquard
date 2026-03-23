@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -29,11 +29,11 @@ use serde::{Serialize, Deserialize};
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Iframe<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Iframe<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub height: Option<i64>,
     pub url: UriValue<S>,
@@ -41,7 +41,7 @@ pub struct Iframe<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Iframe<S> {
+impl<S: BosStr> LexiconSchema for Iframe<S> {
     fn nsid() -> &'static str {
         "pub.leaflet.blocks.iframe"
     }
@@ -93,9 +93,9 @@ pub mod iframe_state {
         type Url = Unset;
     }
     ///State transition - sets the `url` field to Set
-    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrl<S> {}
-    impl<S: State> State for SetUrl<S> {
+    pub struct SetUrl<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUrl<St> {}
+    impl<St: State> State for SetUrl<St> {
         type Url = Set<members::url>;
     }
     /// Marker types for field names
@@ -106,32 +106,32 @@ pub mod iframe_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct IframeBuilder<'a, S: iframe_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct IframeBuilder<S: BosStr, St: iframe_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<UriValue<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Iframe<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> IframeBuilder<'a, iframe_state::Empty> {
+impl<S: BosStr> Iframe<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> IframeBuilder<S, iframe_state::Empty> {
         IframeBuilder::new()
     }
 }
 
-impl<'a> IframeBuilder<'a, iframe_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> IframeBuilder<S, iframe_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         IframeBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: iframe_state::State> IframeBuilder<'a, S> {
+impl<S: BosStr, St: iframe_state::State> IframeBuilder<S, St> {
     /// Set the `height` field (optional)
     pub fn height(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
@@ -144,40 +144,40 @@ impl<'a, S: iframe_state::State> IframeBuilder<'a, S> {
     }
 }
 
-impl<'a, S> IframeBuilder<'a, S>
+impl<S: BosStr, St> IframeBuilder<S, St>
 where
-    S: iframe_state::State,
-    S::Url: iframe_state::IsUnset,
+    St: iframe_state::State,
+    St::Url: iframe_state::IsUnset,
 {
     /// Set the `url` field (required)
     pub fn url(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> IframeBuilder<'a, iframe_state::SetUrl<S>> {
+    ) -> IframeBuilder<S, iframe_state::SetUrl<St>> {
         self._fields.1 = Option::Some(value.into());
         IframeBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> IframeBuilder<'a, S>
+impl<S: BosStr, St> IframeBuilder<S, St>
 where
-    S: iframe_state::State,
-    S::Url: iframe_state::IsSet,
+    St: iframe_state::State,
+    St::Url: iframe_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Iframe<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Iframe<S> {
         Iframe {
             height: self._fields.0,
             url: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Iframe<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Iframe<S> {
         Iframe {
             height: self._fields.0,
             url: self._fields.1.unwrap(),

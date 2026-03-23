@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -38,11 +38,11 @@ use crate::media_ionosphere::Membership;
     rename = "media.ionosphere.group",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Group<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Group<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -69,7 +69,7 @@ pub struct Group<S: Bos<str> + AsRef<str> = DefaultStr> {
 /// Type of group, see Table 30 of DAB SPI for idea
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum GroupKind<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum GroupKind<S: BosStr = DefaultStr> {
     Series,
     Show,
     Concept,
@@ -80,7 +80,7 @@ pub enum GroupKind<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> GroupKind<S> {
+impl<S: BosStr> GroupKind<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Series => "series",
@@ -108,19 +108,19 @@ impl<S: Bos<str> + AsRef<str>> GroupKind<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for GroupKind<S> {
+impl<S: BosStr> core::fmt::Display for GroupKind<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for GroupKind<S> {
+impl<S: BosStr> AsRef<str> for GroupKind<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for GroupKind<S> {
+impl<S: BosStr> Serialize for GroupKind<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -129,8 +129,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for GroupKind<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for GroupKind<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for GroupKind<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -140,14 +139,18 @@ for GroupKind<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for GroupKind<S> {
+impl<S: BosStr + Default> Default for GroupKind<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for GroupKind<S> {
-    type Output = GroupKind<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for GroupKind<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = GroupKind<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             GroupKind::Series => GroupKind::Series,
@@ -168,18 +171,18 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for GroupKind<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GroupGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GroupGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Group<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Group<S> {
+impl<S: BosStr> Group<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, GroupRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -192,17 +195,17 @@ pub struct GroupRecord;
 impl XrpcResp for GroupRecord {
     const NSID: &'static str = "media.ionosphere.group";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GroupGetRecordOutput<S>;
+    type Output<S: BosStr> = GroupGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<GroupGetRecordOutput<S>> for Group<S> {
+impl<S: BosStr> From<GroupGetRecordOutput<S>> for Group<S> {
     fn from(output: GroupGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Group<S> {
+impl<S: BosStr> Collection for Group<S> {
     const NSID: &'static str = "media.ionosphere.group";
     type Record = GroupRecord;
 }
@@ -212,7 +215,7 @@ impl Collection for GroupRecord {
     type Record = GroupRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Group<S> {
+impl<S: BosStr> LexiconSchema for Group<S> {
     fn nsid() -> &'static str {
         "media.ionosphere.group"
     }
@@ -307,57 +310,57 @@ pub mod group_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Language;
         type Ionosphere;
         type Name;
+        type Language;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Language = Unset;
         type Ionosphere = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `language` field to Set
-    pub struct SetLanguage<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLanguage<S> {}
-    impl<S: State> State for SetLanguage<S> {
-        type Language = Set<members::language>;
-        type Ionosphere = S::Ionosphere;
-        type Name = S::Name;
+        type Language = Unset;
     }
     ///State transition - sets the `ionosphere` field to Set
-    pub struct SetIonosphere<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIonosphere<S> {}
-    impl<S: State> State for SetIonosphere<S> {
-        type Language = S::Language;
+    pub struct SetIonosphere<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIonosphere<St> {}
+    impl<St: State> State for SetIonosphere<St> {
         type Ionosphere = Set<members::ionosphere>;
-        type Name = S::Name;
+        type Name = St::Name;
+        type Language = St::Language;
     }
     ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Language = S::Language;
-        type Ionosphere = S::Ionosphere;
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Ionosphere = St::Ionosphere;
         type Name = Set<members::name>;
+        type Language = St::Language;
+    }
+    ///State transition - sets the `language` field to Set
+    pub struct SetLanguage<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLanguage<St> {}
+    impl<St: State> State for SetLanguage<St> {
+        type Ionosphere = St::Ionosphere;
+        type Name = St::Name;
+        type Language = Set<members::language>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `language` field
-        pub struct language(());
         ///Marker type for the `ionosphere` field
         pub struct ionosphere(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `language` field
+        pub struct language(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GroupBuilder<'a, S: group_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GroupBuilder<S: BosStr, St: group_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
         Option<Vec<Genre<S>>>,
@@ -369,28 +372,28 @@ pub struct GroupBuilder<'a, S: group_state::State> {
         Option<Vec<Membership<S>>>,
         Option<S>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Group<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GroupBuilder<'a, group_state::Empty> {
+impl<S: BosStr> Group<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GroupBuilder<S, group_state::Empty> {
         GroupBuilder::new()
     }
 }
 
-impl<'a> GroupBuilder<'a, group_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GroupBuilder<S, group_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GroupBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: group_state::State> GroupBuilder<'a, S> {
+impl<S: BosStr, St: group_state::State> GroupBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -403,7 +406,7 @@ impl<'a, S: group_state::State> GroupBuilder<'a, S> {
     }
 }
 
-impl<'a, S: group_state::State> GroupBuilder<'a, S> {
+impl<S: BosStr, St: group_state::State> GroupBuilder<S, St> {
     /// Set the `genres` field (optional)
     pub fn genres(mut self, value: impl Into<Option<Vec<Genre<S>>>>) -> Self {
         self._fields.1 = value.into();
@@ -416,7 +419,7 @@ impl<'a, S: group_state::State> GroupBuilder<'a, S> {
     }
 }
 
-impl<'a, S: group_state::State> GroupBuilder<'a, S> {
+impl<S: BosStr, St: group_state::State> GroupBuilder<S, St> {
     /// Set the `icon` field (optional)
     pub fn icon(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -429,26 +432,26 @@ impl<'a, S: group_state::State> GroupBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GroupBuilder<'a, S>
+impl<S: BosStr, St> GroupBuilder<S, St>
 where
-    S: group_state::State,
-    S::Ionosphere: group_state::IsUnset,
+    St: group_state::State,
+    St::Ionosphere: group_state::IsUnset,
 {
     /// Set the `ionosphere` field (required)
     pub fn ionosphere(
         mut self,
         value: impl Into<S>,
-    ) -> GroupBuilder<'a, group_state::SetIonosphere<S>> {
+    ) -> GroupBuilder<S, group_state::SetIonosphere<St>> {
         self._fields.3 = Option::Some(value.into());
         GroupBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: group_state::State> GroupBuilder<'a, S> {
+impl<S: BosStr, St: group_state::State> GroupBuilder<S, St> {
     /// Set the `keywords` field (optional)
     pub fn keywords(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -461,7 +464,7 @@ impl<'a, S: group_state::State> GroupBuilder<'a, S> {
     }
 }
 
-impl<'a, S: group_state::State> GroupBuilder<'a, S> {
+impl<S: BosStr, St: group_state::State> GroupBuilder<S, St> {
     /// Set the `kind` field (optional)
     pub fn kind(mut self, value: impl Into<Option<GroupKind<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -474,26 +477,26 @@ impl<'a, S: group_state::State> GroupBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GroupBuilder<'a, S>
+impl<S: BosStr, St> GroupBuilder<S, St>
 where
-    S: group_state::State,
-    S::Language: group_state::IsUnset,
+    St: group_state::State,
+    St::Language: group_state::IsUnset,
 {
     /// Set the `language` field (required)
     pub fn language(
         mut self,
         value: impl Into<Language>,
-    ) -> GroupBuilder<'a, group_state::SetLanguage<S>> {
+    ) -> GroupBuilder<S, group_state::SetLanguage<St>> {
         self._fields.6 = Option::Some(value.into());
         GroupBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: group_state::State> GroupBuilder<'a, S> {
+impl<S: BosStr, St: group_state::State> GroupBuilder<S, St> {
     /// Set the `memberOf` field (optional)
     pub fn member_of(mut self, value: impl Into<Option<Vec<Membership<S>>>>) -> Self {
         self._fields.7 = value.into();
@@ -506,34 +509,34 @@ impl<'a, S: group_state::State> GroupBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GroupBuilder<'a, S>
+impl<S: BosStr, St> GroupBuilder<S, St>
 where
-    S: group_state::State,
-    S::Name: group_state::IsUnset,
+    St: group_state::State,
+    St::Name: group_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> GroupBuilder<'a, group_state::SetName<S>> {
+    ) -> GroupBuilder<S, group_state::SetName<St>> {
         self._fields.8 = Option::Some(value.into());
         GroupBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GroupBuilder<'a, S>
+impl<S: BosStr, St> GroupBuilder<S, St>
 where
-    S: group_state::State,
-    S::Language: group_state::IsSet,
-    S::Ionosphere: group_state::IsSet,
-    S::Name: group_state::IsSet,
+    St: group_state::State,
+    St::Ionosphere: group_state::IsSet,
+    St::Name: group_state::IsSet,
+    St::Language: group_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Group<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Group<S> {
         Group {
             description: self._fields.0,
             genres: self._fields.1,
@@ -547,8 +550,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Group<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Group<S> {
         Group {
             description: self._fields.0,
             genres: self._fields.1,

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "ch.indiemusi.alpha.actor.publishingOwner",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct PublishingOwner<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct PublishingOwner<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub collecting_society: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -61,18 +61,18 @@ pub struct PublishingOwner<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct PublishingOwnerGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct PublishingOwnerGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: PublishingOwner<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> PublishingOwner<S> {
+impl<S: BosStr> PublishingOwner<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, PublishingOwnerRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -85,18 +85,17 @@ pub struct PublishingOwnerRecord;
 impl XrpcResp for PublishingOwnerRecord {
     const NSID: &'static str = "ch.indiemusi.alpha.actor.publishingOwner";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = PublishingOwnerGetRecordOutput<S>;
+    type Output<S: BosStr> = PublishingOwnerGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<PublishingOwnerGetRecordOutput<S>>
-for PublishingOwner<S> {
+impl<S: BosStr> From<PublishingOwnerGetRecordOutput<S>> for PublishingOwner<S> {
     fn from(output: PublishingOwnerGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for PublishingOwner<S> {
+impl<S: BosStr> Collection for PublishingOwner<S> {
     const NSID: &'static str = "ch.indiemusi.alpha.actor.publishingOwner";
     type Record = PublishingOwnerRecord;
 }
@@ -106,7 +105,7 @@ impl Collection for PublishingOwnerRecord {
     type Record = PublishingOwnerRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for PublishingOwner<S> {
+impl<S: BosStr> LexiconSchema for PublishingOwner<S> {
     fn nsid() -> &'static str {
         "ch.indiemusi.alpha.actor.publishingOwner"
     }
@@ -190,32 +189,32 @@ pub mod publishing_owner_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct PublishingOwnerBuilder<'a, S: publishing_owner_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct PublishingOwnerBuilder<S: BosStr, St: publishing_owner_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>, Option<S>, Option<S>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> PublishingOwner<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> PublishingOwnerBuilder<'a, publishing_owner_state::Empty> {
+impl<S: BosStr> PublishingOwner<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> PublishingOwnerBuilder<S, publishing_owner_state::Empty> {
         PublishingOwnerBuilder::new()
     }
 }
 
-impl<'a> PublishingOwnerBuilder<'a, publishing_owner_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> PublishingOwnerBuilder<S, publishing_owner_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         PublishingOwnerBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: publishing_owner_state::State> PublishingOwnerBuilder<'a, S> {
+impl<S: BosStr, St: publishing_owner_state::State> PublishingOwnerBuilder<S, St> {
     /// Set the `collectingSociety` field (optional)
     pub fn collecting_society(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -228,7 +227,7 @@ impl<'a, S: publishing_owner_state::State> PublishingOwnerBuilder<'a, S> {
     }
 }
 
-impl<'a, S: publishing_owner_state::State> PublishingOwnerBuilder<'a, S> {
+impl<S: BosStr, St: publishing_owner_state::State> PublishingOwnerBuilder<S, St> {
     /// Set the `companyName` field (optional)
     pub fn company_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -241,7 +240,7 @@ impl<'a, S: publishing_owner_state::State> PublishingOwnerBuilder<'a, S> {
     }
 }
 
-impl<'a, S: publishing_owner_state::State> PublishingOwnerBuilder<'a, S> {
+impl<S: BosStr, St: publishing_owner_state::State> PublishingOwnerBuilder<S, St> {
     /// Set the `firstName` field (optional)
     pub fn first_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -254,7 +253,7 @@ impl<'a, S: publishing_owner_state::State> PublishingOwnerBuilder<'a, S> {
     }
 }
 
-impl<'a, S: publishing_owner_state::State> PublishingOwnerBuilder<'a, S> {
+impl<S: BosStr, St: publishing_owner_state::State> PublishingOwnerBuilder<S, St> {
     /// Set the `ipi` field (optional)
     pub fn ipi(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -267,7 +266,7 @@ impl<'a, S: publishing_owner_state::State> PublishingOwnerBuilder<'a, S> {
     }
 }
 
-impl<'a, S: publishing_owner_state::State> PublishingOwnerBuilder<'a, S> {
+impl<S: BosStr, St: publishing_owner_state::State> PublishingOwnerBuilder<S, St> {
     /// Set the `lastName` field (optional)
     pub fn last_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
@@ -280,12 +279,12 @@ impl<'a, S: publishing_owner_state::State> PublishingOwnerBuilder<'a, S> {
     }
 }
 
-impl<'a, S> PublishingOwnerBuilder<'a, S>
+impl<S: BosStr, St> PublishingOwnerBuilder<S, St>
 where
-    S: publishing_owner_state::State,
+    St: publishing_owner_state::State,
 {
-    /// Build the final struct
-    pub fn build(self) -> PublishingOwner<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> PublishingOwner<S> {
         PublishingOwner {
             collecting_society: self._fields.0,
             company_name: self._fields.1,
@@ -295,11 +294,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> PublishingOwner<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> PublishingOwner<S> {
         PublishingOwner {
             collecting_society: self._fields.0,
             company_name: self._fields.1,

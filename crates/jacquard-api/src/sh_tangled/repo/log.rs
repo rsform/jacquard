@@ -6,23 +6,27 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[allow(unused_imports)]
+use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Log<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Log<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub cursor: Option<S>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
@@ -31,11 +35,8 @@ pub struct Log<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Defaults to `""`.
     #[serde(default = "_default_path")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub path: Option<S>,
-    #[serde(borrow)]
     pub r#ref: S,
-    #[serde(borrow)]
     pub repo: S,
 }
 
@@ -62,22 +63,19 @@ pub struct LogOutput {
 pub enum LogError {
     /// Repository not found or access denied
     #[serde(rename = "RepoNotFound")]
-    RepoNotFound(Option<jacquard_common::deps::smol_str::SmolStr>),
+    RepoNotFound(Option<SmolStr>),
     /// Git reference not found
     #[serde(rename = "RefNotFound")]
-    RefNotFound(Option<jacquard_common::deps::smol_str::SmolStr>),
+    RefNotFound(Option<SmolStr>),
     /// Path not found in repository
     #[serde(rename = "PathNotFound")]
-    PathNotFound(Option<jacquard_common::deps::smol_str::SmolStr>),
+    PathNotFound(Option<SmolStr>),
     /// Invalid request parameters
     #[serde(rename = "InvalidRequest")]
-    InvalidRequest(Option<jacquard_common::deps::smol_str::SmolStr>),
+    InvalidRequest(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: jacquard_common::deps::smol_str::SmolStr,
-        message: Option<jacquard_common::deps::smol_str::SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for LogError {
@@ -127,9 +125,9 @@ pub struct LogResponse;
 impl jacquard_common::xrpc::XrpcResp for LogResponse {
     const NSID: &'static str = "sh.tangled.repo.log";
     const ENCODING: &'static str = "*/*";
-    type Output<S: Bos<str> + AsRef<str>> = LogOutput;
+    type Output<S: BosStr> = LogOutput;
     type Err = LogError;
-    fn encode_output<S: Bos<str> + AsRef<str>>(
+    fn encode_output<S: BosStr>(
         output: &Self::Output<S>,
     ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError>
     where
@@ -141,7 +139,7 @@ impl jacquard_common::xrpc::XrpcResp for LogResponse {
         body: &'de [u8],
     ) -> Result<Self::Output<S>, jacquard_common::error::DecodeError>
     where
-        S: Bos<str> + AsRef<str> + Deserialize<'de>,
+        S: BosStr + Deserialize<'de>,
         Self::Output<S>: Deserialize<'de>,
     {
         Ok(LogOutput {
@@ -150,8 +148,7 @@ impl jacquard_common::xrpc::XrpcResp for LogResponse {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for Log<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Log<S> {
     const NSID: &'static str = "sh.tangled.repo.log";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = LogResponse;
@@ -162,7 +159,7 @@ pub struct LogRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for LogRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.repo.log";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = Log<S>;
+    type Request<S: BosStr> = Log<S>;
     type Response = LogResponse;
 }
 
@@ -170,8 +167,8 @@ fn _default_limit() -> Option<i64> {
     Some(50i64)
 }
 
-fn _default_path() -> Option<CowStr<'static>> {
-    Some(CowStr::from(""))
+fn _default_path<S: jacquard_common::FromStaticStr>() -> Option<S> {
+    Some(S::from_static(""))
 }
 
 pub mod log_state {
@@ -184,66 +181,66 @@ pub mod log_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Repo;
         type Ref;
+        type Repo;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Repo = Unset;
         type Ref = Unset;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
-        type Repo = Set<members::repo>;
-        type Ref = S::Ref;
+        type Repo = Unset;
     }
     ///State transition - sets the `ref` field to Set
-    pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRef<S> {}
-    impl<S: State> State for SetRef<S> {
-        type Repo = S::Repo;
+    pub struct SetRef<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRef<St> {}
+    impl<St: State> State for SetRef<St> {
         type Ref = Set<members::r#ref>;
+        type Repo = St::Repo;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRepo<St> {}
+    impl<St: State> State for SetRepo<St> {
+        type Ref = St::Ref;
+        type Repo = Set<members::repo>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `repo` field
-        pub struct repo(());
         ///Marker type for the `ref` field
         pub struct r#ref(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct LogBuilder<'a, S: log_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct LogBuilder<S: BosStr, St: log_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>, Option<S>, Option<S>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Log<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> LogBuilder<'a, log_state::Empty> {
+impl<S: BosStr> Log<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> LogBuilder<S, log_state::Empty> {
         LogBuilder::new()
     }
 }
 
-impl<'a> LogBuilder<'a, log_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> LogBuilder<S, log_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         LogBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: log_state::State> LogBuilder<'a, S> {
+impl<S: BosStr, St: log_state::State> LogBuilder<S, St> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -256,7 +253,7 @@ impl<'a, S: log_state::State> LogBuilder<'a, S> {
     }
 }
 
-impl<'a, S: log_state::State> LogBuilder<'a, S> {
+impl<S: BosStr, St: log_state::State> LogBuilder<S, St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -269,7 +266,7 @@ impl<'a, S: log_state::State> LogBuilder<'a, S> {
     }
 }
 
-impl<'a, S: log_state::State> LogBuilder<'a, S> {
+impl<S: BosStr, St: log_state::State> LogBuilder<S, St> {
     /// Set the `path` field (optional)
     pub fn path(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -282,46 +279,46 @@ impl<'a, S: log_state::State> LogBuilder<'a, S> {
     }
 }
 
-impl<'a, S> LogBuilder<'a, S>
+impl<S: BosStr, St> LogBuilder<S, St>
 where
-    S: log_state::State,
-    S::Ref: log_state::IsUnset,
+    St: log_state::State,
+    St::Ref: log_state::IsUnset,
 {
     /// Set the `ref` field (required)
-    pub fn r#ref(mut self, value: impl Into<S>) -> LogBuilder<'a, log_state::SetRef<S>> {
+    pub fn r#ref(mut self, value: impl Into<S>) -> LogBuilder<S, log_state::SetRef<St>> {
         self._fields.3 = Option::Some(value.into());
         LogBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LogBuilder<'a, S>
+impl<S: BosStr, St> LogBuilder<S, St>
 where
-    S: log_state::State,
-    S::Repo: log_state::IsUnset,
+    St: log_state::State,
+    St::Repo: log_state::IsUnset,
 {
     /// Set the `repo` field (required)
-    pub fn repo(mut self, value: impl Into<S>) -> LogBuilder<'a, log_state::SetRepo<S>> {
+    pub fn repo(mut self, value: impl Into<S>) -> LogBuilder<S, log_state::SetRepo<St>> {
         self._fields.4 = Option::Some(value.into());
         LogBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LogBuilder<'a, S>
+impl<S: BosStr, St> LogBuilder<S, St>
 where
-    S: log_state::State,
-    S::Repo: log_state::IsSet,
-    S::Ref: log_state::IsSet,
+    St: log_state::State,
+    St::Ref: log_state::IsSet,
+    St::Repo: log_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Log<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Log<S> {
         Log {
             cursor: self._fields.0,
             limit: self._fields.1,

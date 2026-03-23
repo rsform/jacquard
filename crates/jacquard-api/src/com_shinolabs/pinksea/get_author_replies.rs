@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::string::Datetime;
@@ -20,15 +20,14 @@ use serde::{Serialize, Deserialize};
 use crate::com_shinolabs::pinksea::app_view_defs::HydratedOekaki;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetAuthorReplies<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct GetAuthorReplies<S: BosStr = DefaultStr> {
     pub did: AtIdentifier<S>,
     ///Defaults to `50`. Min: 1. Max: 50.
     #[serde(default = "_default_limit")]
@@ -40,18 +39,16 @@ pub struct GetAuthorReplies<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetAuthorRepliesOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetAuthorRepliesOutput<S: BosStr = DefaultStr> {
     pub oekaki: Vec<HydratedOekaki<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -60,12 +57,11 @@ pub struct GetAuthorRepliesResponse;
 impl jacquard_common::xrpc::XrpcResp for GetAuthorRepliesResponse {
     const NSID: &'static str = "com.shinolabs.pinksea.getAuthorReplies";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetAuthorRepliesOutput<S>;
+    type Output<S: BosStr> = GetAuthorRepliesOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetAuthorReplies<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetAuthorReplies<S> {
     const NSID: &'static str = "com.shinolabs.pinksea.getAuthorReplies";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetAuthorRepliesResponse;
@@ -76,7 +72,7 @@ pub struct GetAuthorRepliesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetAuthorRepliesRequest {
     const PATH: &'static str = "/xrpc/com.shinolabs.pinksea.getAuthorReplies";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetAuthorReplies<S>;
+    type Request<S: BosStr> = GetAuthorReplies<S>;
     type Response = GetAuthorRepliesResponse;
 }
 
@@ -103,9 +99,9 @@ pub mod get_author_replies_state {
         type Did = Unset;
     }
     ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
         type Did = Set<members::did>;
     }
     /// Marker types for field names
@@ -116,51 +112,51 @@ pub mod get_author_replies_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetAuthorRepliesBuilder<'a, S: get_author_replies_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetAuthorRepliesBuilder<S: BosStr, St: get_author_replies_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtIdentifier<S>>, Option<i64>, Option<Datetime>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetAuthorReplies<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetAuthorRepliesBuilder<'a, get_author_replies_state::Empty> {
+impl<S: BosStr> GetAuthorReplies<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetAuthorRepliesBuilder<S, get_author_replies_state::Empty> {
         GetAuthorRepliesBuilder::new()
     }
 }
 
-impl<'a> GetAuthorRepliesBuilder<'a, get_author_replies_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetAuthorRepliesBuilder<S, get_author_replies_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetAuthorRepliesBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetAuthorRepliesBuilder<'a, S>
+impl<S: BosStr, St> GetAuthorRepliesBuilder<S, St>
 where
-    S: get_author_replies_state::State,
-    S::Did: get_author_replies_state::IsUnset,
+    St: get_author_replies_state::State,
+    St::Did: get_author_replies_state::IsUnset,
 {
     /// Set the `did` field (required)
     pub fn did(
         mut self,
         value: impl Into<AtIdentifier<S>>,
-    ) -> GetAuthorRepliesBuilder<'a, get_author_replies_state::SetDid<S>> {
+    ) -> GetAuthorRepliesBuilder<S, get_author_replies_state::SetDid<St>> {
         self._fields.0 = Option::Some(value.into());
         GetAuthorRepliesBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: get_author_replies_state::State> GetAuthorRepliesBuilder<'a, S> {
+impl<S: BosStr, St: get_author_replies_state::State> GetAuthorRepliesBuilder<S, St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -173,7 +169,7 @@ impl<'a, S: get_author_replies_state::State> GetAuthorRepliesBuilder<'a, S> {
     }
 }
 
-impl<'a, S: get_author_replies_state::State> GetAuthorRepliesBuilder<'a, S> {
+impl<S: BosStr, St: get_author_replies_state::State> GetAuthorRepliesBuilder<S, St> {
     /// Set the `since` field (optional)
     pub fn since(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.2 = value.into();
@@ -186,13 +182,13 @@ impl<'a, S: get_author_replies_state::State> GetAuthorRepliesBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GetAuthorRepliesBuilder<'a, S>
+impl<S: BosStr, St> GetAuthorRepliesBuilder<S, St>
 where
-    S: get_author_replies_state::State,
-    S::Did: get_author_replies_state::IsSet,
+    St: get_author_replies_state::State,
+    St::Did: get_author_replies_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetAuthorReplies<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetAuthorReplies<S> {
         GetAuthorReplies {
             did: self._fields.0.unwrap(),
             limit: self._fields.1,

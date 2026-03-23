@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -32,11 +32,11 @@ use crate::tools_ozone::verification::grant_verifications;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GrantError<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GrantError<S: BosStr = DefaultStr> {
     ///Error message describing the reason for failure.
     pub error: S,
     ///The did of the subject being verified
@@ -47,37 +47,17 @@ pub struct GrantError<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GrantVerifications<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GrantVerifications<S: BosStr = DefaultStr> {
     ///Array of verification requests to process
     pub verifications: Vec<grant_verifications::VerificationInput<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
-    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
-}
-
-
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-#[serde(
-    bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
-    )
-)]
-pub struct GrantVerificationsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
-    pub failed_verifications: Vec<grant_verifications::GrantError<S>>,
-    pub verifications: Vec<VerificationView<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -86,11 +66,27 @@ pub struct GrantVerificationsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct VerificationInput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GrantVerificationsOutput<S: BosStr = DefaultStr> {
+    pub failed_verifications: Vec<grant_verifications::GrantError<S>>,
+    pub verifications: Vec<VerificationView<S>>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
+    )
+)]
+pub struct VerificationInput<S: BosStr = DefaultStr> {
     ///Timestamp for verification record. Defaults to current time when not specified.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
@@ -104,7 +100,7 @@ pub struct VerificationInput<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for GrantError<S> {
+impl<S: BosStr> LexiconSchema for GrantError<S> {
     fn nsid() -> &'static str {
         "tools.ozone.verification.grantVerifications"
     }
@@ -124,12 +120,11 @@ pub struct GrantVerificationsResponse;
 impl jacquard_common::xrpc::XrpcResp for GrantVerificationsResponse {
     const NSID: &'static str = "tools.ozone.verification.grantVerifications";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GrantVerificationsOutput<S>;
+    type Output<S: BosStr> = GrantVerificationsOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GrantVerifications<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GrantVerifications<S> {
     const NSID: &'static str = "tools.ozone.verification.grantVerifications";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -144,11 +139,11 @@ impl jacquard_common::xrpc::XrpcEndpoint for GrantVerificationsRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = GrantVerifications<S>;
+    type Request<S: BosStr> = GrantVerifications<S>;
     type Response = GrantVerificationsResponse;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for VerificationInput<S> {
+impl<S: BosStr> LexiconSchema for VerificationInput<S> {
     fn nsid() -> &'static str {
         "tools.ozone.verification.grantVerifications"
     }
@@ -184,17 +179,17 @@ pub mod grant_error_state {
         type Subject = Unset;
     }
     ///State transition - sets the `error` field to Set
-    pub struct SetError<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetError<S> {}
-    impl<S: State> State for SetError<S> {
+    pub struct SetError<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetError<St> {}
+    impl<St: State> State for SetError<St> {
         type Error = Set<members::error>;
-        type Subject = S::Subject;
+        type Subject = St::Subject;
     }
     ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type Error = S::Error;
+    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubject<St> {}
+    impl<St: State> State for SetSubject<St> {
+        type Error = St::Error;
         type Subject = Set<members::subject>;
     }
     /// Marker types for field names
@@ -207,88 +202,88 @@ pub mod grant_error_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GrantErrorBuilder<'a, S: grant_error_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GrantErrorBuilder<S: BosStr, St: grant_error_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<Did<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GrantError<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GrantErrorBuilder<'a, grant_error_state::Empty> {
+impl<S: BosStr> GrantError<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GrantErrorBuilder<S, grant_error_state::Empty> {
         GrantErrorBuilder::new()
     }
 }
 
-impl<'a> GrantErrorBuilder<'a, grant_error_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GrantErrorBuilder<S, grant_error_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GrantErrorBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GrantErrorBuilder<'a, S>
+impl<S: BosStr, St> GrantErrorBuilder<S, St>
 where
-    S: grant_error_state::State,
-    S::Error: grant_error_state::IsUnset,
+    St: grant_error_state::State,
+    St::Error: grant_error_state::IsUnset,
 {
     /// Set the `error` field (required)
     pub fn error(
         mut self,
         value: impl Into<S>,
-    ) -> GrantErrorBuilder<'a, grant_error_state::SetError<S>> {
+    ) -> GrantErrorBuilder<S, grant_error_state::SetError<St>> {
         self._fields.0 = Option::Some(value.into());
         GrantErrorBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GrantErrorBuilder<'a, S>
+impl<S: BosStr, St> GrantErrorBuilder<S, St>
 where
-    S: grant_error_state::State,
-    S::Subject: grant_error_state::IsUnset,
+    St: grant_error_state::State,
+    St::Subject: grant_error_state::IsUnset,
 {
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> GrantErrorBuilder<'a, grant_error_state::SetSubject<S>> {
+    ) -> GrantErrorBuilder<S, grant_error_state::SetSubject<St>> {
         self._fields.1 = Option::Some(value.into());
         GrantErrorBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GrantErrorBuilder<'a, S>
+impl<S: BosStr, St> GrantErrorBuilder<S, St>
 where
-    S: grant_error_state::State,
-    S::Error: grant_error_state::IsSet,
-    S::Subject: grant_error_state::IsSet,
+    St: grant_error_state::State,
+    St::Error: grant_error_state::IsSet,
+    St::Subject: grant_error_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GrantError<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GrantError<S> {
         GrantError {
             error: self._fields.0.unwrap(),
             subject: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> GrantError<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> GrantError<S> {
         GrantError {
             error: self._fields.0.unwrap(),
             subject: self._fields.1.unwrap(),
@@ -472,9 +467,9 @@ pub mod grant_verifications_state {
         type Verifications = Unset;
     }
     ///State transition - sets the `verifications` field to Set
-    pub struct SetVerifications<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVerifications<S> {}
-    impl<S: State> State for SetVerifications<S> {
+    pub struct SetVerifications<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetVerifications<St> {}
+    impl<St: State> State for SetVerifications<St> {
         type Verifications = Set<members::verifications>;
     }
     /// Marker types for field names
@@ -485,67 +480,67 @@ pub mod grant_verifications_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GrantVerificationsBuilder<'a, S: grant_verifications_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GrantVerificationsBuilder<S: BosStr, St: grant_verifications_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<grant_verifications::VerificationInput<S>>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GrantVerifications<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GrantVerificationsBuilder<'a, grant_verifications_state::Empty> {
+impl<S: BosStr> GrantVerifications<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GrantVerificationsBuilder<S, grant_verifications_state::Empty> {
         GrantVerificationsBuilder::new()
     }
 }
 
-impl<'a> GrantVerificationsBuilder<'a, grant_verifications_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GrantVerificationsBuilder<S, grant_verifications_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GrantVerificationsBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GrantVerificationsBuilder<'a, S>
+impl<S: BosStr, St> GrantVerificationsBuilder<S, St>
 where
-    S: grant_verifications_state::State,
-    S::Verifications: grant_verifications_state::IsUnset,
+    St: grant_verifications_state::State,
+    St::Verifications: grant_verifications_state::IsUnset,
 {
     /// Set the `verifications` field (required)
     pub fn verifications(
         mut self,
         value: impl Into<Vec<grant_verifications::VerificationInput<S>>>,
-    ) -> GrantVerificationsBuilder<'a, grant_verifications_state::SetVerifications<S>> {
+    ) -> GrantVerificationsBuilder<S, grant_verifications_state::SetVerifications<St>> {
         self._fields.0 = Option::Some(value.into());
         GrantVerificationsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GrantVerificationsBuilder<'a, S>
+impl<S: BosStr, St> GrantVerificationsBuilder<S, St>
 where
-    S: grant_verifications_state::State,
-    S::Verifications: grant_verifications_state::IsSet,
+    St: grant_verifications_state::State,
+    St::Verifications: grant_verifications_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GrantVerifications<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GrantVerifications<S> {
         GrantVerifications {
             verifications: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> GrantVerifications<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> GrantVerifications<S> {
         GrantVerifications {
             verifications: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -576,27 +571,27 @@ pub mod verification_input_state {
         type Subject = Unset;
     }
     ///State transition - sets the `handle` field to Set
-    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHandle<S> {}
-    impl<S: State> State for SetHandle<S> {
+    pub struct SetHandle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHandle<St> {}
+    impl<St: State> State for SetHandle<St> {
         type Handle = Set<members::handle>;
-        type DisplayName = S::DisplayName;
-        type Subject = S::Subject;
+        type DisplayName = St::DisplayName;
+        type Subject = St::Subject;
     }
     ///State transition - sets the `display_name` field to Set
-    pub struct SetDisplayName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDisplayName<S> {}
-    impl<S: State> State for SetDisplayName<S> {
-        type Handle = S::Handle;
+    pub struct SetDisplayName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDisplayName<St> {}
+    impl<St: State> State for SetDisplayName<St> {
+        type Handle = St::Handle;
         type DisplayName = Set<members::display_name>;
-        type Subject = S::Subject;
+        type Subject = St::Subject;
     }
     ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type Handle = S::Handle;
-        type DisplayName = S::DisplayName;
+    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubject<St> {}
+    impl<St: State> State for SetSubject<St> {
+        type Handle = St::Handle;
+        type DisplayName = St::DisplayName;
         type Subject = Set<members::subject>;
     }
     /// Marker types for field names
@@ -611,32 +606,32 @@ pub mod verification_input_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct VerificationInputBuilder<'a, S: verification_input_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct VerificationInputBuilder<S: BosStr, St: verification_input_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<S>, Option<Handle<S>>, Option<Did<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> VerificationInput<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> VerificationInputBuilder<'a, verification_input_state::Empty> {
+impl<S: BosStr> VerificationInput<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> VerificationInputBuilder<S, verification_input_state::Empty> {
         VerificationInputBuilder::new()
     }
 }
 
-impl<'a> VerificationInputBuilder<'a, verification_input_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> VerificationInputBuilder<S, verification_input_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         VerificationInputBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: verification_input_state::State> VerificationInputBuilder<'a, S> {
+impl<S: BosStr, St: verification_input_state::State> VerificationInputBuilder<S, St> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.0 = value.into();
@@ -649,72 +644,72 @@ impl<'a, S: verification_input_state::State> VerificationInputBuilder<'a, S> {
     }
 }
 
-impl<'a, S> VerificationInputBuilder<'a, S>
+impl<S: BosStr, St> VerificationInputBuilder<S, St>
 where
-    S: verification_input_state::State,
-    S::DisplayName: verification_input_state::IsUnset,
+    St: verification_input_state::State,
+    St::DisplayName: verification_input_state::IsUnset,
 {
     /// Set the `displayName` field (required)
     pub fn display_name(
         mut self,
         value: impl Into<S>,
-    ) -> VerificationInputBuilder<'a, verification_input_state::SetDisplayName<S>> {
+    ) -> VerificationInputBuilder<S, verification_input_state::SetDisplayName<St>> {
         self._fields.1 = Option::Some(value.into());
         VerificationInputBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> VerificationInputBuilder<'a, S>
+impl<S: BosStr, St> VerificationInputBuilder<S, St>
 where
-    S: verification_input_state::State,
-    S::Handle: verification_input_state::IsUnset,
+    St: verification_input_state::State,
+    St::Handle: verification_input_state::IsUnset,
 {
     /// Set the `handle` field (required)
     pub fn handle(
         mut self,
         value: impl Into<Handle<S>>,
-    ) -> VerificationInputBuilder<'a, verification_input_state::SetHandle<S>> {
+    ) -> VerificationInputBuilder<S, verification_input_state::SetHandle<St>> {
         self._fields.2 = Option::Some(value.into());
         VerificationInputBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> VerificationInputBuilder<'a, S>
+impl<S: BosStr, St> VerificationInputBuilder<S, St>
 where
-    S: verification_input_state::State,
-    S::Subject: verification_input_state::IsUnset,
+    St: verification_input_state::State,
+    St::Subject: verification_input_state::IsUnset,
 {
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> VerificationInputBuilder<'a, verification_input_state::SetSubject<S>> {
+    ) -> VerificationInputBuilder<S, verification_input_state::SetSubject<St>> {
         self._fields.3 = Option::Some(value.into());
         VerificationInputBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> VerificationInputBuilder<'a, S>
+impl<S: BosStr, St> VerificationInputBuilder<S, St>
 where
-    S: verification_input_state::State,
-    S::Handle: verification_input_state::IsSet,
-    S::DisplayName: verification_input_state::IsSet,
-    S::Subject: verification_input_state::IsSet,
+    St: verification_input_state::State,
+    St::Handle: verification_input_state::IsSet,
+    St::DisplayName: verification_input_state::IsSet,
+    St::Subject: verification_input_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> VerificationInput<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> VerificationInput<S> {
         VerificationInput {
             created_at: self._fields.0,
             display_name: self._fields.1.unwrap(),
@@ -723,11 +718,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> VerificationInput<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> VerificationInput<S> {
         VerificationInput {
             created_at: self._fields.0,
             display_name: self._fields.1.unwrap(),

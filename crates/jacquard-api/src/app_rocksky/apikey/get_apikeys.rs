@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
@@ -27,19 +27,17 @@ pub struct GetApikeys {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetApikeysOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetApikeysOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub api_keys: Option<Vec<Data<S>>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -48,7 +46,7 @@ pub struct GetApikeysResponse;
 impl jacquard_common::xrpc::XrpcResp for GetApikeysResponse {
     const NSID: &'static str = "app.rocksky.apikey.getApikeys";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetApikeysOutput<S>;
+    type Output<S: BosStr> = GetApikeysOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
@@ -63,7 +61,7 @@ pub struct GetApikeysRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetApikeysRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.apikey.getApikeys";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetApikeys;
+    type Request<S: BosStr> = GetApikeys;
     type Response = GetApikeysResponse;
 }
 
@@ -86,21 +84,21 @@ pub mod get_apikeys_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetApikeysBuilder<S: get_apikeys_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetApikeysBuilder<St: get_apikeys_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<i64>),
 }
 
 impl GetApikeys {
-    /// Create a new builder for this type
+    /// Create a new builder for this type.
     pub fn new() -> GetApikeysBuilder<get_apikeys_state::Empty> {
         GetApikeysBuilder::new()
     }
 }
 
 impl GetApikeysBuilder<get_apikeys_state::Empty> {
-    /// Create a new builder with all fields unset
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetApikeysBuilder {
             _state: PhantomData,
@@ -109,7 +107,7 @@ impl GetApikeysBuilder<get_apikeys_state::Empty> {
     }
 }
 
-impl<S: get_apikeys_state::State> GetApikeysBuilder<S> {
+impl<St: get_apikeys_state::State> GetApikeysBuilder<St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
@@ -122,7 +120,7 @@ impl<S: get_apikeys_state::State> GetApikeysBuilder<S> {
     }
 }
 
-impl<S: get_apikeys_state::State> GetApikeysBuilder<S> {
+impl<St: get_apikeys_state::State> GetApikeysBuilder<St> {
     /// Set the `offset` field (optional)
     pub fn offset(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -135,11 +133,11 @@ impl<S: get_apikeys_state::State> GetApikeysBuilder<S> {
     }
 }
 
-impl<S> GetApikeysBuilder<S>
+impl<St> GetApikeysBuilder<St>
 where
-    S: get_apikeys_state::State,
+    St: get_apikeys_state::State,
 {
-    /// Build the final struct
+    /// Build the final struct.
     pub fn build(self) -> GetApikeys {
         GetApikeys {
             limit: self._fields.0,

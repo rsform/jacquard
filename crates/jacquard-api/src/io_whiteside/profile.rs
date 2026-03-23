@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "io.whiteside.profile",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Profile<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Profile<S: BosStr = DefaultStr> {
     ///Profile content in plain text or markdown format
     pub content: S,
     ///Profile section heading (e.g. 'Hey, I'm John')
@@ -56,18 +56,18 @@ pub struct Profile<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ProfileGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ProfileGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Profile<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Profile<S> {
+impl<S: BosStr> Profile<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, ProfileRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -80,17 +80,17 @@ pub struct ProfileRecord;
 impl XrpcResp for ProfileRecord {
     const NSID: &'static str = "io.whiteside.profile";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ProfileGetRecordOutput<S>;
+    type Output<S: BosStr> = ProfileGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<ProfileGetRecordOutput<S>> for Profile<S> {
+impl<S: BosStr> From<ProfileGetRecordOutput<S>> for Profile<S> {
     fn from(output: ProfileGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Profile<S> {
+impl<S: BosStr> Collection for Profile<S> {
     const NSID: &'static str = "io.whiteside.profile";
     type Record = ProfileRecord;
 }
@@ -100,7 +100,7 @@ impl Collection for ProfileRecord {
     type Record = ProfileRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Profile<S> {
+impl<S: BosStr> LexiconSchema for Profile<S> {
     fn nsid() -> &'static str {
         "io.whiteside.profile"
     }
@@ -160,27 +160,27 @@ pub mod profile_state {
         type UpdatedAt = Unset;
     }
     ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
+    pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetContent<St> {}
+    impl<St: State> State for SetContent<St> {
         type Content = Set<members::content>;
-        type Heading = S::Heading;
-        type UpdatedAt = S::UpdatedAt;
+        type Heading = St::Heading;
+        type UpdatedAt = St::UpdatedAt;
     }
     ///State transition - sets the `heading` field to Set
-    pub struct SetHeading<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHeading<S> {}
-    impl<S: State> State for SetHeading<S> {
-        type Content = S::Content;
+    pub struct SetHeading<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHeading<St> {}
+    impl<St: State> State for SetHeading<St> {
+        type Content = St::Content;
         type Heading = Set<members::heading>;
-        type UpdatedAt = S::UpdatedAt;
+        type UpdatedAt = St::UpdatedAt;
     }
     ///State transition - sets the `updated_at` field to Set
-    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
-    impl<S: State> State for SetUpdatedAt<S> {
-        type Content = S::Content;
-        type Heading = S::Heading;
+    pub struct SetUpdatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUpdatedAt<St> {}
+    impl<St: State> State for SetUpdatedAt<St> {
+        type Content = St::Content;
+        type Heading = St::Heading;
         type UpdatedAt = Set<members::updated_at>;
     }
     /// Marker types for field names
@@ -195,97 +195,97 @@ pub mod profile_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ProfileBuilder<'a, S: profile_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ProfileBuilder<S: BosStr, St: profile_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>, Option<Datetime>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Profile<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ProfileBuilder<'a, profile_state::Empty> {
+impl<S: BosStr> Profile<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ProfileBuilder<S, profile_state::Empty> {
         ProfileBuilder::new()
     }
 }
 
-impl<'a> ProfileBuilder<'a, profile_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ProfileBuilder<S, profile_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ProfileBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ProfileBuilder<'a, S>
+impl<S: BosStr, St> ProfileBuilder<S, St>
 where
-    S: profile_state::State,
-    S::Content: profile_state::IsUnset,
+    St: profile_state::State,
+    St::Content: profile_state::IsUnset,
 {
     /// Set the `content` field (required)
     pub fn content(
         mut self,
         value: impl Into<S>,
-    ) -> ProfileBuilder<'a, profile_state::SetContent<S>> {
+    ) -> ProfileBuilder<S, profile_state::SetContent<St>> {
         self._fields.0 = Option::Some(value.into());
         ProfileBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ProfileBuilder<'a, S>
+impl<S: BosStr, St> ProfileBuilder<S, St>
 where
-    S: profile_state::State,
-    S::Heading: profile_state::IsUnset,
+    St: profile_state::State,
+    St::Heading: profile_state::IsUnset,
 {
     /// Set the `heading` field (required)
     pub fn heading(
         mut self,
         value: impl Into<S>,
-    ) -> ProfileBuilder<'a, profile_state::SetHeading<S>> {
+    ) -> ProfileBuilder<S, profile_state::SetHeading<St>> {
         self._fields.1 = Option::Some(value.into());
         ProfileBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ProfileBuilder<'a, S>
+impl<S: BosStr, St> ProfileBuilder<S, St>
 where
-    S: profile_state::State,
-    S::UpdatedAt: profile_state::IsUnset,
+    St: profile_state::State,
+    St::UpdatedAt: profile_state::IsUnset,
 {
     /// Set the `updatedAt` field (required)
     pub fn updated_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ProfileBuilder<'a, profile_state::SetUpdatedAt<S>> {
+    ) -> ProfileBuilder<S, profile_state::SetUpdatedAt<St>> {
         self._fields.2 = Option::Some(value.into());
         ProfileBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ProfileBuilder<'a, S>
+impl<S: BosStr, St> ProfileBuilder<S, St>
 where
-    S: profile_state::State,
-    S::Content: profile_state::IsSet,
-    S::Heading: profile_state::IsSet,
-    S::UpdatedAt: profile_state::IsSet,
+    St: profile_state::State,
+    St::Content: profile_state::IsSet,
+    St::Heading: profile_state::IsSet,
+    St::UpdatedAt: profile_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Profile<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Profile<S> {
         Profile {
             content: self._fields.0.unwrap(),
             heading: self._fields.1.unwrap(),
@@ -293,11 +293,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Profile<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Profile<S> {
         Profile {
             content: self._fields.0.unwrap(),
             heading: self._fields.1.unwrap(),

@@ -13,7 +13,9 @@ use crate::deps::fluent_uri::{
 use crate::error::DecodeError;
 use crate::stream::StreamError;
 use crate::websocket::{WebSocketClient, WebSocketConnection, WsSink, WsStream};
+use crate::bos::BosStr;
 use crate::{CowStr, Data, IntoStatic, RawData, WsMessage};
+use smol_str::SmolStr;
 use alloc::borrow::ToOwned;
 use alloc::string::String;
 use alloc::string::ToString;
@@ -51,8 +53,8 @@ pub trait SubscriptionResp {
     /// Message encoding (JSON or DAG-CBOR)
     const ENCODING: MessageEncoding;
 
-    /// Message union type
-    type Message<'de>: Deserialize<'de> + IntoStatic;
+    /// Message union type, parameterised on backing string type.
+    type Message<S: BosStr>;
 
     /// Error union type. Always owned (`DeserializeOwned`).
     type Error: Error + DeserializeOwned;
@@ -62,7 +64,11 @@ pub trait SubscriptionResp {
     /// Default implementation uses simple deserialization via serde.
     /// Subscriptions that use framed encoding (header + body) can override
     /// this to do two-stage deserialization.
-    fn decode_message<'de>(bytes: &'de [u8]) -> Result<Self::Message<'de>, DecodeError> {
+    fn decode_message<'de, S>(bytes: &'de [u8]) -> Result<Self::Message<S>, DecodeError>
+    where
+        S: BosStr + Deserialize<'de>,
+        Self::Message<S>: Deserialize<'de>,
+    {
         match Self::ENCODING {
             MessageEncoding::Json => serde_json::from_slice(bytes).map_err(DecodeError::from),
             MessageEncoding::DagCbor => {
@@ -711,7 +717,7 @@ impl<S: SubscriptionResp> SubscriptionStream<S> {
     }
 }
 
-type StreamMessage<'a, R> = <R as SubscriptionResp>::Message<'a>;
+type StreamMessage<S, R> = <R as SubscriptionResp>::Message<S>;
 
 /// XRPC subscription endpoint trait (server-side)
 ///

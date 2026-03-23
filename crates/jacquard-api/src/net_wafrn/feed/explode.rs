@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
     rename = "net.wafrn.feed.explode",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Explode<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Explode<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -55,18 +55,18 @@ pub struct Explode<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ExplodeGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ExplodeGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Explode<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Explode<S> {
+impl<S: BosStr> Explode<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, ExplodeRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -79,17 +79,17 @@ pub struct ExplodeRecord;
 impl XrpcResp for ExplodeRecord {
     const NSID: &'static str = "net.wafrn.feed.explode";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ExplodeGetRecordOutput<S>;
+    type Output<S: BosStr> = ExplodeGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<ExplodeGetRecordOutput<S>> for Explode<S> {
+impl<S: BosStr> From<ExplodeGetRecordOutput<S>> for Explode<S> {
     fn from(output: ExplodeGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Explode<S> {
+impl<S: BosStr> Collection for Explode<S> {
     const NSID: &'static str = "net.wafrn.feed.explode";
     type Record = ExplodeRecord;
 }
@@ -99,7 +99,7 @@ impl Collection for ExplodeRecord {
     type Record = ExplodeRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Explode<S> {
+impl<S: BosStr> LexiconSchema for Explode<S> {
     fn nsid() -> &'static str {
         "net.wafrn.feed.explode"
     }
@@ -133,32 +133,32 @@ pub mod explode_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct ExplodeBuilder<'a, S: explode_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ExplodeBuilder<S: BosStr, St: explode_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<StrongRef<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Explode<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ExplodeBuilder<'a, explode_state::Empty> {
+impl<S: BosStr> Explode<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ExplodeBuilder<S, explode_state::Empty> {
         ExplodeBuilder::new()
     }
 }
 
-impl<'a> ExplodeBuilder<'a, explode_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ExplodeBuilder<S, explode_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ExplodeBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: explode_state::State> ExplodeBuilder<'a, S> {
+impl<S: BosStr, St: explode_state::State> ExplodeBuilder<S, St> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.0 = value.into();
@@ -171,7 +171,7 @@ impl<'a, S: explode_state::State> ExplodeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: explode_state::State> ExplodeBuilder<'a, S> {
+impl<S: BosStr, St: explode_state::State> ExplodeBuilder<S, St> {
     /// Set the `subject` field (optional)
     pub fn subject(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -184,23 +184,20 @@ impl<'a, S: explode_state::State> ExplodeBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ExplodeBuilder<'a, S>
+impl<S: BosStr, St> ExplodeBuilder<S, St>
 where
-    S: explode_state::State,
+    St: explode_state::State,
 {
-    /// Build the final struct
-    pub fn build(self) -> Explode<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Explode<S> {
         Explode {
             created_at: self._fields.0,
             subject: self._fields.1,
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Explode<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Explode<S> {
         Explode {
             created_at: self._fields.0,
             subject: self._fields.1,

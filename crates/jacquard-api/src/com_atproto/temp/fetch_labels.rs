@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
@@ -30,18 +30,16 @@ pub struct FetchLabels {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct FetchLabelsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct FetchLabelsOutput<S: BosStr = DefaultStr> {
     pub labels: Vec<Label<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -50,7 +48,7 @@ pub struct FetchLabelsResponse;
 impl jacquard_common::xrpc::XrpcResp for FetchLabelsResponse {
     const NSID: &'static str = "com.atproto.temp.fetchLabels";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = FetchLabelsOutput<S>;
+    type Output<S: BosStr> = FetchLabelsOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
@@ -65,7 +63,7 @@ pub struct FetchLabelsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for FetchLabelsRequest {
     const PATH: &'static str = "/xrpc/com.atproto.temp.fetchLabels";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = FetchLabels;
+    type Request<S: BosStr> = FetchLabels;
     type Response = FetchLabelsResponse;
 }
 
@@ -92,21 +90,21 @@ pub mod fetch_labels_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct FetchLabelsBuilder<S: fetch_labels_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct FetchLabelsBuilder<St: fetch_labels_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<i64>),
 }
 
 impl FetchLabels {
-    /// Create a new builder for this type
+    /// Create a new builder for this type.
     pub fn new() -> FetchLabelsBuilder<fetch_labels_state::Empty> {
         FetchLabelsBuilder::new()
     }
 }
 
 impl FetchLabelsBuilder<fetch_labels_state::Empty> {
-    /// Create a new builder with all fields unset
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         FetchLabelsBuilder {
             _state: PhantomData,
@@ -115,7 +113,7 @@ impl FetchLabelsBuilder<fetch_labels_state::Empty> {
     }
 }
 
-impl<S: fetch_labels_state::State> FetchLabelsBuilder<S> {
+impl<St: fetch_labels_state::State> FetchLabelsBuilder<St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
@@ -128,7 +126,7 @@ impl<S: fetch_labels_state::State> FetchLabelsBuilder<S> {
     }
 }
 
-impl<S: fetch_labels_state::State> FetchLabelsBuilder<S> {
+impl<St: fetch_labels_state::State> FetchLabelsBuilder<St> {
     /// Set the `since` field (optional)
     pub fn since(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -141,11 +139,11 @@ impl<S: fetch_labels_state::State> FetchLabelsBuilder<S> {
     }
 }
 
-impl<S> FetchLabelsBuilder<S>
+impl<St> FetchLabelsBuilder<St>
 where
-    S: fetch_labels_state::State,
+    St: fetch_labels_state::State,
 {
-    /// Build the final struct
+    /// Build the final struct.
     pub fn build(self) -> FetchLabels {
         FetchLabels {
             limit: self._fields.0,

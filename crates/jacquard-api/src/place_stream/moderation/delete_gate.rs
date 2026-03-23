@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, AtUri};
 use jacquard_common::types::value::Data;
@@ -18,37 +18,33 @@ use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DeleteGate<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DeleteGate<S: BosStr = DefaultStr> {
     ///The AT-URI of the gate record to delete.
     pub gate_uri: AtUri<S>,
     ///The DID of the streamer.
     pub streamer: Did<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DeleteGateOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+pub struct DeleteGateOutput<S: BosStr = DefaultStr> {
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -120,12 +116,11 @@ pub struct DeleteGateResponse;
 impl jacquard_common::xrpc::XrpcResp for DeleteGateResponse {
     const NSID: &'static str = "place.stream.moderation.deleteGate";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = DeleteGateOutput<S>;
+    type Output<S: BosStr> = DeleteGateOutput<S>;
     type Err = DeleteGateError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for DeleteGate<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for DeleteGate<S> {
     const NSID: &'static str = "place.stream.moderation.deleteGate";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -140,7 +135,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for DeleteGateRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = DeleteGate<S>;
+    type Request<S: BosStr> = DeleteGate<S>;
     type Response = DeleteGateResponse;
 }
 
@@ -154,122 +149,122 @@ pub mod delete_gate_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Streamer;
         type GateUri;
+        type Streamer;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Streamer = Unset;
         type GateUri = Unset;
-    }
-    ///State transition - sets the `streamer` field to Set
-    pub struct SetStreamer<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStreamer<S> {}
-    impl<S: State> State for SetStreamer<S> {
-        type Streamer = Set<members::streamer>;
-        type GateUri = S::GateUri;
+        type Streamer = Unset;
     }
     ///State transition - sets the `gate_uri` field to Set
-    pub struct SetGateUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGateUri<S> {}
-    impl<S: State> State for SetGateUri<S> {
-        type Streamer = S::Streamer;
+    pub struct SetGateUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetGateUri<St> {}
+    impl<St: State> State for SetGateUri<St> {
         type GateUri = Set<members::gate_uri>;
+        type Streamer = St::Streamer;
+    }
+    ///State transition - sets the `streamer` field to Set
+    pub struct SetStreamer<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStreamer<St> {}
+    impl<St: State> State for SetStreamer<St> {
+        type GateUri = St::GateUri;
+        type Streamer = Set<members::streamer>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `streamer` field
-        pub struct streamer(());
         ///Marker type for the `gate_uri` field
         pub struct gate_uri(());
+        ///Marker type for the `streamer` field
+        pub struct streamer(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct DeleteGateBuilder<'a, S: delete_gate_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct DeleteGateBuilder<S: BosStr, St: delete_gate_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>, Option<Did<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> DeleteGate<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> DeleteGateBuilder<'a, delete_gate_state::Empty> {
+impl<S: BosStr> DeleteGate<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> DeleteGateBuilder<S, delete_gate_state::Empty> {
         DeleteGateBuilder::new()
     }
 }
 
-impl<'a> DeleteGateBuilder<'a, delete_gate_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> DeleteGateBuilder<S, delete_gate_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         DeleteGateBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DeleteGateBuilder<'a, S>
+impl<S: BosStr, St> DeleteGateBuilder<S, St>
 where
-    S: delete_gate_state::State,
-    S::GateUri: delete_gate_state::IsUnset,
+    St: delete_gate_state::State,
+    St::GateUri: delete_gate_state::IsUnset,
 {
     /// Set the `gateUri` field (required)
     pub fn gate_uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> DeleteGateBuilder<'a, delete_gate_state::SetGateUri<S>> {
+    ) -> DeleteGateBuilder<S, delete_gate_state::SetGateUri<St>> {
         self._fields.0 = Option::Some(value.into());
         DeleteGateBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DeleteGateBuilder<'a, S>
+impl<S: BosStr, St> DeleteGateBuilder<S, St>
 where
-    S: delete_gate_state::State,
-    S::Streamer: delete_gate_state::IsUnset,
+    St: delete_gate_state::State,
+    St::Streamer: delete_gate_state::IsUnset,
 {
     /// Set the `streamer` field (required)
     pub fn streamer(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> DeleteGateBuilder<'a, delete_gate_state::SetStreamer<S>> {
+    ) -> DeleteGateBuilder<S, delete_gate_state::SetStreamer<St>> {
         self._fields.1 = Option::Some(value.into());
         DeleteGateBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DeleteGateBuilder<'a, S>
+impl<S: BosStr, St> DeleteGateBuilder<S, St>
 where
-    S: delete_gate_state::State,
-    S::Streamer: delete_gate_state::IsSet,
-    S::GateUri: delete_gate_state::IsSet,
+    St: delete_gate_state::State,
+    St::GateUri: delete_gate_state::IsSet,
+    St::Streamer: delete_gate_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> DeleteGate<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> DeleteGate<S> {
         DeleteGate {
             gate_uri: self._fields.0.unwrap(),
             streamer: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> DeleteGate<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> DeleteGate<S> {
         DeleteGate {
             gate_uri: self._fields.0.unwrap(),
             streamer: self._fields.1.unwrap(),

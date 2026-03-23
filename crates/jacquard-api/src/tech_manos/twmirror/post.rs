@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -28,7 +28,7 @@ use jacquard_lexicon::schema::LexiconSchema;
 use jacquard_lexicon::validation::{ConstraintError, ValidationPath};
 use serde::{Serialize, Deserialize};
 use crate::tech_manos::twmirror::post;
-pub type TwitterId<'a> = S;
+pub type TwitterId<S: BosStr = DefaultStr> = S;
 /// Sidecar record for mirrored Twitter posts. The rkey should match the bskyPost ref.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -37,11 +37,11 @@ pub type TwitterId<'a> = S;
     rename = "tech.manos.twmirror.post",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Post<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Post<S: BosStr = DefaultStr> {
     ///strongRef to mirrored post on Bluesky.
     pub bsky_post: Data<S>,
     ///Tweet timestamp (regardless of backdating setting).
@@ -60,18 +60,18 @@ pub struct Post<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct PostGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct PostGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Post<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Post<S> {
+impl<S: BosStr> Post<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, PostRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -84,17 +84,17 @@ pub struct PostRecord;
 impl XrpcResp for PostRecord {
     const NSID: &'static str = "tech.manos.twmirror.post";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = PostGetRecordOutput<S>;
+    type Output<S: BosStr> = PostGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<PostGetRecordOutput<S>> for Post<S> {
+impl<S: BosStr> From<PostGetRecordOutput<S>> for Post<S> {
     fn from(output: PostGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Post<S> {
+impl<S: BosStr> Collection for Post<S> {
     const NSID: &'static str = "tech.manos.twmirror.post";
     type Record = PostRecord;
 }
@@ -104,7 +104,7 @@ impl Collection for PostRecord {
     type Record = PostRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Post<S> {
+impl<S: BosStr> LexiconSchema for Post<S> {
     fn nsid() -> &'static str {
         "tech.manos.twmirror.post"
     }
@@ -129,186 +129,186 @@ pub mod post_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type BskyPost;
-        type TwUserId;
         type TweetId;
         type CreatedAt;
+        type TwUserId;
+        type BskyPost;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type BskyPost = Unset;
-        type TwUserId = Unset;
         type TweetId = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `bsky_post` field to Set
-    pub struct SetBskyPost<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBskyPost<S> {}
-    impl<S: State> State for SetBskyPost<S> {
-        type BskyPost = Set<members::bsky_post>;
-        type TwUserId = S::TwUserId;
-        type TweetId = S::TweetId;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `tw_user_id` field to Set
-    pub struct SetTwUserId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTwUserId<S> {}
-    impl<S: State> State for SetTwUserId<S> {
-        type BskyPost = S::BskyPost;
-        type TwUserId = Set<members::tw_user_id>;
-        type TweetId = S::TweetId;
-        type CreatedAt = S::CreatedAt;
+        type TwUserId = Unset;
+        type BskyPost = Unset;
     }
     ///State transition - sets the `tweet_id` field to Set
-    pub struct SetTweetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTweetId<S> {}
-    impl<S: State> State for SetTweetId<S> {
-        type BskyPost = S::BskyPost;
-        type TwUserId = S::TwUserId;
+    pub struct SetTweetId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTweetId<St> {}
+    impl<St: State> State for SetTweetId<St> {
         type TweetId = Set<members::tweet_id>;
-        type CreatedAt = S::CreatedAt;
+        type CreatedAt = St::CreatedAt;
+        type TwUserId = St::TwUserId;
+        type BskyPost = St::BskyPost;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type BskyPost = S::BskyPost;
-        type TwUserId = S::TwUserId;
-        type TweetId = S::TweetId;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type TweetId = St::TweetId;
         type CreatedAt = Set<members::created_at>;
+        type TwUserId = St::TwUserId;
+        type BskyPost = St::BskyPost;
+    }
+    ///State transition - sets the `tw_user_id` field to Set
+    pub struct SetTwUserId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTwUserId<St> {}
+    impl<St: State> State for SetTwUserId<St> {
+        type TweetId = St::TweetId;
+        type CreatedAt = St::CreatedAt;
+        type TwUserId = Set<members::tw_user_id>;
+        type BskyPost = St::BskyPost;
+    }
+    ///State transition - sets the `bsky_post` field to Set
+    pub struct SetBskyPost<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBskyPost<St> {}
+    impl<St: State> State for SetBskyPost<St> {
+        type TweetId = St::TweetId;
+        type CreatedAt = St::CreatedAt;
+        type TwUserId = St::TwUserId;
+        type BskyPost = Set<members::bsky_post>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `bsky_post` field
-        pub struct bsky_post(());
-        ///Marker type for the `tw_user_id` field
-        pub struct tw_user_id(());
         ///Marker type for the `tweet_id` field
         pub struct tweet_id(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `tw_user_id` field
+        pub struct tw_user_id(());
+        ///Marker type for the `bsky_post` field
+        pub struct bsky_post(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct PostBuilder<'a, S: post_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct PostBuilder<S: BosStr, St: post_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Data<S>>,
         Option<Datetime>,
         Option<post::TwitterId<S>>,
         Option<post::TwitterId<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Post<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> PostBuilder<'a, post_state::Empty> {
+impl<S: BosStr> Post<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> PostBuilder<S, post_state::Empty> {
         PostBuilder::new()
     }
 }
 
-impl<'a> PostBuilder<'a, post_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> PostBuilder<S, post_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         PostBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PostBuilder<'a, S>
+impl<S: BosStr, St> PostBuilder<S, St>
 where
-    S: post_state::State,
-    S::BskyPost: post_state::IsUnset,
+    St: post_state::State,
+    St::BskyPost: post_state::IsUnset,
 {
     /// Set the `bskyPost` field (required)
     pub fn bsky_post(
         mut self,
         value: impl Into<Data<S>>,
-    ) -> PostBuilder<'a, post_state::SetBskyPost<S>> {
+    ) -> PostBuilder<S, post_state::SetBskyPost<St>> {
         self._fields.0 = Option::Some(value.into());
         PostBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PostBuilder<'a, S>
+impl<S: BosStr, St> PostBuilder<S, St>
 where
-    S: post_state::State,
-    S::CreatedAt: post_state::IsUnset,
+    St: post_state::State,
+    St::CreatedAt: post_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> PostBuilder<'a, post_state::SetCreatedAt<S>> {
+    ) -> PostBuilder<S, post_state::SetCreatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         PostBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PostBuilder<'a, S>
+impl<S: BosStr, St> PostBuilder<S, St>
 where
-    S: post_state::State,
-    S::TwUserId: post_state::IsUnset,
+    St: post_state::State,
+    St::TwUserId: post_state::IsUnset,
 {
     /// Set the `twUserId` field (required)
     pub fn tw_user_id(
         mut self,
         value: impl Into<post::TwitterId<S>>,
-    ) -> PostBuilder<'a, post_state::SetTwUserId<S>> {
+    ) -> PostBuilder<S, post_state::SetTwUserId<St>> {
         self._fields.2 = Option::Some(value.into());
         PostBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PostBuilder<'a, S>
+impl<S: BosStr, St> PostBuilder<S, St>
 where
-    S: post_state::State,
-    S::TweetId: post_state::IsUnset,
+    St: post_state::State,
+    St::TweetId: post_state::IsUnset,
 {
     /// Set the `tweetId` field (required)
     pub fn tweet_id(
         mut self,
         value: impl Into<post::TwitterId<S>>,
-    ) -> PostBuilder<'a, post_state::SetTweetId<S>> {
+    ) -> PostBuilder<S, post_state::SetTweetId<St>> {
         self._fields.3 = Option::Some(value.into());
         PostBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PostBuilder<'a, S>
+impl<S: BosStr, St> PostBuilder<S, St>
 where
-    S: post_state::State,
-    S::BskyPost: post_state::IsSet,
-    S::TwUserId: post_state::IsSet,
-    S::TweetId: post_state::IsSet,
-    S::CreatedAt: post_state::IsSet,
+    St: post_state::State,
+    St::TweetId: post_state::IsSet,
+    St::CreatedAt: post_state::IsSet,
+    St::TwUserId: post_state::IsSet,
+    St::BskyPost: post_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Post<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Post<S> {
         Post {
             bsky_post: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
@@ -317,8 +317,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Post<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Post<S> {
         Post {
             bsky_post: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),

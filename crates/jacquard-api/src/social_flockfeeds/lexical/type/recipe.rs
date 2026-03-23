@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -39,11 +39,11 @@ use crate::social_flockfeeds::lexical::r#type::product;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Embedded<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Embedded<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub about: Option<EmbeddedAbout<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -346,110 +346,110 @@ pub struct Embedded<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedAbout<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedAbout<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedAbstract<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedAbstract<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedAccessMode<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedAccessMode<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedAccessModeSufficient<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedAccessModeSufficient<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedAccessibilityApi<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedAccessibilityApi<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedAccessibilityControl<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedAccessibilityControl<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedAccessibilityFeature<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedAccessibilityFeature<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedAccessibilityHazard<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedAccessibilityHazard<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedAccessibilitySummary<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedAccessibilitySummary<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedAccountablePerson<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum EmbeddedAccountablePerson<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
@@ -460,121 +460,121 @@ pub enum EmbeddedAccountablePerson<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedAcquireLicensePage<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedAcquireLicensePage<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedAdditionalType<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedAdditionalType<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedAggregateRating<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedAggregateRating<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedAlternateName<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedAlternateName<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedAlternativeHeadline<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedAlternativeHeadline<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedArchivedAt<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedArchivedAt<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedAssesses<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedAssesses<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedAssociatedMedia<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedAssociatedMedia<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedAudience<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedAudience<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedAudio<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedAudio<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedAuthor<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum EmbeddedAuthor<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
@@ -587,33 +587,33 @@ pub enum EmbeddedAuthor<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedAward<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedAward<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedAwards<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedAwards<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedCharacter<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum EmbeddedCharacter<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
@@ -624,88 +624,88 @@ pub enum EmbeddedCharacter<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedCitation<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedCitation<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedComment<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedComment<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedCommentCount<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedCommentCount<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedConditionsOfAccess<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedConditionsOfAccess<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedContentLocation<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedContentLocation<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedContentRating<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedContentRating<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedContentReferenceTime<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedContentReferenceTime<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedContributor<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum EmbeddedContributor<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
@@ -718,33 +718,33 @@ pub enum EmbeddedContributor<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedCookTime<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedCookTime<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedCookingMethod<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedCookingMethod<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedCopyrightHolder<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum EmbeddedCopyrightHolder<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
@@ -757,66 +757,66 @@ pub enum EmbeddedCopyrightHolder<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedCopyrightNotice<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedCopyrightNotice<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedCopyrightYear<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedCopyrightYear<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedCorrection<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedCorrection<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedCountryOfOrigin<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedCountryOfOrigin<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedCreativeWorkStatus<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedCreativeWorkStatus<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedCreator<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum EmbeddedCreator<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
@@ -829,110 +829,110 @@ pub enum EmbeddedCreator<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedCreditText<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedCreditText<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedDateCreated<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedDateCreated<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedDateModified<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedDateModified<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedDatePublished<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedDatePublished<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedDescription<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedDescription<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedDigitalSourceType<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedDigitalSourceType<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedDisambiguatingDescription<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedDisambiguatingDescription<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedDiscussionUrl<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedDiscussionUrl<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedEditEidr<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedEditEidr<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedEditor<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum EmbeddedEditor<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
@@ -943,121 +943,121 @@ pub enum EmbeddedEditor<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedEducationalAlignment<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedEducationalAlignment<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedEducationalLevel<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedEducationalLevel<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedEducationalUse<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedEducationalUse<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedEncoding<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedEncoding<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedEncodingFormat<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedEncodingFormat<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedEncodings<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedEncodings<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedEstimatedCost<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedEstimatedCost<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedExampleOfWork<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedExampleOfWork<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedExpires<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedExpires<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedFileFormat<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedFileFormat<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedFunder<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum EmbeddedFunder<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
@@ -1070,66 +1070,66 @@ pub enum EmbeddedFunder<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedFunding<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedFunding<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedGenre<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedGenre<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedHasPart<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedHasPart<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedHeadline<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedHeadline<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedIdentifier<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedIdentifier<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedImage<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum EmbeddedImage<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
@@ -1140,77 +1140,77 @@ pub enum EmbeddedImage<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedInLanguage<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedInLanguage<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedIngredients<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedIngredients<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedInteractionStatistic<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedInteractionStatistic<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedInteractivityType<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedInteractivityType<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedInterpretedAsClaim<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedInterpretedAsClaim<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedIsAccessibleForFree<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedIsAccessibleForFree<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedIsBasedOn<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum EmbeddedIsBasedOn<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
     ProductEmbedded(Box<product::Embedded<S>>),
 }
@@ -1221,11 +1221,11 @@ pub enum EmbeddedIsBasedOn<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedIsBasedOnUrl<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum EmbeddedIsBasedOnUrl<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
     ProductEmbedded(Box<product::Embedded<S>>),
 }
@@ -1236,99 +1236,99 @@ pub enum EmbeddedIsBasedOnUrl<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedIsFamilyFriendly<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedIsFamilyFriendly<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedIsPartOf<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedIsPartOf<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedKeywords<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedKeywords<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedLearningResourceType<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedLearningResourceType<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedLicense<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedLicense<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedLocationCreated<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedLocationCreated<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedMainEntity<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedMainEntity<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedMainEntityOfPage<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedMainEntityOfPage<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedMaintainer<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum EmbeddedMaintainer<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
@@ -1341,11 +1341,11 @@ pub enum EmbeddedMaintainer<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedMaterial<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum EmbeddedMaterial<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
     ProductEmbedded(Box<product::Embedded<S>>),
 }
@@ -1356,55 +1356,55 @@ pub enum EmbeddedMaterial<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedMaterialExtent<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedMaterialExtent<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedMentions<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedMentions<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedName<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedName<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedNutrition<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedNutrition<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedOffers<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum EmbeddedOffers<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Offer#embedded")]
     OfferEmbedded(Box<offer::Embedded<S>>),
 }
@@ -1415,66 +1415,66 @@ pub enum EmbeddedOffers<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedPattern<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedPattern<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedPerformTime<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedPerformTime<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedPosition<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedPosition<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedPotentialAction<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedPotentialAction<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedPrepTime<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedPrepTime<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedProducer<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum EmbeddedProducer<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
@@ -1487,11 +1487,11 @@ pub enum EmbeddedProducer<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedProvider<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum EmbeddedProvider<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
@@ -1504,22 +1504,22 @@ pub enum EmbeddedProvider<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedPublication<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedPublication<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedPublisher<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum EmbeddedPublisher<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
@@ -1532,11 +1532,11 @@ pub enum EmbeddedPublisher<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedPublisherImprint<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum EmbeddedPublisherImprint<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
@@ -1547,77 +1547,77 @@ pub enum EmbeddedPublisherImprint<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedPublishingPrinciples<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedPublishingPrinciples<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedRecipeCategory<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedRecipeCategory<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedRecipeCuisine<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedRecipeCuisine<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedRecipeIngredient<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedRecipeIngredient<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedRecipeInstructions<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedRecipeInstructions<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedRecipeYield<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedRecipeYield<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedRecordedAt<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum EmbeddedRecordedAt<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
@@ -1628,88 +1628,88 @@ pub enum EmbeddedRecordedAt<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedReleasedEvent<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedReleasedEvent<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedReview<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedReview<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedReviews<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedReviews<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedSameAs<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedSameAs<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedSchemaVersion<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedSchemaVersion<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedSdDatePublished<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedSdDatePublished<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedSdLicense<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedSdLicense<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedSdPublisher<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum EmbeddedSdPublisher<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
@@ -1722,22 +1722,22 @@ pub enum EmbeddedSdPublisher<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedSize<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedSize<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedSourceOrganization<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum EmbeddedSourceOrganization<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
@@ -1748,33 +1748,33 @@ pub enum EmbeddedSourceOrganization<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedSpatial<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedSpatial<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedSpatialCoverage<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedSpatialCoverage<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedSponsor<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum EmbeddedSponsor<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
@@ -1787,33 +1787,33 @@ pub enum EmbeddedSponsor<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedStep<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedStep<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedSteps<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedSteps<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedSubjectOf<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum EmbeddedSubjectOf<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
@@ -1824,77 +1824,77 @@ pub enum EmbeddedSubjectOf<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedSuitableForDiet<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedSuitableForDiet<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedSupply<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedSupply<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedTeaches<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedTeaches<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedTemporal<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedTemporal<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedTemporalCoverage<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedTemporalCoverage<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedText<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedText<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedThumbnail<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum EmbeddedThumbnail<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
@@ -1905,66 +1905,66 @@ pub enum EmbeddedThumbnail<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedThumbnailUrl<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedThumbnailUrl<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedTimeRequired<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedTimeRequired<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedTool<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedTool<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedTotalTime<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedTotalTime<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedTranslationOfWork<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedTranslationOfWork<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedTranslator<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum EmbeddedTranslator<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
@@ -1977,99 +1977,99 @@ pub enum EmbeddedTranslator<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedTypicalAgeRange<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedTypicalAgeRange<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedUrl<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedUrl<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedUsageInfo<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedUsageInfo<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedVersion<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedVersion<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedVideo<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedVideo<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedWordCount<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedWordCount<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedWorkExample<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedWorkExample<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedWorkTranslation<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedWorkTranslation<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedYield<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedYield<S: BosStr = DefaultStr> {}
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -2077,11 +2077,11 @@ pub enum EmbeddedYield<S: Bos<str> + AsRef<str> = DefaultStr> {}
     rename = "social.flockfeeds.lexical.type.Recipe",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Recipe<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Recipe<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub about: Option<RecipeAbout<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -2384,110 +2384,110 @@ pub struct Recipe<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeAbout<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeAbout<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeAbstract<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeAbstract<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeAccessMode<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeAccessMode<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeAccessModeSufficient<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeAccessModeSufficient<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeAccessibilityApi<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeAccessibilityApi<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeAccessibilityControl<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeAccessibilityControl<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeAccessibilityFeature<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeAccessibilityFeature<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeAccessibilityHazard<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeAccessibilityHazard<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeAccessibilitySummary<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeAccessibilitySummary<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeAccountablePerson<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum RecipeAccountablePerson<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
@@ -2498,121 +2498,121 @@ pub enum RecipeAccountablePerson<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeAcquireLicensePage<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeAcquireLicensePage<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeAdditionalType<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeAdditionalType<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeAggregateRating<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeAggregateRating<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeAlternateName<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeAlternateName<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeAlternativeHeadline<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeAlternativeHeadline<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeArchivedAt<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeArchivedAt<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeAssesses<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeAssesses<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeAssociatedMedia<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeAssociatedMedia<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeAudience<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeAudience<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeAudio<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeAudio<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeAuthor<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum RecipeAuthor<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
@@ -2625,33 +2625,33 @@ pub enum RecipeAuthor<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeAward<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeAward<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeAwards<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeAwards<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeCharacter<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum RecipeCharacter<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
@@ -2662,88 +2662,88 @@ pub enum RecipeCharacter<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeCitation<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeCitation<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeComment<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeComment<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeCommentCount<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeCommentCount<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeConditionsOfAccess<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeConditionsOfAccess<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeContentLocation<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeContentLocation<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeContentRating<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeContentRating<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeContentReferenceTime<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeContentReferenceTime<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeContributor<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum RecipeContributor<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
@@ -2756,33 +2756,33 @@ pub enum RecipeContributor<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeCookTime<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeCookTime<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeCookingMethod<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeCookingMethod<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeCopyrightHolder<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum RecipeCopyrightHolder<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
@@ -2795,66 +2795,66 @@ pub enum RecipeCopyrightHolder<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeCopyrightNotice<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeCopyrightNotice<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeCopyrightYear<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeCopyrightYear<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeCorrection<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeCorrection<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeCountryOfOrigin<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeCountryOfOrigin<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeCreativeWorkStatus<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeCreativeWorkStatus<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeCreator<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum RecipeCreator<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
@@ -2867,110 +2867,110 @@ pub enum RecipeCreator<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeCreditText<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeCreditText<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeDateCreated<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeDateCreated<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeDateModified<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeDateModified<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeDatePublished<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeDatePublished<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeDescription<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeDescription<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeDigitalSourceType<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeDigitalSourceType<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeDisambiguatingDescription<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeDisambiguatingDescription<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeDiscussionUrl<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeDiscussionUrl<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeEditEidr<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeEditEidr<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeEditor<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum RecipeEditor<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
     PersonEmbedded(Box<person::Embedded<S>>),
 }
@@ -2981,121 +2981,121 @@ pub enum RecipeEditor<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeEducationalAlignment<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeEducationalAlignment<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeEducationalLevel<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeEducationalLevel<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeEducationalUse<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeEducationalUse<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeEncoding<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeEncoding<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeEncodingFormat<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeEncodingFormat<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeEncodings<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeEncodings<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeEstimatedCost<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeEstimatedCost<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeExampleOfWork<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeExampleOfWork<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeExpires<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeExpires<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeFileFormat<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeFileFormat<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeFunder<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum RecipeFunder<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
@@ -3108,66 +3108,66 @@ pub enum RecipeFunder<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeFunding<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeFunding<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeGenre<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeGenre<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeHasPart<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeHasPart<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeHeadline<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeHeadline<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeIdentifier<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeIdentifier<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeImage<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum RecipeImage<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
@@ -3178,77 +3178,77 @@ pub enum RecipeImage<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeInLanguage<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeInLanguage<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeIngredients<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeIngredients<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeInteractionStatistic<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeInteractionStatistic<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeInteractivityType<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeInteractivityType<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeInterpretedAsClaim<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeInterpretedAsClaim<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeIsAccessibleForFree<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeIsAccessibleForFree<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeIsBasedOn<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum RecipeIsBasedOn<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
     ProductEmbedded(Box<product::Embedded<S>>),
 }
@@ -3259,11 +3259,11 @@ pub enum RecipeIsBasedOn<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeIsBasedOnUrl<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum RecipeIsBasedOnUrl<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
     ProductEmbedded(Box<product::Embedded<S>>),
 }
@@ -3274,99 +3274,99 @@ pub enum RecipeIsBasedOnUrl<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeIsFamilyFriendly<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeIsFamilyFriendly<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeIsPartOf<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeIsPartOf<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeKeywords<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeKeywords<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeLearningResourceType<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeLearningResourceType<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeLicense<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeLicense<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeLocationCreated<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeLocationCreated<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeMainEntity<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeMainEntity<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeMainEntityOfPage<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeMainEntityOfPage<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeMaintainer<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum RecipeMaintainer<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
@@ -3379,11 +3379,11 @@ pub enum RecipeMaintainer<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeMaterial<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum RecipeMaterial<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
     ProductEmbedded(Box<product::Embedded<S>>),
 }
@@ -3394,55 +3394,55 @@ pub enum RecipeMaterial<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeMaterialExtent<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeMaterialExtent<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeMentions<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeMentions<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeName<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeName<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeNutrition<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeNutrition<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeOffers<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum RecipeOffers<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Offer#embedded")]
     OfferEmbedded(Box<offer::Embedded<S>>),
 }
@@ -3453,66 +3453,66 @@ pub enum RecipeOffers<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipePattern<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipePattern<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipePerformTime<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipePerformTime<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipePosition<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipePosition<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipePotentialAction<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipePotentialAction<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipePrepTime<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipePrepTime<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeProducer<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum RecipeProducer<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
@@ -3525,11 +3525,11 @@ pub enum RecipeProducer<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeProvider<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum RecipeProvider<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
@@ -3542,22 +3542,22 @@ pub enum RecipeProvider<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipePublication<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipePublication<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipePublisher<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum RecipePublisher<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
@@ -3570,11 +3570,11 @@ pub enum RecipePublisher<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipePublisherImprint<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum RecipePublisherImprint<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
@@ -3585,77 +3585,77 @@ pub enum RecipePublisherImprint<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipePublishingPrinciples<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipePublishingPrinciples<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeRecipeCategory<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeRecipeCategory<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeRecipeCuisine<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeRecipeCuisine<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeRecipeIngredient<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeRecipeIngredient<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeRecipeInstructions<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeRecipeInstructions<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeRecipeYield<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeRecipeYield<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeRecordedAt<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum RecipeRecordedAt<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
@@ -3666,88 +3666,88 @@ pub enum RecipeRecordedAt<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeReleasedEvent<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeReleasedEvent<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeReview<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeReview<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeReviews<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeReviews<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeSameAs<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeSameAs<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeSchemaVersion<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeSchemaVersion<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeSdDatePublished<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeSdDatePublished<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeSdLicense<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeSdLicense<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeSdPublisher<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum RecipeSdPublisher<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
@@ -3760,22 +3760,22 @@ pub enum RecipeSdPublisher<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeSize<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeSize<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeSourceOrganization<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum RecipeSourceOrganization<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
@@ -3786,33 +3786,33 @@ pub enum RecipeSourceOrganization<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeSpatial<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeSpatial<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeSpatialCoverage<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeSpatialCoverage<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeSponsor<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum RecipeSponsor<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
@@ -3825,33 +3825,33 @@ pub enum RecipeSponsor<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeStep<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeStep<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeSteps<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeSteps<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeSubjectOf<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum RecipeSubjectOf<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
@@ -3862,77 +3862,77 @@ pub enum RecipeSubjectOf<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeSuitableForDiet<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeSuitableForDiet<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeSupply<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeSupply<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeTeaches<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeTeaches<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeTemporal<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeTemporal<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeTemporalCoverage<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeTemporalCoverage<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeText<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeText<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeThumbnail<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum RecipeThumbnail<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
@@ -3943,66 +3943,66 @@ pub enum RecipeThumbnail<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeThumbnailUrl<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeThumbnailUrl<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeTimeRequired<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeTimeRequired<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeTool<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeTool<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeTotalTime<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeTotalTime<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeTranslationOfWork<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeTranslationOfWork<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeTranslator<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum RecipeTranslator<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Person#embedded")]
@@ -4015,123 +4015,123 @@ pub enum RecipeTranslator<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeTypicalAgeRange<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeTypicalAgeRange<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeUrl<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeUrl<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeUsageInfo<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeUsageInfo<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeVersion<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeVersion<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeVideo<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeVideo<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeWordCount<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeWordCount<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeWorkExample<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeWorkExample<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeWorkTranslation<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeWorkTranslation<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RecipeYield<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum RecipeYield<S: BosStr = DefaultStr> {}
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct RecipeGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct RecipeGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Recipe<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Recipe<S> {
+impl<S: BosStr> Recipe<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, RecipeRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Embedded<S> {
+impl<S: BosStr> LexiconSchema for Embedded<S> {
     fn nsid() -> &'static str {
         "social.flockfeeds.lexical.type.Recipe"
     }
@@ -4153,17 +4153,17 @@ pub struct RecipeRecord;
 impl XrpcResp for RecipeRecord {
     const NSID: &'static str = "social.flockfeeds.lexical.type.Recipe";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = RecipeGetRecordOutput<S>;
+    type Output<S: BosStr> = RecipeGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<RecipeGetRecordOutput<S>> for Recipe<S> {
+impl<S: BosStr> From<RecipeGetRecordOutput<S>> for Recipe<S> {
     fn from(output: RecipeGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Recipe<S> {
+impl<S: BosStr> Collection for Recipe<S> {
     const NSID: &'static str = "social.flockfeeds.lexical.type.Recipe";
     type Record = RecipeRecord;
 }
@@ -4173,7 +4173,7 @@ impl Collection for RecipeRecord {
     type Record = RecipeRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Recipe<S> {
+impl<S: BosStr> LexiconSchema for Recipe<S> {
     fn nsid() -> &'static str {
         "social.flockfeeds.lexical.type.Recipe"
     }
@@ -7309,9 +7309,9 @@ pub mod recipe_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct RecipeBuilder<'a, S: recipe_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct RecipeBuilder<S: BosStr, St: recipe_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<RecipeAbout<S>>,
         Option<RecipeAbstract<S>>,
@@ -7460,18 +7460,18 @@ pub struct RecipeBuilder<'a, S: recipe_state::State> {
         Option<RecipeWorkTranslation<S>>,
         Option<RecipeYield<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Recipe<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> RecipeBuilder<'a, recipe_state::Empty> {
+impl<S: BosStr> Recipe<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> RecipeBuilder<S, recipe_state::Empty> {
         RecipeBuilder::new()
     }
 }
 
-impl<'a> RecipeBuilder<'a, recipe_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> RecipeBuilder<S, recipe_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         RecipeBuilder {
             _state: PhantomData,
@@ -7623,12 +7623,12 @@ impl<'a> RecipeBuilder<'a, recipe_state::Empty> {
                 None,
                 None,
             ),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `about` field (optional)
     pub fn about(mut self, value: impl Into<Option<RecipeAbout<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -7641,7 +7641,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `abstract` field (optional)
     pub fn r#abstract(mut self, value: impl Into<Option<RecipeAbstract<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -7654,7 +7654,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `accessMode` field (optional)
     pub fn access_mode(mut self, value: impl Into<Option<RecipeAccessMode<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -7667,7 +7667,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `accessModeSufficient` field (optional)
     pub fn access_mode_sufficient(
         mut self,
@@ -7686,7 +7686,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `accessibilityAPI` field (optional)
     pub fn accessibility_api(
         mut self,
@@ -7705,7 +7705,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `accessibilityControl` field (optional)
     pub fn accessibility_control(
         mut self,
@@ -7724,7 +7724,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `accessibilityFeature` field (optional)
     pub fn accessibility_feature(
         mut self,
@@ -7743,7 +7743,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `accessibilityHazard` field (optional)
     pub fn accessibility_hazard(
         mut self,
@@ -7762,7 +7762,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `accessibilitySummary` field (optional)
     pub fn accessibility_summary(
         mut self,
@@ -7781,7 +7781,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `accountablePerson` field (optional)
     pub fn accountable_person(
         mut self,
@@ -7800,7 +7800,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `acquireLicensePage` field (optional)
     pub fn acquire_license_page(
         mut self,
@@ -7819,7 +7819,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `additionalType` field (optional)
     pub fn additional_type(
         mut self,
@@ -7838,7 +7838,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `aggregateRating` field (optional)
     pub fn aggregate_rating(
         mut self,
@@ -7857,7 +7857,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `alternateName` field (optional)
     pub fn alternate_name(
         mut self,
@@ -7876,7 +7876,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `alternativeHeadline` field (optional)
     pub fn alternative_headline(
         mut self,
@@ -7895,7 +7895,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `archivedAt` field (optional)
     pub fn archived_at(mut self, value: impl Into<Option<RecipeArchivedAt<S>>>) -> Self {
         self._fields.15 = value.into();
@@ -7908,7 +7908,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `assesses` field (optional)
     pub fn assesses(mut self, value: impl Into<Option<RecipeAssesses<S>>>) -> Self {
         self._fields.16 = value.into();
@@ -7921,7 +7921,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `associatedMedia` field (optional)
     pub fn associated_media(
         mut self,
@@ -7940,7 +7940,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `audience` field (optional)
     pub fn audience(mut self, value: impl Into<Option<RecipeAudience<S>>>) -> Self {
         self._fields.18 = value.into();
@@ -7953,7 +7953,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `audio` field (optional)
     pub fn audio(mut self, value: impl Into<Option<RecipeAudio<S>>>) -> Self {
         self._fields.19 = value.into();
@@ -7966,7 +7966,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `author` field (optional)
     pub fn author(mut self, value: impl Into<Option<RecipeAuthor<S>>>) -> Self {
         self._fields.20 = value.into();
@@ -7979,7 +7979,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `award` field (optional)
     pub fn award(mut self, value: impl Into<Option<RecipeAward<S>>>) -> Self {
         self._fields.21 = value.into();
@@ -7992,7 +7992,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `awards` field (optional)
     pub fn awards(mut self, value: impl Into<Option<RecipeAwards<S>>>) -> Self {
         self._fields.22 = value.into();
@@ -8005,7 +8005,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `character` field (optional)
     pub fn character(mut self, value: impl Into<Option<RecipeCharacter<S>>>) -> Self {
         self._fields.23 = value.into();
@@ -8018,7 +8018,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `citation` field (optional)
     pub fn citation(mut self, value: impl Into<Option<RecipeCitation<S>>>) -> Self {
         self._fields.24 = value.into();
@@ -8031,7 +8031,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `comment` field (optional)
     pub fn comment(mut self, value: impl Into<Option<RecipeComment<S>>>) -> Self {
         self._fields.25 = value.into();
@@ -8044,7 +8044,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `commentCount` field (optional)
     pub fn comment_count(
         mut self,
@@ -8060,7 +8060,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `conditionsOfAccess` field (optional)
     pub fn conditions_of_access(
         mut self,
@@ -8079,7 +8079,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `contentLocation` field (optional)
     pub fn content_location(
         mut self,
@@ -8098,7 +8098,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `contentRating` field (optional)
     pub fn content_rating(
         mut self,
@@ -8117,7 +8117,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `contentReferenceTime` field (optional)
     pub fn content_reference_time(
         mut self,
@@ -8136,7 +8136,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `contributor` field (optional)
     pub fn contributor(
         mut self,
@@ -8152,7 +8152,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `cookTime` field (optional)
     pub fn cook_time(mut self, value: impl Into<Option<RecipeCookTime<S>>>) -> Self {
         self._fields.32 = value.into();
@@ -8165,7 +8165,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `cookingMethod` field (optional)
     pub fn cooking_method(
         mut self,
@@ -8184,7 +8184,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `copyrightHolder` field (optional)
     pub fn copyright_holder(
         mut self,
@@ -8203,7 +8203,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `copyrightNotice` field (optional)
     pub fn copyright_notice(
         mut self,
@@ -8222,7 +8222,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `copyrightYear` field (optional)
     pub fn copyright_year(
         mut self,
@@ -8241,7 +8241,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `correction` field (optional)
     pub fn correction(mut self, value: impl Into<Option<RecipeCorrection<S>>>) -> Self {
         self._fields.37 = value.into();
@@ -8254,7 +8254,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `countryOfOrigin` field (optional)
     pub fn country_of_origin(
         mut self,
@@ -8273,7 +8273,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `creativeWorkStatus` field (optional)
     pub fn creative_work_status(
         mut self,
@@ -8292,7 +8292,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `creator` field (optional)
     pub fn creator(mut self, value: impl Into<Option<RecipeCreator<S>>>) -> Self {
         self._fields.40 = value.into();
@@ -8305,7 +8305,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `creditText` field (optional)
     pub fn credit_text(mut self, value: impl Into<Option<RecipeCreditText<S>>>) -> Self {
         self._fields.41 = value.into();
@@ -8318,7 +8318,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `dateCreated` field (optional)
     pub fn date_created(
         mut self,
@@ -8334,7 +8334,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `dateModified` field (optional)
     pub fn date_modified(
         mut self,
@@ -8350,7 +8350,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `datePublished` field (optional)
     pub fn date_published(
         mut self,
@@ -8369,7 +8369,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(
         mut self,
@@ -8385,7 +8385,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `digitalSourceType` field (optional)
     pub fn digital_source_type(
         mut self,
@@ -8404,7 +8404,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `disambiguatingDescription` field (optional)
     pub fn disambiguating_description(
         mut self,
@@ -8423,7 +8423,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `discussionUrl` field (optional)
     pub fn discussion_url(
         mut self,
@@ -8442,7 +8442,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `editEIDR` field (optional)
     pub fn edit_eidr(mut self, value: impl Into<Option<RecipeEditEidr<S>>>) -> Self {
         self._fields.49 = value.into();
@@ -8455,7 +8455,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `editor` field (optional)
     pub fn editor(mut self, value: impl Into<Option<RecipeEditor<S>>>) -> Self {
         self._fields.50 = value.into();
@@ -8468,7 +8468,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `educationalAlignment` field (optional)
     pub fn educational_alignment(
         mut self,
@@ -8487,7 +8487,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `educationalLevel` field (optional)
     pub fn educational_level(
         mut self,
@@ -8506,7 +8506,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `educationalUse` field (optional)
     pub fn educational_use(
         mut self,
@@ -8525,7 +8525,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `encoding` field (optional)
     pub fn encoding(mut self, value: impl Into<Option<RecipeEncoding<S>>>) -> Self {
         self._fields.54 = value.into();
@@ -8538,7 +8538,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `encodingFormat` field (optional)
     pub fn encoding_format(
         mut self,
@@ -8557,7 +8557,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `encodings` field (optional)
     pub fn encodings(mut self, value: impl Into<Option<RecipeEncodings<S>>>) -> Self {
         self._fields.56 = value.into();
@@ -8570,7 +8570,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `estimatedCost` field (optional)
     pub fn estimated_cost(
         mut self,
@@ -8589,7 +8589,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `exampleOfWork` field (optional)
     pub fn example_of_work(
         mut self,
@@ -8608,7 +8608,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `expires` field (optional)
     pub fn expires(mut self, value: impl Into<Option<RecipeExpires<S>>>) -> Self {
         self._fields.59 = value.into();
@@ -8621,7 +8621,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `fileFormat` field (optional)
     pub fn file_format(mut self, value: impl Into<Option<RecipeFileFormat<S>>>) -> Self {
         self._fields.60 = value.into();
@@ -8634,7 +8634,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `funder` field (optional)
     pub fn funder(mut self, value: impl Into<Option<RecipeFunder<S>>>) -> Self {
         self._fields.61 = value.into();
@@ -8647,7 +8647,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `funding` field (optional)
     pub fn funding(mut self, value: impl Into<Option<RecipeFunding<S>>>) -> Self {
         self._fields.62 = value.into();
@@ -8660,7 +8660,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `genre` field (optional)
     pub fn genre(mut self, value: impl Into<Option<RecipeGenre<S>>>) -> Self {
         self._fields.63 = value.into();
@@ -8673,7 +8673,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `hasPart` field (optional)
     pub fn has_part(mut self, value: impl Into<Option<RecipeHasPart<S>>>) -> Self {
         self._fields.64 = value.into();
@@ -8686,7 +8686,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `headline` field (optional)
     pub fn headline(mut self, value: impl Into<Option<RecipeHeadline<S>>>) -> Self {
         self._fields.65 = value.into();
@@ -8699,7 +8699,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `identifier` field (optional)
     pub fn identifier(mut self, value: impl Into<Option<RecipeIdentifier<S>>>) -> Self {
         self._fields.66 = value.into();
@@ -8712,7 +8712,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `image` field (optional)
     pub fn image(mut self, value: impl Into<Option<RecipeImage<S>>>) -> Self {
         self._fields.67 = value.into();
@@ -8725,7 +8725,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `inLanguage` field (optional)
     pub fn in_language(mut self, value: impl Into<Option<RecipeInLanguage<S>>>) -> Self {
         self._fields.68 = value.into();
@@ -8738,7 +8738,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `ingredients` field (optional)
     pub fn ingredients(
         mut self,
@@ -8754,7 +8754,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `interactionStatistic` field (optional)
     pub fn interaction_statistic(
         mut self,
@@ -8773,7 +8773,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `interactivityType` field (optional)
     pub fn interactivity_type(
         mut self,
@@ -8792,7 +8792,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `interpretedAsClaim` field (optional)
     pub fn interpreted_as_claim(
         mut self,
@@ -8811,7 +8811,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `isAccessibleForFree` field (optional)
     pub fn is_accessible_for_free(
         mut self,
@@ -8830,7 +8830,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `isBasedOn` field (optional)
     pub fn is_based_on(mut self, value: impl Into<Option<RecipeIsBasedOn<S>>>) -> Self {
         self._fields.74 = value.into();
@@ -8843,7 +8843,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `isBasedOnUrl` field (optional)
     pub fn is_based_on_url(
         mut self,
@@ -8862,7 +8862,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `isFamilyFriendly` field (optional)
     pub fn is_family_friendly(
         mut self,
@@ -8881,7 +8881,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `isPartOf` field (optional)
     pub fn is_part_of(mut self, value: impl Into<Option<RecipeIsPartOf<S>>>) -> Self {
         self._fields.77 = value.into();
@@ -8894,7 +8894,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `keywords` field (optional)
     pub fn keywords(mut self, value: impl Into<Option<RecipeKeywords<S>>>) -> Self {
         self._fields.78 = value.into();
@@ -8907,7 +8907,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `learningResourceType` field (optional)
     pub fn learning_resource_type(
         mut self,
@@ -8926,7 +8926,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `license` field (optional)
     pub fn license(mut self, value: impl Into<Option<RecipeLicense<S>>>) -> Self {
         self._fields.80 = value.into();
@@ -8939,7 +8939,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `locationCreated` field (optional)
     pub fn location_created(
         mut self,
@@ -8958,7 +8958,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `mainEntity` field (optional)
     pub fn main_entity(mut self, value: impl Into<Option<RecipeMainEntity<S>>>) -> Self {
         self._fields.82 = value.into();
@@ -8971,7 +8971,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `mainEntityOfPage` field (optional)
     pub fn main_entity_of_page(
         mut self,
@@ -8990,7 +8990,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `maintainer` field (optional)
     pub fn maintainer(mut self, value: impl Into<Option<RecipeMaintainer<S>>>) -> Self {
         self._fields.84 = value.into();
@@ -9003,7 +9003,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `material` field (optional)
     pub fn material(mut self, value: impl Into<Option<RecipeMaterial<S>>>) -> Self {
         self._fields.85 = value.into();
@@ -9016,7 +9016,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `materialExtent` field (optional)
     pub fn material_extent(
         mut self,
@@ -9035,7 +9035,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `mentions` field (optional)
     pub fn mentions(mut self, value: impl Into<Option<RecipeMentions<S>>>) -> Self {
         self._fields.87 = value.into();
@@ -9048,7 +9048,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `name` field (optional)
     pub fn name(mut self, value: impl Into<Option<RecipeName<S>>>) -> Self {
         self._fields.88 = value.into();
@@ -9061,7 +9061,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `nutrition` field (optional)
     pub fn nutrition(mut self, value: impl Into<Option<RecipeNutrition<S>>>) -> Self {
         self._fields.89 = value.into();
@@ -9074,7 +9074,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `offers` field (optional)
     pub fn offers(mut self, value: impl Into<Option<RecipeOffers<S>>>) -> Self {
         self._fields.90 = value.into();
@@ -9087,7 +9087,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `pattern` field (optional)
     pub fn pattern(mut self, value: impl Into<Option<RecipePattern<S>>>) -> Self {
         self._fields.91 = value.into();
@@ -9100,7 +9100,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `performTime` field (optional)
     pub fn perform_time(
         mut self,
@@ -9116,7 +9116,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `position` field (optional)
     pub fn position(mut self, value: impl Into<Option<RecipePosition<S>>>) -> Self {
         self._fields.93 = value.into();
@@ -9129,7 +9129,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `potentialAction` field (optional)
     pub fn potential_action(
         mut self,
@@ -9148,7 +9148,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `prepTime` field (optional)
     pub fn prep_time(mut self, value: impl Into<Option<RecipePrepTime<S>>>) -> Self {
         self._fields.95 = value.into();
@@ -9161,7 +9161,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `producer` field (optional)
     pub fn producer(mut self, value: impl Into<Option<RecipeProducer<S>>>) -> Self {
         self._fields.96 = value.into();
@@ -9174,7 +9174,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `provider` field (optional)
     pub fn provider(mut self, value: impl Into<Option<RecipeProvider<S>>>) -> Self {
         self._fields.97 = value.into();
@@ -9187,7 +9187,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `publication` field (optional)
     pub fn publication(
         mut self,
@@ -9203,7 +9203,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `publisher` field (optional)
     pub fn publisher(mut self, value: impl Into<Option<RecipePublisher<S>>>) -> Self {
         self._fields.99 = value.into();
@@ -9216,7 +9216,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `publisherImprint` field (optional)
     pub fn publisher_imprint(
         mut self,
@@ -9235,7 +9235,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `publishingPrinciples` field (optional)
     pub fn publishing_principles(
         mut self,
@@ -9254,7 +9254,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `recipeCategory` field (optional)
     pub fn recipe_category(
         mut self,
@@ -9273,7 +9273,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `recipeCuisine` field (optional)
     pub fn recipe_cuisine(
         mut self,
@@ -9292,7 +9292,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `recipeIngredient` field (optional)
     pub fn recipe_ingredient(
         mut self,
@@ -9311,7 +9311,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `recipeInstructions` field (optional)
     pub fn recipe_instructions(
         mut self,
@@ -9330,7 +9330,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `recipeYield` field (optional)
     pub fn recipe_yield(
         mut self,
@@ -9346,7 +9346,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `recordedAt` field (optional)
     pub fn recorded_at(mut self, value: impl Into<Option<RecipeRecordedAt<S>>>) -> Self {
         self._fields.107 = value.into();
@@ -9359,7 +9359,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `releasedEvent` field (optional)
     pub fn released_event(
         mut self,
@@ -9378,7 +9378,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `review` field (optional)
     pub fn review(mut self, value: impl Into<Option<RecipeReview<S>>>) -> Self {
         self._fields.109 = value.into();
@@ -9391,7 +9391,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `reviews` field (optional)
     pub fn reviews(mut self, value: impl Into<Option<RecipeReviews<S>>>) -> Self {
         self._fields.110 = value.into();
@@ -9404,7 +9404,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `sameAs` field (optional)
     pub fn same_as(mut self, value: impl Into<Option<RecipeSameAs<S>>>) -> Self {
         self._fields.111 = value.into();
@@ -9417,7 +9417,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `schemaVersion` field (optional)
     pub fn schema_version(
         mut self,
@@ -9436,7 +9436,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `sdDatePublished` field (optional)
     pub fn sd_date_published(
         mut self,
@@ -9455,7 +9455,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `sdLicense` field (optional)
     pub fn sd_license(mut self, value: impl Into<Option<RecipeSdLicense<S>>>) -> Self {
         self._fields.114 = value.into();
@@ -9468,7 +9468,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `sdPublisher` field (optional)
     pub fn sd_publisher(
         mut self,
@@ -9484,7 +9484,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `size` field (optional)
     pub fn size(mut self, value: impl Into<Option<RecipeSize<S>>>) -> Self {
         self._fields.116 = value.into();
@@ -9497,7 +9497,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `sourceOrganization` field (optional)
     pub fn source_organization(
         mut self,
@@ -9516,7 +9516,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `spatial` field (optional)
     pub fn spatial(mut self, value: impl Into<Option<RecipeSpatial<S>>>) -> Self {
         self._fields.118 = value.into();
@@ -9529,7 +9529,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `spatialCoverage` field (optional)
     pub fn spatial_coverage(
         mut self,
@@ -9548,7 +9548,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `sponsor` field (optional)
     pub fn sponsor(mut self, value: impl Into<Option<RecipeSponsor<S>>>) -> Self {
         self._fields.120 = value.into();
@@ -9561,7 +9561,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `step` field (optional)
     pub fn step(mut self, value: impl Into<Option<RecipeStep<S>>>) -> Self {
         self._fields.121 = value.into();
@@ -9574,7 +9574,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `steps` field (optional)
     pub fn steps(mut self, value: impl Into<Option<RecipeSteps<S>>>) -> Self {
         self._fields.122 = value.into();
@@ -9587,7 +9587,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `subjectOf` field (optional)
     pub fn subject_of(mut self, value: impl Into<Option<RecipeSubjectOf<S>>>) -> Self {
         self._fields.123 = value.into();
@@ -9600,7 +9600,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `suitableForDiet` field (optional)
     pub fn suitable_for_diet(
         mut self,
@@ -9619,7 +9619,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `supply` field (optional)
     pub fn supply(mut self, value: impl Into<Option<RecipeSupply<S>>>) -> Self {
         self._fields.125 = value.into();
@@ -9632,7 +9632,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `teaches` field (optional)
     pub fn teaches(mut self, value: impl Into<Option<RecipeTeaches<S>>>) -> Self {
         self._fields.126 = value.into();
@@ -9645,7 +9645,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `temporal` field (optional)
     pub fn temporal(mut self, value: impl Into<Option<RecipeTemporal<S>>>) -> Self {
         self._fields.127 = value.into();
@@ -9658,7 +9658,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `temporalCoverage` field (optional)
     pub fn temporal_coverage(
         mut self,
@@ -9677,7 +9677,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `text` field (optional)
     pub fn text(mut self, value: impl Into<Option<RecipeText<S>>>) -> Self {
         self._fields.129 = value.into();
@@ -9690,7 +9690,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `thumbnail` field (optional)
     pub fn thumbnail(mut self, value: impl Into<Option<RecipeThumbnail<S>>>) -> Self {
         self._fields.130 = value.into();
@@ -9703,7 +9703,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `thumbnailUrl` field (optional)
     pub fn thumbnail_url(
         mut self,
@@ -9719,7 +9719,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `timeRequired` field (optional)
     pub fn time_required(
         mut self,
@@ -9735,7 +9735,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `tool` field (optional)
     pub fn tool(mut self, value: impl Into<Option<RecipeTool<S>>>) -> Self {
         self._fields.133 = value.into();
@@ -9748,7 +9748,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `totalTime` field (optional)
     pub fn total_time(mut self, value: impl Into<Option<RecipeTotalTime<S>>>) -> Self {
         self._fields.134 = value.into();
@@ -9761,7 +9761,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `translationOfWork` field (optional)
     pub fn translation_of_work(
         mut self,
@@ -9780,7 +9780,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `translator` field (optional)
     pub fn translator(mut self, value: impl Into<Option<RecipeTranslator<S>>>) -> Self {
         self._fields.136 = value.into();
@@ -9793,7 +9793,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `typicalAgeRange` field (optional)
     pub fn typical_age_range(
         mut self,
@@ -9812,7 +9812,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `url` field (optional)
     pub fn url(mut self, value: impl Into<Option<RecipeUrl<S>>>) -> Self {
         self._fields.138 = value.into();
@@ -9825,7 +9825,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `usageInfo` field (optional)
     pub fn usage_info(mut self, value: impl Into<Option<RecipeUsageInfo<S>>>) -> Self {
         self._fields.139 = value.into();
@@ -9838,7 +9838,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `version` field (optional)
     pub fn version(mut self, value: impl Into<Option<RecipeVersion<S>>>) -> Self {
         self._fields.140 = value.into();
@@ -9851,7 +9851,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `video` field (optional)
     pub fn video(mut self, value: impl Into<Option<RecipeVideo<S>>>) -> Self {
         self._fields.141 = value.into();
@@ -9864,7 +9864,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `wordCount` field (optional)
     pub fn word_count(mut self, value: impl Into<Option<RecipeWordCount<S>>>) -> Self {
         self._fields.142 = value.into();
@@ -9877,7 +9877,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `workExample` field (optional)
     pub fn work_example(
         mut self,
@@ -9893,7 +9893,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `workTranslation` field (optional)
     pub fn work_translation(
         mut self,
@@ -9912,7 +9912,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `yield` field (optional)
     pub fn r#yield(mut self, value: impl Into<Option<RecipeYield<S>>>) -> Self {
         self._fields.145 = value.into();
@@ -9925,12 +9925,12 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S> RecipeBuilder<'a, S>
+impl<S: BosStr, St> RecipeBuilder<S, St>
 where
-    S: recipe_state::State,
+    St: recipe_state::State,
 {
-    /// Build the final struct
-    pub fn build(self) -> Recipe<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Recipe<S> {
         Recipe {
             about: self._fields.0,
             r#abstract: self._fields.1,
@@ -10081,8 +10081,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Recipe<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Recipe<S> {
         Recipe {
             about: self._fields.0,
             r#abstract: self._fields.1,

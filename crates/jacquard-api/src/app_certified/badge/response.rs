@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use crate::app_certified::badge::award::Award;
     rename = "app.certified.badge.response",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Response<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Response<S: BosStr = DefaultStr> {
     ///Reference to the badge award.
     pub badge_award: Award<S>,
     ///Client-declared timestamp when this record was originally created
@@ -57,13 +57,13 @@ pub struct Response<S: Bos<str> + AsRef<str> = DefaultStr> {
 /// The recipient’s response for the badge (accepted or rejected).
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ResponseResponse<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ResponseResponse<S: BosStr = DefaultStr> {
     Accepted,
     Rejected,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> ResponseResponse<S> {
+impl<S: BosStr> ResponseResponse<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Accepted => "accepted",
@@ -81,19 +81,19 @@ impl<S: Bos<str> + AsRef<str>> ResponseResponse<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ResponseResponse<S> {
+impl<S: BosStr> core::fmt::Display for ResponseResponse<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for ResponseResponse<S> {
+impl<S: BosStr> AsRef<str> for ResponseResponse<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for ResponseResponse<S> {
+impl<S: BosStr> Serialize for ResponseResponse<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -102,8 +102,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for ResponseResponse<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for ResponseResponse<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ResponseResponse<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -113,14 +112,18 @@ for ResponseResponse<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for ResponseResponse<S> {
+impl<S: BosStr + Default> Default for ResponseResponse<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for ResponseResponse<S> {
-    type Output = ResponseResponse<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for ResponseResponse<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ResponseResponse<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             ResponseResponse::Accepted => ResponseResponse::Accepted,
@@ -136,18 +139,18 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for ResponseResponse<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ResponseGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ResponseGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Response<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Response<S> {
+impl<S: BosStr> Response<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, ResponseRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -160,17 +163,17 @@ pub struct ResponseRecord;
 impl XrpcResp for ResponseRecord {
     const NSID: &'static str = "app.certified.badge.response";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ResponseGetRecordOutput<S>;
+    type Output<S: BosStr> = ResponseGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<ResponseGetRecordOutput<S>> for Response<S> {
+impl<S: BosStr> From<ResponseGetRecordOutput<S>> for Response<S> {
     fn from(output: ResponseGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Response<S> {
+impl<S: BosStr> Collection for Response<S> {
     const NSID: &'static str = "app.certified.badge.response";
     type Record = ResponseRecord;
 }
@@ -180,7 +183,7 @@ impl Collection for ResponseRecord {
     type Record = ResponseRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Response<S> {
+impl<S: BosStr> LexiconSchema for Response<S> {
     fn nsid() -> &'static str {
         "app.certified.badge.response"
     }
@@ -215,142 +218,142 @@ pub mod response_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Response;
         type BadgeAward;
+        type Response;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Response = Unset;
         type BadgeAward = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Response = S::Response;
-        type BadgeAward = S::BadgeAward;
-    }
-    ///State transition - sets the `response` field to Set
-    pub struct SetResponse<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetResponse<S> {}
-    impl<S: State> State for SetResponse<S> {
-        type CreatedAt = S::CreatedAt;
-        type Response = Set<members::response>;
-        type BadgeAward = S::BadgeAward;
+        type Response = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `badge_award` field to Set
-    pub struct SetBadgeAward<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBadgeAward<S> {}
-    impl<S: State> State for SetBadgeAward<S> {
-        type CreatedAt = S::CreatedAt;
-        type Response = S::Response;
+    pub struct SetBadgeAward<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBadgeAward<St> {}
+    impl<St: State> State for SetBadgeAward<St> {
         type BadgeAward = Set<members::badge_award>;
+        type Response = St::Response;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `response` field to Set
+    pub struct SetResponse<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetResponse<St> {}
+    impl<St: State> State for SetResponse<St> {
+        type BadgeAward = St::BadgeAward;
+        type Response = Set<members::response>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type BadgeAward = St::BadgeAward;
+        type Response = St::Response;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `response` field
-        pub struct response(());
         ///Marker type for the `badge_award` field
         pub struct badge_award(());
+        ///Marker type for the `response` field
+        pub struct response(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ResponseBuilder<'a, S: response_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ResponseBuilder<S: BosStr, St: response_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Award<S>>,
         Option<Datetime>,
         Option<ResponseResponse<S>>,
         Option<S>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Response<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ResponseBuilder<'a, response_state::Empty> {
+impl<S: BosStr> Response<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ResponseBuilder<S, response_state::Empty> {
         ResponseBuilder::new()
     }
 }
 
-impl<'a> ResponseBuilder<'a, response_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ResponseBuilder<S, response_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ResponseBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ResponseBuilder<'a, S>
+impl<S: BosStr, St> ResponseBuilder<S, St>
 where
-    S: response_state::State,
-    S::BadgeAward: response_state::IsUnset,
+    St: response_state::State,
+    St::BadgeAward: response_state::IsUnset,
 {
     /// Set the `badgeAward` field (required)
     pub fn badge_award(
         mut self,
         value: impl Into<Award<S>>,
-    ) -> ResponseBuilder<'a, response_state::SetBadgeAward<S>> {
+    ) -> ResponseBuilder<S, response_state::SetBadgeAward<St>> {
         self._fields.0 = Option::Some(value.into());
         ResponseBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ResponseBuilder<'a, S>
+impl<S: BosStr, St> ResponseBuilder<S, St>
 where
-    S: response_state::State,
-    S::CreatedAt: response_state::IsUnset,
+    St: response_state::State,
+    St::CreatedAt: response_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ResponseBuilder<'a, response_state::SetCreatedAt<S>> {
+    ) -> ResponseBuilder<S, response_state::SetCreatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         ResponseBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ResponseBuilder<'a, S>
+impl<S: BosStr, St> ResponseBuilder<S, St>
 where
-    S: response_state::State,
-    S::Response: response_state::IsUnset,
+    St: response_state::State,
+    St::Response: response_state::IsUnset,
 {
     /// Set the `response` field (required)
     pub fn response(
         mut self,
         value: impl Into<ResponseResponse<S>>,
-    ) -> ResponseBuilder<'a, response_state::SetResponse<S>> {
+    ) -> ResponseBuilder<S, response_state::SetResponse<St>> {
         self._fields.2 = Option::Some(value.into());
         ResponseBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: response_state::State> ResponseBuilder<'a, S> {
+impl<S: BosStr, St: response_state::State> ResponseBuilder<S, St> {
     /// Set the `weight` field (optional)
     pub fn weight(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -363,15 +366,15 @@ impl<'a, S: response_state::State> ResponseBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ResponseBuilder<'a, S>
+impl<S: BosStr, St> ResponseBuilder<S, St>
 where
-    S: response_state::State,
-    S::CreatedAt: response_state::IsSet,
-    S::Response: response_state::IsSet,
-    S::BadgeAward: response_state::IsSet,
+    St: response_state::State,
+    St::BadgeAward: response_state::IsSet,
+    St::Response: response_state::IsSet,
+    St::CreatedAt: response_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Response<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Response<S> {
         Response {
             badge_award: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
@@ -380,11 +383,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Response<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Response<S> {
         Response {
             badge_award: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),

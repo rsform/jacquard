@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Datetime;
 use jacquard_common::types::value::Data;
@@ -22,19 +22,17 @@ use serde::{Serialize, Deserialize};
 pub struct GetServerTime;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetServerTimeOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetServerTimeOutput<S: BosStr = DefaultStr> {
     ///Current server time in RFC3339 format
     pub server_time: Datetime,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -43,7 +41,7 @@ pub struct GetServerTimeResponse;
 impl jacquard_common::xrpc::XrpcResp for GetServerTimeResponse {
     const NSID: &'static str = "place.stream.server.getServerTime";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetServerTimeOutput<S>;
+    type Output<S: BosStr> = GetServerTimeOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
@@ -58,6 +56,6 @@ pub struct GetServerTimeRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetServerTimeRequest {
     const PATH: &'static str = "/xrpc/place.stream.server.getServerTime";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetServerTime;
+    type Request<S: BosStr> = GetServerTime;
     type Response = GetServerTimeResponse;
 }

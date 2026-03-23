@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use crate::org_farmapps::temp::ecrop::CodeType;
     rename = "org.farmapps.temp.agroconnect.cl022",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Cl022<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Cl022<S: BosStr = DefaultStr> {
     ///Date when added to the list
     #[serde(skip_serializing_if = "Option::is_none")]
     pub added: Option<Datetime>,
@@ -82,18 +82,18 @@ pub struct Cl022<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Cl022GetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Cl022GetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Cl022<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Cl022<S> {
+impl<S: BosStr> Cl022<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, Cl022Record>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -106,17 +106,17 @@ pub struct Cl022Record;
 impl XrpcResp for Cl022Record {
     const NSID: &'static str = "org.farmapps.temp.agroconnect.cl022";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = Cl022GetRecordOutput<S>;
+    type Output<S: BosStr> = Cl022GetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<Cl022GetRecordOutput<S>> for Cl022<S> {
+impl<S: BosStr> From<Cl022GetRecordOutput<S>> for Cl022<S> {
     fn from(output: Cl022GetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Cl022<S> {
+impl<S: BosStr> Collection for Cl022<S> {
     const NSID: &'static str = "org.farmapps.temp.agroconnect.cl022";
     type Record = Cl022Record;
 }
@@ -126,7 +126,7 @@ impl Collection for Cl022Record {
     type Record = Cl022Record;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Cl022<S> {
+impl<S: BosStr> LexiconSchema for Cl022<S> {
     fn nsid() -> &'static str {
         "org.farmapps.temp.agroconnect.cl022"
     }
@@ -198,17 +198,17 @@ pub mod cl022_state {
         type Description = Unset;
     }
     ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
+    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetId<St> {}
+    impl<St: State> State for SetId<St> {
         type Id = Set<members::id>;
-        type Description = S::Description;
+        type Description = St::Description;
     }
     ///State transition - sets the `description` field to Set
-    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDescription<S> {}
-    impl<S: State> State for SetDescription<S> {
-        type Id = S::Id;
+    pub struct SetDescription<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDescription<St> {}
+    impl<St: State> State for SetDescription<St> {
+        type Id = St::Id;
         type Description = Set<members::description>;
     }
     /// Marker types for field names
@@ -221,9 +221,9 @@ pub mod cl022_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct Cl022Builder<'a, S: cl022_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct Cl022Builder<S: BosStr, St: cl022_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
         Option<S>,
@@ -237,28 +237,28 @@ pub struct Cl022Builder<'a, S: cl022_state::State> {
         Option<S>,
         Option<Datetime>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Cl022<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> Cl022Builder<'a, cl022_state::Empty> {
+impl<S: BosStr> Cl022<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> Cl022Builder<S, cl022_state::Empty> {
         Cl022Builder::new()
     }
 }
 
-impl<'a> Cl022Builder<'a, cl022_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> Cl022Builder<S, cl022_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         Cl022Builder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: cl022_state::State> Cl022Builder<'a, S> {
+impl<S: BosStr, St: cl022_state::State> Cl022Builder<S, St> {
     /// Set the `added` field (optional)
     pub fn added(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.0 = value.into();
@@ -271,7 +271,7 @@ impl<'a, S: cl022_state::State> Cl022Builder<'a, S> {
     }
 }
 
-impl<'a, S: cl022_state::State> Cl022Builder<'a, S> {
+impl<S: BosStr, St: cl022_state::State> Cl022Builder<S, St> {
     /// Set the `comment` field (optional)
     pub fn comment(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -284,7 +284,7 @@ impl<'a, S: cl022_state::State> Cl022Builder<'a, S> {
     }
 }
 
-impl<'a, S: cl022_state::State> Cl022Builder<'a, S> {
+impl<S: BosStr, St: cl022_state::State> Cl022Builder<S, St> {
     /// Set the `denominator` field (optional)
     pub fn denominator(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -297,45 +297,45 @@ impl<'a, S: cl022_state::State> Cl022Builder<'a, S> {
     }
 }
 
-impl<'a, S> Cl022Builder<'a, S>
+impl<S: BosStr, St> Cl022Builder<S, St>
 where
-    S: cl022_state::State,
-    S::Description: cl022_state::IsUnset,
+    St: cl022_state::State,
+    St::Description: cl022_state::IsUnset,
 {
     /// Set the `description` field (required)
     pub fn description(
         mut self,
         value: impl Into<S>,
-    ) -> Cl022Builder<'a, cl022_state::SetDescription<S>> {
+    ) -> Cl022Builder<S, cl022_state::SetDescription<St>> {
         self._fields.3 = Option::Some(value.into());
         Cl022Builder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> Cl022Builder<'a, S>
+impl<S: BosStr, St> Cl022Builder<S, St>
 where
-    S: cl022_state::State,
-    S::Id: cl022_state::IsUnset,
+    St: cl022_state::State,
+    St::Id: cl022_state::IsUnset,
 {
     /// Set the `id` field (required)
     pub fn id(
         mut self,
         value: impl Into<CodeType<S>>,
-    ) -> Cl022Builder<'a, cl022_state::SetId<S>> {
+    ) -> Cl022Builder<S, cl022_state::SetId<St>> {
         self._fields.4 = Option::Some(value.into());
         Cl022Builder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: cl022_state::State> Cl022Builder<'a, S> {
+impl<S: BosStr, St: cl022_state::State> Cl022Builder<S, St> {
     /// Set the `k2o` field (optional)
     pub fn k2o(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.5 = value.into();
@@ -348,7 +348,7 @@ impl<'a, S: cl022_state::State> Cl022Builder<'a, S> {
     }
 }
 
-impl<'a, S: cl022_state::State> Cl022Builder<'a, S> {
+impl<S: BosStr, St: cl022_state::State> Cl022Builder<S, St> {
     /// Set the `n` field (optional)
     pub fn n(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.6 = value.into();
@@ -361,7 +361,7 @@ impl<'a, S: cl022_state::State> Cl022Builder<'a, S> {
     }
 }
 
-impl<'a, S: cl022_state::State> Cl022Builder<'a, S> {
+impl<S: BosStr, St: cl022_state::State> Cl022Builder<S, St> {
     /// Set the `p2o5` field (optional)
     pub fn p2o5(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.7 = value.into();
@@ -374,7 +374,7 @@ impl<'a, S: cl022_state::State> Cl022Builder<'a, S> {
     }
 }
 
-impl<'a, S: cl022_state::State> Cl022Builder<'a, S> {
+impl<S: BosStr, St: cl022_state::State> Cl022Builder<S, St> {
     /// Set the `type` field (optional)
     pub fn r#type(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.8 = value.into();
@@ -387,7 +387,7 @@ impl<'a, S: cl022_state::State> Cl022Builder<'a, S> {
     }
 }
 
-impl<'a, S: cl022_state::State> Cl022Builder<'a, S> {
+impl<S: BosStr, St: cl022_state::State> Cl022Builder<S, St> {
     /// Set the `unit` field (optional)
     pub fn unit(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.9 = value.into();
@@ -400,7 +400,7 @@ impl<'a, S: cl022_state::State> Cl022Builder<'a, S> {
     }
 }
 
-impl<'a, S: cl022_state::State> Cl022Builder<'a, S> {
+impl<S: BosStr, St: cl022_state::State> Cl022Builder<S, St> {
     /// Set the `updated` field (optional)
     pub fn updated(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.10 = value.into();
@@ -413,14 +413,14 @@ impl<'a, S: cl022_state::State> Cl022Builder<'a, S> {
     }
 }
 
-impl<'a, S> Cl022Builder<'a, S>
+impl<S: BosStr, St> Cl022Builder<S, St>
 where
-    S: cl022_state::State,
-    S::Id: cl022_state::IsSet,
-    S::Description: cl022_state::IsSet,
+    St: cl022_state::State,
+    St::Id: cl022_state::IsSet,
+    St::Description: cl022_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Cl022<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Cl022<S> {
         Cl022 {
             added: self._fields.0,
             comment: self._fields.1,
@@ -436,8 +436,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Cl022<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Cl022<S> {
         Cl022 {
             added: self._fields.0,
             comment: self._fields.1,

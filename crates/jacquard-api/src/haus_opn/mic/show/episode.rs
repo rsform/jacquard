@@ -13,7 +13,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -39,11 +39,11 @@ use serde::{Serialize, Deserialize};
     rename = "haus.opn.mic.show.episode",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Episode<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Episode<S: BosStr = DefaultStr> {
     ///Scheduled or actual date/time when this episode airs.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub airing_date: Option<Datetime>,
@@ -67,14 +67,14 @@ pub struct Episode<S: Bos<str> + AsRef<str> = DefaultStr> {
 /// Current episode lifecycle status.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum EpisodeStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum EpisodeStatus<S: BosStr = DefaultStr> {
     Upcoming,
     Live,
     Ended,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> EpisodeStatus<S> {
+impl<S: BosStr> EpisodeStatus<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Upcoming => "upcoming",
@@ -94,19 +94,19 @@ impl<S: Bos<str> + AsRef<str>> EpisodeStatus<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for EpisodeStatus<S> {
+impl<S: BosStr> core::fmt::Display for EpisodeStatus<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for EpisodeStatus<S> {
+impl<S: BosStr> AsRef<str> for EpisodeStatus<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for EpisodeStatus<S> {
+impl<S: BosStr> Serialize for EpisodeStatus<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -115,8 +115,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for EpisodeStatus<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for EpisodeStatus<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for EpisodeStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -126,14 +125,18 @@ for EpisodeStatus<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for EpisodeStatus<S> {
+impl<S: BosStr + Default> Default for EpisodeStatus<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for EpisodeStatus<S> {
-    type Output = EpisodeStatus<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for EpisodeStatus<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = EpisodeStatus<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             EpisodeStatus::Upcoming => EpisodeStatus::Upcoming,
@@ -150,18 +153,18 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for EpisodeStatus<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct EpisodeGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct EpisodeGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Episode<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Episode<S> {
+impl<S: BosStr> Episode<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, EpisodeRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -174,17 +177,17 @@ pub struct EpisodeRecord;
 impl XrpcResp for EpisodeRecord {
     const NSID: &'static str = "haus.opn.mic.show.episode";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = EpisodeGetRecordOutput<S>;
+    type Output<S: BosStr> = EpisodeGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<EpisodeGetRecordOutput<S>> for Episode<S> {
+impl<S: BosStr> From<EpisodeGetRecordOutput<S>> for Episode<S> {
     fn from(output: EpisodeGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Episode<S> {
+impl<S: BosStr> Collection for Episode<S> {
     const NSID: &'static str = "haus.opn.mic.show.episode";
     type Record = EpisodeRecord;
 }
@@ -194,7 +197,7 @@ impl Collection for EpisodeRecord {
     type Record = EpisodeRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Episode<S> {
+impl<S: BosStr> LexiconSchema for Episode<S> {
     fn nsid() -> &'static str {
         "haus.opn.mic.show.episode"
     }
@@ -278,57 +281,57 @@ pub mod episode_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
         type CreatedAt;
+        type Title;
         type ShowUri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
         type CreatedAt = Unset;
+        type Title = Unset;
         type ShowUri = Unset;
     }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type CreatedAt = S::CreatedAt;
-        type ShowUri = S::ShowUri;
-    }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Title = S::Title;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
-        type ShowUri = S::ShowUri;
+        type Title = St::Title;
+        type ShowUri = St::ShowUri;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
+        type CreatedAt = St::CreatedAt;
+        type Title = Set<members::title>;
+        type ShowUri = St::ShowUri;
     }
     ///State transition - sets the `show_uri` field to Set
-    pub struct SetShowUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetShowUri<S> {}
-    impl<S: State> State for SetShowUri<S> {
-        type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
+    pub struct SetShowUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetShowUri<St> {}
+    impl<St: State> State for SetShowUri<St> {
+        type CreatedAt = St::CreatedAt;
+        type Title = St::Title;
         type ShowUri = Set<members::show_uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `title` field
+        pub struct title(());
         ///Marker type for the `show_uri` field
         pub struct show_uri(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct EpisodeBuilder<'a, S: episode_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct EpisodeBuilder<S: BosStr, St: episode_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
         Option<BlobRef<S>>,
@@ -339,28 +342,28 @@ pub struct EpisodeBuilder<'a, S: episode_state::State> {
         Option<S>,
         Option<UriValue<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Episode<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> EpisodeBuilder<'a, episode_state::Empty> {
+impl<S: BosStr> Episode<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> EpisodeBuilder<S, episode_state::Empty> {
         EpisodeBuilder::new()
     }
 }
 
-impl<'a> EpisodeBuilder<'a, episode_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> EpisodeBuilder<S, episode_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         EpisodeBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
+impl<S: BosStr, St: episode_state::State> EpisodeBuilder<S, St> {
     /// Set the `airingDate` field (optional)
     pub fn airing_date(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.0 = value.into();
@@ -373,7 +376,7 @@ impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
+impl<S: BosStr, St: episode_state::State> EpisodeBuilder<S, St> {
     /// Set the `coverArt` field (optional)
     pub fn cover_art(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -386,26 +389,26 @@ impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
     }
 }
 
-impl<'a, S> EpisodeBuilder<'a, S>
+impl<S: BosStr, St> EpisodeBuilder<S, St>
 where
-    S: episode_state::State,
-    S::CreatedAt: episode_state::IsUnset,
+    St: episode_state::State,
+    St::CreatedAt: episode_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> EpisodeBuilder<'a, episode_state::SetCreatedAt<S>> {
+    ) -> EpisodeBuilder<S, episode_state::SetCreatedAt<St>> {
         self._fields.2 = Option::Some(value.into());
         EpisodeBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
+impl<S: BosStr, St: episode_state::State> EpisodeBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -418,26 +421,26 @@ impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
     }
 }
 
-impl<'a, S> EpisodeBuilder<'a, S>
+impl<S: BosStr, St> EpisodeBuilder<S, St>
 where
-    S: episode_state::State,
-    S::ShowUri: episode_state::IsUnset,
+    St: episode_state::State,
+    St::ShowUri: episode_state::IsUnset,
 {
     /// Set the `showUri` field (required)
     pub fn show_uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> EpisodeBuilder<'a, episode_state::SetShowUri<S>> {
+    ) -> EpisodeBuilder<S, episode_state::SetShowUri<St>> {
         self._fields.4 = Option::Some(value.into());
         EpisodeBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
+impl<S: BosStr, St: episode_state::State> EpisodeBuilder<S, St> {
     /// Set the `status` field (optional)
     pub fn status(mut self, value: impl Into<Option<EpisodeStatus<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -450,26 +453,26 @@ impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
     }
 }
 
-impl<'a, S> EpisodeBuilder<'a, S>
+impl<S: BosStr, St> EpisodeBuilder<S, St>
 where
-    S: episode_state::State,
-    S::Title: episode_state::IsUnset,
+    St: episode_state::State,
+    St::Title: episode_state::IsUnset,
 {
     /// Set the `title` field (required)
     pub fn title(
         mut self,
         value: impl Into<S>,
-    ) -> EpisodeBuilder<'a, episode_state::SetTitle<S>> {
+    ) -> EpisodeBuilder<S, episode_state::SetTitle<St>> {
         self._fields.6 = Option::Some(value.into());
         EpisodeBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
+impl<S: BosStr, St: episode_state::State> EpisodeBuilder<S, St> {
     /// Set the `vodUrl` field (optional)
     pub fn vod_url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.7 = value.into();
@@ -482,15 +485,15 @@ impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
     }
 }
 
-impl<'a, S> EpisodeBuilder<'a, S>
+impl<S: BosStr, St> EpisodeBuilder<S, St>
 where
-    S: episode_state::State,
-    S::Title: episode_state::IsSet,
-    S::CreatedAt: episode_state::IsSet,
-    S::ShowUri: episode_state::IsSet,
+    St: episode_state::State,
+    St::CreatedAt: episode_state::IsSet,
+    St::Title: episode_state::IsSet,
+    St::ShowUri: episode_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Episode<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Episode<S> {
         Episode {
             airing_date: self._fields.0,
             cover_art: self._fields.1,
@@ -503,11 +506,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Episode<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Episode<S> {
         Episode {
             airing_date: self._fields.0,
             cover_art: self._fields.1,

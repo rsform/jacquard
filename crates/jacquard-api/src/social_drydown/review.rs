@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "social.drydown.review",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Review<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Review<S: BosStr = DefaultStr> {
     ///Final: Depth and evolution (1-5)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub complexity: Option<i64>,
@@ -108,18 +108,18 @@ pub struct Review<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ReviewGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ReviewGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Review<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Review<S> {
+impl<S: BosStr> Review<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, ReviewRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -132,17 +132,17 @@ pub struct ReviewRecord;
 impl XrpcResp for ReviewRecord {
     const NSID: &'static str = "social.drydown.review";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ReviewGetRecordOutput<S>;
+    type Output<S: BosStr> = ReviewGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<ReviewGetRecordOutput<S>> for Review<S> {
+impl<S: BosStr> From<ReviewGetRecordOutput<S>> for Review<S> {
     fn from(output: ReviewGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Review<S> {
+impl<S: BosStr> Collection for Review<S> {
     const NSID: &'static str = "social.drydown.review";
     type Record = ReviewRecord;
 }
@@ -152,7 +152,7 @@ impl Collection for ReviewRecord {
     type Record = ReviewRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Review<S> {
+impl<S: BosStr> LexiconSchema for Review<S> {
     fn nsid() -> &'static str {
         "social.drydown.review"
     }
@@ -390,17 +390,17 @@ pub mod review_state {
         type CreatedAt = Unset;
     }
     ///State transition - sets the `fragrance` field to Set
-    pub struct SetFragrance<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFragrance<S> {}
-    impl<S: State> State for SetFragrance<S> {
+    pub struct SetFragrance<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetFragrance<St> {}
+    impl<St: State> State for SetFragrance<St> {
         type Fragrance = Set<members::fragrance>;
-        type CreatedAt = S::CreatedAt;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Fragrance = S::Fragrance;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Fragrance = St::Fragrance;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
@@ -413,9 +413,9 @@ pub mod review_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ReviewBuilder<'a, S: review_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ReviewBuilder<S: BosStr, St: review_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<i64>,
         Option<Datetime>,
@@ -438,18 +438,18 @@ pub struct ReviewBuilder<'a, S: review_state::State> {
         Option<bool>,
         Option<i64>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Review<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ReviewBuilder<'a, review_state::Empty> {
+impl<S: BosStr> Review<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ReviewBuilder<S, review_state::Empty> {
         ReviewBuilder::new()
     }
 }
 
-impl<'a> ReviewBuilder<'a, review_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ReviewBuilder<S, review_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ReviewBuilder {
             _state: PhantomData,
@@ -475,12 +475,12 @@ impl<'a> ReviewBuilder<'a, review_state::Empty> {
                 None,
                 None,
             ),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
+impl<S: BosStr, St: review_state::State> ReviewBuilder<S, St> {
     /// Set the `complexity` field (optional)
     pub fn complexity(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
@@ -493,26 +493,26 @@ impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ReviewBuilder<'a, S>
+impl<S: BosStr, St> ReviewBuilder<S, St>
 where
-    S: review_state::State,
-    S::CreatedAt: review_state::IsUnset,
+    St: review_state::State,
+    St::CreatedAt: review_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ReviewBuilder<'a, review_state::SetCreatedAt<S>> {
+    ) -> ReviewBuilder<S, review_state::SetCreatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         ReviewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
+impl<S: BosStr, St: review_state::State> ReviewBuilder<S, St> {
     /// Set the `drydownRating` field (optional)
     pub fn drydown_rating(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -525,7 +525,7 @@ impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
+impl<S: BosStr, St: review_state::State> ReviewBuilder<S, St> {
     /// Set the `elevation` field (optional)
     pub fn elevation(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.3 = value.into();
@@ -538,7 +538,7 @@ impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
+impl<S: BosStr, St: review_state::State> ReviewBuilder<S, St> {
     /// Set the `endRating` field (optional)
     pub fn end_rating(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.4 = value.into();
@@ -551,26 +551,26 @@ impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ReviewBuilder<'a, S>
+impl<S: BosStr, St> ReviewBuilder<S, St>
 where
-    S: review_state::State,
-    S::Fragrance: review_state::IsUnset,
+    St: review_state::State,
+    St::Fragrance: review_state::IsUnset,
 {
     /// Set the `fragrance` field (required)
     pub fn fragrance(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> ReviewBuilder<'a, review_state::SetFragrance<S>> {
+    ) -> ReviewBuilder<S, review_state::SetFragrance<St>> {
         self._fields.5 = Option::Some(value.into());
         ReviewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
+impl<S: BosStr, St: review_state::State> ReviewBuilder<S, St> {
     /// Set the `longevity` field (optional)
     pub fn longevity(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.6 = value.into();
@@ -583,7 +583,7 @@ impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
+impl<S: BosStr, St: review_state::State> ReviewBuilder<S, St> {
     /// Set the `midProjection` field (optional)
     pub fn mid_projection(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.7 = value.into();
@@ -596,7 +596,7 @@ impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
+impl<S: BosStr, St: review_state::State> ReviewBuilder<S, St> {
     /// Set the `openingProjection` field (optional)
     pub fn opening_projection(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.8 = value.into();
@@ -609,7 +609,7 @@ impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
+impl<S: BosStr, St: review_state::State> ReviewBuilder<S, St> {
     /// Set the `openingRating` field (optional)
     pub fn opening_rating(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.9 = value.into();
@@ -622,7 +622,7 @@ impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
+impl<S: BosStr, St: review_state::State> ReviewBuilder<S, St> {
     /// Set the `overallRating` field (optional)
     pub fn overall_rating(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.10 = value.into();
@@ -635,7 +635,7 @@ impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
+impl<S: BosStr, St: review_state::State> ReviewBuilder<S, St> {
     /// Set the `sillage` field (optional)
     pub fn sillage(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.11 = value.into();
@@ -648,7 +648,7 @@ impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
+impl<S: BosStr, St: review_state::State> ReviewBuilder<S, St> {
     /// Set the `stage1Temp` field (optional)
     pub fn stage1_temp(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.12 = value.into();
@@ -661,7 +661,7 @@ impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
+impl<S: BosStr, St: review_state::State> ReviewBuilder<S, St> {
     /// Set the `stage2CompletedAt` field (optional)
     pub fn stage2_completed_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.13 = value.into();
@@ -674,7 +674,7 @@ impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
+impl<S: BosStr, St: review_state::State> ReviewBuilder<S, St> {
     /// Set the `stage2Temp` field (optional)
     pub fn stage2_temp(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.14 = value.into();
@@ -687,7 +687,7 @@ impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
+impl<S: BosStr, St: review_state::State> ReviewBuilder<S, St> {
     /// Set the `stage3Temp` field (optional)
     pub fn stage3_temp(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.15 = value.into();
@@ -700,7 +700,7 @@ impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
+impl<S: BosStr, St: review_state::State> ReviewBuilder<S, St> {
     /// Set the `text` field (optional)
     pub fn text(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.16 = value.into();
@@ -713,7 +713,7 @@ impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
+impl<S: BosStr, St: review_state::State> ReviewBuilder<S, St> {
     /// Set the `uvIndex` field (optional)
     pub fn uv_index(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.17 = value.into();
@@ -726,7 +726,7 @@ impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
+impl<S: BosStr, St: review_state::State> ReviewBuilder<S, St> {
     /// Set the `weatherOptIn` field (optional)
     pub fn weather_opt_in(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.18 = value.into();
@@ -739,7 +739,7 @@ impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
+impl<S: BosStr, St: review_state::State> ReviewBuilder<S, St> {
     /// Set the `weightedScore` field (optional)
     pub fn weighted_score(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.19 = value.into();
@@ -752,14 +752,14 @@ impl<'a, S: review_state::State> ReviewBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ReviewBuilder<'a, S>
+impl<S: BosStr, St> ReviewBuilder<S, St>
 where
-    S: review_state::State,
-    S::Fragrance: review_state::IsSet,
-    S::CreatedAt: review_state::IsSet,
+    St: review_state::State,
+    St::Fragrance: review_state::IsSet,
+    St::CreatedAt: review_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Review<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Review<S> {
         Review {
             complexity: self._fields.0,
             created_at: self._fields.1.unwrap(),
@@ -784,8 +784,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Review<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Review<S> {
         Review {
             complexity: self._fields.0,
             created_at: self._fields.1.unwrap(),

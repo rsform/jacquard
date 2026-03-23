@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
     rename = "io.kich.recipe.collectionfollow",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Collectionfollow<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Collectionfollow<S: BosStr = DefaultStr> {
     ///When this follow was created
     pub created_at: Datetime,
     ///The collection being followed
@@ -54,18 +54,18 @@ pub struct Collectionfollow<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CollectionfollowGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CollectionfollowGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Collectionfollow<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Collectionfollow<S> {
+impl<S: BosStr> Collectionfollow<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, CollectionfollowRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -78,18 +78,17 @@ pub struct CollectionfollowRecord;
 impl XrpcResp for CollectionfollowRecord {
     const NSID: &'static str = "io.kich.recipe.collectionfollow";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = CollectionfollowGetRecordOutput<S>;
+    type Output<S: BosStr> = CollectionfollowGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<CollectionfollowGetRecordOutput<S>>
-for Collectionfollow<S> {
+impl<S: BosStr> From<CollectionfollowGetRecordOutput<S>> for Collectionfollow<S> {
     fn from(output: CollectionfollowGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Collectionfollow<S> {
+impl<S: BosStr> Collection for Collectionfollow<S> {
     const NSID: &'static str = "io.kich.recipe.collectionfollow";
     type Record = CollectionfollowRecord;
 }
@@ -99,7 +98,7 @@ impl Collection for CollectionfollowRecord {
     type Record = CollectionfollowRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Collectionfollow<S> {
+impl<S: BosStr> LexiconSchema for Collectionfollow<S> {
     fn nsid() -> &'static str {
         "io.kich.recipe.collectionfollow"
     }
@@ -135,17 +134,17 @@ pub mod collectionfollow_state {
         type CreatedAt = Unset;
     }
     ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
+    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubject<St> {}
+    impl<St: State> State for SetSubject<St> {
         type Subject = Set<members::subject>;
-        type CreatedAt = S::CreatedAt;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Subject = S::Subject;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Subject = St::Subject;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
@@ -158,88 +157,88 @@ pub mod collectionfollow_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct CollectionfollowBuilder<'a, S: collectionfollow_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct CollectionfollowBuilder<S: BosStr, St: collectionfollow_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<StrongRef<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Collectionfollow<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> CollectionfollowBuilder<'a, collectionfollow_state::Empty> {
+impl<S: BosStr> Collectionfollow<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> CollectionfollowBuilder<S, collectionfollow_state::Empty> {
         CollectionfollowBuilder::new()
     }
 }
 
-impl<'a> CollectionfollowBuilder<'a, collectionfollow_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> CollectionfollowBuilder<S, collectionfollow_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         CollectionfollowBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CollectionfollowBuilder<'a, S>
+impl<S: BosStr, St> CollectionfollowBuilder<S, St>
 where
-    S: collectionfollow_state::State,
-    S::CreatedAt: collectionfollow_state::IsUnset,
+    St: collectionfollow_state::State,
+    St::CreatedAt: collectionfollow_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> CollectionfollowBuilder<'a, collectionfollow_state::SetCreatedAt<S>> {
+    ) -> CollectionfollowBuilder<S, collectionfollow_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         CollectionfollowBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CollectionfollowBuilder<'a, S>
+impl<S: BosStr, St> CollectionfollowBuilder<S, St>
 where
-    S: collectionfollow_state::State,
-    S::Subject: collectionfollow_state::IsUnset,
+    St: collectionfollow_state::State,
+    St::Subject: collectionfollow_state::IsUnset,
 {
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> CollectionfollowBuilder<'a, collectionfollow_state::SetSubject<S>> {
+    ) -> CollectionfollowBuilder<S, collectionfollow_state::SetSubject<St>> {
         self._fields.1 = Option::Some(value.into());
         CollectionfollowBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CollectionfollowBuilder<'a, S>
+impl<S: BosStr, St> CollectionfollowBuilder<S, St>
 where
-    S: collectionfollow_state::State,
-    S::Subject: collectionfollow_state::IsSet,
-    S::CreatedAt: collectionfollow_state::IsSet,
+    St: collectionfollow_state::State,
+    St::Subject: collectionfollow_state::IsSet,
+    St::CreatedAt: collectionfollow_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Collectionfollow<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Collectionfollow<S> {
         Collectionfollow {
             created_at: self._fields.0.unwrap(),
             subject: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Collectionfollow<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Collectionfollow<S> {
         Collectionfollow {
             created_at: self._fields.0.unwrap(),
             subject: self._fields.1.unwrap(),

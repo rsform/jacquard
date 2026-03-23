@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "app.gainforest.organization.defaultSite",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DefaultSite<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DefaultSite<S: BosStr = DefaultStr> {
     ///The date and time of the creation of the record
     pub created_at: Datetime,
     ///The reference to the default site record in the PDS
@@ -54,18 +54,18 @@ pub struct DefaultSite<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DefaultSiteGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DefaultSiteGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: DefaultSite<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> DefaultSite<S> {
+impl<S: BosStr> DefaultSite<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, DefaultSiteRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -78,17 +78,17 @@ pub struct DefaultSiteRecord;
 impl XrpcResp for DefaultSiteRecord {
     const NSID: &'static str = "app.gainforest.organization.defaultSite";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = DefaultSiteGetRecordOutput<S>;
+    type Output<S: BosStr> = DefaultSiteGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<DefaultSiteGetRecordOutput<S>> for DefaultSite<S> {
+impl<S: BosStr> From<DefaultSiteGetRecordOutput<S>> for DefaultSite<S> {
     fn from(output: DefaultSiteGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for DefaultSite<S> {
+impl<S: BosStr> Collection for DefaultSite<S> {
     const NSID: &'static str = "app.gainforest.organization.defaultSite";
     type Record = DefaultSiteRecord;
 }
@@ -98,7 +98,7 @@ impl Collection for DefaultSiteRecord {
     type Record = DefaultSiteRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for DefaultSite<S> {
+impl<S: BosStr> LexiconSchema for DefaultSite<S> {
     fn nsid() -> &'static str {
         "app.gainforest.organization.defaultSite"
     }
@@ -134,17 +134,17 @@ pub mod default_site_state {
         type CreatedAt = Unset;
     }
     ///State transition - sets the `site` field to Set
-    pub struct SetSite<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSite<S> {}
-    impl<S: State> State for SetSite<S> {
+    pub struct SetSite<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSite<St> {}
+    impl<St: State> State for SetSite<St> {
         type Site = Set<members::site>;
-        type CreatedAt = S::CreatedAt;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Site = S::Site;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Site = St::Site;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
@@ -157,88 +157,88 @@ pub mod default_site_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct DefaultSiteBuilder<'a, S: default_site_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct DefaultSiteBuilder<S: BosStr, St: default_site_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<AtUri<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> DefaultSite<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> DefaultSiteBuilder<'a, default_site_state::Empty> {
+impl<S: BosStr> DefaultSite<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> DefaultSiteBuilder<S, default_site_state::Empty> {
         DefaultSiteBuilder::new()
     }
 }
 
-impl<'a> DefaultSiteBuilder<'a, default_site_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> DefaultSiteBuilder<S, default_site_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         DefaultSiteBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DefaultSiteBuilder<'a, S>
+impl<S: BosStr, St> DefaultSiteBuilder<S, St>
 where
-    S: default_site_state::State,
-    S::CreatedAt: default_site_state::IsUnset,
+    St: default_site_state::State,
+    St::CreatedAt: default_site_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> DefaultSiteBuilder<'a, default_site_state::SetCreatedAt<S>> {
+    ) -> DefaultSiteBuilder<S, default_site_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         DefaultSiteBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DefaultSiteBuilder<'a, S>
+impl<S: BosStr, St> DefaultSiteBuilder<S, St>
 where
-    S: default_site_state::State,
-    S::Site: default_site_state::IsUnset,
+    St: default_site_state::State,
+    St::Site: default_site_state::IsUnset,
 {
     /// Set the `site` field (required)
     pub fn site(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> DefaultSiteBuilder<'a, default_site_state::SetSite<S>> {
+    ) -> DefaultSiteBuilder<S, default_site_state::SetSite<St>> {
         self._fields.1 = Option::Some(value.into());
         DefaultSiteBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DefaultSiteBuilder<'a, S>
+impl<S: BosStr, St> DefaultSiteBuilder<S, St>
 where
-    S: default_site_state::State,
-    S::Site: default_site_state::IsSet,
-    S::CreatedAt: default_site_state::IsSet,
+    St: default_site_state::State,
+    St::Site: default_site_state::IsSet,
+    St::CreatedAt: default_site_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> DefaultSite<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> DefaultSite<S> {
         DefaultSite {
             created_at: self._fields.0.unwrap(),
             site: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> DefaultSite<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> DefaultSite<S> {
         DefaultSite {
             created_at: self._fields.0.unwrap(),
             site: self._fields.1.unwrap(),

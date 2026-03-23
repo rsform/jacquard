@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
 
 #[allow(unused_imports)]
@@ -36,11 +36,11 @@ use serde::{Serialize, Deserialize};
     rename = "com.atprotofans.brokerProof",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct BrokerProof<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct BrokerProof<S: BosStr = DefaultStr> {
     ///CID of the proof record. Required for both inline and remote proofs.
     pub cid: Cid<S>,
     ///Signing key (for inline proofs).
@@ -60,18 +60,18 @@ pub struct BrokerProof<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct BrokerProofGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct BrokerProofGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: BrokerProof<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> BrokerProof<S> {
+impl<S: BosStr> BrokerProof<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, BrokerProofRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -84,17 +84,17 @@ pub struct BrokerProofRecord;
 impl XrpcResp for BrokerProofRecord {
     const NSID: &'static str = "com.atprotofans.brokerProof";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = BrokerProofGetRecordOutput<S>;
+    type Output<S: BosStr> = BrokerProofGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<BrokerProofGetRecordOutput<S>> for BrokerProof<S> {
+impl<S: BosStr> From<BrokerProofGetRecordOutput<S>> for BrokerProof<S> {
     fn from(output: BrokerProofGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for BrokerProof<S> {
+impl<S: BosStr> Collection for BrokerProof<S> {
     const NSID: &'static str = "com.atprotofans.brokerProof";
     type Record = BrokerProofRecord;
 }
@@ -104,7 +104,7 @@ impl Collection for BrokerProofRecord {
     type Record = BrokerProofRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for BrokerProof<S> {
+impl<S: BosStr> LexiconSchema for BrokerProof<S> {
     fn nsid() -> &'static str {
         "com.atprotofans.brokerProof"
     }
@@ -138,9 +138,9 @@ pub mod broker_proof_state {
         type Cid = Unset;
     }
     ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
+    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCid<St> {}
+    impl<St: State> State for SetCid<St> {
         type Cid = Set<members::cid>;
     }
     /// Marker types for field names
@@ -151,51 +151,51 @@ pub mod broker_proof_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct BrokerProofBuilder<'a, S: broker_proof_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct BrokerProofBuilder<S: BosStr, St: broker_proof_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Cid<S>>, Option<S>, Option<Bytes>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> BrokerProof<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> BrokerProofBuilder<'a, broker_proof_state::Empty> {
+impl<S: BosStr> BrokerProof<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> BrokerProofBuilder<S, broker_proof_state::Empty> {
         BrokerProofBuilder::new()
     }
 }
 
-impl<'a> BrokerProofBuilder<'a, broker_proof_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> BrokerProofBuilder<S, broker_proof_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         BrokerProofBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BrokerProofBuilder<'a, S>
+impl<S: BosStr, St> BrokerProofBuilder<S, St>
 where
-    S: broker_proof_state::State,
-    S::Cid: broker_proof_state::IsUnset,
+    St: broker_proof_state::State,
+    St::Cid: broker_proof_state::IsUnset,
 {
     /// Set the `cid` field (required)
     pub fn cid(
         mut self,
         value: impl Into<Cid<S>>,
-    ) -> BrokerProofBuilder<'a, broker_proof_state::SetCid<S>> {
+    ) -> BrokerProofBuilder<S, broker_proof_state::SetCid<St>> {
         self._fields.0 = Option::Some(value.into());
         BrokerProofBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: broker_proof_state::State> BrokerProofBuilder<'a, S> {
+impl<S: BosStr, St: broker_proof_state::State> BrokerProofBuilder<S, St> {
     /// Set the `key` field (optional)
     pub fn key(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -208,7 +208,7 @@ impl<'a, S: broker_proof_state::State> BrokerProofBuilder<'a, S> {
     }
 }
 
-impl<'a, S: broker_proof_state::State> BrokerProofBuilder<'a, S> {
+impl<S: BosStr, St: broker_proof_state::State> BrokerProofBuilder<S, St> {
     /// Set the `signature` field (optional)
     pub fn signature(mut self, value: impl Into<Option<Bytes>>) -> Self {
         self._fields.2 = value.into();
@@ -221,13 +221,13 @@ impl<'a, S: broker_proof_state::State> BrokerProofBuilder<'a, S> {
     }
 }
 
-impl<'a, S> BrokerProofBuilder<'a, S>
+impl<S: BosStr, St> BrokerProofBuilder<S, St>
 where
-    S: broker_proof_state::State,
-    S::Cid: broker_proof_state::IsSet,
+    St: broker_proof_state::State,
+    St::Cid: broker_proof_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> BrokerProof<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> BrokerProof<S> {
         BrokerProof {
             cid: self._fields.0.unwrap(),
             key: self._fields.1,
@@ -235,11 +235,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> BrokerProof<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> BrokerProof<S> {
         BrokerProof {
             cid: self._fields.0.unwrap(),
             key: self._fields.1,

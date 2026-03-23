@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::string::{Did, Handle, Nsid};
@@ -19,28 +19,27 @@ use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DescribeRepo<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct DescribeRepo<S: BosStr = DefaultStr> {
     pub repo: AtIdentifier<S>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DescribeRepoOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DescribeRepoOutput<S: BosStr = DefaultStr> {
     ///List of all the collections (NSIDs) for which this repo contains at least one record.
     pub collections: Vec<Nsid<S>>,
     pub did: Did<S>,
@@ -49,9 +48,7 @@ pub struct DescribeRepoOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub handle: Handle<S>,
     ///Indicates if handle is currently valid (resolves bi-directionally)
     pub handle_is_correct: bool,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -60,12 +57,11 @@ pub struct DescribeRepoResponse;
 impl jacquard_common::xrpc::XrpcResp for DescribeRepoResponse {
     const NSID: &'static str = "com.atproto.repo.describeRepo";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = DescribeRepoOutput<S>;
+    type Output<S: BosStr> = DescribeRepoOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for DescribeRepo<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for DescribeRepo<S> {
     const NSID: &'static str = "com.atproto.repo.describeRepo";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = DescribeRepoResponse;
@@ -76,7 +72,7 @@ pub struct DescribeRepoRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DescribeRepoRequest {
     const PATH: &'static str = "/xrpc/com.atproto.repo.describeRepo";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = DescribeRepo<S>;
+    type Request<S: BosStr> = DescribeRepo<S>;
     type Response = DescribeRepoResponse;
 }
 
@@ -99,9 +95,9 @@ pub mod describe_repo_state {
         type Repo = Unset;
     }
     ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
+    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRepo<St> {}
+    impl<St: State> State for SetRepo<St> {
         type Repo = Set<members::repo>;
     }
     /// Marker types for field names
@@ -112,57 +108,57 @@ pub mod describe_repo_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct DescribeRepoBuilder<'a, S: describe_repo_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct DescribeRepoBuilder<S: BosStr, St: describe_repo_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtIdentifier<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> DescribeRepo<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> DescribeRepoBuilder<'a, describe_repo_state::Empty> {
+impl<S: BosStr> DescribeRepo<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> DescribeRepoBuilder<S, describe_repo_state::Empty> {
         DescribeRepoBuilder::new()
     }
 }
 
-impl<'a> DescribeRepoBuilder<'a, describe_repo_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> DescribeRepoBuilder<S, describe_repo_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         DescribeRepoBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DescribeRepoBuilder<'a, S>
+impl<S: BosStr, St> DescribeRepoBuilder<S, St>
 where
-    S: describe_repo_state::State,
-    S::Repo: describe_repo_state::IsUnset,
+    St: describe_repo_state::State,
+    St::Repo: describe_repo_state::IsUnset,
 {
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
         value: impl Into<AtIdentifier<S>>,
-    ) -> DescribeRepoBuilder<'a, describe_repo_state::SetRepo<S>> {
+    ) -> DescribeRepoBuilder<S, describe_repo_state::SetRepo<St>> {
         self._fields.0 = Option::Some(value.into());
         DescribeRepoBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DescribeRepoBuilder<'a, S>
+impl<S: BosStr, St> DescribeRepoBuilder<S, St>
 where
-    S: describe_repo_state::State,
-    S::Repo: describe_repo_state::IsSet,
+    St: describe_repo_state::State,
+    St::Repo: describe_repo_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> DescribeRepo<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> DescribeRepo<S> {
         DescribeRepo {
             repo: self._fields.0.unwrap(),
         }

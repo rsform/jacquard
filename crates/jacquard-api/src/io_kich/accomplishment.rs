@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,11 +34,11 @@ use serde::{Serialize, Deserialize};
     rename = "io.kich.accomplishment",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Accomplishment<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Accomplishment<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     ///Optional free-form metadata for extra accomplishment context.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -55,18 +55,18 @@ pub struct Accomplishment<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct AccomplishmentGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct AccomplishmentGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Accomplishment<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Accomplishment<S> {
+impl<S: BosStr> Accomplishment<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, AccomplishmentRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -79,18 +79,17 @@ pub struct AccomplishmentRecord;
 impl XrpcResp for AccomplishmentRecord {
     const NSID: &'static str = "io.kich.accomplishment";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = AccomplishmentGetRecordOutput<S>;
+    type Output<S: BosStr> = AccomplishmentGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<AccomplishmentGetRecordOutput<S>>
-for Accomplishment<S> {
+impl<S: BosStr> From<AccomplishmentGetRecordOutput<S>> for Accomplishment<S> {
     fn from(output: AccomplishmentGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Accomplishment<S> {
+impl<S: BosStr> Collection for Accomplishment<S> {
     const NSID: &'static str = "io.kich.accomplishment";
     type Record = AccomplishmentRecord;
 }
@@ -100,7 +99,7 @@ impl Collection for AccomplishmentRecord {
     type Record = AccomplishmentRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Accomplishment<S> {
+impl<S: BosStr> LexiconSchema for Accomplishment<S> {
     fn nsid() -> &'static str {
         "io.kich.accomplishment"
     }
@@ -136,17 +135,17 @@ pub mod accomplishment_state {
         type CreatedAt = Unset;
     }
     ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
+    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetType<St> {}
+    impl<St: State> State for SetType<St> {
         type Type = Set<members::r#type>;
-        type CreatedAt = S::CreatedAt;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Type = S::Type;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Type = St::Type;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
@@ -159,51 +158,51 @@ pub mod accomplishment_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct AccomplishmentBuilder<'a, S: accomplishment_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct AccomplishmentBuilder<S: BosStr, St: accomplishment_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<Data<S>>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Accomplishment<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> AccomplishmentBuilder<'a, accomplishment_state::Empty> {
+impl<S: BosStr> Accomplishment<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> AccomplishmentBuilder<S, accomplishment_state::Empty> {
         AccomplishmentBuilder::new()
     }
 }
 
-impl<'a> AccomplishmentBuilder<'a, accomplishment_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> AccomplishmentBuilder<S, accomplishment_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         AccomplishmentBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AccomplishmentBuilder<'a, S>
+impl<S: BosStr, St> AccomplishmentBuilder<S, St>
 where
-    S: accomplishment_state::State,
-    S::CreatedAt: accomplishment_state::IsUnset,
+    St: accomplishment_state::State,
+    St::CreatedAt: accomplishment_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> AccomplishmentBuilder<'a, accomplishment_state::SetCreatedAt<S>> {
+    ) -> AccomplishmentBuilder<S, accomplishment_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         AccomplishmentBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: accomplishment_state::State> AccomplishmentBuilder<'a, S> {
+impl<S: BosStr, St: accomplishment_state::State> AccomplishmentBuilder<S, St> {
     /// Set the `metadata` field (optional)
     pub fn metadata(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -216,33 +215,33 @@ impl<'a, S: accomplishment_state::State> AccomplishmentBuilder<'a, S> {
     }
 }
 
-impl<'a, S> AccomplishmentBuilder<'a, S>
+impl<S: BosStr, St> AccomplishmentBuilder<S, St>
 where
-    S: accomplishment_state::State,
-    S::Type: accomplishment_state::IsUnset,
+    St: accomplishment_state::State,
+    St::Type: accomplishment_state::IsUnset,
 {
     /// Set the `type` field (required)
     pub fn r#type(
         mut self,
         value: impl Into<S>,
-    ) -> AccomplishmentBuilder<'a, accomplishment_state::SetType<S>> {
+    ) -> AccomplishmentBuilder<S, accomplishment_state::SetType<St>> {
         self._fields.2 = Option::Some(value.into());
         AccomplishmentBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AccomplishmentBuilder<'a, S>
+impl<S: BosStr, St> AccomplishmentBuilder<S, St>
 where
-    S: accomplishment_state::State,
-    S::Type: accomplishment_state::IsSet,
-    S::CreatedAt: accomplishment_state::IsSet,
+    St: accomplishment_state::State,
+    St::Type: accomplishment_state::IsSet,
+    St::CreatedAt: accomplishment_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Accomplishment<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Accomplishment<S> {
         Accomplishment {
             created_at: self._fields.0.unwrap(),
             metadata: self._fields.1,
@@ -250,11 +249,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Accomplishment<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Accomplishment<S> {
         Accomplishment {
             created_at: self._fields.0.unwrap(),
             metadata: self._fields.1,

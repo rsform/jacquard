@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "dev.sensorthings.sensor",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Sensor<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Sensor<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
@@ -59,18 +59,18 @@ pub struct Sensor<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SensorGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SensorGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Sensor<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Sensor<S> {
+impl<S: BosStr> Sensor<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, SensorRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -83,17 +83,17 @@ pub struct SensorRecord;
 impl XrpcResp for SensorRecord {
     const NSID: &'static str = "dev.sensorthings.sensor";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = SensorGetRecordOutput<S>;
+    type Output<S: BosStr> = SensorGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<SensorGetRecordOutput<S>> for Sensor<S> {
+impl<S: BosStr> From<SensorGetRecordOutput<S>> for Sensor<S> {
     fn from(output: SensorGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Sensor<S> {
+impl<S: BosStr> Collection for Sensor<S> {
     const NSID: &'static str = "dev.sensorthings.sensor";
     type Record = SensorRecord;
 }
@@ -103,7 +103,7 @@ impl Collection for SensorRecord {
     type Record = SensorRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Sensor<S> {
+impl<S: BosStr> LexiconSchema for Sensor<S> {
     fn nsid() -> &'static str {
         "dev.sensorthings.sensor"
     }
@@ -183,27 +183,27 @@ pub mod sensor_state {
         type CreatedAt = Unset;
     }
     ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
         type Name = Set<members::name>;
-        type EncodingType = S::EncodingType;
-        type CreatedAt = S::CreatedAt;
+        type EncodingType = St::EncodingType;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `encoding_type` field to Set
-    pub struct SetEncodingType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEncodingType<S> {}
-    impl<S: State> State for SetEncodingType<S> {
-        type Name = S::Name;
+    pub struct SetEncodingType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetEncodingType<St> {}
+    impl<St: State> State for SetEncodingType<St> {
+        type Name = St::Name;
         type EncodingType = Set<members::encoding_type>;
-        type CreatedAt = S::CreatedAt;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Name = S::Name;
-        type EncodingType = S::EncodingType;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Name = St::Name;
+        type EncodingType = St::EncodingType;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
@@ -218,51 +218,51 @@ pub mod sensor_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct SensorBuilder<'a, S: sensor_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct SensorBuilder<S: BosStr, St: sensor_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<S>, Option<S>, Option<S>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Sensor<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> SensorBuilder<'a, sensor_state::Empty> {
+impl<S: BosStr> Sensor<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> SensorBuilder<S, sensor_state::Empty> {
         SensorBuilder::new()
     }
 }
 
-impl<'a> SensorBuilder<'a, sensor_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> SensorBuilder<S, sensor_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SensorBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SensorBuilder<'a, S>
+impl<S: BosStr, St> SensorBuilder<S, St>
 where
-    S: sensor_state::State,
-    S::CreatedAt: sensor_state::IsUnset,
+    St: sensor_state::State,
+    St::CreatedAt: sensor_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> SensorBuilder<'a, sensor_state::SetCreatedAt<S>> {
+    ) -> SensorBuilder<S, sensor_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         SensorBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: sensor_state::State> SensorBuilder<'a, S> {
+impl<S: BosStr, St: sensor_state::State> SensorBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -275,26 +275,26 @@ impl<'a, S: sensor_state::State> SensorBuilder<'a, S> {
     }
 }
 
-impl<'a, S> SensorBuilder<'a, S>
+impl<S: BosStr, St> SensorBuilder<S, St>
 where
-    S: sensor_state::State,
-    S::EncodingType: sensor_state::IsUnset,
+    St: sensor_state::State,
+    St::EncodingType: sensor_state::IsUnset,
 {
     /// Set the `encodingType` field (required)
     pub fn encoding_type(
         mut self,
         value: impl Into<S>,
-    ) -> SensorBuilder<'a, sensor_state::SetEncodingType<S>> {
+    ) -> SensorBuilder<S, sensor_state::SetEncodingType<St>> {
         self._fields.2 = Option::Some(value.into());
         SensorBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: sensor_state::State> SensorBuilder<'a, S> {
+impl<S: BosStr, St: sensor_state::State> SensorBuilder<S, St> {
     /// Set the `metadata` field (optional)
     pub fn metadata(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -307,34 +307,34 @@ impl<'a, S: sensor_state::State> SensorBuilder<'a, S> {
     }
 }
 
-impl<'a, S> SensorBuilder<'a, S>
+impl<S: BosStr, St> SensorBuilder<S, St>
 where
-    S: sensor_state::State,
-    S::Name: sensor_state::IsUnset,
+    St: sensor_state::State,
+    St::Name: sensor_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> SensorBuilder<'a, sensor_state::SetName<S>> {
+    ) -> SensorBuilder<S, sensor_state::SetName<St>> {
         self._fields.4 = Option::Some(value.into());
         SensorBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SensorBuilder<'a, S>
+impl<S: BosStr, St> SensorBuilder<S, St>
 where
-    S: sensor_state::State,
-    S::Name: sensor_state::IsSet,
-    S::EncodingType: sensor_state::IsSet,
-    S::CreatedAt: sensor_state::IsSet,
+    St: sensor_state::State,
+    St::Name: sensor_state::IsSet,
+    St::EncodingType: sensor_state::IsSet,
+    St::CreatedAt: sensor_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Sensor<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Sensor<S> {
         Sensor {
             created_at: self._fields.0.unwrap(),
             description: self._fields.1,
@@ -344,8 +344,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Sensor<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Sensor<S> {
         Sensor {
             created_at: self._fields.0.unwrap(),
             description: self._fields.1,

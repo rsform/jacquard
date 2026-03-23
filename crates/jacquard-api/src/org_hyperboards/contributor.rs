@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
     rename = "org.hyperboards.contributor",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Contributor<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Contributor<S: BosStr = DefaultStr> {
     ///Whether to render the contributor image as circular (default true)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub circular_image: Option<bool>,
@@ -70,18 +70,18 @@ pub struct Contributor<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ContributorGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ContributorGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Contributor<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Contributor<S> {
+impl<S: BosStr> Contributor<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, ContributorRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -94,17 +94,17 @@ pub struct ContributorRecord;
 impl XrpcResp for ContributorRecord {
     const NSID: &'static str = "org.hyperboards.contributor";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ContributorGetRecordOutput<S>;
+    type Output<S: BosStr> = ContributorGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<ContributorGetRecordOutput<S>> for Contributor<S> {
+impl<S: BosStr> From<ContributorGetRecordOutput<S>> for Contributor<S> {
     fn from(output: ContributorGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Contributor<S> {
+impl<S: BosStr> Collection for Contributor<S> {
     const NSID: &'static str = "org.hyperboards.contributor";
     type Record = ContributorRecord;
 }
@@ -114,7 +114,7 @@ impl Collection for ContributorRecord {
     type Record = ContributorRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Contributor<S> {
+impl<S: BosStr> LexiconSchema for Contributor<S> {
     fn nsid() -> &'static str {
         "org.hyperboards.contributor"
     }
@@ -139,43 +139,43 @@ pub mod contributor_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type ContributorRef;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type ContributorRef = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type ContributorRef = S::ContributorRef;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `contributor_ref` field to Set
-    pub struct SetContributorRef<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContributorRef<S> {}
-    impl<S: State> State for SetContributorRef<S> {
-        type CreatedAt = S::CreatedAt;
+    pub struct SetContributorRef<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetContributorRef<St> {}
+    impl<St: State> State for SetContributorRef<St> {
         type ContributorRef = Set<members::contributor_ref>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type ContributorRef = St::ContributorRef;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `contributor_ref` field
         pub struct contributor_ref(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ContributorBuilder<'a, S: contributor_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ContributorBuilder<S: BosStr, St: contributor_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<bool>,
         Option<StrongRef<S>>,
@@ -185,28 +185,28 @@ pub struct ContributorBuilder<'a, S: contributor_state::State> {
         Option<UriValue<S>>,
         Option<UriValue<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Contributor<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ContributorBuilder<'a, contributor_state::Empty> {
+impl<S: BosStr> Contributor<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ContributorBuilder<S, contributor_state::Empty> {
         ContributorBuilder::new()
     }
 }
 
-impl<'a> ContributorBuilder<'a, contributor_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ContributorBuilder<S, contributor_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ContributorBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: contributor_state::State> ContributorBuilder<'a, S> {
+impl<S: BosStr, St: contributor_state::State> ContributorBuilder<S, St> {
     /// Set the `circularImage` field (optional)
     pub fn circular_image(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.0 = value.into();
@@ -219,45 +219,45 @@ impl<'a, S: contributor_state::State> ContributorBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ContributorBuilder<'a, S>
+impl<S: BosStr, St> ContributorBuilder<S, St>
 where
-    S: contributor_state::State,
-    S::ContributorRef: contributor_state::IsUnset,
+    St: contributor_state::State,
+    St::ContributorRef: contributor_state::IsUnset,
 {
     /// Set the `contributorRef` field (required)
     pub fn contributor_ref(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> ContributorBuilder<'a, contributor_state::SetContributorRef<S>> {
+    ) -> ContributorBuilder<S, contributor_state::SetContributorRef<St>> {
         self._fields.1 = Option::Some(value.into());
         ContributorBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ContributorBuilder<'a, S>
+impl<S: BosStr, St> ContributorBuilder<S, St>
 where
-    S: contributor_state::State,
-    S::CreatedAt: contributor_state::IsUnset,
+    St: contributor_state::State,
+    St::CreatedAt: contributor_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ContributorBuilder<'a, contributor_state::SetCreatedAt<S>> {
+    ) -> ContributorBuilder<S, contributor_state::SetCreatedAt<St>> {
         self._fields.2 = Option::Some(value.into());
         ContributorBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: contributor_state::State> ContributorBuilder<'a, S> {
+impl<S: BosStr, St: contributor_state::State> ContributorBuilder<S, St> {
     /// Set the `hoverIframeUrl` field (optional)
     pub fn hover_iframe_url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -270,7 +270,7 @@ impl<'a, S: contributor_state::State> ContributorBuilder<'a, S> {
     }
 }
 
-impl<'a, S: contributor_state::State> ContributorBuilder<'a, S> {
+impl<S: BosStr, St: contributor_state::State> ContributorBuilder<S, St> {
     /// Set the `hoverImageUrl` field (optional)
     pub fn hover_image_url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -283,7 +283,7 @@ impl<'a, S: contributor_state::State> ContributorBuilder<'a, S> {
     }
 }
 
-impl<'a, S: contributor_state::State> ContributorBuilder<'a, S> {
+impl<S: BosStr, St: contributor_state::State> ContributorBuilder<S, St> {
     /// Set the `url` field (optional)
     pub fn url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -296,7 +296,7 @@ impl<'a, S: contributor_state::State> ContributorBuilder<'a, S> {
     }
 }
 
-impl<'a, S: contributor_state::State> ContributorBuilder<'a, S> {
+impl<S: BosStr, St: contributor_state::State> ContributorBuilder<S, St> {
     /// Set the `videoUrl` field (optional)
     pub fn video_url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -309,14 +309,14 @@ impl<'a, S: contributor_state::State> ContributorBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ContributorBuilder<'a, S>
+impl<S: BosStr, St> ContributorBuilder<S, St>
 where
-    S: contributor_state::State,
-    S::CreatedAt: contributor_state::IsSet,
-    S::ContributorRef: contributor_state::IsSet,
+    St: contributor_state::State,
+    St::ContributorRef: contributor_state::IsSet,
+    St::CreatedAt: contributor_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Contributor<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Contributor<S> {
         Contributor {
             circular_image: self._fields.0,
             contributor_ref: self._fields.1.unwrap(),
@@ -328,11 +328,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Contributor<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Contributor<S> {
         Contributor {
             circular_image: self._fields.0,
             contributor_ref: self._fields.1.unwrap(),

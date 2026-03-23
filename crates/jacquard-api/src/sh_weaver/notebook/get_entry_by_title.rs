@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
@@ -19,36 +19,32 @@ use serde::{Serialize, Deserialize};
 use crate::sh_weaver::notebook::BookEntryView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetEntryByTitle<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct GetEntryByTitle<S: BosStr = DefaultStr> {
     pub notebook: AtUri<S>,
-    #[serde(borrow)]
     pub title: S,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetEntryByTitleOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetEntryByTitleOutput<S: BosStr = DefaultStr> {
     pub entry: BookEntryView<S>,
     ///The raw entry record data.
     pub record: Data<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -108,12 +104,11 @@ pub struct GetEntryByTitleResponse;
 impl jacquard_common::xrpc::XrpcResp for GetEntryByTitleResponse {
     const NSID: &'static str = "sh.weaver.notebook.getEntryByTitle";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetEntryByTitleOutput<S>;
+    type Output<S: BosStr> = GetEntryByTitleOutput<S>;
     type Err = GetEntryByTitleError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetEntryByTitle<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetEntryByTitle<S> {
     const NSID: &'static str = "sh.weaver.notebook.getEntryByTitle";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetEntryByTitleResponse;
@@ -124,7 +119,7 @@ pub struct GetEntryByTitleRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetEntryByTitleRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.notebook.getEntryByTitle";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetEntryByTitle<S>;
+    type Request<S: BosStr> = GetEntryByTitle<S>;
     type Response = GetEntryByTitleResponse;
 }
 
@@ -149,17 +144,17 @@ pub mod get_entry_by_title_state {
         type Notebook = Unset;
     }
     ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
         type Title = Set<members::title>;
-        type Notebook = S::Notebook;
+        type Notebook = St::Notebook;
     }
     ///State transition - sets the `notebook` field to Set
-    pub struct SetNotebook<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNotebook<S> {}
-    impl<S: State> State for SetNotebook<S> {
-        type Title = S::Title;
+    pub struct SetNotebook<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetNotebook<St> {}
+    impl<St: State> State for SetNotebook<St> {
+        type Title = St::Title;
         type Notebook = Set<members::notebook>;
     }
     /// Marker types for field names
@@ -172,77 +167,77 @@ pub mod get_entry_by_title_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetEntryByTitleBuilder<'a, S: get_entry_by_title_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetEntryByTitleBuilder<S: BosStr, St: get_entry_by_title_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetEntryByTitle<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetEntryByTitleBuilder<'a, get_entry_by_title_state::Empty> {
+impl<S: BosStr> GetEntryByTitle<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetEntryByTitleBuilder<S, get_entry_by_title_state::Empty> {
         GetEntryByTitleBuilder::new()
     }
 }
 
-impl<'a> GetEntryByTitleBuilder<'a, get_entry_by_title_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetEntryByTitleBuilder<S, get_entry_by_title_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetEntryByTitleBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetEntryByTitleBuilder<'a, S>
+impl<S: BosStr, St> GetEntryByTitleBuilder<S, St>
 where
-    S: get_entry_by_title_state::State,
-    S::Notebook: get_entry_by_title_state::IsUnset,
+    St: get_entry_by_title_state::State,
+    St::Notebook: get_entry_by_title_state::IsUnset,
 {
     /// Set the `notebook` field (required)
     pub fn notebook(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> GetEntryByTitleBuilder<'a, get_entry_by_title_state::SetNotebook<S>> {
+    ) -> GetEntryByTitleBuilder<S, get_entry_by_title_state::SetNotebook<St>> {
         self._fields.0 = Option::Some(value.into());
         GetEntryByTitleBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetEntryByTitleBuilder<'a, S>
+impl<S: BosStr, St> GetEntryByTitleBuilder<S, St>
 where
-    S: get_entry_by_title_state::State,
-    S::Title: get_entry_by_title_state::IsUnset,
+    St: get_entry_by_title_state::State,
+    St::Title: get_entry_by_title_state::IsUnset,
 {
     /// Set the `title` field (required)
     pub fn title(
         mut self,
         value: impl Into<S>,
-    ) -> GetEntryByTitleBuilder<'a, get_entry_by_title_state::SetTitle<S>> {
+    ) -> GetEntryByTitleBuilder<S, get_entry_by_title_state::SetTitle<St>> {
         self._fields.1 = Option::Some(value.into());
         GetEntryByTitleBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetEntryByTitleBuilder<'a, S>
+impl<S: BosStr, St> GetEntryByTitleBuilder<S, St>
 where
-    S: get_entry_by_title_state::State,
-    S::Title: get_entry_by_title_state::IsSet,
-    S::Notebook: get_entry_by_title_state::IsSet,
+    St: get_entry_by_title_state::State,
+    St::Title: get_entry_by_title_state::IsSet,
+    St::Notebook: get_entry_by_title_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetEntryByTitle<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetEntryByTitle<S> {
         GetEntryByTitle {
             notebook: self._fields.0.unwrap(),
             title: self._fields.1.unwrap(),

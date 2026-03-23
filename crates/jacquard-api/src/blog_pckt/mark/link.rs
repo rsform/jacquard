@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -31,11 +31,11 @@ use crate::blog_pckt::mark::link;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct LinkAttrs<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct LinkAttrs<S: BosStr = DefaultStr> {
     ///The URL destination of the hyperlink
     pub href: UriValue<S>,
     ///Defines the relationship between the current document and the linked resource (e.g., nofollow, noopener)
@@ -56,18 +56,18 @@ pub struct LinkAttrs<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Link<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Link<S: BosStr = DefaultStr> {
     ///Link attributes that define the hyperlink behavior and destination
     pub attrs: link::LinkAttrs<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for LinkAttrs<S> {
+impl<S: BosStr> LexiconSchema for LinkAttrs<S> {
     fn nsid() -> &'static str {
         "blog.pckt.mark.link"
     }
@@ -123,7 +123,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for LinkAttrs<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Link<S> {
+impl<S: BosStr> LexiconSchema for Link<S> {
     fn nsid() -> &'static str {
         "blog.pckt.mark.link"
     }
@@ -157,9 +157,9 @@ pub mod link_attrs_state {
         type Href = Unset;
     }
     ///State transition - sets the `href` field to Set
-    pub struct SetHref<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHref<S> {}
-    impl<S: State> State for SetHref<S> {
+    pub struct SetHref<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHref<St> {}
+    impl<St: State> State for SetHref<St> {
         type Href = Set<members::href>;
     }
     /// Marker types for field names
@@ -170,51 +170,51 @@ pub mod link_attrs_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct LinkAttrsBuilder<'a, S: link_attrs_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct LinkAttrsBuilder<S: BosStr, St: link_attrs_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<UriValue<S>>, Option<S>, Option<S>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> LinkAttrs<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> LinkAttrsBuilder<'a, link_attrs_state::Empty> {
+impl<S: BosStr> LinkAttrs<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> LinkAttrsBuilder<S, link_attrs_state::Empty> {
         LinkAttrsBuilder::new()
     }
 }
 
-impl<'a> LinkAttrsBuilder<'a, link_attrs_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> LinkAttrsBuilder<S, link_attrs_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         LinkAttrsBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LinkAttrsBuilder<'a, S>
+impl<S: BosStr, St> LinkAttrsBuilder<S, St>
 where
-    S: link_attrs_state::State,
-    S::Href: link_attrs_state::IsUnset,
+    St: link_attrs_state::State,
+    St::Href: link_attrs_state::IsUnset,
 {
     /// Set the `href` field (required)
     pub fn href(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> LinkAttrsBuilder<'a, link_attrs_state::SetHref<S>> {
+    ) -> LinkAttrsBuilder<S, link_attrs_state::SetHref<St>> {
         self._fields.0 = Option::Some(value.into());
         LinkAttrsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: link_attrs_state::State> LinkAttrsBuilder<'a, S> {
+impl<S: BosStr, St: link_attrs_state::State> LinkAttrsBuilder<S, St> {
     /// Set the `rel` field (optional)
     pub fn rel(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -227,7 +227,7 @@ impl<'a, S: link_attrs_state::State> LinkAttrsBuilder<'a, S> {
     }
 }
 
-impl<'a, S: link_attrs_state::State> LinkAttrsBuilder<'a, S> {
+impl<S: BosStr, St: link_attrs_state::State> LinkAttrsBuilder<S, St> {
     /// Set the `target` field (optional)
     pub fn target(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -240,7 +240,7 @@ impl<'a, S: link_attrs_state::State> LinkAttrsBuilder<'a, S> {
     }
 }
 
-impl<'a, S: link_attrs_state::State> LinkAttrsBuilder<'a, S> {
+impl<S: BosStr, St: link_attrs_state::State> LinkAttrsBuilder<S, St> {
     /// Set the `title` field (optional)
     pub fn title(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -253,13 +253,13 @@ impl<'a, S: link_attrs_state::State> LinkAttrsBuilder<'a, S> {
     }
 }
 
-impl<'a, S> LinkAttrsBuilder<'a, S>
+impl<S: BosStr, St> LinkAttrsBuilder<S, St>
 where
-    S: link_attrs_state::State,
-    S::Href: link_attrs_state::IsSet,
+    St: link_attrs_state::State,
+    St::Href: link_attrs_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> LinkAttrs<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> LinkAttrs<S> {
         LinkAttrs {
             href: self._fields.0.unwrap(),
             rel: self._fields.1,
@@ -268,11 +268,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> LinkAttrs<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> LinkAttrs<S> {
         LinkAttrs {
             href: self._fields.0.unwrap(),
             rel: self._fields.1,
@@ -397,9 +397,9 @@ pub mod link_state {
         type Attrs = Unset;
     }
     ///State transition - sets the `attrs` field to Set
-    pub struct SetAttrs<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAttrs<S> {}
-    impl<S: State> State for SetAttrs<S> {
+    pub struct SetAttrs<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAttrs<St> {}
+    impl<St: State> State for SetAttrs<St> {
         type Attrs = Set<members::attrs>;
     }
     /// Marker types for field names
@@ -410,64 +410,64 @@ pub mod link_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct LinkBuilder<'a, S: link_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct LinkBuilder<S: BosStr, St: link_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<link::LinkAttrs<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Link<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> LinkBuilder<'a, link_state::Empty> {
+impl<S: BosStr> Link<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> LinkBuilder<S, link_state::Empty> {
         LinkBuilder::new()
     }
 }
 
-impl<'a> LinkBuilder<'a, link_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> LinkBuilder<S, link_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         LinkBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LinkBuilder<'a, S>
+impl<S: BosStr, St> LinkBuilder<S, St>
 where
-    S: link_state::State,
-    S::Attrs: link_state::IsUnset,
+    St: link_state::State,
+    St::Attrs: link_state::IsUnset,
 {
     /// Set the `attrs` field (required)
     pub fn attrs(
         mut self,
         value: impl Into<link::LinkAttrs<S>>,
-    ) -> LinkBuilder<'a, link_state::SetAttrs<S>> {
+    ) -> LinkBuilder<S, link_state::SetAttrs<St>> {
         self._fields.0 = Option::Some(value.into());
         LinkBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LinkBuilder<'a, S>
+impl<S: BosStr, St> LinkBuilder<S, St>
 where
-    S: link_state::State,
-    S::Attrs: link_state::IsSet,
+    St: link_state::State,
+    St::Attrs: link_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Link<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Link<S> {
         Link {
             attrs: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Link<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Link<S> {
         Link {
             attrs: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

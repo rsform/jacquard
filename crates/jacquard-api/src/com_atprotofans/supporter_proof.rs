@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
 
 #[allow(unused_imports)]
@@ -36,11 +36,11 @@ use serde::{Serialize, Deserialize};
     rename = "com.atprotofans.supporterProof",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SupporterProof<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SupporterProof<S: BosStr = DefaultStr> {
     ///CID of the proof record. Required for both inline and remote proofs.
     pub cid: Cid<S>,
     ///Signing key (for inline proofs).
@@ -60,18 +60,18 @@ pub struct SupporterProof<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SupporterProofGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SupporterProofGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: SupporterProof<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> SupporterProof<S> {
+impl<S: BosStr> SupporterProof<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, SupporterProofRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -84,18 +84,17 @@ pub struct SupporterProofRecord;
 impl XrpcResp for SupporterProofRecord {
     const NSID: &'static str = "com.atprotofans.supporterProof";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = SupporterProofGetRecordOutput<S>;
+    type Output<S: BosStr> = SupporterProofGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<SupporterProofGetRecordOutput<S>>
-for SupporterProof<S> {
+impl<S: BosStr> From<SupporterProofGetRecordOutput<S>> for SupporterProof<S> {
     fn from(output: SupporterProofGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for SupporterProof<S> {
+impl<S: BosStr> Collection for SupporterProof<S> {
     const NSID: &'static str = "com.atprotofans.supporterProof";
     type Record = SupporterProofRecord;
 }
@@ -105,7 +104,7 @@ impl Collection for SupporterProofRecord {
     type Record = SupporterProofRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for SupporterProof<S> {
+impl<S: BosStr> LexiconSchema for SupporterProof<S> {
     fn nsid() -> &'static str {
         "com.atprotofans.supporterProof"
     }
@@ -139,9 +138,9 @@ pub mod supporter_proof_state {
         type Cid = Unset;
     }
     ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
+    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCid<St> {}
+    impl<St: State> State for SetCid<St> {
         type Cid = Set<members::cid>;
     }
     /// Marker types for field names
@@ -152,51 +151,51 @@ pub mod supporter_proof_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct SupporterProofBuilder<'a, S: supporter_proof_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct SupporterProofBuilder<S: BosStr, St: supporter_proof_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Cid<S>>, Option<S>, Option<Bytes>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> SupporterProof<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> SupporterProofBuilder<'a, supporter_proof_state::Empty> {
+impl<S: BosStr> SupporterProof<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> SupporterProofBuilder<S, supporter_proof_state::Empty> {
         SupporterProofBuilder::new()
     }
 }
 
-impl<'a> SupporterProofBuilder<'a, supporter_proof_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> SupporterProofBuilder<S, supporter_proof_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SupporterProofBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SupporterProofBuilder<'a, S>
+impl<S: BosStr, St> SupporterProofBuilder<S, St>
 where
-    S: supporter_proof_state::State,
-    S::Cid: supporter_proof_state::IsUnset,
+    St: supporter_proof_state::State,
+    St::Cid: supporter_proof_state::IsUnset,
 {
     /// Set the `cid` field (required)
     pub fn cid(
         mut self,
         value: impl Into<Cid<S>>,
-    ) -> SupporterProofBuilder<'a, supporter_proof_state::SetCid<S>> {
+    ) -> SupporterProofBuilder<S, supporter_proof_state::SetCid<St>> {
         self._fields.0 = Option::Some(value.into());
         SupporterProofBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: supporter_proof_state::State> SupporterProofBuilder<'a, S> {
+impl<S: BosStr, St: supporter_proof_state::State> SupporterProofBuilder<S, St> {
     /// Set the `key` field (optional)
     pub fn key(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -209,7 +208,7 @@ impl<'a, S: supporter_proof_state::State> SupporterProofBuilder<'a, S> {
     }
 }
 
-impl<'a, S: supporter_proof_state::State> SupporterProofBuilder<'a, S> {
+impl<S: BosStr, St: supporter_proof_state::State> SupporterProofBuilder<S, St> {
     /// Set the `signature` field (optional)
     pub fn signature(mut self, value: impl Into<Option<Bytes>>) -> Self {
         self._fields.2 = value.into();
@@ -222,13 +221,13 @@ impl<'a, S: supporter_proof_state::State> SupporterProofBuilder<'a, S> {
     }
 }
 
-impl<'a, S> SupporterProofBuilder<'a, S>
+impl<S: BosStr, St> SupporterProofBuilder<S, St>
 where
-    S: supporter_proof_state::State,
-    S::Cid: supporter_proof_state::IsSet,
+    St: supporter_proof_state::State,
+    St::Cid: supporter_proof_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> SupporterProof<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> SupporterProof<S> {
         SupporterProof {
             cid: self._fields.0.unwrap(),
             key: self._fields.1,
@@ -236,11 +235,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> SupporterProof<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> SupporterProof<S> {
         SupporterProof {
             cid: self._fields.0.unwrap(),
             key: self._fields.1,

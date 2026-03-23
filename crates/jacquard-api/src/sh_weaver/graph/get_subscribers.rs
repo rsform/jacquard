@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
@@ -20,42 +20,38 @@ use crate::sh_weaver::actor::ProfileViewBasic;
 use crate::sh_weaver::notebook::NotebookView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetSubscribers<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetSubscribers<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub cursor: Option<S>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
-    #[serde(borrow)]
     pub notebook: AtUri<S>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetSubscribersOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetSubscribersOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
     pub notebook: NotebookView<S>,
     pub subscribers: Vec<ProfileViewBasic<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -64,12 +60,11 @@ pub struct GetSubscribersResponse;
 impl jacquard_common::xrpc::XrpcResp for GetSubscribersResponse {
     const NSID: &'static str = "sh.weaver.graph.getSubscribers";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetSubscribersOutput<S>;
+    type Output<S: BosStr> = GetSubscribersOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetSubscribers<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetSubscribers<S> {
     const NSID: &'static str = "sh.weaver.graph.getSubscribers";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetSubscribersResponse;
@@ -80,7 +75,7 @@ pub struct GetSubscribersRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetSubscribersRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.graph.getSubscribers";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetSubscribers<S>;
+    type Request<S: BosStr> = GetSubscribers<S>;
     type Response = GetSubscribersResponse;
 }
 
@@ -107,9 +102,9 @@ pub mod get_subscribers_state {
         type Notebook = Unset;
     }
     ///State transition - sets the `notebook` field to Set
-    pub struct SetNotebook<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNotebook<S> {}
-    impl<S: State> State for SetNotebook<S> {
+    pub struct SetNotebook<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetNotebook<St> {}
+    impl<St: State> State for SetNotebook<St> {
         type Notebook = Set<members::notebook>;
     }
     /// Marker types for field names
@@ -120,32 +115,32 @@ pub mod get_subscribers_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetSubscribersBuilder<'a, S: get_subscribers_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetSubscribersBuilder<S: BosStr, St: get_subscribers_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>, Option<AtUri<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetSubscribers<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetSubscribersBuilder<'a, get_subscribers_state::Empty> {
+impl<S: BosStr> GetSubscribers<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetSubscribersBuilder<S, get_subscribers_state::Empty> {
         GetSubscribersBuilder::new()
     }
 }
 
-impl<'a> GetSubscribersBuilder<'a, get_subscribers_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetSubscribersBuilder<S, get_subscribers_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetSubscribersBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: get_subscribers_state::State> GetSubscribersBuilder<'a, S> {
+impl<S: BosStr, St: get_subscribers_state::State> GetSubscribersBuilder<S, St> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -158,7 +153,7 @@ impl<'a, S: get_subscribers_state::State> GetSubscribersBuilder<'a, S> {
     }
 }
 
-impl<'a, S: get_subscribers_state::State> GetSubscribersBuilder<'a, S> {
+impl<S: BosStr, St: get_subscribers_state::State> GetSubscribersBuilder<S, St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -171,32 +166,32 @@ impl<'a, S: get_subscribers_state::State> GetSubscribersBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GetSubscribersBuilder<'a, S>
+impl<S: BosStr, St> GetSubscribersBuilder<S, St>
 where
-    S: get_subscribers_state::State,
-    S::Notebook: get_subscribers_state::IsUnset,
+    St: get_subscribers_state::State,
+    St::Notebook: get_subscribers_state::IsUnset,
 {
     /// Set the `notebook` field (required)
     pub fn notebook(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> GetSubscribersBuilder<'a, get_subscribers_state::SetNotebook<S>> {
+    ) -> GetSubscribersBuilder<S, get_subscribers_state::SetNotebook<St>> {
         self._fields.2 = Option::Some(value.into());
         GetSubscribersBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetSubscribersBuilder<'a, S>
+impl<S: BosStr, St> GetSubscribersBuilder<S, St>
 where
-    S: get_subscribers_state::State,
-    S::Notebook: get_subscribers_state::IsSet,
+    St: get_subscribers_state::State,
+    St::Notebook: get_subscribers_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetSubscribers<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetSubscribers<S> {
         GetSubscribers {
             cursor: self._fields.0,
             limit: self._fields.1,

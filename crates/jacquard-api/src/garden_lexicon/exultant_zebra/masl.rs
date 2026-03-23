@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -31,11 +31,11 @@ use crate::garden_lexicon::exultant_zebra::masl;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Masl<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Masl<S: BosStr = DefaultStr> {
     ///Optional name for the bundle.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<S>,
@@ -51,11 +51,11 @@ pub struct Masl<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Resource<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Resource<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub content_type: Option<S>,
     ///Optional path for this resource (e.g. '/index.html').
@@ -67,7 +67,7 @@ pub struct Resource<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Masl<S> {
+impl<S: BosStr> LexiconSchema for Masl<S> {
     fn nsid() -> &'static str {
         "garden.lexicon.exultant-zebra.masl"
     }
@@ -82,7 +82,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Masl<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Resource<S> {
+impl<S: BosStr> LexiconSchema for Resource<S> {
     fn nsid() -> &'static str {
         "garden.lexicon.exultant-zebra.masl"
     }
@@ -116,9 +116,9 @@ pub mod masl_state {
         type Resources = Unset;
     }
     ///State transition - sets the `resources` field to Set
-    pub struct SetResources<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetResources<S> {}
-    impl<S: State> State for SetResources<S> {
+    pub struct SetResources<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetResources<St> {}
+    impl<St: State> State for SetResources<St> {
         type Resources = Set<members::resources>;
     }
     /// Marker types for field names
@@ -129,32 +129,32 @@ pub mod masl_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct MaslBuilder<'a, S: masl_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct MaslBuilder<S: BosStr, St: masl_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<Vec<masl::Resource<S>>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Masl<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> MaslBuilder<'a, masl_state::Empty> {
+impl<S: BosStr> Masl<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> MaslBuilder<S, masl_state::Empty> {
         MaslBuilder::new()
     }
 }
 
-impl<'a> MaslBuilder<'a, masl_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> MaslBuilder<S, masl_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         MaslBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: masl_state::State> MaslBuilder<'a, S> {
+impl<S: BosStr, St: masl_state::State> MaslBuilder<S, St> {
     /// Set the `name` field (optional)
     pub fn name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -167,40 +167,40 @@ impl<'a, S: masl_state::State> MaslBuilder<'a, S> {
     }
 }
 
-impl<'a, S> MaslBuilder<'a, S>
+impl<S: BosStr, St> MaslBuilder<S, St>
 where
-    S: masl_state::State,
-    S::Resources: masl_state::IsUnset,
+    St: masl_state::State,
+    St::Resources: masl_state::IsUnset,
 {
     /// Set the `resources` field (required)
     pub fn resources(
         mut self,
         value: impl Into<Vec<masl::Resource<S>>>,
-    ) -> MaslBuilder<'a, masl_state::SetResources<S>> {
+    ) -> MaslBuilder<S, masl_state::SetResources<St>> {
         self._fields.1 = Option::Some(value.into());
         MaslBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> MaslBuilder<'a, S>
+impl<S: BosStr, St> MaslBuilder<S, St>
 where
-    S: masl_state::State,
-    S::Resources: masl_state::IsSet,
+    St: masl_state::State,
+    St::Resources: masl_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Masl<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Masl<S> {
         Masl {
             name: self._fields.0,
             resources: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Masl<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Masl<S> {
         Masl {
             name: self._fields.0,
             resources: self._fields.1.unwrap(),
@@ -315,9 +315,9 @@ pub mod resource_state {
         type Src = Unset;
     }
     ///State transition - sets the `src` field to Set
-    pub struct SetSrc<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSrc<S> {}
-    impl<S: State> State for SetSrc<S> {
+    pub struct SetSrc<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSrc<St> {}
+    impl<St: State> State for SetSrc<St> {
         type Src = Set<members::src>;
     }
     /// Marker types for field names
@@ -328,32 +328,32 @@ pub mod resource_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ResourceBuilder<'a, S: resource_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ResourceBuilder<S: BosStr, St: resource_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>, Option<BlobRef<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Resource<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ResourceBuilder<'a, resource_state::Empty> {
+impl<S: BosStr> Resource<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ResourceBuilder<S, resource_state::Empty> {
         ResourceBuilder::new()
     }
 }
 
-impl<'a> ResourceBuilder<'a, resource_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ResourceBuilder<S, resource_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ResourceBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: resource_state::State> ResourceBuilder<'a, S> {
+impl<S: BosStr, St: resource_state::State> ResourceBuilder<S, St> {
     /// Set the `contentType` field (optional)
     pub fn content_type(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -366,7 +366,7 @@ impl<'a, S: resource_state::State> ResourceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: resource_state::State> ResourceBuilder<'a, S> {
+impl<S: BosStr, St: resource_state::State> ResourceBuilder<S, St> {
     /// Set the `path` field (optional)
     pub fn path(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -379,32 +379,32 @@ impl<'a, S: resource_state::State> ResourceBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ResourceBuilder<'a, S>
+impl<S: BosStr, St> ResourceBuilder<S, St>
 where
-    S: resource_state::State,
-    S::Src: resource_state::IsUnset,
+    St: resource_state::State,
+    St::Src: resource_state::IsUnset,
 {
     /// Set the `src` field (required)
     pub fn src(
         mut self,
         value: impl Into<BlobRef<S>>,
-    ) -> ResourceBuilder<'a, resource_state::SetSrc<S>> {
+    ) -> ResourceBuilder<S, resource_state::SetSrc<St>> {
         self._fields.2 = Option::Some(value.into());
         ResourceBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ResourceBuilder<'a, S>
+impl<S: BosStr, St> ResourceBuilder<S, St>
 where
-    S: resource_state::State,
-    S::Src: resource_state::IsSet,
+    St: resource_state::State,
+    St::Src: resource_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Resource<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Resource<S> {
         Resource {
             content_type: self._fields.0,
             path: self._fields.1,
@@ -412,11 +412,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Resource<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Resource<S> {
         Resource {
             content_type: self._fields.0,
             path: self._fields.1,

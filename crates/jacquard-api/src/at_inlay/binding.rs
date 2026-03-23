@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
@@ -18,38 +18,33 @@ use serde::{Serialize, Deserialize};
 use crate::at_inlay::Response;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Binding<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Binding<S: BosStr = DefaultStr> {
     ///Path segments to resolve against scope
     pub path: Vec<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct BindingOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct BindingOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
-    #[serde(borrow)]
     pub value: Response<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -58,12 +53,11 @@ pub struct BindingResponse;
 impl jacquard_common::xrpc::XrpcResp for BindingResponse {
     const NSID: &'static str = "at.inlay.Binding";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = BindingOutput<S>;
+    type Output<S: BosStr> = BindingOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for Binding<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Binding<S> {
     const NSID: &'static str = "at.inlay.Binding";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -78,7 +72,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for BindingRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = Binding<S>;
+    type Request<S: BosStr> = Binding<S>;
     type Response = BindingResponse;
 }
 
@@ -101,9 +95,9 @@ pub mod binding_state {
         type Path = Unset;
     }
     ///State transition - sets the `path` field to Set
-    pub struct SetPath<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPath<S> {}
-    impl<S: State> State for SetPath<S> {
+    pub struct SetPath<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPath<St> {}
+    impl<St: State> State for SetPath<St> {
         type Path = Set<members::path>;
     }
     /// Marker types for field names
@@ -114,67 +108,64 @@ pub mod binding_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct BindingBuilder<'a, S: binding_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct BindingBuilder<S: BosStr, St: binding_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Binding<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> BindingBuilder<'a, binding_state::Empty> {
+impl<S: BosStr> Binding<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> BindingBuilder<S, binding_state::Empty> {
         BindingBuilder::new()
     }
 }
 
-impl<'a> BindingBuilder<'a, binding_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> BindingBuilder<S, binding_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         BindingBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BindingBuilder<'a, S>
+impl<S: BosStr, St> BindingBuilder<S, St>
 where
-    S: binding_state::State,
-    S::Path: binding_state::IsUnset,
+    St: binding_state::State,
+    St::Path: binding_state::IsUnset,
 {
     /// Set the `path` field (required)
     pub fn path(
         mut self,
         value: impl Into<Vec<S>>,
-    ) -> BindingBuilder<'a, binding_state::SetPath<S>> {
+    ) -> BindingBuilder<S, binding_state::SetPath<St>> {
         self._fields.0 = Option::Some(value.into());
         BindingBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BindingBuilder<'a, S>
+impl<S: BosStr, St> BindingBuilder<S, St>
 where
-    S: binding_state::State,
-    S::Path: binding_state::IsSet,
+    St: binding_state::State,
+    St::Path: binding_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Binding<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Binding<S> {
         Binding {
             path: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Binding<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Binding<S> {
         Binding {
             path: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

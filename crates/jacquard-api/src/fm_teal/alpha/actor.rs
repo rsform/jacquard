@@ -15,7 +15,7 @@ pub mod status;
 
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -38,11 +38,11 @@ use crate::fm_teal::alpha::actor;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct MiniProfileView<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct MiniProfileView<S: BosStr = DefaultStr> {
     ///IPLD of the avatar
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avatar: Option<S>,
@@ -62,11 +62,11 @@ pub struct MiniProfileView<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ProfileView<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ProfileView<S: BosStr = DefaultStr> {
     ///IPLD of the avatar
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avatar: Option<S>,
@@ -101,11 +101,11 @@ pub struct ProfileView<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct StatusView<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct StatusView<S: BosStr = DefaultStr> {
     ///The unix timestamp of the expiry time of the item. If unavailable, default to 10 minutes past the start time.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub expiry: Option<Datetime>,
@@ -118,7 +118,7 @@ pub struct StatusView<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for MiniProfileView<S> {
+impl<S: BosStr> LexiconSchema for MiniProfileView<S> {
     fn nsid() -> &'static str {
         "fm.teal.alpha.actor.defs"
     }
@@ -133,7 +133,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for MiniProfileView<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ProfileView<S> {
+impl<S: BosStr> LexiconSchema for ProfileView<S> {
     fn nsid() -> &'static str {
         "fm.teal.alpha.actor.defs"
     }
@@ -148,7 +148,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for ProfileView<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for StatusView<S> {
+impl<S: BosStr> LexiconSchema for StatusView<S> {
     fn nsid() -> &'static str {
         "fm.teal.alpha.actor.defs"
     }

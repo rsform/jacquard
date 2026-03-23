@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "games.gamesgamesgamesgames.platformFamily",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct PlatformFamily<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct PlatformFamily<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
@@ -54,18 +54,18 @@ pub struct PlatformFamily<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct PlatformFamilyGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct PlatformFamilyGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: PlatformFamily<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> PlatformFamily<S> {
+impl<S: BosStr> PlatformFamily<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, PlatformFamilyRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -78,18 +78,17 @@ pub struct PlatformFamilyRecord;
 impl XrpcResp for PlatformFamilyRecord {
     const NSID: &'static str = "games.gamesgamesgamesgames.platformFamily";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = PlatformFamilyGetRecordOutput<S>;
+    type Output<S: BosStr> = PlatformFamilyGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<PlatformFamilyGetRecordOutput<S>>
-for PlatformFamily<S> {
+impl<S: BosStr> From<PlatformFamilyGetRecordOutput<S>> for PlatformFamily<S> {
     fn from(output: PlatformFamilyGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for PlatformFamily<S> {
+impl<S: BosStr> Collection for PlatformFamily<S> {
     const NSID: &'static str = "games.gamesgamesgamesgames.platformFamily";
     type Record = PlatformFamilyRecord;
 }
@@ -99,7 +98,7 @@ impl Collection for PlatformFamilyRecord {
     type Record = PlatformFamilyRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for PlatformFamily<S> {
+impl<S: BosStr> LexiconSchema for PlatformFamily<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.platformFamily"
     }
@@ -124,85 +123,85 @@ pub mod platform_family_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Name;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Name = S::Name;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type CreatedAt = S::CreatedAt;
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
         type Name = Set<members::name>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Name = St::Name;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct PlatformFamilyBuilder<'a, S: platform_family_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct PlatformFamilyBuilder<S: BosStr, St: platform_family_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<S>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> PlatformFamily<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> PlatformFamilyBuilder<'a, platform_family_state::Empty> {
+impl<S: BosStr> PlatformFamily<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> PlatformFamilyBuilder<S, platform_family_state::Empty> {
         PlatformFamilyBuilder::new()
     }
 }
 
-impl<'a> PlatformFamilyBuilder<'a, platform_family_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> PlatformFamilyBuilder<S, platform_family_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         PlatformFamilyBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PlatformFamilyBuilder<'a, S>
+impl<S: BosStr, St> PlatformFamilyBuilder<S, St>
 where
-    S: platform_family_state::State,
-    S::CreatedAt: platform_family_state::IsUnset,
+    St: platform_family_state::State,
+    St::CreatedAt: platform_family_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> PlatformFamilyBuilder<'a, platform_family_state::SetCreatedAt<S>> {
+    ) -> PlatformFamilyBuilder<S, platform_family_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         PlatformFamilyBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: platform_family_state::State> PlatformFamilyBuilder<'a, S> {
+impl<S: BosStr, St: platform_family_state::State> PlatformFamilyBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -215,33 +214,33 @@ impl<'a, S: platform_family_state::State> PlatformFamilyBuilder<'a, S> {
     }
 }
 
-impl<'a, S> PlatformFamilyBuilder<'a, S>
+impl<S: BosStr, St> PlatformFamilyBuilder<S, St>
 where
-    S: platform_family_state::State,
-    S::Name: platform_family_state::IsUnset,
+    St: platform_family_state::State,
+    St::Name: platform_family_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> PlatformFamilyBuilder<'a, platform_family_state::SetName<S>> {
+    ) -> PlatformFamilyBuilder<S, platform_family_state::SetName<St>> {
         self._fields.2 = Option::Some(value.into());
         PlatformFamilyBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PlatformFamilyBuilder<'a, S>
+impl<S: BosStr, St> PlatformFamilyBuilder<S, St>
 where
-    S: platform_family_state::State,
-    S::CreatedAt: platform_family_state::IsSet,
-    S::Name: platform_family_state::IsSet,
+    St: platform_family_state::State,
+    St::Name: platform_family_state::IsSet,
+    St::CreatedAt: platform_family_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> PlatformFamily<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> PlatformFamily<S> {
         PlatformFamily {
             created_at: self._fields.0.unwrap(),
             description: self._fields.1,
@@ -249,11 +248,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> PlatformFamily<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> PlatformFamily<S> {
         PlatformFamily {
             created_at: self._fields.0.unwrap(),
             description: self._fields.1,

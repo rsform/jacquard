@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
@@ -18,43 +18,38 @@ use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ResolveSchema<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct ResolveSchema<S: BosStr = DefaultStr> {
     pub handle: S,
-    #[serde(borrow)]
     pub schema_id: S,
     ///(max length: 20)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub version: Option<S>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ResolveSchemaOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ResolveSchemaOutput<S: BosStr = DefaultStr> {
     ///CID of the resolved schema record
     pub cid: S,
     ///The full schema record
     pub record: Data<S>,
     ///AT-URI of the resolved schema record
     pub uri: AtUri<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -106,12 +101,11 @@ pub struct ResolveSchemaResponse;
 impl jacquard_common::xrpc::XrpcResp for ResolveSchemaResponse {
     const NSID: &'static str = "science.alt.dataset.resolveSchema";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ResolveSchemaOutput<S>;
+    type Output<S: BosStr> = ResolveSchemaOutput<S>;
     type Err = ResolveSchemaError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for ResolveSchema<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ResolveSchema<S> {
     const NSID: &'static str = "science.alt.dataset.resolveSchema";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ResolveSchemaResponse;
@@ -122,7 +116,7 @@ pub struct ResolveSchemaRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ResolveSchemaRequest {
     const PATH: &'static str = "/xrpc/science.alt.dataset.resolveSchema";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = ResolveSchema<S>;
+    type Request<S: BosStr> = ResolveSchema<S>;
     type Response = ResolveSchemaResponse;
 }
 
@@ -136,104 +130,104 @@ pub mod resolve_schema_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Handle;
         type SchemaId;
+        type Handle;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Handle = Unset;
         type SchemaId = Unset;
-    }
-    ///State transition - sets the `handle` field to Set
-    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHandle<S> {}
-    impl<S: State> State for SetHandle<S> {
-        type Handle = Set<members::handle>;
-        type SchemaId = S::SchemaId;
+        type Handle = Unset;
     }
     ///State transition - sets the `schema_id` field to Set
-    pub struct SetSchemaId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSchemaId<S> {}
-    impl<S: State> State for SetSchemaId<S> {
-        type Handle = S::Handle;
+    pub struct SetSchemaId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSchemaId<St> {}
+    impl<St: State> State for SetSchemaId<St> {
         type SchemaId = Set<members::schema_id>;
+        type Handle = St::Handle;
+    }
+    ///State transition - sets the `handle` field to Set
+    pub struct SetHandle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHandle<St> {}
+    impl<St: State> State for SetHandle<St> {
+        type SchemaId = St::SchemaId;
+        type Handle = Set<members::handle>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `handle` field
-        pub struct handle(());
         ///Marker type for the `schema_id` field
         pub struct schema_id(());
+        ///Marker type for the `handle` field
+        pub struct handle(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ResolveSchemaBuilder<'a, S: resolve_schema_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ResolveSchemaBuilder<S: BosStr, St: resolve_schema_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ResolveSchema<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ResolveSchemaBuilder<'a, resolve_schema_state::Empty> {
+impl<S: BosStr> ResolveSchema<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ResolveSchemaBuilder<S, resolve_schema_state::Empty> {
         ResolveSchemaBuilder::new()
     }
 }
 
-impl<'a> ResolveSchemaBuilder<'a, resolve_schema_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ResolveSchemaBuilder<S, resolve_schema_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ResolveSchemaBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ResolveSchemaBuilder<'a, S>
+impl<S: BosStr, St> ResolveSchemaBuilder<S, St>
 where
-    S: resolve_schema_state::State,
-    S::Handle: resolve_schema_state::IsUnset,
+    St: resolve_schema_state::State,
+    St::Handle: resolve_schema_state::IsUnset,
 {
     /// Set the `handle` field (required)
     pub fn handle(
         mut self,
         value: impl Into<S>,
-    ) -> ResolveSchemaBuilder<'a, resolve_schema_state::SetHandle<S>> {
+    ) -> ResolveSchemaBuilder<S, resolve_schema_state::SetHandle<St>> {
         self._fields.0 = Option::Some(value.into());
         ResolveSchemaBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ResolveSchemaBuilder<'a, S>
+impl<S: BosStr, St> ResolveSchemaBuilder<S, St>
 where
-    S: resolve_schema_state::State,
-    S::SchemaId: resolve_schema_state::IsUnset,
+    St: resolve_schema_state::State,
+    St::SchemaId: resolve_schema_state::IsUnset,
 {
     /// Set the `schemaId` field (required)
     pub fn schema_id(
         mut self,
         value: impl Into<S>,
-    ) -> ResolveSchemaBuilder<'a, resolve_schema_state::SetSchemaId<S>> {
+    ) -> ResolveSchemaBuilder<S, resolve_schema_state::SetSchemaId<St>> {
         self._fields.1 = Option::Some(value.into());
         ResolveSchemaBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: resolve_schema_state::State> ResolveSchemaBuilder<'a, S> {
+impl<S: BosStr, St: resolve_schema_state::State> ResolveSchemaBuilder<S, St> {
     /// Set the `version` field (optional)
     pub fn version(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -246,14 +240,14 @@ impl<'a, S: resolve_schema_state::State> ResolveSchemaBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ResolveSchemaBuilder<'a, S>
+impl<S: BosStr, St> ResolveSchemaBuilder<S, St>
 where
-    S: resolve_schema_state::State,
-    S::Handle: resolve_schema_state::IsSet,
-    S::SchemaId: resolve_schema_state::IsSet,
+    St: resolve_schema_state::State,
+    St::SchemaId: resolve_schema_state::IsSet,
+    St::Handle: resolve_schema_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ResolveSchema<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ResolveSchema<S> {
         ResolveSchema {
             handle: self._fields.0.unwrap(),
             schema_id: self._fields.1.unwrap(),

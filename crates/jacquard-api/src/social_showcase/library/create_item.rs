@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::UriValue;
 use jacquard_common::types::value::Data;
@@ -20,14 +20,14 @@ use crate::social_showcase::ItemImage;
 use crate::social_showcase::ItemView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CreateItem<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CreateItem<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub category: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -40,22 +40,20 @@ pub struct CreateItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub tags: Vec<S>,
     pub title: S,
     pub visibility: CreateItemVisibility<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum CreateItemVisibility<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum CreateItemVisibility<S: BosStr = DefaultStr> {
     Public,
     Unlisted,
     Private,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> CreateItemVisibility<S> {
+impl<S: BosStr> CreateItemVisibility<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Public => "public",
@@ -75,19 +73,19 @@ impl<S: Bos<str> + AsRef<str>> CreateItemVisibility<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for CreateItemVisibility<S> {
+impl<S: BosStr> core::fmt::Display for CreateItemVisibility<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for CreateItemVisibility<S> {
+impl<S: BosStr> AsRef<str> for CreateItemVisibility<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for CreateItemVisibility<S> {
+impl<S: BosStr> Serialize for CreateItemVisibility<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -96,8 +94,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for CreateItemVisibility<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for CreateItemVisibility<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for CreateItemVisibility<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -107,14 +104,18 @@ for CreateItemVisibility<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for CreateItemVisibility<S> {
+impl<S: BosStr + Default> Default for CreateItemVisibility<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for CreateItemVisibility<S> {
-    type Output = CreateItemVisibility<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for CreateItemVisibility<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = CreateItemVisibility<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             CreateItemVisibility::Public => CreateItemVisibility::Public,
@@ -129,20 +130,17 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for CreateItemVisibility<S> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CreateItemOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CreateItemOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
-    #[serde(borrow)]
     pub value: ItemView<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -151,12 +149,11 @@ pub struct CreateItemResponse;
 impl jacquard_common::xrpc::XrpcResp for CreateItemResponse {
     const NSID: &'static str = "social.showcase.library.createItem";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = CreateItemOutput<S>;
+    type Output<S: BosStr> = CreateItemOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for CreateItem<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for CreateItem<S> {
     const NSID: &'static str = "social.showcase.library.createItem";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -171,7 +168,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for CreateItemRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = CreateItem<S>;
+    type Request<S: BosStr> = CreateItem<S>;
     type Response = CreateItemResponse;
 }
 
@@ -186,72 +183,72 @@ pub mod create_item_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Title;
-        type Images;
         type Tags;
         type Visibility;
+        type Images;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Title = Unset;
-        type Images = Unset;
         type Tags = Unset;
         type Visibility = Unset;
+        type Images = Unset;
     }
     ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
         type Title = Set<members::title>;
-        type Images = S::Images;
-        type Tags = S::Tags;
-        type Visibility = S::Visibility;
-    }
-    ///State transition - sets the `images` field to Set
-    pub struct SetImages<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetImages<S> {}
-    impl<S: State> State for SetImages<S> {
-        type Title = S::Title;
-        type Images = Set<members::images>;
-        type Tags = S::Tags;
-        type Visibility = S::Visibility;
+        type Tags = St::Tags;
+        type Visibility = St::Visibility;
+        type Images = St::Images;
     }
     ///State transition - sets the `tags` field to Set
-    pub struct SetTags<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTags<S> {}
-    impl<S: State> State for SetTags<S> {
-        type Title = S::Title;
-        type Images = S::Images;
+    pub struct SetTags<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTags<St> {}
+    impl<St: State> State for SetTags<St> {
+        type Title = St::Title;
         type Tags = Set<members::tags>;
-        type Visibility = S::Visibility;
+        type Visibility = St::Visibility;
+        type Images = St::Images;
     }
     ///State transition - sets the `visibility` field to Set
-    pub struct SetVisibility<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVisibility<S> {}
-    impl<S: State> State for SetVisibility<S> {
-        type Title = S::Title;
-        type Images = S::Images;
-        type Tags = S::Tags;
+    pub struct SetVisibility<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetVisibility<St> {}
+    impl<St: State> State for SetVisibility<St> {
+        type Title = St::Title;
+        type Tags = St::Tags;
         type Visibility = Set<members::visibility>;
+        type Images = St::Images;
+    }
+    ///State transition - sets the `images` field to Set
+    pub struct SetImages<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetImages<St> {}
+    impl<St: State> State for SetImages<St> {
+        type Title = St::Title;
+        type Tags = St::Tags;
+        type Visibility = St::Visibility;
+        type Images = Set<members::images>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `title` field
         pub struct title(());
-        ///Marker type for the `images` field
-        pub struct images(());
         ///Marker type for the `tags` field
         pub struct tags(());
         ///Marker type for the `visibility` field
         pub struct visibility(());
+        ///Marker type for the `images` field
+        pub struct images(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct CreateItemBuilder<'a, S: create_item_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct CreateItemBuilder<S: BosStr, St: create_item_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
         Option<S>,
@@ -262,28 +259,28 @@ pub struct CreateItemBuilder<'a, S: create_item_state::State> {
         Option<S>,
         Option<CreateItemVisibility<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> CreateItem<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> CreateItemBuilder<'a, create_item_state::Empty> {
+impl<S: BosStr> CreateItem<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> CreateItemBuilder<S, create_item_state::Empty> {
         CreateItemBuilder::new()
     }
 }
 
-impl<'a> CreateItemBuilder<'a, create_item_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> CreateItemBuilder<S, create_item_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         CreateItemBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: create_item_state::State> CreateItemBuilder<'a, S> {
+impl<S: BosStr, St: create_item_state::State> CreateItemBuilder<S, St> {
     /// Set the `category` field (optional)
     pub fn category(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -296,7 +293,7 @@ impl<'a, S: create_item_state::State> CreateItemBuilder<'a, S> {
     }
 }
 
-impl<'a, S: create_item_state::State> CreateItemBuilder<'a, S> {
+impl<S: BosStr, St: create_item_state::State> CreateItemBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -309,7 +306,7 @@ impl<'a, S: create_item_state::State> CreateItemBuilder<'a, S> {
     }
 }
 
-impl<'a, S: create_item_state::State> CreateItemBuilder<'a, S> {
+impl<S: BosStr, St: create_item_state::State> CreateItemBuilder<S, St> {
     /// Set the `externalLink` field (optional)
     pub fn external_link(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -322,26 +319,26 @@ impl<'a, S: create_item_state::State> CreateItemBuilder<'a, S> {
     }
 }
 
-impl<'a, S> CreateItemBuilder<'a, S>
+impl<S: BosStr, St> CreateItemBuilder<S, St>
 where
-    S: create_item_state::State,
-    S::Images: create_item_state::IsUnset,
+    St: create_item_state::State,
+    St::Images: create_item_state::IsUnset,
 {
     /// Set the `images` field (required)
     pub fn images(
         mut self,
         value: impl Into<Vec<ItemImage<S>>>,
-    ) -> CreateItemBuilder<'a, create_item_state::SetImages<S>> {
+    ) -> CreateItemBuilder<S, create_item_state::SetImages<St>> {
         self._fields.3 = Option::Some(value.into());
         CreateItemBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: create_item_state::State> CreateItemBuilder<'a, S> {
+impl<S: BosStr, St: create_item_state::State> CreateItemBuilder<S, St> {
     /// Set the `metadata` field (optional)
     pub fn metadata(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -354,73 +351,73 @@ impl<'a, S: create_item_state::State> CreateItemBuilder<'a, S> {
     }
 }
 
-impl<'a, S> CreateItemBuilder<'a, S>
+impl<S: BosStr, St> CreateItemBuilder<S, St>
 where
-    S: create_item_state::State,
-    S::Tags: create_item_state::IsUnset,
+    St: create_item_state::State,
+    St::Tags: create_item_state::IsUnset,
 {
     /// Set the `tags` field (required)
     pub fn tags(
         mut self,
         value: impl Into<Vec<S>>,
-    ) -> CreateItemBuilder<'a, create_item_state::SetTags<S>> {
+    ) -> CreateItemBuilder<S, create_item_state::SetTags<St>> {
         self._fields.5 = Option::Some(value.into());
         CreateItemBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CreateItemBuilder<'a, S>
+impl<S: BosStr, St> CreateItemBuilder<S, St>
 where
-    S: create_item_state::State,
-    S::Title: create_item_state::IsUnset,
+    St: create_item_state::State,
+    St::Title: create_item_state::IsUnset,
 {
     /// Set the `title` field (required)
     pub fn title(
         mut self,
         value: impl Into<S>,
-    ) -> CreateItemBuilder<'a, create_item_state::SetTitle<S>> {
+    ) -> CreateItemBuilder<S, create_item_state::SetTitle<St>> {
         self._fields.6 = Option::Some(value.into());
         CreateItemBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CreateItemBuilder<'a, S>
+impl<S: BosStr, St> CreateItemBuilder<S, St>
 where
-    S: create_item_state::State,
-    S::Visibility: create_item_state::IsUnset,
+    St: create_item_state::State,
+    St::Visibility: create_item_state::IsUnset,
 {
     /// Set the `visibility` field (required)
     pub fn visibility(
         mut self,
         value: impl Into<CreateItemVisibility<S>>,
-    ) -> CreateItemBuilder<'a, create_item_state::SetVisibility<S>> {
+    ) -> CreateItemBuilder<S, create_item_state::SetVisibility<St>> {
         self._fields.7 = Option::Some(value.into());
         CreateItemBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CreateItemBuilder<'a, S>
+impl<S: BosStr, St> CreateItemBuilder<S, St>
 where
-    S: create_item_state::State,
-    S::Title: create_item_state::IsSet,
-    S::Images: create_item_state::IsSet,
-    S::Tags: create_item_state::IsSet,
-    S::Visibility: create_item_state::IsSet,
+    St: create_item_state::State,
+    St::Title: create_item_state::IsSet,
+    St::Tags: create_item_state::IsSet,
+    St::Visibility: create_item_state::IsSet,
+    St::Images: create_item_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> CreateItem<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> CreateItem<S> {
         CreateItem {
             category: self._fields.0,
             description: self._fields.1,
@@ -433,11 +430,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> CreateItem<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> CreateItem<S> {
         CreateItem {
             category: self._fields.0,
             description: self._fields.1,

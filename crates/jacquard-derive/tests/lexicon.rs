@@ -1,3 +1,5 @@
+use jacquard_common::Bos;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_derive::lexicon;
 use serde::{Deserialize, Serialize};
 extern crate alloc;
@@ -5,8 +7,12 @@ extern crate alloc;
 #[lexicon]
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 #[serde(rename_all = "camelCase")]
-struct TestRecord<'s> {
-    text: &'s str,
+#[serde(bound(
+    serialize = "S: Serialize + Bos<str> + AsRef<str>",
+    deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+))]
+struct TestRecord<S: Bos<str> + AsRef<str> = SmolStr> {
+    text: S,
     count: i64,
 }
 
@@ -16,7 +22,7 @@ fn test_lexicon_adds_extra_data_field() {
 
     let record: TestRecord = serde_json::from_str(json).unwrap();
 
-    assert_eq!(record.text, "hello");
+    assert_eq!(AsRef::<str>::as_ref(&record.text), "hello");
     assert_eq!(record.count, 42);
 
     let extra_data = record.extra_data.unwrap();
@@ -27,7 +33,6 @@ fn test_lexicon_adds_extra_data_field() {
 
 #[test]
 fn test_lexicon_roundtrip() {
-    use jacquard_common::CowStr;
     use jacquard_common::types::value::Data;
     use std::collections::BTreeMap;
 
@@ -35,7 +40,7 @@ fn test_lexicon_roundtrip() {
     extra.insert(
         "custom".into(),
         Data::String(jacquard_common::types::string::AtprotoStr::String(
-            CowStr::Borrowed("value"),
+            SmolStr::from("value"),
         )),
     );
     extra.insert("number".into(), Data::Integer(42));
@@ -49,7 +54,7 @@ fn test_lexicon_roundtrip() {
     );
 
     let record = TestRecord {
-        text: "test",
+        text: SmolStr::from("test"),
         count: 100,
         extra_data: Some(extra),
     };
@@ -61,12 +66,12 @@ fn test_lexicon_roundtrip() {
     let extra_data = parsed.extra_data.unwrap();
     assert_eq!(extra_data.len(), 3);
 
-    // Verify the extra fields were preserved
+    // Verify the extra fields were preserved.
     assert!(extra_data.contains_key("custom"));
     assert!(extra_data.contains_key("number"));
     assert!(extra_data.contains_key("nested"));
 
-    // Verify the values
+    // Verify the values.
     if let Some(Data::String(s)) = extra_data.get("custom") {
         assert_eq!(s.as_str(), "value");
     } else {

@@ -14,7 +14,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -40,11 +40,11 @@ use crate::sh_tangled::repo::pull;
     rename = "sh.tangled.repo.pull",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Pull<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Pull<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub body: Option<S>,
     pub created_at: Datetime,
@@ -71,11 +71,11 @@ pub struct Pull<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct PullGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct PullGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
@@ -87,11 +87,11 @@ pub struct PullGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Source<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Source<S: BosStr = DefaultStr> {
     pub branch: S,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub repo: Option<AtUri<S>>,
@@ -105,18 +105,18 @@ pub struct Source<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Target<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Target<S: BosStr = DefaultStr> {
     pub branch: S,
     pub repo: AtUri<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Pull<S> {
+impl<S: BosStr> Pull<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, PullRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -129,17 +129,17 @@ pub struct PullRecord;
 impl XrpcResp for PullRecord {
     const NSID: &'static str = "sh.tangled.repo.pull";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = PullGetRecordOutput<S>;
+    type Output<S: BosStr> = PullGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<PullGetRecordOutput<S>> for Pull<S> {
+impl<S: BosStr> From<PullGetRecordOutput<S>> for Pull<S> {
     fn from(output: PullGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Pull<S> {
+impl<S: BosStr> Collection for Pull<S> {
     const NSID: &'static str = "sh.tangled.repo.pull";
     type Record = PullRecord;
 }
@@ -149,7 +149,7 @@ impl Collection for PullRecord {
     type Record = PullRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Pull<S> {
+impl<S: BosStr> LexiconSchema for Pull<S> {
     fn nsid() -> &'static str {
         "sh.tangled.repo.pull"
     }
@@ -191,7 +191,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Pull<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Source<S> {
+impl<S: BosStr> LexiconSchema for Source<S> {
     fn nsid() -> &'static str {
         "sh.tangled.repo.pull"
     }
@@ -228,7 +228,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Source<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Target<S> {
+impl<S: BosStr> LexiconSchema for Target<S> {
     fn nsid() -> &'static str {
         "sh.tangled.repo.pull"
     }
@@ -254,72 +254,72 @@ pub mod pull_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CreatedAt;
-        type Target;
         type PatchBlob;
         type Title;
+        type Target;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CreatedAt = Unset;
-        type Target = Unset;
         type PatchBlob = Unset;
         type Title = Unset;
+        type Target = Unset;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
-        type Target = S::Target;
-        type PatchBlob = S::PatchBlob;
-        type Title = S::Title;
-    }
-    ///State transition - sets the `target` field to Set
-    pub struct SetTarget<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTarget<S> {}
-    impl<S: State> State for SetTarget<S> {
-        type CreatedAt = S::CreatedAt;
-        type Target = Set<members::target>;
-        type PatchBlob = S::PatchBlob;
-        type Title = S::Title;
+        type PatchBlob = St::PatchBlob;
+        type Title = St::Title;
+        type Target = St::Target;
     }
     ///State transition - sets the `patch_blob` field to Set
-    pub struct SetPatchBlob<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPatchBlob<S> {}
-    impl<S: State> State for SetPatchBlob<S> {
-        type CreatedAt = S::CreatedAt;
-        type Target = S::Target;
+    pub struct SetPatchBlob<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPatchBlob<St> {}
+    impl<St: State> State for SetPatchBlob<St> {
+        type CreatedAt = St::CreatedAt;
         type PatchBlob = Set<members::patch_blob>;
-        type Title = S::Title;
+        type Title = St::Title;
+        type Target = St::Target;
     }
     ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type CreatedAt = S::CreatedAt;
-        type Target = S::Target;
-        type PatchBlob = S::PatchBlob;
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
+        type CreatedAt = St::CreatedAt;
+        type PatchBlob = St::PatchBlob;
         type Title = Set<members::title>;
+        type Target = St::Target;
+    }
+    ///State transition - sets the `target` field to Set
+    pub struct SetTarget<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTarget<St> {}
+    impl<St: State> State for SetTarget<St> {
+        type CreatedAt = St::CreatedAt;
+        type PatchBlob = St::PatchBlob;
+        type Title = St::Title;
+        type Target = Set<members::target>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `target` field
-        pub struct target(());
         ///Marker type for the `patch_blob` field
         pub struct patch_blob(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `target` field
+        pub struct target(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct PullBuilder<'a, S: pull_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct PullBuilder<S: BosStr, St: pull_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
         Option<Datetime>,
@@ -331,28 +331,28 @@ pub struct PullBuilder<'a, S: pull_state::State> {
         Option<pull::Target<S>>,
         Option<S>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Pull<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> PullBuilder<'a, pull_state::Empty> {
+impl<S: BosStr> Pull<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> PullBuilder<S, pull_state::Empty> {
         PullBuilder::new()
     }
 }
 
-impl<'a> PullBuilder<'a, pull_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> PullBuilder<S, pull_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         PullBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: pull_state::State> PullBuilder<'a, S> {
+impl<S: BosStr, St: pull_state::State> PullBuilder<S, St> {
     /// Set the `body` field (optional)
     pub fn body(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -365,26 +365,26 @@ impl<'a, S: pull_state::State> PullBuilder<'a, S> {
     }
 }
 
-impl<'a, S> PullBuilder<'a, S>
+impl<S: BosStr, St> PullBuilder<S, St>
 where
-    S: pull_state::State,
-    S::CreatedAt: pull_state::IsUnset,
+    St: pull_state::State,
+    St::CreatedAt: pull_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> PullBuilder<'a, pull_state::SetCreatedAt<S>> {
+    ) -> PullBuilder<S, pull_state::SetCreatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         PullBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: pull_state::State> PullBuilder<'a, S> {
+impl<S: BosStr, St: pull_state::State> PullBuilder<S, St> {
     /// Set the `mentions` field (optional)
     pub fn mentions(mut self, value: impl Into<Option<Vec<Did<S>>>>) -> Self {
         self._fields.2 = value.into();
@@ -397,7 +397,7 @@ impl<'a, S: pull_state::State> PullBuilder<'a, S> {
     }
 }
 
-impl<'a, S: pull_state::State> PullBuilder<'a, S> {
+impl<S: BosStr, St: pull_state::State> PullBuilder<S, St> {
     /// Set the `patch` field (optional)
     pub fn patch(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -410,26 +410,26 @@ impl<'a, S: pull_state::State> PullBuilder<'a, S> {
     }
 }
 
-impl<'a, S> PullBuilder<'a, S>
+impl<S: BosStr, St> PullBuilder<S, St>
 where
-    S: pull_state::State,
-    S::PatchBlob: pull_state::IsUnset,
+    St: pull_state::State,
+    St::PatchBlob: pull_state::IsUnset,
 {
     /// Set the `patchBlob` field (required)
     pub fn patch_blob(
         mut self,
         value: impl Into<BlobRef<S>>,
-    ) -> PullBuilder<'a, pull_state::SetPatchBlob<S>> {
+    ) -> PullBuilder<S, pull_state::SetPatchBlob<St>> {
         self._fields.4 = Option::Some(value.into());
         PullBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: pull_state::State> PullBuilder<'a, S> {
+impl<S: BosStr, St: pull_state::State> PullBuilder<S, St> {
     /// Set the `references` field (optional)
     pub fn references(mut self, value: impl Into<Option<Vec<AtUri<S>>>>) -> Self {
         self._fields.5 = value.into();
@@ -442,7 +442,7 @@ impl<'a, S: pull_state::State> PullBuilder<'a, S> {
     }
 }
 
-impl<'a, S: pull_state::State> PullBuilder<'a, S> {
+impl<S: BosStr, St: pull_state::State> PullBuilder<S, St> {
     /// Set the `source` field (optional)
     pub fn source(mut self, value: impl Into<Option<pull::Source<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -455,54 +455,54 @@ impl<'a, S: pull_state::State> PullBuilder<'a, S> {
     }
 }
 
-impl<'a, S> PullBuilder<'a, S>
+impl<S: BosStr, St> PullBuilder<S, St>
 where
-    S: pull_state::State,
-    S::Target: pull_state::IsUnset,
+    St: pull_state::State,
+    St::Target: pull_state::IsUnset,
 {
     /// Set the `target` field (required)
     pub fn target(
         mut self,
         value: impl Into<pull::Target<S>>,
-    ) -> PullBuilder<'a, pull_state::SetTarget<S>> {
+    ) -> PullBuilder<S, pull_state::SetTarget<St>> {
         self._fields.7 = Option::Some(value.into());
         PullBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PullBuilder<'a, S>
+impl<S: BosStr, St> PullBuilder<S, St>
 where
-    S: pull_state::State,
-    S::Title: pull_state::IsUnset,
+    St: pull_state::State,
+    St::Title: pull_state::IsUnset,
 {
     /// Set the `title` field (required)
     pub fn title(
         mut self,
         value: impl Into<S>,
-    ) -> PullBuilder<'a, pull_state::SetTitle<S>> {
+    ) -> PullBuilder<S, pull_state::SetTitle<St>> {
         self._fields.8 = Option::Some(value.into());
         PullBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PullBuilder<'a, S>
+impl<S: BosStr, St> PullBuilder<S, St>
 where
-    S: pull_state::State,
-    S::CreatedAt: pull_state::IsSet,
-    S::Target: pull_state::IsSet,
-    S::PatchBlob: pull_state::IsSet,
-    S::Title: pull_state::IsSet,
+    St: pull_state::State,
+    St::CreatedAt: pull_state::IsSet,
+    St::PatchBlob: pull_state::IsSet,
+    St::Title: pull_state::IsSet,
+    St::Target: pull_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Pull<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Pull<S> {
         Pull {
             body: self._fields.0,
             created_at: self._fields.1.unwrap(),
@@ -516,8 +516,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Pull<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Pull<S> {
         Pull {
             body: self._fields.0,
             created_at: self._fields.1.unwrap(),
@@ -716,17 +716,17 @@ pub mod target_state {
         type Branch = Unset;
     }
     ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
+    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRepo<St> {}
+    impl<St: State> State for SetRepo<St> {
         type Repo = Set<members::repo>;
-        type Branch = S::Branch;
+        type Branch = St::Branch;
     }
     ///State transition - sets the `branch` field to Set
-    pub struct SetBranch<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBranch<S> {}
-    impl<S: State> State for SetBranch<S> {
-        type Repo = S::Repo;
+    pub struct SetBranch<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBranch<St> {}
+    impl<St: State> State for SetBranch<St> {
+        type Repo = St::Repo;
         type Branch = Set<members::branch>;
     }
     /// Marker types for field names
@@ -739,85 +739,85 @@ pub mod target_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct TargetBuilder<'a, S: target_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct TargetBuilder<S: BosStr, St: target_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<AtUri<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Target<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> TargetBuilder<'a, target_state::Empty> {
+impl<S: BosStr> Target<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> TargetBuilder<S, target_state::Empty> {
         TargetBuilder::new()
     }
 }
 
-impl<'a> TargetBuilder<'a, target_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> TargetBuilder<S, target_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         TargetBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> TargetBuilder<'a, S>
+impl<S: BosStr, St> TargetBuilder<S, St>
 where
-    S: target_state::State,
-    S::Branch: target_state::IsUnset,
+    St: target_state::State,
+    St::Branch: target_state::IsUnset,
 {
     /// Set the `branch` field (required)
     pub fn branch(
         mut self,
         value: impl Into<S>,
-    ) -> TargetBuilder<'a, target_state::SetBranch<S>> {
+    ) -> TargetBuilder<S, target_state::SetBranch<St>> {
         self._fields.0 = Option::Some(value.into());
         TargetBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> TargetBuilder<'a, S>
+impl<S: BosStr, St> TargetBuilder<S, St>
 where
-    S: target_state::State,
-    S::Repo: target_state::IsUnset,
+    St: target_state::State,
+    St::Repo: target_state::IsUnset,
 {
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> TargetBuilder<'a, target_state::SetRepo<S>> {
+    ) -> TargetBuilder<S, target_state::SetRepo<St>> {
         self._fields.1 = Option::Some(value.into());
         TargetBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> TargetBuilder<'a, S>
+impl<S: BosStr, St> TargetBuilder<S, St>
 where
-    S: target_state::State,
-    S::Repo: target_state::IsSet,
-    S::Branch: target_state::IsSet,
+    St: target_state::State,
+    St::Repo: target_state::IsSet,
+    St::Branch: target_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Target<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Target<S> {
         Target {
             branch: self._fields.0.unwrap(),
             repo: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Target<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Target<S> {
         Target {
             branch: self._fields.0.unwrap(),
             repo: self._fields.1.unwrap(),

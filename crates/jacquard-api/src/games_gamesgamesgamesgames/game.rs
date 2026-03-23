@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -53,11 +53,11 @@ use crate::games_gamesgamesgamesgames::richtext::facet::Facet;
     rename = "games.gamesgamesgamesgames.game",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Game<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Game<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub age_ratings: Option<Vec<AgeRating<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -125,18 +125,18 @@ pub struct Game<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GameGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GameGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Game<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Game<S> {
+impl<S: BosStr> Game<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, GameRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -149,17 +149,17 @@ pub struct GameRecord;
 impl XrpcResp for GameRecord {
     const NSID: &'static str = "games.gamesgamesgamesgames.game";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GameGetRecordOutput<S>;
+    type Output<S: BosStr> = GameGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<GameGetRecordOutput<S>> for Game<S> {
+impl<S: BosStr> From<GameGetRecordOutput<S>> for Game<S> {
     fn from(output: GameGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Game<S> {
+impl<S: BosStr> Collection for Game<S> {
     const NSID: &'static str = "games.gamesgamesgamesgames.game";
     type Record = GameRecord;
 }
@@ -169,7 +169,7 @@ impl Collection for GameRecord {
     type Record = GameRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Game<S> {
+impl<S: BosStr> LexiconSchema for Game<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.game"
     }
@@ -194,57 +194,57 @@ pub mod game_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Name;
         type ApplicationType;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Name = Unset;
         type ApplicationType = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Name = S::Name;
-        type ApplicationType = S::ApplicationType;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type CreatedAt = S::CreatedAt;
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
         type Name = Set<members::name>;
-        type ApplicationType = S::ApplicationType;
+        type ApplicationType = St::ApplicationType;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `application_type` field to Set
-    pub struct SetApplicationType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetApplicationType<S> {}
-    impl<S: State> State for SetApplicationType<S> {
-        type CreatedAt = S::CreatedAt;
-        type Name = S::Name;
+    pub struct SetApplicationType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetApplicationType<St> {}
+    impl<St: State> State for SetApplicationType<St> {
+        type Name = St::Name;
         type ApplicationType = Set<members::application_type>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Name = St::Name;
+        type ApplicationType = St::ApplicationType;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `application_type` field
         pub struct application_type(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GameBuilder<'a, S: game_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GameBuilder<S: BosStr, St: game_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<AgeRating<S>>>,
         Option<Vec<AlternativeName<S>>>,
@@ -274,18 +274,18 @@ pub struct GameBuilder<'a, S: game_state::State> {
         Option<Vec<ExternalVideo<S>>>,
         Option<Vec<Website<S>>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Game<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GameBuilder<'a, game_state::Empty> {
+impl<S: BosStr> Game<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GameBuilder<S, game_state::Empty> {
         GameBuilder::new()
     }
 }
 
-impl<'a> GameBuilder<'a, game_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GameBuilder<S, game_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GameBuilder {
             _state: PhantomData,
@@ -318,12 +318,12 @@ impl<'a> GameBuilder<'a, game_state::Empty> {
                 None,
                 None,
             ),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: game_state::State> GameBuilder<'a, S> {
+impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
     /// Set the `ageRatings` field (optional)
     pub fn age_ratings(mut self, value: impl Into<Option<Vec<AgeRating<S>>>>) -> Self {
         self._fields.0 = value.into();
@@ -336,7 +336,7 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
     }
 }
 
-impl<'a, S: game_state::State> GameBuilder<'a, S> {
+impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
     /// Set the `alternativeNames` field (optional)
     pub fn alternative_names(
         mut self,
@@ -355,45 +355,45 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GameBuilder<'a, S>
+impl<S: BosStr, St> GameBuilder<S, St>
 where
-    S: game_state::State,
-    S::ApplicationType: game_state::IsUnset,
+    St: game_state::State,
+    St::ApplicationType: game_state::IsUnset,
 {
     /// Set the `applicationType` field (required)
     pub fn application_type(
         mut self,
         value: impl Into<ApplicationType<S>>,
-    ) -> GameBuilder<'a, game_state::SetApplicationType<S>> {
+    ) -> GameBuilder<S, game_state::SetApplicationType<St>> {
         self._fields.2 = Option::Some(value.into());
         GameBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GameBuilder<'a, S>
+impl<S: BosStr, St> GameBuilder<S, St>
 where
-    S: game_state::State,
-    S::CreatedAt: game_state::IsUnset,
+    St: game_state::State,
+    St::CreatedAt: game_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> GameBuilder<'a, game_state::SetCreatedAt<S>> {
+    ) -> GameBuilder<S, game_state::SetCreatedAt<St>> {
         self._fields.3 = Option::Some(value.into());
         GameBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: game_state::State> GameBuilder<'a, S> {
+impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
@@ -406,7 +406,7 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
     }
 }
 
-impl<'a, S: game_state::State> GameBuilder<'a, S> {
+impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
     /// Set the `descriptionFacets` field (optional)
     pub fn description_facets(
         mut self,
@@ -422,7 +422,7 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
     }
 }
 
-impl<'a, S: game_state::State> GameBuilder<'a, S> {
+impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
     /// Set the `engines` field (optional)
     pub fn engines(mut self, value: impl Into<Option<Vec<AtUri<S>>>>) -> Self {
         self._fields.6 = value.into();
@@ -435,7 +435,7 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
     }
 }
 
-impl<'a, S: game_state::State> GameBuilder<'a, S> {
+impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
     /// Set the `externalIds` field (optional)
     pub fn external_ids(mut self, value: impl Into<Option<ExternalIds<S>>>) -> Self {
         self._fields.7 = value.into();
@@ -448,7 +448,7 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
     }
 }
 
-impl<'a, S: game_state::State> GameBuilder<'a, S> {
+impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
     /// Set the `genres` field (optional)
     pub fn genres(mut self, value: impl Into<Option<Vec<Genre<S>>>>) -> Self {
         self._fields.8 = value.into();
@@ -461,7 +461,7 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
     }
 }
 
-impl<'a, S: game_state::State> GameBuilder<'a, S> {
+impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
     /// Set the `keywords` field (optional)
     pub fn keywords(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.9 = value.into();
@@ -474,7 +474,7 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
     }
 }
 
-impl<'a, S: game_state::State> GameBuilder<'a, S> {
+impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
     /// Set the `languageSupports` field (optional)
     pub fn language_supports(
         mut self,
@@ -493,7 +493,7 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
     }
 }
 
-impl<'a, S: game_state::State> GameBuilder<'a, S> {
+impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
     /// Set the `media` field (optional)
     pub fn media(mut self, value: impl Into<Option<Vec<MediaItem<S>>>>) -> Self {
         self._fields.11 = value.into();
@@ -506,7 +506,7 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
     }
 }
 
-impl<'a, S: game_state::State> GameBuilder<'a, S> {
+impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
     /// Set the `modes` field (optional)
     pub fn modes(mut self, value: impl Into<Option<Vec<Mode<S>>>>) -> Self {
         self._fields.12 = value.into();
@@ -519,7 +519,7 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
     }
 }
 
-impl<'a, S: game_state::State> GameBuilder<'a, S> {
+impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
     /// Set the `multiplayerModes` field (optional)
     pub fn multiplayer_modes(
         mut self,
@@ -538,26 +538,26 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GameBuilder<'a, S>
+impl<S: BosStr, St> GameBuilder<S, St>
 where
-    S: game_state::State,
-    S::Name: game_state::IsUnset,
+    St: game_state::State,
+    St::Name: game_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> GameBuilder<'a, game_state::SetName<S>> {
+    ) -> GameBuilder<S, game_state::SetName<St>> {
         self._fields.14 = Option::Some(value.into());
         GameBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: game_state::State> GameBuilder<'a, S> {
+impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
     /// Set the `parent` field (optional)
     pub fn parent(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.15 = value.into();
@@ -570,7 +570,7 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
     }
 }
 
-impl<'a, S: game_state::State> GameBuilder<'a, S> {
+impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
     /// Set the `platformFeatures` field (optional)
     pub fn platform_features(
         mut self,
@@ -589,7 +589,7 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
     }
 }
 
-impl<'a, S: game_state::State> GameBuilder<'a, S> {
+impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
     /// Set the `playerPerspectives` field (optional)
     pub fn player_perspectives(
         mut self,
@@ -608,7 +608,7 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
     }
 }
 
-impl<'a, S: game_state::State> GameBuilder<'a, S> {
+impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
     /// Set the `publishedAt` field (optional)
     pub fn published_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.18 = value.into();
@@ -621,7 +621,7 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
     }
 }
 
-impl<'a, S: game_state::State> GameBuilder<'a, S> {
+impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
     /// Set the `releases` field (optional)
     pub fn releases(mut self, value: impl Into<Option<Vec<Release<S>>>>) -> Self {
         self._fields.19 = value.into();
@@ -634,7 +634,7 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
     }
 }
 
-impl<'a, S: game_state::State> GameBuilder<'a, S> {
+impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
     /// Set the `storyline` field (optional)
     pub fn storyline(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.20 = value.into();
@@ -647,7 +647,7 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
     }
 }
 
-impl<'a, S: game_state::State> GameBuilder<'a, S> {
+impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
     /// Set the `summary` field (optional)
     pub fn summary(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.21 = value.into();
@@ -660,7 +660,7 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
     }
 }
 
-impl<'a, S: game_state::State> GameBuilder<'a, S> {
+impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
     /// Set the `systemRequirements` field (optional)
     pub fn system_requirements(
         mut self,
@@ -679,7 +679,7 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
     }
 }
 
-impl<'a, S: game_state::State> GameBuilder<'a, S> {
+impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
     /// Set the `themes` field (optional)
     pub fn themes(mut self, value: impl Into<Option<Vec<Theme<S>>>>) -> Self {
         self._fields.23 = value.into();
@@ -692,7 +692,7 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
     }
 }
 
-impl<'a, S: game_state::State> GameBuilder<'a, S> {
+impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
     /// Set the `timeToBeat` field (optional)
     pub fn time_to_beat(mut self, value: impl Into<Option<TimeToBeat<S>>>) -> Self {
         self._fields.24 = value.into();
@@ -705,7 +705,7 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
     }
 }
 
-impl<'a, S: game_state::State> GameBuilder<'a, S> {
+impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
     /// Set the `videos` field (optional)
     pub fn videos(mut self, value: impl Into<Option<Vec<ExternalVideo<S>>>>) -> Self {
         self._fields.25 = value.into();
@@ -718,7 +718,7 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
     }
 }
 
-impl<'a, S: game_state::State> GameBuilder<'a, S> {
+impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
     /// Set the `websites` field (optional)
     pub fn websites(mut self, value: impl Into<Option<Vec<Website<S>>>>) -> Self {
         self._fields.26 = value.into();
@@ -731,15 +731,15 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GameBuilder<'a, S>
+impl<S: BosStr, St> GameBuilder<S, St>
 where
-    S: game_state::State,
-    S::CreatedAt: game_state::IsSet,
-    S::Name: game_state::IsSet,
-    S::ApplicationType: game_state::IsSet,
+    St: game_state::State,
+    St::Name: game_state::IsSet,
+    St::ApplicationType: game_state::IsSet,
+    St::CreatedAt: game_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Game<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Game<S> {
         Game {
             age_ratings: self._fields.0,
             alternative_names: self._fields.1,
@@ -771,8 +771,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Game<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Game<S> {
         Game {
             age_ratings: self._fields.0,
             alternative_names: self._fields.1,

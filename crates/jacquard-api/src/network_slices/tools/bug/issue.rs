@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,11 +34,11 @@ use serde::{Serialize, Deserialize};
     rename = "network.slices.tools.bug.issue",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Issue<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Issue<S: BosStr = DefaultStr> {
     ///Reference to the bug report
     pub bug: AtUri<S>,
     pub created_at: Datetime,
@@ -54,18 +54,18 @@ pub struct Issue<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct IssueGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct IssueGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Issue<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Issue<S> {
+impl<S: BosStr> Issue<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, IssueRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -78,17 +78,17 @@ pub struct IssueRecord;
 impl XrpcResp for IssueRecord {
     const NSID: &'static str = "network.slices.tools.bug.issue";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = IssueGetRecordOutput<S>;
+    type Output<S: BosStr> = IssueGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<IssueGetRecordOutput<S>> for Issue<S> {
+impl<S: BosStr> From<IssueGetRecordOutput<S>> for Issue<S> {
     fn from(output: IssueGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Issue<S> {
+impl<S: BosStr> Collection for Issue<S> {
     const NSID: &'static str = "network.slices.tools.bug.issue";
     type Record = IssueRecord;
 }
@@ -98,7 +98,7 @@ impl Collection for IssueRecord {
     type Record = IssueRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Issue<S> {
+impl<S: BosStr> LexiconSchema for Issue<S> {
     fn nsid() -> &'static str {
         "network.slices.tools.bug.issue"
     }
@@ -123,145 +123,145 @@ pub mod issue_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Bug;
         type Issue;
+        type Bug;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Bug = Unset;
         type Issue = Unset;
+        type Bug = Unset;
         type CreatedAt = Unset;
     }
-    ///State transition - sets the `bug` field to Set
-    pub struct SetBug<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBug<S> {}
-    impl<S: State> State for SetBug<S> {
-        type Bug = Set<members::bug>;
-        type Issue = S::Issue;
-        type CreatedAt = S::CreatedAt;
-    }
     ///State transition - sets the `issue` field to Set
-    pub struct SetIssue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIssue<S> {}
-    impl<S: State> State for SetIssue<S> {
-        type Bug = S::Bug;
+    pub struct SetIssue<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIssue<St> {}
+    impl<St: State> State for SetIssue<St> {
         type Issue = Set<members::issue>;
-        type CreatedAt = S::CreatedAt;
+        type Bug = St::Bug;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `bug` field to Set
+    pub struct SetBug<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBug<St> {}
+    impl<St: State> State for SetBug<St> {
+        type Issue = St::Issue;
+        type Bug = Set<members::bug>;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Bug = S::Bug;
-        type Issue = S::Issue;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Issue = St::Issue;
+        type Bug = St::Bug;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `bug` field
-        pub struct bug(());
         ///Marker type for the `issue` field
         pub struct issue(());
+        ///Marker type for the `bug` field
+        pub struct bug(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct IssueBuilder<'a, S: issue_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct IssueBuilder<S: BosStr, St: issue_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>, Option<Datetime>, Option<AtUri<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Issue<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> IssueBuilder<'a, issue_state::Empty> {
+impl<S: BosStr> Issue<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> IssueBuilder<S, issue_state::Empty> {
         IssueBuilder::new()
     }
 }
 
-impl<'a> IssueBuilder<'a, issue_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> IssueBuilder<S, issue_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         IssueBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> IssueBuilder<'a, S>
+impl<S: BosStr, St> IssueBuilder<S, St>
 where
-    S: issue_state::State,
-    S::Bug: issue_state::IsUnset,
+    St: issue_state::State,
+    St::Bug: issue_state::IsUnset,
 {
     /// Set the `bug` field (required)
     pub fn bug(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> IssueBuilder<'a, issue_state::SetBug<S>> {
+    ) -> IssueBuilder<S, issue_state::SetBug<St>> {
         self._fields.0 = Option::Some(value.into());
         IssueBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> IssueBuilder<'a, S>
+impl<S: BosStr, St> IssueBuilder<S, St>
 where
-    S: issue_state::State,
-    S::CreatedAt: issue_state::IsUnset,
+    St: issue_state::State,
+    St::CreatedAt: issue_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> IssueBuilder<'a, issue_state::SetCreatedAt<S>> {
+    ) -> IssueBuilder<S, issue_state::SetCreatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         IssueBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> IssueBuilder<'a, S>
+impl<S: BosStr, St> IssueBuilder<S, St>
 where
-    S: issue_state::State,
-    S::Issue: issue_state::IsUnset,
+    St: issue_state::State,
+    St::Issue: issue_state::IsUnset,
 {
     /// Set the `issue` field (required)
     pub fn issue(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> IssueBuilder<'a, issue_state::SetIssue<S>> {
+    ) -> IssueBuilder<S, issue_state::SetIssue<St>> {
         self._fields.2 = Option::Some(value.into());
         IssueBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> IssueBuilder<'a, S>
+impl<S: BosStr, St> IssueBuilder<S, St>
 where
-    S: issue_state::State,
-    S::Bug: issue_state::IsSet,
-    S::Issue: issue_state::IsSet,
-    S::CreatedAt: issue_state::IsSet,
+    St: issue_state::State,
+    St::Issue: issue_state::IsSet,
+    St::Bug: issue_state::IsSet,
+    St::CreatedAt: issue_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Issue<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Issue<S> {
         Issue {
             bug: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
@@ -269,8 +269,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Issue<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Issue<S> {
         Issue {
             bug: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),

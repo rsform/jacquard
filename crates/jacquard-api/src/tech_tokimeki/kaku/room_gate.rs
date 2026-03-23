@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
     rename = "tech.tokimeki.kaku.roomGate",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct RoomGate<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct RoomGate<S: BosStr = DefaultStr> {
     ///Timestamp when the gate was created
     pub created_at: Datetime,
     ///Whether the room is closed for new replies  Defaults to `false`.
@@ -59,18 +59,18 @@ pub struct RoomGate<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct RoomGateGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct RoomGateGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: RoomGate<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> RoomGate<S> {
+impl<S: BosStr> RoomGate<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, RoomGateRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -83,17 +83,17 @@ pub struct RoomGateRecord;
 impl XrpcResp for RoomGateRecord {
     const NSID: &'static str = "tech.tokimeki.kaku.roomGate";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = RoomGateGetRecordOutput<S>;
+    type Output<S: BosStr> = RoomGateGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<RoomGateGetRecordOutput<S>> for RoomGate<S> {
+impl<S: BosStr> From<RoomGateGetRecordOutput<S>> for RoomGate<S> {
     fn from(output: RoomGateGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for RoomGate<S> {
+impl<S: BosStr> Collection for RoomGate<S> {
     const NSID: &'static str = "tech.tokimeki.kaku.roomGate";
     type Record = RoomGateRecord;
 }
@@ -103,7 +103,7 @@ impl Collection for RoomGateRecord {
     type Record = RoomGateRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for RoomGate<S> {
+impl<S: BosStr> LexiconSchema for RoomGate<S> {
     fn nsid() -> &'static str {
         "tech.tokimeki.kaku.roomGate"
     }
@@ -132,85 +132,85 @@ pub mod room_gate_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Room;
         type CreatedAt;
+        type Room;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Room = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `room` field to Set
-    pub struct SetRoom<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRoom<S> {}
-    impl<S: State> State for SetRoom<S> {
-        type Room = Set<members::room>;
-        type CreatedAt = S::CreatedAt;
+        type Room = Unset;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Room = S::Room;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
+        type Room = St::Room;
+    }
+    ///State transition - sets the `room` field to Set
+    pub struct SetRoom<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRoom<St> {}
+    impl<St: State> State for SetRoom<St> {
+        type CreatedAt = St::CreatedAt;
+        type Room = Set<members::room>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `room` field
-        pub struct room(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `room` field
+        pub struct room(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct RoomGateBuilder<'a, S: room_gate_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct RoomGateBuilder<S: BosStr, St: room_gate_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<bool>, Option<StrongRef<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> RoomGate<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> RoomGateBuilder<'a, room_gate_state::Empty> {
+impl<S: BosStr> RoomGate<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> RoomGateBuilder<S, room_gate_state::Empty> {
         RoomGateBuilder::new()
     }
 }
 
-impl<'a> RoomGateBuilder<'a, room_gate_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> RoomGateBuilder<S, room_gate_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         RoomGateBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RoomGateBuilder<'a, S>
+impl<S: BosStr, St> RoomGateBuilder<S, St>
 where
-    S: room_gate_state::State,
-    S::CreatedAt: room_gate_state::IsUnset,
+    St: room_gate_state::State,
+    St::CreatedAt: room_gate_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> RoomGateBuilder<'a, room_gate_state::SetCreatedAt<S>> {
+    ) -> RoomGateBuilder<S, room_gate_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         RoomGateBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: room_gate_state::State> RoomGateBuilder<'a, S> {
+impl<S: BosStr, St: room_gate_state::State> RoomGateBuilder<S, St> {
     /// Set the `isClosed` field (optional)
     pub fn is_closed(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.1 = value.into();
@@ -223,33 +223,33 @@ impl<'a, S: room_gate_state::State> RoomGateBuilder<'a, S> {
     }
 }
 
-impl<'a, S> RoomGateBuilder<'a, S>
+impl<S: BosStr, St> RoomGateBuilder<S, St>
 where
-    S: room_gate_state::State,
-    S::Room: room_gate_state::IsUnset,
+    St: room_gate_state::State,
+    St::Room: room_gate_state::IsUnset,
 {
     /// Set the `room` field (required)
     pub fn room(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> RoomGateBuilder<'a, room_gate_state::SetRoom<S>> {
+    ) -> RoomGateBuilder<S, room_gate_state::SetRoom<St>> {
         self._fields.2 = Option::Some(value.into());
         RoomGateBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RoomGateBuilder<'a, S>
+impl<S: BosStr, St> RoomGateBuilder<S, St>
 where
-    S: room_gate_state::State,
-    S::Room: room_gate_state::IsSet,
-    S::CreatedAt: room_gate_state::IsSet,
+    St: room_gate_state::State,
+    St::CreatedAt: room_gate_state::IsSet,
+    St::Room: room_gate_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> RoomGate<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> RoomGate<S> {
         RoomGate {
             created_at: self._fields.0.unwrap(),
             is_closed: self._fields.1.or_else(|| Some(false)),
@@ -257,11 +257,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> RoomGate<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> RoomGate<S> {
         RoomGate {
             created_at: self._fields.0.unwrap(),
             is_closed: self._fields.1.or_else(|| Some(false)),

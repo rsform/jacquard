@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -32,11 +32,11 @@ use crate::place_atwork::get_listings;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ListingRecord<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ListingRecord<S: BosStr = DefaultStr> {
     ///CID of the listing record
     pub cid: Cid<S>,
     ///AT-URI of the listing (at://did/place.atwork.listing/rkey)
@@ -50,40 +50,36 @@ pub struct ListingRecord<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetListings<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetListings<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub identity: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub tag: Option<S>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetListingsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetListingsOutput<S: BosStr = DefaultStr> {
     pub listings: Vec<get_listings::ListingRecord<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ListingRecord<S> {
+impl<S: BosStr> LexiconSchema for ListingRecord<S> {
     fn nsid() -> &'static str {
         "place.atwork.getListings"
     }
@@ -103,12 +99,11 @@ pub struct GetListingsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetListingsResponse {
     const NSID: &'static str = "place.atwork.getListings";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetListingsOutput<S>;
+    type Output<S: BosStr> = GetListingsOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetListings<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetListings<S> {
     const NSID: &'static str = "place.atwork.getListings";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetListingsResponse;
@@ -119,7 +114,7 @@ pub struct GetListingsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetListingsRequest {
     const PATH: &'static str = "/xrpc/place.atwork.getListings";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetListings<S>;
+    type Request<S: BosStr> = GetListings<S>;
     type Response = GetListingsResponse;
 }
 
@@ -133,104 +128,104 @@ pub mod listing_record_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Cid;
         type Uri;
+        type Cid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Cid = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Cid = Set<members::cid>;
-        type Uri = S::Uri;
+        type Cid = Unset;
     }
     ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Cid = S::Cid;
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
         type Uri = Set<members::uri>;
+        type Cid = St::Cid;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCid<St> {}
+    impl<St: State> State for SetCid<St> {
+        type Uri = St::Uri;
+        type Cid = Set<members::cid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ListingRecordBuilder<'a, S: listing_record_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ListingRecordBuilder<S: BosStr, St: listing_record_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Cid<S>>, Option<AtUri<S>>, Option<Listing<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ListingRecord<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ListingRecordBuilder<'a, listing_record_state::Empty> {
+impl<S: BosStr> ListingRecord<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ListingRecordBuilder<S, listing_record_state::Empty> {
         ListingRecordBuilder::new()
     }
 }
 
-impl<'a> ListingRecordBuilder<'a, listing_record_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ListingRecordBuilder<S, listing_record_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ListingRecordBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ListingRecordBuilder<'a, S>
+impl<S: BosStr, St> ListingRecordBuilder<S, St>
 where
-    S: listing_record_state::State,
-    S::Cid: listing_record_state::IsUnset,
+    St: listing_record_state::State,
+    St::Cid: listing_record_state::IsUnset,
 {
     /// Set the `cid` field (required)
     pub fn cid(
         mut self,
         value: impl Into<Cid<S>>,
-    ) -> ListingRecordBuilder<'a, listing_record_state::SetCid<S>> {
+    ) -> ListingRecordBuilder<S, listing_record_state::SetCid<St>> {
         self._fields.0 = Option::Some(value.into());
         ListingRecordBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ListingRecordBuilder<'a, S>
+impl<S: BosStr, St> ListingRecordBuilder<S, St>
 where
-    S: listing_record_state::State,
-    S::Uri: listing_record_state::IsUnset,
+    St: listing_record_state::State,
+    St::Uri: listing_record_state::IsUnset,
 {
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> ListingRecordBuilder<'a, listing_record_state::SetUri<S>> {
+    ) -> ListingRecordBuilder<S, listing_record_state::SetUri<St>> {
         self._fields.1 = Option::Some(value.into());
         ListingRecordBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: listing_record_state::State> ListingRecordBuilder<'a, S> {
+impl<S: BosStr, St: listing_record_state::State> ListingRecordBuilder<S, St> {
     /// Set the `value` field (optional)
     pub fn value(mut self, value: impl Into<Option<Listing<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -243,14 +238,14 @@ impl<'a, S: listing_record_state::State> ListingRecordBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ListingRecordBuilder<'a, S>
+impl<S: BosStr, St> ListingRecordBuilder<S, St>
 where
-    S: listing_record_state::State,
-    S::Cid: listing_record_state::IsSet,
-    S::Uri: listing_record_state::IsSet,
+    St: listing_record_state::State,
+    St::Uri: listing_record_state::IsSet,
+    St::Cid: listing_record_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ListingRecord<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ListingRecord<S> {
         ListingRecord {
             cid: self._fields.0.unwrap(),
             uri: self._fields.1.unwrap(),
@@ -258,11 +253,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> ListingRecord<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ListingRecord<S> {
         ListingRecord {
             cid: self._fields.0.unwrap(),
             uri: self._fields.1.unwrap(),
@@ -391,32 +386,32 @@ pub mod get_listings_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetListingsBuilder<'a, S: get_listings_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetListingsBuilder<S: BosStr, St: get_listings_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetListings<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetListingsBuilder<'a, get_listings_state::Empty> {
+impl<S: BosStr> GetListings<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetListingsBuilder<S, get_listings_state::Empty> {
         GetListingsBuilder::new()
     }
 }
 
-impl<'a> GetListingsBuilder<'a, get_listings_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetListingsBuilder<S, get_listings_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetListingsBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: get_listings_state::State> GetListingsBuilder<'a, S> {
+impl<S: BosStr, St: get_listings_state::State> GetListingsBuilder<S, St> {
     /// Set the `identity` field (optional)
     pub fn identity(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -429,7 +424,7 @@ impl<'a, S: get_listings_state::State> GetListingsBuilder<'a, S> {
     }
 }
 
-impl<'a, S: get_listings_state::State> GetListingsBuilder<'a, S> {
+impl<S: BosStr, St: get_listings_state::State> GetListingsBuilder<S, St> {
     /// Set the `tag` field (optional)
     pub fn tag(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -442,12 +437,12 @@ impl<'a, S: get_listings_state::State> GetListingsBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GetListingsBuilder<'a, S>
+impl<S: BosStr, St> GetListingsBuilder<S, St>
 where
-    S: get_listings_state::State,
+    St: get_listings_state::State,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetListings<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetListings<S> {
         GetListings {
             identity: self._fields.0,
             tag: self._fields.1,

@@ -15,7 +15,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -37,11 +37,11 @@ use crate::place_stream::chat;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct MessageView<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct MessageView<S: BosStr = DefaultStr> {
     pub author: ProfileViewBasic<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub chat_profile: Option<Profile<S>>,
@@ -64,16 +64,16 @@ pub struct MessageView<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum MessageViewReplyTo<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum MessageViewReplyTo<S: BosStr = DefaultStr> {
     #[serde(rename = "place.stream.chat.defs#messageView")]
     MessageView(Box<chat::MessageView<S>>),
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for MessageView<S> {
+impl<S: BosStr> LexiconSchema for MessageView<S> {
     fn nsid() -> &'static str {
         "place.stream.chat.defs"
     }
@@ -100,8 +100,8 @@ pub mod message_view_state {
     pub trait State: sealed::Sealed {
         type Uri;
         type Cid;
-        type Author;
         type IndexedAt;
+        type Author;
         type Record;
     }
     /// Empty state - all required fields are unset
@@ -110,58 +110,58 @@ pub mod message_view_state {
     impl State for Empty {
         type Uri = Unset;
         type Cid = Unset;
-        type Author = Unset;
         type IndexedAt = Unset;
+        type Author = Unset;
         type Record = Unset;
     }
     ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
         type Uri = Set<members::uri>;
-        type Cid = S::Cid;
-        type Author = S::Author;
-        type IndexedAt = S::IndexedAt;
-        type Record = S::Record;
+        type Cid = St::Cid;
+        type IndexedAt = St::IndexedAt;
+        type Author = St::Author;
+        type Record = St::Record;
     }
     ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Uri = S::Uri;
+    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCid<St> {}
+    impl<St: State> State for SetCid<St> {
+        type Uri = St::Uri;
         type Cid = Set<members::cid>;
-        type Author = S::Author;
-        type IndexedAt = S::IndexedAt;
-        type Record = S::Record;
-    }
-    ///State transition - sets the `author` field to Set
-    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthor<S> {}
-    impl<S: State> State for SetAuthor<S> {
-        type Uri = S::Uri;
-        type Cid = S::Cid;
-        type Author = Set<members::author>;
-        type IndexedAt = S::IndexedAt;
-        type Record = S::Record;
+        type IndexedAt = St::IndexedAt;
+        type Author = St::Author;
+        type Record = St::Record;
     }
     ///State transition - sets the `indexed_at` field to Set
-    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
-    impl<S: State> State for SetIndexedAt<S> {
-        type Uri = S::Uri;
-        type Cid = S::Cid;
-        type Author = S::Author;
+    pub struct SetIndexedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIndexedAt<St> {}
+    impl<St: State> State for SetIndexedAt<St> {
+        type Uri = St::Uri;
+        type Cid = St::Cid;
         type IndexedAt = Set<members::indexed_at>;
-        type Record = S::Record;
+        type Author = St::Author;
+        type Record = St::Record;
+    }
+    ///State transition - sets the `author` field to Set
+    pub struct SetAuthor<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAuthor<St> {}
+    impl<St: State> State for SetAuthor<St> {
+        type Uri = St::Uri;
+        type Cid = St::Cid;
+        type IndexedAt = St::IndexedAt;
+        type Author = Set<members::author>;
+        type Record = St::Record;
     }
     ///State transition - sets the `record` field to Set
-    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRecord<S> {}
-    impl<S: State> State for SetRecord<S> {
-        type Uri = S::Uri;
-        type Cid = S::Cid;
-        type Author = S::Author;
-        type IndexedAt = S::IndexedAt;
+    pub struct SetRecord<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRecord<St> {}
+    impl<St: State> State for SetRecord<St> {
+        type Uri = St::Uri;
+        type Cid = St::Cid;
+        type IndexedAt = St::IndexedAt;
+        type Author = St::Author;
         type Record = Set<members::record>;
     }
     /// Marker types for field names
@@ -171,18 +171,18 @@ pub mod message_view_state {
         pub struct uri(());
         ///Marker type for the `cid` field
         pub struct cid(());
-        ///Marker type for the `author` field
-        pub struct author(());
         ///Marker type for the `indexed_at` field
         pub struct indexed_at(());
+        ///Marker type for the `author` field
+        pub struct author(());
         ///Marker type for the `record` field
         pub struct record(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct MessageViewBuilder<'a, S: message_view_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct MessageViewBuilder<S: BosStr, St: message_view_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<ProfileViewBasic<S>>,
         Option<Profile<S>>,
@@ -193,47 +193,47 @@ pub struct MessageViewBuilder<'a, S: message_view_state::State> {
         Option<MessageViewReplyTo<S>>,
         Option<AtUri<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> MessageView<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> MessageViewBuilder<'a, message_view_state::Empty> {
+impl<S: BosStr> MessageView<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> MessageViewBuilder<S, message_view_state::Empty> {
         MessageViewBuilder::new()
     }
 }
 
-impl<'a> MessageViewBuilder<'a, message_view_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> MessageViewBuilder<S, message_view_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         MessageViewBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> MessageViewBuilder<'a, S>
+impl<S: BosStr, St> MessageViewBuilder<S, St>
 where
-    S: message_view_state::State,
-    S::Author: message_view_state::IsUnset,
+    St: message_view_state::State,
+    St::Author: message_view_state::IsUnset,
 {
     /// Set the `author` field (required)
     pub fn author(
         mut self,
         value: impl Into<ProfileViewBasic<S>>,
-    ) -> MessageViewBuilder<'a, message_view_state::SetAuthor<S>> {
+    ) -> MessageViewBuilder<S, message_view_state::SetAuthor<St>> {
         self._fields.0 = Option::Some(value.into());
         MessageViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: message_view_state::State> MessageViewBuilder<'a, S> {
+impl<S: BosStr, St: message_view_state::State> MessageViewBuilder<S, St> {
     /// Set the `chatProfile` field (optional)
     pub fn chat_profile(mut self, value: impl Into<Option<Profile<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -246,26 +246,26 @@ impl<'a, S: message_view_state::State> MessageViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S> MessageViewBuilder<'a, S>
+impl<S: BosStr, St> MessageViewBuilder<S, St>
 where
-    S: message_view_state::State,
-    S::Cid: message_view_state::IsUnset,
+    St: message_view_state::State,
+    St::Cid: message_view_state::IsUnset,
 {
     /// Set the `cid` field (required)
     pub fn cid(
         mut self,
         value: impl Into<Cid<S>>,
-    ) -> MessageViewBuilder<'a, message_view_state::SetCid<S>> {
+    ) -> MessageViewBuilder<S, message_view_state::SetCid<St>> {
         self._fields.2 = Option::Some(value.into());
         MessageViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: message_view_state::State> MessageViewBuilder<'a, S> {
+impl<S: BosStr, St: message_view_state::State> MessageViewBuilder<S, St> {
     /// Set the `deleted` field (optional)
     pub fn deleted(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.3 = value.into();
@@ -278,45 +278,45 @@ impl<'a, S: message_view_state::State> MessageViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S> MessageViewBuilder<'a, S>
+impl<S: BosStr, St> MessageViewBuilder<S, St>
 where
-    S: message_view_state::State,
-    S::IndexedAt: message_view_state::IsUnset,
+    St: message_view_state::State,
+    St::IndexedAt: message_view_state::IsUnset,
 {
     /// Set the `indexedAt` field (required)
     pub fn indexed_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> MessageViewBuilder<'a, message_view_state::SetIndexedAt<S>> {
+    ) -> MessageViewBuilder<S, message_view_state::SetIndexedAt<St>> {
         self._fields.4 = Option::Some(value.into());
         MessageViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> MessageViewBuilder<'a, S>
+impl<S: BosStr, St> MessageViewBuilder<S, St>
 where
-    S: message_view_state::State,
-    S::Record: message_view_state::IsUnset,
+    St: message_view_state::State,
+    St::Record: message_view_state::IsUnset,
 {
     /// Set the `record` field (required)
     pub fn record(
         mut self,
         value: impl Into<Data<S>>,
-    ) -> MessageViewBuilder<'a, message_view_state::SetRecord<S>> {
+    ) -> MessageViewBuilder<S, message_view_state::SetRecord<St>> {
         self._fields.5 = Option::Some(value.into());
         MessageViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: message_view_state::State> MessageViewBuilder<'a, S> {
+impl<S: BosStr, St: message_view_state::State> MessageViewBuilder<S, St> {
     /// Set the `replyTo` field (optional)
     pub fn reply_to(mut self, value: impl Into<Option<MessageViewReplyTo<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -329,36 +329,36 @@ impl<'a, S: message_view_state::State> MessageViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S> MessageViewBuilder<'a, S>
+impl<S: BosStr, St> MessageViewBuilder<S, St>
 where
-    S: message_view_state::State,
-    S::Uri: message_view_state::IsUnset,
+    St: message_view_state::State,
+    St::Uri: message_view_state::IsUnset,
 {
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> MessageViewBuilder<'a, message_view_state::SetUri<S>> {
+    ) -> MessageViewBuilder<S, message_view_state::SetUri<St>> {
         self._fields.7 = Option::Some(value.into());
         MessageViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> MessageViewBuilder<'a, S>
+impl<S: BosStr, St> MessageViewBuilder<S, St>
 where
-    S: message_view_state::State,
-    S::Uri: message_view_state::IsSet,
-    S::Cid: message_view_state::IsSet,
-    S::Author: message_view_state::IsSet,
-    S::IndexedAt: message_view_state::IsSet,
-    S::Record: message_view_state::IsSet,
+    St: message_view_state::State,
+    St::Uri: message_view_state::IsSet,
+    St::Cid: message_view_state::IsSet,
+    St::IndexedAt: message_view_state::IsSet,
+    St::Author: message_view_state::IsSet,
+    St::Record: message_view_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> MessageView<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> MessageView<S> {
         MessageView {
             author: self._fields.0.unwrap(),
             chat_profile: self._fields.1,
@@ -371,11 +371,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> MessageView<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> MessageView<S> {
         MessageView {
             author: self._fields.0.unwrap(),
             chat_profile: self._fields.1,

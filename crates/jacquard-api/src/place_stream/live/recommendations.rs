@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "place.stream.live.recommendations",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Recommendations<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Recommendations<S: BosStr = DefaultStr> {
     ///Client-declared timestamp when this list was created.
     pub created_at: Datetime,
     ///Ordered list of recommended streamer DIDs
@@ -54,18 +54,18 @@ pub struct Recommendations<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct RecommendationsGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct RecommendationsGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Recommendations<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Recommendations<S> {
+impl<S: BosStr> Recommendations<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, RecommendationsRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -78,18 +78,17 @@ pub struct RecommendationsRecord;
 impl XrpcResp for RecommendationsRecord {
     const NSID: &'static str = "place.stream.live.recommendations";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = RecommendationsGetRecordOutput<S>;
+    type Output<S: BosStr> = RecommendationsGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<RecommendationsGetRecordOutput<S>>
-for Recommendations<S> {
+impl<S: BosStr> From<RecommendationsGetRecordOutput<S>> for Recommendations<S> {
     fn from(output: RecommendationsGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Recommendations<S> {
+impl<S: BosStr> Collection for Recommendations<S> {
     const NSID: &'static str = "place.stream.live.recommendations";
     type Record = RecommendationsRecord;
 }
@@ -99,7 +98,7 @@ impl Collection for RecommendationsRecord {
     type Record = RecommendationsRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Recommendations<S> {
+impl<S: BosStr> LexiconSchema for Recommendations<S> {
     fn nsid() -> &'static str {
         "place.stream.live.recommendations"
     }
@@ -146,122 +145,122 @@ pub mod recommendations_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Streamers;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Streamers = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Streamers = S::Streamers;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `streamers` field to Set
-    pub struct SetStreamers<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStreamers<S> {}
-    impl<S: State> State for SetStreamers<S> {
-        type CreatedAt = S::CreatedAt;
+    pub struct SetStreamers<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStreamers<St> {}
+    impl<St: State> State for SetStreamers<St> {
         type Streamers = Set<members::streamers>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Streamers = St::Streamers;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `streamers` field
         pub struct streamers(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct RecommendationsBuilder<'a, S: recommendations_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct RecommendationsBuilder<S: BosStr, St: recommendations_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<Vec<Did<S>>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Recommendations<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> RecommendationsBuilder<'a, recommendations_state::Empty> {
+impl<S: BosStr> Recommendations<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> RecommendationsBuilder<S, recommendations_state::Empty> {
         RecommendationsBuilder::new()
     }
 }
 
-impl<'a> RecommendationsBuilder<'a, recommendations_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> RecommendationsBuilder<S, recommendations_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         RecommendationsBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RecommendationsBuilder<'a, S>
+impl<S: BosStr, St> RecommendationsBuilder<S, St>
 where
-    S: recommendations_state::State,
-    S::CreatedAt: recommendations_state::IsUnset,
+    St: recommendations_state::State,
+    St::CreatedAt: recommendations_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> RecommendationsBuilder<'a, recommendations_state::SetCreatedAt<S>> {
+    ) -> RecommendationsBuilder<S, recommendations_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         RecommendationsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RecommendationsBuilder<'a, S>
+impl<S: BosStr, St> RecommendationsBuilder<S, St>
 where
-    S: recommendations_state::State,
-    S::Streamers: recommendations_state::IsUnset,
+    St: recommendations_state::State,
+    St::Streamers: recommendations_state::IsUnset,
 {
     /// Set the `streamers` field (required)
     pub fn streamers(
         mut self,
         value: impl Into<Vec<Did<S>>>,
-    ) -> RecommendationsBuilder<'a, recommendations_state::SetStreamers<S>> {
+    ) -> RecommendationsBuilder<S, recommendations_state::SetStreamers<St>> {
         self._fields.1 = Option::Some(value.into());
         RecommendationsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RecommendationsBuilder<'a, S>
+impl<S: BosStr, St> RecommendationsBuilder<S, St>
 where
-    S: recommendations_state::State,
-    S::CreatedAt: recommendations_state::IsSet,
-    S::Streamers: recommendations_state::IsSet,
+    St: recommendations_state::State,
+    St::Streamers: recommendations_state::IsSet,
+    St::CreatedAt: recommendations_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Recommendations<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Recommendations<S> {
         Recommendations {
             created_at: self._fields.0.unwrap(),
             streamers: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Recommendations<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Recommendations<S> {
         Recommendations {
             created_at: self._fields.0.unwrap(),
             streamers: self._fields.1.unwrap(),

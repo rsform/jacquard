@@ -18,11 +18,15 @@ pub fn generate_build_method(
     schema: &BuilderSchema,
     required_fields: &[RequiredField],
     has_lifetime: bool,
+    has_type_param: bool,
     resolved: &crate::codegen::prettify::ResolvedImports,
 ) -> TokenStream {
     let builder_name = format_ident!("{}Builder", type_name);
     let state_mod_name = format_ident!("{}_state", type_name.to_snake_case());
     let type_ident = format_ident!("{}", type_name);
+
+    let bosstr_path =
+        resolved.external_type_tokens(&crate::codegen::prettify::ExternalImport::BosStr);
 
     let lifetime_param = if has_lifetime {
         quote! { 'a, }
@@ -30,7 +34,39 @@ pub fn generate_build_method(
         quote! {}
     };
 
-    let lifetime_generic = if has_lifetime {
+    // S type parameter for the impl block (with bounds)
+    let s_param = if has_type_param {
+        quote! { S: #bosstr_path, }
+    } else {
+        quote! {}
+    };
+
+    // S arg for instantiating the builder or type (bare, no bounds)
+    let s_arg = if has_type_param {
+        quote! { S, }
+    } else {
+        quote! {}
+    };
+
+    // Return type generic for the built type.
+    //
+    // When has_type_param: the type carries `<S>` (not `<'a>`), so return `TypeIdent<S>`.
+    // When !has_type_param but has_lifetime: return `TypeIdent<'a>`.
+    // Otherwise: return plain `TypeIdent`.
+    let type_return_generic = if has_type_param {
+        quote! { <S> }
+    } else if has_lifetime {
+        quote! { <'a> }
+    } else {
+        quote! {}
+    };
+
+    // For build_with_data we need the Data type generic too.
+    // Data always uses the same type parameter as the built type.
+    let data_type_generic = if has_type_param {
+        // Data<S> — the S flows through
+        quote! { <S> }
+    } else if has_lifetime {
         quote! { <'a> }
     } else {
         quote! {}
@@ -39,7 +75,7 @@ pub fn generate_build_method(
     // Generate where clauses for all required fields being IsSet
     let where_clauses = required_fields.iter().map(|field| {
         let field_pascal = format_ident!("{}", field.name_pascal.as_str());
-        quote! { S::#field_pascal: #state_mod_name::IsSet, }
+        quote! { St::#field_pascal: #state_mod_name::IsSet, }
     });
 
     let required_set: std::collections::HashSet<&SmolStr> =
@@ -78,8 +114,8 @@ pub fn generate_build_method(
         })
         .collect();
 
-    // For LexObject (records/objects), add extra_data field and build_with_data method
-    // LexXrpcParameters don't have extra_data
+    // For LexObject (records/objects), add extra_data field and build_with_data method.
+    // LexXrpcParameters don't have extra_data.
     let (extra_data_field, build_with_data_method) = match schema {
         BuilderSchema::Object(_) => {
             let default_field = quote! { extra_data: Default::default(), };
@@ -88,14 +124,14 @@ pub fn generate_build_method(
             let data_path = resolved.type_path(&crate::codegen::prettify::CommonType::Data);
             let btree_path = resolved.btree_map_path();
             let with_data_method = quote! {
-                /// Build the final struct with custom extra_data
+                /// Build the final struct with custom extra_data.
                 pub fn build_with_data(
                     self,
                     extra_data: #btree_path<
                         #smol_str_path,
-                        #data_path #lifetime_generic
+                        #data_path #data_type_generic
                     >,
-                ) -> #type_ident #lifetime_generic {
+                ) -> #type_ident #type_return_generic {
                     #type_ident {
                         #(#field_extractions)*
                         extra_data: Some(extra_data),
@@ -109,13 +145,13 @@ pub fn generate_build_method(
     };
 
     quote! {
-        impl<#lifetime_param S> #builder_name<#lifetime_param S>
+        impl<#lifetime_param #s_param St> #builder_name<#lifetime_param #s_arg St>
         where
-            S: #state_mod_name::State,
+            St: #state_mod_name::State,
             #(#where_clauses)*
         {
-            /// Build the final struct
-            pub fn build(self) -> #type_ident #lifetime_generic {
+            /// Build the final struct.
+            pub fn build(self) -> #type_ident #type_return_generic {
                 #type_ident {
                     #(#field_extractions)*
                     #extra_data_field
@@ -143,8 +179,9 @@ fn schema_default_expr(
         }
         LexObjectProperty::String(s) if s.known_values.is_none() => {
             let v = s.default.as_ref()?.as_ref();
-            let cowstr_path = resolved.type_path(&crate::codegen::prettify::CommonType::CowStr);
-            Some(quote! { #cowstr_path::from(#v) })
+            // Use SmolStr for the default literal, then convert to S.
+            let smol_str_path = resolved.type_path(&crate::codegen::prettify::CommonType::SmolStr);
+            Some(quote! { #smol_str_path::from(#v) })
         }
         _ => None,
     }

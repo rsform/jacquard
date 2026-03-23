@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -37,11 +37,11 @@ use crate::sh_weaver::edit::DocRef;
     rename = "sh.weaver.edit.root",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Root<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Root<S: BosStr = DefaultStr> {
     pub doc: DocRef<S>,
     pub snapshot: BlobRef<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -54,18 +54,18 @@ pub struct Root<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct RootGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct RootGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Root<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Root<S> {
+impl<S: BosStr> Root<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, RootRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -78,17 +78,17 @@ pub struct RootRecord;
 impl XrpcResp for RootRecord {
     const NSID: &'static str = "sh.weaver.edit.root";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = RootGetRecordOutput<S>;
+    type Output<S: BosStr> = RootGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<RootGetRecordOutput<S>> for Root<S> {
+impl<S: BosStr> From<RootGetRecordOutput<S>> for Root<S> {
     fn from(output: RootGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Root<S> {
+impl<S: BosStr> Collection for Root<S> {
     const NSID: &'static str = "sh.weaver.edit.root";
     type Record = RootRecord;
 }
@@ -98,7 +98,7 @@ impl Collection for RootRecord {
     type Record = RootRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Root<S> {
+impl<S: BosStr> LexiconSchema for Root<S> {
     fn nsid() -> &'static str {
         "sh.weaver.edit.root"
     }
@@ -174,17 +174,17 @@ pub mod root_state {
         type Doc = Unset;
     }
     ///State transition - sets the `snapshot` field to Set
-    pub struct SetSnapshot<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSnapshot<S> {}
-    impl<S: State> State for SetSnapshot<S> {
+    pub struct SetSnapshot<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSnapshot<St> {}
+    impl<St: State> State for SetSnapshot<St> {
         type Snapshot = Set<members::snapshot>;
-        type Doc = S::Doc;
+        type Doc = St::Doc;
     }
     ///State transition - sets the `doc` field to Set
-    pub struct SetDoc<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDoc<S> {}
-    impl<S: State> State for SetDoc<S> {
-        type Snapshot = S::Snapshot;
+    pub struct SetDoc<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDoc<St> {}
+    impl<St: State> State for SetDoc<St> {
+        type Snapshot = St::Snapshot;
         type Doc = Set<members::doc>;
     }
     /// Marker types for field names
@@ -197,85 +197,85 @@ pub mod root_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct RootBuilder<'a, S: root_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct RootBuilder<S: BosStr, St: root_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<DocRef<S>>, Option<BlobRef<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Root<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> RootBuilder<'a, root_state::Empty> {
+impl<S: BosStr> Root<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> RootBuilder<S, root_state::Empty> {
         RootBuilder::new()
     }
 }
 
-impl<'a> RootBuilder<'a, root_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> RootBuilder<S, root_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         RootBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RootBuilder<'a, S>
+impl<S: BosStr, St> RootBuilder<S, St>
 where
-    S: root_state::State,
-    S::Doc: root_state::IsUnset,
+    St: root_state::State,
+    St::Doc: root_state::IsUnset,
 {
     /// Set the `doc` field (required)
     pub fn doc(
         mut self,
         value: impl Into<DocRef<S>>,
-    ) -> RootBuilder<'a, root_state::SetDoc<S>> {
+    ) -> RootBuilder<S, root_state::SetDoc<St>> {
         self._fields.0 = Option::Some(value.into());
         RootBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RootBuilder<'a, S>
+impl<S: BosStr, St> RootBuilder<S, St>
 where
-    S: root_state::State,
-    S::Snapshot: root_state::IsUnset,
+    St: root_state::State,
+    St::Snapshot: root_state::IsUnset,
 {
     /// Set the `snapshot` field (required)
     pub fn snapshot(
         mut self,
         value: impl Into<BlobRef<S>>,
-    ) -> RootBuilder<'a, root_state::SetSnapshot<S>> {
+    ) -> RootBuilder<S, root_state::SetSnapshot<St>> {
         self._fields.1 = Option::Some(value.into());
         RootBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RootBuilder<'a, S>
+impl<S: BosStr, St> RootBuilder<S, St>
 where
-    S: root_state::State,
-    S::Snapshot: root_state::IsSet,
-    S::Doc: root_state::IsSet,
+    St: root_state::State,
+    St::Snapshot: root_state::IsSet,
+    St::Doc: root_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Root<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Root<S> {
         Root {
             doc: self._fields.0.unwrap(),
             snapshot: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Root<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Root<S> {
         Root {
             doc: self._fields.0.unwrap(),
             snapshot: self._fields.1.unwrap(),

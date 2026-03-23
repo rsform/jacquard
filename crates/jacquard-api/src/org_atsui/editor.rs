@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
@@ -19,38 +19,33 @@ use serde::{Serialize, Deserialize};
 use crate::at_inlay::Response;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Editor<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Editor<S: BosStr = DefaultStr> {
     ///AT-URI of the component record to edit
     pub uri: AtUri<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct EditorOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct EditorOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
-    #[serde(borrow)]
     pub value: Response<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -59,12 +54,11 @@ pub struct EditorResponse;
 impl jacquard_common::xrpc::XrpcResp for EditorResponse {
     const NSID: &'static str = "org.atsui.Editor";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = EditorOutput<S>;
+    type Output<S: BosStr> = EditorOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for Editor<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Editor<S> {
     const NSID: &'static str = "org.atsui.Editor";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -79,7 +73,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for EditorRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = Editor<S>;
+    type Request<S: BosStr> = Editor<S>;
     type Response = EditorResponse;
 }
 
@@ -102,9 +96,9 @@ pub mod editor_state {
         type Uri = Unset;
     }
     ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
         type Uri = Set<members::uri>;
     }
     /// Marker types for field names
@@ -115,64 +109,64 @@ pub mod editor_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct EditorBuilder<'a, S: editor_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct EditorBuilder<S: BosStr, St: editor_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Editor<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> EditorBuilder<'a, editor_state::Empty> {
+impl<S: BosStr> Editor<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> EditorBuilder<S, editor_state::Empty> {
         EditorBuilder::new()
     }
 }
 
-impl<'a> EditorBuilder<'a, editor_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> EditorBuilder<S, editor_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         EditorBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> EditorBuilder<'a, S>
+impl<S: BosStr, St> EditorBuilder<S, St>
 where
-    S: editor_state::State,
-    S::Uri: editor_state::IsUnset,
+    St: editor_state::State,
+    St::Uri: editor_state::IsUnset,
 {
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> EditorBuilder<'a, editor_state::SetUri<S>> {
+    ) -> EditorBuilder<S, editor_state::SetUri<St>> {
         self._fields.0 = Option::Some(value.into());
         EditorBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> EditorBuilder<'a, S>
+impl<S: BosStr, St> EditorBuilder<S, St>
 where
-    S: editor_state::State,
-    S::Uri: editor_state::IsSet,
+    St: editor_state::State,
+    St::Uri: editor_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Editor<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Editor<S> {
         Editor {
             uri: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Editor<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Editor<S> {
         Editor {
             uri: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "dev.baileytownsend.health.calories",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Calories<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Calories<S: BosStr = DefaultStr> {
     pub burned: i64,
     pub created_at: Datetime,
     pub intake: i64,
@@ -53,18 +53,18 @@ pub struct Calories<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CaloriesGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CaloriesGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Calories<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Calories<S> {
+impl<S: BosStr> Calories<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, CaloriesRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -77,17 +77,17 @@ pub struct CaloriesRecord;
 impl XrpcResp for CaloriesRecord {
     const NSID: &'static str = "dev.baileytownsend.health.calories";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = CaloriesGetRecordOutput<S>;
+    type Output<S: BosStr> = CaloriesGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<CaloriesGetRecordOutput<S>> for Calories<S> {
+impl<S: BosStr> From<CaloriesGetRecordOutput<S>> for Calories<S> {
     fn from(output: CaloriesGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Calories<S> {
+impl<S: BosStr> Collection for Calories<S> {
     const NSID: &'static str = "dev.baileytownsend.health.calories";
     type Record = CaloriesRecord;
 }
@@ -97,7 +97,7 @@ impl Collection for CaloriesRecord {
     type Record = CaloriesRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Calories<S> {
+impl<S: BosStr> LexiconSchema for Calories<S> {
     fn nsid() -> &'static str {
         "dev.baileytownsend.health.calories"
     }
@@ -135,27 +135,27 @@ pub mod calories_state {
         type CreatedAt = Unset;
     }
     ///State transition - sets the `intake` field to Set
-    pub struct SetIntake<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIntake<S> {}
-    impl<S: State> State for SetIntake<S> {
+    pub struct SetIntake<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIntake<St> {}
+    impl<St: State> State for SetIntake<St> {
         type Intake = Set<members::intake>;
-        type Burned = S::Burned;
-        type CreatedAt = S::CreatedAt;
+        type Burned = St::Burned;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `burned` field to Set
-    pub struct SetBurned<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBurned<S> {}
-    impl<S: State> State for SetBurned<S> {
-        type Intake = S::Intake;
+    pub struct SetBurned<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBurned<St> {}
+    impl<St: State> State for SetBurned<St> {
+        type Intake = St::Intake;
         type Burned = Set<members::burned>;
-        type CreatedAt = S::CreatedAt;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Intake = S::Intake;
-        type Burned = S::Burned;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Intake = St::Intake;
+        type Burned = St::Burned;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
@@ -170,97 +170,97 @@ pub mod calories_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct CaloriesBuilder<'a, S: calories_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct CaloriesBuilder<S: BosStr, St: calories_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<Datetime>, Option<i64>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Calories<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> CaloriesBuilder<'a, calories_state::Empty> {
+impl<S: BosStr> Calories<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> CaloriesBuilder<S, calories_state::Empty> {
         CaloriesBuilder::new()
     }
 }
 
-impl<'a> CaloriesBuilder<'a, calories_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> CaloriesBuilder<S, calories_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         CaloriesBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CaloriesBuilder<'a, S>
+impl<S: BosStr, St> CaloriesBuilder<S, St>
 where
-    S: calories_state::State,
-    S::Burned: calories_state::IsUnset,
+    St: calories_state::State,
+    St::Burned: calories_state::IsUnset,
 {
     /// Set the `burned` field (required)
     pub fn burned(
         mut self,
         value: impl Into<i64>,
-    ) -> CaloriesBuilder<'a, calories_state::SetBurned<S>> {
+    ) -> CaloriesBuilder<S, calories_state::SetBurned<St>> {
         self._fields.0 = Option::Some(value.into());
         CaloriesBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CaloriesBuilder<'a, S>
+impl<S: BosStr, St> CaloriesBuilder<S, St>
 where
-    S: calories_state::State,
-    S::CreatedAt: calories_state::IsUnset,
+    St: calories_state::State,
+    St::CreatedAt: calories_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> CaloriesBuilder<'a, calories_state::SetCreatedAt<S>> {
+    ) -> CaloriesBuilder<S, calories_state::SetCreatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         CaloriesBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CaloriesBuilder<'a, S>
+impl<S: BosStr, St> CaloriesBuilder<S, St>
 where
-    S: calories_state::State,
-    S::Intake: calories_state::IsUnset,
+    St: calories_state::State,
+    St::Intake: calories_state::IsUnset,
 {
     /// Set the `intake` field (required)
     pub fn intake(
         mut self,
         value: impl Into<i64>,
-    ) -> CaloriesBuilder<'a, calories_state::SetIntake<S>> {
+    ) -> CaloriesBuilder<S, calories_state::SetIntake<St>> {
         self._fields.2 = Option::Some(value.into());
         CaloriesBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CaloriesBuilder<'a, S>
+impl<S: BosStr, St> CaloriesBuilder<S, St>
 where
-    S: calories_state::State,
-    S::Intake: calories_state::IsSet,
-    S::Burned: calories_state::IsSet,
-    S::CreatedAt: calories_state::IsSet,
+    St: calories_state::State,
+    St::Intake: calories_state::IsSet,
+    St::Burned: calories_state::IsSet,
+    St::CreatedAt: calories_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Calories<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Calories<S> {
         Calories {
             burned: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
@@ -268,11 +268,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Calories<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Calories<S> {
         Calories {
             burned: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -38,14 +38,14 @@ use crate::com_atproto::label::SelfLabels;
 use crate::app_chronosky::schedule::create_post;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CreatePost<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CreatePost<S: BosStr = DefaultStr> {
     ///Whether to disable quote posts
     #[serde(skip_serializing_if = "Option::is_none")]
     pub disable_quote_posts: Option<bool>,
@@ -59,9 +59,7 @@ pub struct CreatePost<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Thread gate rules to control who can reply
     #[serde(skip_serializing_if = "Option::is_none")]
     pub threadgate_rules: Option<Vec<CreatePostThreadgateRulesItem<S>>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -71,11 +69,11 @@ pub struct CreatePost<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum CreatePostThreadgateRulesItem<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum CreatePostThreadgateRulesItem<S: BosStr = DefaultStr> {
     #[serde(rename = "app.bsky.feed.threadgate#mentionRule")]
     ThreadgateMentionRule(Box<MentionRule<S>>),
     #[serde(rename = "app.bsky.feed.threadgate#followerRule")]
@@ -88,23 +86,21 @@ pub enum CreatePostThreadgateRulesItem<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CreatePostOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CreatePostOutput<S: BosStr = DefaultStr> {
     ///Chronosky schedule ID (parent post ID for threads)
     pub id: S,
     ///Number of posts created (1 for single post, N for thread)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub post_count: Option<i64>,
     pub scheduled_at: Datetime,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -114,11 +110,11 @@ pub struct CreatePostOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ThreadPostInput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ThreadPostInput<S: BosStr = DefaultStr> {
     ///Post creation timestamp (optional)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
@@ -146,11 +142,11 @@ pub struct ThreadPostInput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ThreadPostInputEmbed<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ThreadPostInputEmbed<S: BosStr = DefaultStr> {
     #[serde(rename = "app.bsky.embed.images")]
     Images(Box<Images<S>>),
     #[serde(rename = "app.bsky.embed.external")]
@@ -168,12 +164,11 @@ pub struct CreatePostResponse;
 impl jacquard_common::xrpc::XrpcResp for CreatePostResponse {
     const NSID: &'static str = "app.chronosky.schedule.createPost";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = CreatePostOutput<S>;
+    type Output<S: BosStr> = CreatePostOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for CreatePost<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for CreatePost<S> {
     const NSID: &'static str = "app.chronosky.schedule.createPost";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -188,11 +183,11 @@ impl jacquard_common::xrpc::XrpcEndpoint for CreatePostRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = CreatePost<S>;
+    type Request<S: BosStr> = CreatePost<S>;
     type Response = CreatePostResponse;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ThreadPostInput<S> {
+impl<S: BosStr> LexiconSchema for ThreadPostInput<S> {
     fn nsid() -> &'static str {
         "app.chronosky.schedule.createPost"
     }
@@ -261,43 +256,43 @@ pub mod create_post_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ScheduledAt;
         type Posts;
+        type ScheduledAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ScheduledAt = Unset;
         type Posts = Unset;
-    }
-    ///State transition - sets the `scheduled_at` field to Set
-    pub struct SetScheduledAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetScheduledAt<S> {}
-    impl<S: State> State for SetScheduledAt<S> {
-        type ScheduledAt = Set<members::scheduled_at>;
-        type Posts = S::Posts;
+        type ScheduledAt = Unset;
     }
     ///State transition - sets the `posts` field to Set
-    pub struct SetPosts<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPosts<S> {}
-    impl<S: State> State for SetPosts<S> {
-        type ScheduledAt = S::ScheduledAt;
+    pub struct SetPosts<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPosts<St> {}
+    impl<St: State> State for SetPosts<St> {
         type Posts = Set<members::posts>;
+        type ScheduledAt = St::ScheduledAt;
+    }
+    ///State transition - sets the `scheduled_at` field to Set
+    pub struct SetScheduledAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetScheduledAt<St> {}
+    impl<St: State> State for SetScheduledAt<St> {
+        type Posts = St::Posts;
+        type ScheduledAt = Set<members::scheduled_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `scheduled_at` field
-        pub struct scheduled_at(());
         ///Marker type for the `posts` field
         pub struct posts(());
+        ///Marker type for the `scheduled_at` field
+        pub struct scheduled_at(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct CreatePostBuilder<'a, S: create_post_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct CreatePostBuilder<S: BosStr, St: create_post_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<bool>,
         Option<S>,
@@ -305,28 +300,28 @@ pub struct CreatePostBuilder<'a, S: create_post_state::State> {
         Option<Datetime>,
         Option<Vec<CreatePostThreadgateRulesItem<S>>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> CreatePost<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> CreatePostBuilder<'a, create_post_state::Empty> {
+impl<S: BosStr> CreatePost<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> CreatePostBuilder<S, create_post_state::Empty> {
         CreatePostBuilder::new()
     }
 }
 
-impl<'a> CreatePostBuilder<'a, create_post_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> CreatePostBuilder<S, create_post_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         CreatePostBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: create_post_state::State> CreatePostBuilder<'a, S> {
+impl<S: BosStr, St: create_post_state::State> CreatePostBuilder<S, St> {
     /// Set the `disableQuotePosts` field (optional)
     pub fn disable_quote_posts(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.0 = value.into();
@@ -339,7 +334,7 @@ impl<'a, S: create_post_state::State> CreatePostBuilder<'a, S> {
     }
 }
 
-impl<'a, S: create_post_state::State> CreatePostBuilder<'a, S> {
+impl<S: BosStr, St: create_post_state::State> CreatePostBuilder<S, St> {
     /// Set the `parentPostId` field (optional)
     pub fn parent_post_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -352,45 +347,45 @@ impl<'a, S: create_post_state::State> CreatePostBuilder<'a, S> {
     }
 }
 
-impl<'a, S> CreatePostBuilder<'a, S>
+impl<S: BosStr, St> CreatePostBuilder<S, St>
 where
-    S: create_post_state::State,
-    S::Posts: create_post_state::IsUnset,
+    St: create_post_state::State,
+    St::Posts: create_post_state::IsUnset,
 {
     /// Set the `posts` field (required)
     pub fn posts(
         mut self,
         value: impl Into<Vec<create_post::ThreadPostInput<S>>>,
-    ) -> CreatePostBuilder<'a, create_post_state::SetPosts<S>> {
+    ) -> CreatePostBuilder<S, create_post_state::SetPosts<St>> {
         self._fields.2 = Option::Some(value.into());
         CreatePostBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CreatePostBuilder<'a, S>
+impl<S: BosStr, St> CreatePostBuilder<S, St>
 where
-    S: create_post_state::State,
-    S::ScheduledAt: create_post_state::IsUnset,
+    St: create_post_state::State,
+    St::ScheduledAt: create_post_state::IsUnset,
 {
     /// Set the `scheduledAt` field (required)
     pub fn scheduled_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> CreatePostBuilder<'a, create_post_state::SetScheduledAt<S>> {
+    ) -> CreatePostBuilder<S, create_post_state::SetScheduledAt<St>> {
         self._fields.3 = Option::Some(value.into());
         CreatePostBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: create_post_state::State> CreatePostBuilder<'a, S> {
+impl<S: BosStr, St: create_post_state::State> CreatePostBuilder<S, St> {
     /// Set the `threadgateRules` field (optional)
     pub fn threadgate_rules(
         mut self,
@@ -409,14 +404,14 @@ impl<'a, S: create_post_state::State> CreatePostBuilder<'a, S> {
     }
 }
 
-impl<'a, S> CreatePostBuilder<'a, S>
+impl<S: BosStr, St> CreatePostBuilder<S, St>
 where
-    S: create_post_state::State,
-    S::ScheduledAt: create_post_state::IsSet,
-    S::Posts: create_post_state::IsSet,
+    St: create_post_state::State,
+    St::Posts: create_post_state::IsSet,
+    St::ScheduledAt: create_post_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> CreatePost<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> CreatePost<S> {
         CreatePost {
             disable_quote_posts: self._fields.0,
             parent_post_id: self._fields.1,
@@ -426,11 +421,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> CreatePost<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> CreatePost<S> {
         CreatePost {
             disable_quote_posts: self._fields.0,
             parent_post_id: self._fields.1,

@@ -6,32 +6,33 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[allow(unused_imports)]
+use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Archive<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Archive<S: BosStr = DefaultStr> {
     ///Defaults to `"tar.gz"`.
     #[serde(default = "_default_format")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub format: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub prefix: Option<S>,
-    #[serde(borrow)]
     pub r#ref: S,
-    #[serde(borrow)]
     pub repo: S,
 }
 
@@ -59,22 +60,19 @@ pub struct ArchiveOutput {
 pub enum ArchiveError {
     /// Repository not found or access denied
     #[serde(rename = "RepoNotFound")]
-    RepoNotFound(Option<jacquard_common::deps::smol_str::SmolStr>),
+    RepoNotFound(Option<SmolStr>),
     /// Git reference not found
     #[serde(rename = "RefNotFound")]
-    RefNotFound(Option<jacquard_common::deps::smol_str::SmolStr>),
+    RefNotFound(Option<SmolStr>),
     /// Invalid request parameters
     #[serde(rename = "InvalidRequest")]
-    InvalidRequest(Option<jacquard_common::deps::smol_str::SmolStr>),
+    InvalidRequest(Option<SmolStr>),
     /// Failed to create archive
     #[serde(rename = "ArchiveError")]
-    ArchiveError(Option<jacquard_common::deps::smol_str::SmolStr>),
+    ArchiveError(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: jacquard_common::deps::smol_str::SmolStr,
-        message: Option<jacquard_common::deps::smol_str::SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for ArchiveError {
@@ -124,9 +122,9 @@ pub struct ArchiveResponse;
 impl jacquard_common::xrpc::XrpcResp for ArchiveResponse {
     const NSID: &'static str = "sh.tangled.repo.archive";
     const ENCODING: &'static str = "*/*";
-    type Output<S: Bos<str> + AsRef<str>> = ArchiveOutput;
+    type Output<S: BosStr> = ArchiveOutput;
     type Err = ArchiveError;
-    fn encode_output<S: Bos<str> + AsRef<str>>(
+    fn encode_output<S: BosStr>(
         output: &Self::Output<S>,
     ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError>
     where
@@ -138,7 +136,7 @@ impl jacquard_common::xrpc::XrpcResp for ArchiveResponse {
         body: &'de [u8],
     ) -> Result<Self::Output<S>, jacquard_common::error::DecodeError>
     where
-        S: Bos<str> + AsRef<str> + Deserialize<'de>,
+        S: BosStr + Deserialize<'de>,
         Self::Output<S>: Deserialize<'de>,
     {
         Ok(ArchiveOutput {
@@ -147,8 +145,7 @@ impl jacquard_common::xrpc::XrpcResp for ArchiveResponse {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for Archive<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Archive<S> {
     const NSID: &'static str = "sh.tangled.repo.archive";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ArchiveResponse;
@@ -159,12 +156,12 @@ pub struct ArchiveRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ArchiveRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.repo.archive";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = Archive<S>;
+    type Request<S: BosStr> = Archive<S>;
     type Response = ArchiveResponse;
 }
 
-fn _default_format() -> Option<CowStr<'static>> {
-    Some(CowStr::from("tar.gz"))
+fn _default_format<S: jacquard_common::FromStaticStr>() -> Option<S> {
+    Some(S::from_static("tar.gz"))
 }
 
 pub mod archive_state {
@@ -188,17 +185,17 @@ pub mod archive_state {
         type Ref = Unset;
     }
     ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
+    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRepo<St> {}
+    impl<St: State> State for SetRepo<St> {
         type Repo = Set<members::repo>;
-        type Ref = S::Ref;
+        type Ref = St::Ref;
     }
     ///State transition - sets the `ref` field to Set
-    pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRef<S> {}
-    impl<S: State> State for SetRef<S> {
-        type Repo = S::Repo;
+    pub struct SetRef<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRef<St> {}
+    impl<St: State> State for SetRef<St> {
+        type Repo = St::Repo;
         type Ref = Set<members::r#ref>;
     }
     /// Marker types for field names
@@ -211,32 +208,32 @@ pub mod archive_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ArchiveBuilder<'a, S: archive_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ArchiveBuilder<S: BosStr, St: archive_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>, Option<S>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Archive<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ArchiveBuilder<'a, archive_state::Empty> {
+impl<S: BosStr> Archive<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ArchiveBuilder<S, archive_state::Empty> {
         ArchiveBuilder::new()
     }
 }
 
-impl<'a> ArchiveBuilder<'a, archive_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ArchiveBuilder<S, archive_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ArchiveBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: archive_state::State> ArchiveBuilder<'a, S> {
+impl<S: BosStr, St: archive_state::State> ArchiveBuilder<S, St> {
     /// Set the `format` field (optional)
     pub fn format(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -249,7 +246,7 @@ impl<'a, S: archive_state::State> ArchiveBuilder<'a, S> {
     }
 }
 
-impl<'a, S: archive_state::State> ArchiveBuilder<'a, S> {
+impl<S: BosStr, St: archive_state::State> ArchiveBuilder<S, St> {
     /// Set the `prefix` field (optional)
     pub fn prefix(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -262,52 +259,52 @@ impl<'a, S: archive_state::State> ArchiveBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ArchiveBuilder<'a, S>
+impl<S: BosStr, St> ArchiveBuilder<S, St>
 where
-    S: archive_state::State,
-    S::Ref: archive_state::IsUnset,
+    St: archive_state::State,
+    St::Ref: archive_state::IsUnset,
 {
     /// Set the `ref` field (required)
     pub fn r#ref(
         mut self,
         value: impl Into<S>,
-    ) -> ArchiveBuilder<'a, archive_state::SetRef<S>> {
+    ) -> ArchiveBuilder<S, archive_state::SetRef<St>> {
         self._fields.2 = Option::Some(value.into());
         ArchiveBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ArchiveBuilder<'a, S>
+impl<S: BosStr, St> ArchiveBuilder<S, St>
 where
-    S: archive_state::State,
-    S::Repo: archive_state::IsUnset,
+    St: archive_state::State,
+    St::Repo: archive_state::IsUnset,
 {
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
         value: impl Into<S>,
-    ) -> ArchiveBuilder<'a, archive_state::SetRepo<S>> {
+    ) -> ArchiveBuilder<S, archive_state::SetRepo<St>> {
         self._fields.3 = Option::Some(value.into());
         ArchiveBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ArchiveBuilder<'a, S>
+impl<S: BosStr, St> ArchiveBuilder<S, St>
 where
-    S: archive_state::State,
-    S::Repo: archive_state::IsSet,
-    S::Ref: archive_state::IsSet,
+    St: archive_state::State,
+    St::Repo: archive_state::IsSet,
+    St::Ref: archive_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Archive<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Archive<S> {
         Archive {
             format: self._fields.0,
             prefix: self._fields.1,

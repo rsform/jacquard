@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, AtUri};
 use jacquard_common::types::value::Data;
@@ -19,39 +19,35 @@ use serde::{Serialize, Deserialize};
 use crate::community_lexicon::calendar::rsvp::Rsvp;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetRsvp<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct GetRsvp<S: BosStr = DefaultStr> {
     pub event: AtUri<S>,
-    #[serde(borrow)]
     pub identity: Did<S>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetRsvpOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetRsvpOutput<S: BosStr = DefaultStr> {
     ///CID of the RSVP record.
     pub cid: S,
     ///The RSVP record.
     pub record: Rsvp<S>,
     ///AT-URI of the RSVP record.
     pub uri: AtUri<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -102,12 +98,11 @@ pub struct GetRsvpResponse;
 impl jacquard_common::xrpc::XrpcResp for GetRsvpResponse {
     const NSID: &'static str = "community.lexicon.calendar.getRSVP";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetRsvpOutput<S>;
+    type Output<S: BosStr> = GetRsvpOutput<S>;
     type Err = GetRsvpError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetRsvp<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetRsvp<S> {
     const NSID: &'static str = "community.lexicon.calendar.getRSVP";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetRsvpResponse;
@@ -118,7 +113,7 @@ pub struct GetRsvpRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetRsvpRequest {
     const PATH: &'static str = "/xrpc/community.lexicon.calendar.getRSVP";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetRsvp<S>;
+    type Request<S: BosStr> = GetRsvp<S>;
     type Response = GetRsvpResponse;
 }
 
@@ -132,111 +127,111 @@ pub mod get_rsvp_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Event;
         type Identity;
+        type Event;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Event = Unset;
         type Identity = Unset;
-    }
-    ///State transition - sets the `event` field to Set
-    pub struct SetEvent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEvent<S> {}
-    impl<S: State> State for SetEvent<S> {
-        type Event = Set<members::event>;
-        type Identity = S::Identity;
+        type Event = Unset;
     }
     ///State transition - sets the `identity` field to Set
-    pub struct SetIdentity<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIdentity<S> {}
-    impl<S: State> State for SetIdentity<S> {
-        type Event = S::Event;
+    pub struct SetIdentity<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIdentity<St> {}
+    impl<St: State> State for SetIdentity<St> {
         type Identity = Set<members::identity>;
+        type Event = St::Event;
+    }
+    ///State transition - sets the `event` field to Set
+    pub struct SetEvent<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetEvent<St> {}
+    impl<St: State> State for SetEvent<St> {
+        type Identity = St::Identity;
+        type Event = Set<members::event>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `event` field
-        pub struct event(());
         ///Marker type for the `identity` field
         pub struct identity(());
+        ///Marker type for the `event` field
+        pub struct event(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetRsvpBuilder<'a, S: get_rsvp_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetRsvpBuilder<S: BosStr, St: get_rsvp_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>, Option<Did<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetRsvp<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetRsvpBuilder<'a, get_rsvp_state::Empty> {
+impl<S: BosStr> GetRsvp<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetRsvpBuilder<S, get_rsvp_state::Empty> {
         GetRsvpBuilder::new()
     }
 }
 
-impl<'a> GetRsvpBuilder<'a, get_rsvp_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetRsvpBuilder<S, get_rsvp_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetRsvpBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetRsvpBuilder<'a, S>
+impl<S: BosStr, St> GetRsvpBuilder<S, St>
 where
-    S: get_rsvp_state::State,
-    S::Event: get_rsvp_state::IsUnset,
+    St: get_rsvp_state::State,
+    St::Event: get_rsvp_state::IsUnset,
 {
     /// Set the `event` field (required)
     pub fn event(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> GetRsvpBuilder<'a, get_rsvp_state::SetEvent<S>> {
+    ) -> GetRsvpBuilder<S, get_rsvp_state::SetEvent<St>> {
         self._fields.0 = Option::Some(value.into());
         GetRsvpBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetRsvpBuilder<'a, S>
+impl<S: BosStr, St> GetRsvpBuilder<S, St>
 where
-    S: get_rsvp_state::State,
-    S::Identity: get_rsvp_state::IsUnset,
+    St: get_rsvp_state::State,
+    St::Identity: get_rsvp_state::IsUnset,
 {
     /// Set the `identity` field (required)
     pub fn identity(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> GetRsvpBuilder<'a, get_rsvp_state::SetIdentity<S>> {
+    ) -> GetRsvpBuilder<S, get_rsvp_state::SetIdentity<St>> {
         self._fields.1 = Option::Some(value.into());
         GetRsvpBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetRsvpBuilder<'a, S>
+impl<S: BosStr, St> GetRsvpBuilder<S, St>
 where
-    S: get_rsvp_state::State,
-    S::Event: get_rsvp_state::IsSet,
-    S::Identity: get_rsvp_state::IsSet,
+    St: get_rsvp_state::State,
+    St::Identity: get_rsvp_state::IsSet,
+    St::Event: get_rsvp_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetRsvp<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetRsvp<S> {
         GetRsvp {
             event: self._fields.0.unwrap(),
             identity: self._fields.1.unwrap(),

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
@@ -18,37 +18,33 @@ use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DenyTeleport<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DenyTeleport<S: BosStr = DefaultStr> {
     ///The URI of the teleport record to deny.
     pub uri: AtUri<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DenyTeleportOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DenyTeleportOutput<S: BosStr = DefaultStr> {
     ///Whether the teleport was successfully denied.
     pub success: bool,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -110,12 +106,11 @@ pub struct DenyTeleportResponse;
 impl jacquard_common::xrpc::XrpcResp for DenyTeleportResponse {
     const NSID: &'static str = "place.stream.live.denyTeleport";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = DenyTeleportOutput<S>;
+    type Output<S: BosStr> = DenyTeleportOutput<S>;
     type Err = DenyTeleportError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for DenyTeleport<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for DenyTeleport<S> {
     const NSID: &'static str = "place.stream.live.denyTeleport";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -130,7 +125,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for DenyTeleportRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = DenyTeleport<S>;
+    type Request<S: BosStr> = DenyTeleport<S>;
     type Response = DenyTeleportResponse;
 }
 
@@ -153,9 +148,9 @@ pub mod deny_teleport_state {
         type Uri = Unset;
     }
     ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
         type Uri = Set<members::uri>;
     }
     /// Marker types for field names
@@ -166,67 +161,67 @@ pub mod deny_teleport_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct DenyTeleportBuilder<'a, S: deny_teleport_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct DenyTeleportBuilder<S: BosStr, St: deny_teleport_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> DenyTeleport<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> DenyTeleportBuilder<'a, deny_teleport_state::Empty> {
+impl<S: BosStr> DenyTeleport<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> DenyTeleportBuilder<S, deny_teleport_state::Empty> {
         DenyTeleportBuilder::new()
     }
 }
 
-impl<'a> DenyTeleportBuilder<'a, deny_teleport_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> DenyTeleportBuilder<S, deny_teleport_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         DenyTeleportBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DenyTeleportBuilder<'a, S>
+impl<S: BosStr, St> DenyTeleportBuilder<S, St>
 where
-    S: deny_teleport_state::State,
-    S::Uri: deny_teleport_state::IsUnset,
+    St: deny_teleport_state::State,
+    St::Uri: deny_teleport_state::IsUnset,
 {
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> DenyTeleportBuilder<'a, deny_teleport_state::SetUri<S>> {
+    ) -> DenyTeleportBuilder<S, deny_teleport_state::SetUri<St>> {
         self._fields.0 = Option::Some(value.into());
         DenyTeleportBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DenyTeleportBuilder<'a, S>
+impl<S: BosStr, St> DenyTeleportBuilder<S, St>
 where
-    S: deny_teleport_state::State,
-    S::Uri: deny_teleport_state::IsSet,
+    St: deny_teleport_state::State,
+    St::Uri: deny_teleport_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> DenyTeleport<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> DenyTeleport<S> {
         DenyTeleport {
             uri: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> DenyTeleport<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> DenyTeleport<S> {
         DenyTeleport {
             uri: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

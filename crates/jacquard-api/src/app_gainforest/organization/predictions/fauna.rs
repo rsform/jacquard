@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "app.gainforest.organization.predictions.fauna",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Fauna<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Fauna<S: BosStr = DefaultStr> {
     ///The date and time of the creation of the record
     pub created_at: Datetime,
     ///An array of GBIF taxon keys for each fauna prediction
@@ -54,18 +54,18 @@ pub struct Fauna<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct FaunaGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct FaunaGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Fauna<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Fauna<S> {
+impl<S: BosStr> Fauna<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, FaunaRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -78,17 +78,17 @@ pub struct FaunaRecord;
 impl XrpcResp for FaunaRecord {
     const NSID: &'static str = "app.gainforest.organization.predictions.fauna";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = FaunaGetRecordOutput<S>;
+    type Output<S: BosStr> = FaunaGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<FaunaGetRecordOutput<S>> for Fauna<S> {
+impl<S: BosStr> From<FaunaGetRecordOutput<S>> for Fauna<S> {
     fn from(output: FaunaGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Fauna<S> {
+impl<S: BosStr> Collection for Fauna<S> {
     const NSID: &'static str = "app.gainforest.organization.predictions.fauna";
     type Record = FaunaRecord;
 }
@@ -98,7 +98,7 @@ impl Collection for FaunaRecord {
     type Record = FaunaRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Fauna<S> {
+impl<S: BosStr> LexiconSchema for Fauna<S> {
     fn nsid() -> &'static str {
         "app.gainforest.organization.predictions.fauna"
     }
@@ -134,17 +134,17 @@ pub mod fauna_state {
         type CreatedAt = Unset;
     }
     ///State transition - sets the `gbif_taxon_keys` field to Set
-    pub struct SetGbifTaxonKeys<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGbifTaxonKeys<S> {}
-    impl<S: State> State for SetGbifTaxonKeys<S> {
+    pub struct SetGbifTaxonKeys<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetGbifTaxonKeys<St> {}
+    impl<St: State> State for SetGbifTaxonKeys<St> {
         type GbifTaxonKeys = Set<members::gbif_taxon_keys>;
-        type CreatedAt = S::CreatedAt;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type GbifTaxonKeys = S::GbifTaxonKeys;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type GbifTaxonKeys = St::GbifTaxonKeys;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
@@ -157,85 +157,85 @@ pub mod fauna_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct FaunaBuilder<'a, S: fauna_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct FaunaBuilder<S: BosStr, St: fauna_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<Vec<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Fauna<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> FaunaBuilder<'a, fauna_state::Empty> {
+impl<S: BosStr> Fauna<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> FaunaBuilder<S, fauna_state::Empty> {
         FaunaBuilder::new()
     }
 }
 
-impl<'a> FaunaBuilder<'a, fauna_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> FaunaBuilder<S, fauna_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         FaunaBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> FaunaBuilder<'a, S>
+impl<S: BosStr, St> FaunaBuilder<S, St>
 where
-    S: fauna_state::State,
-    S::CreatedAt: fauna_state::IsUnset,
+    St: fauna_state::State,
+    St::CreatedAt: fauna_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> FaunaBuilder<'a, fauna_state::SetCreatedAt<S>> {
+    ) -> FaunaBuilder<S, fauna_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         FaunaBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> FaunaBuilder<'a, S>
+impl<S: BosStr, St> FaunaBuilder<S, St>
 where
-    S: fauna_state::State,
-    S::GbifTaxonKeys: fauna_state::IsUnset,
+    St: fauna_state::State,
+    St::GbifTaxonKeys: fauna_state::IsUnset,
 {
     /// Set the `gbifTaxonKeys` field (required)
     pub fn gbif_taxon_keys(
         mut self,
         value: impl Into<Vec<S>>,
-    ) -> FaunaBuilder<'a, fauna_state::SetGbifTaxonKeys<S>> {
+    ) -> FaunaBuilder<S, fauna_state::SetGbifTaxonKeys<St>> {
         self._fields.1 = Option::Some(value.into());
         FaunaBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> FaunaBuilder<'a, S>
+impl<S: BosStr, St> FaunaBuilder<S, St>
 where
-    S: fauna_state::State,
-    S::GbifTaxonKeys: fauna_state::IsSet,
-    S::CreatedAt: fauna_state::IsSet,
+    St: fauna_state::State,
+    St::GbifTaxonKeys: fauna_state::IsSet,
+    St::CreatedAt: fauna_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Fauna<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Fauna<S> {
         Fauna {
             created_at: self._fields.0.unwrap(),
             gbif_taxon_keys: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Fauna<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Fauna<S> {
         Fauna {
             created_at: self._fields.0.unwrap(),
             gbif_taxon_keys: self._fields.1.unwrap(),

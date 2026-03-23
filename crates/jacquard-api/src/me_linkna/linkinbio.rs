@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use crate::me_linkna::linkinbio;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ConnectedServices<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ConnectedServices<S: BosStr = DefaultStr> {
     ///GitHub username.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub github_username: Option<S>,
@@ -56,11 +56,11 @@ pub struct ConnectedServices<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GithubContributionDay<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GithubContributionDay<S: BosStr = DefaultStr> {
     ///Number of contributions on this day.
     pub count: i64,
     ///Date in YYYY-MM-DD format.
@@ -77,11 +77,11 @@ pub struct GithubContributionDay<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GoodreadsBook<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GoodreadsBook<S: BosStr = DefaultStr> {
     ///Book author.
     pub author: S,
     ///URL to the book cover image.
@@ -105,11 +105,11 @@ pub struct GoodreadsBook<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct LinkCard<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct LinkCard<S: BosStr = DefaultStr> {
     ///Whether the card is visible on the public page. Defaults to true.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub enabled: Option<bool>,
@@ -140,11 +140,11 @@ pub struct LinkCard<S: Bos<str> + AsRef<str> = DefaultStr> {
     rename = "me.linkna.linkinbio",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Linkinbio<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Linkinbio<S: BosStr = DefaultStr> {
     ///Ordered list of cards on the page. Each card is a union of linkCard, widgetGoodreads, widgetGithub, or widgetTealfm.
     pub cards: Vec<LinkinbioCardsItem<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -167,11 +167,11 @@ pub struct Linkinbio<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum LinkinbioCardsItem<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum LinkinbioCardsItem<S: BosStr = DefaultStr> {
     #[serde(rename = "me.linkna.linkinbio#linkCard")]
     LinkCard(Box<linkinbio::LinkCard<S>>),
     #[serde(rename = "me.linkna.linkinbio#widgetGoodreads")]
@@ -188,11 +188,11 @@ pub enum LinkinbioCardsItem<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct LinkinbioGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct LinkinbioGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
@@ -205,11 +205,11 @@ pub struct LinkinbioGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SocialIcon<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SocialIcon<S: BosStr = DefaultStr> {
     ///Unique identifier for the icon.
     pub id: S,
     ///Platform identifier (e.g., 'bluesky', 'twitter', 'instagram').
@@ -226,11 +226,11 @@ pub struct SocialIcon<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct TealfmPlay<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct TealfmPlay<S: BosStr = DefaultStr> {
     ///Artist name(s).
     pub artist_name: S,
     ///URL to the album cover image (from Cover Art Archive).
@@ -257,11 +257,11 @@ pub struct TealfmPlay<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ThemeConfig<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ThemeConfig<S: BosStr = DefaultStr> {
     ///Page background color.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub background_color: Option<S>,
@@ -356,13 +356,13 @@ pub struct ThemeConfig<S: Bos<str> + AsRef<str> = DefaultStr> {
 /// Button content alignment. Default: left.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ThemeConfigButtonAlignment<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ThemeConfigButtonAlignment<S: BosStr = DefaultStr> {
     Left,
     Right,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> ThemeConfigButtonAlignment<S> {
+impl<S: BosStr> ThemeConfigButtonAlignment<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Left => "left",
@@ -380,19 +380,19 @@ impl<S: Bos<str> + AsRef<str>> ThemeConfigButtonAlignment<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ThemeConfigButtonAlignment<S> {
+impl<S: BosStr> core::fmt::Display for ThemeConfigButtonAlignment<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for ThemeConfigButtonAlignment<S> {
+impl<S: BosStr> AsRef<str> for ThemeConfigButtonAlignment<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for ThemeConfigButtonAlignment<S> {
+impl<S: BosStr> Serialize for ThemeConfigButtonAlignment<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -401,7 +401,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for ThemeConfigButtonAlignment<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
 for ThemeConfigButtonAlignment<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
@@ -412,14 +412,18 @@ for ThemeConfigButtonAlignment<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for ThemeConfigButtonAlignment<S> {
+impl<S: BosStr + Default> Default for ThemeConfigButtonAlignment<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for ThemeConfigButtonAlignment<S> {
-    type Output = ThemeConfigButtonAlignment<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for ThemeConfigButtonAlignment<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ThemeConfigButtonAlignment<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             ThemeConfigButtonAlignment::Left => ThemeConfigButtonAlignment::Left,
@@ -434,7 +438,7 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for ThemeConfigButtonAlignment<S> {
 /// Card/button border radius.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ThemeConfigCardBorderRadius<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ThemeConfigCardBorderRadius<S: BosStr = DefaultStr> {
     None,
     Sm,
     Md,
@@ -443,7 +447,7 @@ pub enum ThemeConfigCardBorderRadius<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> ThemeConfigCardBorderRadius<S> {
+impl<S: BosStr> ThemeConfigCardBorderRadius<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::None => "none",
@@ -467,19 +471,19 @@ impl<S: Bos<str> + AsRef<str>> ThemeConfigCardBorderRadius<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ThemeConfigCardBorderRadius<S> {
+impl<S: BosStr> core::fmt::Display for ThemeConfigCardBorderRadius<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for ThemeConfigCardBorderRadius<S> {
+impl<S: BosStr> AsRef<str> for ThemeConfigCardBorderRadius<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for ThemeConfigCardBorderRadius<S> {
+impl<S: BosStr> Serialize for ThemeConfigCardBorderRadius<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -488,7 +492,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for ThemeConfigCardBorderRadius<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
 for ThemeConfigCardBorderRadius<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
@@ -499,14 +503,18 @@ for ThemeConfigCardBorderRadius<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for ThemeConfigCardBorderRadius<S> {
+impl<S: BosStr + Default> Default for ThemeConfigCardBorderRadius<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for ThemeConfigCardBorderRadius<S> {
-    type Output = ThemeConfigCardBorderRadius<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for ThemeConfigCardBorderRadius<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ThemeConfigCardBorderRadius<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             ThemeConfigCardBorderRadius::None => ThemeConfigCardBorderRadius::None,
@@ -524,7 +532,7 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for ThemeConfigCardBorderRadius<S> {
 /// Card/button shadow intensity.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ThemeConfigCardShadow<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ThemeConfigCardShadow<S: BosStr = DefaultStr> {
     None,
     Sm,
     Md,
@@ -533,7 +541,7 @@ pub enum ThemeConfigCardShadow<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> ThemeConfigCardShadow<S> {
+impl<S: BosStr> ThemeConfigCardShadow<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::None => "none",
@@ -557,19 +565,19 @@ impl<S: Bos<str> + AsRef<str>> ThemeConfigCardShadow<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ThemeConfigCardShadow<S> {
+impl<S: BosStr> core::fmt::Display for ThemeConfigCardShadow<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for ThemeConfigCardShadow<S> {
+impl<S: BosStr> AsRef<str> for ThemeConfigCardShadow<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for ThemeConfigCardShadow<S> {
+impl<S: BosStr> Serialize for ThemeConfigCardShadow<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -578,8 +586,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for ThemeConfigCardShadow<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for ThemeConfigCardShadow<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ThemeConfigCardShadow<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -589,14 +596,18 @@ for ThemeConfigCardShadow<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for ThemeConfigCardShadow<S> {
+impl<S: BosStr + Default> Default for ThemeConfigCardShadow<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for ThemeConfigCardShadow<S> {
-    type Output = ThemeConfigCardShadow<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for ThemeConfigCardShadow<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ThemeConfigCardShadow<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             ThemeConfigCardShadow::None => ThemeConfigCardShadow::None,
@@ -614,13 +625,13 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for ThemeConfigCardShadow<S> {
 /// Custom cursor style. Default: default.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ThemeConfigCursorStyle<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ThemeConfigCursorStyle<S: BosStr = DefaultStr> {
     Default,
     HelloKitty,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> ThemeConfigCursorStyle<S> {
+impl<S: BosStr> ThemeConfigCursorStyle<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Default => "default",
@@ -638,19 +649,19 @@ impl<S: Bos<str> + AsRef<str>> ThemeConfigCursorStyle<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ThemeConfigCursorStyle<S> {
+impl<S: BosStr> core::fmt::Display for ThemeConfigCursorStyle<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for ThemeConfigCursorStyle<S> {
+impl<S: BosStr> AsRef<str> for ThemeConfigCursorStyle<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for ThemeConfigCursorStyle<S> {
+impl<S: BosStr> Serialize for ThemeConfigCursorStyle<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -659,8 +670,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for ThemeConfigCursorStyle<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for ThemeConfigCursorStyle<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ThemeConfigCursorStyle<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -670,14 +680,18 @@ for ThemeConfigCursorStyle<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for ThemeConfigCursorStyle<S> {
+impl<S: BosStr + Default> Default for ThemeConfigCursorStyle<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for ThemeConfigCursorStyle<S> {
-    type Output = ThemeConfigCursorStyle<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for ThemeConfigCursorStyle<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ThemeConfigCursorStyle<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             ThemeConfigCursorStyle::Default => ThemeConfigCursorStyle::Default,
@@ -692,14 +706,14 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for ThemeConfigCursorStyle<S> {
 /// Font size. Default: md.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ThemeConfigFontSize<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ThemeConfigFontSize<S: BosStr = DefaultStr> {
     Sm,
     Md,
     Lg,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> ThemeConfigFontSize<S> {
+impl<S: BosStr> ThemeConfigFontSize<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Sm => "sm",
@@ -719,19 +733,19 @@ impl<S: Bos<str> + AsRef<str>> ThemeConfigFontSize<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ThemeConfigFontSize<S> {
+impl<S: BosStr> core::fmt::Display for ThemeConfigFontSize<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for ThemeConfigFontSize<S> {
+impl<S: BosStr> AsRef<str> for ThemeConfigFontSize<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for ThemeConfigFontSize<S> {
+impl<S: BosStr> Serialize for ThemeConfigFontSize<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -740,8 +754,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for ThemeConfigFontSize<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for ThemeConfigFontSize<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ThemeConfigFontSize<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -751,14 +764,18 @@ for ThemeConfigFontSize<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for ThemeConfigFontSize<S> {
+impl<S: BosStr + Default> Default for ThemeConfigFontSize<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for ThemeConfigFontSize<S> {
-    type Output = ThemeConfigFontSize<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for ThemeConfigFontSize<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ThemeConfigFontSize<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             ThemeConfigFontSize::Sm => ThemeConfigFontSize::Sm,
@@ -772,7 +789,7 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for ThemeConfigFontSize<S> {
 /// Background particle effect. Default: none.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ThemeConfigParticles<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ThemeConfigParticles<S: BosStr = DefaultStr> {
     None,
     White,
     Blue,
@@ -780,7 +797,7 @@ pub enum ThemeConfigParticles<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> ThemeConfigParticles<S> {
+impl<S: BosStr> ThemeConfigParticles<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::None => "none",
@@ -802,19 +819,19 @@ impl<S: Bos<str> + AsRef<str>> ThemeConfigParticles<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ThemeConfigParticles<S> {
+impl<S: BosStr> core::fmt::Display for ThemeConfigParticles<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for ThemeConfigParticles<S> {
+impl<S: BosStr> AsRef<str> for ThemeConfigParticles<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for ThemeConfigParticles<S> {
+impl<S: BosStr> Serialize for ThemeConfigParticles<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -823,8 +840,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for ThemeConfigParticles<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for ThemeConfigParticles<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ThemeConfigParticles<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -834,14 +850,18 @@ for ThemeConfigParticles<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for ThemeConfigParticles<S> {
+impl<S: BosStr + Default> Default for ThemeConfigParticles<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for ThemeConfigParticles<S> {
-    type Output = ThemeConfigParticles<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for ThemeConfigParticles<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ThemeConfigParticles<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             ThemeConfigParticles::None => ThemeConfigParticles::None,
@@ -858,14 +878,14 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for ThemeConfigParticles<S> {
 /// Profile section alignment. Default: center.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ThemeConfigProfileAlignment<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ThemeConfigProfileAlignment<S: BosStr = DefaultStr> {
     Left,
     Center,
     Right,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> ThemeConfigProfileAlignment<S> {
+impl<S: BosStr> ThemeConfigProfileAlignment<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Left => "left",
@@ -885,19 +905,19 @@ impl<S: Bos<str> + AsRef<str>> ThemeConfigProfileAlignment<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ThemeConfigProfileAlignment<S> {
+impl<S: BosStr> core::fmt::Display for ThemeConfigProfileAlignment<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for ThemeConfigProfileAlignment<S> {
+impl<S: BosStr> AsRef<str> for ThemeConfigProfileAlignment<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for ThemeConfigProfileAlignment<S> {
+impl<S: BosStr> Serialize for ThemeConfigProfileAlignment<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -906,7 +926,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for ThemeConfigProfileAlignment<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
 for ThemeConfigProfileAlignment<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
@@ -917,14 +937,18 @@ for ThemeConfigProfileAlignment<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for ThemeConfigProfileAlignment<S> {
+impl<S: BosStr + Default> Default for ThemeConfigProfileAlignment<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for ThemeConfigProfileAlignment<S> {
-    type Output = ThemeConfigProfileAlignment<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for ThemeConfigProfileAlignment<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ThemeConfigProfileAlignment<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             ThemeConfigProfileAlignment::Left => ThemeConfigProfileAlignment::Left,
@@ -940,14 +964,14 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for ThemeConfigProfileAlignment<S> {
 /// Profile picture shape. Default: circle.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ThemeConfigProfilePictureShape<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ThemeConfigProfilePictureShape<S: BosStr = DefaultStr> {
     Circle,
     Rounded,
     Square,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> ThemeConfigProfilePictureShape<S> {
+impl<S: BosStr> ThemeConfigProfilePictureShape<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Circle => "circle",
@@ -967,19 +991,19 @@ impl<S: Bos<str> + AsRef<str>> ThemeConfigProfilePictureShape<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ThemeConfigProfilePictureShape<S> {
+impl<S: BosStr> core::fmt::Display for ThemeConfigProfilePictureShape<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for ThemeConfigProfilePictureShape<S> {
+impl<S: BosStr> AsRef<str> for ThemeConfigProfilePictureShape<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for ThemeConfigProfilePictureShape<S> {
+impl<S: BosStr> Serialize for ThemeConfigProfilePictureShape<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -988,7 +1012,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for ThemeConfigProfilePictureShape<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
 for ThemeConfigProfilePictureShape<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
@@ -999,14 +1023,18 @@ for ThemeConfigProfilePictureShape<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for ThemeConfigProfilePictureShape<S> {
+impl<S: BosStr + Default> Default for ThemeConfigProfilePictureShape<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for ThemeConfigProfilePictureShape<S> {
-    type Output = ThemeConfigProfilePictureShape<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for ThemeConfigProfilePictureShape<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ThemeConfigProfilePictureShape<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             ThemeConfigProfilePictureShape::Circle => {
@@ -1028,14 +1056,14 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for ThemeConfigProfilePictureShape<S> 
 /// Profile picture size. Default: sm.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ThemeConfigProfilePictureSize<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ThemeConfigProfilePictureSize<S: BosStr = DefaultStr> {
     Sm,
     Md,
     Lg,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> ThemeConfigProfilePictureSize<S> {
+impl<S: BosStr> ThemeConfigProfilePictureSize<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Sm => "sm",
@@ -1055,19 +1083,19 @@ impl<S: Bos<str> + AsRef<str>> ThemeConfigProfilePictureSize<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ThemeConfigProfilePictureSize<S> {
+impl<S: BosStr> core::fmt::Display for ThemeConfigProfilePictureSize<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for ThemeConfigProfilePictureSize<S> {
+impl<S: BosStr> AsRef<str> for ThemeConfigProfilePictureSize<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for ThemeConfigProfilePictureSize<S> {
+impl<S: BosStr> Serialize for ThemeConfigProfilePictureSize<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -1076,7 +1104,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for ThemeConfigProfilePictureSize<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
 for ThemeConfigProfilePictureSize<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
@@ -1087,14 +1115,18 @@ for ThemeConfigProfilePictureSize<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for ThemeConfigProfilePictureSize<S> {
+impl<S: BosStr + Default> Default for ThemeConfigProfilePictureSize<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for ThemeConfigProfilePictureSize<S> {
-    type Output = ThemeConfigProfilePictureSize<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for ThemeConfigProfilePictureSize<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ThemeConfigProfilePictureSize<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             ThemeConfigProfilePictureSize::Sm => ThemeConfigProfilePictureSize::Sm,
@@ -1110,13 +1142,13 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for ThemeConfigProfilePictureSize<S> {
 /// Social icons container shape. Default: dock.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ThemeConfigSocialIconsShape<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ThemeConfigSocialIconsShape<S: BosStr = DefaultStr> {
     Dock,
     Sphere,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> ThemeConfigSocialIconsShape<S> {
+impl<S: BosStr> ThemeConfigSocialIconsShape<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Dock => "dock",
@@ -1134,19 +1166,19 @@ impl<S: Bos<str> + AsRef<str>> ThemeConfigSocialIconsShape<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ThemeConfigSocialIconsShape<S> {
+impl<S: BosStr> core::fmt::Display for ThemeConfigSocialIconsShape<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for ThemeConfigSocialIconsShape<S> {
+impl<S: BosStr> AsRef<str> for ThemeConfigSocialIconsShape<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for ThemeConfigSocialIconsShape<S> {
+impl<S: BosStr> Serialize for ThemeConfigSocialIconsShape<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -1155,7 +1187,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for ThemeConfigSocialIconsShape<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
 for ThemeConfigSocialIconsShape<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
@@ -1166,14 +1198,18 @@ for ThemeConfigSocialIconsShape<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for ThemeConfigSocialIconsShape<S> {
+impl<S: BosStr + Default> Default for ThemeConfigSocialIconsShape<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for ThemeConfigSocialIconsShape<S> {
-    type Output = ThemeConfigSocialIconsShape<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for ThemeConfigSocialIconsShape<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ThemeConfigSocialIconsShape<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             ThemeConfigSocialIconsShape::Dock => ThemeConfigSocialIconsShape::Dock,
@@ -1191,11 +1227,11 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for ThemeConfigSocialIconsShape<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct WidgetGithub<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct WidgetGithub<S: BosStr = DefaultStr> {
     ///Contribution data for the last year.
     pub contributions: Vec<linkinbio::GithubContributionDay<S>>,
     ///Whether the widget is visible on the public page. Defaults to true.
@@ -1223,14 +1259,14 @@ pub struct WidgetGithub<S: Bos<str> + AsRef<str> = DefaultStr> {
 /// Widget display size. Default: 1x1.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum WidgetGithubSize<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum WidgetGithubSize<S: BosStr = DefaultStr> {
     _1x1,
     _1x2,
     _2x2,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> WidgetGithubSize<S> {
+impl<S: BosStr> WidgetGithubSize<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::_1x1 => "1x1",
@@ -1250,19 +1286,19 @@ impl<S: Bos<str> + AsRef<str>> WidgetGithubSize<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for WidgetGithubSize<S> {
+impl<S: BosStr> core::fmt::Display for WidgetGithubSize<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for WidgetGithubSize<S> {
+impl<S: BosStr> AsRef<str> for WidgetGithubSize<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for WidgetGithubSize<S> {
+impl<S: BosStr> Serialize for WidgetGithubSize<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -1271,8 +1307,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for WidgetGithubSize<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for WidgetGithubSize<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for WidgetGithubSize<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -1282,14 +1317,18 @@ for WidgetGithubSize<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for WidgetGithubSize<S> {
+impl<S: BosStr + Default> Default for WidgetGithubSize<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for WidgetGithubSize<S> {
-    type Output = WidgetGithubSize<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for WidgetGithubSize<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = WidgetGithubSize<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             WidgetGithubSize::_1x1 => WidgetGithubSize::_1x1,
@@ -1306,11 +1345,11 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for WidgetGithubSize<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct WidgetGoodreads<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct WidgetGoodreads<S: BosStr = DefaultStr> {
     ///Books on the currently-reading shelf.
     pub books: Vec<linkinbio::GoodreadsBook<S>>,
     ///Whether the widget is visible on the public page. Defaults to true.
@@ -1340,14 +1379,14 @@ pub struct WidgetGoodreads<S: Bos<str> + AsRef<str> = DefaultStr> {
 /// Widget display size. Default: 1x1.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum WidgetGoodreadsSize<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum WidgetGoodreadsSize<S: BosStr = DefaultStr> {
     _1x1,
     _1x2,
     _2x2,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> WidgetGoodreadsSize<S> {
+impl<S: BosStr> WidgetGoodreadsSize<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::_1x1 => "1x1",
@@ -1367,19 +1406,19 @@ impl<S: Bos<str> + AsRef<str>> WidgetGoodreadsSize<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for WidgetGoodreadsSize<S> {
+impl<S: BosStr> core::fmt::Display for WidgetGoodreadsSize<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for WidgetGoodreadsSize<S> {
+impl<S: BosStr> AsRef<str> for WidgetGoodreadsSize<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for WidgetGoodreadsSize<S> {
+impl<S: BosStr> Serialize for WidgetGoodreadsSize<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -1388,8 +1427,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for WidgetGoodreadsSize<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for WidgetGoodreadsSize<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for WidgetGoodreadsSize<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -1399,14 +1437,18 @@ for WidgetGoodreadsSize<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for WidgetGoodreadsSize<S> {
+impl<S: BosStr + Default> Default for WidgetGoodreadsSize<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for WidgetGoodreadsSize<S> {
-    type Output = WidgetGoodreadsSize<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for WidgetGoodreadsSize<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = WidgetGoodreadsSize<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             WidgetGoodreadsSize::_1x1 => WidgetGoodreadsSize::_1x1,
@@ -1423,11 +1465,11 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for WidgetGoodreadsSize<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct WidgetTealfm<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct WidgetTealfm<S: BosStr = DefaultStr> {
     ///Copyright notice for cover art images.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cover_art_notice: Option<S>,
@@ -1453,14 +1495,14 @@ pub struct WidgetTealfm<S: Bos<str> + AsRef<str> = DefaultStr> {
 /// Widget display size. Default: 1x1.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum WidgetTealfmSize<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum WidgetTealfmSize<S: BosStr = DefaultStr> {
     _1x1,
     _1x2,
     _2x2,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> WidgetTealfmSize<S> {
+impl<S: BosStr> WidgetTealfmSize<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::_1x1 => "1x1",
@@ -1480,19 +1522,19 @@ impl<S: Bos<str> + AsRef<str>> WidgetTealfmSize<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for WidgetTealfmSize<S> {
+impl<S: BosStr> core::fmt::Display for WidgetTealfmSize<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for WidgetTealfmSize<S> {
+impl<S: BosStr> AsRef<str> for WidgetTealfmSize<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for WidgetTealfmSize<S> {
+impl<S: BosStr> Serialize for WidgetTealfmSize<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -1501,8 +1543,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for WidgetTealfmSize<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for WidgetTealfmSize<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for WidgetTealfmSize<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -1512,14 +1553,18 @@ for WidgetTealfmSize<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for WidgetTealfmSize<S> {
+impl<S: BosStr + Default> Default for WidgetTealfmSize<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for WidgetTealfmSize<S> {
-    type Output = WidgetTealfmSize<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for WidgetTealfmSize<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = WidgetTealfmSize<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             WidgetTealfmSize::_1x1 => WidgetTealfmSize::_1x1,
@@ -1530,13 +1575,13 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for WidgetTealfmSize<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Linkinbio<S> {
+impl<S: BosStr> Linkinbio<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, LinkinbioRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ConnectedServices<S> {
+impl<S: BosStr> LexiconSchema for ConnectedServices<S> {
     fn nsid() -> &'static str {
         "me.linkna.linkinbio"
     }
@@ -1551,7 +1596,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for ConnectedServices<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for GithubContributionDay<S> {
+impl<S: BosStr> LexiconSchema for GithubContributionDay<S> {
     fn nsid() -> &'static str {
         "me.linkna.linkinbio"
     }
@@ -1586,7 +1631,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for GithubContributionDay<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for GoodreadsBook<S> {
+impl<S: BosStr> LexiconSchema for GoodreadsBook<S> {
     fn nsid() -> &'static str {
         "me.linkna.linkinbio"
     }
@@ -1619,7 +1664,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for GoodreadsBook<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for LinkCard<S> {
+impl<S: BosStr> LexiconSchema for LinkCard<S> {
     fn nsid() -> &'static str {
         "me.linkna.linkinbio"
     }
@@ -1651,17 +1696,17 @@ pub struct LinkinbioRecord;
 impl XrpcResp for LinkinbioRecord {
     const NSID: &'static str = "me.linkna.linkinbio";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = LinkinbioGetRecordOutput<S>;
+    type Output<S: BosStr> = LinkinbioGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<LinkinbioGetRecordOutput<S>> for Linkinbio<S> {
+impl<S: BosStr> From<LinkinbioGetRecordOutput<S>> for Linkinbio<S> {
     fn from(output: LinkinbioGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Linkinbio<S> {
+impl<S: BosStr> Collection for Linkinbio<S> {
     const NSID: &'static str = "me.linkna.linkinbio";
     type Record = LinkinbioRecord;
 }
@@ -1671,7 +1716,7 @@ impl Collection for LinkinbioRecord {
     type Record = LinkinbioRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Linkinbio<S> {
+impl<S: BosStr> LexiconSchema for Linkinbio<S> {
     fn nsid() -> &'static str {
         "me.linkna.linkinbio"
     }
@@ -1686,7 +1731,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Linkinbio<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for SocialIcon<S> {
+impl<S: BosStr> LexiconSchema for SocialIcon<S> {
     fn nsid() -> &'static str {
         "me.linkna.linkinbio"
     }
@@ -1701,7 +1746,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for SocialIcon<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for TealfmPlay<S> {
+impl<S: BosStr> LexiconSchema for TealfmPlay<S> {
     fn nsid() -> &'static str {
         "me.linkna.linkinbio"
     }
@@ -1716,7 +1761,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for TealfmPlay<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ThemeConfig<S> {
+impl<S: BosStr> LexiconSchema for ThemeConfig<S> {
     fn nsid() -> &'static str {
         "me.linkna.linkinbio"
     }
@@ -1772,7 +1817,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for ThemeConfig<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for WidgetGithub<S> {
+impl<S: BosStr> LexiconSchema for WidgetGithub<S> {
     fn nsid() -> &'static str {
         "me.linkna.linkinbio"
     }
@@ -1787,7 +1832,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for WidgetGithub<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for WidgetGoodreads<S> {
+impl<S: BosStr> LexiconSchema for WidgetGoodreads<S> {
     fn nsid() -> &'static str {
         "me.linkna.linkinbio"
     }
@@ -1802,7 +1847,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for WidgetGoodreads<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for WidgetTealfm<S> {
+impl<S: BosStr> LexiconSchema for WidgetTealfm<S> {
     fn nsid() -> &'static str {
         "me.linkna.linkinbio"
     }
@@ -2824,148 +2869,151 @@ pub mod github_contribution_day_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Date;
-        type Count;
         type Level;
+        type Count;
+        type Date;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Date = Unset;
-        type Count = Unset;
         type Level = Unset;
-    }
-    ///State transition - sets the `date` field to Set
-    pub struct SetDate<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDate<S> {}
-    impl<S: State> State for SetDate<S> {
-        type Date = Set<members::date>;
-        type Count = S::Count;
-        type Level = S::Level;
-    }
-    ///State transition - sets the `count` field to Set
-    pub struct SetCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCount<S> {}
-    impl<S: State> State for SetCount<S> {
-        type Date = S::Date;
-        type Count = Set<members::count>;
-        type Level = S::Level;
+        type Count = Unset;
+        type Date = Unset;
     }
     ///State transition - sets the `level` field to Set
-    pub struct SetLevel<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLevel<S> {}
-    impl<S: State> State for SetLevel<S> {
-        type Date = S::Date;
-        type Count = S::Count;
+    pub struct SetLevel<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLevel<St> {}
+    impl<St: State> State for SetLevel<St> {
         type Level = Set<members::level>;
+        type Count = St::Count;
+        type Date = St::Date;
+    }
+    ///State transition - sets the `count` field to Set
+    pub struct SetCount<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCount<St> {}
+    impl<St: State> State for SetCount<St> {
+        type Level = St::Level;
+        type Count = Set<members::count>;
+        type Date = St::Date;
+    }
+    ///State transition - sets the `date` field to Set
+    pub struct SetDate<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDate<St> {}
+    impl<St: State> State for SetDate<St> {
+        type Level = St::Level;
+        type Count = St::Count;
+        type Date = Set<members::date>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `date` field
-        pub struct date(());
-        ///Marker type for the `count` field
-        pub struct count(());
         ///Marker type for the `level` field
         pub struct level(());
+        ///Marker type for the `count` field
+        pub struct count(());
+        ///Marker type for the `date` field
+        pub struct date(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GithubContributionDayBuilder<'a, S: github_contribution_day_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GithubContributionDayBuilder<
+    S: BosStr,
+    St: github_contribution_day_state::State,
+> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<S>, Option<i64>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GithubContributionDay<'a> {
-    /// Create a new builder for this type
+impl<S: BosStr> GithubContributionDay<S> {
+    /// Create a new builder for this type.
     pub fn new() -> GithubContributionDayBuilder<
-        'a,
+        S,
         github_contribution_day_state::Empty,
     > {
         GithubContributionDayBuilder::new()
     }
 }
 
-impl<'a> GithubContributionDayBuilder<'a, github_contribution_day_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GithubContributionDayBuilder<S, github_contribution_day_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GithubContributionDayBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GithubContributionDayBuilder<'a, S>
+impl<S: BosStr, St> GithubContributionDayBuilder<S, St>
 where
-    S: github_contribution_day_state::State,
-    S::Count: github_contribution_day_state::IsUnset,
+    St: github_contribution_day_state::State,
+    St::Count: github_contribution_day_state::IsUnset,
 {
     /// Set the `count` field (required)
     pub fn count(
         mut self,
         value: impl Into<i64>,
-    ) -> GithubContributionDayBuilder<'a, github_contribution_day_state::SetCount<S>> {
+    ) -> GithubContributionDayBuilder<S, github_contribution_day_state::SetCount<St>> {
         self._fields.0 = Option::Some(value.into());
         GithubContributionDayBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GithubContributionDayBuilder<'a, S>
+impl<S: BosStr, St> GithubContributionDayBuilder<S, St>
 where
-    S: github_contribution_day_state::State,
-    S::Date: github_contribution_day_state::IsUnset,
+    St: github_contribution_day_state::State,
+    St::Date: github_contribution_day_state::IsUnset,
 {
     /// Set the `date` field (required)
     pub fn date(
         mut self,
         value: impl Into<S>,
-    ) -> GithubContributionDayBuilder<'a, github_contribution_day_state::SetDate<S>> {
+    ) -> GithubContributionDayBuilder<S, github_contribution_day_state::SetDate<St>> {
         self._fields.1 = Option::Some(value.into());
         GithubContributionDayBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GithubContributionDayBuilder<'a, S>
+impl<S: BosStr, St> GithubContributionDayBuilder<S, St>
 where
-    S: github_contribution_day_state::State,
-    S::Level: github_contribution_day_state::IsUnset,
+    St: github_contribution_day_state::State,
+    St::Level: github_contribution_day_state::IsUnset,
 {
     /// Set the `level` field (required)
     pub fn level(
         mut self,
         value: impl Into<i64>,
-    ) -> GithubContributionDayBuilder<'a, github_contribution_day_state::SetLevel<S>> {
+    ) -> GithubContributionDayBuilder<S, github_contribution_day_state::SetLevel<St>> {
         self._fields.2 = Option::Some(value.into());
         GithubContributionDayBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GithubContributionDayBuilder<'a, S>
+impl<S: BosStr, St> GithubContributionDayBuilder<S, St>
 where
-    S: github_contribution_day_state::State,
-    S::Date: github_contribution_day_state::IsSet,
-    S::Count: github_contribution_day_state::IsSet,
-    S::Level: github_contribution_day_state::IsSet,
+    St: github_contribution_day_state::State,
+    St::Level: github_contribution_day_state::IsSet,
+    St::Count: github_contribution_day_state::IsSet,
+    St::Date: github_contribution_day_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GithubContributionDay<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GithubContributionDay<S> {
         GithubContributionDay {
             count: self._fields.0.unwrap(),
             date: self._fields.1.unwrap(),
@@ -2973,11 +3021,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> GithubContributionDay<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> GithubContributionDay<S> {
         GithubContributionDay {
             count: self._fields.0.unwrap(),
             date: self._fields.1.unwrap(),
@@ -3006,9 +3054,9 @@ pub mod linkinbio_state {
         type Cards = Unset;
     }
     ///State transition - sets the `cards` field to Set
-    pub struct SetCards<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCards<S> {}
-    impl<S: State> State for SetCards<S> {
+    pub struct SetCards<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCards<St> {}
+    impl<St: State> State for SetCards<St> {
         type Cards = Set<members::cards>;
     }
     /// Marker types for field names
@@ -3019,9 +3067,9 @@ pub mod linkinbio_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct LinkinbioBuilder<'a, S: linkinbio_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct LinkinbioBuilder<S: BosStr, St: linkinbio_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<LinkinbioCardsItem<S>>>,
         Option<linkinbio::ConnectedServices<S>>,
@@ -3029,47 +3077,47 @@ pub struct LinkinbioBuilder<'a, S: linkinbio_state::State> {
         Option<S>,
         Option<linkinbio::ThemeConfig<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Linkinbio<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> LinkinbioBuilder<'a, linkinbio_state::Empty> {
+impl<S: BosStr> Linkinbio<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> LinkinbioBuilder<S, linkinbio_state::Empty> {
         LinkinbioBuilder::new()
     }
 }
 
-impl<'a> LinkinbioBuilder<'a, linkinbio_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> LinkinbioBuilder<S, linkinbio_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         LinkinbioBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LinkinbioBuilder<'a, S>
+impl<S: BosStr, St> LinkinbioBuilder<S, St>
 where
-    S: linkinbio_state::State,
-    S::Cards: linkinbio_state::IsUnset,
+    St: linkinbio_state::State,
+    St::Cards: linkinbio_state::IsUnset,
 {
     /// Set the `cards` field (required)
     pub fn cards(
         mut self,
         value: impl Into<Vec<LinkinbioCardsItem<S>>>,
-    ) -> LinkinbioBuilder<'a, linkinbio_state::SetCards<S>> {
+    ) -> LinkinbioBuilder<S, linkinbio_state::SetCards<St>> {
         self._fields.0 = Option::Some(value.into());
         LinkinbioBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: linkinbio_state::State> LinkinbioBuilder<'a, S> {
+impl<S: BosStr, St: linkinbio_state::State> LinkinbioBuilder<S, St> {
     /// Set the `connectedServices` field (optional)
     pub fn connected_services(
         mut self,
@@ -3088,7 +3136,7 @@ impl<'a, S: linkinbio_state::State> LinkinbioBuilder<'a, S> {
     }
 }
 
-impl<'a, S: linkinbio_state::State> LinkinbioBuilder<'a, S> {
+impl<S: BosStr, St: linkinbio_state::State> LinkinbioBuilder<S, St> {
     /// Set the `socialIcons` field (optional)
     pub fn social_icons(
         mut self,
@@ -3107,7 +3155,7 @@ impl<'a, S: linkinbio_state::State> LinkinbioBuilder<'a, S> {
     }
 }
 
-impl<'a, S: linkinbio_state::State> LinkinbioBuilder<'a, S> {
+impl<S: BosStr, St: linkinbio_state::State> LinkinbioBuilder<S, St> {
     /// Set the `theme` field (optional)
     pub fn theme(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -3120,7 +3168,7 @@ impl<'a, S: linkinbio_state::State> LinkinbioBuilder<'a, S> {
     }
 }
 
-impl<'a, S: linkinbio_state::State> LinkinbioBuilder<'a, S> {
+impl<S: BosStr, St: linkinbio_state::State> LinkinbioBuilder<S, St> {
     /// Set the `themeConfig` field (optional)
     pub fn theme_config(
         mut self,
@@ -3139,13 +3187,13 @@ impl<'a, S: linkinbio_state::State> LinkinbioBuilder<'a, S> {
     }
 }
 
-impl<'a, S> LinkinbioBuilder<'a, S>
+impl<S: BosStr, St> LinkinbioBuilder<S, St>
 where
-    S: linkinbio_state::State,
-    S::Cards: linkinbio_state::IsSet,
+    St: linkinbio_state::State,
+    St::Cards: linkinbio_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Linkinbio<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Linkinbio<S> {
         Linkinbio {
             cards: self._fields.0.unwrap(),
             connected_services: self._fields.1,
@@ -3155,11 +3203,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Linkinbio<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Linkinbio<S> {
         Linkinbio {
             cards: self._fields.0.unwrap(),
             connected_services: self._fields.1,
@@ -3181,145 +3229,145 @@ pub mod social_icon_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Platform;
         type Id;
+        type Platform;
         type Url;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Platform = Unset;
         type Id = Unset;
+        type Platform = Unset;
         type Url = Unset;
     }
-    ///State transition - sets the `platform` field to Set
-    pub struct SetPlatform<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPlatform<S> {}
-    impl<S: State> State for SetPlatform<S> {
-        type Platform = Set<members::platform>;
-        type Id = S::Id;
-        type Url = S::Url;
-    }
     ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type Platform = S::Platform;
+    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetId<St> {}
+    impl<St: State> State for SetId<St> {
         type Id = Set<members::id>;
-        type Url = S::Url;
+        type Platform = St::Platform;
+        type Url = St::Url;
+    }
+    ///State transition - sets the `platform` field to Set
+    pub struct SetPlatform<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPlatform<St> {}
+    impl<St: State> State for SetPlatform<St> {
+        type Id = St::Id;
+        type Platform = Set<members::platform>;
+        type Url = St::Url;
     }
     ///State transition - sets the `url` field to Set
-    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrl<S> {}
-    impl<S: State> State for SetUrl<S> {
-        type Platform = S::Platform;
-        type Id = S::Id;
+    pub struct SetUrl<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUrl<St> {}
+    impl<St: State> State for SetUrl<St> {
+        type Id = St::Id;
+        type Platform = St::Platform;
         type Url = Set<members::url>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `platform` field
-        pub struct platform(());
         ///Marker type for the `id` field
         pub struct id(());
+        ///Marker type for the `platform` field
+        pub struct platform(());
         ///Marker type for the `url` field
         pub struct url(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct SocialIconBuilder<'a, S: social_icon_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct SocialIconBuilder<S: BosStr, St: social_icon_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>, Option<UriValue<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> SocialIcon<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> SocialIconBuilder<'a, social_icon_state::Empty> {
+impl<S: BosStr> SocialIcon<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> SocialIconBuilder<S, social_icon_state::Empty> {
         SocialIconBuilder::new()
     }
 }
 
-impl<'a> SocialIconBuilder<'a, social_icon_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> SocialIconBuilder<S, social_icon_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SocialIconBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SocialIconBuilder<'a, S>
+impl<S: BosStr, St> SocialIconBuilder<S, St>
 where
-    S: social_icon_state::State,
-    S::Id: social_icon_state::IsUnset,
+    St: social_icon_state::State,
+    St::Id: social_icon_state::IsUnset,
 {
     /// Set the `id` field (required)
     pub fn id(
         mut self,
         value: impl Into<S>,
-    ) -> SocialIconBuilder<'a, social_icon_state::SetId<S>> {
+    ) -> SocialIconBuilder<S, social_icon_state::SetId<St>> {
         self._fields.0 = Option::Some(value.into());
         SocialIconBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SocialIconBuilder<'a, S>
+impl<S: BosStr, St> SocialIconBuilder<S, St>
 where
-    S: social_icon_state::State,
-    S::Platform: social_icon_state::IsUnset,
+    St: social_icon_state::State,
+    St::Platform: social_icon_state::IsUnset,
 {
     /// Set the `platform` field (required)
     pub fn platform(
         mut self,
         value: impl Into<S>,
-    ) -> SocialIconBuilder<'a, social_icon_state::SetPlatform<S>> {
+    ) -> SocialIconBuilder<S, social_icon_state::SetPlatform<St>> {
         self._fields.1 = Option::Some(value.into());
         SocialIconBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SocialIconBuilder<'a, S>
+impl<S: BosStr, St> SocialIconBuilder<S, St>
 where
-    S: social_icon_state::State,
-    S::Url: social_icon_state::IsUnset,
+    St: social_icon_state::State,
+    St::Url: social_icon_state::IsUnset,
 {
     /// Set the `url` field (required)
     pub fn url(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> SocialIconBuilder<'a, social_icon_state::SetUrl<S>> {
+    ) -> SocialIconBuilder<S, social_icon_state::SetUrl<St>> {
         self._fields.2 = Option::Some(value.into());
         SocialIconBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SocialIconBuilder<'a, S>
+impl<S: BosStr, St> SocialIconBuilder<S, St>
 where
-    S: social_icon_state::State,
-    S::Platform: social_icon_state::IsSet,
-    S::Id: social_icon_state::IsSet,
-    S::Url: social_icon_state::IsSet,
+    St: social_icon_state::State,
+    St::Id: social_icon_state::IsSet,
+    St::Platform: social_icon_state::IsSet,
+    St::Url: social_icon_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> SocialIcon<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> SocialIcon<S> {
         SocialIcon {
             id: self._fields.0.unwrap(),
             platform: self._fields.1.unwrap(),
@@ -3327,11 +3375,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> SocialIcon<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> SocialIcon<S> {
         SocialIcon {
             id: self._fields.0.unwrap(),
             platform: self._fields.1.unwrap(),
@@ -3351,73 +3399,73 @@ pub mod widget_github_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type GithubUsername;
         type Id;
-        type Contributions;
+        type GithubUsername;
         type Type;
+        type Contributions;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type GithubUsername = Unset;
         type Id = Unset;
-        type Contributions = Unset;
+        type GithubUsername = Unset;
         type Type = Unset;
-    }
-    ///State transition - sets the `github_username` field to Set
-    pub struct SetGithubUsername<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGithubUsername<S> {}
-    impl<S: State> State for SetGithubUsername<S> {
-        type GithubUsername = Set<members::github_username>;
-        type Id = S::Id;
-        type Contributions = S::Contributions;
-        type Type = S::Type;
+        type Contributions = Unset;
     }
     ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type GithubUsername = S::GithubUsername;
+    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetId<St> {}
+    impl<St: State> State for SetId<St> {
         type Id = Set<members::id>;
-        type Contributions = S::Contributions;
-        type Type = S::Type;
+        type GithubUsername = St::GithubUsername;
+        type Type = St::Type;
+        type Contributions = St::Contributions;
     }
-    ///State transition - sets the `contributions` field to Set
-    pub struct SetContributions<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContributions<S> {}
-    impl<S: State> State for SetContributions<S> {
-        type GithubUsername = S::GithubUsername;
-        type Id = S::Id;
-        type Contributions = Set<members::contributions>;
-        type Type = S::Type;
+    ///State transition - sets the `github_username` field to Set
+    pub struct SetGithubUsername<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetGithubUsername<St> {}
+    impl<St: State> State for SetGithubUsername<St> {
+        type Id = St::Id;
+        type GithubUsername = Set<members::github_username>;
+        type Type = St::Type;
+        type Contributions = St::Contributions;
     }
     ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type GithubUsername = S::GithubUsername;
-        type Id = S::Id;
-        type Contributions = S::Contributions;
+    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetType<St> {}
+    impl<St: State> State for SetType<St> {
+        type Id = St::Id;
+        type GithubUsername = St::GithubUsername;
         type Type = Set<members::r#type>;
+        type Contributions = St::Contributions;
+    }
+    ///State transition - sets the `contributions` field to Set
+    pub struct SetContributions<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetContributions<St> {}
+    impl<St: State> State for SetContributions<St> {
+        type Id = St::Id;
+        type GithubUsername = St::GithubUsername;
+        type Type = St::Type;
+        type Contributions = Set<members::contributions>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `github_username` field
-        pub struct github_username(());
         ///Marker type for the `id` field
         pub struct id(());
-        ///Marker type for the `contributions` field
-        pub struct contributions(());
+        ///Marker type for the `github_username` field
+        pub struct github_username(());
         ///Marker type for the `type` field
         pub struct r#type(());
+        ///Marker type for the `contributions` field
+        pub struct contributions(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct WidgetGithubBuilder<'a, S: widget_github_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct WidgetGithubBuilder<S: BosStr, St: widget_github_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<linkinbio::GithubContributionDay<S>>>,
         Option<bool>,
@@ -3428,47 +3476,47 @@ pub struct WidgetGithubBuilder<'a, S: widget_github_state::State> {
         Option<i64>,
         Option<S>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> WidgetGithub<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> WidgetGithubBuilder<'a, widget_github_state::Empty> {
+impl<S: BosStr> WidgetGithub<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> WidgetGithubBuilder<S, widget_github_state::Empty> {
         WidgetGithubBuilder::new()
     }
 }
 
-impl<'a> WidgetGithubBuilder<'a, widget_github_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> WidgetGithubBuilder<S, widget_github_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         WidgetGithubBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> WidgetGithubBuilder<'a, S>
+impl<S: BosStr, St> WidgetGithubBuilder<S, St>
 where
-    S: widget_github_state::State,
-    S::Contributions: widget_github_state::IsUnset,
+    St: widget_github_state::State,
+    St::Contributions: widget_github_state::IsUnset,
 {
     /// Set the `contributions` field (required)
     pub fn contributions(
         mut self,
         value: impl Into<Vec<linkinbio::GithubContributionDay<S>>>,
-    ) -> WidgetGithubBuilder<'a, widget_github_state::SetContributions<S>> {
+    ) -> WidgetGithubBuilder<S, widget_github_state::SetContributions<St>> {
         self._fields.0 = Option::Some(value.into());
         WidgetGithubBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: widget_github_state::State> WidgetGithubBuilder<'a, S> {
+impl<S: BosStr, St: widget_github_state::State> WidgetGithubBuilder<S, St> {
     /// Set the `enabled` field (optional)
     pub fn enabled(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.1 = value.into();
@@ -3481,45 +3529,45 @@ impl<'a, S: widget_github_state::State> WidgetGithubBuilder<'a, S> {
     }
 }
 
-impl<'a, S> WidgetGithubBuilder<'a, S>
+impl<S: BosStr, St> WidgetGithubBuilder<S, St>
 where
-    S: widget_github_state::State,
-    S::GithubUsername: widget_github_state::IsUnset,
+    St: widget_github_state::State,
+    St::GithubUsername: widget_github_state::IsUnset,
 {
     /// Set the `githubUsername` field (required)
     pub fn github_username(
         mut self,
         value: impl Into<S>,
-    ) -> WidgetGithubBuilder<'a, widget_github_state::SetGithubUsername<S>> {
+    ) -> WidgetGithubBuilder<S, widget_github_state::SetGithubUsername<St>> {
         self._fields.2 = Option::Some(value.into());
         WidgetGithubBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> WidgetGithubBuilder<'a, S>
+impl<S: BosStr, St> WidgetGithubBuilder<S, St>
 where
-    S: widget_github_state::State,
-    S::Id: widget_github_state::IsUnset,
+    St: widget_github_state::State,
+    St::Id: widget_github_state::IsUnset,
 {
     /// Set the `id` field (required)
     pub fn id(
         mut self,
         value: impl Into<S>,
-    ) -> WidgetGithubBuilder<'a, widget_github_state::SetId<S>> {
+    ) -> WidgetGithubBuilder<S, widget_github_state::SetId<St>> {
         self._fields.3 = Option::Some(value.into());
         WidgetGithubBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: widget_github_state::State> WidgetGithubBuilder<'a, S> {
+impl<S: BosStr, St: widget_github_state::State> WidgetGithubBuilder<S, St> {
     /// Set the `lastSyncedAt` field (optional)
     pub fn last_synced_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.4 = value.into();
@@ -3532,7 +3580,7 @@ impl<'a, S: widget_github_state::State> WidgetGithubBuilder<'a, S> {
     }
 }
 
-impl<'a, S: widget_github_state::State> WidgetGithubBuilder<'a, S> {
+impl<S: BosStr, St: widget_github_state::State> WidgetGithubBuilder<S, St> {
     /// Set the `size` field (optional)
     pub fn size(mut self, value: impl Into<Option<WidgetGithubSize<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -3545,7 +3593,7 @@ impl<'a, S: widget_github_state::State> WidgetGithubBuilder<'a, S> {
     }
 }
 
-impl<'a, S: widget_github_state::State> WidgetGithubBuilder<'a, S> {
+impl<S: BosStr, St: widget_github_state::State> WidgetGithubBuilder<S, St> {
     /// Set the `totalContributions` field (optional)
     pub fn total_contributions(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.6 = value.into();
@@ -3558,35 +3606,35 @@ impl<'a, S: widget_github_state::State> WidgetGithubBuilder<'a, S> {
     }
 }
 
-impl<'a, S> WidgetGithubBuilder<'a, S>
+impl<S: BosStr, St> WidgetGithubBuilder<S, St>
 where
-    S: widget_github_state::State,
-    S::Type: widget_github_state::IsUnset,
+    St: widget_github_state::State,
+    St::Type: widget_github_state::IsUnset,
 {
     /// Set the `type` field (required)
     pub fn r#type(
         mut self,
         value: impl Into<S>,
-    ) -> WidgetGithubBuilder<'a, widget_github_state::SetType<S>> {
+    ) -> WidgetGithubBuilder<S, widget_github_state::SetType<St>> {
         self._fields.7 = Option::Some(value.into());
         WidgetGithubBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> WidgetGithubBuilder<'a, S>
+impl<S: BosStr, St> WidgetGithubBuilder<S, St>
 where
-    S: widget_github_state::State,
-    S::GithubUsername: widget_github_state::IsSet,
-    S::Id: widget_github_state::IsSet,
-    S::Contributions: widget_github_state::IsSet,
-    S::Type: widget_github_state::IsSet,
+    St: widget_github_state::State,
+    St::Id: widget_github_state::IsSet,
+    St::GithubUsername: widget_github_state::IsSet,
+    St::Type: widget_github_state::IsSet,
+    St::Contributions: widget_github_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> WidgetGithub<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> WidgetGithub<S> {
         WidgetGithub {
             contributions: self._fields.0.unwrap(),
             enabled: self._fields.1,
@@ -3599,11 +3647,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> WidgetGithub<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> WidgetGithub<S> {
         WidgetGithub {
             contributions: self._fields.0.unwrap(),
             enabled: self._fields.1,
@@ -3628,91 +3676,91 @@ pub mod widget_goodreads_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Books;
         type Id;
-        type GoodreadsUserId;
-        type Type;
         type Shelf;
+        type GoodreadsUserId;
+        type Books;
+        type Type;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Books = Unset;
         type Id = Unset;
-        type GoodreadsUserId = Unset;
-        type Type = Unset;
         type Shelf = Unset;
-    }
-    ///State transition - sets the `books` field to Set
-    pub struct SetBooks<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBooks<S> {}
-    impl<S: State> State for SetBooks<S> {
-        type Books = Set<members::books>;
-        type Id = S::Id;
-        type GoodreadsUserId = S::GoodreadsUserId;
-        type Type = S::Type;
-        type Shelf = S::Shelf;
+        type GoodreadsUserId = Unset;
+        type Books = Unset;
+        type Type = Unset;
     }
     ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type Books = S::Books;
+    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetId<St> {}
+    impl<St: State> State for SetId<St> {
         type Id = Set<members::id>;
-        type GoodreadsUserId = S::GoodreadsUserId;
-        type Type = S::Type;
-        type Shelf = S::Shelf;
-    }
-    ///State transition - sets the `goodreads_user_id` field to Set
-    pub struct SetGoodreadsUserId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGoodreadsUserId<S> {}
-    impl<S: State> State for SetGoodreadsUserId<S> {
-        type Books = S::Books;
-        type Id = S::Id;
-        type GoodreadsUserId = Set<members::goodreads_user_id>;
-        type Type = S::Type;
-        type Shelf = S::Shelf;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type Books = S::Books;
-        type Id = S::Id;
-        type GoodreadsUserId = S::GoodreadsUserId;
-        type Type = Set<members::r#type>;
-        type Shelf = S::Shelf;
+        type Shelf = St::Shelf;
+        type GoodreadsUserId = St::GoodreadsUserId;
+        type Books = St::Books;
+        type Type = St::Type;
     }
     ///State transition - sets the `shelf` field to Set
-    pub struct SetShelf<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetShelf<S> {}
-    impl<S: State> State for SetShelf<S> {
-        type Books = S::Books;
-        type Id = S::Id;
-        type GoodreadsUserId = S::GoodreadsUserId;
-        type Type = S::Type;
+    pub struct SetShelf<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetShelf<St> {}
+    impl<St: State> State for SetShelf<St> {
+        type Id = St::Id;
         type Shelf = Set<members::shelf>;
+        type GoodreadsUserId = St::GoodreadsUserId;
+        type Books = St::Books;
+        type Type = St::Type;
+    }
+    ///State transition - sets the `goodreads_user_id` field to Set
+    pub struct SetGoodreadsUserId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetGoodreadsUserId<St> {}
+    impl<St: State> State for SetGoodreadsUserId<St> {
+        type Id = St::Id;
+        type Shelf = St::Shelf;
+        type GoodreadsUserId = Set<members::goodreads_user_id>;
+        type Books = St::Books;
+        type Type = St::Type;
+    }
+    ///State transition - sets the `books` field to Set
+    pub struct SetBooks<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBooks<St> {}
+    impl<St: State> State for SetBooks<St> {
+        type Id = St::Id;
+        type Shelf = St::Shelf;
+        type GoodreadsUserId = St::GoodreadsUserId;
+        type Books = Set<members::books>;
+        type Type = St::Type;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetType<St> {}
+    impl<St: State> State for SetType<St> {
+        type Id = St::Id;
+        type Shelf = St::Shelf;
+        type GoodreadsUserId = St::GoodreadsUserId;
+        type Books = St::Books;
+        type Type = Set<members::r#type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `books` field
-        pub struct books(());
         ///Marker type for the `id` field
         pub struct id(());
-        ///Marker type for the `goodreads_user_id` field
-        pub struct goodreads_user_id(());
-        ///Marker type for the `type` field
-        pub struct r#type(());
         ///Marker type for the `shelf` field
         pub struct shelf(());
+        ///Marker type for the `goodreads_user_id` field
+        pub struct goodreads_user_id(());
+        ///Marker type for the `books` field
+        pub struct books(());
+        ///Marker type for the `type` field
+        pub struct r#type(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct WidgetGoodreadsBuilder<'a, S: widget_goodreads_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct WidgetGoodreadsBuilder<S: BosStr, St: widget_goodreads_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<linkinbio::GoodreadsBook<S>>>,
         Option<bool>,
@@ -3724,47 +3772,47 @@ pub struct WidgetGoodreadsBuilder<'a, S: widget_goodreads_state::State> {
         Option<WidgetGoodreadsSize<S>>,
         Option<S>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> WidgetGoodreads<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> WidgetGoodreadsBuilder<'a, widget_goodreads_state::Empty> {
+impl<S: BosStr> WidgetGoodreads<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> WidgetGoodreadsBuilder<S, widget_goodreads_state::Empty> {
         WidgetGoodreadsBuilder::new()
     }
 }
 
-impl<'a> WidgetGoodreadsBuilder<'a, widget_goodreads_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> WidgetGoodreadsBuilder<S, widget_goodreads_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         WidgetGoodreadsBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> WidgetGoodreadsBuilder<'a, S>
+impl<S: BosStr, St> WidgetGoodreadsBuilder<S, St>
 where
-    S: widget_goodreads_state::State,
-    S::Books: widget_goodreads_state::IsUnset,
+    St: widget_goodreads_state::State,
+    St::Books: widget_goodreads_state::IsUnset,
 {
     /// Set the `books` field (required)
     pub fn books(
         mut self,
         value: impl Into<Vec<linkinbio::GoodreadsBook<S>>>,
-    ) -> WidgetGoodreadsBuilder<'a, widget_goodreads_state::SetBooks<S>> {
+    ) -> WidgetGoodreadsBuilder<S, widget_goodreads_state::SetBooks<St>> {
         self._fields.0 = Option::Some(value.into());
         WidgetGoodreadsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: widget_goodreads_state::State> WidgetGoodreadsBuilder<'a, S> {
+impl<S: BosStr, St: widget_goodreads_state::State> WidgetGoodreadsBuilder<S, St> {
     /// Set the `enabled` field (optional)
     pub fn enabled(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.1 = value.into();
@@ -3777,45 +3825,45 @@ impl<'a, S: widget_goodreads_state::State> WidgetGoodreadsBuilder<'a, S> {
     }
 }
 
-impl<'a, S> WidgetGoodreadsBuilder<'a, S>
+impl<S: BosStr, St> WidgetGoodreadsBuilder<S, St>
 where
-    S: widget_goodreads_state::State,
-    S::GoodreadsUserId: widget_goodreads_state::IsUnset,
+    St: widget_goodreads_state::State,
+    St::GoodreadsUserId: widget_goodreads_state::IsUnset,
 {
     /// Set the `goodreadsUserId` field (required)
     pub fn goodreads_user_id(
         mut self,
         value: impl Into<S>,
-    ) -> WidgetGoodreadsBuilder<'a, widget_goodreads_state::SetGoodreadsUserId<S>> {
+    ) -> WidgetGoodreadsBuilder<S, widget_goodreads_state::SetGoodreadsUserId<St>> {
         self._fields.2 = Option::Some(value.into());
         WidgetGoodreadsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> WidgetGoodreadsBuilder<'a, S>
+impl<S: BosStr, St> WidgetGoodreadsBuilder<S, St>
 where
-    S: widget_goodreads_state::State,
-    S::Id: widget_goodreads_state::IsUnset,
+    St: widget_goodreads_state::State,
+    St::Id: widget_goodreads_state::IsUnset,
 {
     /// Set the `id` field (required)
     pub fn id(
         mut self,
         value: impl Into<S>,
-    ) -> WidgetGoodreadsBuilder<'a, widget_goodreads_state::SetId<S>> {
+    ) -> WidgetGoodreadsBuilder<S, widget_goodreads_state::SetId<St>> {
         self._fields.3 = Option::Some(value.into());
         WidgetGoodreadsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: widget_goodreads_state::State> WidgetGoodreadsBuilder<'a, S> {
+impl<S: BosStr, St: widget_goodreads_state::State> WidgetGoodreadsBuilder<S, St> {
     /// Set the `lastSyncedAt` field (optional)
     pub fn last_synced_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.4 = value.into();
@@ -3828,7 +3876,7 @@ impl<'a, S: widget_goodreads_state::State> WidgetGoodreadsBuilder<'a, S> {
     }
 }
 
-impl<'a, S: widget_goodreads_state::State> WidgetGoodreadsBuilder<'a, S> {
+impl<S: BosStr, St: widget_goodreads_state::State> WidgetGoodreadsBuilder<S, St> {
     /// Set the `readBooks` field (optional)
     pub fn read_books(
         mut self,
@@ -3847,26 +3895,26 @@ impl<'a, S: widget_goodreads_state::State> WidgetGoodreadsBuilder<'a, S> {
     }
 }
 
-impl<'a, S> WidgetGoodreadsBuilder<'a, S>
+impl<S: BosStr, St> WidgetGoodreadsBuilder<S, St>
 where
-    S: widget_goodreads_state::State,
-    S::Shelf: widget_goodreads_state::IsUnset,
+    St: widget_goodreads_state::State,
+    St::Shelf: widget_goodreads_state::IsUnset,
 {
     /// Set the `shelf` field (required)
     pub fn shelf(
         mut self,
         value: impl Into<S>,
-    ) -> WidgetGoodreadsBuilder<'a, widget_goodreads_state::SetShelf<S>> {
+    ) -> WidgetGoodreadsBuilder<S, widget_goodreads_state::SetShelf<St>> {
         self._fields.6 = Option::Some(value.into());
         WidgetGoodreadsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: widget_goodreads_state::State> WidgetGoodreadsBuilder<'a, S> {
+impl<S: BosStr, St: widget_goodreads_state::State> WidgetGoodreadsBuilder<S, St> {
     /// Set the `size` field (optional)
     pub fn size(mut self, value: impl Into<Option<WidgetGoodreadsSize<S>>>) -> Self {
         self._fields.7 = value.into();
@@ -3879,36 +3927,36 @@ impl<'a, S: widget_goodreads_state::State> WidgetGoodreadsBuilder<'a, S> {
     }
 }
 
-impl<'a, S> WidgetGoodreadsBuilder<'a, S>
+impl<S: BosStr, St> WidgetGoodreadsBuilder<S, St>
 where
-    S: widget_goodreads_state::State,
-    S::Type: widget_goodreads_state::IsUnset,
+    St: widget_goodreads_state::State,
+    St::Type: widget_goodreads_state::IsUnset,
 {
     /// Set the `type` field (required)
     pub fn r#type(
         mut self,
         value: impl Into<S>,
-    ) -> WidgetGoodreadsBuilder<'a, widget_goodreads_state::SetType<S>> {
+    ) -> WidgetGoodreadsBuilder<S, widget_goodreads_state::SetType<St>> {
         self._fields.8 = Option::Some(value.into());
         WidgetGoodreadsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> WidgetGoodreadsBuilder<'a, S>
+impl<S: BosStr, St> WidgetGoodreadsBuilder<S, St>
 where
-    S: widget_goodreads_state::State,
-    S::Books: widget_goodreads_state::IsSet,
-    S::Id: widget_goodreads_state::IsSet,
-    S::GoodreadsUserId: widget_goodreads_state::IsSet,
-    S::Type: widget_goodreads_state::IsSet,
-    S::Shelf: widget_goodreads_state::IsSet,
+    St: widget_goodreads_state::State,
+    St::Id: widget_goodreads_state::IsSet,
+    St::Shelf: widget_goodreads_state::IsSet,
+    St::GoodreadsUserId: widget_goodreads_state::IsSet,
+    St::Books: widget_goodreads_state::IsSet,
+    St::Type: widget_goodreads_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> WidgetGoodreads<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> WidgetGoodreads<S> {
         WidgetGoodreads {
             books: self._fields.0.unwrap(),
             enabled: self._fields.1,
@@ -3922,11 +3970,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> WidgetGoodreads<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> WidgetGoodreads<S> {
         WidgetGoodreads {
             books: self._fields.0.unwrap(),
             enabled: self._fields.1,
@@ -3965,27 +4013,27 @@ pub mod widget_tealfm_state {
         type Plays = Unset;
     }
     ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
+    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetId<St> {}
+    impl<St: State> State for SetId<St> {
         type Id = Set<members::id>;
-        type Type = S::Type;
-        type Plays = S::Plays;
+        type Type = St::Type;
+        type Plays = St::Plays;
     }
     ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type Id = S::Id;
+    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetType<St> {}
+    impl<St: State> State for SetType<St> {
+        type Id = St::Id;
         type Type = Set<members::r#type>;
-        type Plays = S::Plays;
+        type Plays = St::Plays;
     }
     ///State transition - sets the `plays` field to Set
-    pub struct SetPlays<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPlays<S> {}
-    impl<S: State> State for SetPlays<S> {
-        type Id = S::Id;
-        type Type = S::Type;
+    pub struct SetPlays<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPlays<St> {}
+    impl<St: State> State for SetPlays<St> {
+        type Id = St::Id;
+        type Type = St::Type;
         type Plays = Set<members::plays>;
     }
     /// Marker types for field names
@@ -4000,9 +4048,9 @@ pub mod widget_tealfm_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct WidgetTealfmBuilder<'a, S: widget_tealfm_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct WidgetTealfmBuilder<S: BosStr, St: widget_tealfm_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
         Option<bool>,
@@ -4012,28 +4060,28 @@ pub struct WidgetTealfmBuilder<'a, S: widget_tealfm_state::State> {
         Option<WidgetTealfmSize<S>>,
         Option<S>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> WidgetTealfm<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> WidgetTealfmBuilder<'a, widget_tealfm_state::Empty> {
+impl<S: BosStr> WidgetTealfm<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> WidgetTealfmBuilder<S, widget_tealfm_state::Empty> {
         WidgetTealfmBuilder::new()
     }
 }
 
-impl<'a> WidgetTealfmBuilder<'a, widget_tealfm_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> WidgetTealfmBuilder<S, widget_tealfm_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         WidgetTealfmBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: widget_tealfm_state::State> WidgetTealfmBuilder<'a, S> {
+impl<S: BosStr, St: widget_tealfm_state::State> WidgetTealfmBuilder<S, St> {
     /// Set the `coverArtNotice` field (optional)
     pub fn cover_art_notice(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -4046,7 +4094,7 @@ impl<'a, S: widget_tealfm_state::State> WidgetTealfmBuilder<'a, S> {
     }
 }
 
-impl<'a, S: widget_tealfm_state::State> WidgetTealfmBuilder<'a, S> {
+impl<S: BosStr, St: widget_tealfm_state::State> WidgetTealfmBuilder<S, St> {
     /// Set the `enabled` field (optional)
     pub fn enabled(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.1 = value.into();
@@ -4059,26 +4107,26 @@ impl<'a, S: widget_tealfm_state::State> WidgetTealfmBuilder<'a, S> {
     }
 }
 
-impl<'a, S> WidgetTealfmBuilder<'a, S>
+impl<S: BosStr, St> WidgetTealfmBuilder<S, St>
 where
-    S: widget_tealfm_state::State,
-    S::Id: widget_tealfm_state::IsUnset,
+    St: widget_tealfm_state::State,
+    St::Id: widget_tealfm_state::IsUnset,
 {
     /// Set the `id` field (required)
     pub fn id(
         mut self,
         value: impl Into<S>,
-    ) -> WidgetTealfmBuilder<'a, widget_tealfm_state::SetId<S>> {
+    ) -> WidgetTealfmBuilder<S, widget_tealfm_state::SetId<St>> {
         self._fields.2 = Option::Some(value.into());
         WidgetTealfmBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: widget_tealfm_state::State> WidgetTealfmBuilder<'a, S> {
+impl<S: BosStr, St: widget_tealfm_state::State> WidgetTealfmBuilder<S, St> {
     /// Set the `lastSyncedAt` field (optional)
     pub fn last_synced_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.3 = value.into();
@@ -4091,26 +4139,26 @@ impl<'a, S: widget_tealfm_state::State> WidgetTealfmBuilder<'a, S> {
     }
 }
 
-impl<'a, S> WidgetTealfmBuilder<'a, S>
+impl<S: BosStr, St> WidgetTealfmBuilder<S, St>
 where
-    S: widget_tealfm_state::State,
-    S::Plays: widget_tealfm_state::IsUnset,
+    St: widget_tealfm_state::State,
+    St::Plays: widget_tealfm_state::IsUnset,
 {
     /// Set the `plays` field (required)
     pub fn plays(
         mut self,
         value: impl Into<Vec<linkinbio::TealfmPlay<S>>>,
-    ) -> WidgetTealfmBuilder<'a, widget_tealfm_state::SetPlays<S>> {
+    ) -> WidgetTealfmBuilder<S, widget_tealfm_state::SetPlays<St>> {
         self._fields.4 = Option::Some(value.into());
         WidgetTealfmBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: widget_tealfm_state::State> WidgetTealfmBuilder<'a, S> {
+impl<S: BosStr, St: widget_tealfm_state::State> WidgetTealfmBuilder<S, St> {
     /// Set the `size` field (optional)
     pub fn size(mut self, value: impl Into<Option<WidgetTealfmSize<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -4123,34 +4171,34 @@ impl<'a, S: widget_tealfm_state::State> WidgetTealfmBuilder<'a, S> {
     }
 }
 
-impl<'a, S> WidgetTealfmBuilder<'a, S>
+impl<S: BosStr, St> WidgetTealfmBuilder<S, St>
 where
-    S: widget_tealfm_state::State,
-    S::Type: widget_tealfm_state::IsUnset,
+    St: widget_tealfm_state::State,
+    St::Type: widget_tealfm_state::IsUnset,
 {
     /// Set the `type` field (required)
     pub fn r#type(
         mut self,
         value: impl Into<S>,
-    ) -> WidgetTealfmBuilder<'a, widget_tealfm_state::SetType<S>> {
+    ) -> WidgetTealfmBuilder<S, widget_tealfm_state::SetType<St>> {
         self._fields.6 = Option::Some(value.into());
         WidgetTealfmBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> WidgetTealfmBuilder<'a, S>
+impl<S: BosStr, St> WidgetTealfmBuilder<S, St>
 where
-    S: widget_tealfm_state::State,
-    S::Id: widget_tealfm_state::IsSet,
-    S::Type: widget_tealfm_state::IsSet,
-    S::Plays: widget_tealfm_state::IsSet,
+    St: widget_tealfm_state::State,
+    St::Id: widget_tealfm_state::IsSet,
+    St::Type: widget_tealfm_state::IsSet,
+    St::Plays: widget_tealfm_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> WidgetTealfm<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> WidgetTealfm<S> {
         WidgetTealfm {
             cover_art_notice: self._fields.0,
             enabled: self._fields.1,
@@ -4162,11 +4210,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> WidgetTealfm<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> WidgetTealfm<S> {
         WidgetTealfm {
             cover_art_notice: self._fields.0,
             enabled: self._fields.1,

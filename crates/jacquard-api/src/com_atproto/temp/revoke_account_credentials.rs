@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::value::Data;
@@ -18,18 +18,16 @@ use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct RevokeAccountCredentials<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct RevokeAccountCredentials<S: BosStr = DefaultStr> {
     pub account: AtIdentifier<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -38,12 +36,11 @@ pub struct RevokeAccountCredentialsResponse;
 impl jacquard_common::xrpc::XrpcResp for RevokeAccountCredentialsResponse {
     const NSID: &'static str = "com.atproto.temp.revokeAccountCredentials";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ();
+    type Output<S: BosStr> = ();
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for RevokeAccountCredentials<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for RevokeAccountCredentials<S> {
     const NSID: &'static str = "com.atproto.temp.revokeAccountCredentials";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -58,7 +55,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for RevokeAccountCredentialsRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = RevokeAccountCredentials<S>;
+    type Request<S: BosStr> = RevokeAccountCredentials<S>;
     type Response = RevokeAccountCredentialsResponse;
 }
 
@@ -81,9 +78,9 @@ pub mod revoke_account_credentials_state {
         type Account = Unset;
     }
     ///State transition - sets the `account` field to Set
-    pub struct SetAccount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAccount<S> {}
-    impl<S: State> State for SetAccount<S> {
+    pub struct SetAccount<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAccount<St> {}
+    impl<St: State> State for SetAccount<St> {
         type Account = Set<members::account>;
     }
     /// Marker types for field names
@@ -94,76 +91,78 @@ pub mod revoke_account_credentials_state {
     }
 }
 
-/// Builder for constructing an instance of this type
+/// Builder for constructing an instance of this type.
 pub struct RevokeAccountCredentialsBuilder<
-    'a,
-    S: revoke_account_credentials_state::State,
+    S: BosStr,
+    St: revoke_account_credentials_state::State,
 > {
-    _state: PhantomData<fn() -> S>,
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtIdentifier<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> RevokeAccountCredentials<'a> {
-    /// Create a new builder for this type
+impl<S: BosStr> RevokeAccountCredentials<S> {
+    /// Create a new builder for this type.
     pub fn new() -> RevokeAccountCredentialsBuilder<
-        'a,
+        S,
         revoke_account_credentials_state::Empty,
     > {
         RevokeAccountCredentialsBuilder::new()
     }
 }
 
-impl<'a> RevokeAccountCredentialsBuilder<'a, revoke_account_credentials_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<
+    S: BosStr,
+> RevokeAccountCredentialsBuilder<S, revoke_account_credentials_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         RevokeAccountCredentialsBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RevokeAccountCredentialsBuilder<'a, S>
+impl<S: BosStr, St> RevokeAccountCredentialsBuilder<S, St>
 where
-    S: revoke_account_credentials_state::State,
-    S::Account: revoke_account_credentials_state::IsUnset,
+    St: revoke_account_credentials_state::State,
+    St::Account: revoke_account_credentials_state::IsUnset,
 {
     /// Set the `account` field (required)
     pub fn account(
         mut self,
         value: impl Into<AtIdentifier<S>>,
     ) -> RevokeAccountCredentialsBuilder<
-        'a,
-        revoke_account_credentials_state::SetAccount<S>,
+        S,
+        revoke_account_credentials_state::SetAccount<St>,
     > {
         self._fields.0 = Option::Some(value.into());
         RevokeAccountCredentialsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RevokeAccountCredentialsBuilder<'a, S>
+impl<S: BosStr, St> RevokeAccountCredentialsBuilder<S, St>
 where
-    S: revoke_account_credentials_state::State,
-    S::Account: revoke_account_credentials_state::IsSet,
+    St: revoke_account_credentials_state::State,
+    St::Account: revoke_account_credentials_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> RevokeAccountCredentials<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> RevokeAccountCredentials<S> {
         RevokeAccountCredentials {
             account: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> RevokeAccountCredentials<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> RevokeAccountCredentials<S> {
         RevokeAccountCredentials {
             account: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

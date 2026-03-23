@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
@@ -18,37 +18,32 @@ use serde::{Serialize, Deserialize};
 use crate::at_inlay::Response;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Fragment<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Fragment<S: BosStr = DefaultStr> {
     pub children: Data<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct FragmentOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct FragmentOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
-    #[serde(borrow)]
     pub value: Response<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -57,12 +52,11 @@ pub struct FragmentResponse;
 impl jacquard_common::xrpc::XrpcResp for FragmentResponse {
     const NSID: &'static str = "at.inlay.Fragment";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = FragmentOutput<S>;
+    type Output<S: BosStr> = FragmentOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for Fragment<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Fragment<S> {
     const NSID: &'static str = "at.inlay.Fragment";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -77,7 +71,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for FragmentRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = Fragment<S>;
+    type Request<S: BosStr> = Fragment<S>;
     type Response = FragmentResponse;
 }
 
@@ -100,9 +94,9 @@ pub mod fragment_state {
         type Children = Unset;
     }
     ///State transition - sets the `children` field to Set
-    pub struct SetChildren<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetChildren<S> {}
-    impl<S: State> State for SetChildren<S> {
+    pub struct SetChildren<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetChildren<St> {}
+    impl<St: State> State for SetChildren<St> {
         type Children = Set<members::children>;
     }
     /// Marker types for field names
@@ -113,67 +107,64 @@ pub mod fragment_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct FragmentBuilder<'a, S: fragment_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct FragmentBuilder<S: BosStr, St: fragment_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Data<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Fragment<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> FragmentBuilder<'a, fragment_state::Empty> {
+impl<S: BosStr> Fragment<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> FragmentBuilder<S, fragment_state::Empty> {
         FragmentBuilder::new()
     }
 }
 
-impl<'a> FragmentBuilder<'a, fragment_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> FragmentBuilder<S, fragment_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         FragmentBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> FragmentBuilder<'a, S>
+impl<S: BosStr, St> FragmentBuilder<S, St>
 where
-    S: fragment_state::State,
-    S::Children: fragment_state::IsUnset,
+    St: fragment_state::State,
+    St::Children: fragment_state::IsUnset,
 {
     /// Set the `children` field (required)
     pub fn children(
         mut self,
         value: impl Into<Data<S>>,
-    ) -> FragmentBuilder<'a, fragment_state::SetChildren<S>> {
+    ) -> FragmentBuilder<S, fragment_state::SetChildren<St>> {
         self._fields.0 = Option::Some(value.into());
         FragmentBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> FragmentBuilder<'a, S>
+impl<S: BosStr, St> FragmentBuilder<S, St>
 where
-    S: fragment_state::State,
-    S::Children: fragment_state::IsSet,
+    St: fragment_state::State,
+    St::Children: fragment_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Fragment<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Fragment<S> {
         Fragment {
             children: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Fragment<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Fragment<S> {
         Fragment {
             children: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

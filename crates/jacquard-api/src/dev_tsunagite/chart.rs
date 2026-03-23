@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
 
 #[allow(unused_imports)]
@@ -39,11 +39,11 @@ use crate::dev_tsunagite::types::TypedRef;
     rename = "dev.tsunagite.chart",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Chart<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Chart<S: BosStr = DefaultStr> {
     ///The difficulty slot this chart is placed in. Can be an inline definition or a reference to a standard-defined difficulty slot.
     pub difficulty: ChartDifficulty<S>,
     ///The game this chart is included in. URI must point to a record of type `dev.tsunagite.game`.
@@ -71,11 +71,11 @@ pub struct Chart<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ChartDifficulty<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ChartDifficulty<S: BosStr = DefaultStr> {
     #[serde(rename = "dev.tsunagite.difficulty")]
     Difficulty(Box<Difficulty<S>>),
     #[serde(rename = "dev.tsunagite.types#typedRef")]
@@ -88,18 +88,18 @@ pub enum ChartDifficulty<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ChartGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ChartGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Chart<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Chart<S> {
+impl<S: BosStr> Chart<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, ChartRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -112,17 +112,17 @@ pub struct ChartRecord;
 impl XrpcResp for ChartRecord {
     const NSID: &'static str = "dev.tsunagite.chart";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ChartGetRecordOutput<S>;
+    type Output<S: BosStr> = ChartGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<ChartGetRecordOutput<S>> for Chart<S> {
+impl<S: BosStr> From<ChartGetRecordOutput<S>> for Chart<S> {
     fn from(output: ChartGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Chart<S> {
+impl<S: BosStr> Collection for Chart<S> {
     const NSID: &'static str = "dev.tsunagite.chart";
     type Record = ChartRecord;
 }
@@ -132,7 +132,7 @@ impl Collection for ChartRecord {
     type Record = ChartRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Chart<S> {
+impl<S: BosStr> LexiconSchema for Chart<S> {
     fn nsid() -> &'static str {
         "dev.tsunagite.chart"
     }
@@ -203,73 +203,73 @@ pub mod chart_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Song;
-        type Game;
-        type Rating;
         type Difficulty;
+        type Game;
+        type Song;
+        type Rating;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Song = Unset;
-        type Game = Unset;
-        type Rating = Unset;
         type Difficulty = Unset;
-    }
-    ///State transition - sets the `song` field to Set
-    pub struct SetSong<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSong<S> {}
-    impl<S: State> State for SetSong<S> {
-        type Song = Set<members::song>;
-        type Game = S::Game;
-        type Rating = S::Rating;
-        type Difficulty = S::Difficulty;
-    }
-    ///State transition - sets the `game` field to Set
-    pub struct SetGame<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGame<S> {}
-    impl<S: State> State for SetGame<S> {
-        type Song = S::Song;
-        type Game = Set<members::game>;
-        type Rating = S::Rating;
-        type Difficulty = S::Difficulty;
-    }
-    ///State transition - sets the `rating` field to Set
-    pub struct SetRating<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRating<S> {}
-    impl<S: State> State for SetRating<S> {
-        type Song = S::Song;
-        type Game = S::Game;
-        type Rating = Set<members::rating>;
-        type Difficulty = S::Difficulty;
+        type Game = Unset;
+        type Song = Unset;
+        type Rating = Unset;
     }
     ///State transition - sets the `difficulty` field to Set
-    pub struct SetDifficulty<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDifficulty<S> {}
-    impl<S: State> State for SetDifficulty<S> {
-        type Song = S::Song;
-        type Game = S::Game;
-        type Rating = S::Rating;
+    pub struct SetDifficulty<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDifficulty<St> {}
+    impl<St: State> State for SetDifficulty<St> {
         type Difficulty = Set<members::difficulty>;
+        type Game = St::Game;
+        type Song = St::Song;
+        type Rating = St::Rating;
+    }
+    ///State transition - sets the `game` field to Set
+    pub struct SetGame<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetGame<St> {}
+    impl<St: State> State for SetGame<St> {
+        type Difficulty = St::Difficulty;
+        type Game = Set<members::game>;
+        type Song = St::Song;
+        type Rating = St::Rating;
+    }
+    ///State transition - sets the `song` field to Set
+    pub struct SetSong<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSong<St> {}
+    impl<St: State> State for SetSong<St> {
+        type Difficulty = St::Difficulty;
+        type Game = St::Game;
+        type Song = Set<members::song>;
+        type Rating = St::Rating;
+    }
+    ///State transition - sets the `rating` field to Set
+    pub struct SetRating<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRating<St> {}
+    impl<St: State> State for SetRating<St> {
+        type Difficulty = St::Difficulty;
+        type Game = St::Game;
+        type Song = St::Song;
+        type Rating = Set<members::rating>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `song` field
-        pub struct song(());
-        ///Marker type for the `game` field
-        pub struct game(());
-        ///Marker type for the `rating` field
-        pub struct rating(());
         ///Marker type for the `difficulty` field
         pub struct difficulty(());
+        ///Marker type for the `game` field
+        pub struct game(());
+        ///Marker type for the `song` field
+        pub struct song(());
+        ///Marker type for the `rating` field
+        pub struct rating(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ChartBuilder<'a, S: chart_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ChartBuilder<S: BosStr, St: chart_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<ChartDifficulty<S>>,
         Option<AtUri<S>>,
@@ -279,66 +279,66 @@ pub struct ChartBuilder<'a, S: chart_state::State> {
         Option<S>,
         Option<AtUri<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Chart<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ChartBuilder<'a, chart_state::Empty> {
+impl<S: BosStr> Chart<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ChartBuilder<S, chart_state::Empty> {
         ChartBuilder::new()
     }
 }
 
-impl<'a> ChartBuilder<'a, chart_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ChartBuilder<S, chart_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ChartBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ChartBuilder<'a, S>
+impl<S: BosStr, St> ChartBuilder<S, St>
 where
-    S: chart_state::State,
-    S::Difficulty: chart_state::IsUnset,
+    St: chart_state::State,
+    St::Difficulty: chart_state::IsUnset,
 {
     /// Set the `difficulty` field (required)
     pub fn difficulty(
         mut self,
         value: impl Into<ChartDifficulty<S>>,
-    ) -> ChartBuilder<'a, chart_state::SetDifficulty<S>> {
+    ) -> ChartBuilder<S, chart_state::SetDifficulty<St>> {
         self._fields.0 = Option::Some(value.into());
         ChartBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ChartBuilder<'a, S>
+impl<S: BosStr, St> ChartBuilder<S, St>
 where
-    S: chart_state::State,
-    S::Game: chart_state::IsUnset,
+    St: chart_state::State,
+    St::Game: chart_state::IsUnset,
 {
     /// Set the `game` field (required)
     pub fn game(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> ChartBuilder<'a, chart_state::SetGame<S>> {
+    ) -> ChartBuilder<S, chart_state::SetGame<St>> {
         self._fields.1 = Option::Some(value.into());
         ChartBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: chart_state::State> ChartBuilder<'a, S> {
+impl<S: BosStr, St: chart_state::State> ChartBuilder<S, St> {
     /// Set the `jacket` field (optional)
     pub fn jacket(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -351,7 +351,7 @@ impl<'a, S: chart_state::State> ChartBuilder<'a, S> {
     }
 }
 
-impl<'a, S: chart_state::State> ChartBuilder<'a, S> {
+impl<S: BosStr, St: chart_state::State> ChartBuilder<S, St> {
     /// Set the `jacketArtist` field (optional)
     pub fn jacket_artist(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -364,7 +364,7 @@ impl<'a, S: chart_state::State> ChartBuilder<'a, S> {
     }
 }
 
-impl<'a, S: chart_state::State> ChartBuilder<'a, S> {
+impl<S: BosStr, St: chart_state::State> ChartBuilder<S, St> {
     /// Set the `rankedVersions` field (optional)
     pub fn ranked_versions(mut self, value: impl Into<Option<Vec<Bytes>>>) -> Self {
         self._fields.4 = value.into();
@@ -377,54 +377,54 @@ impl<'a, S: chart_state::State> ChartBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ChartBuilder<'a, S>
+impl<S: BosStr, St> ChartBuilder<S, St>
 where
-    S: chart_state::State,
-    S::Rating: chart_state::IsUnset,
+    St: chart_state::State,
+    St::Rating: chart_state::IsUnset,
 {
     /// Set the `rating` field (required)
     pub fn rating(
         mut self,
         value: impl Into<S>,
-    ) -> ChartBuilder<'a, chart_state::SetRating<S>> {
+    ) -> ChartBuilder<S, chart_state::SetRating<St>> {
         self._fields.5 = Option::Some(value.into());
         ChartBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ChartBuilder<'a, S>
+impl<S: BosStr, St> ChartBuilder<S, St>
 where
-    S: chart_state::State,
-    S::Song: chart_state::IsUnset,
+    St: chart_state::State,
+    St::Song: chart_state::IsUnset,
 {
     /// Set the `song` field (required)
     pub fn song(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> ChartBuilder<'a, chart_state::SetSong<S>> {
+    ) -> ChartBuilder<S, chart_state::SetSong<St>> {
         self._fields.6 = Option::Some(value.into());
         ChartBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ChartBuilder<'a, S>
+impl<S: BosStr, St> ChartBuilder<S, St>
 where
-    S: chart_state::State,
-    S::Song: chart_state::IsSet,
-    S::Game: chart_state::IsSet,
-    S::Rating: chart_state::IsSet,
-    S::Difficulty: chart_state::IsSet,
+    St: chart_state::State,
+    St::Difficulty: chart_state::IsSet,
+    St::Game: chart_state::IsSet,
+    St::Song: chart_state::IsSet,
+    St::Rating: chart_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Chart<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Chart<S> {
         Chart {
             difficulty: self._fields.0.unwrap(),
             game: self._fields.1.unwrap(),
@@ -436,8 +436,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Chart<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Chart<S> {
         Chart {
             difficulty: self._fields.0.unwrap(),
             game: self._fields.1.unwrap(),

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "garden.lexicon.unconquered-modesto.example",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Example<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Example<S: BosStr = DefaultStr> {
     pub message2: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -51,18 +51,18 @@ pub struct Example<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ExampleGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ExampleGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Example<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Example<S> {
+impl<S: BosStr> Example<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, ExampleRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -75,17 +75,17 @@ pub struct ExampleRecord;
 impl XrpcResp for ExampleRecord {
     const NSID: &'static str = "garden.lexicon.unconquered-modesto.example";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ExampleGetRecordOutput<S>;
+    type Output<S: BosStr> = ExampleGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<ExampleGetRecordOutput<S>> for Example<S> {
+impl<S: BosStr> From<ExampleGetRecordOutput<S>> for Example<S> {
     fn from(output: ExampleGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Example<S> {
+impl<S: BosStr> Collection for Example<S> {
     const NSID: &'static str = "garden.lexicon.unconquered-modesto.example";
     type Record = ExampleRecord;
 }
@@ -95,7 +95,7 @@ impl Collection for ExampleRecord {
     type Record = ExampleRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Example<S> {
+impl<S: BosStr> LexiconSchema for Example<S> {
     fn nsid() -> &'static str {
         "garden.lexicon.unconquered-modesto.example"
     }
@@ -129,9 +129,9 @@ pub mod example_state {
         type Message2 = Unset;
     }
     ///State transition - sets the `message2` field to Set
-    pub struct SetMessage2<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMessage2<S> {}
-    impl<S: State> State for SetMessage2<S> {
+    pub struct SetMessage2<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMessage2<St> {}
+    impl<St: State> State for SetMessage2<St> {
         type Message2 = Set<members::message2>;
     }
     /// Marker types for field names
@@ -142,67 +142,64 @@ pub mod example_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ExampleBuilder<'a, S: example_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ExampleBuilder<S: BosStr, St: example_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Example<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ExampleBuilder<'a, example_state::Empty> {
+impl<S: BosStr> Example<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ExampleBuilder<S, example_state::Empty> {
         ExampleBuilder::new()
     }
 }
 
-impl<'a> ExampleBuilder<'a, example_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ExampleBuilder<S, example_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ExampleBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ExampleBuilder<'a, S>
+impl<S: BosStr, St> ExampleBuilder<S, St>
 where
-    S: example_state::State,
-    S::Message2: example_state::IsUnset,
+    St: example_state::State,
+    St::Message2: example_state::IsUnset,
 {
     /// Set the `message2` field (required)
     pub fn message2(
         mut self,
         value: impl Into<S>,
-    ) -> ExampleBuilder<'a, example_state::SetMessage2<S>> {
+    ) -> ExampleBuilder<S, example_state::SetMessage2<St>> {
         self._fields.0 = Option::Some(value.into());
         ExampleBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ExampleBuilder<'a, S>
+impl<S: BosStr, St> ExampleBuilder<S, St>
 where
-    S: example_state::State,
-    S::Message2: example_state::IsSet,
+    St: example_state::State,
+    St::Message2: example_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Example<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Example<S> {
         Example {
             message2: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Example<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Example<S> {
         Example {
             message2: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

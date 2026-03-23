@@ -6,7 +6,13 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[allow(unused_imports)]
+use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
@@ -25,7 +31,7 @@ pub struct SeekResponse;
 impl jacquard_common::xrpc::XrpcResp for SeekResponse {
     const NSID: &'static str = "app.rocksky.spotify.seek";
     const ENCODING: &'static str = "application/json";
-    type Output<S: jacquard_common::Bos<str> + AsRef<str>> = ();
+    type Output<S: BosStr> = ();
     type Err = jacquard_common::xrpc::GenericError;
 }
 
@@ -44,7 +50,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for SeekRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: jacquard_common::Bos<str> + AsRef<str>> = Seek;
+    type Request<S: BosStr> = Seek;
     type Response = SeekResponse;
 }
 
@@ -67,9 +73,9 @@ pub mod seek_params_state {
         type Position = Unset;
     }
     ///State transition - sets the `position` field to Set
-    pub struct SetPosition<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPosition<S> {}
-    impl<S: State> State for SetPosition<S> {
+    pub struct SetPosition<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPosition<St> {}
+    impl<St: State> State for SetPosition<St> {
         type Position = Set<members::position>;
     }
     /// Marker types for field names
@@ -80,21 +86,21 @@ pub mod seek_params_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct SeekParamsBuilder<S: seek_params_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct SeekParamsBuilder<St: seek_params_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>,),
 }
 
 impl SeekParams {
-    /// Create a new builder for this type
+    /// Create a new builder for this type.
     pub fn new() -> SeekParamsBuilder<seek_params_state::Empty> {
         SeekParamsBuilder::new()
     }
 }
 
 impl SeekParamsBuilder<seek_params_state::Empty> {
-    /// Create a new builder with all fields unset
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SeekParamsBuilder {
             _state: PhantomData,
@@ -103,16 +109,16 @@ impl SeekParamsBuilder<seek_params_state::Empty> {
     }
 }
 
-impl<S> SeekParamsBuilder<S>
+impl<St> SeekParamsBuilder<St>
 where
-    S: seek_params_state::State,
-    S::Position: seek_params_state::IsUnset,
+    St: seek_params_state::State,
+    St::Position: seek_params_state::IsUnset,
 {
     /// Set the `position` field (required)
     pub fn position(
         mut self,
         value: impl Into<i64>,
-    ) -> SeekParamsBuilder<seek_params_state::SetPosition<S>> {
+    ) -> SeekParamsBuilder<seek_params_state::SetPosition<St>> {
         self._fields.0 = Option::Some(value.into());
         SeekParamsBuilder {
             _state: PhantomData,
@@ -121,12 +127,12 @@ where
     }
 }
 
-impl<S> SeekParamsBuilder<S>
+impl<St> SeekParamsBuilder<St>
 where
-    S: seek_params_state::State,
-    S::Position: seek_params_state::IsSet,
+    St: seek_params_state::State,
+    St::Position: seek_params_state::IsSet,
 {
-    /// Build the final struct
+    /// Build the final struct.
     pub fn build(self) -> SeekParams {
         SeekParams {
             position: self._fields.0.unwrap(),

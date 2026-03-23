@@ -14,7 +14,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -38,11 +38,11 @@ use serde::{Serialize, Deserialize};
     rename = "sh.tangled.repo.issue.state",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct State<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct State<S: BosStr = DefaultStr> {
     pub issue: AtUri<S>,
     ///state of the issue
     pub state: StateState<S>,
@@ -53,13 +53,13 @@ pub struct State<S: Bos<str> + AsRef<str> = DefaultStr> {
 /// state of the issue
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum StateState<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum StateState<S: BosStr = DefaultStr> {
     ShTangledRepoIssueStateOpen,
     ShTangledRepoIssueStateClosed,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> StateState<S> {
+impl<S: BosStr> StateState<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::ShTangledRepoIssueStateOpen => "sh.tangled.repo.issue.state.open",
@@ -77,19 +77,19 @@ impl<S: Bos<str> + AsRef<str>> StateState<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for StateState<S> {
+impl<S: BosStr> core::fmt::Display for StateState<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for StateState<S> {
+impl<S: BosStr> AsRef<str> for StateState<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for StateState<S> {
+impl<S: BosStr> Serialize for StateState<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -98,8 +98,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for StateState<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for StateState<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for StateState<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -109,14 +108,18 @@ for StateState<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for StateState<S> {
+impl<S: BosStr + Default> Default for StateState<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for StateState<S> {
-    type Output = StateState<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for StateState<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = StateState<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             StateState::ShTangledRepoIssueStateOpen => {
@@ -136,18 +139,18 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for StateState<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct StateGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct StateGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: State<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> State<S> {
+impl<S: BosStr> State<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, StateRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -160,17 +163,17 @@ pub struct StateRecord;
 impl XrpcResp for StateRecord {
     const NSID: &'static str = "sh.tangled.repo.issue.state";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = StateGetRecordOutput<S>;
+    type Output<S: BosStr> = StateGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<StateGetRecordOutput<S>> for State<S> {
+impl<S: BosStr> From<StateGetRecordOutput<S>> for State<S> {
     fn from(output: StateGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for State<S> {
+impl<S: BosStr> Collection for State<S> {
     const NSID: &'static str = "sh.tangled.repo.issue.state";
     type Record = StateRecord;
 }
@@ -180,7 +183,7 @@ impl Collection for StateRecord {
     type Record = StateRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for State<S> {
+impl<S: BosStr> LexiconSchema for State<S> {
     fn nsid() -> &'static str {
         "sh.tangled.repo.issue.state"
     }
@@ -216,17 +219,17 @@ pub mod state_state {
         type Issue = Unset;
     }
     ///State transition - sets the `state` field to Set
-    pub struct SetState<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetState<S> {}
-    impl<S: State> State for SetState<S> {
+    pub struct SetState<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetState<St> {}
+    impl<St: State> State for SetState<St> {
         type State = Set<members::state>;
-        type Issue = S::Issue;
+        type Issue = St::Issue;
     }
     ///State transition - sets the `issue` field to Set
-    pub struct SetIssue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIssue<S> {}
-    impl<S: State> State for SetIssue<S> {
-        type State = S::State;
+    pub struct SetIssue<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIssue<St> {}
+    impl<St: State> State for SetIssue<St> {
+        type State = St::State;
         type Issue = Set<members::issue>;
     }
     /// Marker types for field names
@@ -239,85 +242,85 @@ pub mod state_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct StateBuilder<'a, S: state_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct StateBuilder<S: BosStr, St: state_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>, Option<StateState<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> State<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> StateBuilder<'a, state_state::Empty> {
+impl<S: BosStr> State<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> StateBuilder<S, state_state::Empty> {
         StateBuilder::new()
     }
 }
 
-impl<'a> StateBuilder<'a, state_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> StateBuilder<S, state_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         StateBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> StateBuilder<'a, S>
+impl<S: BosStr, St> StateBuilder<S, St>
 where
-    S: state_state::State,
-    S::Issue: state_state::IsUnset,
+    St: state_state::State,
+    St::Issue: state_state::IsUnset,
 {
     /// Set the `issue` field (required)
     pub fn issue(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> StateBuilder<'a, state_state::SetIssue<S>> {
+    ) -> StateBuilder<S, state_state::SetIssue<St>> {
         self._fields.0 = Option::Some(value.into());
         StateBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> StateBuilder<'a, S>
+impl<S: BosStr, St> StateBuilder<S, St>
 where
-    S: state_state::State,
-    S::State: state_state::IsUnset,
+    St: state_state::State,
+    St::State: state_state::IsUnset,
 {
     /// Set the `state` field (required)
     pub fn state(
         mut self,
         value: impl Into<StateState<S>>,
-    ) -> StateBuilder<'a, state_state::SetState<S>> {
+    ) -> StateBuilder<S, state_state::SetState<St>> {
         self._fields.1 = Option::Some(value.into());
         StateBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> StateBuilder<'a, S>
+impl<S: BosStr, St> StateBuilder<S, St>
 where
-    S: state_state::State,
-    S::State: state_state::IsSet,
-    S::Issue: state_state::IsSet,
+    St: state_state::State,
+    St::State: state_state::IsSet,
+    St::Issue: state_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> State<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> State<S> {
         State {
             issue: self._fields.0.unwrap(),
             state: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> State<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> State<S> {
         State {
             issue: self._fields.0.unwrap(),
             state: self._fields.1.unwrap(),

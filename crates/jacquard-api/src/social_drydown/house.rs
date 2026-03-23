@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "social.drydown.house",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct House<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct House<S: BosStr = DefaultStr> {
     ///Timestamp when house was created
     pub created_at: Datetime,
     ///House/brand name (must be unique per user)
@@ -57,18 +57,18 @@ pub struct House<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct HouseGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct HouseGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: House<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> House<S> {
+impl<S: BosStr> House<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, HouseRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -81,17 +81,17 @@ pub struct HouseRecord;
 impl XrpcResp for HouseRecord {
     const NSID: &'static str = "social.drydown.house";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = HouseGetRecordOutput<S>;
+    type Output<S: BosStr> = HouseGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<HouseGetRecordOutput<S>> for House<S> {
+impl<S: BosStr> From<HouseGetRecordOutput<S>> for House<S> {
     fn from(output: HouseGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for House<S> {
+impl<S: BosStr> Collection for House<S> {
     const NSID: &'static str = "social.drydown.house";
     type Record = HouseRecord;
 }
@@ -101,7 +101,7 @@ impl Collection for HouseRecord {
     type Record = HouseRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for House<S> {
+impl<S: BosStr> LexiconSchema for House<S> {
     fn nsid() -> &'static str {
         "social.drydown.house"
     }
@@ -159,17 +159,17 @@ pub mod house_state {
         type CreatedAt = Unset;
     }
     ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
         type Name = Set<members::name>;
-        type CreatedAt = S::CreatedAt;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Name = S::Name;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Name = St::Name;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
@@ -182,70 +182,70 @@ pub mod house_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct HouseBuilder<'a, S: house_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct HouseBuilder<S: BosStr, St: house_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<S>, Option<Datetime>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> House<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> HouseBuilder<'a, house_state::Empty> {
+impl<S: BosStr> House<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> HouseBuilder<S, house_state::Empty> {
         HouseBuilder::new()
     }
 }
 
-impl<'a> HouseBuilder<'a, house_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> HouseBuilder<S, house_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         HouseBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> HouseBuilder<'a, S>
+impl<S: BosStr, St> HouseBuilder<S, St>
 where
-    S: house_state::State,
-    S::CreatedAt: house_state::IsUnset,
+    St: house_state::State,
+    St::CreatedAt: house_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> HouseBuilder<'a, house_state::SetCreatedAt<S>> {
+    ) -> HouseBuilder<S, house_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         HouseBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> HouseBuilder<'a, S>
+impl<S: BosStr, St> HouseBuilder<S, St>
 where
-    S: house_state::State,
-    S::Name: house_state::IsUnset,
+    St: house_state::State,
+    St::Name: house_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> HouseBuilder<'a, house_state::SetName<S>> {
+    ) -> HouseBuilder<S, house_state::SetName<St>> {
         self._fields.1 = Option::Some(value.into());
         HouseBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: house_state::State> HouseBuilder<'a, S> {
+impl<S: BosStr, St: house_state::State> HouseBuilder<S, St> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.2 = value.into();
@@ -258,14 +258,14 @@ impl<'a, S: house_state::State> HouseBuilder<'a, S> {
     }
 }
 
-impl<'a, S> HouseBuilder<'a, S>
+impl<S: BosStr, St> HouseBuilder<S, St>
 where
-    S: house_state::State,
-    S::Name: house_state::IsSet,
-    S::CreatedAt: house_state::IsSet,
+    St: house_state::State,
+    St::Name: house_state::IsSet,
+    St::CreatedAt: house_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> House<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> House<S> {
         House {
             created_at: self._fields.0.unwrap(),
             name: self._fields.1.unwrap(),
@@ -273,8 +273,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> House<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> House<S> {
         House {
             created_at: self._fields.0.unwrap(),
             name: self._fields.1.unwrap(),

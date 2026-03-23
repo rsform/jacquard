@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use serde::{Serialize, Deserialize};
     rename = "dev.kanad.lexicon-test-2026-02-26.exampleCatLexicon",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ExampleCatLexicon<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ExampleCatLexicon<S: BosStr = DefaultStr> {
     ///picture of the cat
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avatar: Option<BlobRef<S>>,
@@ -57,18 +57,18 @@ pub struct ExampleCatLexicon<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ExampleCatLexiconGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ExampleCatLexiconGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: ExampleCatLexicon<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> ExampleCatLexicon<S> {
+impl<S: BosStr> ExampleCatLexicon<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, ExampleCatLexiconRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -81,18 +81,17 @@ pub struct ExampleCatLexiconRecord;
 impl XrpcResp for ExampleCatLexiconRecord {
     const NSID: &'static str = "dev.kanad.lexicon-test-2026-02-26.exampleCatLexicon";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ExampleCatLexiconGetRecordOutput<S>;
+    type Output<S: BosStr> = ExampleCatLexiconGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<ExampleCatLexiconGetRecordOutput<S>>
-for ExampleCatLexicon<S> {
+impl<S: BosStr> From<ExampleCatLexiconGetRecordOutput<S>> for ExampleCatLexicon<S> {
     fn from(output: ExampleCatLexiconGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for ExampleCatLexicon<S> {
+impl<S: BosStr> Collection for ExampleCatLexicon<S> {
     const NSID: &'static str = "dev.kanad.lexicon-test-2026-02-26.exampleCatLexicon";
     type Record = ExampleCatLexiconRecord;
 }
@@ -102,7 +101,7 @@ impl Collection for ExampleCatLexiconRecord {
     type Record = ExampleCatLexiconRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ExampleCatLexicon<S> {
+impl<S: BosStr> LexiconSchema for ExampleCatLexicon<S> {
     fn nsid() -> &'static str {
         "dev.kanad.lexicon-test-2026-02-26.exampleCatLexicon"
     }
@@ -202,66 +201,66 @@ pub mod example_cat_lexicon_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Name;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Name = S::Name;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type CreatedAt = S::CreatedAt;
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
         type Name = Set<members::name>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Name = St::Name;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ExampleCatLexiconBuilder<'a, S: example_cat_lexicon_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ExampleCatLexiconBuilder<S: BosStr, St: example_cat_lexicon_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<BlobRef<S>>, Option<Datetime>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ExampleCatLexicon<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ExampleCatLexiconBuilder<'a, example_cat_lexicon_state::Empty> {
+impl<S: BosStr> ExampleCatLexicon<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ExampleCatLexiconBuilder<S, example_cat_lexicon_state::Empty> {
         ExampleCatLexiconBuilder::new()
     }
 }
 
-impl<'a> ExampleCatLexiconBuilder<'a, example_cat_lexicon_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ExampleCatLexiconBuilder<S, example_cat_lexicon_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ExampleCatLexiconBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: example_cat_lexicon_state::State> ExampleCatLexiconBuilder<'a, S> {
+impl<S: BosStr, St: example_cat_lexicon_state::State> ExampleCatLexiconBuilder<S, St> {
     /// Set the `avatar` field (optional)
     pub fn avatar(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -274,52 +273,52 @@ impl<'a, S: example_cat_lexicon_state::State> ExampleCatLexiconBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ExampleCatLexiconBuilder<'a, S>
+impl<S: BosStr, St> ExampleCatLexiconBuilder<S, St>
 where
-    S: example_cat_lexicon_state::State,
-    S::CreatedAt: example_cat_lexicon_state::IsUnset,
+    St: example_cat_lexicon_state::State,
+    St::CreatedAt: example_cat_lexicon_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ExampleCatLexiconBuilder<'a, example_cat_lexicon_state::SetCreatedAt<S>> {
+    ) -> ExampleCatLexiconBuilder<S, example_cat_lexicon_state::SetCreatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         ExampleCatLexiconBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ExampleCatLexiconBuilder<'a, S>
+impl<S: BosStr, St> ExampleCatLexiconBuilder<S, St>
 where
-    S: example_cat_lexicon_state::State,
-    S::Name: example_cat_lexicon_state::IsUnset,
+    St: example_cat_lexicon_state::State,
+    St::Name: example_cat_lexicon_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> ExampleCatLexiconBuilder<'a, example_cat_lexicon_state::SetName<S>> {
+    ) -> ExampleCatLexiconBuilder<S, example_cat_lexicon_state::SetName<St>> {
         self._fields.2 = Option::Some(value.into());
         ExampleCatLexiconBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ExampleCatLexiconBuilder<'a, S>
+impl<S: BosStr, St> ExampleCatLexiconBuilder<S, St>
 where
-    S: example_cat_lexicon_state::State,
-    S::CreatedAt: example_cat_lexicon_state::IsSet,
-    S::Name: example_cat_lexicon_state::IsSet,
+    St: example_cat_lexicon_state::State,
+    St::Name: example_cat_lexicon_state::IsSet,
+    St::CreatedAt: example_cat_lexicon_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ExampleCatLexicon<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ExampleCatLexicon<S> {
         ExampleCatLexicon {
             avatar: self._fields.0,
             created_at: self._fields.1.unwrap(),
@@ -327,11 +326,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> ExampleCatLexicon<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ExampleCatLexicon<S> {
         ExampleCatLexicon {
             avatar: self._fields.0,
             created_at: self._fields.1.unwrap(),

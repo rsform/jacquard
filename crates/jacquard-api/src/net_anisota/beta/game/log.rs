@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,11 +34,11 @@ use crate::net_anisota::beta::game::log;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CollectionData<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CollectionData<S: BosStr = DefaultStr> {
     ///Catch probability for specimens (decimal string between 0.0 and 1.0)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub catch_probability: Option<S>,
@@ -70,11 +70,11 @@ pub struct CollectionData<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DailyRewardsData<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DailyRewardsData<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reward_items: Option<Vec<log::RewardItem<S>>>,
     ///Number of rewards claimed
@@ -96,11 +96,11 @@ pub struct DailyRewardsData<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct FeedContext<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct FeedContext<S: BosStr = DefaultStr> {
     ///URI of the feed being viewed
     #[serde(skip_serializing_if = "Option::is_none")]
     pub feed_uri: Option<S>,
@@ -123,11 +123,11 @@ pub struct FeedContext<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GameCardData<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GameCardData<S: BosStr = DefaultStr> {
     ///Type of game card
     #[serde(skip_serializing_if = "Option::is_none")]
     pub card_type: Option<S>,
@@ -159,11 +159,11 @@ pub struct GameCardData<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ItemUsageData<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ItemUsageData<S: BosStr = DefaultStr> {
     ///Effect that was applied
     #[serde(skip_serializing_if = "Option::is_none")]
     pub effect_applied: Option<S>,
@@ -191,11 +191,11 @@ pub struct ItemUsageData<S: Bos<str> + AsRef<str> = DefaultStr> {
     rename = "net.anisota.beta.game.log",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Log<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Log<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub collection_data: Option<log::CollectionData<S>>,
     ///When the log record was created
@@ -239,11 +239,11 @@ pub struct Log<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct LogGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct LogGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
@@ -256,11 +256,11 @@ pub struct LogGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Metadata<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Metadata<S: BosStr = DefaultStr> {
     ///Version of the client application
     #[serde(skip_serializing_if = "Option::is_none")]
     pub client_version: Option<S>,
@@ -283,11 +283,11 @@ pub struct Metadata<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct RewardItem<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct RewardItem<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub item_id: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -298,13 +298,13 @@ pub struct RewardItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Log<S> {
+impl<S: BosStr> Log<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, LogRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for CollectionData<S> {
+impl<S: BosStr> LexiconSchema for CollectionData<S> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.log"
     }
@@ -337,7 +337,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for CollectionData<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for DailyRewardsData<S> {
+impl<S: BosStr> LexiconSchema for DailyRewardsData<S> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.log"
     }
@@ -379,7 +379,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for DailyRewardsData<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for FeedContext<S> {
+impl<S: BosStr> LexiconSchema for FeedContext<S> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.log"
     }
@@ -421,7 +421,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for FeedContext<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for GameCardData<S> {
+impl<S: BosStr> LexiconSchema for GameCardData<S> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.log"
     }
@@ -454,7 +454,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for GameCardData<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ItemUsageData<S> {
+impl<S: BosStr> LexiconSchema for ItemUsageData<S> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.log"
     }
@@ -494,17 +494,17 @@ pub struct LogRecord;
 impl XrpcResp for LogRecord {
     const NSID: &'static str = "net.anisota.beta.game.log";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = LogGetRecordOutput<S>;
+    type Output<S: BosStr> = LogGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<LogGetRecordOutput<S>> for Log<S> {
+impl<S: BosStr> From<LogGetRecordOutput<S>> for Log<S> {
     fn from(output: LogGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Log<S> {
+impl<S: BosStr> Collection for Log<S> {
     const NSID: &'static str = "net.anisota.beta.game.log";
     type Record = LogRecord;
 }
@@ -514,7 +514,7 @@ impl Collection for LogRecord {
     type Record = LogRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Log<S> {
+impl<S: BosStr> LexiconSchema for Log<S> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.log"
     }
@@ -540,7 +540,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Log<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Metadata<S> {
+impl<S: BosStr> LexiconSchema for Metadata<S> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.log"
     }
@@ -564,7 +564,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Metadata<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for RewardItem<S> {
+impl<S: BosStr> LexiconSchema for RewardItem<S> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.log"
     }
@@ -1129,57 +1129,57 @@ pub mod log_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Timestamp;
         type SessionId;
         type EventType;
-        type Timestamp;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Timestamp = Unset;
         type SessionId = Unset;
         type EventType = Unset;
-        type Timestamp = Unset;
-    }
-    ///State transition - sets the `session_id` field to Set
-    pub struct SetSessionId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSessionId<S> {}
-    impl<S: State> State for SetSessionId<S> {
-        type SessionId = Set<members::session_id>;
-        type EventType = S::EventType;
-        type Timestamp = S::Timestamp;
-    }
-    ///State transition - sets the `event_type` field to Set
-    pub struct SetEventType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEventType<S> {}
-    impl<S: State> State for SetEventType<S> {
-        type SessionId = S::SessionId;
-        type EventType = Set<members::event_type>;
-        type Timestamp = S::Timestamp;
     }
     ///State transition - sets the `timestamp` field to Set
-    pub struct SetTimestamp<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTimestamp<S> {}
-    impl<S: State> State for SetTimestamp<S> {
-        type SessionId = S::SessionId;
-        type EventType = S::EventType;
+    pub struct SetTimestamp<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTimestamp<St> {}
+    impl<St: State> State for SetTimestamp<St> {
         type Timestamp = Set<members::timestamp>;
+        type SessionId = St::SessionId;
+        type EventType = St::EventType;
+    }
+    ///State transition - sets the `session_id` field to Set
+    pub struct SetSessionId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSessionId<St> {}
+    impl<St: State> State for SetSessionId<St> {
+        type Timestamp = St::Timestamp;
+        type SessionId = Set<members::session_id>;
+        type EventType = St::EventType;
+    }
+    ///State transition - sets the `event_type` field to Set
+    pub struct SetEventType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetEventType<St> {}
+    impl<St: State> State for SetEventType<St> {
+        type Timestamp = St::Timestamp;
+        type SessionId = St::SessionId;
+        type EventType = Set<members::event_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `timestamp` field
+        pub struct timestamp(());
         ///Marker type for the `session_id` field
         pub struct session_id(());
         ///Marker type for the `event_type` field
         pub struct event_type(());
-        ///Marker type for the `timestamp` field
-        pub struct timestamp(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct LogBuilder<'a, S: log_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct LogBuilder<S: BosStr, St: log_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<log::CollectionData<S>>,
         Option<Datetime>,
@@ -1196,18 +1196,18 @@ pub struct LogBuilder<'a, S: log_state::State> {
         Option<S>,
         Option<Datetime>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Log<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> LogBuilder<'a, log_state::Empty> {
+impl<S: BosStr> Log<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> LogBuilder<S, log_state::Empty> {
         LogBuilder::new()
     }
 }
 
-impl<'a> LogBuilder<'a, log_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> LogBuilder<S, log_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         LogBuilder {
             _state: PhantomData,
@@ -1227,12 +1227,12 @@ impl<'a> LogBuilder<'a, log_state::Empty> {
                 None,
                 None,
             ),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: log_state::State> LogBuilder<'a, S> {
+impl<S: BosStr, St: log_state::State> LogBuilder<S, St> {
     /// Set the `collectionData` field (optional)
     pub fn collection_data(
         mut self,
@@ -1251,7 +1251,7 @@ impl<'a, S: log_state::State> LogBuilder<'a, S> {
     }
 }
 
-impl<'a, S: log_state::State> LogBuilder<'a, S> {
+impl<S: BosStr, St: log_state::State> LogBuilder<S, St> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.1 = value.into();
@@ -1264,7 +1264,7 @@ impl<'a, S: log_state::State> LogBuilder<'a, S> {
     }
 }
 
-impl<'a, S: log_state::State> LogBuilder<'a, S> {
+impl<S: BosStr, St: log_state::State> LogBuilder<S, St> {
     /// Set the `dailyRewardsData` field (optional)
     pub fn daily_rewards_data(
         mut self,
@@ -1283,26 +1283,26 @@ impl<'a, S: log_state::State> LogBuilder<'a, S> {
     }
 }
 
-impl<'a, S> LogBuilder<'a, S>
+impl<S: BosStr, St> LogBuilder<S, St>
 where
-    S: log_state::State,
-    S::EventType: log_state::IsUnset,
+    St: log_state::State,
+    St::EventType: log_state::IsUnset,
 {
     /// Set the `eventType` field (required)
     pub fn event_type(
         mut self,
         value: impl Into<S>,
-    ) -> LogBuilder<'a, log_state::SetEventType<S>> {
+    ) -> LogBuilder<S, log_state::SetEventType<St>> {
         self._fields.3 = Option::Some(value.into());
         LogBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: log_state::State> LogBuilder<'a, S> {
+impl<S: BosStr, St: log_state::State> LogBuilder<S, St> {
     /// Set the `feedContext` field (optional)
     pub fn feed_context(
         mut self,
@@ -1318,7 +1318,7 @@ impl<'a, S: log_state::State> LogBuilder<'a, S> {
     }
 }
 
-impl<'a, S: log_state::State> LogBuilder<'a, S> {
+impl<S: BosStr, St: log_state::State> LogBuilder<S, St> {
     /// Set the `gameCardData` field (optional)
     pub fn game_card_data(
         mut self,
@@ -1334,7 +1334,7 @@ impl<'a, S: log_state::State> LogBuilder<'a, S> {
     }
 }
 
-impl<'a, S: log_state::State> LogBuilder<'a, S> {
+impl<S: BosStr, St: log_state::State> LogBuilder<S, St> {
     /// Set the `gameCardId` field (optional)
     pub fn game_card_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.6 = value.into();
@@ -1347,7 +1347,7 @@ impl<'a, S: log_state::State> LogBuilder<'a, S> {
     }
 }
 
-impl<'a, S: log_state::State> LogBuilder<'a, S> {
+impl<S: BosStr, St: log_state::State> LogBuilder<S, St> {
     /// Set the `itemUsageData` field (optional)
     pub fn item_usage_data(
         mut self,
@@ -1366,7 +1366,7 @@ impl<'a, S: log_state::State> LogBuilder<'a, S> {
     }
 }
 
-impl<'a, S: log_state::State> LogBuilder<'a, S> {
+impl<S: BosStr, St: log_state::State> LogBuilder<S, St> {
     /// Set the `metadata` field (optional)
     pub fn metadata(mut self, value: impl Into<Option<log::Metadata<S>>>) -> Self {
         self._fields.8 = value.into();
@@ -1379,7 +1379,7 @@ impl<'a, S: log_state::State> LogBuilder<'a, S> {
     }
 }
 
-impl<'a, S: log_state::State> LogBuilder<'a, S> {
+impl<S: BosStr, St: log_state::State> LogBuilder<S, St> {
     /// Set the `parentLogUri` field (optional)
     pub fn parent_log_uri(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.9 = value.into();
@@ -1392,7 +1392,7 @@ impl<'a, S: log_state::State> LogBuilder<'a, S> {
     }
 }
 
-impl<'a, S: log_state::State> LogBuilder<'a, S> {
+impl<S: BosStr, St: log_state::State> LogBuilder<S, St> {
     /// Set the `rootLogUri` field (optional)
     pub fn root_log_uri(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.10 = value.into();
@@ -1405,26 +1405,26 @@ impl<'a, S: log_state::State> LogBuilder<'a, S> {
     }
 }
 
-impl<'a, S> LogBuilder<'a, S>
+impl<S: BosStr, St> LogBuilder<S, St>
 where
-    S: log_state::State,
-    S::SessionId: log_state::IsUnset,
+    St: log_state::State,
+    St::SessionId: log_state::IsUnset,
 {
     /// Set the `sessionId` field (required)
     pub fn session_id(
         mut self,
         value: impl Into<S>,
-    ) -> LogBuilder<'a, log_state::SetSessionId<S>> {
+    ) -> LogBuilder<S, log_state::SetSessionId<St>> {
         self._fields.11 = Option::Some(value.into());
         LogBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: log_state::State> LogBuilder<'a, S> {
+impl<S: BosStr, St: log_state::State> LogBuilder<S, St> {
     /// Set the `sessionUri` field (optional)
     pub fn session_uri(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.12 = value.into();
@@ -1437,34 +1437,34 @@ impl<'a, S: log_state::State> LogBuilder<'a, S> {
     }
 }
 
-impl<'a, S> LogBuilder<'a, S>
+impl<S: BosStr, St> LogBuilder<S, St>
 where
-    S: log_state::State,
-    S::Timestamp: log_state::IsUnset,
+    St: log_state::State,
+    St::Timestamp: log_state::IsUnset,
 {
     /// Set the `timestamp` field (required)
     pub fn timestamp(
         mut self,
         value: impl Into<Datetime>,
-    ) -> LogBuilder<'a, log_state::SetTimestamp<S>> {
+    ) -> LogBuilder<S, log_state::SetTimestamp<St>> {
         self._fields.13 = Option::Some(value.into());
         LogBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LogBuilder<'a, S>
+impl<S: BosStr, St> LogBuilder<S, St>
 where
-    S: log_state::State,
-    S::SessionId: log_state::IsSet,
-    S::EventType: log_state::IsSet,
-    S::Timestamp: log_state::IsSet,
+    St: log_state::State,
+    St::Timestamp: log_state::IsSet,
+    St::SessionId: log_state::IsSet,
+    St::EventType: log_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Log<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Log<S> {
         Log {
             collection_data: self._fields.0,
             created_at: self._fields.1,
@@ -1483,8 +1483,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Log<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Log<S> {
         Log {
             collection_data: self._fields.0,
             created_at: self._fields.1,

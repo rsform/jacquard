@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -39,11 +39,11 @@ use crate::pub_leaflet::publication::Theme;
     rename = "site.standard.document",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Document<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Document<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub bsky_post_ref: Option<StrongRef<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -80,18 +80,18 @@ pub struct Document<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DocumentGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DocumentGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Document<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Document<S> {
+impl<S: BosStr> Document<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, DocumentRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -104,17 +104,17 @@ pub struct DocumentRecord;
 impl XrpcResp for DocumentRecord {
     const NSID: &'static str = "site.standard.document";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = DocumentGetRecordOutput<S>;
+    type Output<S: BosStr> = DocumentGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<DocumentGetRecordOutput<S>> for Document<S> {
+impl<S: BosStr> From<DocumentGetRecordOutput<S>> for Document<S> {
     fn from(output: DocumentGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Document<S> {
+impl<S: BosStr> Collection for Document<S> {
     const NSID: &'static str = "site.standard.document";
     type Record = DocumentRecord;
 }
@@ -124,7 +124,7 @@ impl Collection for DocumentRecord {
     type Record = DocumentRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Document<S> {
+impl<S: BosStr> LexiconSchema for Document<S> {
     fn nsid() -> &'static str {
         "site.standard.document"
     }
@@ -233,57 +233,57 @@ pub mod document_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
         type Site;
         type PublishedAt;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
         type Site = Unset;
         type PublishedAt = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type Site = S::Site;
-        type PublishedAt = S::PublishedAt;
+        type Title = Unset;
     }
     ///State transition - sets the `site` field to Set
-    pub struct SetSite<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSite<S> {}
-    impl<S: State> State for SetSite<S> {
-        type Title = S::Title;
+    pub struct SetSite<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSite<St> {}
+    impl<St: State> State for SetSite<St> {
         type Site = Set<members::site>;
-        type PublishedAt = S::PublishedAt;
+        type PublishedAt = St::PublishedAt;
+        type Title = St::Title;
     }
     ///State transition - sets the `published_at` field to Set
-    pub struct SetPublishedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPublishedAt<S> {}
-    impl<S: State> State for SetPublishedAt<S> {
-        type Title = S::Title;
-        type Site = S::Site;
+    pub struct SetPublishedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPublishedAt<St> {}
+    impl<St: State> State for SetPublishedAt<St> {
+        type Site = St::Site;
         type PublishedAt = Set<members::published_at>;
+        type Title = St::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
+        type Site = St::Site;
+        type PublishedAt = St::PublishedAt;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `site` field
         pub struct site(());
         ///Marker type for the `published_at` field
         pub struct published_at(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct DocumentBuilder<'a, S: document_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct DocumentBuilder<S: BosStr, St: document_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<StrongRef<S>>,
         Option<Content<S>>,
@@ -299,18 +299,18 @@ pub struct DocumentBuilder<'a, S: document_state::State> {
         Option<S>,
         Option<Datetime>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Document<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> DocumentBuilder<'a, document_state::Empty> {
+impl<S: BosStr> Document<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> DocumentBuilder<S, document_state::Empty> {
         DocumentBuilder::new()
     }
 }
 
-impl<'a> DocumentBuilder<'a, document_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> DocumentBuilder<S, document_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         DocumentBuilder {
             _state: PhantomData,
@@ -329,12 +329,12 @@ impl<'a> DocumentBuilder<'a, document_state::Empty> {
                 None,
                 None,
             ),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
+impl<S: BosStr, St: document_state::State> DocumentBuilder<S, St> {
     /// Set the `bskyPostRef` field (optional)
     pub fn bsky_post_ref(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -347,7 +347,7 @@ impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
     }
 }
 
-impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
+impl<S: BosStr, St: document_state::State> DocumentBuilder<S, St> {
     /// Set the `content` field (optional)
     pub fn content(mut self, value: impl Into<Option<Content<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -360,7 +360,7 @@ impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
     }
 }
 
-impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
+impl<S: BosStr, St: document_state::State> DocumentBuilder<S, St> {
     /// Set the `coverImage` field (optional)
     pub fn cover_image(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -373,7 +373,7 @@ impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
     }
 }
 
-impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
+impl<S: BosStr, St: document_state::State> DocumentBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -386,7 +386,7 @@ impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
     }
 }
 
-impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
+impl<S: BosStr, St: document_state::State> DocumentBuilder<S, St> {
     /// Set the `path` field (optional)
     pub fn path(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
@@ -399,7 +399,7 @@ impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
     }
 }
 
-impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
+impl<S: BosStr, St: document_state::State> DocumentBuilder<S, St> {
     /// Set the `preferences` field (optional)
     pub fn preferences(mut self, value: impl Into<Option<Preferences<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -412,45 +412,45 @@ impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
     }
 }
 
-impl<'a, S> DocumentBuilder<'a, S>
+impl<S: BosStr, St> DocumentBuilder<S, St>
 where
-    S: document_state::State,
-    S::PublishedAt: document_state::IsUnset,
+    St: document_state::State,
+    St::PublishedAt: document_state::IsUnset,
 {
     /// Set the `publishedAt` field (required)
     pub fn published_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> DocumentBuilder<'a, document_state::SetPublishedAt<S>> {
+    ) -> DocumentBuilder<S, document_state::SetPublishedAt<St>> {
         self._fields.6 = Option::Some(value.into());
         DocumentBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DocumentBuilder<'a, S>
+impl<S: BosStr, St> DocumentBuilder<S, St>
 where
-    S: document_state::State,
-    S::Site: document_state::IsUnset,
+    St: document_state::State,
+    St::Site: document_state::IsUnset,
 {
     /// Set the `site` field (required)
     pub fn site(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> DocumentBuilder<'a, document_state::SetSite<S>> {
+    ) -> DocumentBuilder<S, document_state::SetSite<St>> {
         self._fields.7 = Option::Some(value.into());
         DocumentBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
+impl<S: BosStr, St: document_state::State> DocumentBuilder<S, St> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.8 = value.into();
@@ -463,7 +463,7 @@ impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
     }
 }
 
-impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
+impl<S: BosStr, St: document_state::State> DocumentBuilder<S, St> {
     /// Set the `textContent` field (optional)
     pub fn text_content(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.9 = value.into();
@@ -476,7 +476,7 @@ impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
     }
 }
 
-impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
+impl<S: BosStr, St: document_state::State> DocumentBuilder<S, St> {
     /// Set the `theme` field (optional)
     pub fn theme(mut self, value: impl Into<Option<Theme<S>>>) -> Self {
         self._fields.10 = value.into();
@@ -489,26 +489,26 @@ impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
     }
 }
 
-impl<'a, S> DocumentBuilder<'a, S>
+impl<S: BosStr, St> DocumentBuilder<S, St>
 where
-    S: document_state::State,
-    S::Title: document_state::IsUnset,
+    St: document_state::State,
+    St::Title: document_state::IsUnset,
 {
     /// Set the `title` field (required)
     pub fn title(
         mut self,
         value: impl Into<S>,
-    ) -> DocumentBuilder<'a, document_state::SetTitle<S>> {
+    ) -> DocumentBuilder<S, document_state::SetTitle<St>> {
         self._fields.11 = Option::Some(value.into());
         DocumentBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
+impl<S: BosStr, St: document_state::State> DocumentBuilder<S, St> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.12 = value.into();
@@ -521,15 +521,15 @@ impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
     }
 }
 
-impl<'a, S> DocumentBuilder<'a, S>
+impl<S: BosStr, St> DocumentBuilder<S, St>
 where
-    S: document_state::State,
-    S::Title: document_state::IsSet,
-    S::Site: document_state::IsSet,
-    S::PublishedAt: document_state::IsSet,
+    St: document_state::State,
+    St::Site: document_state::IsSet,
+    St::PublishedAt: document_state::IsSet,
+    St::Title: document_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Document<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Document<S> {
         Document {
             bsky_post_ref: self._fields.0,
             content: self._fields.1,
@@ -547,11 +547,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Document<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Document<S> {
         Document {
             bsky_post_ref: self._fields.0,
             content: self._fields.1,

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "tech.lenooby09.didgit.signatureProof",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SignatureProof<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SignatureProof<S: BosStr = DefaultStr> {
     ///The hex SHA-256 object ID being proven.
     pub object_id: S,
     ///The type of object.
@@ -62,7 +62,7 @@ pub struct SignatureProof<S: Bos<str> + AsRef<str> = DefaultStr> {
 /// The type of object.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum SignatureProofObjectType<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum SignatureProofObjectType<S: BosStr = DefaultStr> {
     Blob,
     Tree,
     Commit,
@@ -70,7 +70,7 @@ pub enum SignatureProofObjectType<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> SignatureProofObjectType<S> {
+impl<S: BosStr> SignatureProofObjectType<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Blob => "blob",
@@ -92,19 +92,19 @@ impl<S: Bos<str> + AsRef<str>> SignatureProofObjectType<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for SignatureProofObjectType<S> {
+impl<S: BosStr> core::fmt::Display for SignatureProofObjectType<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for SignatureProofObjectType<S> {
+impl<S: BosStr> AsRef<str> for SignatureProofObjectType<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for SignatureProofObjectType<S> {
+impl<S: BosStr> Serialize for SignatureProofObjectType<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -113,7 +113,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for SignatureProofObjectType<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
 for SignatureProofObjectType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
@@ -124,14 +124,18 @@ for SignatureProofObjectType<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for SignatureProofObjectType<S> {
+impl<S: BosStr + Default> Default for SignatureProofObjectType<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for SignatureProofObjectType<S> {
-    type Output = SignatureProofObjectType<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for SignatureProofObjectType<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = SignatureProofObjectType<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             SignatureProofObjectType::Blob => SignatureProofObjectType::Blob,
@@ -151,18 +155,18 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for SignatureProofObjectType<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SignatureProofGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SignatureProofGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: SignatureProof<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> SignatureProof<S> {
+impl<S: BosStr> SignatureProof<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, SignatureProofRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -175,18 +179,17 @@ pub struct SignatureProofRecord;
 impl XrpcResp for SignatureProofRecord {
     const NSID: &'static str = "tech.lenooby09.didgit.signatureProof";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = SignatureProofGetRecordOutput<S>;
+    type Output<S: BosStr> = SignatureProofGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<SignatureProofGetRecordOutput<S>>
-for SignatureProof<S> {
+impl<S: BosStr> From<SignatureProofGetRecordOutput<S>> for SignatureProof<S> {
     fn from(output: SignatureProofGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for SignatureProof<S> {
+impl<S: BosStr> Collection for SignatureProof<S> {
     const NSID: &'static str = "tech.lenooby09.didgit.signatureProof";
     type Record = SignatureProofRecord;
 }
@@ -196,7 +199,7 @@ impl Collection for SignatureProofRecord {
     type Record = SignatureProofRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for SignatureProof<S> {
+impl<S: BosStr> LexiconSchema for SignatureProof<S> {
     fn nsid() -> &'static str {
         "tech.lenooby09.didgit.signatureProof"
     }
@@ -286,111 +289,111 @@ pub mod signature_proof_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type ObjectType;
+        type Signature;
         type Signer;
         type SignedAt;
-        type ObjectType;
         type ObjectId;
         type SignatureType;
-        type Signature;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type ObjectType = Unset;
+        type Signature = Unset;
         type Signer = Unset;
         type SignedAt = Unset;
-        type ObjectType = Unset;
         type ObjectId = Unset;
         type SignatureType = Unset;
-        type Signature = Unset;
-    }
-    ///State transition - sets the `signer` field to Set
-    pub struct SetSigner<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSigner<S> {}
-    impl<S: State> State for SetSigner<S> {
-        type Signer = Set<members::signer>;
-        type SignedAt = S::SignedAt;
-        type ObjectType = S::ObjectType;
-        type ObjectId = S::ObjectId;
-        type SignatureType = S::SignatureType;
-        type Signature = S::Signature;
-    }
-    ///State transition - sets the `signed_at` field to Set
-    pub struct SetSignedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSignedAt<S> {}
-    impl<S: State> State for SetSignedAt<S> {
-        type Signer = S::Signer;
-        type SignedAt = Set<members::signed_at>;
-        type ObjectType = S::ObjectType;
-        type ObjectId = S::ObjectId;
-        type SignatureType = S::SignatureType;
-        type Signature = S::Signature;
     }
     ///State transition - sets the `object_type` field to Set
-    pub struct SetObjectType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetObjectType<S> {}
-    impl<S: State> State for SetObjectType<S> {
-        type Signer = S::Signer;
-        type SignedAt = S::SignedAt;
+    pub struct SetObjectType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetObjectType<St> {}
+    impl<St: State> State for SetObjectType<St> {
         type ObjectType = Set<members::object_type>;
-        type ObjectId = S::ObjectId;
-        type SignatureType = S::SignatureType;
-        type Signature = S::Signature;
-    }
-    ///State transition - sets the `object_id` field to Set
-    pub struct SetObjectId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetObjectId<S> {}
-    impl<S: State> State for SetObjectId<S> {
-        type Signer = S::Signer;
-        type SignedAt = S::SignedAt;
-        type ObjectType = S::ObjectType;
-        type ObjectId = Set<members::object_id>;
-        type SignatureType = S::SignatureType;
-        type Signature = S::Signature;
-    }
-    ///State transition - sets the `signature_type` field to Set
-    pub struct SetSignatureType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSignatureType<S> {}
-    impl<S: State> State for SetSignatureType<S> {
-        type Signer = S::Signer;
-        type SignedAt = S::SignedAt;
-        type ObjectType = S::ObjectType;
-        type ObjectId = S::ObjectId;
-        type SignatureType = Set<members::signature_type>;
-        type Signature = S::Signature;
+        type Signature = St::Signature;
+        type Signer = St::Signer;
+        type SignedAt = St::SignedAt;
+        type ObjectId = St::ObjectId;
+        type SignatureType = St::SignatureType;
     }
     ///State transition - sets the `signature` field to Set
-    pub struct SetSignature<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSignature<S> {}
-    impl<S: State> State for SetSignature<S> {
-        type Signer = S::Signer;
-        type SignedAt = S::SignedAt;
-        type ObjectType = S::ObjectType;
-        type ObjectId = S::ObjectId;
-        type SignatureType = S::SignatureType;
+    pub struct SetSignature<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSignature<St> {}
+    impl<St: State> State for SetSignature<St> {
+        type ObjectType = St::ObjectType;
         type Signature = Set<members::signature>;
+        type Signer = St::Signer;
+        type SignedAt = St::SignedAt;
+        type ObjectId = St::ObjectId;
+        type SignatureType = St::SignatureType;
+    }
+    ///State transition - sets the `signer` field to Set
+    pub struct SetSigner<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSigner<St> {}
+    impl<St: State> State for SetSigner<St> {
+        type ObjectType = St::ObjectType;
+        type Signature = St::Signature;
+        type Signer = Set<members::signer>;
+        type SignedAt = St::SignedAt;
+        type ObjectId = St::ObjectId;
+        type SignatureType = St::SignatureType;
+    }
+    ///State transition - sets the `signed_at` field to Set
+    pub struct SetSignedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSignedAt<St> {}
+    impl<St: State> State for SetSignedAt<St> {
+        type ObjectType = St::ObjectType;
+        type Signature = St::Signature;
+        type Signer = St::Signer;
+        type SignedAt = Set<members::signed_at>;
+        type ObjectId = St::ObjectId;
+        type SignatureType = St::SignatureType;
+    }
+    ///State transition - sets the `object_id` field to Set
+    pub struct SetObjectId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetObjectId<St> {}
+    impl<St: State> State for SetObjectId<St> {
+        type ObjectType = St::ObjectType;
+        type Signature = St::Signature;
+        type Signer = St::Signer;
+        type SignedAt = St::SignedAt;
+        type ObjectId = Set<members::object_id>;
+        type SignatureType = St::SignatureType;
+    }
+    ///State transition - sets the `signature_type` field to Set
+    pub struct SetSignatureType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSignatureType<St> {}
+    impl<St: State> State for SetSignatureType<St> {
+        type ObjectType = St::ObjectType;
+        type Signature = St::Signature;
+        type Signer = St::Signer;
+        type SignedAt = St::SignedAt;
+        type ObjectId = St::ObjectId;
+        type SignatureType = Set<members::signature_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `object_type` field
+        pub struct object_type(());
+        ///Marker type for the `signature` field
+        pub struct signature(());
         ///Marker type for the `signer` field
         pub struct signer(());
         ///Marker type for the `signed_at` field
         pub struct signed_at(());
-        ///Marker type for the `object_type` field
-        pub struct object_type(());
         ///Marker type for the `object_id` field
         pub struct object_id(());
         ///Marker type for the `signature_type` field
         pub struct signature_type(());
-        ///Marker type for the `signature` field
-        pub struct signature(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct SignatureProofBuilder<'a, S: signature_proof_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct SignatureProofBuilder<S: BosStr, St: signature_proof_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
         Option<SignatureProofObjectType<S>>,
@@ -400,66 +403,66 @@ pub struct SignatureProofBuilder<'a, S: signature_proof_state::State> {
         Option<i64>,
         Option<S>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> SignatureProof<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> SignatureProofBuilder<'a, signature_proof_state::Empty> {
+impl<S: BosStr> SignatureProof<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> SignatureProofBuilder<S, signature_proof_state::Empty> {
         SignatureProofBuilder::new()
     }
 }
 
-impl<'a> SignatureProofBuilder<'a, signature_proof_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> SignatureProofBuilder<S, signature_proof_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SignatureProofBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SignatureProofBuilder<'a, S>
+impl<S: BosStr, St> SignatureProofBuilder<S, St>
 where
-    S: signature_proof_state::State,
-    S::ObjectId: signature_proof_state::IsUnset,
+    St: signature_proof_state::State,
+    St::ObjectId: signature_proof_state::IsUnset,
 {
     /// Set the `objectId` field (required)
     pub fn object_id(
         mut self,
         value: impl Into<S>,
-    ) -> SignatureProofBuilder<'a, signature_proof_state::SetObjectId<S>> {
+    ) -> SignatureProofBuilder<S, signature_proof_state::SetObjectId<St>> {
         self._fields.0 = Option::Some(value.into());
         SignatureProofBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SignatureProofBuilder<'a, S>
+impl<S: BosStr, St> SignatureProofBuilder<S, St>
 where
-    S: signature_proof_state::State,
-    S::ObjectType: signature_proof_state::IsUnset,
+    St: signature_proof_state::State,
+    St::ObjectType: signature_proof_state::IsUnset,
 {
     /// Set the `objectType` field (required)
     pub fn object_type(
         mut self,
         value: impl Into<SignatureProofObjectType<S>>,
-    ) -> SignatureProofBuilder<'a, signature_proof_state::SetObjectType<S>> {
+    ) -> SignatureProofBuilder<S, signature_proof_state::SetObjectType<St>> {
         self._fields.1 = Option::Some(value.into());
         SignatureProofBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: signature_proof_state::State> SignatureProofBuilder<'a, S> {
+impl<S: BosStr, St: signature_proof_state::State> SignatureProofBuilder<S, St> {
     /// Set the `pdsEndpoint` field (optional)
     pub fn pds_endpoint(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -472,94 +475,94 @@ impl<'a, S: signature_proof_state::State> SignatureProofBuilder<'a, S> {
     }
 }
 
-impl<'a, S> SignatureProofBuilder<'a, S>
+impl<S: BosStr, St> SignatureProofBuilder<S, St>
 where
-    S: signature_proof_state::State,
-    S::Signature: signature_proof_state::IsUnset,
+    St: signature_proof_state::State,
+    St::Signature: signature_proof_state::IsUnset,
 {
     /// Set the `signature` field (required)
     pub fn signature(
         mut self,
         value: impl Into<S>,
-    ) -> SignatureProofBuilder<'a, signature_proof_state::SetSignature<S>> {
+    ) -> SignatureProofBuilder<S, signature_proof_state::SetSignature<St>> {
         self._fields.3 = Option::Some(value.into());
         SignatureProofBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SignatureProofBuilder<'a, S>
+impl<S: BosStr, St> SignatureProofBuilder<S, St>
 where
-    S: signature_proof_state::State,
-    S::SignatureType: signature_proof_state::IsUnset,
+    St: signature_proof_state::State,
+    St::SignatureType: signature_proof_state::IsUnset,
 {
     /// Set the `signatureType` field (required)
     pub fn signature_type(
         mut self,
         value: impl Into<S>,
-    ) -> SignatureProofBuilder<'a, signature_proof_state::SetSignatureType<S>> {
+    ) -> SignatureProofBuilder<S, signature_proof_state::SetSignatureType<St>> {
         self._fields.4 = Option::Some(value.into());
         SignatureProofBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SignatureProofBuilder<'a, S>
+impl<S: BosStr, St> SignatureProofBuilder<S, St>
 where
-    S: signature_proof_state::State,
-    S::SignedAt: signature_proof_state::IsUnset,
+    St: signature_proof_state::State,
+    St::SignedAt: signature_proof_state::IsUnset,
 {
     /// Set the `signedAt` field (required)
     pub fn signed_at(
         mut self,
         value: impl Into<i64>,
-    ) -> SignatureProofBuilder<'a, signature_proof_state::SetSignedAt<S>> {
+    ) -> SignatureProofBuilder<S, signature_proof_state::SetSignedAt<St>> {
         self._fields.5 = Option::Some(value.into());
         SignatureProofBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SignatureProofBuilder<'a, S>
+impl<S: BosStr, St> SignatureProofBuilder<S, St>
 where
-    S: signature_proof_state::State,
-    S::Signer: signature_proof_state::IsUnset,
+    St: signature_proof_state::State,
+    St::Signer: signature_proof_state::IsUnset,
 {
     /// Set the `signer` field (required)
     pub fn signer(
         mut self,
         value: impl Into<S>,
-    ) -> SignatureProofBuilder<'a, signature_proof_state::SetSigner<S>> {
+    ) -> SignatureProofBuilder<S, signature_proof_state::SetSigner<St>> {
         self._fields.6 = Option::Some(value.into());
         SignatureProofBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SignatureProofBuilder<'a, S>
+impl<S: BosStr, St> SignatureProofBuilder<S, St>
 where
-    S: signature_proof_state::State,
-    S::Signer: signature_proof_state::IsSet,
-    S::SignedAt: signature_proof_state::IsSet,
-    S::ObjectType: signature_proof_state::IsSet,
-    S::ObjectId: signature_proof_state::IsSet,
-    S::SignatureType: signature_proof_state::IsSet,
-    S::Signature: signature_proof_state::IsSet,
+    St: signature_proof_state::State,
+    St::ObjectType: signature_proof_state::IsSet,
+    St::Signature: signature_proof_state::IsSet,
+    St::Signer: signature_proof_state::IsSet,
+    St::SignedAt: signature_proof_state::IsSet,
+    St::ObjectId: signature_proof_state::IsSet,
+    St::SignatureType: signature_proof_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> SignatureProof<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> SignatureProof<S> {
         SignatureProof {
             object_id: self._fields.0.unwrap(),
             object_type: self._fields.1.unwrap(),
@@ -571,11 +574,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> SignatureProof<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> SignatureProof<S> {
         SignatureProof {
             object_id: self._fields.0.unwrap(),
             object_type: self._fields.1.unwrap(),

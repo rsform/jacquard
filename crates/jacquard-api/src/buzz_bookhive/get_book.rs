@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
 use jacquard_common::types::string::Datetime;
@@ -24,38 +24,34 @@ use crate::buzz_bookhive::Review;
 use crate::buzz_bookhive::hive_book::HiveBook;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetBook<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetBook<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub goodreads_id: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub id: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub isbn: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub isbn13: Option<S>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetBookOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetBookOutput<S: BosStr = DefaultStr> {
     ///Other users' activity on the book
     #[serde(skip_serializing_if = "Option::is_none")]
     pub activity: Option<Vec<Activity<S>>>,
@@ -87,15 +83,13 @@ pub struct GetBookOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub started_at: Option<Datetime>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub status: Option<GetBookOutputStatus<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum GetBookOutputStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum GetBookOutputStatus<S: BosStr = DefaultStr> {
     Finished,
     Reading,
     WantToRead,
@@ -104,7 +98,7 @@ pub enum GetBookOutputStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> GetBookOutputStatus<S> {
+impl<S: BosStr> GetBookOutputStatus<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Finished => "buzz.bookhive.defs#finished",
@@ -128,19 +122,19 @@ impl<S: Bos<str> + AsRef<str>> GetBookOutputStatus<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for GetBookOutputStatus<S> {
+impl<S: BosStr> core::fmt::Display for GetBookOutputStatus<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for GetBookOutputStatus<S> {
+impl<S: BosStr> AsRef<str> for GetBookOutputStatus<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for GetBookOutputStatus<S> {
+impl<S: BosStr> Serialize for GetBookOutputStatus<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -149,8 +143,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for GetBookOutputStatus<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for GetBookOutputStatus<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for GetBookOutputStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -160,14 +153,18 @@ for GetBookOutputStatus<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for GetBookOutputStatus<S> {
+impl<S: BosStr + Default> Default for GetBookOutputStatus<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for GetBookOutputStatus<S> {
-    type Output = GetBookOutputStatus<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for GetBookOutputStatus<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = GetBookOutputStatus<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             GetBookOutputStatus::Finished => GetBookOutputStatus::Finished,
@@ -185,12 +182,11 @@ pub struct GetBookResponse;
 impl jacquard_common::xrpc::XrpcResp for GetBookResponse {
     const NSID: &'static str = "buzz.bookhive.getBook";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetBookOutput<S>;
+    type Output<S: BosStr> = GetBookOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetBook<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetBook<S> {
     const NSID: &'static str = "buzz.bookhive.getBook";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetBookResponse;
@@ -201,7 +197,7 @@ pub struct GetBookRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetBookRequest {
     const PATH: &'static str = "/xrpc/buzz.bookhive.getBook";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetBook<S>;
+    type Request<S: BosStr> = GetBook<S>;
     type Response = GetBookResponse;
 }
 
@@ -224,32 +220,32 @@ pub mod get_book_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetBookBuilder<'a, S: get_book_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetBookBuilder<S: BosStr, St: get_book_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>, Option<S>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetBook<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetBookBuilder<'a, get_book_state::Empty> {
+impl<S: BosStr> GetBook<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetBookBuilder<S, get_book_state::Empty> {
         GetBookBuilder::new()
     }
 }
 
-impl<'a> GetBookBuilder<'a, get_book_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetBookBuilder<S, get_book_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetBookBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: get_book_state::State> GetBookBuilder<'a, S> {
+impl<S: BosStr, St: get_book_state::State> GetBookBuilder<S, St> {
     /// Set the `goodreadsId` field (optional)
     pub fn goodreads_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -262,7 +258,7 @@ impl<'a, S: get_book_state::State> GetBookBuilder<'a, S> {
     }
 }
 
-impl<'a, S: get_book_state::State> GetBookBuilder<'a, S> {
+impl<S: BosStr, St: get_book_state::State> GetBookBuilder<S, St> {
     /// Set the `id` field (optional)
     pub fn id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -275,7 +271,7 @@ impl<'a, S: get_book_state::State> GetBookBuilder<'a, S> {
     }
 }
 
-impl<'a, S: get_book_state::State> GetBookBuilder<'a, S> {
+impl<S: BosStr, St: get_book_state::State> GetBookBuilder<S, St> {
     /// Set the `isbn` field (optional)
     pub fn isbn(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -288,7 +284,7 @@ impl<'a, S: get_book_state::State> GetBookBuilder<'a, S> {
     }
 }
 
-impl<'a, S: get_book_state::State> GetBookBuilder<'a, S> {
+impl<S: BosStr, St: get_book_state::State> GetBookBuilder<S, St> {
     /// Set the `isbn13` field (optional)
     pub fn isbn13(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -301,12 +297,12 @@ impl<'a, S: get_book_state::State> GetBookBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GetBookBuilder<'a, S>
+impl<S: BosStr, St> GetBookBuilder<S, St>
 where
-    S: get_book_state::State,
+    St: get_book_state::State,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetBook<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetBook<S> {
         GetBook {
             goodreads_id: self._fields.0,
             id: self._fields.1,

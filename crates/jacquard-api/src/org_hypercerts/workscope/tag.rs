@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -38,11 +38,11 @@ use crate::org_hypercerts::Uri;
     rename = "org.hypercerts.workscope.tag",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Tag<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Tag<S: BosStr = DefaultStr> {
     ///Alternative human-readable names for this scope (e.g., translations, abbreviations, or common synonyms). Unlike sameAs, these are plain-text labels, not links to external ontologies.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub aliases: Option<Vec<S>>,
@@ -80,7 +80,7 @@ pub struct Tag<S: Bos<str> + AsRef<str> = DefaultStr> {
 /// Category type of this scope.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum TagCategory<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum TagCategory<S: BosStr = DefaultStr> {
     Topic,
     Language,
     Domain,
@@ -88,7 +88,7 @@ pub enum TagCategory<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> TagCategory<S> {
+impl<S: BosStr> TagCategory<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Topic => "topic",
@@ -110,19 +110,19 @@ impl<S: Bos<str> + AsRef<str>> TagCategory<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for TagCategory<S> {
+impl<S: BosStr> core::fmt::Display for TagCategory<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for TagCategory<S> {
+impl<S: BosStr> AsRef<str> for TagCategory<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for TagCategory<S> {
+impl<S: BosStr> Serialize for TagCategory<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -131,8 +131,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for TagCategory<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for TagCategory<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for TagCategory<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -142,14 +141,18 @@ for TagCategory<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for TagCategory<S> {
+impl<S: BosStr + Default> Default for TagCategory<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for TagCategory<S> {
-    type Output = TagCategory<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for TagCategory<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = TagCategory<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             TagCategory::Topic => TagCategory::Topic,
@@ -167,11 +170,11 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for TagCategory<S> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum TagReferenceDocument<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum TagReferenceDocument<S: BosStr = DefaultStr> {
     #[serde(rename = "org.hypercerts.defs#uri")]
     Uri(Box<Uri<S>>),
     #[serde(rename = "org.hypercerts.defs#smallBlob")]
@@ -181,14 +184,14 @@ pub enum TagReferenceDocument<S: Bos<str> + AsRef<str> = DefaultStr> {
 /// Lifecycle status of this tag. Communities propose tags, curators accept them, deprecated tags point to replacements via supersededBy.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum TagStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum TagStatus<S: BosStr = DefaultStr> {
     Proposed,
     Accepted,
     Deprecated,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> TagStatus<S> {
+impl<S: BosStr> TagStatus<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Proposed => "proposed",
@@ -208,19 +211,19 @@ impl<S: Bos<str> + AsRef<str>> TagStatus<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for TagStatus<S> {
+impl<S: BosStr> core::fmt::Display for TagStatus<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for TagStatus<S> {
+impl<S: BosStr> AsRef<str> for TagStatus<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for TagStatus<S> {
+impl<S: BosStr> Serialize for TagStatus<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -229,8 +232,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for TagStatus<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for TagStatus<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for TagStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -240,14 +242,18 @@ for TagStatus<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for TagStatus<S> {
+impl<S: BosStr + Default> Default for TagStatus<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for TagStatus<S> {
-    type Output = TagStatus<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for TagStatus<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = TagStatus<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             TagStatus::Proposed => TagStatus::Proposed,
@@ -264,18 +270,18 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for TagStatus<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct TagGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct TagGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Tag<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Tag<S> {
+impl<S: BosStr> Tag<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, TagRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -288,17 +294,17 @@ pub struct TagRecord;
 impl XrpcResp for TagRecord {
     const NSID: &'static str = "org.hypercerts.workscope.tag";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = TagGetRecordOutput<S>;
+    type Output<S: BosStr> = TagGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<TagGetRecordOutput<S>> for Tag<S> {
+impl<S: BosStr> From<TagGetRecordOutput<S>> for Tag<S> {
     fn from(output: TagGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Tag<S> {
+impl<S: BosStr> Collection for Tag<S> {
     const NSID: &'static str = "org.hypercerts.workscope.tag";
     type Record = TagRecord;
 }
@@ -308,7 +314,7 @@ impl Collection for TagRecord {
     type Record = TagRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Tag<S> {
+impl<S: BosStr> LexiconSchema for Tag<S> {
     fn nsid() -> &'static str {
         "org.hypercerts.workscope.tag"
     }
@@ -430,27 +436,27 @@ pub mod tag_state {
         type Name = Unset;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
-        type Key = S::Key;
-        type Name = S::Name;
+        type Key = St::Key;
+        type Name = St::Name;
     }
     ///State transition - sets the `key` field to Set
-    pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetKey<S> {}
-    impl<S: State> State for SetKey<S> {
-        type CreatedAt = S::CreatedAt;
+    pub struct SetKey<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetKey<St> {}
+    impl<St: State> State for SetKey<St> {
+        type CreatedAt = St::CreatedAt;
         type Key = Set<members::key>;
-        type Name = S::Name;
+        type Name = St::Name;
     }
     ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type CreatedAt = S::CreatedAt;
-        type Key = S::Key;
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type CreatedAt = St::CreatedAt;
+        type Key = St::Key;
         type Name = Set<members::name>;
     }
     /// Marker types for field names
@@ -465,9 +471,9 @@ pub mod tag_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct TagBuilder<'a, S: tag_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct TagBuilder<S: BosStr, St: tag_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<S>>,
         Option<TagCategory<S>>,
@@ -481,28 +487,28 @@ pub struct TagBuilder<'a, S: tag_state::State> {
         Option<TagStatus<S>>,
         Option<StrongRef<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Tag<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> TagBuilder<'a, tag_state::Empty> {
+impl<S: BosStr> Tag<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> TagBuilder<S, tag_state::Empty> {
         TagBuilder::new()
     }
 }
 
-impl<'a> TagBuilder<'a, tag_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> TagBuilder<S, tag_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         TagBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: tag_state::State> TagBuilder<'a, S> {
+impl<S: BosStr, St: tag_state::State> TagBuilder<S, St> {
     /// Set the `aliases` field (optional)
     pub fn aliases(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -515,7 +521,7 @@ impl<'a, S: tag_state::State> TagBuilder<'a, S> {
     }
 }
 
-impl<'a, S: tag_state::State> TagBuilder<'a, S> {
+impl<S: BosStr, St: tag_state::State> TagBuilder<S, St> {
     /// Set the `category` field (optional)
     pub fn category(mut self, value: impl Into<Option<TagCategory<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -528,26 +534,26 @@ impl<'a, S: tag_state::State> TagBuilder<'a, S> {
     }
 }
 
-impl<'a, S> TagBuilder<'a, S>
+impl<S: BosStr, St> TagBuilder<S, St>
 where
-    S: tag_state::State,
-    S::CreatedAt: tag_state::IsUnset,
+    St: tag_state::State,
+    St::CreatedAt: tag_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> TagBuilder<'a, tag_state::SetCreatedAt<S>> {
+    ) -> TagBuilder<S, tag_state::SetCreatedAt<St>> {
         self._fields.2 = Option::Some(value.into());
         TagBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: tag_state::State> TagBuilder<'a, S> {
+impl<S: BosStr, St: tag_state::State> TagBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -560,39 +566,39 @@ impl<'a, S: tag_state::State> TagBuilder<'a, S> {
     }
 }
 
-impl<'a, S> TagBuilder<'a, S>
+impl<S: BosStr, St> TagBuilder<S, St>
 where
-    S: tag_state::State,
-    S::Key: tag_state::IsUnset,
+    St: tag_state::State,
+    St::Key: tag_state::IsUnset,
 {
     /// Set the `key` field (required)
-    pub fn key(mut self, value: impl Into<S>) -> TagBuilder<'a, tag_state::SetKey<S>> {
+    pub fn key(mut self, value: impl Into<S>) -> TagBuilder<S, tag_state::SetKey<St>> {
         self._fields.4 = Option::Some(value.into());
         TagBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> TagBuilder<'a, S>
+impl<S: BosStr, St> TagBuilder<S, St>
 where
-    S: tag_state::State,
-    S::Name: tag_state::IsUnset,
+    St: tag_state::State,
+    St::Name: tag_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<S>) -> TagBuilder<'a, tag_state::SetName<S>> {
+    pub fn name(mut self, value: impl Into<S>) -> TagBuilder<S, tag_state::SetName<St>> {
         self._fields.5 = Option::Some(value.into());
         TagBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: tag_state::State> TagBuilder<'a, S> {
+impl<S: BosStr, St: tag_state::State> TagBuilder<S, St> {
     /// Set the `parent` field (optional)
     pub fn parent(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -605,7 +611,7 @@ impl<'a, S: tag_state::State> TagBuilder<'a, S> {
     }
 }
 
-impl<'a, S: tag_state::State> TagBuilder<'a, S> {
+impl<S: BosStr, St: tag_state::State> TagBuilder<S, St> {
     /// Set the `referenceDocument` field (optional)
     pub fn reference_document(
         mut self,
@@ -624,7 +630,7 @@ impl<'a, S: tag_state::State> TagBuilder<'a, S> {
     }
 }
 
-impl<'a, S: tag_state::State> TagBuilder<'a, S> {
+impl<S: BosStr, St: tag_state::State> TagBuilder<S, St> {
     /// Set the `sameAs` field (optional)
     pub fn same_as(mut self, value: impl Into<Option<Vec<UriValue<S>>>>) -> Self {
         self._fields.8 = value.into();
@@ -637,7 +643,7 @@ impl<'a, S: tag_state::State> TagBuilder<'a, S> {
     }
 }
 
-impl<'a, S: tag_state::State> TagBuilder<'a, S> {
+impl<S: BosStr, St: tag_state::State> TagBuilder<S, St> {
     /// Set the `status` field (optional)
     pub fn status(mut self, value: impl Into<Option<TagStatus<S>>>) -> Self {
         self._fields.9 = value.into();
@@ -650,7 +656,7 @@ impl<'a, S: tag_state::State> TagBuilder<'a, S> {
     }
 }
 
-impl<'a, S: tag_state::State> TagBuilder<'a, S> {
+impl<S: BosStr, St: tag_state::State> TagBuilder<S, St> {
     /// Set the `supersededBy` field (optional)
     pub fn superseded_by(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.10 = value.into();
@@ -663,15 +669,15 @@ impl<'a, S: tag_state::State> TagBuilder<'a, S> {
     }
 }
 
-impl<'a, S> TagBuilder<'a, S>
+impl<S: BosStr, St> TagBuilder<S, St>
 where
-    S: tag_state::State,
-    S::CreatedAt: tag_state::IsSet,
-    S::Key: tag_state::IsSet,
-    S::Name: tag_state::IsSet,
+    St: tag_state::State,
+    St::CreatedAt: tag_state::IsSet,
+    St::Key: tag_state::IsSet,
+    St::Name: tag_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Tag<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Tag<S> {
         Tag {
             aliases: self._fields.0,
             category: self._fields.1,
@@ -687,8 +693,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Tag<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Tag<S> {
         Tag {
             aliases: self._fields.0,
             category: self._fields.1,

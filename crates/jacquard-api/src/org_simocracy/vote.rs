@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
     rename = "org.simocracy.vote",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Vote<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Vote<S: BosStr = DefaultStr> {
     ///Timestamp when the vote was cast
     pub created_at: Datetime,
     ///Reference to the sim record being voted for
@@ -57,18 +57,18 @@ pub struct Vote<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct VoteGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct VoteGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Vote<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Vote<S> {
+impl<S: BosStr> Vote<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, VoteRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -81,17 +81,17 @@ pub struct VoteRecord;
 impl XrpcResp for VoteRecord {
     const NSID: &'static str = "org.simocracy.vote";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = VoteGetRecordOutput<S>;
+    type Output<S: BosStr> = VoteGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<VoteGetRecordOutput<S>> for Vote<S> {
+impl<S: BosStr> From<VoteGetRecordOutput<S>> for Vote<S> {
     fn from(output: VoteGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Vote<S> {
+impl<S: BosStr> Collection for Vote<S> {
     const NSID: &'static str = "org.simocracy.vote";
     type Record = VoteRecord;
 }
@@ -101,7 +101,7 @@ impl Collection for VoteRecord {
     type Record = VoteRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Vote<S> {
+impl<S: BosStr> LexiconSchema for Vote<S> {
     fn nsid() -> &'static str {
         "org.simocracy.vote"
     }
@@ -126,145 +126,145 @@ pub mod vote_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Sim;
         type Votes;
         type CreatedAt;
+        type Sim;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Sim = Unset;
         type Votes = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `sim` field to Set
-    pub struct SetSim<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSim<S> {}
-    impl<S: State> State for SetSim<S> {
-        type Sim = Set<members::sim>;
-        type Votes = S::Votes;
-        type CreatedAt = S::CreatedAt;
+        type Sim = Unset;
     }
     ///State transition - sets the `votes` field to Set
-    pub struct SetVotes<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVotes<S> {}
-    impl<S: State> State for SetVotes<S> {
-        type Sim = S::Sim;
+    pub struct SetVotes<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetVotes<St> {}
+    impl<St: State> State for SetVotes<St> {
         type Votes = Set<members::votes>;
-        type CreatedAt = S::CreatedAt;
+        type CreatedAt = St::CreatedAt;
+        type Sim = St::Sim;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Sim = S::Sim;
-        type Votes = S::Votes;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Votes = St::Votes;
         type CreatedAt = Set<members::created_at>;
+        type Sim = St::Sim;
+    }
+    ///State transition - sets the `sim` field to Set
+    pub struct SetSim<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSim<St> {}
+    impl<St: State> State for SetSim<St> {
+        type Votes = St::Votes;
+        type CreatedAt = St::CreatedAt;
+        type Sim = Set<members::sim>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `sim` field
-        pub struct sim(());
         ///Marker type for the `votes` field
         pub struct votes(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `sim` field
+        pub struct sim(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct VoteBuilder<'a, S: vote_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct VoteBuilder<S: BosStr, St: vote_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<StrongRef<S>>, Option<i64>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Vote<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> VoteBuilder<'a, vote_state::Empty> {
+impl<S: BosStr> Vote<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> VoteBuilder<S, vote_state::Empty> {
         VoteBuilder::new()
     }
 }
 
-impl<'a> VoteBuilder<'a, vote_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> VoteBuilder<S, vote_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         VoteBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> VoteBuilder<'a, S>
+impl<S: BosStr, St> VoteBuilder<S, St>
 where
-    S: vote_state::State,
-    S::CreatedAt: vote_state::IsUnset,
+    St: vote_state::State,
+    St::CreatedAt: vote_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> VoteBuilder<'a, vote_state::SetCreatedAt<S>> {
+    ) -> VoteBuilder<S, vote_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         VoteBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> VoteBuilder<'a, S>
+impl<S: BosStr, St> VoteBuilder<S, St>
 where
-    S: vote_state::State,
-    S::Sim: vote_state::IsUnset,
+    St: vote_state::State,
+    St::Sim: vote_state::IsUnset,
 {
     /// Set the `sim` field (required)
     pub fn sim(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> VoteBuilder<'a, vote_state::SetSim<S>> {
+    ) -> VoteBuilder<S, vote_state::SetSim<St>> {
         self._fields.1 = Option::Some(value.into());
         VoteBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> VoteBuilder<'a, S>
+impl<S: BosStr, St> VoteBuilder<S, St>
 where
-    S: vote_state::State,
-    S::Votes: vote_state::IsUnset,
+    St: vote_state::State,
+    St::Votes: vote_state::IsUnset,
 {
     /// Set the `votes` field (required)
     pub fn votes(
         mut self,
         value: impl Into<i64>,
-    ) -> VoteBuilder<'a, vote_state::SetVotes<S>> {
+    ) -> VoteBuilder<S, vote_state::SetVotes<St>> {
         self._fields.2 = Option::Some(value.into());
         VoteBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> VoteBuilder<'a, S>
+impl<S: BosStr, St> VoteBuilder<S, St>
 where
-    S: vote_state::State,
-    S::Sim: vote_state::IsSet,
-    S::Votes: vote_state::IsSet,
-    S::CreatedAt: vote_state::IsSet,
+    St: vote_state::State,
+    St::Votes: vote_state::IsSet,
+    St::CreatedAt: vote_state::IsSet,
+    St::Sim: vote_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Vote<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Vote<S> {
         Vote {
             created_at: self._fields.0.unwrap(),
             sim: self._fields.1.unwrap(),
@@ -272,8 +272,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Vote<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Vote<S> {
         Vote {
             created_at: self._fields.0.unwrap(),
             sim: self._fields.1.unwrap(),

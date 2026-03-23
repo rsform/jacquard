@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "com.suibari.atsumeat.config",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Config<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Config<S: BosStr = DefaultStr> {
     pub hub_ref: UriValue<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -51,18 +51,18 @@ pub struct Config<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ConfigGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ConfigGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Config<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Config<S> {
+impl<S: BosStr> Config<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, ConfigRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -75,17 +75,17 @@ pub struct ConfigRecord;
 impl XrpcResp for ConfigRecord {
     const NSID: &'static str = "com.suibari.atsumeat.config";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ConfigGetRecordOutput<S>;
+    type Output<S: BosStr> = ConfigGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<ConfigGetRecordOutput<S>> for Config<S> {
+impl<S: BosStr> From<ConfigGetRecordOutput<S>> for Config<S> {
     fn from(output: ConfigGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Config<S> {
+impl<S: BosStr> Collection for Config<S> {
     const NSID: &'static str = "com.suibari.atsumeat.config";
     type Record = ConfigRecord;
 }
@@ -95,7 +95,7 @@ impl Collection for ConfigRecord {
     type Record = ConfigRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Config<S> {
+impl<S: BosStr> LexiconSchema for Config<S> {
     fn nsid() -> &'static str {
         "com.suibari.atsumeat.config"
     }
@@ -129,9 +129,9 @@ pub mod config_state {
         type HubRef = Unset;
     }
     ///State transition - sets the `hub_ref` field to Set
-    pub struct SetHubRef<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHubRef<S> {}
-    impl<S: State> State for SetHubRef<S> {
+    pub struct SetHubRef<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHubRef<St> {}
+    impl<St: State> State for SetHubRef<St> {
         type HubRef = Set<members::hub_ref>;
     }
     /// Marker types for field names
@@ -142,64 +142,64 @@ pub mod config_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ConfigBuilder<'a, S: config_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ConfigBuilder<S: BosStr, St: config_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<UriValue<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Config<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ConfigBuilder<'a, config_state::Empty> {
+impl<S: BosStr> Config<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ConfigBuilder<S, config_state::Empty> {
         ConfigBuilder::new()
     }
 }
 
-impl<'a> ConfigBuilder<'a, config_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ConfigBuilder<S, config_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ConfigBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ConfigBuilder<'a, S>
+impl<S: BosStr, St> ConfigBuilder<S, St>
 where
-    S: config_state::State,
-    S::HubRef: config_state::IsUnset,
+    St: config_state::State,
+    St::HubRef: config_state::IsUnset,
 {
     /// Set the `hubRef` field (required)
     pub fn hub_ref(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> ConfigBuilder<'a, config_state::SetHubRef<S>> {
+    ) -> ConfigBuilder<S, config_state::SetHubRef<St>> {
         self._fields.0 = Option::Some(value.into());
         ConfigBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ConfigBuilder<'a, S>
+impl<S: BosStr, St> ConfigBuilder<S, St>
 where
-    S: config_state::State,
-    S::HubRef: config_state::IsSet,
+    St: config_state::State,
+    St::HubRef: config_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Config<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Config<S> {
         Config {
             hub_ref: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Config<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Config<S> {
         Config {
             hub_ref: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

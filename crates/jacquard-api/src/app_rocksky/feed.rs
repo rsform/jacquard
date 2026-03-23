@@ -17,7 +17,7 @@ pub mod search;
 
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -44,11 +44,11 @@ use crate::app_rocksky::feed;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct FeedGeneratorView<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct FeedGeneratorView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avatar: Option<UriValue<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -70,11 +70,11 @@ pub struct FeedGeneratorView<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct FeedGeneratorsView<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct FeedGeneratorsView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub feeds: Option<Vec<feed::FeedGeneratorView<S>>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -86,11 +86,11 @@ pub struct FeedGeneratorsView<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct FeedItemView<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct FeedItemView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub scrobble: Option<ScrobbleViewBasic<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -102,11 +102,11 @@ pub struct FeedItemView<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct FeedUriView<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct FeedUriView<S: BosStr = DefaultStr> {
     ///The feed URI.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub uri: Option<AtUri<S>>,
@@ -119,11 +119,11 @@ pub struct FeedUriView<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct FeedView<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct FeedView<S: BosStr = DefaultStr> {
     ///The pagination cursor for the next set of results.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -138,11 +138,11 @@ pub struct FeedView<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct NowPlayingView<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct NowPlayingView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub album: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -182,11 +182,11 @@ pub struct NowPlayingView<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct NowPlayingsView<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct NowPlayingsView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub now_playings: Option<Vec<feed::NowPlayingView<S>>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -198,11 +198,11 @@ pub struct NowPlayingsView<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SearchResultsView<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SearchResultsView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub estimated_total_hits: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -223,11 +223,11 @@ pub struct SearchResultsView<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum SearchResultsViewHitsItem<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum SearchResultsViewHitsItem<S: BosStr = DefaultStr> {
     #[serde(rename = "app.rocksky.song.defs#songViewBasic")]
     SongViewBasic(Box<SongViewBasic<S>>),
     #[serde(rename = "app.rocksky.album.defs#albumViewBasic")]
@@ -240,7 +240,7 @@ pub enum SearchResultsViewHitsItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     ProfileViewBasic(Box<ProfileViewBasic<S>>),
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for FeedGeneratorView<S> {
+impl<S: BosStr> LexiconSchema for FeedGeneratorView<S> {
     fn nsid() -> &'static str {
         "app.rocksky.feed.defs"
     }
@@ -255,7 +255,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for FeedGeneratorView<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for FeedGeneratorsView<S> {
+impl<S: BosStr> LexiconSchema for FeedGeneratorsView<S> {
     fn nsid() -> &'static str {
         "app.rocksky.feed.defs"
     }
@@ -270,7 +270,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for FeedGeneratorsView<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for FeedItemView<S> {
+impl<S: BosStr> LexiconSchema for FeedItemView<S> {
     fn nsid() -> &'static str {
         "app.rocksky.feed.defs"
     }
@@ -285,7 +285,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for FeedItemView<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for FeedUriView<S> {
+impl<S: BosStr> LexiconSchema for FeedUriView<S> {
     fn nsid() -> &'static str {
         "app.rocksky.feed.defs"
     }
@@ -300,7 +300,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for FeedUriView<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for FeedView<S> {
+impl<S: BosStr> LexiconSchema for FeedView<S> {
     fn nsid() -> &'static str {
         "app.rocksky.feed.defs"
     }
@@ -315,7 +315,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for FeedView<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for NowPlayingView<S> {
+impl<S: BosStr> LexiconSchema for NowPlayingView<S> {
     fn nsid() -> &'static str {
         "app.rocksky.feed.defs"
     }
@@ -330,7 +330,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for NowPlayingView<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for NowPlayingsView<S> {
+impl<S: BosStr> LexiconSchema for NowPlayingsView<S> {
     fn nsid() -> &'static str {
         "app.rocksky.feed.defs"
     }
@@ -345,7 +345,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for NowPlayingsView<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for SearchResultsView<S> {
+impl<S: BosStr> LexiconSchema for SearchResultsView<S> {
     fn nsid() -> &'static str {
         "app.rocksky.feed.defs"
     }

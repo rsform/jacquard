@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, Handle};
 use jacquard_common::types::value::Data;
@@ -18,14 +18,14 @@ use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CreateSession<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CreateSession<S: BosStr = DefaultStr> {
     ///When true, instead of throwing error for takendown accounts, a valid response with a narrow scoped token will be returned
     #[serde(skip_serializing_if = "Option::is_none")]
     pub allow_takendown: Option<bool>,
@@ -34,22 +34,20 @@ pub struct CreateSession<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Handle or other identifier supported by the server for the authenticating user.
     pub identifier: S,
     pub password: S,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CreateSessionOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CreateSessionOutput<S: BosStr = DefaultStr> {
     pub access_jwt: S,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub active: Option<bool>,
@@ -67,23 +65,21 @@ pub struct CreateSessionOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///If active=false, this optional field indicates a possible reason for why the account is not active. If active=false and no status is supplied, then the host makes no claim for why the repository is no longer being hosted.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub status: Option<CreateSessionOutputStatus<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// If active=false, this optional field indicates a possible reason for why the account is not active. If active=false and no status is supplied, then the host makes no claim for why the repository is no longer being hosted.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum CreateSessionOutputStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum CreateSessionOutputStatus<S: BosStr = DefaultStr> {
     Takendown,
     Suspended,
     Deactivated,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> CreateSessionOutputStatus<S> {
+impl<S: BosStr> CreateSessionOutputStatus<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Takendown => "takendown",
@@ -103,19 +99,19 @@ impl<S: Bos<str> + AsRef<str>> CreateSessionOutputStatus<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for CreateSessionOutputStatus<S> {
+impl<S: BosStr> core::fmt::Display for CreateSessionOutputStatus<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for CreateSessionOutputStatus<S> {
+impl<S: BosStr> AsRef<str> for CreateSessionOutputStatus<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for CreateSessionOutputStatus<S> {
+impl<S: BosStr> Serialize for CreateSessionOutputStatus<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -124,7 +120,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for CreateSessionOutputStatus<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
 for CreateSessionOutputStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
@@ -135,14 +131,18 @@ for CreateSessionOutputStatus<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for CreateSessionOutputStatus<S> {
+impl<S: BosStr + Default> Default for CreateSessionOutputStatus<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for CreateSessionOutputStatus<S> {
-    type Output = CreateSessionOutputStatus<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for CreateSessionOutputStatus<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = CreateSessionOutputStatus<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             CreateSessionOutputStatus::Takendown => CreateSessionOutputStatus::Takendown,
@@ -213,12 +213,11 @@ pub struct CreateSessionResponse;
 impl jacquard_common::xrpc::XrpcResp for CreateSessionResponse {
     const NSID: &'static str = "com.atproto.server.createSession";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = CreateSessionOutput<S>;
+    type Output<S: BosStr> = CreateSessionOutput<S>;
     type Err = CreateSessionError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for CreateSession<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for CreateSession<S> {
     const NSID: &'static str = "com.atproto.server.createSession";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -233,6 +232,6 @@ impl jacquard_common::xrpc::XrpcEndpoint for CreateSessionRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = CreateSession<S>;
+    type Request<S: BosStr> = CreateSession<S>;
     type Response = CreateSessionResponse;
 }

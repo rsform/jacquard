@@ -21,7 +21,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -49,11 +49,11 @@ use crate::app_rocksky::shout;
     rename = "app.rocksky.shout",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Shout<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Shout<S: BosStr = DefaultStr> {
     ///The date when the shout was created.
     pub created_at: Datetime,
     ///The message of the shout.
@@ -71,11 +71,11 @@ pub struct Shout<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ShoutGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ShoutGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
@@ -87,11 +87,11 @@ pub struct ShoutGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Author<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Author<S: BosStr = DefaultStr> {
     ///The URL of the author's avatar image.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avatar: Option<UriValue<S>>,
@@ -116,11 +116,11 @@ pub struct Author<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ShoutView<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ShoutView<S: BosStr = DefaultStr> {
     ///The author of the shout.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub author: Option<shout::Author<S>>,
@@ -140,7 +140,7 @@ pub struct ShoutView<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Shout<S> {
+impl<S: BosStr> Shout<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, ShoutRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -153,17 +153,17 @@ pub struct ShoutRecord;
 impl XrpcResp for ShoutRecord {
     const NSID: &'static str = "app.rocksky.shout";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ShoutGetRecordOutput<S>;
+    type Output<S: BosStr> = ShoutGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<ShoutGetRecordOutput<S>> for Shout<S> {
+impl<S: BosStr> From<ShoutGetRecordOutput<S>> for Shout<S> {
     fn from(output: ShoutGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Shout<S> {
+impl<S: BosStr> Collection for Shout<S> {
     const NSID: &'static str = "app.rocksky.shout";
     type Record = ShoutRecord;
 }
@@ -173,7 +173,7 @@ impl Collection for ShoutRecord {
     type Record = ShoutRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Shout<S> {
+impl<S: BosStr> LexiconSchema for Shout<S> {
     fn nsid() -> &'static str {
         "app.rocksky.shout"
     }
@@ -210,7 +210,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Shout<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Author<S> {
+impl<S: BosStr> LexiconSchema for Author<S> {
     fn nsid() -> &'static str {
         "app.rocksky.shout.defs"
     }
@@ -225,7 +225,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Author<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ShoutView<S> {
+impl<S: BosStr> LexiconSchema for ShoutView<S> {
     fn nsid() -> &'static str {
         "app.rocksky.shout.defs"
     }
@@ -250,118 +250,118 @@ pub mod shout_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Message;
         type CreatedAt;
         type Subject;
+        type Message;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Message = Unset;
         type CreatedAt = Unset;
         type Subject = Unset;
-    }
-    ///State transition - sets the `message` field to Set
-    pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMessage<S> {}
-    impl<S: State> State for SetMessage<S> {
-        type Message = Set<members::message>;
-        type CreatedAt = S::CreatedAt;
-        type Subject = S::Subject;
+        type Message = Unset;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Message = S::Message;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
-        type Subject = S::Subject;
+        type Subject = St::Subject;
+        type Message = St::Message;
     }
     ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type Message = S::Message;
-        type CreatedAt = S::CreatedAt;
+    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubject<St> {}
+    impl<St: State> State for SetSubject<St> {
+        type CreatedAt = St::CreatedAt;
         type Subject = Set<members::subject>;
+        type Message = St::Message;
+    }
+    ///State transition - sets the `message` field to Set
+    pub struct SetMessage<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMessage<St> {}
+    impl<St: State> State for SetMessage<St> {
+        type CreatedAt = St::CreatedAt;
+        type Subject = St::Subject;
+        type Message = Set<members::message>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `message` field
-        pub struct message(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `subject` field
         pub struct subject(());
+        ///Marker type for the `message` field
+        pub struct message(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ShoutBuilder<'a, S: shout_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ShoutBuilder<S: BosStr, St: shout_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<S>, Option<StrongRef<S>>, Option<StrongRef<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Shout<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ShoutBuilder<'a, shout_state::Empty> {
+impl<S: BosStr> Shout<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ShoutBuilder<S, shout_state::Empty> {
         ShoutBuilder::new()
     }
 }
 
-impl<'a> ShoutBuilder<'a, shout_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ShoutBuilder<S, shout_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ShoutBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ShoutBuilder<'a, S>
+impl<S: BosStr, St> ShoutBuilder<S, St>
 where
-    S: shout_state::State,
-    S::CreatedAt: shout_state::IsUnset,
+    St: shout_state::State,
+    St::CreatedAt: shout_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ShoutBuilder<'a, shout_state::SetCreatedAt<S>> {
+    ) -> ShoutBuilder<S, shout_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         ShoutBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ShoutBuilder<'a, S>
+impl<S: BosStr, St> ShoutBuilder<S, St>
 where
-    S: shout_state::State,
-    S::Message: shout_state::IsUnset,
+    St: shout_state::State,
+    St::Message: shout_state::IsUnset,
 {
     /// Set the `message` field (required)
     pub fn message(
         mut self,
         value: impl Into<S>,
-    ) -> ShoutBuilder<'a, shout_state::SetMessage<S>> {
+    ) -> ShoutBuilder<S, shout_state::SetMessage<St>> {
         self._fields.1 = Option::Some(value.into());
         ShoutBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: shout_state::State> ShoutBuilder<'a, S> {
+impl<S: BosStr, St: shout_state::State> ShoutBuilder<S, St> {
     /// Set the `parent` field (optional)
     pub fn parent(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -374,34 +374,34 @@ impl<'a, S: shout_state::State> ShoutBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ShoutBuilder<'a, S>
+impl<S: BosStr, St> ShoutBuilder<S, St>
 where
-    S: shout_state::State,
-    S::Subject: shout_state::IsUnset,
+    St: shout_state::State,
+    St::Subject: shout_state::IsUnset,
 {
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> ShoutBuilder<'a, shout_state::SetSubject<S>> {
+    ) -> ShoutBuilder<S, shout_state::SetSubject<St>> {
         self._fields.3 = Option::Some(value.into());
         ShoutBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ShoutBuilder<'a, S>
+impl<S: BosStr, St> ShoutBuilder<S, St>
 where
-    S: shout_state::State,
-    S::Message: shout_state::IsSet,
-    S::CreatedAt: shout_state::IsSet,
-    S::Subject: shout_state::IsSet,
+    St: shout_state::State,
+    St::CreatedAt: shout_state::IsSet,
+    St::Subject: shout_state::IsSet,
+    St::Message: shout_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Shout<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Shout<S> {
         Shout {
             created_at: self._fields.0.unwrap(),
             message: self._fields.1.unwrap(),
@@ -410,8 +410,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Shout<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Shout<S> {
         Shout {
             created_at: self._fields.0.unwrap(),
             message: self._fields.1.unwrap(),

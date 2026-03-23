@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "social.grain.photo.exif",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Exif<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Exif<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub date_time_original: Option<Datetime>,
@@ -72,18 +72,18 @@ pub struct Exif<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ExifGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ExifGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Exif<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Exif<S> {
+impl<S: BosStr> Exif<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, ExifRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -96,17 +96,17 @@ pub struct ExifRecord;
 impl XrpcResp for ExifRecord {
     const NSID: &'static str = "social.grain.photo.exif";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ExifGetRecordOutput<S>;
+    type Output<S: BosStr> = ExifGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<ExifGetRecordOutput<S>> for Exif<S> {
+impl<S: BosStr> From<ExifGetRecordOutput<S>> for Exif<S> {
     fn from(output: ExifGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Exif<S> {
+impl<S: BosStr> Collection for Exif<S> {
     const NSID: &'static str = "social.grain.photo.exif";
     type Record = ExifRecord;
 }
@@ -116,7 +116,7 @@ impl Collection for ExifRecord {
     type Record = ExifRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Exif<S> {
+impl<S: BosStr> LexiconSchema for Exif<S> {
     fn nsid() -> &'static str {
         "social.grain.photo.exif"
     }
@@ -141,43 +141,43 @@ pub mod exif_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Photo;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Photo = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Photo = S::Photo;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `photo` field to Set
-    pub struct SetPhoto<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPhoto<S> {}
-    impl<S: State> State for SetPhoto<S> {
-        type CreatedAt = S::CreatedAt;
+    pub struct SetPhoto<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPhoto<St> {}
+    impl<St: State> State for SetPhoto<St> {
         type Photo = Set<members::photo>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Photo = St::Photo;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `photo` field
         pub struct photo(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ExifBuilder<'a, S: exif_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ExifBuilder<S: BosStr, St: exif_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
         Option<Datetime>,
@@ -192,18 +192,18 @@ pub struct ExifBuilder<'a, S: exif_state::State> {
         Option<S>,
         Option<AtUri<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Exif<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ExifBuilder<'a, exif_state::Empty> {
+impl<S: BosStr> Exif<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ExifBuilder<S, exif_state::Empty> {
         ExifBuilder::new()
     }
 }
 
-impl<'a> ExifBuilder<'a, exif_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ExifBuilder<S, exif_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ExifBuilder {
             _state: PhantomData,
@@ -221,31 +221,31 @@ impl<'a> ExifBuilder<'a, exif_state::Empty> {
                 None,
                 None,
             ),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ExifBuilder<'a, S>
+impl<S: BosStr, St> ExifBuilder<S, St>
 where
-    S: exif_state::State,
-    S::CreatedAt: exif_state::IsUnset,
+    St: exif_state::State,
+    St::CreatedAt: exif_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ExifBuilder<'a, exif_state::SetCreatedAt<S>> {
+    ) -> ExifBuilder<S, exif_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         ExifBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
+impl<S: BosStr, St: exif_state::State> ExifBuilder<S, St> {
     /// Set the `dateTimeOriginal` field (optional)
     pub fn date_time_original(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.1 = value.into();
@@ -258,7 +258,7 @@ impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
     }
 }
 
-impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
+impl<S: BosStr, St: exif_state::State> ExifBuilder<S, St> {
     /// Set the `exposureTime` field (optional)
     pub fn exposure_time(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -271,7 +271,7 @@ impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
     }
 }
 
-impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
+impl<S: BosStr, St: exif_state::State> ExifBuilder<S, St> {
     /// Set the `fNumber` field (optional)
     pub fn f_number(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.3 = value.into();
@@ -284,7 +284,7 @@ impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
     }
 }
 
-impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
+impl<S: BosStr, St: exif_state::State> ExifBuilder<S, St> {
     /// Set the `flash` field (optional)
     pub fn flash(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
@@ -297,7 +297,7 @@ impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
     }
 }
 
-impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
+impl<S: BosStr, St: exif_state::State> ExifBuilder<S, St> {
     /// Set the `focalLengthIn35mmFormat` field (optional)
     pub fn focal_length_in35mm_format(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.5 = value.into();
@@ -310,7 +310,7 @@ impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
     }
 }
 
-impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
+impl<S: BosStr, St: exif_state::State> ExifBuilder<S, St> {
     /// Set the `iSO` field (optional)
     pub fn i_so(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.6 = value.into();
@@ -323,7 +323,7 @@ impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
     }
 }
 
-impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
+impl<S: BosStr, St: exif_state::State> ExifBuilder<S, St> {
     /// Set the `lensMake` field (optional)
     pub fn lens_make(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.7 = value.into();
@@ -336,7 +336,7 @@ impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
     }
 }
 
-impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
+impl<S: BosStr, St: exif_state::State> ExifBuilder<S, St> {
     /// Set the `lensModel` field (optional)
     pub fn lens_model(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.8 = value.into();
@@ -349,7 +349,7 @@ impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
     }
 }
 
-impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
+impl<S: BosStr, St: exif_state::State> ExifBuilder<S, St> {
     /// Set the `make` field (optional)
     pub fn make(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.9 = value.into();
@@ -362,7 +362,7 @@ impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
     }
 }
 
-impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
+impl<S: BosStr, St: exif_state::State> ExifBuilder<S, St> {
     /// Set the `model` field (optional)
     pub fn model(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.10 = value.into();
@@ -375,33 +375,33 @@ impl<'a, S: exif_state::State> ExifBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ExifBuilder<'a, S>
+impl<S: BosStr, St> ExifBuilder<S, St>
 where
-    S: exif_state::State,
-    S::Photo: exif_state::IsUnset,
+    St: exif_state::State,
+    St::Photo: exif_state::IsUnset,
 {
     /// Set the `photo` field (required)
     pub fn photo(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> ExifBuilder<'a, exif_state::SetPhoto<S>> {
+    ) -> ExifBuilder<S, exif_state::SetPhoto<St>> {
         self._fields.11 = Option::Some(value.into());
         ExifBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ExifBuilder<'a, S>
+impl<S: BosStr, St> ExifBuilder<S, St>
 where
-    S: exif_state::State,
-    S::CreatedAt: exif_state::IsSet,
-    S::Photo: exif_state::IsSet,
+    St: exif_state::State,
+    St::Photo: exif_state::IsSet,
+    St::CreatedAt: exif_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Exif<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Exif<S> {
         Exif {
             created_at: self._fields.0.unwrap(),
             date_time_original: self._fields.1,
@@ -418,8 +418,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Exif<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Exif<S> {
         Exif {
             created_at: self._fields.0.unwrap(),
             date_time_original: self._fields.1,

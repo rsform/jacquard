@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -37,11 +37,11 @@ use crate::pub_quizzy::quiz;
     rename = "pub.quizzy.quiz",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Quiz<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Quiz<S: BosStr = DefaultStr> {
     ///A short description about the quiz, and what to expect from it
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
@@ -74,11 +74,11 @@ pub struct Quiz<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct QuizGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct QuizGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
@@ -91,11 +91,11 @@ pub struct QuizGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct QuestionRef<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct QuestionRef<S: BosStr = DefaultStr> {
     ///A custom name for this question, as opposed to its number
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<S>,
@@ -114,11 +114,11 @@ pub struct QuestionRef<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Round<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Round<S: BosStr = DefaultStr> {
     ///Ordered list of questions in this round
     pub questions: Vec<quiz::QuestionRef<S>>,
     ///Optional title for this round (requires locale if set)
@@ -128,7 +128,7 @@ pub struct Round<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Quiz<S> {
+impl<S: BosStr> Quiz<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, QuizRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -141,17 +141,17 @@ pub struct QuizRecord;
 impl XrpcResp for QuizRecord {
     const NSID: &'static str = "pub.quizzy.quiz";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = QuizGetRecordOutput<S>;
+    type Output<S: BosStr> = QuizGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<QuizGetRecordOutput<S>> for Quiz<S> {
+impl<S: BosStr> From<QuizGetRecordOutput<S>> for Quiz<S> {
     fn from(output: QuizGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Quiz<S> {
+impl<S: BosStr> Collection for Quiz<S> {
     const NSID: &'static str = "pub.quizzy.quiz";
     type Record = QuizRecord;
 }
@@ -161,7 +161,7 @@ impl Collection for QuizRecord {
     type Record = QuizRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Quiz<S> {
+impl<S: BosStr> LexiconSchema for Quiz<S> {
     fn nsid() -> &'static str {
         "pub.quizzy.quiz"
     }
@@ -242,7 +242,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Quiz<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for QuestionRef<S> {
+impl<S: BosStr> LexiconSchema for QuestionRef<S> {
     fn nsid() -> &'static str {
         "pub.quizzy.quiz"
     }
@@ -288,7 +288,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for QuestionRef<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Round<S> {
+impl<S: BosStr> LexiconSchema for Round<S> {
     fn nsid() -> &'static str {
         "pub.quizzy.quiz"
     }
@@ -365,73 +365,73 @@ pub mod quiz_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
-        type Rounds;
         type Locales;
         type Timestamp;
+        type Title;
+        type Rounds;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
-        type Rounds = Unset;
         type Locales = Unset;
         type Timestamp = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type Rounds = S::Rounds;
-        type Locales = S::Locales;
-        type Timestamp = S::Timestamp;
-    }
-    ///State transition - sets the `rounds` field to Set
-    pub struct SetRounds<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRounds<S> {}
-    impl<S: State> State for SetRounds<S> {
-        type Title = S::Title;
-        type Rounds = Set<members::rounds>;
-        type Locales = S::Locales;
-        type Timestamp = S::Timestamp;
+        type Title = Unset;
+        type Rounds = Unset;
     }
     ///State transition - sets the `locales` field to Set
-    pub struct SetLocales<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLocales<S> {}
-    impl<S: State> State for SetLocales<S> {
-        type Title = S::Title;
-        type Rounds = S::Rounds;
+    pub struct SetLocales<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLocales<St> {}
+    impl<St: State> State for SetLocales<St> {
         type Locales = Set<members::locales>;
-        type Timestamp = S::Timestamp;
+        type Timestamp = St::Timestamp;
+        type Title = St::Title;
+        type Rounds = St::Rounds;
     }
     ///State transition - sets the `timestamp` field to Set
-    pub struct SetTimestamp<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTimestamp<S> {}
-    impl<S: State> State for SetTimestamp<S> {
-        type Title = S::Title;
-        type Rounds = S::Rounds;
-        type Locales = S::Locales;
+    pub struct SetTimestamp<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTimestamp<St> {}
+    impl<St: State> State for SetTimestamp<St> {
+        type Locales = St::Locales;
         type Timestamp = Set<members::timestamp>;
+        type Title = St::Title;
+        type Rounds = St::Rounds;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
+        type Locales = St::Locales;
+        type Timestamp = St::Timestamp;
+        type Title = Set<members::title>;
+        type Rounds = St::Rounds;
+    }
+    ///State transition - sets the `rounds` field to Set
+    pub struct SetRounds<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRounds<St> {}
+    impl<St: State> State for SetRounds<St> {
+        type Locales = St::Locales;
+        type Timestamp = St::Timestamp;
+        type Title = St::Title;
+        type Rounds = Set<members::rounds>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
-        ///Marker type for the `rounds` field
-        pub struct rounds(());
         ///Marker type for the `locales` field
         pub struct locales(());
         ///Marker type for the `timestamp` field
         pub struct timestamp(());
+        ///Marker type for the `title` field
+        pub struct title(());
+        ///Marker type for the `rounds` field
+        pub struct rounds(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct QuizBuilder<'a, S: quiz_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct QuizBuilder<S: BosStr, St: quiz_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
         Option<bool>,
@@ -442,28 +442,28 @@ pub struct QuizBuilder<'a, S: quiz_state::State> {
         Option<Datetime>,
         Option<S>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Quiz<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> QuizBuilder<'a, quiz_state::Empty> {
+impl<S: BosStr> Quiz<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> QuizBuilder<S, quiz_state::Empty> {
         QuizBuilder::new()
     }
 }
 
-impl<'a> QuizBuilder<'a, quiz_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> QuizBuilder<S, quiz_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         QuizBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: quiz_state::State> QuizBuilder<'a, S> {
+impl<S: BosStr, St: quiz_state::State> QuizBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -476,7 +476,7 @@ impl<'a, S: quiz_state::State> QuizBuilder<'a, S> {
     }
 }
 
-impl<'a, S: quiz_state::State> QuizBuilder<'a, S> {
+impl<S: BosStr, St: quiz_state::State> QuizBuilder<S, St> {
     /// Set the `hasAudio` field (optional)
     pub fn has_audio(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.1 = value.into();
@@ -489,7 +489,7 @@ impl<'a, S: quiz_state::State> QuizBuilder<'a, S> {
     }
 }
 
-impl<'a, S: quiz_state::State> QuizBuilder<'a, S> {
+impl<S: BosStr, St: quiz_state::State> QuizBuilder<S, St> {
     /// Set the `hasVisuals` field (optional)
     pub fn has_visuals(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.2 = value.into();
@@ -502,26 +502,26 @@ impl<'a, S: quiz_state::State> QuizBuilder<'a, S> {
     }
 }
 
-impl<'a, S> QuizBuilder<'a, S>
+impl<S: BosStr, St> QuizBuilder<S, St>
 where
-    S: quiz_state::State,
-    S::Locales: quiz_state::IsUnset,
+    St: quiz_state::State,
+    St::Locales: quiz_state::IsUnset,
 {
     /// Set the `locales` field (required)
     pub fn locales(
         mut self,
         value: impl Into<Vec<Language>>,
-    ) -> QuizBuilder<'a, quiz_state::SetLocales<S>> {
+    ) -> QuizBuilder<S, quiz_state::SetLocales<St>> {
         self._fields.3 = Option::Some(value.into());
         QuizBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: quiz_state::State> QuizBuilder<'a, S> {
+impl<S: BosStr, St: quiz_state::State> QuizBuilder<S, St> {
     /// Set the `revisionOf` field (optional)
     pub fn revision_of(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -534,73 +534,73 @@ impl<'a, S: quiz_state::State> QuizBuilder<'a, S> {
     }
 }
 
-impl<'a, S> QuizBuilder<'a, S>
+impl<S: BosStr, St> QuizBuilder<S, St>
 where
-    S: quiz_state::State,
-    S::Rounds: quiz_state::IsUnset,
+    St: quiz_state::State,
+    St::Rounds: quiz_state::IsUnset,
 {
     /// Set the `rounds` field (required)
     pub fn rounds(
         mut self,
         value: impl Into<Vec<quiz::Round<S>>>,
-    ) -> QuizBuilder<'a, quiz_state::SetRounds<S>> {
+    ) -> QuizBuilder<S, quiz_state::SetRounds<St>> {
         self._fields.5 = Option::Some(value.into());
         QuizBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> QuizBuilder<'a, S>
+impl<S: BosStr, St> QuizBuilder<S, St>
 where
-    S: quiz_state::State,
-    S::Timestamp: quiz_state::IsUnset,
+    St: quiz_state::State,
+    St::Timestamp: quiz_state::IsUnset,
 {
     /// Set the `timestamp` field (required)
     pub fn timestamp(
         mut self,
         value: impl Into<Datetime>,
-    ) -> QuizBuilder<'a, quiz_state::SetTimestamp<S>> {
+    ) -> QuizBuilder<S, quiz_state::SetTimestamp<St>> {
         self._fields.6 = Option::Some(value.into());
         QuizBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> QuizBuilder<'a, S>
+impl<S: BosStr, St> QuizBuilder<S, St>
 where
-    S: quiz_state::State,
-    S::Title: quiz_state::IsUnset,
+    St: quiz_state::State,
+    St::Title: quiz_state::IsUnset,
 {
     /// Set the `title` field (required)
     pub fn title(
         mut self,
         value: impl Into<S>,
-    ) -> QuizBuilder<'a, quiz_state::SetTitle<S>> {
+    ) -> QuizBuilder<S, quiz_state::SetTitle<St>> {
         self._fields.7 = Option::Some(value.into());
         QuizBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> QuizBuilder<'a, S>
+impl<S: BosStr, St> QuizBuilder<S, St>
 where
-    S: quiz_state::State,
-    S::Title: quiz_state::IsSet,
-    S::Rounds: quiz_state::IsSet,
-    S::Locales: quiz_state::IsSet,
-    S::Timestamp: quiz_state::IsSet,
+    St: quiz_state::State,
+    St::Locales: quiz_state::IsSet,
+    St::Timestamp: quiz_state::IsSet,
+    St::Title: quiz_state::IsSet,
+    St::Rounds: quiz_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Quiz<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Quiz<S> {
         Quiz {
             description: self._fields.0,
             has_audio: self._fields.1.or_else(|| Some(false)),
@@ -613,8 +613,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Quiz<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Quiz<S> {
         Quiz {
             description: self._fields.0,
             has_audio: self._fields.1.or_else(|| Some(false)),
@@ -863,9 +863,9 @@ pub mod question_ref_state {
         type Question = Unset;
     }
     ///State transition - sets the `question` field to Set
-    pub struct SetQuestion<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetQuestion<S> {}
-    impl<S: State> State for SetQuestion<S> {
+    pub struct SetQuestion<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetQuestion<St> {}
+    impl<St: State> State for SetQuestion<St> {
         type Question = Set<members::question>;
     }
     /// Marker types for field names
@@ -876,32 +876,32 @@ pub mod question_ref_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct QuestionRefBuilder<'a, S: question_ref_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct QuestionRefBuilder<S: BosStr, St: question_ref_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>, Option<StrongRef<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> QuestionRef<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> QuestionRefBuilder<'a, question_ref_state::Empty> {
+impl<S: BosStr> QuestionRef<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> QuestionRefBuilder<S, question_ref_state::Empty> {
         QuestionRefBuilder::new()
     }
 }
 
-impl<'a> QuestionRefBuilder<'a, question_ref_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> QuestionRefBuilder<S, question_ref_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         QuestionRefBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: question_ref_state::State> QuestionRefBuilder<'a, S> {
+impl<S: BosStr, St: question_ref_state::State> QuestionRefBuilder<S, St> {
     /// Set the `name` field (optional)
     pub fn name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -914,7 +914,7 @@ impl<'a, S: question_ref_state::State> QuestionRefBuilder<'a, S> {
     }
 }
 
-impl<'a, S: question_ref_state::State> QuestionRefBuilder<'a, S> {
+impl<S: BosStr, St: question_ref_state::State> QuestionRefBuilder<S, St> {
     /// Set the `points` field (optional)
     pub fn points(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -927,32 +927,32 @@ impl<'a, S: question_ref_state::State> QuestionRefBuilder<'a, S> {
     }
 }
 
-impl<'a, S> QuestionRefBuilder<'a, S>
+impl<S: BosStr, St> QuestionRefBuilder<S, St>
 where
-    S: question_ref_state::State,
-    S::Question: question_ref_state::IsUnset,
+    St: question_ref_state::State,
+    St::Question: question_ref_state::IsUnset,
 {
     /// Set the `question` field (required)
     pub fn question(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> QuestionRefBuilder<'a, question_ref_state::SetQuestion<S>> {
+    ) -> QuestionRefBuilder<S, question_ref_state::SetQuestion<St>> {
         self._fields.2 = Option::Some(value.into());
         QuestionRefBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> QuestionRefBuilder<'a, S>
+impl<S: BosStr, St> QuestionRefBuilder<S, St>
 where
-    S: question_ref_state::State,
-    S::Question: question_ref_state::IsSet,
+    St: question_ref_state::State,
+    St::Question: question_ref_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> QuestionRef<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> QuestionRef<S> {
         QuestionRef {
             name: self._fields.0,
             points: self._fields.1.or_else(|| Some(1i64)),
@@ -960,11 +960,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> QuestionRef<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> QuestionRef<S> {
         QuestionRef {
             name: self._fields.0,
             points: self._fields.1.or_else(|| Some(1i64)),
@@ -993,9 +993,9 @@ pub mod round_state {
         type Questions = Unset;
     }
     ///State transition - sets the `questions` field to Set
-    pub struct SetQuestions<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetQuestions<S> {}
-    impl<S: State> State for SetQuestions<S> {
+    pub struct SetQuestions<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetQuestions<St> {}
+    impl<St: State> State for SetQuestions<St> {
         type Questions = Set<members::questions>;
     }
     /// Marker types for field names
@@ -1006,51 +1006,51 @@ pub mod round_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct RoundBuilder<'a, S: round_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct RoundBuilder<S: BosStr, St: round_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<quiz::QuestionRef<S>>>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Round<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> RoundBuilder<'a, round_state::Empty> {
+impl<S: BosStr> Round<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> RoundBuilder<S, round_state::Empty> {
         RoundBuilder::new()
     }
 }
 
-impl<'a> RoundBuilder<'a, round_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> RoundBuilder<S, round_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         RoundBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RoundBuilder<'a, S>
+impl<S: BosStr, St> RoundBuilder<S, St>
 where
-    S: round_state::State,
-    S::Questions: round_state::IsUnset,
+    St: round_state::State,
+    St::Questions: round_state::IsUnset,
 {
     /// Set the `questions` field (required)
     pub fn questions(
         mut self,
         value: impl Into<Vec<quiz::QuestionRef<S>>>,
-    ) -> RoundBuilder<'a, round_state::SetQuestions<S>> {
+    ) -> RoundBuilder<S, round_state::SetQuestions<St>> {
         self._fields.0 = Option::Some(value.into());
         RoundBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: round_state::State> RoundBuilder<'a, S> {
+impl<S: BosStr, St: round_state::State> RoundBuilder<S, St> {
     /// Set the `title` field (optional)
     pub fn title(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -1063,21 +1063,21 @@ impl<'a, S: round_state::State> RoundBuilder<'a, S> {
     }
 }
 
-impl<'a, S> RoundBuilder<'a, S>
+impl<S: BosStr, St> RoundBuilder<S, St>
 where
-    S: round_state::State,
-    S::Questions: round_state::IsSet,
+    St: round_state::State,
+    St::Questions: round_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Round<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Round<S> {
         Round {
             questions: self._fields.0.unwrap(),
             title: self._fields.1,
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Round<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Round<S> {
         Round {
             questions: self._fields.0.unwrap(),
             title: self._fields.1,

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -30,18 +30,18 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct TileEmbed<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct TileEmbed<S: BosStr = DefaultStr> {
     ///A strong reference to a garden.lexicon.exultant-zebra.tile record.
     pub tile: StrongRef<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for TileEmbed<S> {
+impl<S: BosStr> LexiconSchema for TileEmbed<S> {
     fn nsid() -> &'static str {
         "garden.lexicon.exultant-zebra.tileEmbed"
     }
@@ -75,9 +75,9 @@ pub mod tile_embed_state {
         type Tile = Unset;
     }
     ///State transition - sets the `tile` field to Set
-    pub struct SetTile<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTile<S> {}
-    impl<S: State> State for SetTile<S> {
+    pub struct SetTile<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTile<St> {}
+    impl<St: State> State for SetTile<St> {
         type Tile = Set<members::tile>;
     }
     /// Marker types for field names
@@ -88,67 +88,67 @@ pub mod tile_embed_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct TileEmbedBuilder<'a, S: tile_embed_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct TileEmbedBuilder<S: BosStr, St: tile_embed_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<StrongRef<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> TileEmbed<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> TileEmbedBuilder<'a, tile_embed_state::Empty> {
+impl<S: BosStr> TileEmbed<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> TileEmbedBuilder<S, tile_embed_state::Empty> {
         TileEmbedBuilder::new()
     }
 }
 
-impl<'a> TileEmbedBuilder<'a, tile_embed_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> TileEmbedBuilder<S, tile_embed_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         TileEmbedBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> TileEmbedBuilder<'a, S>
+impl<S: BosStr, St> TileEmbedBuilder<S, St>
 where
-    S: tile_embed_state::State,
-    S::Tile: tile_embed_state::IsUnset,
+    St: tile_embed_state::State,
+    St::Tile: tile_embed_state::IsUnset,
 {
     /// Set the `tile` field (required)
     pub fn tile(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> TileEmbedBuilder<'a, tile_embed_state::SetTile<S>> {
+    ) -> TileEmbedBuilder<S, tile_embed_state::SetTile<St>> {
         self._fields.0 = Option::Some(value.into());
         TileEmbedBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> TileEmbedBuilder<'a, S>
+impl<S: BosStr, St> TileEmbedBuilder<S, St>
 where
-    S: tile_embed_state::State,
-    S::Tile: tile_embed_state::IsSet,
+    St: tile_embed_state::State,
+    St::Tile: tile_embed_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> TileEmbed<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> TileEmbed<S> {
         TileEmbed {
             tile: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> TileEmbed<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> TileEmbed<S> {
         TileEmbed {
             tile: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

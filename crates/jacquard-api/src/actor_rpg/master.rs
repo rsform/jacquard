@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "actor.rpg.master",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Master<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Master<S: BosStr = DefaultStr> {
     ///Name of the campaign this validation relates to
     #[serde(skip_serializing_if = "Option::is_none")]
     pub campaign: Option<S>,
@@ -66,14 +66,14 @@ pub struct Master<S: Bos<str> + AsRef<str> = DefaultStr> {
 /// What portions of stats are validated. 'none' = inherent trust (always valid), 'custom' = selected fields only, 'full' = all fields must match
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum MasterSnapshotScope<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum MasterSnapshotScope<S: BosStr = DefaultStr> {
     None,
     Custom,
     Full,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> MasterSnapshotScope<S> {
+impl<S: BosStr> MasterSnapshotScope<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::None => "none",
@@ -93,19 +93,19 @@ impl<S: Bos<str> + AsRef<str>> MasterSnapshotScope<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for MasterSnapshotScope<S> {
+impl<S: BosStr> core::fmt::Display for MasterSnapshotScope<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for MasterSnapshotScope<S> {
+impl<S: BosStr> AsRef<str> for MasterSnapshotScope<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for MasterSnapshotScope<S> {
+impl<S: BosStr> Serialize for MasterSnapshotScope<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -114,8 +114,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for MasterSnapshotScope<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for MasterSnapshotScope<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for MasterSnapshotScope<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -125,14 +124,18 @@ for MasterSnapshotScope<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for MasterSnapshotScope<S> {
+impl<S: BosStr + Default> Default for MasterSnapshotScope<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for MasterSnapshotScope<S> {
-    type Output = MasterSnapshotScope<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for MasterSnapshotScope<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = MasterSnapshotScope<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             MasterSnapshotScope::None => MasterSnapshotScope::None,
@@ -149,18 +152,18 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for MasterSnapshotScope<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct MasterGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct MasterGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Master<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Master<S> {
+impl<S: BosStr> Master<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, MasterRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -173,17 +176,17 @@ pub struct MasterRecord;
 impl XrpcResp for MasterRecord {
     const NSID: &'static str = "actor.rpg.master";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = MasterGetRecordOutput<S>;
+    type Output<S: BosStr> = MasterGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<MasterGetRecordOutput<S>> for Master<S> {
+impl<S: BosStr> From<MasterGetRecordOutput<S>> for Master<S> {
     fn from(output: MasterGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Master<S> {
+impl<S: BosStr> Collection for Master<S> {
     const NSID: &'static str = "actor.rpg.master";
     type Record = MasterRecord;
 }
@@ -193,7 +196,7 @@ impl Collection for MasterRecord {
     type Record = MasterRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Master<S> {
+impl<S: BosStr> LexiconSchema for Master<S> {
     fn nsid() -> &'static str {
         "actor.rpg.master"
     }
@@ -252,27 +255,27 @@ pub mod master_state {
         type CreatedAt = Unset;
     }
     ///State transition - sets the `player` field to Set
-    pub struct SetPlayer<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPlayer<S> {}
-    impl<S: State> State for SetPlayer<S> {
+    pub struct SetPlayer<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPlayer<St> {}
+    impl<St: State> State for SetPlayer<St> {
         type Player = Set<members::player>;
-        type System = S::System;
-        type CreatedAt = S::CreatedAt;
+        type System = St::System;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `system` field to Set
-    pub struct SetSystem<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSystem<S> {}
-    impl<S: State> State for SetSystem<S> {
-        type Player = S::Player;
+    pub struct SetSystem<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSystem<St> {}
+    impl<St: State> State for SetSystem<St> {
+        type Player = St::Player;
         type System = Set<members::system>;
-        type CreatedAt = S::CreatedAt;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Player = S::Player;
-        type System = S::System;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Player = St::Player;
+        type System = St::System;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
@@ -287,9 +290,9 @@ pub mod master_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct MasterBuilder<'a, S: master_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct MasterBuilder<S: BosStr, St: master_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
         Option<Datetime>,
@@ -300,28 +303,28 @@ pub struct MasterBuilder<'a, S: master_state::State> {
         Option<S>,
         Option<Datetime>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Master<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> MasterBuilder<'a, master_state::Empty> {
+impl<S: BosStr> Master<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> MasterBuilder<S, master_state::Empty> {
         MasterBuilder::new()
     }
 }
 
-impl<'a> MasterBuilder<'a, master_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> MasterBuilder<S, master_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         MasterBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: master_state::State> MasterBuilder<'a, S> {
+impl<S: BosStr, St: master_state::State> MasterBuilder<S, St> {
     /// Set the `campaign` field (optional)
     pub fn campaign(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -334,45 +337,45 @@ impl<'a, S: master_state::State> MasterBuilder<'a, S> {
     }
 }
 
-impl<'a, S> MasterBuilder<'a, S>
+impl<S: BosStr, St> MasterBuilder<S, St>
 where
-    S: master_state::State,
-    S::CreatedAt: master_state::IsUnset,
+    St: master_state::State,
+    St::CreatedAt: master_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> MasterBuilder<'a, master_state::SetCreatedAt<S>> {
+    ) -> MasterBuilder<S, master_state::SetCreatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         MasterBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> MasterBuilder<'a, S>
+impl<S: BosStr, St> MasterBuilder<S, St>
 where
-    S: master_state::State,
-    S::Player: master_state::IsUnset,
+    St: master_state::State,
+    St::Player: master_state::IsUnset,
 {
     /// Set the `player` field (required)
     pub fn player(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> MasterBuilder<'a, master_state::SetPlayer<S>> {
+    ) -> MasterBuilder<S, master_state::SetPlayer<St>> {
         self._fields.2 = Option::Some(value.into());
         MasterBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: master_state::State> MasterBuilder<'a, S> {
+impl<S: BosStr, St: master_state::State> MasterBuilder<S, St> {
     /// Set the `snapshotScope` field (optional)
     pub fn snapshot_scope(
         mut self,
@@ -391,7 +394,7 @@ impl<'a, S: master_state::State> MasterBuilder<'a, S> {
     }
 }
 
-impl<'a, S: master_state::State> MasterBuilder<'a, S> {
+impl<S: BosStr, St: master_state::State> MasterBuilder<S, St> {
     /// Set the `spriteCid` field (optional)
     pub fn sprite_cid(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
@@ -404,7 +407,7 @@ impl<'a, S: master_state::State> MasterBuilder<'a, S> {
     }
 }
 
-impl<'a, S: master_state::State> MasterBuilder<'a, S> {
+impl<S: BosStr, St: master_state::State> MasterBuilder<S, St> {
     /// Set the `stats` field (optional)
     pub fn stats(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -417,26 +420,26 @@ impl<'a, S: master_state::State> MasterBuilder<'a, S> {
     }
 }
 
-impl<'a, S> MasterBuilder<'a, S>
+impl<S: BosStr, St> MasterBuilder<S, St>
 where
-    S: master_state::State,
-    S::System: master_state::IsUnset,
+    St: master_state::State,
+    St::System: master_state::IsUnset,
 {
     /// Set the `system` field (required)
     pub fn system(
         mut self,
         value: impl Into<S>,
-    ) -> MasterBuilder<'a, master_state::SetSystem<S>> {
+    ) -> MasterBuilder<S, master_state::SetSystem<St>> {
         self._fields.6 = Option::Some(value.into());
         MasterBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: master_state::State> MasterBuilder<'a, S> {
+impl<S: BosStr, St: master_state::State> MasterBuilder<S, St> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.7 = value.into();
@@ -449,15 +452,15 @@ impl<'a, S: master_state::State> MasterBuilder<'a, S> {
     }
 }
 
-impl<'a, S> MasterBuilder<'a, S>
+impl<S: BosStr, St> MasterBuilder<S, St>
 where
-    S: master_state::State,
-    S::Player: master_state::IsSet,
-    S::System: master_state::IsSet,
-    S::CreatedAt: master_state::IsSet,
+    St: master_state::State,
+    St::Player: master_state::IsSet,
+    St::System: master_state::IsSet,
+    St::CreatedAt: master_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Master<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Master<S> {
         Master {
             campaign: self._fields.0,
             created_at: self._fields.1.unwrap(),
@@ -470,8 +473,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Master<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Master<S> {
         Master {
             campaign: self._fields.0,
             created_at: self._fields.1.unwrap(),

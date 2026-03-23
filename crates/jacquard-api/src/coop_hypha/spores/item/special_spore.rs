@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "coop.hypha.spores.item.specialSpore",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SpecialSpore<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SpecialSpore<S: BosStr = DefaultStr> {
     ///When this capture occurred.
     pub created_at: Datetime,
     ///Origin garden DID. Used for backlink indexing to find all captures of this spore.
@@ -54,18 +54,18 @@ pub struct SpecialSpore<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SpecialSporeGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SpecialSporeGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: SpecialSpore<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> SpecialSpore<S> {
+impl<S: BosStr> SpecialSpore<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, SpecialSporeRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -78,17 +78,17 @@ pub struct SpecialSporeRecord;
 impl XrpcResp for SpecialSporeRecord {
     const NSID: &'static str = "coop.hypha.spores.item.specialSpore";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = SpecialSporeGetRecordOutput<S>;
+    type Output<S: BosStr> = SpecialSporeGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<SpecialSporeGetRecordOutput<S>> for SpecialSpore<S> {
+impl<S: BosStr> From<SpecialSporeGetRecordOutput<S>> for SpecialSpore<S> {
     fn from(output: SpecialSporeGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for SpecialSpore<S> {
+impl<S: BosStr> Collection for SpecialSpore<S> {
     const NSID: &'static str = "coop.hypha.spores.item.specialSpore";
     type Record = SpecialSporeRecord;
 }
@@ -98,7 +98,7 @@ impl Collection for SpecialSporeRecord {
     type Record = SpecialSporeRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for SpecialSpore<S> {
+impl<S: BosStr> LexiconSchema for SpecialSpore<S> {
     fn nsid() -> &'static str {
         "coop.hypha.spores.item.specialSpore"
     }
@@ -123,122 +123,122 @@ pub mod special_spore_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Subject;
         type CreatedAt;
+        type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Subject = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type Subject = Set<members::subject>;
-        type CreatedAt = S::CreatedAt;
+        type Subject = Unset;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Subject = S::Subject;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
+        type Subject = St::Subject;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubject<St> {}
+    impl<St: State> State for SetSubject<St> {
+        type CreatedAt = St::CreatedAt;
+        type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `subject` field
-        pub struct subject(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct SpecialSporeBuilder<'a, S: special_spore_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct SpecialSporeBuilder<S: BosStr, St: special_spore_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<Did<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> SpecialSpore<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> SpecialSporeBuilder<'a, special_spore_state::Empty> {
+impl<S: BosStr> SpecialSpore<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> SpecialSporeBuilder<S, special_spore_state::Empty> {
         SpecialSporeBuilder::new()
     }
 }
 
-impl<'a> SpecialSporeBuilder<'a, special_spore_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> SpecialSporeBuilder<S, special_spore_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SpecialSporeBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SpecialSporeBuilder<'a, S>
+impl<S: BosStr, St> SpecialSporeBuilder<S, St>
 where
-    S: special_spore_state::State,
-    S::CreatedAt: special_spore_state::IsUnset,
+    St: special_spore_state::State,
+    St::CreatedAt: special_spore_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> SpecialSporeBuilder<'a, special_spore_state::SetCreatedAt<S>> {
+    ) -> SpecialSporeBuilder<S, special_spore_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         SpecialSporeBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SpecialSporeBuilder<'a, S>
+impl<S: BosStr, St> SpecialSporeBuilder<S, St>
 where
-    S: special_spore_state::State,
-    S::Subject: special_spore_state::IsUnset,
+    St: special_spore_state::State,
+    St::Subject: special_spore_state::IsUnset,
 {
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> SpecialSporeBuilder<'a, special_spore_state::SetSubject<S>> {
+    ) -> SpecialSporeBuilder<S, special_spore_state::SetSubject<St>> {
         self._fields.1 = Option::Some(value.into());
         SpecialSporeBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SpecialSporeBuilder<'a, S>
+impl<S: BosStr, St> SpecialSporeBuilder<S, St>
 where
-    S: special_spore_state::State,
-    S::Subject: special_spore_state::IsSet,
-    S::CreatedAt: special_spore_state::IsSet,
+    St: special_spore_state::State,
+    St::CreatedAt: special_spore_state::IsSet,
+    St::Subject: special_spore_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> SpecialSpore<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> SpecialSpore<S> {
         SpecialSpore {
             created_at: self._fields.0.unwrap(),
             subject: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> SpecialSpore<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> SpecialSpore<S> {
         SpecialSpore {
             created_at: self._fields.0.unwrap(),
             subject: self._fields.1.unwrap(),

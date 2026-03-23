@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Cid;
 use jacquard_common::types::value::Data;
@@ -18,14 +18,14 @@ use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CheckAccountStatusOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CheckAccountStatusOutput<S: BosStr = DefaultStr> {
     pub activated: bool,
     pub expected_blobs: i64,
     pub imported_blobs: i64,
@@ -35,9 +35,7 @@ pub struct CheckAccountStatusOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub repo_commit: Cid<S>,
     pub repo_rev: S,
     pub valid_did: bool,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -50,7 +48,7 @@ pub struct CheckAccountStatusResponse;
 impl jacquard_common::xrpc::XrpcResp for CheckAccountStatusResponse {
     const NSID: &'static str = "com.atproto.server.checkAccountStatus";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = CheckAccountStatusOutput<S>;
+    type Output<S: BosStr> = CheckAccountStatusOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
@@ -65,6 +63,6 @@ pub struct CheckAccountStatusRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CheckAccountStatusRequest {
     const PATH: &'static str = "/xrpc/com.atproto.server.checkAccountStatus";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = CheckAccountStatus;
+    type Request<S: BosStr> = CheckAccountStatus;
     type Response = CheckAccountStatusResponse;
 }

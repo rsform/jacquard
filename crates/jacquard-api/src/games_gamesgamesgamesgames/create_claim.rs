@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
@@ -18,14 +18,14 @@ use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CreateClaim<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CreateClaim<S: BosStr = DefaultStr> {
     pub contact: S,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub games: Option<Vec<AtUri<S>>>,
@@ -34,26 +34,22 @@ pub struct CreateClaim<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub org: Option<AtUri<S>>,
     pub r#type: S,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CreateClaimOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CreateClaimOutput<S: BosStr = DefaultStr> {
     pub uri: AtUri<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -62,12 +58,11 @@ pub struct CreateClaimResponse;
 impl jacquard_common::xrpc::XrpcResp for CreateClaimResponse {
     const NSID: &'static str = "games.gamesgamesgamesgames.createClaim";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = CreateClaimOutput<S>;
+    type Output<S: BosStr> = CreateClaimOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for CreateClaim<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for CreateClaim<S> {
     const NSID: &'static str = "games.gamesgamesgamesgames.createClaim";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -82,6 +77,6 @@ impl jacquard_common::xrpc::XrpcEndpoint for CreateClaimRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = CreateClaim<S>;
+    type Request<S: BosStr> = CreateClaim<S>;
     type Response = CreateClaimResponse;
 }

@@ -15,7 +15,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -38,11 +38,11 @@ use crate::com_atproto::label::Label;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ProfileViewBasic<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ProfileViewBasic<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub associated: Option<ProfileAssociated<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -64,7 +64,7 @@ pub struct ProfileViewBasic<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ProfileViewBasic<S> {
+impl<S: BosStr> LexiconSchema for ProfileViewBasic<S> {
     fn nsid() -> &'static str {
         "chat.bsky.actor.defs"
     }
@@ -111,43 +111,43 @@ pub mod profile_view_basic_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Handle;
         type Did;
+        type Handle;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Handle = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `handle` field to Set
-    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHandle<S> {}
-    impl<S: State> State for SetHandle<S> {
-        type Handle = Set<members::handle>;
-        type Did = S::Did;
+        type Handle = Unset;
     }
     ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Handle = S::Handle;
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
         type Did = Set<members::did>;
+        type Handle = St::Handle;
+    }
+    ///State transition - sets the `handle` field to Set
+    pub struct SetHandle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHandle<St> {}
+    impl<St: State> State for SetHandle<St> {
+        type Did = St::Did;
+        type Handle = Set<members::handle>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `handle` field
-        pub struct handle(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `handle` field
+        pub struct handle(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ProfileViewBasicBuilder<'a, S: profile_view_basic_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ProfileViewBasicBuilder<S: BosStr, St: profile_view_basic_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<ProfileAssociated<S>>,
         Option<UriValue<S>>,
@@ -159,28 +159,28 @@ pub struct ProfileViewBasicBuilder<'a, S: profile_view_basic_state::State> {
         Option<VerificationState<S>>,
         Option<ViewerState<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ProfileViewBasic<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ProfileViewBasicBuilder<'a, profile_view_basic_state::Empty> {
+impl<S: BosStr> ProfileViewBasic<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ProfileViewBasicBuilder<S, profile_view_basic_state::Empty> {
         ProfileViewBasicBuilder::new()
     }
 }
 
-impl<'a> ProfileViewBasicBuilder<'a, profile_view_basic_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ProfileViewBasicBuilder<S, profile_view_basic_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ProfileViewBasicBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
+impl<S: BosStr, St: profile_view_basic_state::State> ProfileViewBasicBuilder<S, St> {
     /// Set the `associated` field (optional)
     pub fn associated(mut self, value: impl Into<Option<ProfileAssociated<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -193,7 +193,7 @@ impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
     }
 }
 
-impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
+impl<S: BosStr, St: profile_view_basic_state::State> ProfileViewBasicBuilder<S, St> {
     /// Set the `avatar` field (optional)
     pub fn avatar(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -206,7 +206,7 @@ impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
     }
 }
 
-impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
+impl<S: BosStr, St: profile_view_basic_state::State> ProfileViewBasicBuilder<S, St> {
     /// Set the `chatDisabled` field (optional)
     pub fn chat_disabled(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.2 = value.into();
@@ -219,26 +219,26 @@ impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ProfileViewBasicBuilder<'a, S>
+impl<S: BosStr, St> ProfileViewBasicBuilder<S, St>
 where
-    S: profile_view_basic_state::State,
-    S::Did: profile_view_basic_state::IsUnset,
+    St: profile_view_basic_state::State,
+    St::Did: profile_view_basic_state::IsUnset,
 {
     /// Set the `did` field (required)
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> ProfileViewBasicBuilder<'a, profile_view_basic_state::SetDid<S>> {
+    ) -> ProfileViewBasicBuilder<S, profile_view_basic_state::SetDid<St>> {
         self._fields.3 = Option::Some(value.into());
         ProfileViewBasicBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
+impl<S: BosStr, St: profile_view_basic_state::State> ProfileViewBasicBuilder<S, St> {
     /// Set the `displayName` field (optional)
     pub fn display_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
@@ -251,26 +251,26 @@ impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ProfileViewBasicBuilder<'a, S>
+impl<S: BosStr, St> ProfileViewBasicBuilder<S, St>
 where
-    S: profile_view_basic_state::State,
-    S::Handle: profile_view_basic_state::IsUnset,
+    St: profile_view_basic_state::State,
+    St::Handle: profile_view_basic_state::IsUnset,
 {
     /// Set the `handle` field (required)
     pub fn handle(
         mut self,
         value: impl Into<Handle<S>>,
-    ) -> ProfileViewBasicBuilder<'a, profile_view_basic_state::SetHandle<S>> {
+    ) -> ProfileViewBasicBuilder<S, profile_view_basic_state::SetHandle<St>> {
         self._fields.5 = Option::Some(value.into());
         ProfileViewBasicBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
+impl<S: BosStr, St: profile_view_basic_state::State> ProfileViewBasicBuilder<S, St> {
     /// Set the `labels` field (optional)
     pub fn labels(mut self, value: impl Into<Option<Vec<Label<S>>>>) -> Self {
         self._fields.6 = value.into();
@@ -283,7 +283,7 @@ impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
     }
 }
 
-impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
+impl<S: BosStr, St: profile_view_basic_state::State> ProfileViewBasicBuilder<S, St> {
     /// Set the `verification` field (optional)
     pub fn verification(
         mut self,
@@ -299,7 +299,7 @@ impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
     }
 }
 
-impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
+impl<S: BosStr, St: profile_view_basic_state::State> ProfileViewBasicBuilder<S, St> {
     /// Set the `viewer` field (optional)
     pub fn viewer(mut self, value: impl Into<Option<ViewerState<S>>>) -> Self {
         self._fields.8 = value.into();
@@ -312,14 +312,14 @@ impl<'a, S: profile_view_basic_state::State> ProfileViewBasicBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ProfileViewBasicBuilder<'a, S>
+impl<S: BosStr, St> ProfileViewBasicBuilder<S, St>
 where
-    S: profile_view_basic_state::State,
-    S::Handle: profile_view_basic_state::IsSet,
-    S::Did: profile_view_basic_state::IsSet,
+    St: profile_view_basic_state::State,
+    St::Did: profile_view_basic_state::IsSet,
+    St::Handle: profile_view_basic_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ProfileViewBasic<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ProfileViewBasic<S> {
         ProfileViewBasic {
             associated: self._fields.0,
             avatar: self._fields.1,
@@ -333,11 +333,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> ProfileViewBasic<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ProfileViewBasic<S> {
         ProfileViewBasic {
             associated: self._fields.0,
             avatar: self._fields.1,

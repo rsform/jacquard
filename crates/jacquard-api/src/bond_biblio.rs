@@ -12,7 +12,7 @@ pub mod stamp;
 
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -31,11 +31,11 @@ use serde::{Serialize, Deserialize};
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct BookRequirement<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct BookRequirement<S: BosStr = DefaultStr> {
     ///Author name(s), tab-separated for multiple
     pub authors: S,
     pub title: S,
@@ -43,7 +43,7 @@ pub struct BookRequirement<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for BookRequirement<S> {
+impl<S: BosStr> LexiconSchema for BookRequirement<S> {
     fn nsid() -> &'static str {
         "bond.biblio.defs"
     }

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
 
 #[allow(unused_imports)]
@@ -38,11 +38,11 @@ use crate::zone_stratos::actor::enrollment;
     rename = "zone.stratos.actor.enrollment",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Enrollment<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Enrollment<S: BosStr = DefaultStr> {
     ///Service attestation vouching for the user's enrollment, boundaries, and signing key.
     pub attestation: enrollment::ServiceAttestation<S>,
     ///List of boundaries the user has access to on this Stratos service.
@@ -64,11 +64,11 @@ pub struct Enrollment<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct EnrollmentGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct EnrollmentGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
@@ -81,11 +81,11 @@ pub struct EnrollmentGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ServiceAttestation<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ServiceAttestation<S: BosStr = DefaultStr> {
     ///Raw signature bytes of the DAG-CBOR encoded attestation payload, signed by the service key.
     #[serde(with = "jacquard_common::serde_bytes_helper")]
     pub sig: Bytes,
@@ -95,7 +95,7 @@ pub struct ServiceAttestation<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Enrollment<S> {
+impl<S: BosStr> Enrollment<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, EnrollmentRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -108,17 +108,17 @@ pub struct EnrollmentRecord;
 impl XrpcResp for EnrollmentRecord {
     const NSID: &'static str = "zone.stratos.actor.enrollment";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = EnrollmentGetRecordOutput<S>;
+    type Output<S: BosStr> = EnrollmentGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<EnrollmentGetRecordOutput<S>> for Enrollment<S> {
+impl<S: BosStr> From<EnrollmentGetRecordOutput<S>> for Enrollment<S> {
     fn from(output: EnrollmentGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Enrollment<S> {
+impl<S: BosStr> Collection for Enrollment<S> {
     const NSID: &'static str = "zone.stratos.actor.enrollment";
     type Record = EnrollmentRecord;
 }
@@ -128,7 +128,7 @@ impl Collection for EnrollmentRecord {
     type Record = EnrollmentRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Enrollment<S> {
+impl<S: BosStr> LexiconSchema for Enrollment<S> {
     fn nsid() -> &'static str {
         "zone.stratos.actor.enrollment"
     }
@@ -153,7 +153,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Enrollment<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ServiceAttestation<S> {
+impl<S: BosStr> LexiconSchema for ServiceAttestation<S> {
     fn nsid() -> &'static str {
         "zone.stratos.actor.enrollment"
     }
@@ -180,8 +180,8 @@ pub mod enrollment_state {
     pub trait State: sealed::Sealed {
         type Service;
         type SigningKey;
-        type CreatedAt;
         type Attestation;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -189,44 +189,44 @@ pub mod enrollment_state {
     impl State for Empty {
         type Service = Unset;
         type SigningKey = Unset;
-        type CreatedAt = Unset;
         type Attestation = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `service` field to Set
-    pub struct SetService<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetService<S> {}
-    impl<S: State> State for SetService<S> {
+    pub struct SetService<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetService<St> {}
+    impl<St: State> State for SetService<St> {
         type Service = Set<members::service>;
-        type SigningKey = S::SigningKey;
-        type CreatedAt = S::CreatedAt;
-        type Attestation = S::Attestation;
+        type SigningKey = St::SigningKey;
+        type Attestation = St::Attestation;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `signing_key` field to Set
-    pub struct SetSigningKey<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSigningKey<S> {}
-    impl<S: State> State for SetSigningKey<S> {
-        type Service = S::Service;
+    pub struct SetSigningKey<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSigningKey<St> {}
+    impl<St: State> State for SetSigningKey<St> {
+        type Service = St::Service;
         type SigningKey = Set<members::signing_key>;
-        type CreatedAt = S::CreatedAt;
-        type Attestation = S::Attestation;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Service = S::Service;
-        type SigningKey = S::SigningKey;
-        type CreatedAt = Set<members::created_at>;
-        type Attestation = S::Attestation;
+        type Attestation = St::Attestation;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `attestation` field to Set
-    pub struct SetAttestation<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAttestation<S> {}
-    impl<S: State> State for SetAttestation<S> {
-        type Service = S::Service;
-        type SigningKey = S::SigningKey;
-        type CreatedAt = S::CreatedAt;
+    pub struct SetAttestation<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAttestation<St> {}
+    impl<St: State> State for SetAttestation<St> {
+        type Service = St::Service;
+        type SigningKey = St::SigningKey;
         type Attestation = Set<members::attestation>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Service = St::Service;
+        type SigningKey = St::SigningKey;
+        type Attestation = St::Attestation;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -235,16 +235,16 @@ pub mod enrollment_state {
         pub struct service(());
         ///Marker type for the `signing_key` field
         pub struct signing_key(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `attestation` field
         pub struct attestation(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct EnrollmentBuilder<'a, S: enrollment_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct EnrollmentBuilder<S: BosStr, St: enrollment_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<enrollment::ServiceAttestation<S>>,
         Option<Vec<Domain<S>>>,
@@ -252,47 +252,47 @@ pub struct EnrollmentBuilder<'a, S: enrollment_state::State> {
         Option<UriValue<S>>,
         Option<S>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Enrollment<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> EnrollmentBuilder<'a, enrollment_state::Empty> {
+impl<S: BosStr> Enrollment<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> EnrollmentBuilder<S, enrollment_state::Empty> {
         EnrollmentBuilder::new()
     }
 }
 
-impl<'a> EnrollmentBuilder<'a, enrollment_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> EnrollmentBuilder<S, enrollment_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         EnrollmentBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> EnrollmentBuilder<'a, S>
+impl<S: BosStr, St> EnrollmentBuilder<S, St>
 where
-    S: enrollment_state::State,
-    S::Attestation: enrollment_state::IsUnset,
+    St: enrollment_state::State,
+    St::Attestation: enrollment_state::IsUnset,
 {
     /// Set the `attestation` field (required)
     pub fn attestation(
         mut self,
         value: impl Into<enrollment::ServiceAttestation<S>>,
-    ) -> EnrollmentBuilder<'a, enrollment_state::SetAttestation<S>> {
+    ) -> EnrollmentBuilder<S, enrollment_state::SetAttestation<St>> {
         self._fields.0 = Option::Some(value.into());
         EnrollmentBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: enrollment_state::State> EnrollmentBuilder<'a, S> {
+impl<S: BosStr, St: enrollment_state::State> EnrollmentBuilder<S, St> {
     /// Set the `boundaries` field (optional)
     pub fn boundaries(mut self, value: impl Into<Option<Vec<Domain<S>>>>) -> Self {
         self._fields.1 = value.into();
@@ -305,73 +305,73 @@ impl<'a, S: enrollment_state::State> EnrollmentBuilder<'a, S> {
     }
 }
 
-impl<'a, S> EnrollmentBuilder<'a, S>
+impl<S: BosStr, St> EnrollmentBuilder<S, St>
 where
-    S: enrollment_state::State,
-    S::CreatedAt: enrollment_state::IsUnset,
+    St: enrollment_state::State,
+    St::CreatedAt: enrollment_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> EnrollmentBuilder<'a, enrollment_state::SetCreatedAt<S>> {
+    ) -> EnrollmentBuilder<S, enrollment_state::SetCreatedAt<St>> {
         self._fields.2 = Option::Some(value.into());
         EnrollmentBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> EnrollmentBuilder<'a, S>
+impl<S: BosStr, St> EnrollmentBuilder<S, St>
 where
-    S: enrollment_state::State,
-    S::Service: enrollment_state::IsUnset,
+    St: enrollment_state::State,
+    St::Service: enrollment_state::IsUnset,
 {
     /// Set the `service` field (required)
     pub fn service(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> EnrollmentBuilder<'a, enrollment_state::SetService<S>> {
+    ) -> EnrollmentBuilder<S, enrollment_state::SetService<St>> {
         self._fields.3 = Option::Some(value.into());
         EnrollmentBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> EnrollmentBuilder<'a, S>
+impl<S: BosStr, St> EnrollmentBuilder<S, St>
 where
-    S: enrollment_state::State,
-    S::SigningKey: enrollment_state::IsUnset,
+    St: enrollment_state::State,
+    St::SigningKey: enrollment_state::IsUnset,
 {
     /// Set the `signingKey` field (required)
     pub fn signing_key(
         mut self,
         value: impl Into<S>,
-    ) -> EnrollmentBuilder<'a, enrollment_state::SetSigningKey<S>> {
+    ) -> EnrollmentBuilder<S, enrollment_state::SetSigningKey<St>> {
         self._fields.4 = Option::Some(value.into());
         EnrollmentBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> EnrollmentBuilder<'a, S>
+impl<S: BosStr, St> EnrollmentBuilder<S, St>
 where
-    S: enrollment_state::State,
-    S::Service: enrollment_state::IsSet,
-    S::SigningKey: enrollment_state::IsSet,
-    S::CreatedAt: enrollment_state::IsSet,
-    S::Attestation: enrollment_state::IsSet,
+    St: enrollment_state::State,
+    St::Service: enrollment_state::IsSet,
+    St::SigningKey: enrollment_state::IsSet,
+    St::Attestation: enrollment_state::IsSet,
+    St::CreatedAt: enrollment_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Enrollment<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Enrollment<S> {
         Enrollment {
             attestation: self._fields.0.unwrap(),
             boundaries: self._fields.1,
@@ -381,11 +381,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Enrollment<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Enrollment<S> {
         Enrollment {
             attestation: self._fields.0.unwrap(),
             boundaries: self._fields.1,
@@ -547,122 +547,122 @@ pub mod service_attestation_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type SigningKey;
         type Sig;
+        type SigningKey;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type SigningKey = Unset;
         type Sig = Unset;
-    }
-    ///State transition - sets the `signing_key` field to Set
-    pub struct SetSigningKey<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSigningKey<S> {}
-    impl<S: State> State for SetSigningKey<S> {
-        type SigningKey = Set<members::signing_key>;
-        type Sig = S::Sig;
+        type SigningKey = Unset;
     }
     ///State transition - sets the `sig` field to Set
-    pub struct SetSig<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSig<S> {}
-    impl<S: State> State for SetSig<S> {
-        type SigningKey = S::SigningKey;
+    pub struct SetSig<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSig<St> {}
+    impl<St: State> State for SetSig<St> {
         type Sig = Set<members::sig>;
+        type SigningKey = St::SigningKey;
+    }
+    ///State transition - sets the `signing_key` field to Set
+    pub struct SetSigningKey<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSigningKey<St> {}
+    impl<St: State> State for SetSigningKey<St> {
+        type Sig = St::Sig;
+        type SigningKey = Set<members::signing_key>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `signing_key` field
-        pub struct signing_key(());
         ///Marker type for the `sig` field
         pub struct sig(());
+        ///Marker type for the `signing_key` field
+        pub struct signing_key(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ServiceAttestationBuilder<'a, S: service_attestation_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ServiceAttestationBuilder<S: BosStr, St: service_attestation_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Bytes>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ServiceAttestation<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ServiceAttestationBuilder<'a, service_attestation_state::Empty> {
+impl<S: BosStr> ServiceAttestation<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ServiceAttestationBuilder<S, service_attestation_state::Empty> {
         ServiceAttestationBuilder::new()
     }
 }
 
-impl<'a> ServiceAttestationBuilder<'a, service_attestation_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ServiceAttestationBuilder<S, service_attestation_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ServiceAttestationBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ServiceAttestationBuilder<'a, S>
+impl<S: BosStr, St> ServiceAttestationBuilder<S, St>
 where
-    S: service_attestation_state::State,
-    S::Sig: service_attestation_state::IsUnset,
+    St: service_attestation_state::State,
+    St::Sig: service_attestation_state::IsUnset,
 {
     /// Set the `sig` field (required)
     pub fn sig(
         mut self,
         value: impl Into<Bytes>,
-    ) -> ServiceAttestationBuilder<'a, service_attestation_state::SetSig<S>> {
+    ) -> ServiceAttestationBuilder<S, service_attestation_state::SetSig<St>> {
         self._fields.0 = Option::Some(value.into());
         ServiceAttestationBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ServiceAttestationBuilder<'a, S>
+impl<S: BosStr, St> ServiceAttestationBuilder<S, St>
 where
-    S: service_attestation_state::State,
-    S::SigningKey: service_attestation_state::IsUnset,
+    St: service_attestation_state::State,
+    St::SigningKey: service_attestation_state::IsUnset,
 {
     /// Set the `signingKey` field (required)
     pub fn signing_key(
         mut self,
         value: impl Into<S>,
-    ) -> ServiceAttestationBuilder<'a, service_attestation_state::SetSigningKey<S>> {
+    ) -> ServiceAttestationBuilder<S, service_attestation_state::SetSigningKey<St>> {
         self._fields.1 = Option::Some(value.into());
         ServiceAttestationBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ServiceAttestationBuilder<'a, S>
+impl<S: BosStr, St> ServiceAttestationBuilder<S, St>
 where
-    S: service_attestation_state::State,
-    S::SigningKey: service_attestation_state::IsSet,
-    S::Sig: service_attestation_state::IsSet,
+    St: service_attestation_state::State,
+    St::Sig: service_attestation_state::IsSet,
+    St::SigningKey: service_attestation_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ServiceAttestation<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ServiceAttestation<S> {
         ServiceAttestation {
             sig: self._fields.0.unwrap(),
             signing_key: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> ServiceAttestation<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ServiceAttestation<S> {
         ServiceAttestation {
             sig: self._fields.0.unwrap(),
             signing_key: self._fields.1.unwrap(),

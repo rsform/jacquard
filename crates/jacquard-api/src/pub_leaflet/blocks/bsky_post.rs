@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -29,11 +29,11 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct BskyPost<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct BskyPost<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub client_host: Option<S>,
     pub post_ref: StrongRef<S>,
@@ -41,7 +41,7 @@ pub struct BskyPost<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for BskyPost<S> {
+impl<S: BosStr> LexiconSchema for BskyPost<S> {
     fn nsid() -> &'static str {
         "pub.leaflet.blocks.bskyPost"
     }
@@ -75,9 +75,9 @@ pub mod bsky_post_state {
         type PostRef = Unset;
     }
     ///State transition - sets the `post_ref` field to Set
-    pub struct SetPostRef<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPostRef<S> {}
-    impl<S: State> State for SetPostRef<S> {
+    pub struct SetPostRef<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPostRef<St> {}
+    impl<St: State> State for SetPostRef<St> {
         type PostRef = Set<members::post_ref>;
     }
     /// Marker types for field names
@@ -88,32 +88,32 @@ pub mod bsky_post_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct BskyPostBuilder<'a, S: bsky_post_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct BskyPostBuilder<S: BosStr, St: bsky_post_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<StrongRef<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> BskyPost<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> BskyPostBuilder<'a, bsky_post_state::Empty> {
+impl<S: BosStr> BskyPost<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> BskyPostBuilder<S, bsky_post_state::Empty> {
         BskyPostBuilder::new()
     }
 }
 
-impl<'a> BskyPostBuilder<'a, bsky_post_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> BskyPostBuilder<S, bsky_post_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         BskyPostBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: bsky_post_state::State> BskyPostBuilder<'a, S> {
+impl<S: BosStr, St: bsky_post_state::State> BskyPostBuilder<S, St> {
     /// Set the `clientHost` field (optional)
     pub fn client_host(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -126,43 +126,40 @@ impl<'a, S: bsky_post_state::State> BskyPostBuilder<'a, S> {
     }
 }
 
-impl<'a, S> BskyPostBuilder<'a, S>
+impl<S: BosStr, St> BskyPostBuilder<S, St>
 where
-    S: bsky_post_state::State,
-    S::PostRef: bsky_post_state::IsUnset,
+    St: bsky_post_state::State,
+    St::PostRef: bsky_post_state::IsUnset,
 {
     /// Set the `postRef` field (required)
     pub fn post_ref(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> BskyPostBuilder<'a, bsky_post_state::SetPostRef<S>> {
+    ) -> BskyPostBuilder<S, bsky_post_state::SetPostRef<St>> {
         self._fields.1 = Option::Some(value.into());
         BskyPostBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BskyPostBuilder<'a, S>
+impl<S: BosStr, St> BskyPostBuilder<S, St>
 where
-    S: bsky_post_state::State,
-    S::PostRef: bsky_post_state::IsSet,
+    St: bsky_post_state::State,
+    St::PostRef: bsky_post_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> BskyPost<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> BskyPost<S> {
         BskyPost {
             client_host: self._fields.0,
             post_ref: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> BskyPost<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> BskyPost<S> {
         BskyPost {
             client_host: self._fields.0,
             post_ref: self._fields.1.unwrap(),

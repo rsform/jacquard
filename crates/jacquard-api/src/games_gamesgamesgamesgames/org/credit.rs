@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -37,11 +37,11 @@ use crate::games_gamesgamesgamesgames::CompanyRole;
     rename = "games.gamesgamesgamesgames.org.credit",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Credit<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Credit<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
     ///The name to be used if there is no profile associated with this credit, or the profile is inaccessible.
@@ -61,18 +61,18 @@ pub struct Credit<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CreditGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CreditGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Credit<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Credit<S> {
+impl<S: BosStr> Credit<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, CreditRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -85,17 +85,17 @@ pub struct CreditRecord;
 impl XrpcResp for CreditRecord {
     const NSID: &'static str = "games.gamesgamesgamesgames.org.credit";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = CreditGetRecordOutput<S>;
+    type Output<S: BosStr> = CreditGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<CreditGetRecordOutput<S>> for Credit<S> {
+impl<S: BosStr> From<CreditGetRecordOutput<S>> for Credit<S> {
     fn from(output: CreditGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Credit<S> {
+impl<S: BosStr> Collection for Credit<S> {
     const NSID: &'static str = "games.gamesgamesgamesgames.org.credit";
     type Record = CreditRecord;
 }
@@ -105,7 +105,7 @@ impl Collection for CreditRecord {
     type Record = CreditRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Credit<S> {
+impl<S: BosStr> LexiconSchema for Credit<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.org.credit"
     }
@@ -141,56 +141,56 @@ pub mod credit_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Game;
-        type Org;
         type Roles;
+        type Org;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Game = Unset;
-        type Org = Unset;
         type Roles = Unset;
+        type Org = Unset;
     }
     ///State transition - sets the `game` field to Set
-    pub struct SetGame<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGame<S> {}
-    impl<S: State> State for SetGame<S> {
+    pub struct SetGame<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetGame<St> {}
+    impl<St: State> State for SetGame<St> {
         type Game = Set<members::game>;
-        type Org = S::Org;
-        type Roles = S::Roles;
-    }
-    ///State transition - sets the `org` field to Set
-    pub struct SetOrg<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetOrg<S> {}
-    impl<S: State> State for SetOrg<S> {
-        type Game = S::Game;
-        type Org = Set<members::org>;
-        type Roles = S::Roles;
+        type Roles = St::Roles;
+        type Org = St::Org;
     }
     ///State transition - sets the `roles` field to Set
-    pub struct SetRoles<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRoles<S> {}
-    impl<S: State> State for SetRoles<S> {
-        type Game = S::Game;
-        type Org = S::Org;
+    pub struct SetRoles<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRoles<St> {}
+    impl<St: State> State for SetRoles<St> {
+        type Game = St::Game;
         type Roles = Set<members::roles>;
+        type Org = St::Org;
+    }
+    ///State transition - sets the `org` field to Set
+    pub struct SetOrg<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetOrg<St> {}
+    impl<St: State> State for SetOrg<St> {
+        type Game = St::Game;
+        type Roles = St::Roles;
+        type Org = Set<members::org>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `game` field
         pub struct game(());
-        ///Marker type for the `org` field
-        pub struct org(());
         ///Marker type for the `roles` field
         pub struct roles(());
+        ///Marker type for the `org` field
+        pub struct org(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct CreditBuilder<'a, S: credit_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct CreditBuilder<S: BosStr, St: credit_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
         Option<S>,
@@ -198,28 +198,28 @@ pub struct CreditBuilder<'a, S: credit_state::State> {
         Option<StrongRef<S>>,
         Option<Vec<CompanyRole<S>>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Credit<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> CreditBuilder<'a, credit_state::Empty> {
+impl<S: BosStr> Credit<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> CreditBuilder<S, credit_state::Empty> {
         CreditBuilder::new()
     }
 }
 
-impl<'a> CreditBuilder<'a, credit_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> CreditBuilder<S, credit_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         CreditBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: credit_state::State> CreditBuilder<'a, S> {
+impl<S: BosStr, St: credit_state::State> CreditBuilder<S, St> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.0 = value.into();
@@ -232,7 +232,7 @@ impl<'a, S: credit_state::State> CreditBuilder<'a, S> {
     }
 }
 
-impl<'a, S: credit_state::State> CreditBuilder<'a, S> {
+impl<S: BosStr, St: credit_state::State> CreditBuilder<S, St> {
     /// Set the `displayName` field (optional)
     pub fn display_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -245,72 +245,72 @@ impl<'a, S: credit_state::State> CreditBuilder<'a, S> {
     }
 }
 
-impl<'a, S> CreditBuilder<'a, S>
+impl<S: BosStr, St> CreditBuilder<S, St>
 where
-    S: credit_state::State,
-    S::Game: credit_state::IsUnset,
+    St: credit_state::State,
+    St::Game: credit_state::IsUnset,
 {
     /// Set the `game` field (required)
     pub fn game(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> CreditBuilder<'a, credit_state::SetGame<S>> {
+    ) -> CreditBuilder<S, credit_state::SetGame<St>> {
         self._fields.2 = Option::Some(value.into());
         CreditBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CreditBuilder<'a, S>
+impl<S: BosStr, St> CreditBuilder<S, St>
 where
-    S: credit_state::State,
-    S::Org: credit_state::IsUnset,
+    St: credit_state::State,
+    St::Org: credit_state::IsUnset,
 {
     /// Set the `org` field (required)
     pub fn org(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> CreditBuilder<'a, credit_state::SetOrg<S>> {
+    ) -> CreditBuilder<S, credit_state::SetOrg<St>> {
         self._fields.3 = Option::Some(value.into());
         CreditBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CreditBuilder<'a, S>
+impl<S: BosStr, St> CreditBuilder<S, St>
 where
-    S: credit_state::State,
-    S::Roles: credit_state::IsUnset,
+    St: credit_state::State,
+    St::Roles: credit_state::IsUnset,
 {
     /// Set the `roles` field (required)
     pub fn roles(
         mut self,
         value: impl Into<Vec<CompanyRole<S>>>,
-    ) -> CreditBuilder<'a, credit_state::SetRoles<S>> {
+    ) -> CreditBuilder<S, credit_state::SetRoles<St>> {
         self._fields.4 = Option::Some(value.into());
         CreditBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CreditBuilder<'a, S>
+impl<S: BosStr, St> CreditBuilder<S, St>
 where
-    S: credit_state::State,
-    S::Game: credit_state::IsSet,
-    S::Org: credit_state::IsSet,
-    S::Roles: credit_state::IsSet,
+    St: credit_state::State,
+    St::Game: credit_state::IsSet,
+    St::Roles: credit_state::IsSet,
+    St::Org: credit_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Credit<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Credit<S> {
         Credit {
             created_at: self._fields.0,
             display_name: self._fields.1,
@@ -320,8 +320,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Credit<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Credit<S> {
         Credit {
             created_at: self._fields.0,
             display_name: self._fields.1,

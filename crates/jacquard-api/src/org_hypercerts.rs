@@ -18,7 +18,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -39,11 +39,11 @@ use serde::{Serialize, Deserialize};
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct LargeBlob<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct LargeBlob<S: BosStr = DefaultStr> {
     ///Blob to external data (up to 100MB)
     pub blob: BlobRef<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -56,11 +56,11 @@ pub struct LargeBlob<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct LargeImage<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct LargeImage<S: BosStr = DefaultStr> {
     ///Image (up to 10MB)
     pub image: BlobRef<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -73,11 +73,11 @@ pub struct LargeImage<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SmallBlob<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SmallBlob<S: BosStr = DefaultStr> {
     ///Blob to external data (up to 10MB)
     pub blob: BlobRef<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -90,11 +90,11 @@ pub struct SmallBlob<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SmallImage<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SmallImage<S: BosStr = DefaultStr> {
     ///Image (up to 5MB)
     pub image: BlobRef<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -107,11 +107,11 @@ pub struct SmallImage<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SmallVideo<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SmallVideo<S: BosStr = DefaultStr> {
     ///Video (up to 20MB)
     pub video: BlobRef<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -124,18 +124,18 @@ pub struct SmallVideo<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Uri<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Uri<S: BosStr = DefaultStr> {
     ///URI to external data
     pub uri: UriValue<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for LargeBlob<S> {
+impl<S: BosStr> LexiconSchema for LargeBlob<S> {
     fn nsid() -> &'static str {
         "org.hypercerts.defs"
     }
@@ -190,7 +190,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for LargeBlob<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for LargeImage<S> {
+impl<S: BosStr> LexiconSchema for LargeImage<S> {
     fn nsid() -> &'static str {
         "org.hypercerts.defs"
     }
@@ -253,7 +253,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for LargeImage<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for SmallBlob<S> {
+impl<S: BosStr> LexiconSchema for SmallBlob<S> {
     fn nsid() -> &'static str {
         "org.hypercerts.defs"
     }
@@ -308,7 +308,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for SmallBlob<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for SmallImage<S> {
+impl<S: BosStr> LexiconSchema for SmallImage<S> {
     fn nsid() -> &'static str {
         "org.hypercerts.defs"
     }
@@ -371,7 +371,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for SmallImage<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for SmallVideo<S> {
+impl<S: BosStr> LexiconSchema for SmallVideo<S> {
     fn nsid() -> &'static str {
         "org.hypercerts.defs"
     }
@@ -428,7 +428,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for SmallVideo<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Uri<S> {
+impl<S: BosStr> LexiconSchema for Uri<S> {
     fn nsid() -> &'static str {
         "org.hypercerts.defs"
     }
@@ -462,9 +462,9 @@ pub mod large_blob_state {
         type Blob = Unset;
     }
     ///State transition - sets the `blob` field to Set
-    pub struct SetBlob<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBlob<S> {}
-    impl<S: State> State for SetBlob<S> {
+    pub struct SetBlob<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBlob<St> {}
+    impl<St: State> State for SetBlob<St> {
         type Blob = Set<members::blob>;
     }
     /// Marker types for field names
@@ -475,67 +475,67 @@ pub mod large_blob_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct LargeBlobBuilder<'a, S: large_blob_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct LargeBlobBuilder<S: BosStr, St: large_blob_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<BlobRef<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> LargeBlob<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> LargeBlobBuilder<'a, large_blob_state::Empty> {
+impl<S: BosStr> LargeBlob<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> LargeBlobBuilder<S, large_blob_state::Empty> {
         LargeBlobBuilder::new()
     }
 }
 
-impl<'a> LargeBlobBuilder<'a, large_blob_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> LargeBlobBuilder<S, large_blob_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         LargeBlobBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LargeBlobBuilder<'a, S>
+impl<S: BosStr, St> LargeBlobBuilder<S, St>
 where
-    S: large_blob_state::State,
-    S::Blob: large_blob_state::IsUnset,
+    St: large_blob_state::State,
+    St::Blob: large_blob_state::IsUnset,
 {
     /// Set the `blob` field (required)
     pub fn blob(
         mut self,
         value: impl Into<BlobRef<S>>,
-    ) -> LargeBlobBuilder<'a, large_blob_state::SetBlob<S>> {
+    ) -> LargeBlobBuilder<S, large_blob_state::SetBlob<St>> {
         self._fields.0 = Option::Some(value.into());
         LargeBlobBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LargeBlobBuilder<'a, S>
+impl<S: BosStr, St> LargeBlobBuilder<S, St>
 where
-    S: large_blob_state::State,
-    S::Blob: large_blob_state::IsSet,
+    St: large_blob_state::State,
+    St::Blob: large_blob_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> LargeBlob<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> LargeBlob<S> {
         LargeBlob {
             blob: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> LargeBlob<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> LargeBlob<S> {
         LargeBlob {
             blob: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -698,9 +698,9 @@ pub mod large_image_state {
         type Image = Unset;
     }
     ///State transition - sets the `image` field to Set
-    pub struct SetImage<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetImage<S> {}
-    impl<S: State> State for SetImage<S> {
+    pub struct SetImage<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetImage<St> {}
+    impl<St: State> State for SetImage<St> {
         type Image = Set<members::image>;
     }
     /// Marker types for field names
@@ -711,67 +711,67 @@ pub mod large_image_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct LargeImageBuilder<'a, S: large_image_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct LargeImageBuilder<S: BosStr, St: large_image_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<BlobRef<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> LargeImage<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> LargeImageBuilder<'a, large_image_state::Empty> {
+impl<S: BosStr> LargeImage<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> LargeImageBuilder<S, large_image_state::Empty> {
         LargeImageBuilder::new()
     }
 }
 
-impl<'a> LargeImageBuilder<'a, large_image_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> LargeImageBuilder<S, large_image_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         LargeImageBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LargeImageBuilder<'a, S>
+impl<S: BosStr, St> LargeImageBuilder<S, St>
 where
-    S: large_image_state::State,
-    S::Image: large_image_state::IsUnset,
+    St: large_image_state::State,
+    St::Image: large_image_state::IsUnset,
 {
     /// Set the `image` field (required)
     pub fn image(
         mut self,
         value: impl Into<BlobRef<S>>,
-    ) -> LargeImageBuilder<'a, large_image_state::SetImage<S>> {
+    ) -> LargeImageBuilder<S, large_image_state::SetImage<St>> {
         self._fields.0 = Option::Some(value.into());
         LargeImageBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LargeImageBuilder<'a, S>
+impl<S: BosStr, St> LargeImageBuilder<S, St>
 where
-    S: large_image_state::State,
-    S::Image: large_image_state::IsSet,
+    St: large_image_state::State,
+    St::Image: large_image_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> LargeImage<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> LargeImage<S> {
         LargeImage {
             image: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> LargeImage<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> LargeImage<S> {
         LargeImage {
             image: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -798,9 +798,9 @@ pub mod small_blob_state {
         type Blob = Unset;
     }
     ///State transition - sets the `blob` field to Set
-    pub struct SetBlob<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBlob<S> {}
-    impl<S: State> State for SetBlob<S> {
+    pub struct SetBlob<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBlob<St> {}
+    impl<St: State> State for SetBlob<St> {
         type Blob = Set<members::blob>;
     }
     /// Marker types for field names
@@ -811,67 +811,67 @@ pub mod small_blob_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct SmallBlobBuilder<'a, S: small_blob_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct SmallBlobBuilder<S: BosStr, St: small_blob_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<BlobRef<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> SmallBlob<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> SmallBlobBuilder<'a, small_blob_state::Empty> {
+impl<S: BosStr> SmallBlob<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> SmallBlobBuilder<S, small_blob_state::Empty> {
         SmallBlobBuilder::new()
     }
 }
 
-impl<'a> SmallBlobBuilder<'a, small_blob_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> SmallBlobBuilder<S, small_blob_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SmallBlobBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SmallBlobBuilder<'a, S>
+impl<S: BosStr, St> SmallBlobBuilder<S, St>
 where
-    S: small_blob_state::State,
-    S::Blob: small_blob_state::IsUnset,
+    St: small_blob_state::State,
+    St::Blob: small_blob_state::IsUnset,
 {
     /// Set the `blob` field (required)
     pub fn blob(
         mut self,
         value: impl Into<BlobRef<S>>,
-    ) -> SmallBlobBuilder<'a, small_blob_state::SetBlob<S>> {
+    ) -> SmallBlobBuilder<S, small_blob_state::SetBlob<St>> {
         self._fields.0 = Option::Some(value.into());
         SmallBlobBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SmallBlobBuilder<'a, S>
+impl<S: BosStr, St> SmallBlobBuilder<S, St>
 where
-    S: small_blob_state::State,
-    S::Blob: small_blob_state::IsSet,
+    St: small_blob_state::State,
+    St::Blob: small_blob_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> SmallBlob<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> SmallBlob<S> {
         SmallBlob {
             blob: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> SmallBlob<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> SmallBlob<S> {
         SmallBlob {
             blob: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -898,9 +898,9 @@ pub mod small_image_state {
         type Image = Unset;
     }
     ///State transition - sets the `image` field to Set
-    pub struct SetImage<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetImage<S> {}
-    impl<S: State> State for SetImage<S> {
+    pub struct SetImage<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetImage<St> {}
+    impl<St: State> State for SetImage<St> {
         type Image = Set<members::image>;
     }
     /// Marker types for field names
@@ -911,67 +911,67 @@ pub mod small_image_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct SmallImageBuilder<'a, S: small_image_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct SmallImageBuilder<S: BosStr, St: small_image_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<BlobRef<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> SmallImage<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> SmallImageBuilder<'a, small_image_state::Empty> {
+impl<S: BosStr> SmallImage<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> SmallImageBuilder<S, small_image_state::Empty> {
         SmallImageBuilder::new()
     }
 }
 
-impl<'a> SmallImageBuilder<'a, small_image_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> SmallImageBuilder<S, small_image_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SmallImageBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SmallImageBuilder<'a, S>
+impl<S: BosStr, St> SmallImageBuilder<S, St>
 where
-    S: small_image_state::State,
-    S::Image: small_image_state::IsUnset,
+    St: small_image_state::State,
+    St::Image: small_image_state::IsUnset,
 {
     /// Set the `image` field (required)
     pub fn image(
         mut self,
         value: impl Into<BlobRef<S>>,
-    ) -> SmallImageBuilder<'a, small_image_state::SetImage<S>> {
+    ) -> SmallImageBuilder<S, small_image_state::SetImage<St>> {
         self._fields.0 = Option::Some(value.into());
         SmallImageBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SmallImageBuilder<'a, S>
+impl<S: BosStr, St> SmallImageBuilder<S, St>
 where
-    S: small_image_state::State,
-    S::Image: small_image_state::IsSet,
+    St: small_image_state::State,
+    St::Image: small_image_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> SmallImage<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> SmallImage<S> {
         SmallImage {
             image: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> SmallImage<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> SmallImage<S> {
         SmallImage {
             image: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -998,9 +998,9 @@ pub mod small_video_state {
         type Video = Unset;
     }
     ///State transition - sets the `video` field to Set
-    pub struct SetVideo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVideo<S> {}
-    impl<S: State> State for SetVideo<S> {
+    pub struct SetVideo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetVideo<St> {}
+    impl<St: State> State for SetVideo<St> {
         type Video = Set<members::video>;
     }
     /// Marker types for field names
@@ -1011,67 +1011,67 @@ pub mod small_video_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct SmallVideoBuilder<'a, S: small_video_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct SmallVideoBuilder<S: BosStr, St: small_video_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<BlobRef<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> SmallVideo<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> SmallVideoBuilder<'a, small_video_state::Empty> {
+impl<S: BosStr> SmallVideo<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> SmallVideoBuilder<S, small_video_state::Empty> {
         SmallVideoBuilder::new()
     }
 }
 
-impl<'a> SmallVideoBuilder<'a, small_video_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> SmallVideoBuilder<S, small_video_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SmallVideoBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SmallVideoBuilder<'a, S>
+impl<S: BosStr, St> SmallVideoBuilder<S, St>
 where
-    S: small_video_state::State,
-    S::Video: small_video_state::IsUnset,
+    St: small_video_state::State,
+    St::Video: small_video_state::IsUnset,
 {
     /// Set the `video` field (required)
     pub fn video(
         mut self,
         value: impl Into<BlobRef<S>>,
-    ) -> SmallVideoBuilder<'a, small_video_state::SetVideo<S>> {
+    ) -> SmallVideoBuilder<S, small_video_state::SetVideo<St>> {
         self._fields.0 = Option::Some(value.into());
         SmallVideoBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SmallVideoBuilder<'a, S>
+impl<S: BosStr, St> SmallVideoBuilder<S, St>
 where
-    S: small_video_state::State,
-    S::Video: small_video_state::IsSet,
+    St: small_video_state::State,
+    St::Video: small_video_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> SmallVideo<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> SmallVideo<S> {
         SmallVideo {
             video: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> SmallVideo<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> SmallVideo<S> {
         SmallVideo {
             video: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -1098,9 +1098,9 @@ pub mod uri_state {
         type Uri = Unset;
     }
     ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
         type Uri = Set<members::uri>;
     }
     /// Marker types for field names
@@ -1111,64 +1111,64 @@ pub mod uri_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct UriBuilder<'a, S: uri_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct UriBuilder<S: BosStr, St: uri_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<UriValue<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Uri<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> UriBuilder<'a, uri_state::Empty> {
+impl<S: BosStr> Uri<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> UriBuilder<S, uri_state::Empty> {
         UriBuilder::new()
     }
 }
 
-impl<'a> UriBuilder<'a, uri_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> UriBuilder<S, uri_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         UriBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> UriBuilder<'a, S>
+impl<S: BosStr, St> UriBuilder<S, St>
 where
-    S: uri_state::State,
-    S::Uri: uri_state::IsUnset,
+    St: uri_state::State,
+    St::Uri: uri_state::IsUnset,
 {
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> UriBuilder<'a, uri_state::SetUri<S>> {
+    ) -> UriBuilder<S, uri_state::SetUri<St>> {
         self._fields.0 = Option::Some(value.into());
         UriBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> UriBuilder<'a, S>
+impl<S: BosStr, St> UriBuilder<S, St>
 where
-    S: uri_state::State,
-    S::Uri: uri_state::IsSet,
+    St: uri_state::State,
+    St::Uri: uri_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Uri<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Uri<S> {
         Uri {
             uri: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Uri<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Uri<S> {
         Uri {
             uri: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

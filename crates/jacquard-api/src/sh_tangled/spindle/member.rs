@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,11 +34,11 @@ use serde::{Serialize, Deserialize};
     rename = "sh.tangled.spindle.member",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Member<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Member<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     ///spindle instance that the subject is now a member of
     pub instance: S,
@@ -53,18 +53,18 @@ pub struct Member<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct MemberGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct MemberGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Member<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Member<S> {
+impl<S: BosStr> Member<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, MemberRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -77,17 +77,17 @@ pub struct MemberRecord;
 impl XrpcResp for MemberRecord {
     const NSID: &'static str = "sh.tangled.spindle.member";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = MemberGetRecordOutput<S>;
+    type Output<S: BosStr> = MemberGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<MemberGetRecordOutput<S>> for Member<S> {
+impl<S: BosStr> From<MemberGetRecordOutput<S>> for Member<S> {
     fn from(output: MemberGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Member<S> {
+impl<S: BosStr> Collection for Member<S> {
     const NSID: &'static str = "sh.tangled.spindle.member";
     type Record = MemberRecord;
 }
@@ -97,7 +97,7 @@ impl Collection for MemberRecord {
     type Record = MemberRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Member<S> {
+impl<S: BosStr> LexiconSchema for Member<S> {
     fn nsid() -> &'static str {
         "sh.tangled.spindle.member"
     }
@@ -122,145 +122,145 @@ pub mod member_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Instance;
         type CreatedAt;
         type Subject;
+        type Instance;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Instance = Unset;
         type CreatedAt = Unset;
         type Subject = Unset;
-    }
-    ///State transition - sets the `instance` field to Set
-    pub struct SetInstance<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetInstance<S> {}
-    impl<S: State> State for SetInstance<S> {
-        type Instance = Set<members::instance>;
-        type CreatedAt = S::CreatedAt;
-        type Subject = S::Subject;
+        type Instance = Unset;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Instance = S::Instance;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
-        type Subject = S::Subject;
+        type Subject = St::Subject;
+        type Instance = St::Instance;
     }
     ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type Instance = S::Instance;
-        type CreatedAt = S::CreatedAt;
+    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubject<St> {}
+    impl<St: State> State for SetSubject<St> {
+        type CreatedAt = St::CreatedAt;
         type Subject = Set<members::subject>;
+        type Instance = St::Instance;
+    }
+    ///State transition - sets the `instance` field to Set
+    pub struct SetInstance<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetInstance<St> {}
+    impl<St: State> State for SetInstance<St> {
+        type CreatedAt = St::CreatedAt;
+        type Subject = St::Subject;
+        type Instance = Set<members::instance>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `instance` field
-        pub struct instance(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `subject` field
         pub struct subject(());
+        ///Marker type for the `instance` field
+        pub struct instance(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct MemberBuilder<'a, S: member_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct MemberBuilder<S: BosStr, St: member_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<S>, Option<Did<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Member<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> MemberBuilder<'a, member_state::Empty> {
+impl<S: BosStr> Member<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> MemberBuilder<S, member_state::Empty> {
         MemberBuilder::new()
     }
 }
 
-impl<'a> MemberBuilder<'a, member_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> MemberBuilder<S, member_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         MemberBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> MemberBuilder<'a, S>
+impl<S: BosStr, St> MemberBuilder<S, St>
 where
-    S: member_state::State,
-    S::CreatedAt: member_state::IsUnset,
+    St: member_state::State,
+    St::CreatedAt: member_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> MemberBuilder<'a, member_state::SetCreatedAt<S>> {
+    ) -> MemberBuilder<S, member_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         MemberBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> MemberBuilder<'a, S>
+impl<S: BosStr, St> MemberBuilder<S, St>
 where
-    S: member_state::State,
-    S::Instance: member_state::IsUnset,
+    St: member_state::State,
+    St::Instance: member_state::IsUnset,
 {
     /// Set the `instance` field (required)
     pub fn instance(
         mut self,
         value: impl Into<S>,
-    ) -> MemberBuilder<'a, member_state::SetInstance<S>> {
+    ) -> MemberBuilder<S, member_state::SetInstance<St>> {
         self._fields.1 = Option::Some(value.into());
         MemberBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> MemberBuilder<'a, S>
+impl<S: BosStr, St> MemberBuilder<S, St>
 where
-    S: member_state::State,
-    S::Subject: member_state::IsUnset,
+    St: member_state::State,
+    St::Subject: member_state::IsUnset,
 {
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> MemberBuilder<'a, member_state::SetSubject<S>> {
+    ) -> MemberBuilder<S, member_state::SetSubject<St>> {
         self._fields.2 = Option::Some(value.into());
         MemberBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> MemberBuilder<'a, S>
+impl<S: BosStr, St> MemberBuilder<S, St>
 where
-    S: member_state::State,
-    S::Instance: member_state::IsSet,
-    S::CreatedAt: member_state::IsSet,
-    S::Subject: member_state::IsSet,
+    St: member_state::State,
+    St::CreatedAt: member_state::IsSet,
+    St::Subject: member_state::IsSet,
+    St::Instance: member_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Member<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Member<S> {
         Member {
             created_at: self._fields.0.unwrap(),
             instance: self._fields.1.unwrap(),
@@ -268,8 +268,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Member<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Member<S> {
         Member {
             created_at: self._fields.0.unwrap(),
             instance: self._fields.1.unwrap(),

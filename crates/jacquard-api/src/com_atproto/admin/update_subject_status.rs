@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
@@ -21,22 +21,20 @@ use crate::com_atproto::admin::StatusAttr;
 use crate::com_atproto::repo::strong_ref::StrongRef;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct UpdateSubjectStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct UpdateSubjectStatus<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub deactivated: Option<StatusAttr<S>>,
     pub subject: UpdateSubjectStatusSubject<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub takedown: Option<StatusAttr<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -46,11 +44,11 @@ pub struct UpdateSubjectStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum UpdateSubjectStatusSubject<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum UpdateSubjectStatusSubject<S: BosStr = DefaultStr> {
     #[serde(rename = "com.atproto.admin.defs#repoRef")]
     RepoRef(Box<RepoRef<S>>),
     #[serde(rename = "com.atproto.repo.strongRef")]
@@ -61,20 +59,18 @@ pub enum UpdateSubjectStatusSubject<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct UpdateSubjectStatusOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct UpdateSubjectStatusOutput<S: BosStr = DefaultStr> {
     pub subject: UpdateSubjectStatusOutputSubject<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub takedown: Option<StatusAttr<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -84,11 +80,11 @@ pub struct UpdateSubjectStatusOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum UpdateSubjectStatusOutputSubject<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum UpdateSubjectStatusOutputSubject<S: BosStr = DefaultStr> {
     #[serde(rename = "com.atproto.admin.defs#repoRef")]
     RepoRef(Box<RepoRef<S>>),
     #[serde(rename = "com.atproto.repo.strongRef")]
@@ -102,12 +98,11 @@ pub struct UpdateSubjectStatusResponse;
 impl jacquard_common::xrpc::XrpcResp for UpdateSubjectStatusResponse {
     const NSID: &'static str = "com.atproto.admin.updateSubjectStatus";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = UpdateSubjectStatusOutput<S>;
+    type Output<S: BosStr> = UpdateSubjectStatusOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for UpdateSubjectStatus<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UpdateSubjectStatus<S> {
     const NSID: &'static str = "com.atproto.admin.updateSubjectStatus";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -122,7 +117,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for UpdateSubjectStatusRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = UpdateSubjectStatus<S>;
+    type Request<S: BosStr> = UpdateSubjectStatus<S>;
     type Response = UpdateSubjectStatusResponse;
 }
 
@@ -145,9 +140,9 @@ pub mod update_subject_status_state {
         type Subject = Unset;
     }
     ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
+    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubject<St> {}
+    impl<St: State> State for SetSubject<St> {
         type Subject = Set<members::subject>;
     }
     /// Marker types for field names
@@ -158,36 +153,42 @@ pub mod update_subject_status_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct UpdateSubjectStatusBuilder<'a, S: update_subject_status_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct UpdateSubjectStatusBuilder<
+    S: BosStr,
+    St: update_subject_status_state::State,
+> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<StatusAttr<S>>,
         Option<UpdateSubjectStatusSubject<S>>,
         Option<StatusAttr<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> UpdateSubjectStatus<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> UpdateSubjectStatusBuilder<'a, update_subject_status_state::Empty> {
+impl<S: BosStr> UpdateSubjectStatus<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> UpdateSubjectStatusBuilder<S, update_subject_status_state::Empty> {
         UpdateSubjectStatusBuilder::new()
     }
 }
 
-impl<'a> UpdateSubjectStatusBuilder<'a, update_subject_status_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> UpdateSubjectStatusBuilder<S, update_subject_status_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         UpdateSubjectStatusBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: update_subject_status_state::State> UpdateSubjectStatusBuilder<'a, S> {
+impl<
+    S: BosStr,
+    St: update_subject_status_state::State,
+> UpdateSubjectStatusBuilder<S, St> {
     /// Set the `deactivated` field (optional)
     pub fn deactivated(mut self, value: impl Into<Option<StatusAttr<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -200,26 +201,29 @@ impl<'a, S: update_subject_status_state::State> UpdateSubjectStatusBuilder<'a, S
     }
 }
 
-impl<'a, S> UpdateSubjectStatusBuilder<'a, S>
+impl<S: BosStr, St> UpdateSubjectStatusBuilder<S, St>
 where
-    S: update_subject_status_state::State,
-    S::Subject: update_subject_status_state::IsUnset,
+    St: update_subject_status_state::State,
+    St::Subject: update_subject_status_state::IsUnset,
 {
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
         value: impl Into<UpdateSubjectStatusSubject<S>>,
-    ) -> UpdateSubjectStatusBuilder<'a, update_subject_status_state::SetSubject<S>> {
+    ) -> UpdateSubjectStatusBuilder<S, update_subject_status_state::SetSubject<St>> {
         self._fields.1 = Option::Some(value.into());
         UpdateSubjectStatusBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: update_subject_status_state::State> UpdateSubjectStatusBuilder<'a, S> {
+impl<
+    S: BosStr,
+    St: update_subject_status_state::State,
+> UpdateSubjectStatusBuilder<S, St> {
     /// Set the `takedown` field (optional)
     pub fn takedown(mut self, value: impl Into<Option<StatusAttr<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -232,13 +236,13 @@ impl<'a, S: update_subject_status_state::State> UpdateSubjectStatusBuilder<'a, S
     }
 }
 
-impl<'a, S> UpdateSubjectStatusBuilder<'a, S>
+impl<S: BosStr, St> UpdateSubjectStatusBuilder<S, St>
 where
-    S: update_subject_status_state::State,
-    S::Subject: update_subject_status_state::IsSet,
+    St: update_subject_status_state::State,
+    St::Subject: update_subject_status_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> UpdateSubjectStatus<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> UpdateSubjectStatus<S> {
         UpdateSubjectStatus {
             deactivated: self._fields.0,
             subject: self._fields.1.unwrap(),
@@ -246,11 +250,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> UpdateSubjectStatus<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> UpdateSubjectStatus<S> {
         UpdateSubjectStatus {
             deactivated: self._fields.0,
             subject: self._fields.1.unwrap(),

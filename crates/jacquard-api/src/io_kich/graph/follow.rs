@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,11 +34,11 @@ use serde::{Serialize, Deserialize};
     rename = "io.kich.graph.follow",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Follow<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Follow<S: BosStr = DefaultStr> {
     ///When this follow was created
     pub created_at: Datetime,
     ///The DID of the user being followed
@@ -53,18 +53,18 @@ pub struct Follow<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct FollowGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct FollowGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Follow<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Follow<S> {
+impl<S: BosStr> Follow<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, FollowRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -77,17 +77,17 @@ pub struct FollowRecord;
 impl XrpcResp for FollowRecord {
     const NSID: &'static str = "io.kich.graph.follow";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = FollowGetRecordOutput<S>;
+    type Output<S: BosStr> = FollowGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<FollowGetRecordOutput<S>> for Follow<S> {
+impl<S: BosStr> From<FollowGetRecordOutput<S>> for Follow<S> {
     fn from(output: FollowGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Follow<S> {
+impl<S: BosStr> Collection for Follow<S> {
     const NSID: &'static str = "io.kich.graph.follow";
     type Record = FollowRecord;
 }
@@ -97,7 +97,7 @@ impl Collection for FollowRecord {
     type Record = FollowRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Follow<S> {
+impl<S: BosStr> LexiconSchema for Follow<S> {
     fn nsid() -> &'static str {
         "io.kich.graph.follow"
     }
@@ -133,17 +133,17 @@ pub mod follow_state {
         type CreatedAt = Unset;
     }
     ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
+    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubject<St> {}
+    impl<St: State> State for SetSubject<St> {
         type Subject = Set<members::subject>;
-        type CreatedAt = S::CreatedAt;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Subject = S::Subject;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Subject = St::Subject;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
@@ -156,85 +156,85 @@ pub mod follow_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct FollowBuilder<'a, S: follow_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct FollowBuilder<S: BosStr, St: follow_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<Did<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Follow<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> FollowBuilder<'a, follow_state::Empty> {
+impl<S: BosStr> Follow<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> FollowBuilder<S, follow_state::Empty> {
         FollowBuilder::new()
     }
 }
 
-impl<'a> FollowBuilder<'a, follow_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> FollowBuilder<S, follow_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         FollowBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> FollowBuilder<'a, S>
+impl<S: BosStr, St> FollowBuilder<S, St>
 where
-    S: follow_state::State,
-    S::CreatedAt: follow_state::IsUnset,
+    St: follow_state::State,
+    St::CreatedAt: follow_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> FollowBuilder<'a, follow_state::SetCreatedAt<S>> {
+    ) -> FollowBuilder<S, follow_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         FollowBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> FollowBuilder<'a, S>
+impl<S: BosStr, St> FollowBuilder<S, St>
 where
-    S: follow_state::State,
-    S::Subject: follow_state::IsUnset,
+    St: follow_state::State,
+    St::Subject: follow_state::IsUnset,
 {
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> FollowBuilder<'a, follow_state::SetSubject<S>> {
+    ) -> FollowBuilder<S, follow_state::SetSubject<St>> {
         self._fields.1 = Option::Some(value.into());
         FollowBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> FollowBuilder<'a, S>
+impl<S: BosStr, St> FollowBuilder<S, St>
 where
-    S: follow_state::State,
-    S::Subject: follow_state::IsSet,
-    S::CreatedAt: follow_state::IsSet,
+    St: follow_state::State,
+    St::Subject: follow_state::IsSet,
+    St::CreatedAt: follow_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Follow<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Follow<S> {
         Follow {
             created_at: self._fields.0.unwrap(),
             subject: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Follow<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Follow<S> {
         Follow {
             created_at: self._fields.0.unwrap(),
             subject: self._fields.1.unwrap(),

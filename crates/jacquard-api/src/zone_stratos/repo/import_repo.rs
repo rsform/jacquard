@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
@@ -25,19 +25,17 @@ pub struct ImportRepo {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ImportRepoOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ImportRepoOutput<S: BosStr = DefaultStr> {
     ///Number of records successfully imported.
     pub imported: i64,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -99,7 +97,7 @@ pub struct ImportRepoResponse;
 impl jacquard_common::xrpc::XrpcResp for ImportRepoResponse {
     const NSID: &'static str = "zone.stratos.repo.importRepo";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ImportRepoOutput<S>;
+    type Output<S: BosStr> = ImportRepoOutput<S>;
     type Err = ImportRepoError;
 }
 
@@ -109,20 +107,24 @@ impl jacquard_common::xrpc::XrpcRequest for ImportRepo {
         "application/vnd.ipld.car",
     );
     type Response = ImportRepoResponse;
-    fn encode_body(&self) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError> {
-        Ok(self.body.to_vec())
+    fn encode_body(
+        &self,
+        buffer: &mut [u8],
+    ) -> Result<(), jacquard_common::xrpc::EncodeError>
+    where
+        Self: Serialize,
+    {
+        Ok(buffer.copy_from_slice(self.body.as_ref()))
     }
     fn decode_body<'de>(
         body: &'de [u8],
-    ) -> Result<Box<Self>, jacquard_common::error::DecodeError>
+    ) -> Result<Self, jacquard_common::error::DecodeError>
     where
         Self: Deserialize<'de>,
     {
-        Ok(
-            Box::new(Self {
-                body: jacquard_common::deps::bytes::Bytes::copy_from_slice(body),
-            }),
-        )
+        Ok(Self {
+            body: jacquard_common::deps::bytes::Bytes::copy_from_slice(body),
+        })
     }
 }
 
@@ -133,6 +135,6 @@ impl jacquard_common::xrpc::XrpcEndpoint for ImportRepoRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/vnd.ipld.car",
     );
-    type Request<S: Bos<str> + AsRef<str>> = ImportRepo;
+    type Request<S: BosStr> = ImportRepo;
     type Response = ImportRepoResponse;
 }

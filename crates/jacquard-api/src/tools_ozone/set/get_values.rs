@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
@@ -18,42 +18,38 @@ use serde::{Serialize, Deserialize};
 use crate::tools_ozone::set::SetView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetValues<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetValues<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub cursor: Option<S>,
     ///Defaults to `100`. Min: 1. Max: 1000.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
-    #[serde(borrow)]
     pub name: S,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetValuesOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetValuesOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
     pub set: SetView<S>,
     pub values: Vec<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -105,12 +101,11 @@ pub struct GetValuesResponse;
 impl jacquard_common::xrpc::XrpcResp for GetValuesResponse {
     const NSID: &'static str = "tools.ozone.set.getValues";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetValuesOutput<S>;
+    type Output<S: BosStr> = GetValuesOutput<S>;
     type Err = GetValuesError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetValues<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetValues<S> {
     const NSID: &'static str = "tools.ozone.set.getValues";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetValuesResponse;
@@ -121,7 +116,7 @@ pub struct GetValuesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetValuesRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.set.getValues";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetValues<S>;
+    type Request<S: BosStr> = GetValues<S>;
     type Response = GetValuesResponse;
 }
 
@@ -148,9 +143,9 @@ pub mod get_values_state {
         type Name = Unset;
     }
     ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
         type Name = Set<members::name>;
     }
     /// Marker types for field names
@@ -161,32 +156,32 @@ pub mod get_values_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetValuesBuilder<'a, S: get_values_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetValuesBuilder<S: BosStr, St: get_values_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetValues<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetValuesBuilder<'a, get_values_state::Empty> {
+impl<S: BosStr> GetValues<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetValuesBuilder<S, get_values_state::Empty> {
         GetValuesBuilder::new()
     }
 }
 
-impl<'a> GetValuesBuilder<'a, get_values_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetValuesBuilder<S, get_values_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetValuesBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: get_values_state::State> GetValuesBuilder<'a, S> {
+impl<S: BosStr, St: get_values_state::State> GetValuesBuilder<S, St> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -199,7 +194,7 @@ impl<'a, S: get_values_state::State> GetValuesBuilder<'a, S> {
     }
 }
 
-impl<'a, S: get_values_state::State> GetValuesBuilder<'a, S> {
+impl<S: BosStr, St: get_values_state::State> GetValuesBuilder<S, St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -212,32 +207,32 @@ impl<'a, S: get_values_state::State> GetValuesBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GetValuesBuilder<'a, S>
+impl<S: BosStr, St> GetValuesBuilder<S, St>
 where
-    S: get_values_state::State,
-    S::Name: get_values_state::IsUnset,
+    St: get_values_state::State,
+    St::Name: get_values_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> GetValuesBuilder<'a, get_values_state::SetName<S>> {
+    ) -> GetValuesBuilder<S, get_values_state::SetName<St>> {
         self._fields.2 = Option::Some(value.into());
         GetValuesBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetValuesBuilder<'a, S>
+impl<S: BosStr, St> GetValuesBuilder<S, St>
 where
-    S: get_values_state::State,
-    S::Name: get_values_state::IsSet,
+    St: get_values_state::State,
+    St::Name: get_values_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetValues<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetValues<S> {
         GetValues {
             cursor: self._fields.0,
             limit: self._fields.1,

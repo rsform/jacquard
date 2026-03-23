@@ -6,8 +6,14 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[allow(unused_imports)]
+use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
@@ -26,9 +32,9 @@ pub struct ExportRepoResponse;
 impl jacquard_common::xrpc::XrpcResp for ExportRepoResponse {
     const NSID: &'static str = "ooo.bsky.authfetch.exportRepo";
     const ENCODING: &'static str = "application/vnd.ipld.car";
-    type Output<S: jacquard_common::Bos<str> + AsRef<str>> = ExportRepoOutput;
+    type Output<S: BosStr> = ExportRepoOutput;
     type Err = jacquard_common::xrpc::GenericError;
-    fn encode_output<S: jacquard_common::Bos<str> + AsRef<str>>(
+    fn encode_output<S: BosStr>(
         output: &Self::Output<S>,
     ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError>
     where
@@ -40,7 +46,7 @@ impl jacquard_common::xrpc::XrpcResp for ExportRepoResponse {
         body: &'de [u8],
     ) -> Result<Self::Output<S>, jacquard_common::error::DecodeError>
     where
-        S: jacquard_common::Bos<str> + AsRef<str> + Deserialize<'de>,
+        S: BosStr + Deserialize<'de>,
         Self::Output<S>: Deserialize<'de>,
     {
         Ok(ExportRepoOutput {
@@ -60,6 +66,6 @@ pub struct ExportRepoRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ExportRepoRequest {
     const PATH: &'static str = "/xrpc/ooo.bsky.authfetch.exportRepo";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: jacquard_common::Bos<str> + AsRef<str>> = ExportRepo;
+    type Request<S: BosStr> = ExportRepo;
     type Response = ExportRepoResponse;
 }

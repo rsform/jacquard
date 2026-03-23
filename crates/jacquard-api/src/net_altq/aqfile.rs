@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use crate::net_altq::aqfile;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Checksum<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Checksum<S: BosStr = DefaultStr> {
     ///Hash algorithm name.
     pub algo: ChecksumAlgo<S>,
     ///Hex or base64 encoded digest produced by the algorithm.
@@ -52,14 +52,14 @@ pub struct Checksum<S: Bos<str> + AsRef<str> = DefaultStr> {
 /// Hash algorithm name.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ChecksumAlgo<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ChecksumAlgo<S: BosStr = DefaultStr> {
     Sha256,
     Sha512,
     Blake3,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> ChecksumAlgo<S> {
+impl<S: BosStr> ChecksumAlgo<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Sha256 => "sha256",
@@ -79,19 +79,19 @@ impl<S: Bos<str> + AsRef<str>> ChecksumAlgo<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ChecksumAlgo<S> {
+impl<S: BosStr> core::fmt::Display for ChecksumAlgo<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for ChecksumAlgo<S> {
+impl<S: BosStr> AsRef<str> for ChecksumAlgo<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for ChecksumAlgo<S> {
+impl<S: BosStr> Serialize for ChecksumAlgo<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -100,8 +100,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for ChecksumAlgo<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for ChecksumAlgo<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ChecksumAlgo<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -111,14 +110,18 @@ for ChecksumAlgo<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for ChecksumAlgo<S> {
+impl<S: BosStr + Default> Default for ChecksumAlgo<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for ChecksumAlgo<S> {
-    type Output = ChecksumAlgo<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for ChecksumAlgo<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ChecksumAlgo<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             ChecksumAlgo::Sha256 => ChecksumAlgo::Sha256,
@@ -135,11 +138,11 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for ChecksumAlgo<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct File<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct File<S: BosStr = DefaultStr> {
     ///MIME type, e.g. 'video/mp4'.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub mime_type: Option<S>,
@@ -162,11 +165,11 @@ pub struct File<S: Bos<str> + AsRef<str> = DefaultStr> {
     rename = "net.altq.aqfile",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Aqfile<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Aqfile<S: BosStr = DefaultStr> {
     ///Handle or DID of the account to attribute this upload to.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub attribution: Option<AtIdentifier<S>>,
@@ -189,24 +192,24 @@ pub struct Aqfile<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct AqfileGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct AqfileGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Aqfile<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Aqfile<S> {
+impl<S: BosStr> Aqfile<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, AqfileRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Checksum<S> {
+impl<S: BosStr> LexiconSchema for Checksum<S> {
     fn nsid() -> &'static str {
         "net.altq.aqfile"
     }
@@ -243,7 +246,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Checksum<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for File<S> {
+impl<S: BosStr> LexiconSchema for File<S> {
     fn nsid() -> &'static str {
         "net.altq.aqfile"
     }
@@ -306,17 +309,17 @@ pub struct AqfileRecord;
 impl XrpcResp for AqfileRecord {
     const NSID: &'static str = "net.altq.aqfile";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = AqfileGetRecordOutput<S>;
+    type Output<S: BosStr> = AqfileGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<AqfileGetRecordOutput<S>> for Aqfile<S> {
+impl<S: BosStr> From<AqfileGetRecordOutput<S>> for Aqfile<S> {
     fn from(output: AqfileGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Aqfile<S> {
+impl<S: BosStr> Collection for Aqfile<S> {
     const NSID: &'static str = "net.altq.aqfile";
     type Record = AqfileRecord;
 }
@@ -326,7 +329,7 @@ impl Collection for AqfileRecord {
     type Record = AqfileRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Aqfile<S> {
+impl<S: BosStr> LexiconSchema for Aqfile<S> {
     fn nsid() -> &'static str {
         "net.altq.aqfile"
     }
@@ -583,17 +586,17 @@ pub mod file_state {
         type Size = Unset;
     }
     ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
         type Name = Set<members::name>;
-        type Size = S::Size;
+        type Size = St::Size;
     }
     ///State transition - sets the `size` field to Set
-    pub struct SetSize<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSize<S> {}
-    impl<S: State> State for SetSize<S> {
-        type Name = S::Name;
+    pub struct SetSize<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSize<St> {}
+    impl<St: State> State for SetSize<St> {
+        type Name = St::Name;
         type Size = Set<members::size>;
     }
     /// Marker types for field names
@@ -606,32 +609,32 @@ pub mod file_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct FileBuilder<'a, S: file_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct FileBuilder<S: BosStr, St: file_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<Datetime>, Option<S>, Option<i64>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> File<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> FileBuilder<'a, file_state::Empty> {
+impl<S: BosStr> File<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> FileBuilder<S, file_state::Empty> {
         FileBuilder::new()
     }
 }
 
-impl<'a> FileBuilder<'a, file_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> FileBuilder<S, file_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         FileBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: file_state::State> FileBuilder<'a, S> {
+impl<S: BosStr, St: file_state::State> FileBuilder<S, St> {
     /// Set the `mimeType` field (optional)
     pub fn mime_type(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -644,7 +647,7 @@ impl<'a, S: file_state::State> FileBuilder<'a, S> {
     }
 }
 
-impl<'a, S: file_state::State> FileBuilder<'a, S> {
+impl<S: BosStr, St: file_state::State> FileBuilder<S, St> {
     /// Set the `modifiedAt` field (optional)
     pub fn modified_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.1 = value.into();
@@ -657,52 +660,52 @@ impl<'a, S: file_state::State> FileBuilder<'a, S> {
     }
 }
 
-impl<'a, S> FileBuilder<'a, S>
+impl<S: BosStr, St> FileBuilder<S, St>
 where
-    S: file_state::State,
-    S::Name: file_state::IsUnset,
+    St: file_state::State,
+    St::Name: file_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> FileBuilder<'a, file_state::SetName<S>> {
+    ) -> FileBuilder<S, file_state::SetName<St>> {
         self._fields.2 = Option::Some(value.into());
         FileBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> FileBuilder<'a, S>
+impl<S: BosStr, St> FileBuilder<S, St>
 where
-    S: file_state::State,
-    S::Size: file_state::IsUnset,
+    St: file_state::State,
+    St::Size: file_state::IsUnset,
 {
     /// Set the `size` field (required)
     pub fn size(
         mut self,
         value: impl Into<i64>,
-    ) -> FileBuilder<'a, file_state::SetSize<S>> {
+    ) -> FileBuilder<S, file_state::SetSize<St>> {
         self._fields.3 = Option::Some(value.into());
         FileBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> FileBuilder<'a, S>
+impl<S: BosStr, St> FileBuilder<S, St>
 where
-    S: file_state::State,
-    S::Name: file_state::IsSet,
-    S::Size: file_state::IsSet,
+    St: file_state::State,
+    St::Name: file_state::IsSet,
+    St::Size: file_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> File<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> File<S> {
         File {
             mime_type: self._fields.0,
             modified_at: self._fields.1,
@@ -711,8 +714,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> File<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> File<S> {
         File {
             mime_type: self._fields.0,
             modified_at: self._fields.1,
@@ -733,57 +736,57 @@ pub mod aqfile_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type File;
-        type CreatedAt;
         type Blob;
+        type CreatedAt;
+        type File;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type File = Unset;
-        type CreatedAt = Unset;
         type Blob = Unset;
-    }
-    ///State transition - sets the `file` field to Set
-    pub struct SetFile<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFile<S> {}
-    impl<S: State> State for SetFile<S> {
-        type File = Set<members::file>;
-        type CreatedAt = S::CreatedAt;
-        type Blob = S::Blob;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type File = S::File;
-        type CreatedAt = Set<members::created_at>;
-        type Blob = S::Blob;
+        type CreatedAt = Unset;
+        type File = Unset;
     }
     ///State transition - sets the `blob` field to Set
-    pub struct SetBlob<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBlob<S> {}
-    impl<S: State> State for SetBlob<S> {
-        type File = S::File;
-        type CreatedAt = S::CreatedAt;
+    pub struct SetBlob<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBlob<St> {}
+    impl<St: State> State for SetBlob<St> {
         type Blob = Set<members::blob>;
+        type CreatedAt = St::CreatedAt;
+        type File = St::File;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Blob = St::Blob;
+        type CreatedAt = Set<members::created_at>;
+        type File = St::File;
+    }
+    ///State transition - sets the `file` field to Set
+    pub struct SetFile<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetFile<St> {}
+    impl<St: State> State for SetFile<St> {
+        type Blob = St::Blob;
+        type CreatedAt = St::CreatedAt;
+        type File = Set<members::file>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `file` field
-        pub struct file(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `blob` field
         pub struct blob(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `file` field
+        pub struct file(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct AqfileBuilder<'a, S: aqfile_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct AqfileBuilder<S: BosStr, St: aqfile_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<AtIdentifier<S>>,
         Option<BlobRef<S>>,
@@ -791,28 +794,28 @@ pub struct AqfileBuilder<'a, S: aqfile_state::State> {
         Option<Datetime>,
         Option<aqfile::File<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Aqfile<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> AqfileBuilder<'a, aqfile_state::Empty> {
+impl<S: BosStr> Aqfile<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> AqfileBuilder<S, aqfile_state::Empty> {
         AqfileBuilder::new()
     }
 }
 
-impl<'a> AqfileBuilder<'a, aqfile_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> AqfileBuilder<S, aqfile_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         AqfileBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: aqfile_state::State> AqfileBuilder<'a, S> {
+impl<S: BosStr, St: aqfile_state::State> AqfileBuilder<S, St> {
     /// Set the `attribution` field (optional)
     pub fn attribution(mut self, value: impl Into<Option<AtIdentifier<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -825,26 +828,26 @@ impl<'a, S: aqfile_state::State> AqfileBuilder<'a, S> {
     }
 }
 
-impl<'a, S> AqfileBuilder<'a, S>
+impl<S: BosStr, St> AqfileBuilder<S, St>
 where
-    S: aqfile_state::State,
-    S::Blob: aqfile_state::IsUnset,
+    St: aqfile_state::State,
+    St::Blob: aqfile_state::IsUnset,
 {
     /// Set the `blob` field (required)
     pub fn blob(
         mut self,
         value: impl Into<BlobRef<S>>,
-    ) -> AqfileBuilder<'a, aqfile_state::SetBlob<S>> {
+    ) -> AqfileBuilder<S, aqfile_state::SetBlob<St>> {
         self._fields.1 = Option::Some(value.into());
         AqfileBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: aqfile_state::State> AqfileBuilder<'a, S> {
+impl<S: BosStr, St: aqfile_state::State> AqfileBuilder<S, St> {
     /// Set the `checksum` field (optional)
     pub fn checksum(mut self, value: impl Into<Option<aqfile::Checksum<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -857,53 +860,53 @@ impl<'a, S: aqfile_state::State> AqfileBuilder<'a, S> {
     }
 }
 
-impl<'a, S> AqfileBuilder<'a, S>
+impl<S: BosStr, St> AqfileBuilder<S, St>
 where
-    S: aqfile_state::State,
-    S::CreatedAt: aqfile_state::IsUnset,
+    St: aqfile_state::State,
+    St::CreatedAt: aqfile_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> AqfileBuilder<'a, aqfile_state::SetCreatedAt<S>> {
+    ) -> AqfileBuilder<S, aqfile_state::SetCreatedAt<St>> {
         self._fields.3 = Option::Some(value.into());
         AqfileBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AqfileBuilder<'a, S>
+impl<S: BosStr, St> AqfileBuilder<S, St>
 where
-    S: aqfile_state::State,
-    S::File: aqfile_state::IsUnset,
+    St: aqfile_state::State,
+    St::File: aqfile_state::IsUnset,
 {
     /// Set the `file` field (required)
     pub fn file(
         mut self,
         value: impl Into<aqfile::File<S>>,
-    ) -> AqfileBuilder<'a, aqfile_state::SetFile<S>> {
+    ) -> AqfileBuilder<S, aqfile_state::SetFile<St>> {
         self._fields.4 = Option::Some(value.into());
         AqfileBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AqfileBuilder<'a, S>
+impl<S: BosStr, St> AqfileBuilder<S, St>
 where
-    S: aqfile_state::State,
-    S::File: aqfile_state::IsSet,
-    S::CreatedAt: aqfile_state::IsSet,
-    S::Blob: aqfile_state::IsSet,
+    St: aqfile_state::State,
+    St::Blob: aqfile_state::IsSet,
+    St::CreatedAt: aqfile_state::IsSet,
+    St::File: aqfile_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Aqfile<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Aqfile<S> {
         Aqfile {
             attribution: self._fields.0,
             blob: self._fields.1.unwrap(),
@@ -913,8 +916,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Aqfile<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Aqfile<S> {
         Aqfile {
             attribution: self._fields.0,
             blob: self._fields.1.unwrap(),

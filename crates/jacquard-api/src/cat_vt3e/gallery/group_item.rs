@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "cat.vt3e.gallery.groupItem",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GroupItem<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GroupItem<S: BosStr = DefaultStr> {
     pub added_at: Datetime,
     ///uri of the group that the image belongs to
     pub group: AtUri<S>,
@@ -57,18 +57,18 @@ pub struct GroupItem<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GroupItemGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GroupItemGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: GroupItem<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> GroupItem<S> {
+impl<S: BosStr> GroupItem<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, GroupItemRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -81,17 +81,17 @@ pub struct GroupItemRecord;
 impl XrpcResp for GroupItemRecord {
     const NSID: &'static str = "cat.vt3e.gallery.groupItem";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GroupItemGetRecordOutput<S>;
+    type Output<S: BosStr> = GroupItemGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<GroupItemGetRecordOutput<S>> for GroupItem<S> {
+impl<S: BosStr> From<GroupItemGetRecordOutput<S>> for GroupItem<S> {
     fn from(output: GroupItemGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for GroupItem<S> {
+impl<S: BosStr> Collection for GroupItem<S> {
     const NSID: &'static str = "cat.vt3e.gallery.groupItem";
     type Record = GroupItemRecord;
 }
@@ -101,7 +101,7 @@ impl Collection for GroupItemRecord {
     type Record = GroupItemRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for GroupItem<S> {
+impl<S: BosStr> LexiconSchema for GroupItem<S> {
     fn nsid() -> &'static str {
         "cat.vt3e.gallery.groupItem"
     }
@@ -139,27 +139,27 @@ pub mod group_item_state {
         type Image = Unset;
     }
     ///State transition - sets the `group` field to Set
-    pub struct SetGroup<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGroup<S> {}
-    impl<S: State> State for SetGroup<S> {
+    pub struct SetGroup<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetGroup<St> {}
+    impl<St: State> State for SetGroup<St> {
         type Group = Set<members::group>;
-        type AddedAt = S::AddedAt;
-        type Image = S::Image;
+        type AddedAt = St::AddedAt;
+        type Image = St::Image;
     }
     ///State transition - sets the `added_at` field to Set
-    pub struct SetAddedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAddedAt<S> {}
-    impl<S: State> State for SetAddedAt<S> {
-        type Group = S::Group;
+    pub struct SetAddedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAddedAt<St> {}
+    impl<St: State> State for SetAddedAt<St> {
+        type Group = St::Group;
         type AddedAt = Set<members::added_at>;
-        type Image = S::Image;
+        type Image = St::Image;
     }
     ///State transition - sets the `image` field to Set
-    pub struct SetImage<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetImage<S> {}
-    impl<S: State> State for SetImage<S> {
-        type Group = S::Group;
-        type AddedAt = S::AddedAt;
+    pub struct SetImage<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetImage<St> {}
+    impl<St: State> State for SetImage<St> {
+        type Group = St::Group;
+        type AddedAt = St::AddedAt;
         type Image = Set<members::image>;
     }
     /// Marker types for field names
@@ -174,89 +174,89 @@ pub mod group_item_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GroupItemBuilder<'a, S: group_item_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GroupItemBuilder<S: BosStr, St: group_item_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<AtUri<S>>, Option<AtUri<S>>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GroupItem<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GroupItemBuilder<'a, group_item_state::Empty> {
+impl<S: BosStr> GroupItem<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GroupItemBuilder<S, group_item_state::Empty> {
         GroupItemBuilder::new()
     }
 }
 
-impl<'a> GroupItemBuilder<'a, group_item_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GroupItemBuilder<S, group_item_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GroupItemBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GroupItemBuilder<'a, S>
+impl<S: BosStr, St> GroupItemBuilder<S, St>
 where
-    S: group_item_state::State,
-    S::AddedAt: group_item_state::IsUnset,
+    St: group_item_state::State,
+    St::AddedAt: group_item_state::IsUnset,
 {
     /// Set the `addedAt` field (required)
     pub fn added_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> GroupItemBuilder<'a, group_item_state::SetAddedAt<S>> {
+    ) -> GroupItemBuilder<S, group_item_state::SetAddedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         GroupItemBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GroupItemBuilder<'a, S>
+impl<S: BosStr, St> GroupItemBuilder<S, St>
 where
-    S: group_item_state::State,
-    S::Group: group_item_state::IsUnset,
+    St: group_item_state::State,
+    St::Group: group_item_state::IsUnset,
 {
     /// Set the `group` field (required)
     pub fn group(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> GroupItemBuilder<'a, group_item_state::SetGroup<S>> {
+    ) -> GroupItemBuilder<S, group_item_state::SetGroup<St>> {
         self._fields.1 = Option::Some(value.into());
         GroupItemBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GroupItemBuilder<'a, S>
+impl<S: BosStr, St> GroupItemBuilder<S, St>
 where
-    S: group_item_state::State,
-    S::Image: group_item_state::IsUnset,
+    St: group_item_state::State,
+    St::Image: group_item_state::IsUnset,
 {
     /// Set the `image` field (required)
     pub fn image(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> GroupItemBuilder<'a, group_item_state::SetImage<S>> {
+    ) -> GroupItemBuilder<S, group_item_state::SetImage<St>> {
         self._fields.2 = Option::Some(value.into());
         GroupItemBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: group_item_state::State> GroupItemBuilder<'a, S> {
+impl<S: BosStr, St: group_item_state::State> GroupItemBuilder<S, St> {
     /// Set the `note` field (optional)
     pub fn note(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -269,15 +269,15 @@ impl<'a, S: group_item_state::State> GroupItemBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GroupItemBuilder<'a, S>
+impl<S: BosStr, St> GroupItemBuilder<S, St>
 where
-    S: group_item_state::State,
-    S::Group: group_item_state::IsSet,
-    S::AddedAt: group_item_state::IsSet,
-    S::Image: group_item_state::IsSet,
+    St: group_item_state::State,
+    St::Group: group_item_state::IsSet,
+    St::AddedAt: group_item_state::IsSet,
+    St::Image: group_item_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GroupItem<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GroupItem<S> {
         GroupItem {
             added_at: self._fields.0.unwrap(),
             group: self._fields.1.unwrap(),
@@ -286,11 +286,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> GroupItem<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> GroupItem<S> {
         GroupItem {
             added_at: self._fields.0.unwrap(),
             group: self._fields.1.unwrap(),

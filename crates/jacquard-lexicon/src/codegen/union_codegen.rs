@@ -1,6 +1,6 @@
-use crate::codegen::nsid_utils::{NsidPath, RefPath};
 use crate::corpus::LexiconCorpus;
 use crate::error::Result;
+use crate::ref_utils::{NsidPath, RefPath};
 use heck::ToPascalCase;
 use jacquard_common::CowStr;
 use proc_macro2::TokenStream;

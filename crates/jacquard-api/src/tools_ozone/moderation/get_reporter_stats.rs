@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
@@ -19,32 +19,29 @@ use serde::{Serialize, Deserialize};
 use crate::tools_ozone::moderation::ReporterStats;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetReporterStats<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct GetReporterStats<S: BosStr = DefaultStr> {
     pub dids: Vec<Did<S>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetReporterStatsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetReporterStatsOutput<S: BosStr = DefaultStr> {
     pub stats: Vec<ReporterStats<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -53,12 +50,11 @@ pub struct GetReporterStatsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetReporterStatsResponse {
     const NSID: &'static str = "tools.ozone.moderation.getReporterStats";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetReporterStatsOutput<S>;
+    type Output<S: BosStr> = GetReporterStatsOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetReporterStats<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetReporterStats<S> {
     const NSID: &'static str = "tools.ozone.moderation.getReporterStats";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetReporterStatsResponse;
@@ -69,7 +65,7 @@ pub struct GetReporterStatsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetReporterStatsRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.moderation.getReporterStats";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetReporterStats<S>;
+    type Request<S: BosStr> = GetReporterStats<S>;
     type Response = GetReporterStatsResponse;
 }
 
@@ -92,9 +88,9 @@ pub mod get_reporter_stats_state {
         type Dids = Unset;
     }
     ///State transition - sets the `dids` field to Set
-    pub struct SetDids<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDids<S> {}
-    impl<S: State> State for SetDids<S> {
+    pub struct SetDids<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDids<St> {}
+    impl<St: State> State for SetDids<St> {
         type Dids = Set<members::dids>;
     }
     /// Marker types for field names
@@ -105,57 +101,57 @@ pub mod get_reporter_stats_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetReporterStatsBuilder<'a, S: get_reporter_stats_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetReporterStatsBuilder<S: BosStr, St: get_reporter_stats_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<Did<S>>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetReporterStats<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetReporterStatsBuilder<'a, get_reporter_stats_state::Empty> {
+impl<S: BosStr> GetReporterStats<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetReporterStatsBuilder<S, get_reporter_stats_state::Empty> {
         GetReporterStatsBuilder::new()
     }
 }
 
-impl<'a> GetReporterStatsBuilder<'a, get_reporter_stats_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetReporterStatsBuilder<S, get_reporter_stats_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetReporterStatsBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetReporterStatsBuilder<'a, S>
+impl<S: BosStr, St> GetReporterStatsBuilder<S, St>
 where
-    S: get_reporter_stats_state::State,
-    S::Dids: get_reporter_stats_state::IsUnset,
+    St: get_reporter_stats_state::State,
+    St::Dids: get_reporter_stats_state::IsUnset,
 {
     /// Set the `dids` field (required)
     pub fn dids(
         mut self,
         value: impl Into<Vec<Did<S>>>,
-    ) -> GetReporterStatsBuilder<'a, get_reporter_stats_state::SetDids<S>> {
+    ) -> GetReporterStatsBuilder<S, get_reporter_stats_state::SetDids<St>> {
         self._fields.0 = Option::Some(value.into());
         GetReporterStatsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetReporterStatsBuilder<'a, S>
+impl<S: BosStr, St> GetReporterStatsBuilder<S, St>
 where
-    S: get_reporter_stats_state::State,
-    S::Dids: get_reporter_stats_state::IsSet,
+    St: get_reporter_stats_state::State,
+    St::Dids: get_reporter_stats_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetReporterStats<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetReporterStats<S> {
         GetReporterStats {
             dids: self._fields.0.unwrap(),
         }

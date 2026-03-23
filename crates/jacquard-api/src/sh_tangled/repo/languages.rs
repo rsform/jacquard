@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -29,11 +29,11 @@ use crate::sh_tangled::repo::languages;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Language<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Language<S: BosStr = DefaultStr> {
     ///Hex color code for this language
     #[serde(skip_serializing_if = "Option::is_none")]
     pub color: Option<S>,
@@ -55,33 +55,31 @@ pub struct Language<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Languages<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Languages<S: BosStr = DefaultStr> {
     ///Defaults to `"HEAD"`.
     #[serde(default = "_default_ref")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub r#ref: Option<S>,
-    #[serde(borrow)]
     pub repo: S,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct LanguagesOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct LanguagesOutput<S: BosStr = DefaultStr> {
     pub languages: Vec<languages::Language<S>>,
     ///The git reference used
     pub r#ref: S,
@@ -91,9 +89,7 @@ pub struct LanguagesOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Total size of all analyzed files in bytes
     #[serde(skip_serializing_if = "Option::is_none")]
     pub total_size: Option<i64>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -160,7 +156,7 @@ impl core::fmt::Display for LanguagesError {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Language<S> {
+impl<S: BosStr> LexiconSchema for Language<S> {
     fn nsid() -> &'static str {
         "sh.tangled.repo.languages"
     }
@@ -180,12 +176,11 @@ pub struct LanguagesResponse;
 impl jacquard_common::xrpc::XrpcResp for LanguagesResponse {
     const NSID: &'static str = "sh.tangled.repo.languages";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = LanguagesOutput<S>;
+    type Output<S: BosStr> = LanguagesOutput<S>;
     type Err = LanguagesError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for Languages<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Languages<S> {
     const NSID: &'static str = "sh.tangled.repo.languages";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = LanguagesResponse;
@@ -196,7 +191,7 @@ pub struct LanguagesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for LanguagesRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.repo.languages";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = Languages<S>;
+    type Request<S: BosStr> = Languages<S>;
     type Response = LanguagesResponse;
 }
 
@@ -210,57 +205,57 @@ pub mod language_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Name;
         type Size;
         type Percentage;
-        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Name = Unset;
         type Size = Unset;
         type Percentage = Unset;
-        type Name = Unset;
-    }
-    ///State transition - sets the `size` field to Set
-    pub struct SetSize<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSize<S> {}
-    impl<S: State> State for SetSize<S> {
-        type Size = Set<members::size>;
-        type Percentage = S::Percentage;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `percentage` field to Set
-    pub struct SetPercentage<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPercentage<S> {}
-    impl<S: State> State for SetPercentage<S> {
-        type Size = S::Size;
-        type Percentage = Set<members::percentage>;
-        type Name = S::Name;
     }
     ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Size = S::Size;
-        type Percentage = S::Percentage;
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
         type Name = Set<members::name>;
+        type Size = St::Size;
+        type Percentage = St::Percentage;
+    }
+    ///State transition - sets the `size` field to Set
+    pub struct SetSize<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSize<St> {}
+    impl<St: State> State for SetSize<St> {
+        type Name = St::Name;
+        type Size = Set<members::size>;
+        type Percentage = St::Percentage;
+    }
+    ///State transition - sets the `percentage` field to Set
+    pub struct SetPercentage<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPercentage<St> {}
+    impl<St: State> State for SetPercentage<St> {
+        type Name = St::Name;
+        type Size = St::Size;
+        type Percentage = Set<members::percentage>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `size` field
         pub struct size(());
         ///Marker type for the `percentage` field
         pub struct percentage(());
-        ///Marker type for the `name` field
-        pub struct name(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct LanguageBuilder<'a, S: language_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct LanguageBuilder<S: BosStr, St: language_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
         Option<Vec<S>>,
@@ -269,28 +264,28 @@ pub struct LanguageBuilder<'a, S: language_state::State> {
         Option<i64>,
         Option<i64>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Language<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> LanguageBuilder<'a, language_state::Empty> {
+impl<S: BosStr> Language<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> LanguageBuilder<S, language_state::Empty> {
         LanguageBuilder::new()
     }
 }
 
-impl<'a> LanguageBuilder<'a, language_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> LanguageBuilder<S, language_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         LanguageBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: language_state::State> LanguageBuilder<'a, S> {
+impl<S: BosStr, St: language_state::State> LanguageBuilder<S, St> {
     /// Set the `color` field (optional)
     pub fn color(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -303,7 +298,7 @@ impl<'a, S: language_state::State> LanguageBuilder<'a, S> {
     }
 }
 
-impl<'a, S: language_state::State> LanguageBuilder<'a, S> {
+impl<S: BosStr, St: language_state::State> LanguageBuilder<S, St> {
     /// Set the `extensions` field (optional)
     pub fn extensions(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -316,7 +311,7 @@ impl<'a, S: language_state::State> LanguageBuilder<'a, S> {
     }
 }
 
-impl<'a, S: language_state::State> LanguageBuilder<'a, S> {
+impl<S: BosStr, St: language_state::State> LanguageBuilder<S, St> {
     /// Set the `fileCount` field (optional)
     pub fn file_count(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -329,72 +324,72 @@ impl<'a, S: language_state::State> LanguageBuilder<'a, S> {
     }
 }
 
-impl<'a, S> LanguageBuilder<'a, S>
+impl<S: BosStr, St> LanguageBuilder<S, St>
 where
-    S: language_state::State,
-    S::Name: language_state::IsUnset,
+    St: language_state::State,
+    St::Name: language_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> LanguageBuilder<'a, language_state::SetName<S>> {
+    ) -> LanguageBuilder<S, language_state::SetName<St>> {
         self._fields.3 = Option::Some(value.into());
         LanguageBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LanguageBuilder<'a, S>
+impl<S: BosStr, St> LanguageBuilder<S, St>
 where
-    S: language_state::State,
-    S::Percentage: language_state::IsUnset,
+    St: language_state::State,
+    St::Percentage: language_state::IsUnset,
 {
     /// Set the `percentage` field (required)
     pub fn percentage(
         mut self,
         value: impl Into<i64>,
-    ) -> LanguageBuilder<'a, language_state::SetPercentage<S>> {
+    ) -> LanguageBuilder<S, language_state::SetPercentage<St>> {
         self._fields.4 = Option::Some(value.into());
         LanguageBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LanguageBuilder<'a, S>
+impl<S: BosStr, St> LanguageBuilder<S, St>
 where
-    S: language_state::State,
-    S::Size: language_state::IsUnset,
+    St: language_state::State,
+    St::Size: language_state::IsUnset,
 {
     /// Set the `size` field (required)
     pub fn size(
         mut self,
         value: impl Into<i64>,
-    ) -> LanguageBuilder<'a, language_state::SetSize<S>> {
+    ) -> LanguageBuilder<S, language_state::SetSize<St>> {
         self._fields.5 = Option::Some(value.into());
         LanguageBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LanguageBuilder<'a, S>
+impl<S: BosStr, St> LanguageBuilder<S, St>
 where
-    S: language_state::State,
-    S::Size: language_state::IsSet,
-    S::Percentage: language_state::IsSet,
-    S::Name: language_state::IsSet,
+    St: language_state::State,
+    St::Name: language_state::IsSet,
+    St::Size: language_state::IsSet,
+    St::Percentage: language_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Language<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Language<S> {
         Language {
             color: self._fields.0,
             extensions: self._fields.1,
@@ -405,11 +400,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Language<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Language<S> {
         Language {
             color: self._fields.0,
             extensions: self._fields.1,
@@ -544,8 +536,8 @@ fn lexicon_doc_sh_tangled_repo_languages() -> LexiconDoc<'static> {
     }
 }
 
-fn _default_ref() -> Option<CowStr<'static>> {
-    Some(CowStr::from("HEAD"))
+fn _default_ref<S: jacquard_common::FromStaticStr>() -> Option<S> {
+    Some(S::from_static("HEAD"))
 }
 
 pub mod languages_state {
@@ -567,9 +559,9 @@ pub mod languages_state {
         type Repo = Unset;
     }
     ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
+    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRepo<St> {}
+    impl<St: State> State for SetRepo<St> {
         type Repo = Set<members::repo>;
     }
     /// Marker types for field names
@@ -580,32 +572,32 @@ pub mod languages_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct LanguagesBuilder<'a, S: languages_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct LanguagesBuilder<S: BosStr, St: languages_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Languages<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> LanguagesBuilder<'a, languages_state::Empty> {
+impl<S: BosStr> Languages<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> LanguagesBuilder<S, languages_state::Empty> {
         LanguagesBuilder::new()
     }
 }
 
-impl<'a> LanguagesBuilder<'a, languages_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> LanguagesBuilder<S, languages_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         LanguagesBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: languages_state::State> LanguagesBuilder<'a, S> {
+impl<S: BosStr, St: languages_state::State> LanguagesBuilder<S, St> {
     /// Set the `ref` field (optional)
     pub fn r#ref(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -618,32 +610,32 @@ impl<'a, S: languages_state::State> LanguagesBuilder<'a, S> {
     }
 }
 
-impl<'a, S> LanguagesBuilder<'a, S>
+impl<S: BosStr, St> LanguagesBuilder<S, St>
 where
-    S: languages_state::State,
-    S::Repo: languages_state::IsUnset,
+    St: languages_state::State,
+    St::Repo: languages_state::IsUnset,
 {
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
         value: impl Into<S>,
-    ) -> LanguagesBuilder<'a, languages_state::SetRepo<S>> {
+    ) -> LanguagesBuilder<S, languages_state::SetRepo<St>> {
         self._fields.1 = Option::Some(value.into());
         LanguagesBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LanguagesBuilder<'a, S>
+impl<S: BosStr, St> LanguagesBuilder<S, St>
 where
-    S: languages_state::State,
-    S::Repo: languages_state::IsSet,
+    St: languages_state::State,
+    St::Repo: languages_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Languages<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Languages<S> {
         Languages {
             r#ref: self._fields.0,
             repo: self._fields.1.unwrap(),

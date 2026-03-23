@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
@@ -19,19 +19,17 @@ use serde::{Serialize, Deserialize};
 use crate::games_gamesgamesgamesgames::GameSummaryView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ListGames<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ListGames<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub cursor: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub did: Option<Did<S>>,
     ///Defaults to `20`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
@@ -40,31 +38,27 @@ pub struct ListGames<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Defaults to `"indexed_at"`.
     #[serde(default = "_default_sort")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub sort: Option<S>,
     ///Defaults to `"desc"`.
     #[serde(default = "_default_sort_direction")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub sort_direction: Option<S>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ListGamesOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ListGamesOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
     pub games: Vec<GameSummaryView<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -73,12 +67,11 @@ pub struct ListGamesResponse;
 impl jacquard_common::xrpc::XrpcResp for ListGamesResponse {
     const NSID: &'static str = "games.gamesgamesgamesgames.listGames";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ListGamesOutput<S>;
+    type Output<S: BosStr> = ListGamesOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for ListGames<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ListGames<S> {
     const NSID: &'static str = "games.gamesgamesgamesgames.listGames";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ListGamesResponse;
@@ -89,7 +82,7 @@ pub struct ListGamesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListGamesRequest {
     const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.listGames";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = ListGames<S>;
+    type Request<S: BosStr> = ListGames<S>;
     type Response = ListGamesResponse;
 }
 
@@ -97,12 +90,12 @@ fn _default_limit() -> Option<i64> {
     Some(20i64)
 }
 
-fn _default_sort() -> Option<CowStr<'static>> {
-    Some(CowStr::from("indexed_at"))
+fn _default_sort<S: jacquard_common::FromStaticStr>() -> Option<S> {
+    Some(S::from_static("indexed_at"))
 }
 
-fn _default_sort_direction() -> Option<CowStr<'static>> {
-    Some(CowStr::from("desc"))
+fn _default_sort_direction<S: jacquard_common::FromStaticStr>() -> Option<S> {
+    Some(S::from_static("desc"))
 }
 
 pub mod list_games_state {
@@ -124,32 +117,32 @@ pub mod list_games_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct ListGamesBuilder<'a, S: list_games_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ListGamesBuilder<S: BosStr, St: list_games_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<Did<S>>, Option<i64>, Option<S>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ListGames<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ListGamesBuilder<'a, list_games_state::Empty> {
+impl<S: BosStr> ListGames<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ListGamesBuilder<S, list_games_state::Empty> {
         ListGamesBuilder::new()
     }
 }
 
-impl<'a> ListGamesBuilder<'a, list_games_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ListGamesBuilder<S, list_games_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ListGamesBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: list_games_state::State> ListGamesBuilder<'a, S> {
+impl<S: BosStr, St: list_games_state::State> ListGamesBuilder<S, St> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -162,7 +155,7 @@ impl<'a, S: list_games_state::State> ListGamesBuilder<'a, S> {
     }
 }
 
-impl<'a, S: list_games_state::State> ListGamesBuilder<'a, S> {
+impl<S: BosStr, St: list_games_state::State> ListGamesBuilder<S, St> {
     /// Set the `did` field (optional)
     pub fn did(mut self, value: impl Into<Option<Did<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -175,7 +168,7 @@ impl<'a, S: list_games_state::State> ListGamesBuilder<'a, S> {
     }
 }
 
-impl<'a, S: list_games_state::State> ListGamesBuilder<'a, S> {
+impl<S: BosStr, St: list_games_state::State> ListGamesBuilder<S, St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -188,7 +181,7 @@ impl<'a, S: list_games_state::State> ListGamesBuilder<'a, S> {
     }
 }
 
-impl<'a, S: list_games_state::State> ListGamesBuilder<'a, S> {
+impl<S: BosStr, St: list_games_state::State> ListGamesBuilder<S, St> {
     /// Set the `sort` field (optional)
     pub fn sort(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -201,7 +194,7 @@ impl<'a, S: list_games_state::State> ListGamesBuilder<'a, S> {
     }
 }
 
-impl<'a, S: list_games_state::State> ListGamesBuilder<'a, S> {
+impl<S: BosStr, St: list_games_state::State> ListGamesBuilder<S, St> {
     /// Set the `sortDirection` field (optional)
     pub fn sort_direction(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
@@ -214,12 +207,12 @@ impl<'a, S: list_games_state::State> ListGamesBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ListGamesBuilder<'a, S>
+impl<S: BosStr, St> ListGamesBuilder<S, St>
 where
-    S: list_games_state::State,
+    St: list_games_state::State,
 {
-    /// Build the final struct
-    pub fn build(self) -> ListGames<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ListGames<S> {
         ListGames {
             cursor: self._fields.0,
             did: self._fields.1,

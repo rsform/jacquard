@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -31,11 +31,11 @@ use crate::app_offprint::block::image_grid;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GridImage<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GridImage<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub alt: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -51,11 +51,11 @@ pub struct GridImage<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ImageGrid<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ImageGrid<S: BosStr = DefaultStr> {
     ///Aspect ratio mode
     #[serde(skip_serializing_if = "Option::is_none")]
     pub aspect_ratio: Option<S>,
@@ -71,7 +71,7 @@ pub struct ImageGrid<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for GridImage<S> {
+impl<S: BosStr> LexiconSchema for GridImage<S> {
     fn nsid() -> &'static str {
         "app.offprint.block.imageGrid"
     }
@@ -136,7 +136,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for GridImage<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ImageGrid<S> {
+impl<S: BosStr> LexiconSchema for ImageGrid<S> {
     fn nsid() -> &'static str {
         "app.offprint.block.imageGrid"
     }
@@ -306,9 +306,9 @@ pub mod image_grid_state {
         type Images = Unset;
     }
     ///State transition - sets the `images` field to Set
-    pub struct SetImages<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetImages<S> {}
-    impl<S: State> State for SetImages<S> {
+    pub struct SetImages<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetImages<St> {}
+    impl<St: State> State for SetImages<St> {
         type Images = Set<members::images>;
     }
     /// Marker types for field names
@@ -319,32 +319,32 @@ pub mod image_grid_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ImageGridBuilder<'a, S: image_grid_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ImageGridBuilder<S: BosStr, St: image_grid_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>, Option<i64>, Option<Vec<image_grid::GridImage<S>>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ImageGrid<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ImageGridBuilder<'a, image_grid_state::Empty> {
+impl<S: BosStr> ImageGrid<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ImageGridBuilder<S, image_grid_state::Empty> {
         ImageGridBuilder::new()
     }
 }
 
-impl<'a> ImageGridBuilder<'a, image_grid_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ImageGridBuilder<S, image_grid_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ImageGridBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: image_grid_state::State> ImageGridBuilder<'a, S> {
+impl<S: BosStr, St: image_grid_state::State> ImageGridBuilder<S, St> {
     /// Set the `aspectRatio` field (optional)
     pub fn aspect_ratio(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -357,7 +357,7 @@ impl<'a, S: image_grid_state::State> ImageGridBuilder<'a, S> {
     }
 }
 
-impl<'a, S: image_grid_state::State> ImageGridBuilder<'a, S> {
+impl<S: BosStr, St: image_grid_state::State> ImageGridBuilder<S, St> {
     /// Set the `caption` field (optional)
     pub fn caption(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -370,7 +370,7 @@ impl<'a, S: image_grid_state::State> ImageGridBuilder<'a, S> {
     }
 }
 
-impl<'a, S: image_grid_state::State> ImageGridBuilder<'a, S> {
+impl<S: BosStr, St: image_grid_state::State> ImageGridBuilder<S, St> {
     /// Set the `gridRows` field (optional)
     pub fn grid_rows(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -383,32 +383,32 @@ impl<'a, S: image_grid_state::State> ImageGridBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ImageGridBuilder<'a, S>
+impl<S: BosStr, St> ImageGridBuilder<S, St>
 where
-    S: image_grid_state::State,
-    S::Images: image_grid_state::IsUnset,
+    St: image_grid_state::State,
+    St::Images: image_grid_state::IsUnset,
 {
     /// Set the `images` field (required)
     pub fn images(
         mut self,
         value: impl Into<Vec<image_grid::GridImage<S>>>,
-    ) -> ImageGridBuilder<'a, image_grid_state::SetImages<S>> {
+    ) -> ImageGridBuilder<S, image_grid_state::SetImages<St>> {
         self._fields.3 = Option::Some(value.into());
         ImageGridBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ImageGridBuilder<'a, S>
+impl<S: BosStr, St> ImageGridBuilder<S, St>
 where
-    S: image_grid_state::State,
-    S::Images: image_grid_state::IsSet,
+    St: image_grid_state::State,
+    St::Images: image_grid_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ImageGrid<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ImageGrid<S> {
         ImageGrid {
             aspect_ratio: self._fields.0,
             caption: self._fields.1,
@@ -417,11 +417,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> ImageGrid<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ImageGrid<S> {
         ImageGrid {
             aspect_ratio: self._fields.0,
             caption: self._fields.1,

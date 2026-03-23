@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
@@ -18,21 +18,19 @@ use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct UpdateActorAccess<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct UpdateActorAccess<S: BosStr = DefaultStr> {
     pub actor: Did<S>,
     pub allow_access: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub r#ref: Option<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -41,12 +39,11 @@ pub struct UpdateActorAccessResponse;
 impl jacquard_common::xrpc::XrpcResp for UpdateActorAccessResponse {
     const NSID: &'static str = "chat.bsky.moderation.updateActorAccess";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ();
+    type Output<S: BosStr> = ();
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for UpdateActorAccess<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UpdateActorAccess<S> {
     const NSID: &'static str = "chat.bsky.moderation.updateActorAccess";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -61,7 +58,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for UpdateActorAccessRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = UpdateActorAccess<S>;
+    type Request<S: BosStr> = UpdateActorAccess<S>;
     type Response = UpdateActorAccessResponse;
 }
 
@@ -86,17 +83,17 @@ pub mod update_actor_access_state {
         type AllowAccess = Unset;
     }
     ///State transition - sets the `actor` field to Set
-    pub struct SetActor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetActor<S> {}
-    impl<S: State> State for SetActor<S> {
+    pub struct SetActor<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetActor<St> {}
+    impl<St: State> State for SetActor<St> {
         type Actor = Set<members::actor>;
-        type AllowAccess = S::AllowAccess;
+        type AllowAccess = St::AllowAccess;
     }
     ///State transition - sets the `allow_access` field to Set
-    pub struct SetAllowAccess<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAllowAccess<S> {}
-    impl<S: State> State for SetAllowAccess<S> {
-        type Actor = S::Actor;
+    pub struct SetAllowAccess<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAllowAccess<St> {}
+    impl<St: State> State for SetAllowAccess<St> {
+        type Actor = St::Actor;
         type AllowAccess = Set<members::allow_access>;
     }
     /// Marker types for field names
@@ -109,70 +106,70 @@ pub mod update_actor_access_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct UpdateActorAccessBuilder<'a, S: update_actor_access_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct UpdateActorAccessBuilder<S: BosStr, St: update_actor_access_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>, Option<bool>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> UpdateActorAccess<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> UpdateActorAccessBuilder<'a, update_actor_access_state::Empty> {
+impl<S: BosStr> UpdateActorAccess<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> UpdateActorAccessBuilder<S, update_actor_access_state::Empty> {
         UpdateActorAccessBuilder::new()
     }
 }
 
-impl<'a> UpdateActorAccessBuilder<'a, update_actor_access_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> UpdateActorAccessBuilder<S, update_actor_access_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         UpdateActorAccessBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> UpdateActorAccessBuilder<'a, S>
+impl<S: BosStr, St> UpdateActorAccessBuilder<S, St>
 where
-    S: update_actor_access_state::State,
-    S::Actor: update_actor_access_state::IsUnset,
+    St: update_actor_access_state::State,
+    St::Actor: update_actor_access_state::IsUnset,
 {
     /// Set the `actor` field (required)
     pub fn actor(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> UpdateActorAccessBuilder<'a, update_actor_access_state::SetActor<S>> {
+    ) -> UpdateActorAccessBuilder<S, update_actor_access_state::SetActor<St>> {
         self._fields.0 = Option::Some(value.into());
         UpdateActorAccessBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> UpdateActorAccessBuilder<'a, S>
+impl<S: BosStr, St> UpdateActorAccessBuilder<S, St>
 where
-    S: update_actor_access_state::State,
-    S::AllowAccess: update_actor_access_state::IsUnset,
+    St: update_actor_access_state::State,
+    St::AllowAccess: update_actor_access_state::IsUnset,
 {
     /// Set the `allowAccess` field (required)
     pub fn allow_access(
         mut self,
         value: impl Into<bool>,
-    ) -> UpdateActorAccessBuilder<'a, update_actor_access_state::SetAllowAccess<S>> {
+    ) -> UpdateActorAccessBuilder<S, update_actor_access_state::SetAllowAccess<St>> {
         self._fields.1 = Option::Some(value.into());
         UpdateActorAccessBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: update_actor_access_state::State> UpdateActorAccessBuilder<'a, S> {
+impl<S: BosStr, St: update_actor_access_state::State> UpdateActorAccessBuilder<S, St> {
     /// Set the `ref` field (optional)
     pub fn r#ref(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -185,14 +182,14 @@ impl<'a, S: update_actor_access_state::State> UpdateActorAccessBuilder<'a, S> {
     }
 }
 
-impl<'a, S> UpdateActorAccessBuilder<'a, S>
+impl<S: BosStr, St> UpdateActorAccessBuilder<S, St>
 where
-    S: update_actor_access_state::State,
-    S::Actor: update_actor_access_state::IsSet,
-    S::AllowAccess: update_actor_access_state::IsSet,
+    St: update_actor_access_state::State,
+    St::Actor: update_actor_access_state::IsSet,
+    St::AllowAccess: update_actor_access_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> UpdateActorAccess<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> UpdateActorAccess<S> {
         UpdateActorAccess {
             actor: self._fields.0.unwrap(),
             allow_access: self._fields.1.unwrap(),
@@ -200,11 +197,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> UpdateActorAccess<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> UpdateActorAccess<S> {
         UpdateActorAccess {
             actor: self._fields.0.unwrap(),
             allow_access: self._fields.1.unwrap(),

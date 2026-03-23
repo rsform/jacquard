@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "place.atwork.endorsementProof",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct EndorsementProof<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct EndorsementProof<S: BosStr = DefaultStr> {
     ///The CID (Content Identifier) of the endorsement content that this proof validates. The endorsement's signatures array references this proof record.
     pub cid: Cid<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -52,18 +52,18 @@ pub struct EndorsementProof<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct EndorsementProofGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct EndorsementProofGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: EndorsementProof<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> EndorsementProof<S> {
+impl<S: BosStr> EndorsementProof<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, EndorsementProofRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -76,18 +76,17 @@ pub struct EndorsementProofRecord;
 impl XrpcResp for EndorsementProofRecord {
     const NSID: &'static str = "place.atwork.endorsementProof";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = EndorsementProofGetRecordOutput<S>;
+    type Output<S: BosStr> = EndorsementProofGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<EndorsementProofGetRecordOutput<S>>
-for EndorsementProof<S> {
+impl<S: BosStr> From<EndorsementProofGetRecordOutput<S>> for EndorsementProof<S> {
     fn from(output: EndorsementProofGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for EndorsementProof<S> {
+impl<S: BosStr> Collection for EndorsementProof<S> {
     const NSID: &'static str = "place.atwork.endorsementProof";
     type Record = EndorsementProofRecord;
 }
@@ -97,7 +96,7 @@ impl Collection for EndorsementProofRecord {
     type Record = EndorsementProofRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for EndorsementProof<S> {
+impl<S: BosStr> LexiconSchema for EndorsementProof<S> {
     fn nsid() -> &'static str {
         "place.atwork.endorsementProof"
     }
@@ -131,9 +130,9 @@ pub mod endorsement_proof_state {
         type Cid = Unset;
     }
     ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
+    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCid<St> {}
+    impl<St: State> State for SetCid<St> {
         type Cid = Set<members::cid>;
     }
     /// Marker types for field names
@@ -144,67 +143,67 @@ pub mod endorsement_proof_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct EndorsementProofBuilder<'a, S: endorsement_proof_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct EndorsementProofBuilder<S: BosStr, St: endorsement_proof_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Cid<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> EndorsementProof<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> EndorsementProofBuilder<'a, endorsement_proof_state::Empty> {
+impl<S: BosStr> EndorsementProof<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> EndorsementProofBuilder<S, endorsement_proof_state::Empty> {
         EndorsementProofBuilder::new()
     }
 }
 
-impl<'a> EndorsementProofBuilder<'a, endorsement_proof_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> EndorsementProofBuilder<S, endorsement_proof_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         EndorsementProofBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> EndorsementProofBuilder<'a, S>
+impl<S: BosStr, St> EndorsementProofBuilder<S, St>
 where
-    S: endorsement_proof_state::State,
-    S::Cid: endorsement_proof_state::IsUnset,
+    St: endorsement_proof_state::State,
+    St::Cid: endorsement_proof_state::IsUnset,
 {
     /// Set the `cid` field (required)
     pub fn cid(
         mut self,
         value: impl Into<Cid<S>>,
-    ) -> EndorsementProofBuilder<'a, endorsement_proof_state::SetCid<S>> {
+    ) -> EndorsementProofBuilder<S, endorsement_proof_state::SetCid<St>> {
         self._fields.0 = Option::Some(value.into());
         EndorsementProofBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> EndorsementProofBuilder<'a, S>
+impl<S: BosStr, St> EndorsementProofBuilder<S, St>
 where
-    S: endorsement_proof_state::State,
-    S::Cid: endorsement_proof_state::IsSet,
+    St: endorsement_proof_state::State,
+    St::Cid: endorsement_proof_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> EndorsementProof<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> EndorsementProof<S> {
         EndorsementProof {
             cid: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> EndorsementProof<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> EndorsementProof<S> {
         EndorsementProof {
             cid: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

@@ -6,8 +6,14 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[allow(unused_imports)]
+use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
@@ -27,7 +33,7 @@ pub struct ListVideosResponse;
 impl jacquard_common::xrpc::XrpcResp for ListVideosResponse {
     const NSID: &'static str = "com.5jiji.test.listVideos";
     const ENCODING: &'static str = "application/json";
-    type Output<S: jacquard_common::Bos<str> + AsRef<str>> = ListVideosOutput;
+    type Output<S: BosStr> = ListVideosOutput;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
@@ -42,6 +48,6 @@ pub struct ListVideosRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListVideosRequest {
     const PATH: &'static str = "/xrpc/com.5jiji.test.listVideos";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: jacquard_common::Bos<str> + AsRef<str>> = ListVideos;
+    type Request<S: BosStr> = ListVideos;
     type Response = ListVideosResponse;
 }

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,11 +34,11 @@ use crate::actor_rpg::stats;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Abilities<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Abilities<S: BosStr = DefaultStr> {
     ///Charisma
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cha: Option<i64>,
@@ -67,11 +67,11 @@ pub struct Abilities<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Attack<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Attack<S: BosStr = DefaultStr> {
     ///Attack bonus (e.g., +5)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub bonus: Option<S>,
@@ -96,11 +96,11 @@ pub struct Attack<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Coinage<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Coinage<S: BosStr = DefaultStr> {
     ///Copper pieces
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cp: Option<i64>,
@@ -126,11 +126,11 @@ pub struct Coinage<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Combat<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Combat<S: BosStr = DefaultStr> {
     ///Armor Class
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ac: Option<i64>,
@@ -156,11 +156,11 @@ pub struct Combat<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Conditions<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Conditions<S: BosStr = DefaultStr> {
     ///Death saving throw progress
     #[serde(skip_serializing_if = "Option::is_none")]
     pub death_saves: Option<stats::DeathSaves<S>>,
@@ -180,11 +180,11 @@ pub struct Conditions<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CustomStat<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CustomStat<S: BosStr = DefaultStr> {
     ///Category (optional)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub category: Option<S>,
@@ -208,11 +208,11 @@ pub struct CustomStat<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CustomStats<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CustomStats<S: BosStr = DefaultStr> {
     ///Custom stat entries
     #[serde(skip_serializing_if = "Option::is_none")]
     pub stats: Option<Vec<stats::CustomStat<S>>>,
@@ -232,11 +232,11 @@ pub struct CustomStats<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DccAbilities<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DccAbilities<S: BosStr = DefaultStr> {
     ///Agility
     #[serde(skip_serializing_if = "Option::is_none")]
     pub agi: Option<i64>,
@@ -274,11 +274,11 @@ pub struct DccAbilities<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DccAttack<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DccAttack<S: BosStr = DefaultStr> {
     ///Attack modifier (e.g., +2, d16+2 for deed die)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub attack_mod: Option<S>,
@@ -309,11 +309,11 @@ pub struct DccAttack<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DccCleric<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DccCleric<S: BosStr = DefaultStr> {
     ///Deity or supernatural patron
     #[serde(skip_serializing_if = "Option::is_none")]
     pub deity: Option<S>,
@@ -354,11 +354,11 @@ pub struct DccCleric<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DccClericSpell<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DccClericSpell<S: BosStr = DefaultStr> {
     ///Spell level
     pub level: i64,
     ///Spell name
@@ -379,11 +379,11 @@ pub struct DccClericSpell<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DccCoinage<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DccCoinage<S: BosStr = DefaultStr> {
     ///Copper pieces
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cp: Option<i64>,
@@ -403,11 +403,11 @@ pub struct DccCoinage<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DccCombat<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DccCombat<S: BosStr = DefaultStr> {
     ///Armor Class (10 + armor + AGI mod + shield)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ac: Option<i64>,
@@ -442,11 +442,11 @@ pub struct DccCombat<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DccCorruption<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DccCorruption<S: BosStr = DefaultStr> {
     ///Description of the corruption
     #[serde(skip_serializing_if = "Option::is_none")]
     pub effect: Option<S>,
@@ -469,11 +469,11 @@ pub struct DccCorruption<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DccEquipment<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DccEquipment<S: BosStr = DefaultStr> {
     ///Armor worn (affects fumble die)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub armor: Option<S>,
@@ -505,11 +505,11 @@ pub struct DccEquipment<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DccHalfling<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DccHalfling<S: BosStr = DefaultStr> {
     ///Can spend luck to aid nearby allies
     #[serde(skip_serializing_if = "Option::is_none")]
     pub good_luck_charm: Option<bool>,
@@ -538,11 +538,11 @@ pub struct DccHalfling<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DccHp<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DccHp<S: BosStr = DefaultStr> {
     ///Current HP
     #[serde(skip_serializing_if = "Option::is_none")]
     pub current: Option<i64>,
@@ -559,11 +559,11 @@ pub struct DccHp<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DccIdentity<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DccIdentity<S: BosStr = DefaultStr> {
     ///Alignment (Lawful, Neutral, Chaotic)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub alignment: Option<S>,
@@ -592,11 +592,11 @@ pub struct DccIdentity<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DccLuck<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DccLuck<S: BosStr = DefaultStr> {
     ///Birth augur name (e.g., Harsh Winter, The Bull, Fortunate Date)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub birth_augur: Option<S>,
@@ -619,11 +619,11 @@ pub struct DccLuck<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DccSaves<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DccSaves<S: BosStr = DefaultStr> {
     ///Fortitude save modifier
     #[serde(skip_serializing_if = "Option::is_none")]
     pub fort: Option<i64>,
@@ -643,11 +643,11 @@ pub struct DccSaves<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DccSpellburn<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DccSpellburn<S: BosStr = DefaultStr> {
     ///Agility points currently burned
     #[serde(skip_serializing_if = "Option::is_none")]
     pub agi_burned: Option<i64>,
@@ -670,11 +670,11 @@ pub struct DccSpellburn<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DccStats<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DccStats<S: BosStr = DefaultStr> {
     ///The six ability scores (STR, AGI, STA, INT, PER, LUK)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub abilities: Option<stats::DccAbilities<S>>,
@@ -736,11 +736,11 @@ pub struct DccStats<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DccThief<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DccThief<S: BosStr = DefaultStr> {
     ///Alignment (affects some skill targets)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub alignment: Option<S>,
@@ -763,11 +763,11 @@ pub struct DccThief<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DccThiefSkills<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DccThiefSkills<S: BosStr = DefaultStr> {
     ///Backstab attack bonus
     #[serde(skip_serializing_if = "Option::is_none")]
     pub backstab: Option<i64>,
@@ -817,11 +817,11 @@ pub struct DccThiefSkills<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DccWarrior<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DccWarrior<S: BosStr = DefaultStr> {
     ///Current deed die (d3, d4, d5, d6, d7, d8, d10+d3, etc.)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub deed_die: Option<S>,
@@ -853,11 +853,11 @@ pub struct DccWarrior<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DccWizard<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DccWizard<S: BosStr = DefaultStr> {
     ///Corruption effects suffered (structured)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub corruption: Option<Vec<stats::DccCorruption<S>>>,
@@ -892,11 +892,11 @@ pub struct DccWizard<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DccWizardSpell<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DccWizardSpell<S: BosStr = DefaultStr> {
     ///Spell level
     pub level: i64,
     ///Spell is currently lost (must be re-learned)
@@ -923,11 +923,11 @@ pub struct DccWizardSpell<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DeathSaves<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DeathSaves<S: BosStr = DefaultStr> {
     ///Failures (0-3)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub failures: Option<i64>,
@@ -944,11 +944,11 @@ pub struct DeathSaves<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DndStats<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DndStats<S: BosStr = DefaultStr> {
     ///The six ability scores (STR, DEX, CON, INT, WIS, CHA)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub abilities: Option<stats::Abilities<S>>,
@@ -1007,11 +1007,11 @@ pub struct DndStats<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Equipment<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Equipment<S: BosStr = DefaultStr> {
     ///Armor
     #[serde(skip_serializing_if = "Option::is_none")]
     pub armor: Option<S>,
@@ -1034,11 +1034,11 @@ pub struct Equipment<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Hp<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Hp<S: BosStr = DefaultStr> {
     ///Current HP
     #[serde(skip_serializing_if = "Option::is_none")]
     pub current: Option<i64>,
@@ -1058,11 +1058,11 @@ pub struct Hp<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Identity<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Identity<S: BosStr = DefaultStr> {
     ///Alignment (e.g., Lawful Good)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub alignment: Option<S>,
@@ -1096,11 +1096,11 @@ pub struct Identity<S: Bos<str> + AsRef<str> = DefaultStr> {
     rename = "actor.rpg.stats",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Stats<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Stats<S: BosStr = DefaultStr> {
     ///Timestamp when this record was created
     pub created_at: Datetime,
     ///User-defined custom stat system
@@ -1131,11 +1131,11 @@ pub struct Stats<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct StatsGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct StatsGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
@@ -1148,11 +1148,11 @@ pub struct StatsGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Passives<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Passives<S: BosStr = DefaultStr> {
     ///Passive Insight
     #[serde(skip_serializing_if = "Option::is_none")]
     pub insight: Option<i64>,
@@ -1172,11 +1172,11 @@ pub struct Passives<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Personality<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Personality<S: BosStr = DefaultStr> {
     ///Backstory
     #[serde(skip_serializing_if = "Option::is_none")]
     pub backstory: Option<S>,
@@ -1202,11 +1202,11 @@ pub struct Personality<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ReverieStats<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ReverieStats<S: BosStr = DefaultStr> {
     ///Authority (0-100)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub authority: Option<i64>,
@@ -1235,7 +1235,7 @@ pub struct ReverieStats<S: Bos<str> + AsRef<str> = DefaultStr> {
 /// Philosophical octant
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ReverieStatsOctant<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ReverieStatsOctant<S: BosStr = DefaultStr> {
     Adaptive,
     Chaotic,
     Prepared,
@@ -1250,7 +1250,7 @@ pub enum ReverieStatsOctant<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> ReverieStatsOctant<S> {
+impl<S: BosStr> ReverieStatsOctant<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Adaptive => "adaptive",
@@ -1286,19 +1286,19 @@ impl<S: Bos<str> + AsRef<str>> ReverieStatsOctant<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ReverieStatsOctant<S> {
+impl<S: BosStr> core::fmt::Display for ReverieStatsOctant<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for ReverieStatsOctant<S> {
+impl<S: BosStr> AsRef<str> for ReverieStatsOctant<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for ReverieStatsOctant<S> {
+impl<S: BosStr> Serialize for ReverieStatsOctant<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -1307,8 +1307,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for ReverieStatsOctant<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for ReverieStatsOctant<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ReverieStatsOctant<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -1318,14 +1317,18 @@ for ReverieStatsOctant<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for ReverieStatsOctant<S> {
+impl<S: BosStr + Default> Default for ReverieStatsOctant<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for ReverieStatsOctant<S> {
-    type Output = ReverieStatsOctant<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for ReverieStatsOctant<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ReverieStatsOctant<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             ReverieStatsOctant::Adaptive => ReverieStatsOctant::Adaptive,
@@ -1350,11 +1353,11 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for ReverieStatsOctant<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct RmmzStats<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct RmmzStats<S: BosStr = DefaultStr> {
     ///Agility
     #[serde(skip_serializing_if = "Option::is_none")]
     pub agi: Option<i64>,
@@ -1419,11 +1422,11 @@ pub struct RmmzStats<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Saves<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Saves<S: BosStr = DefaultStr> {
     ///Charisma save modifier
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cha: Option<i64>,
@@ -1452,11 +1455,11 @@ pub struct Saves<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Skills<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Skills<S: BosStr = DefaultStr> {
     ///Acrobatics (DEX)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub acrobatics: Option<i64>,
@@ -1521,11 +1524,11 @@ pub struct Skills<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SpellList<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SpellList<S: BosStr = DefaultStr> {
     ///Cantrips (at-will)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cantrips: Option<Vec<S>>,
@@ -1566,11 +1569,11 @@ pub struct SpellList<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Spellcasting<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Spellcasting<S: BosStr = DefaultStr> {
     ///Spellcasting ability (INT, WIS, CHA)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ability: Option<S>,
@@ -1596,11 +1599,11 @@ pub struct Spellcasting<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Spellslot<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Spellslot<S: BosStr = DefaultStr> {
     ///Spell level
     pub level: i64,
     ///Total slots
@@ -1612,13 +1615,13 @@ pub struct Spellslot<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Stats<S> {
+impl<S: BosStr> Stats<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, StatsRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Abilities<S> {
+impl<S: BosStr> LexiconSchema for Abilities<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -1741,7 +1744,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Abilities<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Attack<S> {
+impl<S: BosStr> LexiconSchema for Attack<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -1797,7 +1800,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Attack<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Coinage<S> {
+impl<S: BosStr> LexiconSchema for Coinage<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -1857,7 +1860,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Coinage<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Combat<S> {
+impl<S: BosStr> LexiconSchema for Combat<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -1909,7 +1912,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Combat<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Conditions<S> {
+impl<S: BosStr> LexiconSchema for Conditions<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -1942,7 +1945,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Conditions<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for CustomStat<S> {
+impl<S: BosStr> LexiconSchema for CustomStat<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -1978,7 +1981,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for CustomStat<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for CustomStats<S> {
+impl<S: BosStr> LexiconSchema for CustomStats<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -2013,7 +2016,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for CustomStats<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for DccAbilities<S> {
+impl<S: BosStr> LexiconSchema for DccAbilities<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -2190,7 +2193,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for DccAbilities<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for DccAttack<S> {
+impl<S: BosStr> LexiconSchema for DccAttack<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -2276,7 +2279,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for DccAttack<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for DccCleric<S> {
+impl<S: BosStr> LexiconSchema for DccCleric<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -2387,7 +2390,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for DccCleric<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for DccClericSpell<S> {
+impl<S: BosStr> LexiconSchema for DccClericSpell<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -2443,7 +2446,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for DccClericSpell<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for DccCoinage<S> {
+impl<S: BosStr> LexiconSchema for DccCoinage<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -2485,7 +2488,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for DccCoinage<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for DccCombat<S> {
+impl<S: BosStr> LexiconSchema for DccCombat<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -2558,7 +2561,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for DccCombat<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for DccCorruption<S> {
+impl<S: BosStr> LexiconSchema for DccCorruption<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -2603,7 +2606,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for DccCorruption<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for DccEquipment<S> {
+impl<S: BosStr> LexiconSchema for DccEquipment<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -2687,7 +2690,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for DccEquipment<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for DccHalfling<S> {
+impl<S: BosStr> LexiconSchema for DccHalfling<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -2730,7 +2733,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for DccHalfling<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for DccHp<S> {
+impl<S: BosStr> LexiconSchema for DccHp<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -2763,7 +2766,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for DccHp<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for DccIdentity<S> {
+impl<S: BosStr> LexiconSchema for DccIdentity<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -2845,7 +2848,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for DccIdentity<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for DccLuck<S> {
+impl<S: BosStr> LexiconSchema for DccLuck<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -2908,7 +2911,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for DccLuck<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for DccSaves<S> {
+impl<S: BosStr> LexiconSchema for DccSaves<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -2923,7 +2926,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for DccSaves<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for DccSpellburn<S> {
+impl<S: BosStr> LexiconSchema for DccSpellburn<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -2974,7 +2977,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for DccSpellburn<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for DccStats<S> {
+impl<S: BosStr> LexiconSchema for DccStats<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -3029,7 +3032,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for DccStats<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for DccThief<S> {
+impl<S: BosStr> LexiconSchema for DccThief<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -3073,7 +3076,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for DccThief<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for DccThiefSkills<S> {
+impl<S: BosStr> LexiconSchema for DccThiefSkills<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -3088,7 +3091,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for DccThiefSkills<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for DccWarrior<S> {
+impl<S: BosStr> LexiconSchema for DccWarrior<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -3151,7 +3154,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for DccWarrior<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for DccWizard<S> {
+impl<S: BosStr> LexiconSchema for DccWizard<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -3234,7 +3237,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for DccWizard<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for DccWizardSpell<S> {
+impl<S: BosStr> LexiconSchema for DccWizardSpell<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -3318,7 +3321,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for DccWizardSpell<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for DeathSaves<S> {
+impl<S: BosStr> LexiconSchema for DeathSaves<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -3369,7 +3372,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for DeathSaves<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for DndStats<S> {
+impl<S: BosStr> LexiconSchema for DndStats<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -3424,7 +3427,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for DndStats<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Equipment<S> {
+impl<S: BosStr> LexiconSchema for Equipment<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -3479,7 +3482,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Equipment<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Hp<S> {
+impl<S: BosStr> LexiconSchema for Hp<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -3521,7 +3524,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Hp<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Identity<S> {
+impl<S: BosStr> LexiconSchema for Identity<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -3610,17 +3613,17 @@ pub struct StatsRecord;
 impl XrpcResp for StatsRecord {
     const NSID: &'static str = "actor.rpg.stats";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = StatsGetRecordOutput<S>;
+    type Output<S: BosStr> = StatsGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<StatsGetRecordOutput<S>> for Stats<S> {
+impl<S: BosStr> From<StatsGetRecordOutput<S>> for Stats<S> {
     fn from(output: StatsGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Stats<S> {
+impl<S: BosStr> Collection for Stats<S> {
     const NSID: &'static str = "actor.rpg.stats";
     type Record = StatsRecord;
 }
@@ -3630,7 +3633,7 @@ impl Collection for StatsRecord {
     type Record = StatsRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Stats<S> {
+impl<S: BosStr> LexiconSchema for Stats<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -3645,7 +3648,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Stats<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Passives<S> {
+impl<S: BosStr> LexiconSchema for Passives<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -3660,7 +3663,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Passives<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Personality<S> {
+impl<S: BosStr> LexiconSchema for Personality<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -3725,7 +3728,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Personality<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ReverieStats<S> {
+impl<S: BosStr> LexiconSchema for ReverieStats<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -3848,7 +3851,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for ReverieStats<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for RmmzStats<S> {
+impl<S: BosStr> LexiconSchema for RmmzStats<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -4053,7 +4056,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for RmmzStats<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Saves<S> {
+impl<S: BosStr> LexiconSchema for Saves<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -4068,7 +4071,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Saves<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Skills<S> {
+impl<S: BosStr> LexiconSchema for Skills<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -4083,7 +4086,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Skills<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for SpellList<S> {
+impl<S: BosStr> LexiconSchema for SpellList<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -4198,7 +4201,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for SpellList<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Spellcasting<S> {
+impl<S: BosStr> LexiconSchema for Spellcasting<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -4242,7 +4245,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Spellcasting<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Spellslot<S> {
+impl<S: BosStr> LexiconSchema for Spellslot<S> {
     fn nsid() -> &'static str {
         "actor.rpg.stats"
     }
@@ -7178,66 +7181,66 @@ pub mod custom_stat_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Value;
         type Name;
+        type Value;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Value = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `value` field to Set
-    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValue<S> {}
-    impl<S: State> State for SetValue<S> {
-        type Value = Set<members::value>;
-        type Name = S::Name;
+        type Value = Unset;
     }
     ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Value = S::Value;
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
         type Name = Set<members::name>;
+        type Value = St::Value;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetValue<St> {}
+    impl<St: State> State for SetValue<St> {
+        type Name = St::Name;
+        type Value = Set<members::value>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `value` field
-        pub struct value(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `value` field
+        pub struct value(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct CustomStatBuilder<'a, S: custom_stat_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct CustomStatBuilder<S: BosStr, St: custom_stat_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>, Option<i64>, Option<S>, Option<i64>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> CustomStat<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> CustomStatBuilder<'a, custom_stat_state::Empty> {
+impl<S: BosStr> CustomStat<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> CustomStatBuilder<S, custom_stat_state::Empty> {
         CustomStatBuilder::new()
     }
 }
 
-impl<'a> CustomStatBuilder<'a, custom_stat_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> CustomStatBuilder<S, custom_stat_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         CustomStatBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: custom_stat_state::State> CustomStatBuilder<'a, S> {
+impl<S: BosStr, St: custom_stat_state::State> CustomStatBuilder<S, St> {
     /// Set the `category` field (optional)
     pub fn category(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -7250,7 +7253,7 @@ impl<'a, S: custom_stat_state::State> CustomStatBuilder<'a, S> {
     }
 }
 
-impl<'a, S: custom_stat_state::State> CustomStatBuilder<'a, S> {
+impl<S: BosStr, St: custom_stat_state::State> CustomStatBuilder<S, St> {
     /// Set the `max` field (optional)
     pub fn max(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -7263,7 +7266,7 @@ impl<'a, S: custom_stat_state::State> CustomStatBuilder<'a, S> {
     }
 }
 
-impl<'a, S: custom_stat_state::State> CustomStatBuilder<'a, S> {
+impl<S: BosStr, St: custom_stat_state::State> CustomStatBuilder<S, St> {
     /// Set the `min` field (optional)
     pub fn min(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -7276,52 +7279,52 @@ impl<'a, S: custom_stat_state::State> CustomStatBuilder<'a, S> {
     }
 }
 
-impl<'a, S> CustomStatBuilder<'a, S>
+impl<S: BosStr, St> CustomStatBuilder<S, St>
 where
-    S: custom_stat_state::State,
-    S::Name: custom_stat_state::IsUnset,
+    St: custom_stat_state::State,
+    St::Name: custom_stat_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> CustomStatBuilder<'a, custom_stat_state::SetName<S>> {
+    ) -> CustomStatBuilder<S, custom_stat_state::SetName<St>> {
         self._fields.3 = Option::Some(value.into());
         CustomStatBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CustomStatBuilder<'a, S>
+impl<S: BosStr, St> CustomStatBuilder<S, St>
 where
-    S: custom_stat_state::State,
-    S::Value: custom_stat_state::IsUnset,
+    St: custom_stat_state::State,
+    St::Value: custom_stat_state::IsUnset,
 {
     /// Set the `value` field (required)
     pub fn value(
         mut self,
         value: impl Into<i64>,
-    ) -> CustomStatBuilder<'a, custom_stat_state::SetValue<S>> {
+    ) -> CustomStatBuilder<S, custom_stat_state::SetValue<St>> {
         self._fields.4 = Option::Some(value.into());
         CustomStatBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CustomStatBuilder<'a, S>
+impl<S: BosStr, St> CustomStatBuilder<S, St>
 where
-    S: custom_stat_state::State,
-    S::Value: custom_stat_state::IsSet,
-    S::Name: custom_stat_state::IsSet,
+    St: custom_stat_state::State,
+    St::Name: custom_stat_state::IsSet,
+    St::Value: custom_stat_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> CustomStat<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> CustomStat<S> {
         CustomStat {
             category: self._fields.0,
             max: self._fields.1,
@@ -7331,11 +7334,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> CustomStat<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> CustomStat<S> {
         CustomStat {
             category: self._fields.0,
             max: self._fields.1,
@@ -7357,104 +7360,104 @@ pub mod dcc_cleric_spell_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Level;
         type Name;
+        type Level;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Level = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `level` field to Set
-    pub struct SetLevel<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLevel<S> {}
-    impl<S: State> State for SetLevel<S> {
-        type Level = Set<members::level>;
-        type Name = S::Name;
+        type Level = Unset;
     }
     ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Level = S::Level;
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
         type Name = Set<members::name>;
+        type Level = St::Level;
+    }
+    ///State transition - sets the `level` field to Set
+    pub struct SetLevel<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLevel<St> {}
+    impl<St: State> State for SetLevel<St> {
+        type Name = St::Name;
+        type Level = Set<members::level>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `level` field
-        pub struct level(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `level` field
+        pub struct level(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct DccClericSpellBuilder<'a, S: dcc_cleric_spell_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct DccClericSpellBuilder<S: BosStr, St: dcc_cleric_spell_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<S>, Option<S>, Option<bool>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> DccClericSpell<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> DccClericSpellBuilder<'a, dcc_cleric_spell_state::Empty> {
+impl<S: BosStr> DccClericSpell<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> DccClericSpellBuilder<S, dcc_cleric_spell_state::Empty> {
         DccClericSpellBuilder::new()
     }
 }
 
-impl<'a> DccClericSpellBuilder<'a, dcc_cleric_spell_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> DccClericSpellBuilder<S, dcc_cleric_spell_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         DccClericSpellBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DccClericSpellBuilder<'a, S>
+impl<S: BosStr, St> DccClericSpellBuilder<S, St>
 where
-    S: dcc_cleric_spell_state::State,
-    S::Level: dcc_cleric_spell_state::IsUnset,
+    St: dcc_cleric_spell_state::State,
+    St::Level: dcc_cleric_spell_state::IsUnset,
 {
     /// Set the `level` field (required)
     pub fn level(
         mut self,
         value: impl Into<i64>,
-    ) -> DccClericSpellBuilder<'a, dcc_cleric_spell_state::SetLevel<S>> {
+    ) -> DccClericSpellBuilder<S, dcc_cleric_spell_state::SetLevel<St>> {
         self._fields.0 = Option::Some(value.into());
         DccClericSpellBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DccClericSpellBuilder<'a, S>
+impl<S: BosStr, St> DccClericSpellBuilder<S, St>
 where
-    S: dcc_cleric_spell_state::State,
-    S::Name: dcc_cleric_spell_state::IsUnset,
+    St: dcc_cleric_spell_state::State,
+    St::Name: dcc_cleric_spell_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> DccClericSpellBuilder<'a, dcc_cleric_spell_state::SetName<S>> {
+    ) -> DccClericSpellBuilder<S, dcc_cleric_spell_state::SetName<St>> {
         self._fields.1 = Option::Some(value.into());
         DccClericSpellBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: dcc_cleric_spell_state::State> DccClericSpellBuilder<'a, S> {
+impl<S: BosStr, St: dcc_cleric_spell_state::State> DccClericSpellBuilder<S, St> {
     /// Set the `notes` field (optional)
     pub fn notes(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -7467,7 +7470,7 @@ impl<'a, S: dcc_cleric_spell_state::State> DccClericSpellBuilder<'a, S> {
     }
 }
 
-impl<'a, S: dcc_cleric_spell_state::State> DccClericSpellBuilder<'a, S> {
+impl<S: BosStr, St: dcc_cleric_spell_state::State> DccClericSpellBuilder<S, St> {
     /// Set the `sinful` field (optional)
     pub fn sinful(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.3 = value.into();
@@ -7480,14 +7483,14 @@ impl<'a, S: dcc_cleric_spell_state::State> DccClericSpellBuilder<'a, S> {
     }
 }
 
-impl<'a, S> DccClericSpellBuilder<'a, S>
+impl<S: BosStr, St> DccClericSpellBuilder<S, St>
 where
-    S: dcc_cleric_spell_state::State,
-    S::Level: dcc_cleric_spell_state::IsSet,
-    S::Name: dcc_cleric_spell_state::IsSet,
+    St: dcc_cleric_spell_state::State,
+    St::Name: dcc_cleric_spell_state::IsSet,
+    St::Level: dcc_cleric_spell_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> DccClericSpell<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> DccClericSpell<S> {
         DccClericSpell {
             level: self._fields.0.unwrap(),
             name: self._fields.1.unwrap(),
@@ -7496,11 +7499,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> DccClericSpell<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> DccClericSpell<S> {
         DccClericSpell {
             level: self._fields.0.unwrap(),
             name: self._fields.1.unwrap(),
@@ -7532,17 +7535,17 @@ pub mod dcc_wizard_spell_state {
         type Level = Unset;
     }
     ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
         type Name = Set<members::name>;
-        type Level = S::Level;
+        type Level = St::Level;
     }
     ///State transition - sets the `level` field to Set
-    pub struct SetLevel<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLevel<S> {}
-    impl<S: State> State for SetLevel<S> {
-        type Name = S::Name;
+    pub struct SetLevel<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLevel<St> {}
+    impl<St: State> State for SetLevel<St> {
+        type Name = St::Name;
         type Level = Set<members::level>;
     }
     /// Marker types for field names
@@ -7555,51 +7558,51 @@ pub mod dcc_wizard_spell_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct DccWizardSpellBuilder<'a, S: dcc_wizard_spell_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct DccWizardSpellBuilder<S: BosStr, St: dcc_wizard_spell_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<bool>, Option<S>, Option<i64>, Option<S>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> DccWizardSpell<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> DccWizardSpellBuilder<'a, dcc_wizard_spell_state::Empty> {
+impl<S: BosStr> DccWizardSpell<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> DccWizardSpellBuilder<S, dcc_wizard_spell_state::Empty> {
         DccWizardSpellBuilder::new()
     }
 }
 
-impl<'a> DccWizardSpellBuilder<'a, dcc_wizard_spell_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> DccWizardSpellBuilder<S, dcc_wizard_spell_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         DccWizardSpellBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DccWizardSpellBuilder<'a, S>
+impl<S: BosStr, St> DccWizardSpellBuilder<S, St>
 where
-    S: dcc_wizard_spell_state::State,
-    S::Level: dcc_wizard_spell_state::IsUnset,
+    St: dcc_wizard_spell_state::State,
+    St::Level: dcc_wizard_spell_state::IsUnset,
 {
     /// Set the `level` field (required)
     pub fn level(
         mut self,
         value: impl Into<i64>,
-    ) -> DccWizardSpellBuilder<'a, dcc_wizard_spell_state::SetLevel<S>> {
+    ) -> DccWizardSpellBuilder<S, dcc_wizard_spell_state::SetLevel<St>> {
         self._fields.0 = Option::Some(value.into());
         DccWizardSpellBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: dcc_wizard_spell_state::State> DccWizardSpellBuilder<'a, S> {
+impl<S: BosStr, St: dcc_wizard_spell_state::State> DccWizardSpellBuilder<S, St> {
     /// Set the `lost` field (optional)
     pub fn lost(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.1 = value.into();
@@ -7612,7 +7615,7 @@ impl<'a, S: dcc_wizard_spell_state::State> DccWizardSpellBuilder<'a, S> {
     }
 }
 
-impl<'a, S: dcc_wizard_spell_state::State> DccWizardSpellBuilder<'a, S> {
+impl<S: BosStr, St: dcc_wizard_spell_state::State> DccWizardSpellBuilder<S, St> {
     /// Set the `mercurialMagic` field (optional)
     pub fn mercurial_magic(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -7625,7 +7628,7 @@ impl<'a, S: dcc_wizard_spell_state::State> DccWizardSpellBuilder<'a, S> {
     }
 }
 
-impl<'a, S: dcc_wizard_spell_state::State> DccWizardSpellBuilder<'a, S> {
+impl<S: BosStr, St: dcc_wizard_spell_state::State> DccWizardSpellBuilder<S, St> {
     /// Set the `mercurialRoll` field (optional)
     pub fn mercurial_roll(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.3 = value.into();
@@ -7638,26 +7641,26 @@ impl<'a, S: dcc_wizard_spell_state::State> DccWizardSpellBuilder<'a, S> {
     }
 }
 
-impl<'a, S> DccWizardSpellBuilder<'a, S>
+impl<S: BosStr, St> DccWizardSpellBuilder<S, St>
 where
-    S: dcc_wizard_spell_state::State,
-    S::Name: dcc_wizard_spell_state::IsUnset,
+    St: dcc_wizard_spell_state::State,
+    St::Name: dcc_wizard_spell_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> DccWizardSpellBuilder<'a, dcc_wizard_spell_state::SetName<S>> {
+    ) -> DccWizardSpellBuilder<S, dcc_wizard_spell_state::SetName<St>> {
         self._fields.4 = Option::Some(value.into());
         DccWizardSpellBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: dcc_wizard_spell_state::State> DccWizardSpellBuilder<'a, S> {
+impl<S: BosStr, St: dcc_wizard_spell_state::State> DccWizardSpellBuilder<S, St> {
     /// Set the `notes` field (optional)
     pub fn notes(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
@@ -7670,14 +7673,14 @@ impl<'a, S: dcc_wizard_spell_state::State> DccWizardSpellBuilder<'a, S> {
     }
 }
 
-impl<'a, S> DccWizardSpellBuilder<'a, S>
+impl<S: BosStr, St> DccWizardSpellBuilder<S, St>
 where
-    S: dcc_wizard_spell_state::State,
-    S::Name: dcc_wizard_spell_state::IsSet,
-    S::Level: dcc_wizard_spell_state::IsSet,
+    St: dcc_wizard_spell_state::State,
+    St::Name: dcc_wizard_spell_state::IsSet,
+    St::Level: dcc_wizard_spell_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> DccWizardSpell<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> DccWizardSpell<S> {
         DccWizardSpell {
             level: self._fields.0.unwrap(),
             lost: self._fields.1,
@@ -7688,11 +7691,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> DccWizardSpell<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> DccWizardSpell<S> {
         DccWizardSpell {
             level: self._fields.0.unwrap(),
             lost: self._fields.1,
@@ -7724,9 +7727,9 @@ pub mod stats_state {
         type CreatedAt = Unset;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
@@ -7737,9 +7740,9 @@ pub mod stats_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct StatsBuilder<'a, S: stats_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct StatsBuilder<S: BosStr, St: stats_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
         Option<stats::CustomStats<S>>,
@@ -7749,47 +7752,47 @@ pub struct StatsBuilder<'a, S: stats_state::State> {
         Option<stats::RmmzStats<S>>,
         Option<Datetime>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Stats<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> StatsBuilder<'a, stats_state::Empty> {
+impl<S: BosStr> Stats<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> StatsBuilder<S, stats_state::Empty> {
         StatsBuilder::new()
     }
 }
 
-impl<'a> StatsBuilder<'a, stats_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> StatsBuilder<S, stats_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         StatsBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> StatsBuilder<'a, S>
+impl<S: BosStr, St> StatsBuilder<S, St>
 where
-    S: stats_state::State,
-    S::CreatedAt: stats_state::IsUnset,
+    St: stats_state::State,
+    St::CreatedAt: stats_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> StatsBuilder<'a, stats_state::SetCreatedAt<S>> {
+    ) -> StatsBuilder<S, stats_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         StatsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: stats_state::State> StatsBuilder<'a, S> {
+impl<S: BosStr, St: stats_state::State> StatsBuilder<S, St> {
     /// Set the `custom` field (optional)
     pub fn custom(mut self, value: impl Into<Option<stats::CustomStats<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -7802,7 +7805,7 @@ impl<'a, S: stats_state::State> StatsBuilder<'a, S> {
     }
 }
 
-impl<'a, S: stats_state::State> StatsBuilder<'a, S> {
+impl<S: BosStr, St: stats_state::State> StatsBuilder<S, St> {
     /// Set the `dcc` field (optional)
     pub fn dcc(mut self, value: impl Into<Option<stats::DccStats<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -7815,7 +7818,7 @@ impl<'a, S: stats_state::State> StatsBuilder<'a, S> {
     }
 }
 
-impl<'a, S: stats_state::State> StatsBuilder<'a, S> {
+impl<S: BosStr, St: stats_state::State> StatsBuilder<S, St> {
     /// Set the `dnd` field (optional)
     pub fn dnd(mut self, value: impl Into<Option<stats::DndStats<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -7828,7 +7831,7 @@ impl<'a, S: stats_state::State> StatsBuilder<'a, S> {
     }
 }
 
-impl<'a, S: stats_state::State> StatsBuilder<'a, S> {
+impl<S: BosStr, St: stats_state::State> StatsBuilder<S, St> {
     /// Set the `reverie` field (optional)
     pub fn reverie(mut self, value: impl Into<Option<stats::ReverieStats<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -7841,7 +7844,7 @@ impl<'a, S: stats_state::State> StatsBuilder<'a, S> {
     }
 }
 
-impl<'a, S: stats_state::State> StatsBuilder<'a, S> {
+impl<S: BosStr, St: stats_state::State> StatsBuilder<S, St> {
     /// Set the `rmmz` field (optional)
     pub fn rmmz(mut self, value: impl Into<Option<stats::RmmzStats<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -7854,7 +7857,7 @@ impl<'a, S: stats_state::State> StatsBuilder<'a, S> {
     }
 }
 
-impl<'a, S: stats_state::State> StatsBuilder<'a, S> {
+impl<S: BosStr, St: stats_state::State> StatsBuilder<S, St> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.6 = value.into();
@@ -7867,13 +7870,13 @@ impl<'a, S: stats_state::State> StatsBuilder<'a, S> {
     }
 }
 
-impl<'a, S> StatsBuilder<'a, S>
+impl<S: BosStr, St> StatsBuilder<S, St>
 where
-    S: stats_state::State,
-    S::CreatedAt: stats_state::IsSet,
+    St: stats_state::State,
+    St::CreatedAt: stats_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Stats<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Stats<S> {
         Stats {
             created_at: self._fields.0.unwrap(),
             custom: self._fields.1,
@@ -7885,8 +7888,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Stats<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Stats<S> {
         Stats {
             created_at: self._fields.0.unwrap(),
             custom: self._fields.1,
@@ -7921,17 +7924,17 @@ pub mod spellslot_state {
         type Total = Unset;
     }
     ///State transition - sets the `level` field to Set
-    pub struct SetLevel<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLevel<S> {}
-    impl<S: State> State for SetLevel<S> {
+    pub struct SetLevel<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLevel<St> {}
+    impl<St: State> State for SetLevel<St> {
         type Level = Set<members::level>;
-        type Total = S::Total;
+        type Total = St::Total;
     }
     ///State transition - sets the `total` field to Set
-    pub struct SetTotal<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTotal<S> {}
-    impl<S: State> State for SetTotal<S> {
-        type Level = S::Level;
+    pub struct SetTotal<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTotal<St> {}
+    impl<St: State> State for SetTotal<St> {
+        type Level = St::Level;
         type Total = Set<members::total>;
     }
     /// Marker types for field names
@@ -7944,70 +7947,70 @@ pub mod spellslot_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct SpellslotBuilder<'a, S: spellslot_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct SpellslotBuilder<S: BosStr, St: spellslot_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<i64>, Option<i64>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Spellslot<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> SpellslotBuilder<'a, spellslot_state::Empty> {
+impl<S: BosStr> Spellslot<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> SpellslotBuilder<S, spellslot_state::Empty> {
         SpellslotBuilder::new()
     }
 }
 
-impl<'a> SpellslotBuilder<'a, spellslot_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> SpellslotBuilder<S, spellslot_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SpellslotBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SpellslotBuilder<'a, S>
+impl<S: BosStr, St> SpellslotBuilder<S, St>
 where
-    S: spellslot_state::State,
-    S::Level: spellslot_state::IsUnset,
+    St: spellslot_state::State,
+    St::Level: spellslot_state::IsUnset,
 {
     /// Set the `level` field (required)
     pub fn level(
         mut self,
         value: impl Into<i64>,
-    ) -> SpellslotBuilder<'a, spellslot_state::SetLevel<S>> {
+    ) -> SpellslotBuilder<S, spellslot_state::SetLevel<St>> {
         self._fields.0 = Option::Some(value.into());
         SpellslotBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SpellslotBuilder<'a, S>
+impl<S: BosStr, St> SpellslotBuilder<S, St>
 where
-    S: spellslot_state::State,
-    S::Total: spellslot_state::IsUnset,
+    St: spellslot_state::State,
+    St::Total: spellslot_state::IsUnset,
 {
     /// Set the `total` field (required)
     pub fn total(
         mut self,
         value: impl Into<i64>,
-    ) -> SpellslotBuilder<'a, spellslot_state::SetTotal<S>> {
+    ) -> SpellslotBuilder<S, spellslot_state::SetTotal<St>> {
         self._fields.1 = Option::Some(value.into());
         SpellslotBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: spellslot_state::State> SpellslotBuilder<'a, S> {
+impl<S: BosStr, St: spellslot_state::State> SpellslotBuilder<S, St> {
     /// Set the `used` field (optional)
     pub fn used(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -8020,14 +8023,14 @@ impl<'a, S: spellslot_state::State> SpellslotBuilder<'a, S> {
     }
 }
 
-impl<'a, S> SpellslotBuilder<'a, S>
+impl<S: BosStr, St> SpellslotBuilder<S, St>
 where
-    S: spellslot_state::State,
-    S::Level: spellslot_state::IsSet,
-    S::Total: spellslot_state::IsSet,
+    St: spellslot_state::State,
+    St::Level: spellslot_state::IsSet,
+    St::Total: spellslot_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Spellslot<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Spellslot<S> {
         Spellslot {
             level: self._fields.0.unwrap(),
             total: self._fields.1.unwrap(),
@@ -8035,11 +8038,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Spellslot<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Spellslot<S> {
         Spellslot {
             level: self._fields.0.unwrap(),
             total: self._fields.1.unwrap(),

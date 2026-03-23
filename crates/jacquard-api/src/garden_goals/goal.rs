@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use serde::{Serialize, Deserialize};
     rename = "garden.goals.goal",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Goal<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Goal<S: BosStr = DefaultStr> {
     ///Preset name or hex color for incomplete state
     #[serde(skip_serializing_if = "Option::is_none")]
     pub accent_color: Option<S>,
@@ -92,18 +92,18 @@ pub struct Goal<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GoalGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GoalGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Goal<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Goal<S> {
+impl<S: BosStr> Goal<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, GoalRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -116,17 +116,17 @@ pub struct GoalRecord;
 impl XrpcResp for GoalRecord {
     const NSID: &'static str = "garden.goals.goal";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GoalGetRecordOutput<S>;
+    type Output<S: BosStr> = GoalGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<GoalGetRecordOutput<S>> for Goal<S> {
+impl<S: BosStr> From<GoalGetRecordOutput<S>> for Goal<S> {
     fn from(output: GoalGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Goal<S> {
+impl<S: BosStr> Collection for Goal<S> {
     const NSID: &'static str = "garden.goals.goal";
     type Record = GoalRecord;
 }
@@ -136,7 +136,7 @@ impl Collection for GoalRecord {
     type Record = GoalRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Goal<S> {
+impl<S: BosStr> LexiconSchema for Goal<S> {
     fn nsid() -> &'static str {
         "garden.goals.goal"
     }
@@ -328,73 +328,73 @@ pub mod goal_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type GoalId;
         type Name;
+        type CreatedAt;
         type Year;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type GoalId = Unset;
         type Name = Unset;
+        type CreatedAt = Unset;
         type Year = Unset;
     }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type GoalId = S::GoalId;
-        type Name = S::Name;
-        type Year = S::Year;
-    }
     ///State transition - sets the `goal_id` field to Set
-    pub struct SetGoalId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGoalId<S> {}
-    impl<S: State> State for SetGoalId<S> {
-        type CreatedAt = S::CreatedAt;
+    pub struct SetGoalId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetGoalId<St> {}
+    impl<St: State> State for SetGoalId<St> {
         type GoalId = Set<members::goal_id>;
-        type Name = S::Name;
-        type Year = S::Year;
+        type Name = St::Name;
+        type CreatedAt = St::CreatedAt;
+        type Year = St::Year;
     }
     ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type CreatedAt = S::CreatedAt;
-        type GoalId = S::GoalId;
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type GoalId = St::GoalId;
         type Name = Set<members::name>;
-        type Year = S::Year;
+        type CreatedAt = St::CreatedAt;
+        type Year = St::Year;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type GoalId = St::GoalId;
+        type Name = St::Name;
+        type CreatedAt = Set<members::created_at>;
+        type Year = St::Year;
     }
     ///State transition - sets the `year` field to Set
-    pub struct SetYear<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetYear<S> {}
-    impl<S: State> State for SetYear<S> {
-        type CreatedAt = S::CreatedAt;
-        type GoalId = S::GoalId;
-        type Name = S::Name;
+    pub struct SetYear<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetYear<St> {}
+    impl<St: State> State for SetYear<St> {
+        type GoalId = St::GoalId;
+        type Name = St::Name;
+        type CreatedAt = St::CreatedAt;
         type Year = Set<members::year>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `goal_id` field
         pub struct goal_id(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `year` field
         pub struct year(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GoalBuilder<'a, S: goal_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GoalBuilder<S: BosStr, St: goal_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
         Option<Vec<S>>,
@@ -412,18 +412,18 @@ pub struct GoalBuilder<'a, S: goal_state::State> {
         Option<i64>,
         Option<i64>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Goal<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GoalBuilder<'a, goal_state::Empty> {
+impl<S: BosStr> Goal<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GoalBuilder<S, goal_state::Empty> {
         GoalBuilder::new()
     }
 }
 
-impl<'a> GoalBuilder<'a, goal_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GoalBuilder<S, goal_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GoalBuilder {
             _state: PhantomData,
@@ -444,12 +444,12 @@ impl<'a> GoalBuilder<'a, goal_state::Empty> {
                 None,
                 None,
             ),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
+impl<S: BosStr, St: goal_state::State> GoalBuilder<S, St> {
     /// Set the `accentColor` field (optional)
     pub fn accent_color(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -462,7 +462,7 @@ impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
     }
 }
 
-impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
+impl<S: BosStr, St: goal_state::State> GoalBuilder<S, St> {
     /// Set the `categories` field (optional)
     pub fn categories(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -475,7 +475,7 @@ impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
     }
 }
 
-impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
+impl<S: BosStr, St: goal_state::State> GoalBuilder<S, St> {
     /// Set the `completedAccentColor` field (optional)
     pub fn completed_accent_color(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -488,7 +488,7 @@ impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
     }
 }
 
-impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
+impl<S: BosStr, St: goal_state::State> GoalBuilder<S, St> {
     /// Set the `completedPiece` field (optional)
     pub fn completed_piece(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -501,7 +501,7 @@ impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
     }
 }
 
-impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
+impl<S: BosStr, St: goal_state::State> GoalBuilder<S, St> {
     /// Set the `completedPieceBlob` field (optional)
     pub fn completed_piece_blob(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -514,7 +514,7 @@ impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
     }
 }
 
-impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
+impl<S: BosStr, St: goal_state::State> GoalBuilder<S, St> {
     /// Set the `completedPieceUrl` field (optional)
     pub fn completed_piece_url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -527,26 +527,26 @@ impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GoalBuilder<'a, S>
+impl<S: BosStr, St> GoalBuilder<S, St>
 where
-    S: goal_state::State,
-    S::CreatedAt: goal_state::IsUnset,
+    St: goal_state::State,
+    St::CreatedAt: goal_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> GoalBuilder<'a, goal_state::SetCreatedAt<S>> {
+    ) -> GoalBuilder<S, goal_state::SetCreatedAt<St>> {
         self._fields.6 = Option::Some(value.into());
         GoalBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
+impl<S: BosStr, St: goal_state::State> GoalBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.7 = value.into();
@@ -559,45 +559,45 @@ impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GoalBuilder<'a, S>
+impl<S: BosStr, St> GoalBuilder<S, St>
 where
-    S: goal_state::State,
-    S::GoalId: goal_state::IsUnset,
+    St: goal_state::State,
+    St::GoalId: goal_state::IsUnset,
 {
     /// Set the `goalId` field (required)
     pub fn goal_id(
         mut self,
         value: impl Into<S>,
-    ) -> GoalBuilder<'a, goal_state::SetGoalId<S>> {
+    ) -> GoalBuilder<S, goal_state::SetGoalId<St>> {
         self._fields.8 = Option::Some(value.into());
         GoalBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GoalBuilder<'a, S>
+impl<S: BosStr, St> GoalBuilder<S, St>
 where
-    S: goal_state::State,
-    S::Name: goal_state::IsUnset,
+    St: goal_state::State,
+    St::Name: goal_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> GoalBuilder<'a, goal_state::SetName<S>> {
+    ) -> GoalBuilder<S, goal_state::SetName<St>> {
         self._fields.9 = Option::Some(value.into());
         GoalBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
+impl<S: BosStr, St: goal_state::State> GoalBuilder<S, St> {
     /// Set the `piece` field (optional)
     pub fn piece(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.10 = value.into();
@@ -610,7 +610,7 @@ impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
     }
 }
 
-impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
+impl<S: BosStr, St: goal_state::State> GoalBuilder<S, St> {
     /// Set the `pieceBlob` field (optional)
     pub fn piece_blob(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.11 = value.into();
@@ -623,7 +623,7 @@ impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
     }
 }
 
-impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
+impl<S: BosStr, St: goal_state::State> GoalBuilder<S, St> {
     /// Set the `pieceUrl` field (optional)
     pub fn piece_url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.12 = value.into();
@@ -636,7 +636,7 @@ impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
     }
 }
 
-impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
+impl<S: BosStr, St: goal_state::State> GoalBuilder<S, St> {
     /// Set the `targetCount` field (optional)
     pub fn target_count(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.13 = value.into();
@@ -649,35 +649,35 @@ impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GoalBuilder<'a, S>
+impl<S: BosStr, St> GoalBuilder<S, St>
 where
-    S: goal_state::State,
-    S::Year: goal_state::IsUnset,
+    St: goal_state::State,
+    St::Year: goal_state::IsUnset,
 {
     /// Set the `year` field (required)
     pub fn year(
         mut self,
         value: impl Into<i64>,
-    ) -> GoalBuilder<'a, goal_state::SetYear<S>> {
+    ) -> GoalBuilder<S, goal_state::SetYear<St>> {
         self._fields.14 = Option::Some(value.into());
         GoalBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GoalBuilder<'a, S>
+impl<S: BosStr, St> GoalBuilder<S, St>
 where
-    S: goal_state::State,
-    S::CreatedAt: goal_state::IsSet,
-    S::GoalId: goal_state::IsSet,
-    S::Name: goal_state::IsSet,
-    S::Year: goal_state::IsSet,
+    St: goal_state::State,
+    St::GoalId: goal_state::IsSet,
+    St::Name: goal_state::IsSet,
+    St::CreatedAt: goal_state::IsSet,
+    St::Year: goal_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Goal<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Goal<S> {
         Goal {
             accent_color: self._fields.0,
             categories: self._fields.1,
@@ -697,8 +697,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Goal<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Goal<S> {
         Goal {
             accent_color: self._fields.0,
             categories: self._fields.1,

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::string::Datetime;
@@ -20,15 +20,14 @@ use serde::{Serialize, Deserialize};
 use crate::app_rocksky::album::AlbumViewBasic;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetActorAlbums<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct GetActorAlbums<S: BosStr = DefaultStr> {
     pub did: AtIdentifier<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub end_date: Option<Datetime>,
@@ -44,19 +43,17 @@ pub struct GetActorAlbums<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetActorAlbumsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetActorAlbumsOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub albums: Option<Vec<AlbumViewBasic<S>>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -65,12 +62,11 @@ pub struct GetActorAlbumsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetActorAlbumsResponse {
     const NSID: &'static str = "app.rocksky.actor.getActorAlbums";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetActorAlbumsOutput<S>;
+    type Output<S: BosStr> = GetActorAlbumsOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetActorAlbums<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetActorAlbums<S> {
     const NSID: &'static str = "app.rocksky.actor.getActorAlbums";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetActorAlbumsResponse;
@@ -81,7 +77,7 @@ pub struct GetActorAlbumsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetActorAlbumsRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.actor.getActorAlbums";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetActorAlbums<S>;
+    type Request<S: BosStr> = GetActorAlbums<S>;
     type Response = GetActorAlbumsResponse;
 }
 
@@ -104,9 +100,9 @@ pub mod get_actor_albums_state {
         type Did = Unset;
     }
     ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
         type Did = Set<members::did>;
     }
     /// Marker types for field names
@@ -117,9 +113,9 @@ pub mod get_actor_albums_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetActorAlbumsBuilder<'a, S: get_actor_albums_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetActorAlbumsBuilder<S: BosStr, St: get_actor_albums_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<AtIdentifier<S>>,
         Option<Datetime>,
@@ -127,47 +123,47 @@ pub struct GetActorAlbumsBuilder<'a, S: get_actor_albums_state::State> {
         Option<i64>,
         Option<Datetime>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetActorAlbums<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetActorAlbumsBuilder<'a, get_actor_albums_state::Empty> {
+impl<S: BosStr> GetActorAlbums<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetActorAlbumsBuilder<S, get_actor_albums_state::Empty> {
         GetActorAlbumsBuilder::new()
     }
 }
 
-impl<'a> GetActorAlbumsBuilder<'a, get_actor_albums_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetActorAlbumsBuilder<S, get_actor_albums_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetActorAlbumsBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetActorAlbumsBuilder<'a, S>
+impl<S: BosStr, St> GetActorAlbumsBuilder<S, St>
 where
-    S: get_actor_albums_state::State,
-    S::Did: get_actor_albums_state::IsUnset,
+    St: get_actor_albums_state::State,
+    St::Did: get_actor_albums_state::IsUnset,
 {
     /// Set the `did` field (required)
     pub fn did(
         mut self,
         value: impl Into<AtIdentifier<S>>,
-    ) -> GetActorAlbumsBuilder<'a, get_actor_albums_state::SetDid<S>> {
+    ) -> GetActorAlbumsBuilder<S, get_actor_albums_state::SetDid<St>> {
         self._fields.0 = Option::Some(value.into());
         GetActorAlbumsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: get_actor_albums_state::State> GetActorAlbumsBuilder<'a, S> {
+impl<S: BosStr, St: get_actor_albums_state::State> GetActorAlbumsBuilder<S, St> {
     /// Set the `endDate` field (optional)
     pub fn end_date(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.1 = value.into();
@@ -180,7 +176,7 @@ impl<'a, S: get_actor_albums_state::State> GetActorAlbumsBuilder<'a, S> {
     }
 }
 
-impl<'a, S: get_actor_albums_state::State> GetActorAlbumsBuilder<'a, S> {
+impl<S: BosStr, St: get_actor_albums_state::State> GetActorAlbumsBuilder<S, St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -193,7 +189,7 @@ impl<'a, S: get_actor_albums_state::State> GetActorAlbumsBuilder<'a, S> {
     }
 }
 
-impl<'a, S: get_actor_albums_state::State> GetActorAlbumsBuilder<'a, S> {
+impl<S: BosStr, St: get_actor_albums_state::State> GetActorAlbumsBuilder<S, St> {
     /// Set the `offset` field (optional)
     pub fn offset(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.3 = value.into();
@@ -206,7 +202,7 @@ impl<'a, S: get_actor_albums_state::State> GetActorAlbumsBuilder<'a, S> {
     }
 }
 
-impl<'a, S: get_actor_albums_state::State> GetActorAlbumsBuilder<'a, S> {
+impl<S: BosStr, St: get_actor_albums_state::State> GetActorAlbumsBuilder<S, St> {
     /// Set the `startDate` field (optional)
     pub fn start_date(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.4 = value.into();
@@ -219,13 +215,13 @@ impl<'a, S: get_actor_albums_state::State> GetActorAlbumsBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GetActorAlbumsBuilder<'a, S>
+impl<S: BosStr, St> GetActorAlbumsBuilder<S, St>
 where
-    S: get_actor_albums_state::State,
-    S::Did: get_actor_albums_state::IsSet,
+    St: get_actor_albums_state::State,
+    St::Did: get_actor_albums_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetActorAlbums<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetActorAlbums<S> {
         GetActorAlbums {
             did: self._fields.0.unwrap(),
             end_date: self._fields.1,

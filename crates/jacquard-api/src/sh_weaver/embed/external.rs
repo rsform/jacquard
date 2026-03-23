@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -31,11 +31,11 @@ use crate::sh_weaver::embed::external;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ExternalEmbed<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ExternalEmbed<S: BosStr = DefaultStr> {
     pub description: S,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub thumb: Option<BlobRef<S>>,
@@ -50,11 +50,11 @@ pub struct ExternalEmbed<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct External<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct External<S: BosStr = DefaultStr> {
     pub embeds: Vec<external::ExternalEmbed<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -65,11 +65,11 @@ pub struct External<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct View<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct View<S: BosStr = DefaultStr> {
     pub external: Vec<external::ViewExternal<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -80,11 +80,11 @@ pub struct View<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ViewExternal<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ViewExternal<S: BosStr = DefaultStr> {
     pub description: S,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub thumb: Option<UriValue<S>>,
@@ -94,7 +94,7 @@ pub struct ViewExternal<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ExternalEmbed<S> {
+impl<S: BosStr> LexiconSchema for ExternalEmbed<S> {
     fn nsid() -> &'static str {
         "sh.weaver.embed.external"
     }
@@ -147,7 +147,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for ExternalEmbed<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for External<S> {
+impl<S: BosStr> LexiconSchema for External<S> {
     fn nsid() -> &'static str {
         "sh.weaver.embed.external"
     }
@@ -173,7 +173,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for External<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for View<S> {
+impl<S: BosStr> LexiconSchema for View<S> {
     fn nsid() -> &'static str {
         "sh.weaver.embed.external"
     }
@@ -199,7 +199,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for View<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ViewExternal<S> {
+impl<S: BosStr> LexiconSchema for ViewExternal<S> {
     fn nsid() -> &'static str {
         "sh.weaver.embed.external"
     }
@@ -224,99 +224,99 @@ pub mod external_embed_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
-        type Description;
         type Uri;
+        type Description;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
-        type Description = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type Description = S::Description;
-        type Uri = S::Uri;
-    }
-    ///State transition - sets the `description` field to Set
-    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDescription<S> {}
-    impl<S: State> State for SetDescription<S> {
-        type Title = S::Title;
-        type Description = Set<members::description>;
-        type Uri = S::Uri;
+        type Description = Unset;
+        type Title = Unset;
     }
     ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Title = S::Title;
-        type Description = S::Description;
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
         type Uri = Set<members::uri>;
+        type Description = St::Description;
+        type Title = St::Title;
+    }
+    ///State transition - sets the `description` field to Set
+    pub struct SetDescription<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDescription<St> {}
+    impl<St: State> State for SetDescription<St> {
+        type Uri = St::Uri;
+        type Description = Set<members::description>;
+        type Title = St::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
+        type Uri = St::Uri;
+        type Description = St::Description;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
-        ///Marker type for the `description` field
-        pub struct description(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `description` field
+        pub struct description(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ExternalEmbedBuilder<'a, S: external_embed_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ExternalEmbedBuilder<S: BosStr, St: external_embed_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<BlobRef<S>>, Option<S>, Option<UriValue<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ExternalEmbed<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ExternalEmbedBuilder<'a, external_embed_state::Empty> {
+impl<S: BosStr> ExternalEmbed<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ExternalEmbedBuilder<S, external_embed_state::Empty> {
         ExternalEmbedBuilder::new()
     }
 }
 
-impl<'a> ExternalEmbedBuilder<'a, external_embed_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ExternalEmbedBuilder<S, external_embed_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ExternalEmbedBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ExternalEmbedBuilder<'a, S>
+impl<S: BosStr, St> ExternalEmbedBuilder<S, St>
 where
-    S: external_embed_state::State,
-    S::Description: external_embed_state::IsUnset,
+    St: external_embed_state::State,
+    St::Description: external_embed_state::IsUnset,
 {
     /// Set the `description` field (required)
     pub fn description(
         mut self,
         value: impl Into<S>,
-    ) -> ExternalEmbedBuilder<'a, external_embed_state::SetDescription<S>> {
+    ) -> ExternalEmbedBuilder<S, external_embed_state::SetDescription<St>> {
         self._fields.0 = Option::Some(value.into());
         ExternalEmbedBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: external_embed_state::State> ExternalEmbedBuilder<'a, S> {
+impl<S: BosStr, St: external_embed_state::State> ExternalEmbedBuilder<S, St> {
     /// Set the `thumb` field (optional)
     pub fn thumb(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -329,53 +329,53 @@ impl<'a, S: external_embed_state::State> ExternalEmbedBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ExternalEmbedBuilder<'a, S>
+impl<S: BosStr, St> ExternalEmbedBuilder<S, St>
 where
-    S: external_embed_state::State,
-    S::Title: external_embed_state::IsUnset,
+    St: external_embed_state::State,
+    St::Title: external_embed_state::IsUnset,
 {
     /// Set the `title` field (required)
     pub fn title(
         mut self,
         value: impl Into<S>,
-    ) -> ExternalEmbedBuilder<'a, external_embed_state::SetTitle<S>> {
+    ) -> ExternalEmbedBuilder<S, external_embed_state::SetTitle<St>> {
         self._fields.2 = Option::Some(value.into());
         ExternalEmbedBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ExternalEmbedBuilder<'a, S>
+impl<S: BosStr, St> ExternalEmbedBuilder<S, St>
 where
-    S: external_embed_state::State,
-    S::Uri: external_embed_state::IsUnset,
+    St: external_embed_state::State,
+    St::Uri: external_embed_state::IsUnset,
 {
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> ExternalEmbedBuilder<'a, external_embed_state::SetUri<S>> {
+    ) -> ExternalEmbedBuilder<S, external_embed_state::SetUri<St>> {
         self._fields.3 = Option::Some(value.into());
         ExternalEmbedBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ExternalEmbedBuilder<'a, S>
+impl<S: BosStr, St> ExternalEmbedBuilder<S, St>
 where
-    S: external_embed_state::State,
-    S::Title: external_embed_state::IsSet,
-    S::Description: external_embed_state::IsSet,
-    S::Uri: external_embed_state::IsSet,
+    St: external_embed_state::State,
+    St::Uri: external_embed_state::IsSet,
+    St::Description: external_embed_state::IsSet,
+    St::Title: external_embed_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ExternalEmbed<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ExternalEmbed<S> {
         ExternalEmbed {
             description: self._fields.0.unwrap(),
             thumb: self._fields.1,
@@ -384,11 +384,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> ExternalEmbed<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ExternalEmbed<S> {
         ExternalEmbed {
             description: self._fields.0.unwrap(),
             thumb: self._fields.1,
@@ -555,9 +555,9 @@ pub mod external_state {
         type Embeds = Unset;
     }
     ///State transition - sets the `embeds` field to Set
-    pub struct SetEmbeds<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEmbeds<S> {}
-    impl<S: State> State for SetEmbeds<S> {
+    pub struct SetEmbeds<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetEmbeds<St> {}
+    impl<St: State> State for SetEmbeds<St> {
         type Embeds = Set<members::embeds>;
     }
     /// Marker types for field names
@@ -568,67 +568,64 @@ pub mod external_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ExternalBuilder<'a, S: external_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ExternalBuilder<S: BosStr, St: external_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<external::ExternalEmbed<S>>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> External<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ExternalBuilder<'a, external_state::Empty> {
+impl<S: BosStr> External<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ExternalBuilder<S, external_state::Empty> {
         ExternalBuilder::new()
     }
 }
 
-impl<'a> ExternalBuilder<'a, external_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ExternalBuilder<S, external_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ExternalBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ExternalBuilder<'a, S>
+impl<S: BosStr, St> ExternalBuilder<S, St>
 where
-    S: external_state::State,
-    S::Embeds: external_state::IsUnset,
+    St: external_state::State,
+    St::Embeds: external_state::IsUnset,
 {
     /// Set the `embeds` field (required)
     pub fn embeds(
         mut self,
         value: impl Into<Vec<external::ExternalEmbed<S>>>,
-    ) -> ExternalBuilder<'a, external_state::SetEmbeds<S>> {
+    ) -> ExternalBuilder<S, external_state::SetEmbeds<St>> {
         self._fields.0 = Option::Some(value.into());
         ExternalBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ExternalBuilder<'a, S>
+impl<S: BosStr, St> ExternalBuilder<S, St>
 where
-    S: external_state::State,
-    S::Embeds: external_state::IsSet,
+    St: external_state::State,
+    St::Embeds: external_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> External<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> External<S> {
         External {
             embeds: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> External<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> External<S> {
         External {
             embeds: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -655,9 +652,9 @@ pub mod view_state {
         type External = Unset;
     }
     ///State transition - sets the `external` field to Set
-    pub struct SetExternal<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetExternal<S> {}
-    impl<S: State> State for SetExternal<S> {
+    pub struct SetExternal<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetExternal<St> {}
+    impl<St: State> State for SetExternal<St> {
         type External = Set<members::external>;
     }
     /// Marker types for field names
@@ -668,64 +665,64 @@ pub mod view_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ViewBuilder<'a, S: view_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ViewBuilder<S: BosStr, St: view_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<external::ViewExternal<S>>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> View<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ViewBuilder<'a, view_state::Empty> {
+impl<S: BosStr> View<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ViewBuilder<S, view_state::Empty> {
         ViewBuilder::new()
     }
 }
 
-impl<'a> ViewBuilder<'a, view_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ViewBuilder<S, view_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ViewBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ViewBuilder<'a, S>
+impl<S: BosStr, St> ViewBuilder<S, St>
 where
-    S: view_state::State,
-    S::External: view_state::IsUnset,
+    St: view_state::State,
+    St::External: view_state::IsUnset,
 {
     /// Set the `external` field (required)
     pub fn external(
         mut self,
         value: impl Into<Vec<external::ViewExternal<S>>>,
-    ) -> ViewBuilder<'a, view_state::SetExternal<S>> {
+    ) -> ViewBuilder<S, view_state::SetExternal<St>> {
         self._fields.0 = Option::Some(value.into());
         ViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ViewBuilder<'a, S>
+impl<S: BosStr, St> ViewBuilder<S, St>
 where
-    S: view_state::State,
-    S::External: view_state::IsSet,
+    St: view_state::State,
+    St::External: view_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> View<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> View<S> {
         View {
             external: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> View<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> View<S> {
         View {
             external: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -743,99 +740,99 @@ pub mod view_external_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
         type Uri;
         type Description;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
         type Uri = Unset;
         type Description = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type Uri = S::Uri;
-        type Description = S::Description;
+        type Title = Unset;
     }
     ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Title = S::Title;
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
         type Uri = Set<members::uri>;
-        type Description = S::Description;
+        type Description = St::Description;
+        type Title = St::Title;
     }
     ///State transition - sets the `description` field to Set
-    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDescription<S> {}
-    impl<S: State> State for SetDescription<S> {
-        type Title = S::Title;
-        type Uri = S::Uri;
+    pub struct SetDescription<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDescription<St> {}
+    impl<St: State> State for SetDescription<St> {
+        type Uri = St::Uri;
         type Description = Set<members::description>;
+        type Title = St::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
+        type Uri = St::Uri;
+        type Description = St::Description;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `uri` field
         pub struct uri(());
         ///Marker type for the `description` field
         pub struct description(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ViewExternalBuilder<'a, S: view_external_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ViewExternalBuilder<S: BosStr, St: view_external_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<UriValue<S>>, Option<S>, Option<UriValue<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ViewExternal<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ViewExternalBuilder<'a, view_external_state::Empty> {
+impl<S: BosStr> ViewExternal<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ViewExternalBuilder<S, view_external_state::Empty> {
         ViewExternalBuilder::new()
     }
 }
 
-impl<'a> ViewExternalBuilder<'a, view_external_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ViewExternalBuilder<S, view_external_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ViewExternalBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ViewExternalBuilder<'a, S>
+impl<S: BosStr, St> ViewExternalBuilder<S, St>
 where
-    S: view_external_state::State,
-    S::Description: view_external_state::IsUnset,
+    St: view_external_state::State,
+    St::Description: view_external_state::IsUnset,
 {
     /// Set the `description` field (required)
     pub fn description(
         mut self,
         value: impl Into<S>,
-    ) -> ViewExternalBuilder<'a, view_external_state::SetDescription<S>> {
+    ) -> ViewExternalBuilder<S, view_external_state::SetDescription<St>> {
         self._fields.0 = Option::Some(value.into());
         ViewExternalBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: view_external_state::State> ViewExternalBuilder<'a, S> {
+impl<S: BosStr, St: view_external_state::State> ViewExternalBuilder<S, St> {
     /// Set the `thumb` field (optional)
     pub fn thumb(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -848,53 +845,53 @@ impl<'a, S: view_external_state::State> ViewExternalBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ViewExternalBuilder<'a, S>
+impl<S: BosStr, St> ViewExternalBuilder<S, St>
 where
-    S: view_external_state::State,
-    S::Title: view_external_state::IsUnset,
+    St: view_external_state::State,
+    St::Title: view_external_state::IsUnset,
 {
     /// Set the `title` field (required)
     pub fn title(
         mut self,
         value: impl Into<S>,
-    ) -> ViewExternalBuilder<'a, view_external_state::SetTitle<S>> {
+    ) -> ViewExternalBuilder<S, view_external_state::SetTitle<St>> {
         self._fields.2 = Option::Some(value.into());
         ViewExternalBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ViewExternalBuilder<'a, S>
+impl<S: BosStr, St> ViewExternalBuilder<S, St>
 where
-    S: view_external_state::State,
-    S::Uri: view_external_state::IsUnset,
+    St: view_external_state::State,
+    St::Uri: view_external_state::IsUnset,
 {
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> ViewExternalBuilder<'a, view_external_state::SetUri<S>> {
+    ) -> ViewExternalBuilder<S, view_external_state::SetUri<St>> {
         self._fields.3 = Option::Some(value.into());
         ViewExternalBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ViewExternalBuilder<'a, S>
+impl<S: BosStr, St> ViewExternalBuilder<S, St>
 where
-    S: view_external_state::State,
-    S::Title: view_external_state::IsSet,
-    S::Uri: view_external_state::IsSet,
-    S::Description: view_external_state::IsSet,
+    St: view_external_state::State,
+    St::Uri: view_external_state::IsSet,
+    St::Description: view_external_state::IsSet,
+    St::Title: view_external_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ViewExternal<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ViewExternal<S> {
         ViewExternal {
             description: self._fields.0.unwrap(),
             thumb: self._fields.1,
@@ -903,11 +900,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> ViewExternal<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ViewExternal<S> {
         ViewExternal {
             description: self._fields.0.unwrap(),
             thumb: self._fields.1,

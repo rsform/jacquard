@@ -10,46 +10,42 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct VerifyPhone<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct VerifyPhone<S: BosStr = DefaultStr> {
     ///The code received via SMS as a result of the call to `app.bsky.contact.startPhoneVerification`.
     pub code: S,
     ///The phone number to verify. Should be the same as the one passed to `app.bsky.contact.startPhoneVerification`.
     pub phone: S,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct VerifyPhoneOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct VerifyPhoneOutput<S: BosStr = DefaultStr> {
     ///JWT to be used in a call to `app.bsky.contact.importContacts`. It is only valid for a single call.
     pub token: S,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -136,12 +132,11 @@ pub struct VerifyPhoneResponse;
 impl jacquard_common::xrpc::XrpcResp for VerifyPhoneResponse {
     const NSID: &'static str = "app.bsky.contact.verifyPhone";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = VerifyPhoneOutput<S>;
+    type Output<S: BosStr> = VerifyPhoneOutput<S>;
     type Err = VerifyPhoneError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for VerifyPhone<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for VerifyPhone<S> {
     const NSID: &'static str = "app.bsky.contact.verifyPhone";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -156,6 +151,6 @@ impl jacquard_common::xrpc::XrpcEndpoint for VerifyPhoneRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = VerifyPhone<S>;
+    type Request<S: BosStr> = VerifyPhone<S>;
     type Response = VerifyPhoneResponse;
 }

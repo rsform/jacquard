@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use crate::app_greengale::blog::Theme;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ContentRef<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ContentRef<S: BosStr = DefaultStr> {
     ///AT-URI pointing to the full document content
     pub uri: AtUri<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -55,11 +55,11 @@ pub struct ContentRef<S: Bos<str> + AsRef<str> = DefaultStr> {
     rename = "app.greengale.document",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Document<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Document<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub blobs: Option<Vec<BlobMetadata<S>>>,
     ///Markdown content of the document
@@ -99,24 +99,24 @@ pub struct Document<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DocumentGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DocumentGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Document<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Document<S> {
+impl<S: BosStr> Document<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, DocumentRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ContentRef<S> {
+impl<S: BosStr> LexiconSchema for ContentRef<S> {
     fn nsid() -> &'static str {
         "app.greengale.document"
     }
@@ -138,17 +138,17 @@ pub struct DocumentRecord;
 impl XrpcResp for DocumentRecord {
     const NSID: &'static str = "app.greengale.document";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = DocumentGetRecordOutput<S>;
+    type Output<S: BosStr> = DocumentGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<DocumentGetRecordOutput<S>> for Document<S> {
+impl<S: BosStr> From<DocumentGetRecordOutput<S>> for Document<S> {
     fn from(output: DocumentGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Document<S> {
+impl<S: BosStr> Collection for Document<S> {
     const NSID: &'static str = "app.greengale.document";
     type Record = DocumentRecord;
 }
@@ -158,7 +158,7 @@ impl Collection for DocumentRecord {
     type Record = DocumentRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Document<S> {
+impl<S: BosStr> LexiconSchema for Document<S> {
     fn nsid() -> &'static str {
         "app.greengale.document"
     }
@@ -266,9 +266,9 @@ pub mod content_ref_state {
         type Uri = Unset;
     }
     ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
         type Uri = Set<members::uri>;
     }
     /// Marker types for field names
@@ -279,67 +279,67 @@ pub mod content_ref_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ContentRefBuilder<'a, S: content_ref_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ContentRefBuilder<S: BosStr, St: content_ref_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ContentRef<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ContentRefBuilder<'a, content_ref_state::Empty> {
+impl<S: BosStr> ContentRef<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ContentRefBuilder<S, content_ref_state::Empty> {
         ContentRefBuilder::new()
     }
 }
 
-impl<'a> ContentRefBuilder<'a, content_ref_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ContentRefBuilder<S, content_ref_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ContentRefBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ContentRefBuilder<'a, S>
+impl<S: BosStr, St> ContentRefBuilder<S, St>
 where
-    S: content_ref_state::State,
-    S::Uri: content_ref_state::IsUnset,
+    St: content_ref_state::State,
+    St::Uri: content_ref_state::IsUnset,
 {
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> ContentRefBuilder<'a, content_ref_state::SetUri<S>> {
+    ) -> ContentRefBuilder<S, content_ref_state::SetUri<St>> {
         self._fields.0 = Option::Some(value.into());
         ContentRefBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ContentRefBuilder<'a, S>
+impl<S: BosStr, St> ContentRefBuilder<S, St>
 where
-    S: content_ref_state::State,
-    S::Uri: content_ref_state::IsSet,
+    St: content_ref_state::State,
+    St::Uri: content_ref_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ContentRef<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ContentRef<S> {
         ContentRef {
             uri: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> ContentRef<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ContentRef<S> {
         ContentRef {
             uri: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -542,8 +542,8 @@ fn _default_document_latex() -> Option<bool> {
     Some(false)
 }
 
-fn _default_document_visibility<S: From<&'static str>>() -> ::core::option::Option<S> {
-    Some(S::from("public"))
+fn _default_document_visibility<S: FromStaticStr>() -> ::core::option::Option<S> {
+    Some(S::from_static("public"))
 }
 
 pub mod document_state {
@@ -557,8 +557,8 @@ pub mod document_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type PublishedAt;
-        type Path;
         type Url;
+        type Path;
         type Title;
         type Content;
     }
@@ -567,59 +567,59 @@ pub mod document_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type PublishedAt = Unset;
-        type Path = Unset;
         type Url = Unset;
+        type Path = Unset;
         type Title = Unset;
         type Content = Unset;
     }
     ///State transition - sets the `published_at` field to Set
-    pub struct SetPublishedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPublishedAt<S> {}
-    impl<S: State> State for SetPublishedAt<S> {
+    pub struct SetPublishedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPublishedAt<St> {}
+    impl<St: State> State for SetPublishedAt<St> {
         type PublishedAt = Set<members::published_at>;
-        type Path = S::Path;
-        type Url = S::Url;
-        type Title = S::Title;
-        type Content = S::Content;
-    }
-    ///State transition - sets the `path` field to Set
-    pub struct SetPath<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPath<S> {}
-    impl<S: State> State for SetPath<S> {
-        type PublishedAt = S::PublishedAt;
-        type Path = Set<members::path>;
-        type Url = S::Url;
-        type Title = S::Title;
-        type Content = S::Content;
+        type Url = St::Url;
+        type Path = St::Path;
+        type Title = St::Title;
+        type Content = St::Content;
     }
     ///State transition - sets the `url` field to Set
-    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrl<S> {}
-    impl<S: State> State for SetUrl<S> {
-        type PublishedAt = S::PublishedAt;
-        type Path = S::Path;
+    pub struct SetUrl<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUrl<St> {}
+    impl<St: State> State for SetUrl<St> {
+        type PublishedAt = St::PublishedAt;
         type Url = Set<members::url>;
-        type Title = S::Title;
-        type Content = S::Content;
+        type Path = St::Path;
+        type Title = St::Title;
+        type Content = St::Content;
+    }
+    ///State transition - sets the `path` field to Set
+    pub struct SetPath<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPath<St> {}
+    impl<St: State> State for SetPath<St> {
+        type PublishedAt = St::PublishedAt;
+        type Url = St::Url;
+        type Path = Set<members::path>;
+        type Title = St::Title;
+        type Content = St::Content;
     }
     ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type PublishedAt = S::PublishedAt;
-        type Path = S::Path;
-        type Url = S::Url;
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
+        type PublishedAt = St::PublishedAt;
+        type Url = St::Url;
+        type Path = St::Path;
         type Title = Set<members::title>;
-        type Content = S::Content;
+        type Content = St::Content;
     }
     ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type PublishedAt = S::PublishedAt;
-        type Path = S::Path;
-        type Url = S::Url;
-        type Title = S::Title;
+    pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetContent<St> {}
+    impl<St: State> State for SetContent<St> {
+        type PublishedAt = St::PublishedAt;
+        type Url = St::Url;
+        type Path = St::Path;
+        type Title = St::Title;
         type Content = Set<members::content>;
     }
     /// Marker types for field names
@@ -627,10 +627,10 @@ pub mod document_state {
     pub mod members {
         ///Marker type for the `published_at` field
         pub struct published_at(());
-        ///Marker type for the `path` field
-        pub struct path(());
         ///Marker type for the `url` field
         pub struct url(());
+        ///Marker type for the `path` field
+        pub struct path(());
         ///Marker type for the `title` field
         pub struct title(());
         ///Marker type for the `content` field
@@ -638,9 +638,9 @@ pub mod document_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct DocumentBuilder<'a, S: document_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct DocumentBuilder<S: BosStr, St: document_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<BlobMetadata<S>>>,
         Option<S>,
@@ -655,18 +655,18 @@ pub struct DocumentBuilder<'a, S: document_state::State> {
         Option<UriValue<S>>,
         Option<S>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Document<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> DocumentBuilder<'a, document_state::Empty> {
+impl<S: BosStr> Document<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> DocumentBuilder<S, document_state::Empty> {
         DocumentBuilder::new()
     }
 }
 
-impl<'a> DocumentBuilder<'a, document_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> DocumentBuilder<S, document_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         DocumentBuilder {
             _state: PhantomData,
@@ -684,12 +684,12 @@ impl<'a> DocumentBuilder<'a, document_state::Empty> {
                 None,
                 None,
             ),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
+impl<S: BosStr, St: document_state::State> DocumentBuilder<S, St> {
     /// Set the `blobs` field (optional)
     pub fn blobs(mut self, value: impl Into<Option<Vec<BlobMetadata<S>>>>) -> Self {
         self._fields.0 = value.into();
@@ -702,26 +702,26 @@ impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
     }
 }
 
-impl<'a, S> DocumentBuilder<'a, S>
+impl<S: BosStr, St> DocumentBuilder<S, St>
 where
-    S: document_state::State,
-    S::Content: document_state::IsUnset,
+    St: document_state::State,
+    St::Content: document_state::IsUnset,
 {
     /// Set the `content` field (required)
     pub fn content(
         mut self,
         value: impl Into<S>,
-    ) -> DocumentBuilder<'a, document_state::SetContent<S>> {
+    ) -> DocumentBuilder<S, document_state::SetContent<St>> {
         self._fields.1 = Option::Some(value.into());
         DocumentBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
+impl<S: BosStr, St: document_state::State> DocumentBuilder<S, St> {
     /// Set the `latex` field (optional)
     pub fn latex(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.2 = value.into();
@@ -734,7 +734,7 @@ impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
     }
 }
 
-impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
+impl<S: BosStr, St: document_state::State> DocumentBuilder<S, St> {
     /// Set the `ogp` field (optional)
     pub fn ogp(mut self, value: impl Into<Option<Ogp<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -747,45 +747,45 @@ impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
     }
 }
 
-impl<'a, S> DocumentBuilder<'a, S>
+impl<S: BosStr, St> DocumentBuilder<S, St>
 where
-    S: document_state::State,
-    S::Path: document_state::IsUnset,
+    St: document_state::State,
+    St::Path: document_state::IsUnset,
 {
     /// Set the `path` field (required)
     pub fn path(
         mut self,
         value: impl Into<S>,
-    ) -> DocumentBuilder<'a, document_state::SetPath<S>> {
+    ) -> DocumentBuilder<S, document_state::SetPath<St>> {
         self._fields.4 = Option::Some(value.into());
         DocumentBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DocumentBuilder<'a, S>
+impl<S: BosStr, St> DocumentBuilder<S, St>
 where
-    S: document_state::State,
-    S::PublishedAt: document_state::IsUnset,
+    St: document_state::State,
+    St::PublishedAt: document_state::IsUnset,
 {
     /// Set the `publishedAt` field (required)
     pub fn published_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> DocumentBuilder<'a, document_state::SetPublishedAt<S>> {
+    ) -> DocumentBuilder<S, document_state::SetPublishedAt<St>> {
         self._fields.5 = Option::Some(value.into());
         DocumentBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
+impl<S: BosStr, St: document_state::State> DocumentBuilder<S, St> {
     /// Set the `subtitle` field (optional)
     pub fn subtitle(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.6 = value.into();
@@ -798,7 +798,7 @@ impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
     }
 }
 
-impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
+impl<S: BosStr, St: document_state::State> DocumentBuilder<S, St> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.7 = value.into();
@@ -811,7 +811,7 @@ impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
     }
 }
 
-impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
+impl<S: BosStr, St: document_state::State> DocumentBuilder<S, St> {
     /// Set the `theme` field (optional)
     pub fn theme(mut self, value: impl Into<Option<Theme<S>>>) -> Self {
         self._fields.8 = value.into();
@@ -824,45 +824,45 @@ impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
     }
 }
 
-impl<'a, S> DocumentBuilder<'a, S>
+impl<S: BosStr, St> DocumentBuilder<S, St>
 where
-    S: document_state::State,
-    S::Title: document_state::IsUnset,
+    St: document_state::State,
+    St::Title: document_state::IsUnset,
 {
     /// Set the `title` field (required)
     pub fn title(
         mut self,
         value: impl Into<S>,
-    ) -> DocumentBuilder<'a, document_state::SetTitle<S>> {
+    ) -> DocumentBuilder<S, document_state::SetTitle<St>> {
         self._fields.9 = Option::Some(value.into());
         DocumentBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DocumentBuilder<'a, S>
+impl<S: BosStr, St> DocumentBuilder<S, St>
 where
-    S: document_state::State,
-    S::Url: document_state::IsUnset,
+    St: document_state::State,
+    St::Url: document_state::IsUnset,
 {
     /// Set the `url` field (required)
     pub fn url(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> DocumentBuilder<'a, document_state::SetUrl<S>> {
+    ) -> DocumentBuilder<S, document_state::SetUrl<St>> {
         self._fields.10 = Option::Some(value.into());
         DocumentBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
+impl<S: BosStr, St: document_state::State> DocumentBuilder<S, St> {
     /// Set the `visibility` field (optional)
     pub fn visibility(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.11 = value.into();
@@ -875,17 +875,17 @@ impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
     }
 }
 
-impl<'a, S> DocumentBuilder<'a, S>
+impl<S: BosStr, St> DocumentBuilder<S, St>
 where
-    S: document_state::State,
-    S::PublishedAt: document_state::IsSet,
-    S::Path: document_state::IsSet,
-    S::Url: document_state::IsSet,
-    S::Title: document_state::IsSet,
-    S::Content: document_state::IsSet,
+    St: document_state::State,
+    St::PublishedAt: document_state::IsSet,
+    St::Url: document_state::IsSet,
+    St::Path: document_state::IsSet,
+    St::Title: document_state::IsSet,
+    St::Content: document_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Document<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Document<S> {
         Document {
             blobs: self._fields.0,
             content: self._fields.1.unwrap(),
@@ -898,15 +898,12 @@ where
             theme: self._fields.8,
             title: self._fields.9.unwrap(),
             url: self._fields.10.unwrap(),
-            visibility: self._fields.11.or_else(|| Some(CowStr::from("public"))),
+            visibility: self._fields.11.or_else(|| Some(SmolStr::from("public"))),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Document<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Document<S> {
         Document {
             blobs: self._fields.0,
             content: self._fields.1.unwrap(),
@@ -919,7 +916,7 @@ where
             theme: self._fields.8,
             title: self._fields.9.unwrap(),
             url: self._fields.10.unwrap(),
-            visibility: self._fields.11.or_else(|| Some(CowStr::from("public"))),
+            visibility: self._fields.11.or_else(|| Some(SmolStr::from("public"))),
             extra_data: Some(extra_data),
         }
     }

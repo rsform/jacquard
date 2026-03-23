@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use crate::app_dropanchor::checkin;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Address<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Address<S: BosStr = DefaultStr> {
     ///The ISO 3166 country code (preferably 2-letter)
     pub country: S,
     ///The locality (city, town, etc.)
@@ -67,11 +67,11 @@ pub struct Address<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CheckinImage<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CheckinImage<S: BosStr = DefaultStr> {
     ///Alt text for accessibility
     #[serde(skip_serializing_if = "Option::is_none")]
     pub alt: Option<S>,
@@ -89,11 +89,11 @@ pub struct CheckinImage<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct FsqPlace<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct FsqPlace<S: BosStr = DefaultStr> {
     ///The unique identifier of a Foursquare POI
     pub fsq_place_id: S,
     ///Latitude in decimal degrees
@@ -115,11 +115,11 @@ pub struct FsqPlace<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Geo<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Geo<S: BosStr = DefaultStr> {
     ///Altitude in meters
     #[serde(skip_serializing_if = "Option::is_none")]
     pub altitude: Option<S>,
@@ -142,11 +142,11 @@ pub struct Geo<S: Bos<str> + AsRef<str> = DefaultStr> {
     rename = "app.dropanchor.checkin",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Checkin<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Checkin<S: BosStr = DefaultStr> {
     ///Address of the check-in location (based on community.lexicon.location.address)
     pub address: checkin::Address<S>,
     ///Place category (e.g., cafe, restaurant)
@@ -180,24 +180,24 @@ pub struct Checkin<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CheckinGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CheckinGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Checkin<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Checkin<S> {
+impl<S: BosStr> Checkin<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, CheckinRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Address<S> {
+impl<S: BosStr> LexiconSchema for Address<S> {
     fn nsid() -> &'static str {
         "app.dropanchor.checkin"
     }
@@ -284,7 +284,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Address<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for CheckinImage<S> {
+impl<S: BosStr> LexiconSchema for CheckinImage<S> {
     fn nsid() -> &'static str {
         "app.dropanchor.checkin"
     }
@@ -395,7 +395,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for CheckinImage<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for FsqPlace<S> {
+impl<S: BosStr> LexiconSchema for FsqPlace<S> {
     fn nsid() -> &'static str {
         "app.dropanchor.checkin"
     }
@@ -451,7 +451,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for FsqPlace<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Geo<S> {
+impl<S: BosStr> LexiconSchema for Geo<S> {
     fn nsid() -> &'static str {
         "app.dropanchor.checkin"
     }
@@ -515,17 +515,17 @@ pub struct CheckinRecord;
 impl XrpcResp for CheckinRecord {
     const NSID: &'static str = "app.dropanchor.checkin";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = CheckinGetRecordOutput<S>;
+    type Output<S: BosStr> = CheckinGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<CheckinGetRecordOutput<S>> for Checkin<S> {
+impl<S: BosStr> From<CheckinGetRecordOutput<S>> for Checkin<S> {
     fn from(output: CheckinGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Checkin<S> {
+impl<S: BosStr> Collection for Checkin<S> {
     const NSID: &'static str = "app.dropanchor.checkin";
     type Record = CheckinRecord;
 }
@@ -535,7 +535,7 @@ impl Collection for CheckinRecord {
     type Record = CheckinRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Checkin<S> {
+impl<S: BosStr> LexiconSchema for Checkin<S> {
     fn nsid() -> &'static str {
         "app.dropanchor.checkin"
     }
@@ -964,66 +964,66 @@ pub mod checkin_image_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Thumb;
         type Fullsize;
+        type Thumb;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Thumb = Unset;
         type Fullsize = Unset;
-    }
-    ///State transition - sets the `thumb` field to Set
-    pub struct SetThumb<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetThumb<S> {}
-    impl<S: State> State for SetThumb<S> {
-        type Thumb = Set<members::thumb>;
-        type Fullsize = S::Fullsize;
+        type Thumb = Unset;
     }
     ///State transition - sets the `fullsize` field to Set
-    pub struct SetFullsize<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFullsize<S> {}
-    impl<S: State> State for SetFullsize<S> {
-        type Thumb = S::Thumb;
+    pub struct SetFullsize<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetFullsize<St> {}
+    impl<St: State> State for SetFullsize<St> {
         type Fullsize = Set<members::fullsize>;
+        type Thumb = St::Thumb;
+    }
+    ///State transition - sets the `thumb` field to Set
+    pub struct SetThumb<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetThumb<St> {}
+    impl<St: State> State for SetThumb<St> {
+        type Fullsize = St::Fullsize;
+        type Thumb = Set<members::thumb>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `thumb` field
-        pub struct thumb(());
         ///Marker type for the `fullsize` field
         pub struct fullsize(());
+        ///Marker type for the `thumb` field
+        pub struct thumb(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct CheckinImageBuilder<'a, S: checkin_image_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct CheckinImageBuilder<S: BosStr, St: checkin_image_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<BlobRef<S>>, Option<BlobRef<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> CheckinImage<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> CheckinImageBuilder<'a, checkin_image_state::Empty> {
+impl<S: BosStr> CheckinImage<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> CheckinImageBuilder<S, checkin_image_state::Empty> {
         CheckinImageBuilder::new()
     }
 }
 
-impl<'a> CheckinImageBuilder<'a, checkin_image_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> CheckinImageBuilder<S, checkin_image_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         CheckinImageBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: checkin_image_state::State> CheckinImageBuilder<'a, S> {
+impl<S: BosStr, St: checkin_image_state::State> CheckinImageBuilder<S, St> {
     /// Set the `alt` field (optional)
     pub fn alt(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -1036,52 +1036,52 @@ impl<'a, S: checkin_image_state::State> CheckinImageBuilder<'a, S> {
     }
 }
 
-impl<'a, S> CheckinImageBuilder<'a, S>
+impl<S: BosStr, St> CheckinImageBuilder<S, St>
 where
-    S: checkin_image_state::State,
-    S::Fullsize: checkin_image_state::IsUnset,
+    St: checkin_image_state::State,
+    St::Fullsize: checkin_image_state::IsUnset,
 {
     /// Set the `fullsize` field (required)
     pub fn fullsize(
         mut self,
         value: impl Into<BlobRef<S>>,
-    ) -> CheckinImageBuilder<'a, checkin_image_state::SetFullsize<S>> {
+    ) -> CheckinImageBuilder<S, checkin_image_state::SetFullsize<St>> {
         self._fields.1 = Option::Some(value.into());
         CheckinImageBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CheckinImageBuilder<'a, S>
+impl<S: BosStr, St> CheckinImageBuilder<S, St>
 where
-    S: checkin_image_state::State,
-    S::Thumb: checkin_image_state::IsUnset,
+    St: checkin_image_state::State,
+    St::Thumb: checkin_image_state::IsUnset,
 {
     /// Set the `thumb` field (required)
     pub fn thumb(
         mut self,
         value: impl Into<BlobRef<S>>,
-    ) -> CheckinImageBuilder<'a, checkin_image_state::SetThumb<S>> {
+    ) -> CheckinImageBuilder<S, checkin_image_state::SetThumb<St>> {
         self._fields.2 = Option::Some(value.into());
         CheckinImageBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CheckinImageBuilder<'a, S>
+impl<S: BosStr, St> CheckinImageBuilder<S, St>
 where
-    S: checkin_image_state::State,
-    S::Thumb: checkin_image_state::IsSet,
-    S::Fullsize: checkin_image_state::IsSet,
+    St: checkin_image_state::State,
+    St::Fullsize: checkin_image_state::IsSet,
+    St::Thumb: checkin_image_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> CheckinImage<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> CheckinImage<S> {
         CheckinImage {
             alt: self._fields.0,
             fullsize: self._fields.1.unwrap(),
@@ -1089,11 +1089,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> CheckinImage<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> CheckinImage<S> {
         CheckinImage {
             alt: self._fields.0,
             fullsize: self._fields.1.unwrap(),
@@ -1113,73 +1113,73 @@ pub mod checkin_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Text;
-        type Geo;
         type CreatedAt;
         type Address;
+        type Text;
+        type Geo;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Text = Unset;
-        type Geo = Unset;
         type CreatedAt = Unset;
         type Address = Unset;
-    }
-    ///State transition - sets the `text` field to Set
-    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetText<S> {}
-    impl<S: State> State for SetText<S> {
-        type Text = Set<members::text>;
-        type Geo = S::Geo;
-        type CreatedAt = S::CreatedAt;
-        type Address = S::Address;
-    }
-    ///State transition - sets the `geo` field to Set
-    pub struct SetGeo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGeo<S> {}
-    impl<S: State> State for SetGeo<S> {
-        type Text = S::Text;
-        type Geo = Set<members::geo>;
-        type CreatedAt = S::CreatedAt;
-        type Address = S::Address;
+        type Text = Unset;
+        type Geo = Unset;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Text = S::Text;
-        type Geo = S::Geo;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
-        type Address = S::Address;
+        type Address = St::Address;
+        type Text = St::Text;
+        type Geo = St::Geo;
     }
     ///State transition - sets the `address` field to Set
-    pub struct SetAddress<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAddress<S> {}
-    impl<S: State> State for SetAddress<S> {
-        type Text = S::Text;
-        type Geo = S::Geo;
-        type CreatedAt = S::CreatedAt;
+    pub struct SetAddress<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAddress<St> {}
+    impl<St: State> State for SetAddress<St> {
+        type CreatedAt = St::CreatedAt;
         type Address = Set<members::address>;
+        type Text = St::Text;
+        type Geo = St::Geo;
+    }
+    ///State transition - sets the `text` field to Set
+    pub struct SetText<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetText<St> {}
+    impl<St: State> State for SetText<St> {
+        type CreatedAt = St::CreatedAt;
+        type Address = St::Address;
+        type Text = Set<members::text>;
+        type Geo = St::Geo;
+    }
+    ///State transition - sets the `geo` field to Set
+    pub struct SetGeo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetGeo<St> {}
+    impl<St: State> State for SetGeo<St> {
+        type CreatedAt = St::CreatedAt;
+        type Address = St::Address;
+        type Text = St::Text;
+        type Geo = Set<members::geo>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `text` field
-        pub struct text(());
-        ///Marker type for the `geo` field
-        pub struct geo(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `address` field
         pub struct address(());
+        ///Marker type for the `text` field
+        pub struct text(());
+        ///Marker type for the `geo` field
+        pub struct geo(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct CheckinBuilder<'a, S: checkin_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct CheckinBuilder<S: BosStr, St: checkin_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<checkin::Address<S>>,
         Option<S>,
@@ -1191,47 +1191,47 @@ pub struct CheckinBuilder<'a, S: checkin_state::State> {
         Option<checkin::CheckinImage<S>>,
         Option<S>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Checkin<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> CheckinBuilder<'a, checkin_state::Empty> {
+impl<S: BosStr> Checkin<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> CheckinBuilder<S, checkin_state::Empty> {
         CheckinBuilder::new()
     }
 }
 
-impl<'a> CheckinBuilder<'a, checkin_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> CheckinBuilder<S, checkin_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         CheckinBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CheckinBuilder<'a, S>
+impl<S: BosStr, St> CheckinBuilder<S, St>
 where
-    S: checkin_state::State,
-    S::Address: checkin_state::IsUnset,
+    St: checkin_state::State,
+    St::Address: checkin_state::IsUnset,
 {
     /// Set the `address` field (required)
     pub fn address(
         mut self,
         value: impl Into<checkin::Address<S>>,
-    ) -> CheckinBuilder<'a, checkin_state::SetAddress<S>> {
+    ) -> CheckinBuilder<S, checkin_state::SetAddress<St>> {
         self._fields.0 = Option::Some(value.into());
         CheckinBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: checkin_state::State> CheckinBuilder<'a, S> {
+impl<S: BosStr, St: checkin_state::State> CheckinBuilder<S, St> {
     /// Set the `category` field (optional)
     pub fn category(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -1244,7 +1244,7 @@ impl<'a, S: checkin_state::State> CheckinBuilder<'a, S> {
     }
 }
 
-impl<'a, S: checkin_state::State> CheckinBuilder<'a, S> {
+impl<S: BosStr, St: checkin_state::State> CheckinBuilder<S, St> {
     /// Set the `categoryGroup` field (optional)
     pub fn category_group(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -1257,7 +1257,7 @@ impl<'a, S: checkin_state::State> CheckinBuilder<'a, S> {
     }
 }
 
-impl<'a, S: checkin_state::State> CheckinBuilder<'a, S> {
+impl<S: BosStr, St: checkin_state::State> CheckinBuilder<S, St> {
     /// Set the `categoryIcon` field (optional)
     pub fn category_icon(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -1270,26 +1270,26 @@ impl<'a, S: checkin_state::State> CheckinBuilder<'a, S> {
     }
 }
 
-impl<'a, S> CheckinBuilder<'a, S>
+impl<S: BosStr, St> CheckinBuilder<S, St>
 where
-    S: checkin_state::State,
-    S::CreatedAt: checkin_state::IsUnset,
+    St: checkin_state::State,
+    St::CreatedAt: checkin_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> CheckinBuilder<'a, checkin_state::SetCreatedAt<S>> {
+    ) -> CheckinBuilder<S, checkin_state::SetCreatedAt<St>> {
         self._fields.4 = Option::Some(value.into());
         CheckinBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: checkin_state::State> CheckinBuilder<'a, S> {
+impl<S: BosStr, St: checkin_state::State> CheckinBuilder<S, St> {
     /// Set the `fsq` field (optional)
     pub fn fsq(mut self, value: impl Into<Option<checkin::FsqPlace<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -1302,26 +1302,26 @@ impl<'a, S: checkin_state::State> CheckinBuilder<'a, S> {
     }
 }
 
-impl<'a, S> CheckinBuilder<'a, S>
+impl<S: BosStr, St> CheckinBuilder<S, St>
 where
-    S: checkin_state::State,
-    S::Geo: checkin_state::IsUnset,
+    St: checkin_state::State,
+    St::Geo: checkin_state::IsUnset,
 {
     /// Set the `geo` field (required)
     pub fn geo(
         mut self,
         value: impl Into<checkin::Geo<S>>,
-    ) -> CheckinBuilder<'a, checkin_state::SetGeo<S>> {
+    ) -> CheckinBuilder<S, checkin_state::SetGeo<St>> {
         self._fields.6 = Option::Some(value.into());
         CheckinBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: checkin_state::State> CheckinBuilder<'a, S> {
+impl<S: BosStr, St: checkin_state::State> CheckinBuilder<S, St> {
     /// Set the `image` field (optional)
     pub fn image(mut self, value: impl Into<Option<checkin::CheckinImage<S>>>) -> Self {
         self._fields.7 = value.into();
@@ -1334,35 +1334,35 @@ impl<'a, S: checkin_state::State> CheckinBuilder<'a, S> {
     }
 }
 
-impl<'a, S> CheckinBuilder<'a, S>
+impl<S: BosStr, St> CheckinBuilder<S, St>
 where
-    S: checkin_state::State,
-    S::Text: checkin_state::IsUnset,
+    St: checkin_state::State,
+    St::Text: checkin_state::IsUnset,
 {
     /// Set the `text` field (required)
     pub fn text(
         mut self,
         value: impl Into<S>,
-    ) -> CheckinBuilder<'a, checkin_state::SetText<S>> {
+    ) -> CheckinBuilder<S, checkin_state::SetText<St>> {
         self._fields.8 = Option::Some(value.into());
         CheckinBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CheckinBuilder<'a, S>
+impl<S: BosStr, St> CheckinBuilder<S, St>
 where
-    S: checkin_state::State,
-    S::Text: checkin_state::IsSet,
-    S::Geo: checkin_state::IsSet,
-    S::CreatedAt: checkin_state::IsSet,
-    S::Address: checkin_state::IsSet,
+    St: checkin_state::State,
+    St::CreatedAt: checkin_state::IsSet,
+    St::Address: checkin_state::IsSet,
+    St::Text: checkin_state::IsSet,
+    St::Geo: checkin_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Checkin<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Checkin<S> {
         Checkin {
             address: self._fields.0.unwrap(),
             category: self._fields.1,
@@ -1376,11 +1376,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Checkin<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Checkin<S> {
         Checkin {
             address: self._fields.0.unwrap(),
             category: self._fields.1,

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use crate::fm_teal::alpha::feed::PlayView;
     rename = "fm.teal.alpha.actor.status",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Status<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Status<S: BosStr = DefaultStr> {
     ///The unix timestamp of the expiry time of the item. If unavailable, default to 10 minutes past the start time.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub expiry: Option<Datetime>,
@@ -57,18 +57,18 @@ pub struct Status<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct StatusGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct StatusGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Status<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Status<S> {
+impl<S: BosStr> Status<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, StatusRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -81,17 +81,17 @@ pub struct StatusRecord;
 impl XrpcResp for StatusRecord {
     const NSID: &'static str = "fm.teal.alpha.actor.status";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = StatusGetRecordOutput<S>;
+    type Output<S: BosStr> = StatusGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<StatusGetRecordOutput<S>> for Status<S> {
+impl<S: BosStr> From<StatusGetRecordOutput<S>> for Status<S> {
     fn from(output: StatusGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Status<S> {
+impl<S: BosStr> Collection for Status<S> {
     const NSID: &'static str = "fm.teal.alpha.actor.status";
     type Record = StatusRecord;
 }
@@ -101,7 +101,7 @@ impl Collection for StatusRecord {
     type Record = StatusRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Status<S> {
+impl<S: BosStr> LexiconSchema for Status<S> {
     fn nsid() -> &'static str {
         "fm.teal.alpha.actor.status"
     }
@@ -126,66 +126,66 @@ pub mod status_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Item;
         type Time;
+        type Item;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Item = Unset;
         type Time = Unset;
-    }
-    ///State transition - sets the `item` field to Set
-    pub struct SetItem<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetItem<S> {}
-    impl<S: State> State for SetItem<S> {
-        type Item = Set<members::item>;
-        type Time = S::Time;
+        type Item = Unset;
     }
     ///State transition - sets the `time` field to Set
-    pub struct SetTime<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTime<S> {}
-    impl<S: State> State for SetTime<S> {
-        type Item = S::Item;
+    pub struct SetTime<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTime<St> {}
+    impl<St: State> State for SetTime<St> {
         type Time = Set<members::time>;
+        type Item = St::Item;
+    }
+    ///State transition - sets the `item` field to Set
+    pub struct SetItem<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetItem<St> {}
+    impl<St: State> State for SetItem<St> {
+        type Time = St::Time;
+        type Item = Set<members::item>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `item` field
-        pub struct item(());
         ///Marker type for the `time` field
         pub struct time(());
+        ///Marker type for the `item` field
+        pub struct item(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct StatusBuilder<'a, S: status_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct StatusBuilder<S: BosStr, St: status_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<PlayView<S>>, Option<Datetime>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Status<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> StatusBuilder<'a, status_state::Empty> {
+impl<S: BosStr> Status<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> StatusBuilder<S, status_state::Empty> {
         StatusBuilder::new()
     }
 }
 
-impl<'a> StatusBuilder<'a, status_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> StatusBuilder<S, status_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         StatusBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: status_state::State> StatusBuilder<'a, S> {
+impl<S: BosStr, St: status_state::State> StatusBuilder<S, St> {
     /// Set the `expiry` field (optional)
     pub fn expiry(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.0 = value.into();
@@ -198,52 +198,52 @@ impl<'a, S: status_state::State> StatusBuilder<'a, S> {
     }
 }
 
-impl<'a, S> StatusBuilder<'a, S>
+impl<S: BosStr, St> StatusBuilder<S, St>
 where
-    S: status_state::State,
-    S::Item: status_state::IsUnset,
+    St: status_state::State,
+    St::Item: status_state::IsUnset,
 {
     /// Set the `item` field (required)
     pub fn item(
         mut self,
         value: impl Into<PlayView<S>>,
-    ) -> StatusBuilder<'a, status_state::SetItem<S>> {
+    ) -> StatusBuilder<S, status_state::SetItem<St>> {
         self._fields.1 = Option::Some(value.into());
         StatusBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> StatusBuilder<'a, S>
+impl<S: BosStr, St> StatusBuilder<S, St>
 where
-    S: status_state::State,
-    S::Time: status_state::IsUnset,
+    St: status_state::State,
+    St::Time: status_state::IsUnset,
 {
     /// Set the `time` field (required)
     pub fn time(
         mut self,
         value: impl Into<Datetime>,
-    ) -> StatusBuilder<'a, status_state::SetTime<S>> {
+    ) -> StatusBuilder<S, status_state::SetTime<St>> {
         self._fields.2 = Option::Some(value.into());
         StatusBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> StatusBuilder<'a, S>
+impl<S: BosStr, St> StatusBuilder<S, St>
 where
-    S: status_state::State,
-    S::Item: status_state::IsSet,
-    S::Time: status_state::IsSet,
+    St: status_state::State,
+    St::Time: status_state::IsSet,
+    St::Item: status_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Status<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Status<S> {
         Status {
             expiry: self._fields.0,
             item: self._fields.1.unwrap(),
@@ -251,8 +251,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Status<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Status<S> {
         Status {
             expiry: self._fields.0,
             item: self._fields.1.unwrap(),

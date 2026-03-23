@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "dev.fudgeu.experimental.atforumv1.forum.identity",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Identity<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Identity<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub accent: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -55,18 +55,18 @@ pub struct Identity<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct IdentityGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct IdentityGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Identity<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Identity<S> {
+impl<S: BosStr> Identity<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, IdentityRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -79,17 +79,17 @@ pub struct IdentityRecord;
 impl XrpcResp for IdentityRecord {
     const NSID: &'static str = "dev.fudgeu.experimental.atforumv1.forum.identity";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = IdentityGetRecordOutput<S>;
+    type Output<S: BosStr> = IdentityGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<IdentityGetRecordOutput<S>> for Identity<S> {
+impl<S: BosStr> From<IdentityGetRecordOutput<S>> for Identity<S> {
     fn from(output: IdentityGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Identity<S> {
+impl<S: BosStr> Collection for Identity<S> {
     const NSID: &'static str = "dev.fudgeu.experimental.atforumv1.forum.identity";
     type Record = IdentityRecord;
 }
@@ -99,7 +99,7 @@ impl Collection for IdentityRecord {
     type Record = IdentityRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Identity<S> {
+impl<S: BosStr> LexiconSchema for Identity<S> {
     fn nsid() -> &'static str {
         "dev.fudgeu.experimental.atforumv1.forum.identity"
     }
@@ -174,9 +174,9 @@ pub mod identity_state {
         type Name = Unset;
     }
     ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
         type Name = Set<members::name>;
     }
     /// Marker types for field names
@@ -187,32 +187,32 @@ pub mod identity_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct IdentityBuilder<'a, S: identity_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct IdentityBuilder<S: BosStr, St: identity_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Identity<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> IdentityBuilder<'a, identity_state::Empty> {
+impl<S: BosStr> Identity<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> IdentityBuilder<S, identity_state::Empty> {
         IdentityBuilder::new()
     }
 }
 
-impl<'a> IdentityBuilder<'a, identity_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> IdentityBuilder<S, identity_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         IdentityBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: identity_state::State> IdentityBuilder<'a, S> {
+impl<S: BosStr, St: identity_state::State> IdentityBuilder<S, St> {
     /// Set the `accent` field (optional)
     pub fn accent(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -225,7 +225,7 @@ impl<'a, S: identity_state::State> IdentityBuilder<'a, S> {
     }
 }
 
-impl<'a, S: identity_state::State> IdentityBuilder<'a, S> {
+impl<S: BosStr, St: identity_state::State> IdentityBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -238,32 +238,32 @@ impl<'a, S: identity_state::State> IdentityBuilder<'a, S> {
     }
 }
 
-impl<'a, S> IdentityBuilder<'a, S>
+impl<S: BosStr, St> IdentityBuilder<S, St>
 where
-    S: identity_state::State,
-    S::Name: identity_state::IsUnset,
+    St: identity_state::State,
+    St::Name: identity_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> IdentityBuilder<'a, identity_state::SetName<S>> {
+    ) -> IdentityBuilder<S, identity_state::SetName<St>> {
         self._fields.2 = Option::Some(value.into());
         IdentityBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> IdentityBuilder<'a, S>
+impl<S: BosStr, St> IdentityBuilder<S, St>
 where
-    S: identity_state::State,
-    S::Name: identity_state::IsSet,
+    St: identity_state::State,
+    St::Name: identity_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Identity<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Identity<S> {
         Identity {
             accent: self._fields.0,
             description: self._fields.1,
@@ -271,11 +271,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Identity<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Identity<S> {
         Identity {
             accent: self._fields.0,
             description: self._fields.1,

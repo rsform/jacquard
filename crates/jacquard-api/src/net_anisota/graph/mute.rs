@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,11 +34,11 @@ use crate::net_anisota::graph::mute;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ContentTypes<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ContentTypes<S: BosStr = DefaultStr> {
     ///Mute regular posts from this account  Defaults to `true`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_content_types_posts")]
@@ -67,11 +67,11 @@ pub struct ContentTypes<S: Bos<str> + AsRef<str> = DefaultStr> {
     rename = "net.anisota.graph.mute",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Mute<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Mute<S: BosStr = DefaultStr> {
     ///Types of content to mute from this account
     #[serde(skip_serializing_if = "Option::is_none")]
     pub content_types: Option<mute::ContentTypes<S>>,
@@ -98,24 +98,24 @@ pub struct Mute<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct MuteGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct MuteGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Mute<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Mute<S> {
+impl<S: BosStr> Mute<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, MuteRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ContentTypes<S> {
+impl<S: BosStr> LexiconSchema for ContentTypes<S> {
     fn nsid() -> &'static str {
         "net.anisota.graph.mute"
     }
@@ -137,17 +137,17 @@ pub struct MuteRecord;
 impl XrpcResp for MuteRecord {
     const NSID: &'static str = "net.anisota.graph.mute";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = MuteGetRecordOutput<S>;
+    type Output<S: BosStr> = MuteGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<MuteGetRecordOutput<S>> for Mute<S> {
+impl<S: BosStr> From<MuteGetRecordOutput<S>> for Mute<S> {
     fn from(output: MuteGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Mute<S> {
+impl<S: BosStr> Collection for Mute<S> {
     const NSID: &'static str = "net.anisota.graph.mute";
     type Record = MuteRecord;
 }
@@ -157,7 +157,7 @@ impl Collection for MuteRecord {
     type Record = MuteRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Mute<S> {
+impl<S: BosStr> LexiconSchema for Mute<S> {
     fn nsid() -> &'static str {
         "net.anisota.graph.mute"
     }
@@ -390,17 +390,17 @@ pub mod mute_state {
         type Subject = Unset;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
-        type Subject = S::Subject;
+        type Subject = St::Subject;
     }
     ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type CreatedAt = S::CreatedAt;
+    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubject<St> {}
+    impl<St: State> State for SetSubject<St> {
+        type CreatedAt = St::CreatedAt;
         type Subject = Set<members::subject>;
     }
     /// Marker types for field names
@@ -413,9 +413,9 @@ pub mod mute_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct MuteBuilder<'a, S: mute_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct MuteBuilder<S: BosStr, St: mute_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<mute::ContentTypes<S>>,
         Option<Datetime>,
@@ -424,28 +424,28 @@ pub struct MuteBuilder<'a, S: mute_state::State> {
         Option<Did<S>>,
         Option<Vec<AtUri<S>>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Mute<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> MuteBuilder<'a, mute_state::Empty> {
+impl<S: BosStr> Mute<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> MuteBuilder<S, mute_state::Empty> {
         MuteBuilder::new()
     }
 }
 
-impl<'a> MuteBuilder<'a, mute_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> MuteBuilder<S, mute_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         MuteBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: mute_state::State> MuteBuilder<'a, S> {
+impl<S: BosStr, St: mute_state::State> MuteBuilder<S, St> {
     /// Set the `contentTypes` field (optional)
     pub fn content_types(
         mut self,
@@ -461,26 +461,26 @@ impl<'a, S: mute_state::State> MuteBuilder<'a, S> {
     }
 }
 
-impl<'a, S> MuteBuilder<'a, S>
+impl<S: BosStr, St> MuteBuilder<S, St>
 where
-    S: mute_state::State,
-    S::CreatedAt: mute_state::IsUnset,
+    St: mute_state::State,
+    St::CreatedAt: mute_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> MuteBuilder<'a, mute_state::SetCreatedAt<S>> {
+    ) -> MuteBuilder<S, mute_state::SetCreatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         MuteBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: mute_state::State> MuteBuilder<'a, S> {
+impl<S: BosStr, St: mute_state::State> MuteBuilder<S, St> {
     /// Set the `expiresAt` field (optional)
     pub fn expires_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.2 = value.into();
@@ -493,7 +493,7 @@ impl<'a, S: mute_state::State> MuteBuilder<'a, S> {
     }
 }
 
-impl<'a, S: mute_state::State> MuteBuilder<'a, S> {
+impl<S: BosStr, St: mute_state::State> MuteBuilder<S, St> {
     /// Set the `reason` field (optional)
     pub fn reason(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -506,26 +506,26 @@ impl<'a, S: mute_state::State> MuteBuilder<'a, S> {
     }
 }
 
-impl<'a, S> MuteBuilder<'a, S>
+impl<S: BosStr, St> MuteBuilder<S, St>
 where
-    S: mute_state::State,
-    S::Subject: mute_state::IsUnset,
+    St: mute_state::State,
+    St::Subject: mute_state::IsUnset,
 {
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> MuteBuilder<'a, mute_state::SetSubject<S>> {
+    ) -> MuteBuilder<S, mute_state::SetSubject<St>> {
         self._fields.4 = Option::Some(value.into());
         MuteBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: mute_state::State> MuteBuilder<'a, S> {
+impl<S: BosStr, St: mute_state::State> MuteBuilder<S, St> {
     /// Set the `targetFeeds` field (optional)
     pub fn target_feeds(mut self, value: impl Into<Option<Vec<AtUri<S>>>>) -> Self {
         self._fields.5 = value.into();
@@ -538,14 +538,14 @@ impl<'a, S: mute_state::State> MuteBuilder<'a, S> {
     }
 }
 
-impl<'a, S> MuteBuilder<'a, S>
+impl<S: BosStr, St> MuteBuilder<S, St>
 where
-    S: mute_state::State,
-    S::CreatedAt: mute_state::IsSet,
-    S::Subject: mute_state::IsSet,
+    St: mute_state::State,
+    St::CreatedAt: mute_state::IsSet,
+    St::Subject: mute_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Mute<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Mute<S> {
         Mute {
             content_types: self._fields.0,
             created_at: self._fields.1.unwrap(),
@@ -556,8 +556,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Mute<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Mute<S> {
         Mute {
             content_types: self._fields.0,
             created_at: self._fields.1.unwrap(),

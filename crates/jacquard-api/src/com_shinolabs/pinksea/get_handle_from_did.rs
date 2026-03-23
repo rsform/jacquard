@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::string::Handle;
@@ -19,33 +19,30 @@ use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetHandleFromDid<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct GetHandleFromDid<S: BosStr = DefaultStr> {
     pub did: AtIdentifier<S>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetHandleFromDidOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetHandleFromDidOutput<S: BosStr = DefaultStr> {
     ///The handle.
     pub handle: Handle<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -54,12 +51,11 @@ pub struct GetHandleFromDidResponse;
 impl jacquard_common::xrpc::XrpcResp for GetHandleFromDidResponse {
     const NSID: &'static str = "com.shinolabs.pinksea.getHandleFromDid";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetHandleFromDidOutput<S>;
+    type Output<S: BosStr> = GetHandleFromDidOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetHandleFromDid<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetHandleFromDid<S> {
     const NSID: &'static str = "com.shinolabs.pinksea.getHandleFromDid";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetHandleFromDidResponse;
@@ -70,7 +66,7 @@ pub struct GetHandleFromDidRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetHandleFromDidRequest {
     const PATH: &'static str = "/xrpc/com.shinolabs.pinksea.getHandleFromDid";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetHandleFromDid<S>;
+    type Request<S: BosStr> = GetHandleFromDid<S>;
     type Response = GetHandleFromDidResponse;
 }
 
@@ -93,9 +89,9 @@ pub mod get_handle_from_did_state {
         type Did = Unset;
     }
     ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
         type Did = Set<members::did>;
     }
     /// Marker types for field names
@@ -106,57 +102,57 @@ pub mod get_handle_from_did_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetHandleFromDidBuilder<'a, S: get_handle_from_did_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetHandleFromDidBuilder<S: BosStr, St: get_handle_from_did_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtIdentifier<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetHandleFromDid<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetHandleFromDidBuilder<'a, get_handle_from_did_state::Empty> {
+impl<S: BosStr> GetHandleFromDid<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetHandleFromDidBuilder<S, get_handle_from_did_state::Empty> {
         GetHandleFromDidBuilder::new()
     }
 }
 
-impl<'a> GetHandleFromDidBuilder<'a, get_handle_from_did_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetHandleFromDidBuilder<S, get_handle_from_did_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetHandleFromDidBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetHandleFromDidBuilder<'a, S>
+impl<S: BosStr, St> GetHandleFromDidBuilder<S, St>
 where
-    S: get_handle_from_did_state::State,
-    S::Did: get_handle_from_did_state::IsUnset,
+    St: get_handle_from_did_state::State,
+    St::Did: get_handle_from_did_state::IsUnset,
 {
     /// Set the `did` field (required)
     pub fn did(
         mut self,
         value: impl Into<AtIdentifier<S>>,
-    ) -> GetHandleFromDidBuilder<'a, get_handle_from_did_state::SetDid<S>> {
+    ) -> GetHandleFromDidBuilder<S, get_handle_from_did_state::SetDid<St>> {
         self._fields.0 = Option::Some(value.into());
         GetHandleFromDidBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetHandleFromDidBuilder<'a, S>
+impl<S: BosStr, St> GetHandleFromDidBuilder<S, St>
 where
-    S: get_handle_from_did_state::State,
-    S::Did: get_handle_from_did_state::IsSet,
+    St: get_handle_from_did_state::State,
+    St::Did: get_handle_from_did_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetHandleFromDid<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetHandleFromDid<S> {
         GetHandleFromDid {
             did: self._fields.0.unwrap(),
         }

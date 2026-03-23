@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use crate::app_certified::Did;
     rename = "org.hypercerts.funding.receipt",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Receipt<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Receipt<S: BosStr = DefaultStr> {
     ///Amount of funding received as a numeric string (e.g. '1000.50').
     pub amount: S,
     ///Client-declared timestamp when this receipt record was created.
@@ -79,18 +79,18 @@ pub struct Receipt<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ReceiptGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ReceiptGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Receipt<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Receipt<S> {
+impl<S: BosStr> Receipt<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, ReceiptRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -103,17 +103,17 @@ pub struct ReceiptRecord;
 impl XrpcResp for ReceiptRecord {
     const NSID: &'static str = "org.hypercerts.funding.receipt";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ReceiptGetRecordOutput<S>;
+    type Output<S: BosStr> = ReceiptGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<ReceiptGetRecordOutput<S>> for Receipt<S> {
+impl<S: BosStr> From<ReceiptGetRecordOutput<S>> for Receipt<S> {
     fn from(output: ReceiptGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Receipt<S> {
+impl<S: BosStr> Collection for Receipt<S> {
     const NSID: &'static str = "org.hypercerts.funding.receipt";
     type Record = ReceiptRecord;
 }
@@ -123,7 +123,7 @@ impl Collection for ReceiptRecord {
     type Record = ReceiptRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Receipt<S> {
+impl<S: BosStr> LexiconSchema for Receipt<S> {
     fn nsid() -> &'static str {
         "org.hypercerts.funding.receipt"
     }
@@ -224,8 +224,8 @@ pub mod receipt_state {
         type Currency;
         type Amount;
         type CreatedAt;
-        type To;
         type From;
+        type To;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -234,58 +234,58 @@ pub mod receipt_state {
         type Currency = Unset;
         type Amount = Unset;
         type CreatedAt = Unset;
-        type To = Unset;
         type From = Unset;
+        type To = Unset;
     }
     ///State transition - sets the `currency` field to Set
-    pub struct SetCurrency<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCurrency<S> {}
-    impl<S: State> State for SetCurrency<S> {
+    pub struct SetCurrency<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCurrency<St> {}
+    impl<St: State> State for SetCurrency<St> {
         type Currency = Set<members::currency>;
-        type Amount = S::Amount;
-        type CreatedAt = S::CreatedAt;
-        type To = S::To;
-        type From = S::From;
+        type Amount = St::Amount;
+        type CreatedAt = St::CreatedAt;
+        type From = St::From;
+        type To = St::To;
     }
     ///State transition - sets the `amount` field to Set
-    pub struct SetAmount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAmount<S> {}
-    impl<S: State> State for SetAmount<S> {
-        type Currency = S::Currency;
+    pub struct SetAmount<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAmount<St> {}
+    impl<St: State> State for SetAmount<St> {
+        type Currency = St::Currency;
         type Amount = Set<members::amount>;
-        type CreatedAt = S::CreatedAt;
-        type To = S::To;
-        type From = S::From;
+        type CreatedAt = St::CreatedAt;
+        type From = St::From;
+        type To = St::To;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Currency = S::Currency;
-        type Amount = S::Amount;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Currency = St::Currency;
+        type Amount = St::Amount;
         type CreatedAt = Set<members::created_at>;
-        type To = S::To;
-        type From = S::From;
-    }
-    ///State transition - sets the `to` field to Set
-    pub struct SetTo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTo<S> {}
-    impl<S: State> State for SetTo<S> {
-        type Currency = S::Currency;
-        type Amount = S::Amount;
-        type CreatedAt = S::CreatedAt;
-        type To = Set<members::to>;
-        type From = S::From;
+        type From = St::From;
+        type To = St::To;
     }
     ///State transition - sets the `from` field to Set
-    pub struct SetFrom<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFrom<S> {}
-    impl<S: State> State for SetFrom<S> {
-        type Currency = S::Currency;
-        type Amount = S::Amount;
-        type CreatedAt = S::CreatedAt;
-        type To = S::To;
+    pub struct SetFrom<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetFrom<St> {}
+    impl<St: State> State for SetFrom<St> {
+        type Currency = St::Currency;
+        type Amount = St::Amount;
+        type CreatedAt = St::CreatedAt;
         type From = Set<members::from>;
+        type To = St::To;
+    }
+    ///State transition - sets the `to` field to Set
+    pub struct SetTo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTo<St> {}
+    impl<St: State> State for SetTo<St> {
+        type Currency = St::Currency;
+        type Amount = St::Amount;
+        type CreatedAt = St::CreatedAt;
+        type From = St::From;
+        type To = Set<members::to>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -296,16 +296,16 @@ pub mod receipt_state {
         pub struct amount(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `to` field
-        pub struct to(());
         ///Marker type for the `from` field
         pub struct from(());
+        ///Marker type for the `to` field
+        pub struct to(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ReceiptBuilder<'a, S: receipt_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ReceiptBuilder<S: BosStr, St: receipt_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
         Option<Datetime>,
@@ -319,85 +319,85 @@ pub struct ReceiptBuilder<'a, S: receipt_state::State> {
         Option<S>,
         Option<S>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Receipt<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ReceiptBuilder<'a, receipt_state::Empty> {
+impl<S: BosStr> Receipt<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ReceiptBuilder<S, receipt_state::Empty> {
         ReceiptBuilder::new()
     }
 }
 
-impl<'a> ReceiptBuilder<'a, receipt_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ReceiptBuilder<S, receipt_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ReceiptBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ReceiptBuilder<'a, S>
+impl<S: BosStr, St> ReceiptBuilder<S, St>
 where
-    S: receipt_state::State,
-    S::Amount: receipt_state::IsUnset,
+    St: receipt_state::State,
+    St::Amount: receipt_state::IsUnset,
 {
     /// Set the `amount` field (required)
     pub fn amount(
         mut self,
         value: impl Into<S>,
-    ) -> ReceiptBuilder<'a, receipt_state::SetAmount<S>> {
+    ) -> ReceiptBuilder<S, receipt_state::SetAmount<St>> {
         self._fields.0 = Option::Some(value.into());
         ReceiptBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ReceiptBuilder<'a, S>
+impl<S: BosStr, St> ReceiptBuilder<S, St>
 where
-    S: receipt_state::State,
-    S::CreatedAt: receipt_state::IsUnset,
+    St: receipt_state::State,
+    St::CreatedAt: receipt_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ReceiptBuilder<'a, receipt_state::SetCreatedAt<S>> {
+    ) -> ReceiptBuilder<S, receipt_state::SetCreatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         ReceiptBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ReceiptBuilder<'a, S>
+impl<S: BosStr, St> ReceiptBuilder<S, St>
 where
-    S: receipt_state::State,
-    S::Currency: receipt_state::IsUnset,
+    St: receipt_state::State,
+    St::Currency: receipt_state::IsUnset,
 {
     /// Set the `currency` field (required)
     pub fn currency(
         mut self,
         value: impl Into<S>,
-    ) -> ReceiptBuilder<'a, receipt_state::SetCurrency<S>> {
+    ) -> ReceiptBuilder<S, receipt_state::SetCurrency<St>> {
         self._fields.2 = Option::Some(value.into());
         ReceiptBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: receipt_state::State> ReceiptBuilder<'a, S> {
+impl<S: BosStr, St: receipt_state::State> ReceiptBuilder<S, St> {
     /// Set the `for` field (optional)
     pub fn r#for(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -410,26 +410,26 @@ impl<'a, S: receipt_state::State> ReceiptBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ReceiptBuilder<'a, S>
+impl<S: BosStr, St> ReceiptBuilder<S, St>
 where
-    S: receipt_state::State,
-    S::From: receipt_state::IsUnset,
+    St: receipt_state::State,
+    St::From: receipt_state::IsUnset,
 {
     /// Set the `from` field (required)
     pub fn from(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> ReceiptBuilder<'a, receipt_state::SetFrom<S>> {
+    ) -> ReceiptBuilder<S, receipt_state::SetFrom<St>> {
         self._fields.4 = Option::Some(value.into());
         ReceiptBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: receipt_state::State> ReceiptBuilder<'a, S> {
+impl<S: BosStr, St: receipt_state::State> ReceiptBuilder<S, St> {
     /// Set the `notes` field (optional)
     pub fn notes(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
@@ -442,7 +442,7 @@ impl<'a, S: receipt_state::State> ReceiptBuilder<'a, S> {
     }
 }
 
-impl<'a, S: receipt_state::State> ReceiptBuilder<'a, S> {
+impl<S: BosStr, St: receipt_state::State> ReceiptBuilder<S, St> {
     /// Set the `occurredAt` field (optional)
     pub fn occurred_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.6 = value.into();
@@ -455,7 +455,7 @@ impl<'a, S: receipt_state::State> ReceiptBuilder<'a, S> {
     }
 }
 
-impl<'a, S: receipt_state::State> ReceiptBuilder<'a, S> {
+impl<S: BosStr, St: receipt_state::State> ReceiptBuilder<S, St> {
     /// Set the `paymentNetwork` field (optional)
     pub fn payment_network(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.7 = value.into();
@@ -468,7 +468,7 @@ impl<'a, S: receipt_state::State> ReceiptBuilder<'a, S> {
     }
 }
 
-impl<'a, S: receipt_state::State> ReceiptBuilder<'a, S> {
+impl<S: BosStr, St: receipt_state::State> ReceiptBuilder<S, St> {
     /// Set the `paymentRail` field (optional)
     pub fn payment_rail(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.8 = value.into();
@@ -481,26 +481,26 @@ impl<'a, S: receipt_state::State> ReceiptBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ReceiptBuilder<'a, S>
+impl<S: BosStr, St> ReceiptBuilder<S, St>
 where
-    S: receipt_state::State,
-    S::To: receipt_state::IsUnset,
+    St: receipt_state::State,
+    St::To: receipt_state::IsUnset,
 {
     /// Set the `to` field (required)
     pub fn to(
         mut self,
         value: impl Into<S>,
-    ) -> ReceiptBuilder<'a, receipt_state::SetTo<S>> {
+    ) -> ReceiptBuilder<S, receipt_state::SetTo<St>> {
         self._fields.9 = Option::Some(value.into());
         ReceiptBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: receipt_state::State> ReceiptBuilder<'a, S> {
+impl<S: BosStr, St: receipt_state::State> ReceiptBuilder<S, St> {
     /// Set the `transactionId` field (optional)
     pub fn transaction_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.10 = value.into();
@@ -513,17 +513,17 @@ impl<'a, S: receipt_state::State> ReceiptBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ReceiptBuilder<'a, S>
+impl<S: BosStr, St> ReceiptBuilder<S, St>
 where
-    S: receipt_state::State,
-    S::Currency: receipt_state::IsSet,
-    S::Amount: receipt_state::IsSet,
-    S::CreatedAt: receipt_state::IsSet,
-    S::To: receipt_state::IsSet,
-    S::From: receipt_state::IsSet,
+    St: receipt_state::State,
+    St::Currency: receipt_state::IsSet,
+    St::Amount: receipt_state::IsSet,
+    St::CreatedAt: receipt_state::IsSet,
+    St::From: receipt_state::IsSet,
+    St::To: receipt_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Receipt<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Receipt<S> {
         Receipt {
             amount: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
@@ -539,11 +539,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Receipt<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Receipt<S> {
         Receipt {
             amount: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),

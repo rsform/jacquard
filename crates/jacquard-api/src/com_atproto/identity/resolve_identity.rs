@@ -6,48 +6,44 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[allow(unused_imports)]
+use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
+use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 use crate::com_atproto::identity::IdentityInfo;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ResolveIdentity<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct ResolveIdentity<S: BosStr = DefaultStr> {
     pub identifier: AtIdentifier<S>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ResolveIdentityOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ResolveIdentityOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
-    #[serde(borrow)]
     pub value: IdentityInfo<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
-    pub extra_data: Option<
-        alloc::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<S>,
-        >,
-    >,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
@@ -66,19 +62,16 @@ pub struct ResolveIdentityOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 pub enum ResolveIdentityError {
     /// The resolution process confirmed that the handle does not resolve to any DID.
     #[serde(rename = "HandleNotFound")]
-    HandleNotFound(Option<jacquard_common::deps::smol_str::SmolStr>),
+    HandleNotFound(Option<SmolStr>),
     /// The DID resolution process confirmed that there is no current DID.
     #[serde(rename = "DidNotFound")]
-    DidNotFound(Option<jacquard_common::deps::smol_str::SmolStr>),
+    DidNotFound(Option<SmolStr>),
     /// The DID previously existed, but has been deactivated.
     #[serde(rename = "DidDeactivated")]
-    DidDeactivated(Option<jacquard_common::deps::smol_str::SmolStr>),
+    DidDeactivated(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: jacquard_common::deps::smol_str::SmolStr,
-        message: Option<jacquard_common::deps::smol_str::SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for ResolveIdentityError {
@@ -121,12 +114,11 @@ pub struct ResolveIdentityResponse;
 impl jacquard_common::xrpc::XrpcResp for ResolveIdentityResponse {
     const NSID: &'static str = "com.atproto.identity.resolveIdentity";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ResolveIdentityOutput<S>;
+    type Output<S: BosStr> = ResolveIdentityOutput<S>;
     type Err = ResolveIdentityError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for ResolveIdentity<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ResolveIdentity<S> {
     const NSID: &'static str = "com.atproto.identity.resolveIdentity";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ResolveIdentityResponse;
@@ -137,7 +129,7 @@ pub struct ResolveIdentityRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ResolveIdentityRequest {
     const PATH: &'static str = "/xrpc/com.atproto.identity.resolveIdentity";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = ResolveIdentity<S>;
+    type Request<S: BosStr> = ResolveIdentity<S>;
     type Response = ResolveIdentityResponse;
 }
 
@@ -160,9 +152,9 @@ pub mod resolve_identity_state {
         type Identifier = Unset;
     }
     ///State transition - sets the `identifier` field to Set
-    pub struct SetIdentifier<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIdentifier<S> {}
-    impl<S: State> State for SetIdentifier<S> {
+    pub struct SetIdentifier<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIdentifier<St> {}
+    impl<St: State> State for SetIdentifier<St> {
         type Identifier = Set<members::identifier>;
     }
     /// Marker types for field names
@@ -173,57 +165,57 @@ pub mod resolve_identity_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ResolveIdentityBuilder<'a, S: resolve_identity_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ResolveIdentityBuilder<S: BosStr, St: resolve_identity_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtIdentifier<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ResolveIdentity<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ResolveIdentityBuilder<'a, resolve_identity_state::Empty> {
+impl<S: BosStr> ResolveIdentity<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ResolveIdentityBuilder<S, resolve_identity_state::Empty> {
         ResolveIdentityBuilder::new()
     }
 }
 
-impl<'a> ResolveIdentityBuilder<'a, resolve_identity_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ResolveIdentityBuilder<S, resolve_identity_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ResolveIdentityBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ResolveIdentityBuilder<'a, S>
+impl<S: BosStr, St> ResolveIdentityBuilder<S, St>
 where
-    S: resolve_identity_state::State,
-    S::Identifier: resolve_identity_state::IsUnset,
+    St: resolve_identity_state::State,
+    St::Identifier: resolve_identity_state::IsUnset,
 {
     /// Set the `identifier` field (required)
     pub fn identifier(
         mut self,
         value: impl Into<AtIdentifier<S>>,
-    ) -> ResolveIdentityBuilder<'a, resolve_identity_state::SetIdentifier<S>> {
+    ) -> ResolveIdentityBuilder<S, resolve_identity_state::SetIdentifier<St>> {
         self._fields.0 = Option::Some(value.into());
         ResolveIdentityBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ResolveIdentityBuilder<'a, S>
+impl<S: BosStr, St> ResolveIdentityBuilder<S, St>
 where
-    S: resolve_identity_state::State,
-    S::Identifier: resolve_identity_state::IsSet,
+    St: resolve_identity_state::State,
+    St::Identifier: resolve_identity_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ResolveIdentity<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ResolveIdentity<S> {
         ResolveIdentity {
             identifier: self._fields.0.unwrap(),
         }

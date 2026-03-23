@@ -12,7 +12,7 @@ pub mod get_files;
 
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -31,11 +31,11 @@ use crate::app_rocksky::googledrive;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct FileListView<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct FileListView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub files: Option<Vec<googledrive::FileView<S>>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -47,11 +47,11 @@ pub struct FileListView<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct FileView<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct FileView<S: BosStr = DefaultStr> {
     ///The unique identifier of the file.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<S>,
@@ -59,7 +59,7 @@ pub struct FileView<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for FileListView<S> {
+impl<S: BosStr> LexiconSchema for FileListView<S> {
     fn nsid() -> &'static str {
         "app.rocksky.googledrive.defs"
     }
@@ -74,7 +74,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for FileListView<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for FileView<S> {
+impl<S: BosStr> LexiconSchema for FileView<S> {
     fn nsid() -> &'static str {
         "app.rocksky.googledrive.defs"
     }

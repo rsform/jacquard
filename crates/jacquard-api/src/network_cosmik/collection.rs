@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "network.cosmik.collection",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Collection<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Collection<S: BosStr = DefaultStr> {
     ///Access control for the collection
     pub access_type: CollectionAccessType<S>,
     ///List of collaborator DIDs who can add cards to closed collections
@@ -63,13 +63,13 @@ pub struct Collection<S: Bos<str> + AsRef<str> = DefaultStr> {
 /// Access control for the collection
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum CollectionAccessType<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum CollectionAccessType<S: BosStr = DefaultStr> {
     Open,
     Closed,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> CollectionAccessType<S> {
+impl<S: BosStr> CollectionAccessType<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Open => "OPEN",
@@ -87,19 +87,19 @@ impl<S: Bos<str> + AsRef<str>> CollectionAccessType<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for CollectionAccessType<S> {
+impl<S: BosStr> core::fmt::Display for CollectionAccessType<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for CollectionAccessType<S> {
+impl<S: BosStr> AsRef<str> for CollectionAccessType<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for CollectionAccessType<S> {
+impl<S: BosStr> Serialize for CollectionAccessType<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -108,8 +108,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for CollectionAccessType<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for CollectionAccessType<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for CollectionAccessType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -119,14 +118,18 @@ for CollectionAccessType<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for CollectionAccessType<S> {
+impl<S: BosStr + Default> Default for CollectionAccessType<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for CollectionAccessType<S> {
-    type Output = CollectionAccessType<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for CollectionAccessType<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = CollectionAccessType<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             CollectionAccessType::Open => CollectionAccessType::Open,
@@ -144,18 +147,18 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for CollectionAccessType<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CollectionGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CollectionGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Collection<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection<S> {
+impl<S: BosStr> Collection<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, CollectionRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -168,18 +171,17 @@ pub struct CollectionRecord;
 impl XrpcResp for CollectionRecord {
     const NSID: &'static str = "network.cosmik.collection";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = CollectionGetRecordOutput<S>;
+    type Output<S: BosStr> = CollectionGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<CollectionGetRecordOutput<S>> for Collection<S> {
+impl<S: BosStr> From<CollectionGetRecordOutput<S>> for Collection<S> {
     fn from(output: CollectionGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> jacquard_common::types::collection::Collection
-for Collection<S> {
+impl<S: BosStr> jacquard_common::types::collection::Collection for Collection<S> {
     const NSID: &'static str = "network.cosmik.collection";
     type Record = CollectionRecord;
 }
@@ -189,7 +191,7 @@ impl jacquard_common::types::collection::Collection for CollectionRecord {
     type Record = CollectionRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Collection<S> {
+impl<S: BosStr> LexiconSchema for Collection<S> {
     fn nsid() -> &'static str {
         "network.cosmik.collection"
     }
@@ -235,43 +237,43 @@ pub mod collection_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type AccessType;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type AccessType = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type AccessType = S::AccessType;
+        type Name = Unset;
     }
     ///State transition - sets the `access_type` field to Set
-    pub struct SetAccessType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAccessType<S> {}
-    impl<S: State> State for SetAccessType<S> {
-        type Name = S::Name;
+    pub struct SetAccessType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAccessType<St> {}
+    impl<St: State> State for SetAccessType<St> {
         type AccessType = Set<members::access_type>;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type AccessType = St::AccessType;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `access_type` field
         pub struct access_type(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct CollectionBuilder<'a, S: collection_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct CollectionBuilder<S: BosStr, St: collection_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<CollectionAccessType<S>>,
         Option<Vec<S>>,
@@ -280,47 +282,47 @@ pub struct CollectionBuilder<'a, S: collection_state::State> {
         Option<S>,
         Option<Datetime>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Collection<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> CollectionBuilder<'a, collection_state::Empty> {
+impl<S: BosStr> Collection<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> CollectionBuilder<S, collection_state::Empty> {
         CollectionBuilder::new()
     }
 }
 
-impl<'a> CollectionBuilder<'a, collection_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> CollectionBuilder<S, collection_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         CollectionBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CollectionBuilder<'a, S>
+impl<S: BosStr, St> CollectionBuilder<S, St>
 where
-    S: collection_state::State,
-    S::AccessType: collection_state::IsUnset,
+    St: collection_state::State,
+    St::AccessType: collection_state::IsUnset,
 {
     /// Set the `accessType` field (required)
     pub fn access_type(
         mut self,
         value: impl Into<CollectionAccessType<S>>,
-    ) -> CollectionBuilder<'a, collection_state::SetAccessType<S>> {
+    ) -> CollectionBuilder<S, collection_state::SetAccessType<St>> {
         self._fields.0 = Option::Some(value.into());
         CollectionBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
+impl<S: BosStr, St: collection_state::State> CollectionBuilder<S, St> {
     /// Set the `collaborators` field (optional)
     pub fn collaborators(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -333,7 +335,7 @@ impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
     }
 }
 
-impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
+impl<S: BosStr, St: collection_state::State> CollectionBuilder<S, St> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.2 = value.into();
@@ -346,7 +348,7 @@ impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
     }
 }
 
-impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
+impl<S: BosStr, St: collection_state::State> CollectionBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -359,26 +361,26 @@ impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
     }
 }
 
-impl<'a, S> CollectionBuilder<'a, S>
+impl<S: BosStr, St> CollectionBuilder<S, St>
 where
-    S: collection_state::State,
-    S::Name: collection_state::IsUnset,
+    St: collection_state::State,
+    St::Name: collection_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> CollectionBuilder<'a, collection_state::SetName<S>> {
+    ) -> CollectionBuilder<S, collection_state::SetName<St>> {
         self._fields.4 = Option::Some(value.into());
         CollectionBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
+impl<S: BosStr, St: collection_state::State> CollectionBuilder<S, St> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.5 = value.into();
@@ -391,14 +393,14 @@ impl<'a, S: collection_state::State> CollectionBuilder<'a, S> {
     }
 }
 
-impl<'a, S> CollectionBuilder<'a, S>
+impl<S: BosStr, St> CollectionBuilder<S, St>
 where
-    S: collection_state::State,
-    S::Name: collection_state::IsSet,
-    S::AccessType: collection_state::IsSet,
+    St: collection_state::State,
+    St::AccessType: collection_state::IsSet,
+    St::Name: collection_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Collection<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Collection<S> {
         Collection {
             access_type: self._fields.0.unwrap(),
             collaborators: self._fields.1,
@@ -409,11 +411,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Collection<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Collection<S> {
         Collection {
             access_type: self._fields.0.unwrap(),
             collaborators: self._fields.1,

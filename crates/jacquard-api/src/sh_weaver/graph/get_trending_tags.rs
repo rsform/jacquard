@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
@@ -28,18 +28,16 @@ pub struct GetTrendingTags {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetTrendingTagsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetTrendingTagsOutput<S: BosStr = DefaultStr> {
     pub tags: Vec<TagView<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -48,7 +46,7 @@ pub struct GetTrendingTagsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetTrendingTagsResponse {
     const NSID: &'static str = "sh.weaver.graph.getTrendingTags";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetTrendingTagsOutput<S>;
+    type Output<S: BosStr> = GetTrendingTagsOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
@@ -63,7 +61,7 @@ pub struct GetTrendingTagsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetTrendingTagsRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.graph.getTrendingTags";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetTrendingTags;
+    type Request<S: BosStr> = GetTrendingTags;
     type Response = GetTrendingTagsResponse;
 }
 
@@ -90,21 +88,21 @@ pub mod get_trending_tags_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetTrendingTagsBuilder<S: get_trending_tags_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetTrendingTagsBuilder<St: get_trending_tags_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>,),
 }
 
 impl GetTrendingTags {
-    /// Create a new builder for this type
+    /// Create a new builder for this type.
     pub fn new() -> GetTrendingTagsBuilder<get_trending_tags_state::Empty> {
         GetTrendingTagsBuilder::new()
     }
 }
 
 impl GetTrendingTagsBuilder<get_trending_tags_state::Empty> {
-    /// Create a new builder with all fields unset
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetTrendingTagsBuilder {
             _state: PhantomData,
@@ -113,7 +111,7 @@ impl GetTrendingTagsBuilder<get_trending_tags_state::Empty> {
     }
 }
 
-impl<S: get_trending_tags_state::State> GetTrendingTagsBuilder<S> {
+impl<St: get_trending_tags_state::State> GetTrendingTagsBuilder<St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
@@ -126,11 +124,11 @@ impl<S: get_trending_tags_state::State> GetTrendingTagsBuilder<S> {
     }
 }
 
-impl<S> GetTrendingTagsBuilder<S>
+impl<St> GetTrendingTagsBuilder<St>
 where
-    S: get_trending_tags_state::State,
+    St: get_trending_tags_state::State,
 {
-    /// Build the final struct
+    /// Build the final struct.
     pub fn build(self) -> GetTrendingTags {
         GetTrendingTags {
             limit: self._fields.0,

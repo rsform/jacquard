@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -40,11 +40,11 @@ use crate::social_showcase::VisibilitySettings;
     rename = "social.showcase.profile.preferences",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Preferences<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Preferences<S: BosStr = DefaultStr> {
     pub activity: ActivitySettings<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub display: Option<DisplaySettings<S>>,
@@ -66,18 +66,18 @@ pub struct Preferences<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct PreferencesGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct PreferencesGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Preferences<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Preferences<S> {
+impl<S: BosStr> Preferences<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, PreferencesRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -90,17 +90,17 @@ pub struct PreferencesRecord;
 impl XrpcResp for PreferencesRecord {
     const NSID: &'static str = "social.showcase.profile.preferences";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = PreferencesGetRecordOutput<S>;
+    type Output<S: BosStr> = PreferencesGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<PreferencesGetRecordOutput<S>> for Preferences<S> {
+impl<S: BosStr> From<PreferencesGetRecordOutput<S>> for Preferences<S> {
     fn from(output: PreferencesGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Preferences<S> {
+impl<S: BosStr> Collection for Preferences<S> {
     const NSID: &'static str = "social.showcase.profile.preferences";
     type Record = PreferencesRecord;
 }
@@ -110,7 +110,7 @@ impl Collection for PreferencesRecord {
     type Record = PreferencesRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Preferences<S> {
+impl<S: BosStr> LexiconSchema for Preferences<S> {
     fn nsid() -> &'static str {
         "social.showcase.profile.preferences"
     }
@@ -139,91 +139,91 @@ pub mod preferences_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Visibility;
-        type Privacy;
         type Activity;
+        type Privacy;
         type UpdatedAt;
+        type Visibility;
         type Notifications;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Visibility = Unset;
-        type Privacy = Unset;
         type Activity = Unset;
+        type Privacy = Unset;
         type UpdatedAt = Unset;
+        type Visibility = Unset;
         type Notifications = Unset;
     }
-    ///State transition - sets the `visibility` field to Set
-    pub struct SetVisibility<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVisibility<S> {}
-    impl<S: State> State for SetVisibility<S> {
-        type Visibility = Set<members::visibility>;
-        type Privacy = S::Privacy;
-        type Activity = S::Activity;
-        type UpdatedAt = S::UpdatedAt;
-        type Notifications = S::Notifications;
+    ///State transition - sets the `activity` field to Set
+    pub struct SetActivity<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetActivity<St> {}
+    impl<St: State> State for SetActivity<St> {
+        type Activity = Set<members::activity>;
+        type Privacy = St::Privacy;
+        type UpdatedAt = St::UpdatedAt;
+        type Visibility = St::Visibility;
+        type Notifications = St::Notifications;
     }
     ///State transition - sets the `privacy` field to Set
-    pub struct SetPrivacy<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPrivacy<S> {}
-    impl<S: State> State for SetPrivacy<S> {
-        type Visibility = S::Visibility;
+    pub struct SetPrivacy<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPrivacy<St> {}
+    impl<St: State> State for SetPrivacy<St> {
+        type Activity = St::Activity;
         type Privacy = Set<members::privacy>;
-        type Activity = S::Activity;
-        type UpdatedAt = S::UpdatedAt;
-        type Notifications = S::Notifications;
-    }
-    ///State transition - sets the `activity` field to Set
-    pub struct SetActivity<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetActivity<S> {}
-    impl<S: State> State for SetActivity<S> {
-        type Visibility = S::Visibility;
-        type Privacy = S::Privacy;
-        type Activity = Set<members::activity>;
-        type UpdatedAt = S::UpdatedAt;
-        type Notifications = S::Notifications;
+        type UpdatedAt = St::UpdatedAt;
+        type Visibility = St::Visibility;
+        type Notifications = St::Notifications;
     }
     ///State transition - sets the `updated_at` field to Set
-    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
-    impl<S: State> State for SetUpdatedAt<S> {
-        type Visibility = S::Visibility;
-        type Privacy = S::Privacy;
-        type Activity = S::Activity;
+    pub struct SetUpdatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUpdatedAt<St> {}
+    impl<St: State> State for SetUpdatedAt<St> {
+        type Activity = St::Activity;
+        type Privacy = St::Privacy;
         type UpdatedAt = Set<members::updated_at>;
-        type Notifications = S::Notifications;
+        type Visibility = St::Visibility;
+        type Notifications = St::Notifications;
+    }
+    ///State transition - sets the `visibility` field to Set
+    pub struct SetVisibility<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetVisibility<St> {}
+    impl<St: State> State for SetVisibility<St> {
+        type Activity = St::Activity;
+        type Privacy = St::Privacy;
+        type UpdatedAt = St::UpdatedAt;
+        type Visibility = Set<members::visibility>;
+        type Notifications = St::Notifications;
     }
     ///State transition - sets the `notifications` field to Set
-    pub struct SetNotifications<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNotifications<S> {}
-    impl<S: State> State for SetNotifications<S> {
-        type Visibility = S::Visibility;
-        type Privacy = S::Privacy;
-        type Activity = S::Activity;
-        type UpdatedAt = S::UpdatedAt;
+    pub struct SetNotifications<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetNotifications<St> {}
+    impl<St: State> State for SetNotifications<St> {
+        type Activity = St::Activity;
+        type Privacy = St::Privacy;
+        type UpdatedAt = St::UpdatedAt;
+        type Visibility = St::Visibility;
         type Notifications = Set<members::notifications>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `visibility` field
-        pub struct visibility(());
-        ///Marker type for the `privacy` field
-        pub struct privacy(());
         ///Marker type for the `activity` field
         pub struct activity(());
+        ///Marker type for the `privacy` field
+        pub struct privacy(());
         ///Marker type for the `updated_at` field
         pub struct updated_at(());
+        ///Marker type for the `visibility` field
+        pub struct visibility(());
         ///Marker type for the `notifications` field
         pub struct notifications(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct PreferencesBuilder<'a, S: preferences_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct PreferencesBuilder<S: BosStr, St: preferences_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<ActivitySettings<S>>,
         Option<DisplaySettings<S>>,
@@ -233,47 +233,47 @@ pub struct PreferencesBuilder<'a, S: preferences_state::State> {
         Option<Datetime>,
         Option<VisibilitySettings<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Preferences<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> PreferencesBuilder<'a, preferences_state::Empty> {
+impl<S: BosStr> Preferences<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> PreferencesBuilder<S, preferences_state::Empty> {
         PreferencesBuilder::new()
     }
 }
 
-impl<'a> PreferencesBuilder<'a, preferences_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> PreferencesBuilder<S, preferences_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         PreferencesBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PreferencesBuilder<'a, S>
+impl<S: BosStr, St> PreferencesBuilder<S, St>
 where
-    S: preferences_state::State,
-    S::Activity: preferences_state::IsUnset,
+    St: preferences_state::State,
+    St::Activity: preferences_state::IsUnset,
 {
     /// Set the `activity` field (required)
     pub fn activity(
         mut self,
         value: impl Into<ActivitySettings<S>>,
-    ) -> PreferencesBuilder<'a, preferences_state::SetActivity<S>> {
+    ) -> PreferencesBuilder<S, preferences_state::SetActivity<St>> {
         self._fields.0 = Option::Some(value.into());
         PreferencesBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: preferences_state::State> PreferencesBuilder<'a, S> {
+impl<S: BosStr, St: preferences_state::State> PreferencesBuilder<S, St> {
     /// Set the `display` field (optional)
     pub fn display(mut self, value: impl Into<Option<DisplaySettings<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -286,45 +286,45 @@ impl<'a, S: preferences_state::State> PreferencesBuilder<'a, S> {
     }
 }
 
-impl<'a, S> PreferencesBuilder<'a, S>
+impl<S: BosStr, St> PreferencesBuilder<S, St>
 where
-    S: preferences_state::State,
-    S::Notifications: preferences_state::IsUnset,
+    St: preferences_state::State,
+    St::Notifications: preferences_state::IsUnset,
 {
     /// Set the `notifications` field (required)
     pub fn notifications(
         mut self,
         value: impl Into<NotificationSettings<S>>,
-    ) -> PreferencesBuilder<'a, preferences_state::SetNotifications<S>> {
+    ) -> PreferencesBuilder<S, preferences_state::SetNotifications<St>> {
         self._fields.2 = Option::Some(value.into());
         PreferencesBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PreferencesBuilder<'a, S>
+impl<S: BosStr, St> PreferencesBuilder<S, St>
 where
-    S: preferences_state::State,
-    S::Privacy: preferences_state::IsUnset,
+    St: preferences_state::State,
+    St::Privacy: preferences_state::IsUnset,
 {
     /// Set the `privacy` field (required)
     pub fn privacy(
         mut self,
         value: impl Into<PrivacySettings<S>>,
-    ) -> PreferencesBuilder<'a, preferences_state::SetPrivacy<S>> {
+    ) -> PreferencesBuilder<S, preferences_state::SetPrivacy<St>> {
         self._fields.3 = Option::Some(value.into());
         PreferencesBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: preferences_state::State> PreferencesBuilder<'a, S> {
+impl<S: BosStr, St: preferences_state::State> PreferencesBuilder<S, St> {
     /// Set the `schemaVersion` field (optional)
     pub fn schema_version(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.4 = value.into();
@@ -337,55 +337,55 @@ impl<'a, S: preferences_state::State> PreferencesBuilder<'a, S> {
     }
 }
 
-impl<'a, S> PreferencesBuilder<'a, S>
+impl<S: BosStr, St> PreferencesBuilder<S, St>
 where
-    S: preferences_state::State,
-    S::UpdatedAt: preferences_state::IsUnset,
+    St: preferences_state::State,
+    St::UpdatedAt: preferences_state::IsUnset,
 {
     /// Set the `updatedAt` field (required)
     pub fn updated_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> PreferencesBuilder<'a, preferences_state::SetUpdatedAt<S>> {
+    ) -> PreferencesBuilder<S, preferences_state::SetUpdatedAt<St>> {
         self._fields.5 = Option::Some(value.into());
         PreferencesBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PreferencesBuilder<'a, S>
+impl<S: BosStr, St> PreferencesBuilder<S, St>
 where
-    S: preferences_state::State,
-    S::Visibility: preferences_state::IsUnset,
+    St: preferences_state::State,
+    St::Visibility: preferences_state::IsUnset,
 {
     /// Set the `visibility` field (required)
     pub fn visibility(
         mut self,
         value: impl Into<VisibilitySettings<S>>,
-    ) -> PreferencesBuilder<'a, preferences_state::SetVisibility<S>> {
+    ) -> PreferencesBuilder<S, preferences_state::SetVisibility<St>> {
         self._fields.6 = Option::Some(value.into());
         PreferencesBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PreferencesBuilder<'a, S>
+impl<S: BosStr, St> PreferencesBuilder<S, St>
 where
-    S: preferences_state::State,
-    S::Visibility: preferences_state::IsSet,
-    S::Privacy: preferences_state::IsSet,
-    S::Activity: preferences_state::IsSet,
-    S::UpdatedAt: preferences_state::IsSet,
-    S::Notifications: preferences_state::IsSet,
+    St: preferences_state::State,
+    St::Activity: preferences_state::IsSet,
+    St::Privacy: preferences_state::IsSet,
+    St::UpdatedAt: preferences_state::IsSet,
+    St::Visibility: preferences_state::IsSet,
+    St::Notifications: preferences_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Preferences<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Preferences<S> {
         Preferences {
             activity: self._fields.0.unwrap(),
             display: self._fields.1,
@@ -397,11 +397,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Preferences<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Preferences<S> {
         Preferences {
             activity: self._fields.0.unwrap(),
             display: self._fields.1,

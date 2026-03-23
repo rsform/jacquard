@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -38,11 +38,11 @@ use crate::org_hypercerts::Uri;
     rename = "org.hypercerts.helper.workScopeTag",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct WorkScopeTag<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct WorkScopeTag<S: BosStr = DefaultStr> {
     ///Optional array of alternative names or identifiers for this scope.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub aliases: Option<Vec<S>>,
@@ -74,11 +74,11 @@ pub struct WorkScopeTag<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum WorkScopeTagExternalReference<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum WorkScopeTagExternalReference<S: BosStr = DefaultStr> {
     #[serde(rename = "org.hypercerts.defs#uri")]
     Uri(Box<Uri<S>>),
     #[serde(rename = "org.hypercerts.defs#smallBlob")]
@@ -91,18 +91,18 @@ pub enum WorkScopeTagExternalReference<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct WorkScopeTagGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct WorkScopeTagGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: WorkScopeTag<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> WorkScopeTag<S> {
+impl<S: BosStr> WorkScopeTag<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, WorkScopeTagRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -115,17 +115,17 @@ pub struct WorkScopeTagRecord;
 impl XrpcResp for WorkScopeTagRecord {
     const NSID: &'static str = "org.hypercerts.helper.workScopeTag";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = WorkScopeTagGetRecordOutput<S>;
+    type Output<S: BosStr> = WorkScopeTagGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<WorkScopeTagGetRecordOutput<S>> for WorkScopeTag<S> {
+impl<S: BosStr> From<WorkScopeTagGetRecordOutput<S>> for WorkScopeTag<S> {
     fn from(output: WorkScopeTagGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for WorkScopeTag<S> {
+impl<S: BosStr> Collection for WorkScopeTag<S> {
     const NSID: &'static str = "org.hypercerts.helper.workScopeTag";
     type Record = WorkScopeTagRecord;
 }
@@ -135,7 +135,7 @@ impl Collection for WorkScopeTagRecord {
     type Record = WorkScopeTagRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for WorkScopeTag<S> {
+impl<S: BosStr> LexiconSchema for WorkScopeTag<S> {
     fn nsid() -> &'static str {
         "org.hypercerts.helper.workScopeTag"
     }
@@ -224,57 +224,57 @@ pub mod work_scope_tag_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Label;
         type CreatedAt;
         type Key;
+        type Label;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Label = Unset;
         type CreatedAt = Unset;
         type Key = Unset;
-    }
-    ///State transition - sets the `label` field to Set
-    pub struct SetLabel<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLabel<S> {}
-    impl<S: State> State for SetLabel<S> {
-        type Label = Set<members::label>;
-        type CreatedAt = S::CreatedAt;
-        type Key = S::Key;
+        type Label = Unset;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Label = S::Label;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
-        type Key = S::Key;
+        type Key = St::Key;
+        type Label = St::Label;
     }
     ///State transition - sets the `key` field to Set
-    pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetKey<S> {}
-    impl<S: State> State for SetKey<S> {
-        type Label = S::Label;
-        type CreatedAt = S::CreatedAt;
+    pub struct SetKey<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetKey<St> {}
+    impl<St: State> State for SetKey<St> {
+        type CreatedAt = St::CreatedAt;
         type Key = Set<members::key>;
+        type Label = St::Label;
+    }
+    ///State transition - sets the `label` field to Set
+    pub struct SetLabel<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLabel<St> {}
+    impl<St: State> State for SetLabel<St> {
+        type CreatedAt = St::CreatedAt;
+        type Key = St::Key;
+        type Label = Set<members::label>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `label` field
-        pub struct label(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `key` field
         pub struct key(());
+        ///Marker type for the `label` field
+        pub struct label(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct WorkScopeTagBuilder<'a, S: work_scope_tag_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct WorkScopeTagBuilder<S: BosStr, St: work_scope_tag_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<S>>,
         Option<Datetime>,
@@ -285,28 +285,28 @@ pub struct WorkScopeTagBuilder<'a, S: work_scope_tag_state::State> {
         Option<S>,
         Option<StrongRef<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> WorkScopeTag<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> WorkScopeTagBuilder<'a, work_scope_tag_state::Empty> {
+impl<S: BosStr> WorkScopeTag<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> WorkScopeTagBuilder<S, work_scope_tag_state::Empty> {
         WorkScopeTagBuilder::new()
     }
 }
 
-impl<'a> WorkScopeTagBuilder<'a, work_scope_tag_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> WorkScopeTagBuilder<S, work_scope_tag_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         WorkScopeTagBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: work_scope_tag_state::State> WorkScopeTagBuilder<'a, S> {
+impl<S: BosStr, St: work_scope_tag_state::State> WorkScopeTagBuilder<S, St> {
     /// Set the `aliases` field (optional)
     pub fn aliases(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -319,26 +319,26 @@ impl<'a, S: work_scope_tag_state::State> WorkScopeTagBuilder<'a, S> {
     }
 }
 
-impl<'a, S> WorkScopeTagBuilder<'a, S>
+impl<S: BosStr, St> WorkScopeTagBuilder<S, St>
 where
-    S: work_scope_tag_state::State,
-    S::CreatedAt: work_scope_tag_state::IsUnset,
+    St: work_scope_tag_state::State,
+    St::CreatedAt: work_scope_tag_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> WorkScopeTagBuilder<'a, work_scope_tag_state::SetCreatedAt<S>> {
+    ) -> WorkScopeTagBuilder<S, work_scope_tag_state::SetCreatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         WorkScopeTagBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: work_scope_tag_state::State> WorkScopeTagBuilder<'a, S> {
+impl<S: BosStr, St: work_scope_tag_state::State> WorkScopeTagBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -351,7 +351,7 @@ impl<'a, S: work_scope_tag_state::State> WorkScopeTagBuilder<'a, S> {
     }
 }
 
-impl<'a, S: work_scope_tag_state::State> WorkScopeTagBuilder<'a, S> {
+impl<S: BosStr, St: work_scope_tag_state::State> WorkScopeTagBuilder<S, St> {
     /// Set the `externalReference` field (optional)
     pub fn external_reference(
         mut self,
@@ -370,26 +370,26 @@ impl<'a, S: work_scope_tag_state::State> WorkScopeTagBuilder<'a, S> {
     }
 }
 
-impl<'a, S> WorkScopeTagBuilder<'a, S>
+impl<S: BosStr, St> WorkScopeTagBuilder<S, St>
 where
-    S: work_scope_tag_state::State,
-    S::Key: work_scope_tag_state::IsUnset,
+    St: work_scope_tag_state::State,
+    St::Key: work_scope_tag_state::IsUnset,
 {
     /// Set the `key` field (required)
     pub fn key(
         mut self,
         value: impl Into<S>,
-    ) -> WorkScopeTagBuilder<'a, work_scope_tag_state::SetKey<S>> {
+    ) -> WorkScopeTagBuilder<S, work_scope_tag_state::SetKey<St>> {
         self._fields.4 = Option::Some(value.into());
         WorkScopeTagBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: work_scope_tag_state::State> WorkScopeTagBuilder<'a, S> {
+impl<S: BosStr, St: work_scope_tag_state::State> WorkScopeTagBuilder<S, St> {
     /// Set the `kind` field (optional)
     pub fn kind(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
@@ -402,26 +402,26 @@ impl<'a, S: work_scope_tag_state::State> WorkScopeTagBuilder<'a, S> {
     }
 }
 
-impl<'a, S> WorkScopeTagBuilder<'a, S>
+impl<S: BosStr, St> WorkScopeTagBuilder<S, St>
 where
-    S: work_scope_tag_state::State,
-    S::Label: work_scope_tag_state::IsUnset,
+    St: work_scope_tag_state::State,
+    St::Label: work_scope_tag_state::IsUnset,
 {
     /// Set the `label` field (required)
     pub fn label(
         mut self,
         value: impl Into<S>,
-    ) -> WorkScopeTagBuilder<'a, work_scope_tag_state::SetLabel<S>> {
+    ) -> WorkScopeTagBuilder<S, work_scope_tag_state::SetLabel<St>> {
         self._fields.6 = Option::Some(value.into());
         WorkScopeTagBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: work_scope_tag_state::State> WorkScopeTagBuilder<'a, S> {
+impl<S: BosStr, St: work_scope_tag_state::State> WorkScopeTagBuilder<S, St> {
     /// Set the `parent` field (optional)
     pub fn parent(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.7 = value.into();
@@ -434,15 +434,15 @@ impl<'a, S: work_scope_tag_state::State> WorkScopeTagBuilder<'a, S> {
     }
 }
 
-impl<'a, S> WorkScopeTagBuilder<'a, S>
+impl<S: BosStr, St> WorkScopeTagBuilder<S, St>
 where
-    S: work_scope_tag_state::State,
-    S::Label: work_scope_tag_state::IsSet,
-    S::CreatedAt: work_scope_tag_state::IsSet,
-    S::Key: work_scope_tag_state::IsSet,
+    St: work_scope_tag_state::State,
+    St::CreatedAt: work_scope_tag_state::IsSet,
+    St::Key: work_scope_tag_state::IsSet,
+    St::Label: work_scope_tag_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> WorkScopeTag<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> WorkScopeTag<S> {
         WorkScopeTag {
             aliases: self._fields.0,
             created_at: self._fields.1.unwrap(),
@@ -455,11 +455,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> WorkScopeTag<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> WorkScopeTag<S> {
         WorkScopeTag {
             aliases: self._fields.0,
             created_at: self._fields.1.unwrap(),

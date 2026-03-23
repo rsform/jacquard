@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
@@ -19,32 +19,29 @@ use serde::{Serialize, Deserialize};
 use crate::sh_weaver::collab::SessionView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetResourceSessions<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct GetResourceSessions<S: BosStr = DefaultStr> {
     pub resource: AtUri<S>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetResourceSessionsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetResourceSessionsOutput<S: BosStr = DefaultStr> {
     pub sessions: Vec<SessionView<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -53,12 +50,11 @@ pub struct GetResourceSessionsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetResourceSessionsResponse {
     const NSID: &'static str = "sh.weaver.collab.getResourceSessions";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetResourceSessionsOutput<S>;
+    type Output<S: BosStr> = GetResourceSessionsOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetResourceSessions<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetResourceSessions<S> {
     const NSID: &'static str = "sh.weaver.collab.getResourceSessions";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetResourceSessionsResponse;
@@ -69,7 +65,7 @@ pub struct GetResourceSessionsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetResourceSessionsRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.collab.getResourceSessions";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetResourceSessions<S>;
+    type Request<S: BosStr> = GetResourceSessions<S>;
     type Response = GetResourceSessionsResponse;
 }
 
@@ -92,9 +88,9 @@ pub mod get_resource_sessions_state {
         type Resource = Unset;
     }
     ///State transition - sets the `resource` field to Set
-    pub struct SetResource<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetResource<S> {}
-    impl<S: State> State for SetResource<S> {
+    pub struct SetResource<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetResource<St> {}
+    impl<St: State> State for SetResource<St> {
         type Resource = Set<members::resource>;
     }
     /// Marker types for field names
@@ -105,57 +101,60 @@ pub mod get_resource_sessions_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetResourceSessionsBuilder<'a, S: get_resource_sessions_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetResourceSessionsBuilder<
+    S: BosStr,
+    St: get_resource_sessions_state::State,
+> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetResourceSessions<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetResourceSessionsBuilder<'a, get_resource_sessions_state::Empty> {
+impl<S: BosStr> GetResourceSessions<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetResourceSessionsBuilder<S, get_resource_sessions_state::Empty> {
         GetResourceSessionsBuilder::new()
     }
 }
 
-impl<'a> GetResourceSessionsBuilder<'a, get_resource_sessions_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetResourceSessionsBuilder<S, get_resource_sessions_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetResourceSessionsBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetResourceSessionsBuilder<'a, S>
+impl<S: BosStr, St> GetResourceSessionsBuilder<S, St>
 where
-    S: get_resource_sessions_state::State,
-    S::Resource: get_resource_sessions_state::IsUnset,
+    St: get_resource_sessions_state::State,
+    St::Resource: get_resource_sessions_state::IsUnset,
 {
     /// Set the `resource` field (required)
     pub fn resource(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> GetResourceSessionsBuilder<'a, get_resource_sessions_state::SetResource<S>> {
+    ) -> GetResourceSessionsBuilder<S, get_resource_sessions_state::SetResource<St>> {
         self._fields.0 = Option::Some(value.into());
         GetResourceSessionsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetResourceSessionsBuilder<'a, S>
+impl<S: BosStr, St> GetResourceSessionsBuilder<S, St>
 where
-    S: get_resource_sessions_state::State,
-    S::Resource: get_resource_sessions_state::IsSet,
+    St: get_resource_sessions_state::State,
+    St::Resource: get_resource_sessions_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetResourceSessions<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetResourceSessions<S> {
         GetResourceSessions {
             resource: self._fields.0.unwrap(),
         }

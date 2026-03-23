@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{AtUri, Datetime};
 use jacquard_common::types::value::Data;
@@ -18,35 +18,33 @@ use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetPost<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetPost<S: BosStr = DefaultStr> {
     ///If the specified uri is password-protected, please provide the password. If no password is specified, the non-protected content will be returned.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub password: Option<S>,
     ///Skyblur post at-uri. It shoud be uk.skyblur.post collection.
     pub uri: AtUri<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetPostOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetPostOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub additional: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -64,9 +62,7 @@ pub struct GetPostOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub text: S,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub visibility: Option<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -75,12 +71,11 @@ pub struct GetPostResponse;
 impl jacquard_common::xrpc::XrpcResp for GetPostResponse {
     const NSID: &'static str = "uk.skyblur.post.getPost";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetPostOutput<S>;
+    type Output<S: BosStr> = GetPostOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetPost<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetPost<S> {
     const NSID: &'static str = "uk.skyblur.post.getPost";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -95,7 +90,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetPostRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = GetPost<S>;
+    type Request<S: BosStr> = GetPost<S>;
     type Response = GetPostResponse;
 }
 
@@ -118,9 +113,9 @@ pub mod get_post_state {
         type Uri = Unset;
     }
     ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
         type Uri = Set<members::uri>;
     }
     /// Marker types for field names
@@ -131,32 +126,32 @@ pub mod get_post_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetPostBuilder<'a, S: get_post_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetPostBuilder<S: BosStr, St: get_post_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<AtUri<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetPost<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetPostBuilder<'a, get_post_state::Empty> {
+impl<S: BosStr> GetPost<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetPostBuilder<S, get_post_state::Empty> {
         GetPostBuilder::new()
     }
 }
 
-impl<'a> GetPostBuilder<'a, get_post_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetPostBuilder<S, get_post_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetPostBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: get_post_state::State> GetPostBuilder<'a, S> {
+impl<S: BosStr, St: get_post_state::State> GetPostBuilder<S, St> {
     /// Set the `password` field (optional)
     pub fn password(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -169,43 +164,40 @@ impl<'a, S: get_post_state::State> GetPostBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GetPostBuilder<'a, S>
+impl<S: BosStr, St> GetPostBuilder<S, St>
 where
-    S: get_post_state::State,
-    S::Uri: get_post_state::IsUnset,
+    St: get_post_state::State,
+    St::Uri: get_post_state::IsUnset,
 {
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> GetPostBuilder<'a, get_post_state::SetUri<S>> {
+    ) -> GetPostBuilder<S, get_post_state::SetUri<St>> {
         self._fields.1 = Option::Some(value.into());
         GetPostBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetPostBuilder<'a, S>
+impl<S: BosStr, St> GetPostBuilder<S, St>
 where
-    S: get_post_state::State,
-    S::Uri: get_post_state::IsSet,
+    St: get_post_state::State,
+    St::Uri: get_post_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetPost<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetPost<S> {
         GetPost {
             password: self._fields.0,
             uri: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> GetPost<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> GetPost<S> {
         GetPost {
             password: self._fields.0,
             uri: self._fields.1.unwrap(),

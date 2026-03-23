@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -29,11 +29,11 @@ use crate::blog_pckt::block::list_item::ListItem;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct OrderedList<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct OrderedList<S: BosStr = DefaultStr> {
     ///Array of list items
     pub content: Vec<ListItem<S>>,
     ///Starting number for the ordered list (default: 1)
@@ -43,7 +43,7 @@ pub struct OrderedList<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for OrderedList<S> {
+impl<S: BosStr> LexiconSchema for OrderedList<S> {
     fn nsid() -> &'static str {
         "blog.pckt.block.orderedList"
     }
@@ -86,9 +86,9 @@ pub mod ordered_list_state {
         type Content = Unset;
     }
     ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
+    pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetContent<St> {}
+    impl<St: State> State for SetContent<St> {
         type Content = Set<members::content>;
     }
     /// Marker types for field names
@@ -99,51 +99,51 @@ pub mod ordered_list_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct OrderedListBuilder<'a, S: ordered_list_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct OrderedListBuilder<S: BosStr, St: ordered_list_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<ListItem<S>>>, Option<i64>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> OrderedList<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> OrderedListBuilder<'a, ordered_list_state::Empty> {
+impl<S: BosStr> OrderedList<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> OrderedListBuilder<S, ordered_list_state::Empty> {
         OrderedListBuilder::new()
     }
 }
 
-impl<'a> OrderedListBuilder<'a, ordered_list_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> OrderedListBuilder<S, ordered_list_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         OrderedListBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> OrderedListBuilder<'a, S>
+impl<S: BosStr, St> OrderedListBuilder<S, St>
 where
-    S: ordered_list_state::State,
-    S::Content: ordered_list_state::IsUnset,
+    St: ordered_list_state::State,
+    St::Content: ordered_list_state::IsUnset,
 {
     /// Set the `content` field (required)
     pub fn content(
         mut self,
         value: impl Into<Vec<ListItem<S>>>,
-    ) -> OrderedListBuilder<'a, ordered_list_state::SetContent<S>> {
+    ) -> OrderedListBuilder<S, ordered_list_state::SetContent<St>> {
         self._fields.0 = Option::Some(value.into());
         OrderedListBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: ordered_list_state::State> OrderedListBuilder<'a, S> {
+impl<S: BosStr, St: ordered_list_state::State> OrderedListBuilder<S, St> {
     /// Set the `start` field (optional)
     pub fn start(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -156,24 +156,24 @@ impl<'a, S: ordered_list_state::State> OrderedListBuilder<'a, S> {
     }
 }
 
-impl<'a, S> OrderedListBuilder<'a, S>
+impl<S: BosStr, St> OrderedListBuilder<S, St>
 where
-    S: ordered_list_state::State,
-    S::Content: ordered_list_state::IsSet,
+    St: ordered_list_state::State,
+    St::Content: ordered_list_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> OrderedList<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> OrderedList<S> {
         OrderedList {
             content: self._fields.0.unwrap(),
             start: self._fields.1,
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> OrderedList<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> OrderedList<S> {
         OrderedList {
             content: self._fields.0.unwrap(),
             start: self._fields.1,

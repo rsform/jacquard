@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
@@ -19,28 +19,26 @@ use serde::{Serialize, Deserialize};
 use crate::tools_ozone::team::Member;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct UpdateMember<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct UpdateMember<S: BosStr = DefaultStr> {
     pub did: Did<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub disabled: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub role: Option<UpdateMemberRole<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum UpdateMemberRole<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum UpdateMemberRole<S: BosStr = DefaultStr> {
     RoleAdmin,
     RoleModerator,
     RoleVerifier,
@@ -48,7 +46,7 @@ pub enum UpdateMemberRole<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> UpdateMemberRole<S> {
+impl<S: BosStr> UpdateMemberRole<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::RoleAdmin => "tools.ozone.team.defs#roleAdmin",
@@ -70,19 +68,19 @@ impl<S: Bos<str> + AsRef<str>> UpdateMemberRole<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for UpdateMemberRole<S> {
+impl<S: BosStr> core::fmt::Display for UpdateMemberRole<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for UpdateMemberRole<S> {
+impl<S: BosStr> AsRef<str> for UpdateMemberRole<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for UpdateMemberRole<S> {
+impl<S: BosStr> Serialize for UpdateMemberRole<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -91,8 +89,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for UpdateMemberRole<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for UpdateMemberRole<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for UpdateMemberRole<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -102,14 +99,18 @@ for UpdateMemberRole<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for UpdateMemberRole<S> {
+impl<S: BosStr + Default> Default for UpdateMemberRole<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for UpdateMemberRole<S> {
-    type Output = UpdateMemberRole<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for UpdateMemberRole<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = UpdateMemberRole<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             UpdateMemberRole::RoleAdmin => UpdateMemberRole::RoleAdmin,
@@ -123,20 +124,17 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for UpdateMemberRole<S> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct UpdateMemberOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct UpdateMemberOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
-    #[serde(borrow)]
     pub value: Member<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -188,12 +186,11 @@ pub struct UpdateMemberResponse;
 impl jacquard_common::xrpc::XrpcResp for UpdateMemberResponse {
     const NSID: &'static str = "tools.ozone.team.updateMember";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = UpdateMemberOutput<S>;
+    type Output<S: BosStr> = UpdateMemberOutput<S>;
     type Err = UpdateMemberError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for UpdateMember<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UpdateMember<S> {
     const NSID: &'static str = "tools.ozone.team.updateMember";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -208,7 +205,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for UpdateMemberRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = UpdateMember<S>;
+    type Request<S: BosStr> = UpdateMember<S>;
     type Response = UpdateMemberResponse;
 }
 
@@ -231,9 +228,9 @@ pub mod update_member_state {
         type Did = Unset;
     }
     ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
         type Did = Set<members::did>;
     }
     /// Marker types for field names
@@ -244,51 +241,51 @@ pub mod update_member_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct UpdateMemberBuilder<'a, S: update_member_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct UpdateMemberBuilder<S: BosStr, St: update_member_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>, Option<bool>, Option<UpdateMemberRole<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> UpdateMember<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> UpdateMemberBuilder<'a, update_member_state::Empty> {
+impl<S: BosStr> UpdateMember<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> UpdateMemberBuilder<S, update_member_state::Empty> {
         UpdateMemberBuilder::new()
     }
 }
 
-impl<'a> UpdateMemberBuilder<'a, update_member_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> UpdateMemberBuilder<S, update_member_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         UpdateMemberBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> UpdateMemberBuilder<'a, S>
+impl<S: BosStr, St> UpdateMemberBuilder<S, St>
 where
-    S: update_member_state::State,
-    S::Did: update_member_state::IsUnset,
+    St: update_member_state::State,
+    St::Did: update_member_state::IsUnset,
 {
     /// Set the `did` field (required)
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> UpdateMemberBuilder<'a, update_member_state::SetDid<S>> {
+    ) -> UpdateMemberBuilder<S, update_member_state::SetDid<St>> {
         self._fields.0 = Option::Some(value.into());
         UpdateMemberBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: update_member_state::State> UpdateMemberBuilder<'a, S> {
+impl<S: BosStr, St: update_member_state::State> UpdateMemberBuilder<S, St> {
     /// Set the `disabled` field (optional)
     pub fn disabled(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.1 = value.into();
@@ -301,7 +298,7 @@ impl<'a, S: update_member_state::State> UpdateMemberBuilder<'a, S> {
     }
 }
 
-impl<'a, S: update_member_state::State> UpdateMemberBuilder<'a, S> {
+impl<S: BosStr, St: update_member_state::State> UpdateMemberBuilder<S, St> {
     /// Set the `role` field (optional)
     pub fn role(mut self, value: impl Into<Option<UpdateMemberRole<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -314,13 +311,13 @@ impl<'a, S: update_member_state::State> UpdateMemberBuilder<'a, S> {
     }
 }
 
-impl<'a, S> UpdateMemberBuilder<'a, S>
+impl<S: BosStr, St> UpdateMemberBuilder<S, St>
 where
-    S: update_member_state::State,
-    S::Did: update_member_state::IsSet,
+    St: update_member_state::State,
+    St::Did: update_member_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> UpdateMember<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> UpdateMember<S> {
         UpdateMember {
             did: self._fields.0.unwrap(),
             disabled: self._fields.1,
@@ -328,11 +325,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> UpdateMember<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> UpdateMember<S> {
         UpdateMember {
             did: self._fields.0.unwrap(),
             disabled: self._fields.1,

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
@@ -18,35 +18,32 @@ use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetStripeIntent<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetStripeIntent<S: BosStr = DefaultStr> {
     pub amount: i64,
-    #[serde(borrow)]
     pub id: S,
-    #[serde(borrow)]
     pub iss: Did<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub token: Option<S>,
 }
 
 /// The intent data
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetStripeIntentOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetStripeIntentOutput<S: BosStr = DefaultStr> {
     ///The customer ID for the payment intent
     pub customer: S,
     ///The customer session ID for the payment intent
@@ -57,9 +54,7 @@ pub struct GetStripeIntentOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub payment_intent: S,
     ///The publishable key for the payment intent
     pub publishable_key: S,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -68,12 +63,11 @@ pub struct GetStripeIntentResponse;
 impl jacquard_common::xrpc::XrpcResp for GetStripeIntentResponse {
     const NSID: &'static str = "app.ocho.payment.getStripeIntent";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetStripeIntentOutput<S>;
+    type Output<S: BosStr> = GetStripeIntentOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetStripeIntent<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetStripeIntent<S> {
     const NSID: &'static str = "app.ocho.payment.getStripeIntent";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetStripeIntentResponse;
@@ -84,7 +78,7 @@ pub struct GetStripeIntentRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetStripeIntentRequest {
     const PATH: &'static str = "/xrpc/app.ocho.payment.getStripeIntent";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetStripeIntent<S>;
+    type Request<S: BosStr> = GetStripeIntent<S>;
     type Response = GetStripeIntentResponse;
 }
 
@@ -98,137 +92,137 @@ pub mod get_stripe_intent_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Id;
-        type Amount;
         type Iss;
+        type Amount;
+        type Id;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Id = Unset;
-        type Amount = Unset;
         type Iss = Unset;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type Id = Set<members::id>;
-        type Amount = S::Amount;
-        type Iss = S::Iss;
-    }
-    ///State transition - sets the `amount` field to Set
-    pub struct SetAmount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAmount<S> {}
-    impl<S: State> State for SetAmount<S> {
-        type Id = S::Id;
-        type Amount = Set<members::amount>;
-        type Iss = S::Iss;
+        type Amount = Unset;
+        type Id = Unset;
     }
     ///State transition - sets the `iss` field to Set
-    pub struct SetIss<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIss<S> {}
-    impl<S: State> State for SetIss<S> {
-        type Id = S::Id;
-        type Amount = S::Amount;
+    pub struct SetIss<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIss<St> {}
+    impl<St: State> State for SetIss<St> {
         type Iss = Set<members::iss>;
+        type Amount = St::Amount;
+        type Id = St::Id;
+    }
+    ///State transition - sets the `amount` field to Set
+    pub struct SetAmount<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAmount<St> {}
+    impl<St: State> State for SetAmount<St> {
+        type Iss = St::Iss;
+        type Amount = Set<members::amount>;
+        type Id = St::Id;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetId<St> {}
+    impl<St: State> State for SetId<St> {
+        type Iss = St::Iss;
+        type Amount = St::Amount;
+        type Id = Set<members::id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `id` field
-        pub struct id(());
-        ///Marker type for the `amount` field
-        pub struct amount(());
         ///Marker type for the `iss` field
         pub struct iss(());
+        ///Marker type for the `amount` field
+        pub struct amount(());
+        ///Marker type for the `id` field
+        pub struct id(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetStripeIntentBuilder<'a, S: get_stripe_intent_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetStripeIntentBuilder<S: BosStr, St: get_stripe_intent_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<S>, Option<Did<S>>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetStripeIntent<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetStripeIntentBuilder<'a, get_stripe_intent_state::Empty> {
+impl<S: BosStr> GetStripeIntent<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetStripeIntentBuilder<S, get_stripe_intent_state::Empty> {
         GetStripeIntentBuilder::new()
     }
 }
 
-impl<'a> GetStripeIntentBuilder<'a, get_stripe_intent_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetStripeIntentBuilder<S, get_stripe_intent_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetStripeIntentBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetStripeIntentBuilder<'a, S>
+impl<S: BosStr, St> GetStripeIntentBuilder<S, St>
 where
-    S: get_stripe_intent_state::State,
-    S::Amount: get_stripe_intent_state::IsUnset,
+    St: get_stripe_intent_state::State,
+    St::Amount: get_stripe_intent_state::IsUnset,
 {
     /// Set the `amount` field (required)
     pub fn amount(
         mut self,
         value: impl Into<i64>,
-    ) -> GetStripeIntentBuilder<'a, get_stripe_intent_state::SetAmount<S>> {
+    ) -> GetStripeIntentBuilder<S, get_stripe_intent_state::SetAmount<St>> {
         self._fields.0 = Option::Some(value.into());
         GetStripeIntentBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetStripeIntentBuilder<'a, S>
+impl<S: BosStr, St> GetStripeIntentBuilder<S, St>
 where
-    S: get_stripe_intent_state::State,
-    S::Id: get_stripe_intent_state::IsUnset,
+    St: get_stripe_intent_state::State,
+    St::Id: get_stripe_intent_state::IsUnset,
 {
     /// Set the `id` field (required)
     pub fn id(
         mut self,
         value: impl Into<S>,
-    ) -> GetStripeIntentBuilder<'a, get_stripe_intent_state::SetId<S>> {
+    ) -> GetStripeIntentBuilder<S, get_stripe_intent_state::SetId<St>> {
         self._fields.1 = Option::Some(value.into());
         GetStripeIntentBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetStripeIntentBuilder<'a, S>
+impl<S: BosStr, St> GetStripeIntentBuilder<S, St>
 where
-    S: get_stripe_intent_state::State,
-    S::Iss: get_stripe_intent_state::IsUnset,
+    St: get_stripe_intent_state::State,
+    St::Iss: get_stripe_intent_state::IsUnset,
 {
     /// Set the `iss` field (required)
     pub fn iss(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> GetStripeIntentBuilder<'a, get_stripe_intent_state::SetIss<S>> {
+    ) -> GetStripeIntentBuilder<S, get_stripe_intent_state::SetIss<St>> {
         self._fields.2 = Option::Some(value.into());
         GetStripeIntentBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: get_stripe_intent_state::State> GetStripeIntentBuilder<'a, S> {
+impl<S: BosStr, St: get_stripe_intent_state::State> GetStripeIntentBuilder<S, St> {
     /// Set the `token` field (optional)
     pub fn token(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -241,15 +235,15 @@ impl<'a, S: get_stripe_intent_state::State> GetStripeIntentBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GetStripeIntentBuilder<'a, S>
+impl<S: BosStr, St> GetStripeIntentBuilder<S, St>
 where
-    S: get_stripe_intent_state::State,
-    S::Id: get_stripe_intent_state::IsSet,
-    S::Amount: get_stripe_intent_state::IsSet,
-    S::Iss: get_stripe_intent_state::IsSet,
+    St: get_stripe_intent_state::State,
+    St::Iss: get_stripe_intent_state::IsSet,
+    St::Amount: get_stripe_intent_state::IsSet,
+    St::Id: get_stripe_intent_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetStripeIntent<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetStripeIntent<S> {
         GetStripeIntent {
             amount: self._fields.0.unwrap(),
             id: self._fields.1.unwrap(),

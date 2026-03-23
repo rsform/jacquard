@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -27,30 +27,28 @@ use serde::{Serialize, Deserialize};
 use crate::sh_tangled::repo::branch;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Branch<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct Branch<S: BosStr = DefaultStr> {
     pub name: S,
-    #[serde(borrow)]
     pub repo: S,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct BranchOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct BranchOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub author: Option<branch::Signature<S>>,
     ///Latest commit hash on this branch
@@ -68,9 +66,7 @@ pub struct BranchOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub short_hash: Option<S>,
     ///Timestamp of latest commit
     pub when: Datetime,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -142,11 +138,11 @@ impl core::fmt::Display for BranchError {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Signature<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Signature<S: BosStr = DefaultStr> {
     ///Author email
     pub email: S,
     ///Author name
@@ -162,12 +158,11 @@ pub struct BranchResponse;
 impl jacquard_common::xrpc::XrpcResp for BranchResponse {
     const NSID: &'static str = "sh.tangled.repo.branch";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = BranchOutput<S>;
+    type Output<S: BosStr> = BranchOutput<S>;
     type Err = BranchError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for Branch<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Branch<S> {
     const NSID: &'static str = "sh.tangled.repo.branch";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = BranchResponse;
@@ -178,11 +173,11 @@ pub struct BranchRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for BranchRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.repo.branch";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = Branch<S>;
+    type Request<S: BosStr> = Branch<S>;
     type Response = BranchResponse;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Signature<S> {
+impl<S: BosStr> LexiconSchema for Signature<S> {
     fn nsid() -> &'static str {
         "sh.tangled.repo.branch"
     }
@@ -218,17 +213,17 @@ pub mod branch_state {
         type Name = Unset;
     }
     ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
+    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRepo<St> {}
+    impl<St: State> State for SetRepo<St> {
         type Repo = Set<members::repo>;
-        type Name = S::Name;
+        type Name = St::Name;
     }
     ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Repo = S::Repo;
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Repo = St::Repo;
         type Name = Set<members::name>;
     }
     /// Marker types for field names
@@ -241,77 +236,77 @@ pub mod branch_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct BranchBuilder<'a, S: branch_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct BranchBuilder<S: BosStr, St: branch_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Branch<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> BranchBuilder<'a, branch_state::Empty> {
+impl<S: BosStr> Branch<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> BranchBuilder<S, branch_state::Empty> {
         BranchBuilder::new()
     }
 }
 
-impl<'a> BranchBuilder<'a, branch_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> BranchBuilder<S, branch_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         BranchBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BranchBuilder<'a, S>
+impl<S: BosStr, St> BranchBuilder<S, St>
 where
-    S: branch_state::State,
-    S::Name: branch_state::IsUnset,
+    St: branch_state::State,
+    St::Name: branch_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> BranchBuilder<'a, branch_state::SetName<S>> {
+    ) -> BranchBuilder<S, branch_state::SetName<St>> {
         self._fields.0 = Option::Some(value.into());
         BranchBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BranchBuilder<'a, S>
+impl<S: BosStr, St> BranchBuilder<S, St>
 where
-    S: branch_state::State,
-    S::Repo: branch_state::IsUnset,
+    St: branch_state::State,
+    St::Repo: branch_state::IsUnset,
 {
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
         value: impl Into<S>,
-    ) -> BranchBuilder<'a, branch_state::SetRepo<S>> {
+    ) -> BranchBuilder<S, branch_state::SetRepo<St>> {
         self._fields.1 = Option::Some(value.into());
         BranchBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BranchBuilder<'a, S>
+impl<S: BosStr, St> BranchBuilder<S, St>
 where
-    S: branch_state::State,
-    S::Repo: branch_state::IsSet,
-    S::Name: branch_state::IsSet,
+    St: branch_state::State,
+    St::Repo: branch_state::IsSet,
+    St::Name: branch_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Branch<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Branch<S> {
         Branch {
             name: self._fields.0.unwrap(),
             repo: self._fields.1.unwrap(),
@@ -342,27 +337,27 @@ pub mod signature_state {
         type When = Unset;
     }
     ///State transition - sets the `email` field to Set
-    pub struct SetEmail<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEmail<S> {}
-    impl<S: State> State for SetEmail<S> {
+    pub struct SetEmail<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetEmail<St> {}
+    impl<St: State> State for SetEmail<St> {
         type Email = Set<members::email>;
-        type Name = S::Name;
-        type When = S::When;
+        type Name = St::Name;
+        type When = St::When;
     }
     ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Email = S::Email;
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Email = St::Email;
         type Name = Set<members::name>;
-        type When = S::When;
+        type When = St::When;
     }
     ///State transition - sets the `when` field to Set
-    pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWhen<S> {}
-    impl<S: State> State for SetWhen<S> {
-        type Email = S::Email;
-        type Name = S::Name;
+    pub struct SetWhen<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetWhen<St> {}
+    impl<St: State> State for SetWhen<St> {
+        type Email = St::Email;
+        type Name = St::Name;
         type When = Set<members::when>;
     }
     /// Marker types for field names
@@ -377,97 +372,97 @@ pub mod signature_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct SignatureBuilder<'a, S: signature_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct SignatureBuilder<S: BosStr, St: signature_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>, Option<Datetime>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Signature<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> SignatureBuilder<'a, signature_state::Empty> {
+impl<S: BosStr> Signature<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> SignatureBuilder<S, signature_state::Empty> {
         SignatureBuilder::new()
     }
 }
 
-impl<'a> SignatureBuilder<'a, signature_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> SignatureBuilder<S, signature_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SignatureBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SignatureBuilder<'a, S>
+impl<S: BosStr, St> SignatureBuilder<S, St>
 where
-    S: signature_state::State,
-    S::Email: signature_state::IsUnset,
+    St: signature_state::State,
+    St::Email: signature_state::IsUnset,
 {
     /// Set the `email` field (required)
     pub fn email(
         mut self,
         value: impl Into<S>,
-    ) -> SignatureBuilder<'a, signature_state::SetEmail<S>> {
+    ) -> SignatureBuilder<S, signature_state::SetEmail<St>> {
         self._fields.0 = Option::Some(value.into());
         SignatureBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SignatureBuilder<'a, S>
+impl<S: BosStr, St> SignatureBuilder<S, St>
 where
-    S: signature_state::State,
-    S::Name: signature_state::IsUnset,
+    St: signature_state::State,
+    St::Name: signature_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> SignatureBuilder<'a, signature_state::SetName<S>> {
+    ) -> SignatureBuilder<S, signature_state::SetName<St>> {
         self._fields.1 = Option::Some(value.into());
         SignatureBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SignatureBuilder<'a, S>
+impl<S: BosStr, St> SignatureBuilder<S, St>
 where
-    S: signature_state::State,
-    S::When: signature_state::IsUnset,
+    St: signature_state::State,
+    St::When: signature_state::IsUnset,
 {
     /// Set the `when` field (required)
     pub fn when(
         mut self,
         value: impl Into<Datetime>,
-    ) -> SignatureBuilder<'a, signature_state::SetWhen<S>> {
+    ) -> SignatureBuilder<S, signature_state::SetWhen<St>> {
         self._fields.2 = Option::Some(value.into());
         SignatureBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SignatureBuilder<'a, S>
+impl<S: BosStr, St> SignatureBuilder<S, St>
 where
-    S: signature_state::State,
-    S::Email: signature_state::IsSet,
-    S::Name: signature_state::IsSet,
-    S::When: signature_state::IsSet,
+    St: signature_state::State,
+    St::Email: signature_state::IsSet,
+    St::Name: signature_state::IsSet,
+    St::When: signature_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Signature<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Signature<S> {
         Signature {
             email: self._fields.0.unwrap(),
             name: self._fields.1.unwrap(),
@@ -475,11 +470,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Signature<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Signature<S> {
         Signature {
             email: self._fields.0.unwrap(),
             name: self._fields.1.unwrap(),

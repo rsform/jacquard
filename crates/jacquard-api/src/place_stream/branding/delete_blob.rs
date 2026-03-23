@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
@@ -18,39 +18,35 @@ use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DeleteBlob<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DeleteBlob<S: BosStr = DefaultStr> {
     ///DID of the broadcaster. If not provided, uses the server's default broadcaster.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub broadcaster: Option<Did<S>>,
     ///Branding asset key (mainLogo, favicon, siteTitle, etc.)
     pub key: S,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DeleteBlobOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DeleteBlobOutput<S: BosStr = DefaultStr> {
     pub success: bool,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -112,12 +108,11 @@ pub struct DeleteBlobResponse;
 impl jacquard_common::xrpc::XrpcResp for DeleteBlobResponse {
     const NSID: &'static str = "place.stream.branding.deleteBlob";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = DeleteBlobOutput<S>;
+    type Output<S: BosStr> = DeleteBlobOutput<S>;
     type Err = DeleteBlobError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for DeleteBlob<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for DeleteBlob<S> {
     const NSID: &'static str = "place.stream.branding.deleteBlob";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -132,6 +127,6 @@ impl jacquard_common::xrpc::XrpcEndpoint for DeleteBlobRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = DeleteBlob<S>;
+    type Request<S: BosStr> = DeleteBlob<S>;
     type Response = DeleteBlobResponse;
 }

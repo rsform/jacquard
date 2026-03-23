@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -29,18 +29,18 @@ use serde::{Serialize, Deserialize};
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Button<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Button<S: BosStr = DefaultStr> {
     pub text: S,
     pub url: UriValue<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Button<S> {
+impl<S: BosStr> LexiconSchema for Button<S> {
     fn nsid() -> &'static str {
         "pub.leaflet.blocks.button"
     }
@@ -76,17 +76,17 @@ pub mod button_state {
         type Text = Unset;
     }
     ///State transition - sets the `url` field to Set
-    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrl<S> {}
-    impl<S: State> State for SetUrl<S> {
+    pub struct SetUrl<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUrl<St> {}
+    impl<St: State> State for SetUrl<St> {
         type Url = Set<members::url>;
-        type Text = S::Text;
+        type Text = St::Text;
     }
     ///State transition - sets the `text` field to Set
-    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetText<S> {}
-    impl<S: State> State for SetText<S> {
-        type Url = S::Url;
+    pub struct SetText<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetText<St> {}
+    impl<St: State> State for SetText<St> {
+        type Url = St::Url;
         type Text = Set<members::text>;
     }
     /// Marker types for field names
@@ -99,85 +99,85 @@ pub mod button_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ButtonBuilder<'a, S: button_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ButtonBuilder<S: BosStr, St: button_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<UriValue<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Button<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ButtonBuilder<'a, button_state::Empty> {
+impl<S: BosStr> Button<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ButtonBuilder<S, button_state::Empty> {
         ButtonBuilder::new()
     }
 }
 
-impl<'a> ButtonBuilder<'a, button_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ButtonBuilder<S, button_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ButtonBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ButtonBuilder<'a, S>
+impl<S: BosStr, St> ButtonBuilder<S, St>
 where
-    S: button_state::State,
-    S::Text: button_state::IsUnset,
+    St: button_state::State,
+    St::Text: button_state::IsUnset,
 {
     /// Set the `text` field (required)
     pub fn text(
         mut self,
         value: impl Into<S>,
-    ) -> ButtonBuilder<'a, button_state::SetText<S>> {
+    ) -> ButtonBuilder<S, button_state::SetText<St>> {
         self._fields.0 = Option::Some(value.into());
         ButtonBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ButtonBuilder<'a, S>
+impl<S: BosStr, St> ButtonBuilder<S, St>
 where
-    S: button_state::State,
-    S::Url: button_state::IsUnset,
+    St: button_state::State,
+    St::Url: button_state::IsUnset,
 {
     /// Set the `url` field (required)
     pub fn url(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> ButtonBuilder<'a, button_state::SetUrl<S>> {
+    ) -> ButtonBuilder<S, button_state::SetUrl<St>> {
         self._fields.1 = Option::Some(value.into());
         ButtonBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ButtonBuilder<'a, S>
+impl<S: BosStr, St> ButtonBuilder<S, St>
 where
-    S: button_state::State,
-    S::Url: button_state::IsSet,
-    S::Text: button_state::IsSet,
+    St: button_state::State,
+    St::Url: button_state::IsSet,
+    St::Text: button_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Button<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Button<S> {
         Button {
             text: self._fields.0.unwrap(),
             url: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Button<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Button<S> {
         Button {
             text: self._fields.0.unwrap(),
             url: self._fields.1.unwrap(),

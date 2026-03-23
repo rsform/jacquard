@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Tid;
 use jacquard_common::types::value::Data;
@@ -18,18 +18,16 @@ use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DeleteDraft<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DeleteDraft<S: BosStr = DefaultStr> {
     pub id: Tid,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -38,12 +36,11 @@ pub struct DeleteDraftResponse;
 impl jacquard_common::xrpc::XrpcResp for DeleteDraftResponse {
     const NSID: &'static str = "app.bsky.draft.deleteDraft";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ();
+    type Output<S: BosStr> = ();
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for DeleteDraft<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for DeleteDraft<S> {
     const NSID: &'static str = "app.bsky.draft.deleteDraft";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -58,7 +55,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for DeleteDraftRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = DeleteDraft<S>;
+    type Request<S: BosStr> = DeleteDraft<S>;
     type Response = DeleteDraftResponse;
 }
 
@@ -81,9 +78,9 @@ pub mod delete_draft_state {
         type Id = Unset;
     }
     ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
+    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetId<St> {}
+    impl<St: State> State for SetId<St> {
         type Id = Set<members::id>;
     }
     /// Marker types for field names
@@ -94,67 +91,67 @@ pub mod delete_draft_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct DeleteDraftBuilder<'a, S: delete_draft_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct DeleteDraftBuilder<S: BosStr, St: delete_draft_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Tid>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> DeleteDraft<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> DeleteDraftBuilder<'a, delete_draft_state::Empty> {
+impl<S: BosStr> DeleteDraft<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> DeleteDraftBuilder<S, delete_draft_state::Empty> {
         DeleteDraftBuilder::new()
     }
 }
 
-impl<'a> DeleteDraftBuilder<'a, delete_draft_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> DeleteDraftBuilder<S, delete_draft_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         DeleteDraftBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DeleteDraftBuilder<'a, S>
+impl<S: BosStr, St> DeleteDraftBuilder<S, St>
 where
-    S: delete_draft_state::State,
-    S::Id: delete_draft_state::IsUnset,
+    St: delete_draft_state::State,
+    St::Id: delete_draft_state::IsUnset,
 {
     /// Set the `id` field (required)
     pub fn id(
         mut self,
         value: impl Into<Tid>,
-    ) -> DeleteDraftBuilder<'a, delete_draft_state::SetId<S>> {
+    ) -> DeleteDraftBuilder<S, delete_draft_state::SetId<St>> {
         self._fields.0 = Option::Some(value.into());
         DeleteDraftBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DeleteDraftBuilder<'a, S>
+impl<S: BosStr, St> DeleteDraftBuilder<S, St>
 where
-    S: delete_draft_state::State,
-    S::Id: delete_draft_state::IsSet,
+    St: delete_draft_state::State,
+    St::Id: delete_draft_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> DeleteDraft<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> DeleteDraft<S> {
         DeleteDraft {
             id: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> DeleteDraft<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> DeleteDraft<S> {
         DeleteDraft {
             id: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

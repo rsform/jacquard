@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
 
 #[allow(unused_imports)]
@@ -39,11 +39,11 @@ use crate::sh_weaver::edit::DocRef;
     rename = "sh.weaver.edit.diff",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Diff<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Diff<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
     pub doc: DocRef<S>,
@@ -67,18 +67,18 @@ pub struct Diff<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DiffGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DiffGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Diff<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Diff<S> {
+impl<S: BosStr> Diff<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, DiffRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -91,17 +91,17 @@ pub struct DiffRecord;
 impl XrpcResp for DiffRecord {
     const NSID: &'static str = "sh.weaver.edit.diff";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = DiffGetRecordOutput<S>;
+    type Output<S: BosStr> = DiffGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<DiffGetRecordOutput<S>> for Diff<S> {
+impl<S: BosStr> From<DiffGetRecordOutput<S>> for Diff<S> {
     fn from(output: DiffGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Diff<S> {
+impl<S: BosStr> Collection for Diff<S> {
     const NSID: &'static str = "sh.weaver.edit.diff";
     type Record = DiffRecord;
 }
@@ -111,7 +111,7 @@ impl Collection for DiffRecord {
     type Record = DiffRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Diff<S> {
+impl<S: BosStr> LexiconSchema for Diff<S> {
     fn nsid() -> &'static str {
         "sh.weaver.edit.diff"
     }
@@ -185,17 +185,17 @@ pub mod diff_state {
         type Doc = Unset;
     }
     ///State transition - sets the `root` field to Set
-    pub struct SetRoot<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRoot<S> {}
-    impl<S: State> State for SetRoot<S> {
+    pub struct SetRoot<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRoot<St> {}
+    impl<St: State> State for SetRoot<St> {
         type Root = Set<members::root>;
-        type Doc = S::Doc;
+        type Doc = St::Doc;
     }
     ///State transition - sets the `doc` field to Set
-    pub struct SetDoc<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDoc<S> {}
-    impl<S: State> State for SetDoc<S> {
-        type Root = S::Root;
+    pub struct SetDoc<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDoc<St> {}
+    impl<St: State> State for SetDoc<St> {
+        type Root = St::Root;
         type Doc = Set<members::doc>;
     }
     /// Marker types for field names
@@ -208,9 +208,9 @@ pub mod diff_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct DiffBuilder<'a, S: diff_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct DiffBuilder<S: BosStr, St: diff_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
         Option<DocRef<S>>,
@@ -219,28 +219,28 @@ pub struct DiffBuilder<'a, S: diff_state::State> {
         Option<StrongRef<S>>,
         Option<BlobRef<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Diff<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> DiffBuilder<'a, diff_state::Empty> {
+impl<S: BosStr> Diff<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> DiffBuilder<S, diff_state::Empty> {
         DiffBuilder::new()
     }
 }
 
-impl<'a> DiffBuilder<'a, diff_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> DiffBuilder<S, diff_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         DiffBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: diff_state::State> DiffBuilder<'a, S> {
+impl<S: BosStr, St: diff_state::State> DiffBuilder<S, St> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.0 = value.into();
@@ -253,26 +253,26 @@ impl<'a, S: diff_state::State> DiffBuilder<'a, S> {
     }
 }
 
-impl<'a, S> DiffBuilder<'a, S>
+impl<S: BosStr, St> DiffBuilder<S, St>
 where
-    S: diff_state::State,
-    S::Doc: diff_state::IsUnset,
+    St: diff_state::State,
+    St::Doc: diff_state::IsUnset,
 {
     /// Set the `doc` field (required)
     pub fn doc(
         mut self,
         value: impl Into<DocRef<S>>,
-    ) -> DiffBuilder<'a, diff_state::SetDoc<S>> {
+    ) -> DiffBuilder<S, diff_state::SetDoc<St>> {
         self._fields.1 = Option::Some(value.into());
         DiffBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: diff_state::State> DiffBuilder<'a, S> {
+impl<S: BosStr, St: diff_state::State> DiffBuilder<S, St> {
     /// Set the `inlineDiff` field (optional)
     pub fn inline_diff(mut self, value: impl Into<Option<Bytes>>) -> Self {
         self._fields.2 = value.into();
@@ -285,7 +285,7 @@ impl<'a, S: diff_state::State> DiffBuilder<'a, S> {
     }
 }
 
-impl<'a, S: diff_state::State> DiffBuilder<'a, S> {
+impl<S: BosStr, St: diff_state::State> DiffBuilder<S, St> {
     /// Set the `prev` field (optional)
     pub fn prev(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -298,26 +298,26 @@ impl<'a, S: diff_state::State> DiffBuilder<'a, S> {
     }
 }
 
-impl<'a, S> DiffBuilder<'a, S>
+impl<S: BosStr, St> DiffBuilder<S, St>
 where
-    S: diff_state::State,
-    S::Root: diff_state::IsUnset,
+    St: diff_state::State,
+    St::Root: diff_state::IsUnset,
 {
     /// Set the `root` field (required)
     pub fn root(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> DiffBuilder<'a, diff_state::SetRoot<S>> {
+    ) -> DiffBuilder<S, diff_state::SetRoot<St>> {
         self._fields.4 = Option::Some(value.into());
         DiffBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: diff_state::State> DiffBuilder<'a, S> {
+impl<S: BosStr, St: diff_state::State> DiffBuilder<S, St> {
     /// Set the `snapshot` field (optional)
     pub fn snapshot(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -330,14 +330,14 @@ impl<'a, S: diff_state::State> DiffBuilder<'a, S> {
     }
 }
 
-impl<'a, S> DiffBuilder<'a, S>
+impl<S: BosStr, St> DiffBuilder<S, St>
 where
-    S: diff_state::State,
-    S::Root: diff_state::IsSet,
-    S::Doc: diff_state::IsSet,
+    St: diff_state::State,
+    St::Root: diff_state::IsSet,
+    St::Doc: diff_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Diff<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Diff<S> {
         Diff {
             created_at: self._fields.0,
             doc: self._fields.1.unwrap(),
@@ -348,8 +348,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Diff<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Diff<S> {
         Diff {
             created_at: self._fields.0,
             doc: self._fields.1.unwrap(),

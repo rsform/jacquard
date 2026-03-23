@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -31,11 +31,11 @@ use crate::com_shinolabs::pinksea::app_view_defs;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Author<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Author<S: BosStr = DefaultStr> {
     ///The DID of the author
     pub did: Did<S>,
     ///The handle of the author.
@@ -50,11 +50,11 @@ pub struct Author<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct HydratedOekaki<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct HydratedOekaki<S: BosStr = DefaultStr> {
     ///Alt text description of the image, for accessibility.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub alt: Option<S>,
@@ -82,18 +82,18 @@ pub struct HydratedOekaki<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct OekakiTombstone<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct OekakiTombstone<S: BosStr = DefaultStr> {
     ///The AT uri of the former oekaki.
     pub former_at: AtUri<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Author<S> {
+impl<S: BosStr> LexiconSchema for Author<S> {
     fn nsid() -> &'static str {
         "com.shinolabs.pinksea.appViewDefs"
     }
@@ -108,7 +108,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Author<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for HydratedOekaki<S> {
+impl<S: BosStr> LexiconSchema for HydratedOekaki<S> {
     fn nsid() -> &'static str {
         "com.shinolabs.pinksea.appViewDefs"
     }
@@ -133,7 +133,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for HydratedOekaki<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for OekakiTombstone<S> {
+impl<S: BosStr> LexiconSchema for OekakiTombstone<S> {
     fn nsid() -> &'static str {
         "com.shinolabs.pinksea.appViewDefs"
     }
@@ -158,119 +158,119 @@ pub mod author_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Handle;
         type Did;
+        type Handle;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Handle = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `handle` field to Set
-    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHandle<S> {}
-    impl<S: State> State for SetHandle<S> {
-        type Handle = Set<members::handle>;
-        type Did = S::Did;
+        type Handle = Unset;
     }
     ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Handle = S::Handle;
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
         type Did = Set<members::did>;
+        type Handle = St::Handle;
+    }
+    ///State transition - sets the `handle` field to Set
+    pub struct SetHandle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHandle<St> {}
+    impl<St: State> State for SetHandle<St> {
+        type Did = St::Did;
+        type Handle = Set<members::handle>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `handle` field
-        pub struct handle(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `handle` field
+        pub struct handle(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct AuthorBuilder<'a, S: author_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct AuthorBuilder<S: BosStr, St: author_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>, Option<Handle<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Author<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> AuthorBuilder<'a, author_state::Empty> {
+impl<S: BosStr> Author<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> AuthorBuilder<S, author_state::Empty> {
         AuthorBuilder::new()
     }
 }
 
-impl<'a> AuthorBuilder<'a, author_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> AuthorBuilder<S, author_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         AuthorBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AuthorBuilder<'a, S>
+impl<S: BosStr, St> AuthorBuilder<S, St>
 where
-    S: author_state::State,
-    S::Did: author_state::IsUnset,
+    St: author_state::State,
+    St::Did: author_state::IsUnset,
 {
     /// Set the `did` field (required)
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> AuthorBuilder<'a, author_state::SetDid<S>> {
+    ) -> AuthorBuilder<S, author_state::SetDid<St>> {
         self._fields.0 = Option::Some(value.into());
         AuthorBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AuthorBuilder<'a, S>
+impl<S: BosStr, St> AuthorBuilder<S, St>
 where
-    S: author_state::State,
-    S::Handle: author_state::IsUnset,
+    St: author_state::State,
+    St::Handle: author_state::IsUnset,
 {
     /// Set the `handle` field (required)
     pub fn handle(
         mut self,
         value: impl Into<Handle<S>>,
-    ) -> AuthorBuilder<'a, author_state::SetHandle<S>> {
+    ) -> AuthorBuilder<S, author_state::SetHandle<St>> {
         self._fields.1 = Option::Some(value.into());
         AuthorBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AuthorBuilder<'a, S>
+impl<S: BosStr, St> AuthorBuilder<S, St>
 where
-    S: author_state::State,
-    S::Handle: author_state::IsSet,
-    S::Did: author_state::IsSet,
+    St: author_state::State,
+    St::Did: author_state::IsSet,
+    St::Handle: author_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Author<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Author<S> {
         Author {
             did: self._fields.0.unwrap(),
             handle: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Author<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Author<S> {
         Author {
             did: self._fields.0.unwrap(),
             handle: self._fields.1.unwrap(),
@@ -464,110 +464,110 @@ pub mod hydrated_oekaki_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Nsfw;
-        type CreationTime;
-        type Author;
-        type At;
         type Cid;
+        type Author;
         type Image;
+        type CreationTime;
+        type At;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Nsfw = Unset;
-        type CreationTime = Unset;
-        type Author = Unset;
-        type At = Unset;
         type Cid = Unset;
+        type Author = Unset;
         type Image = Unset;
+        type CreationTime = Unset;
+        type At = Unset;
     }
     ///State transition - sets the `nsfw` field to Set
-    pub struct SetNsfw<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNsfw<S> {}
-    impl<S: State> State for SetNsfw<S> {
+    pub struct SetNsfw<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetNsfw<St> {}
+    impl<St: State> State for SetNsfw<St> {
         type Nsfw = Set<members::nsfw>;
-        type CreationTime = S::CreationTime;
-        type Author = S::Author;
-        type At = S::At;
-        type Cid = S::Cid;
-        type Image = S::Image;
-    }
-    ///State transition - sets the `creation_time` field to Set
-    pub struct SetCreationTime<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreationTime<S> {}
-    impl<S: State> State for SetCreationTime<S> {
-        type Nsfw = S::Nsfw;
-        type CreationTime = Set<members::creation_time>;
-        type Author = S::Author;
-        type At = S::At;
-        type Cid = S::Cid;
-        type Image = S::Image;
-    }
-    ///State transition - sets the `author` field to Set
-    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthor<S> {}
-    impl<S: State> State for SetAuthor<S> {
-        type Nsfw = S::Nsfw;
-        type CreationTime = S::CreationTime;
-        type Author = Set<members::author>;
-        type At = S::At;
-        type Cid = S::Cid;
-        type Image = S::Image;
-    }
-    ///State transition - sets the `at` field to Set
-    pub struct SetAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAt<S> {}
-    impl<S: State> State for SetAt<S> {
-        type Nsfw = S::Nsfw;
-        type CreationTime = S::CreationTime;
-        type Author = S::Author;
-        type At = Set<members::at>;
-        type Cid = S::Cid;
-        type Image = S::Image;
+        type Cid = St::Cid;
+        type Author = St::Author;
+        type Image = St::Image;
+        type CreationTime = St::CreationTime;
+        type At = St::At;
     }
     ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Nsfw = S::Nsfw;
-        type CreationTime = S::CreationTime;
-        type Author = S::Author;
-        type At = S::At;
+    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCid<St> {}
+    impl<St: State> State for SetCid<St> {
+        type Nsfw = St::Nsfw;
         type Cid = Set<members::cid>;
-        type Image = S::Image;
+        type Author = St::Author;
+        type Image = St::Image;
+        type CreationTime = St::CreationTime;
+        type At = St::At;
+    }
+    ///State transition - sets the `author` field to Set
+    pub struct SetAuthor<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAuthor<St> {}
+    impl<St: State> State for SetAuthor<St> {
+        type Nsfw = St::Nsfw;
+        type Cid = St::Cid;
+        type Author = Set<members::author>;
+        type Image = St::Image;
+        type CreationTime = St::CreationTime;
+        type At = St::At;
     }
     ///State transition - sets the `image` field to Set
-    pub struct SetImage<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetImage<S> {}
-    impl<S: State> State for SetImage<S> {
-        type Nsfw = S::Nsfw;
-        type CreationTime = S::CreationTime;
-        type Author = S::Author;
-        type At = S::At;
-        type Cid = S::Cid;
+    pub struct SetImage<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetImage<St> {}
+    impl<St: State> State for SetImage<St> {
+        type Nsfw = St::Nsfw;
+        type Cid = St::Cid;
+        type Author = St::Author;
         type Image = Set<members::image>;
+        type CreationTime = St::CreationTime;
+        type At = St::At;
+    }
+    ///State transition - sets the `creation_time` field to Set
+    pub struct SetCreationTime<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreationTime<St> {}
+    impl<St: State> State for SetCreationTime<St> {
+        type Nsfw = St::Nsfw;
+        type Cid = St::Cid;
+        type Author = St::Author;
+        type Image = St::Image;
+        type CreationTime = Set<members::creation_time>;
+        type At = St::At;
+    }
+    ///State transition - sets the `at` field to Set
+    pub struct SetAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAt<St> {}
+    impl<St: State> State for SetAt<St> {
+        type Nsfw = St::Nsfw;
+        type Cid = St::Cid;
+        type Author = St::Author;
+        type Image = St::Image;
+        type CreationTime = St::CreationTime;
+        type At = Set<members::at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `nsfw` field
         pub struct nsfw(());
-        ///Marker type for the `creation_time` field
-        pub struct creation_time(());
-        ///Marker type for the `author` field
-        pub struct author(());
-        ///Marker type for the `at` field
-        pub struct at(());
         ///Marker type for the `cid` field
         pub struct cid(());
+        ///Marker type for the `author` field
+        pub struct author(());
         ///Marker type for the `image` field
         pub struct image(());
+        ///Marker type for the `creation_time` field
+        pub struct creation_time(());
+        ///Marker type for the `at` field
+        pub struct at(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct HydratedOekakiBuilder<'a, S: hydrated_oekaki_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct HydratedOekakiBuilder<S: BosStr, St: hydrated_oekaki_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
         Option<UriValue<S>>,
@@ -578,28 +578,28 @@ pub struct HydratedOekakiBuilder<'a, S: hydrated_oekaki_state::State> {
         Option<bool>,
         Option<Vec<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> HydratedOekaki<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> HydratedOekakiBuilder<'a, hydrated_oekaki_state::Empty> {
+impl<S: BosStr> HydratedOekaki<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> HydratedOekakiBuilder<S, hydrated_oekaki_state::Empty> {
         HydratedOekakiBuilder::new()
     }
 }
 
-impl<'a> HydratedOekakiBuilder<'a, hydrated_oekaki_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> HydratedOekakiBuilder<S, hydrated_oekaki_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         HydratedOekakiBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: hydrated_oekaki_state::State> HydratedOekakiBuilder<'a, S> {
+impl<S: BosStr, St: hydrated_oekaki_state::State> HydratedOekakiBuilder<S, St> {
     /// Set the `alt` field (optional)
     pub fn alt(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -612,121 +612,121 @@ impl<'a, S: hydrated_oekaki_state::State> HydratedOekakiBuilder<'a, S> {
     }
 }
 
-impl<'a, S> HydratedOekakiBuilder<'a, S>
+impl<S: BosStr, St> HydratedOekakiBuilder<S, St>
 where
-    S: hydrated_oekaki_state::State,
-    S::At: hydrated_oekaki_state::IsUnset,
+    St: hydrated_oekaki_state::State,
+    St::At: hydrated_oekaki_state::IsUnset,
 {
     /// Set the `at` field (required)
     pub fn at(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> HydratedOekakiBuilder<'a, hydrated_oekaki_state::SetAt<S>> {
+    ) -> HydratedOekakiBuilder<S, hydrated_oekaki_state::SetAt<St>> {
         self._fields.1 = Option::Some(value.into());
         HydratedOekakiBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> HydratedOekakiBuilder<'a, S>
+impl<S: BosStr, St> HydratedOekakiBuilder<S, St>
 where
-    S: hydrated_oekaki_state::State,
-    S::Author: hydrated_oekaki_state::IsUnset,
+    St: hydrated_oekaki_state::State,
+    St::Author: hydrated_oekaki_state::IsUnset,
 {
     /// Set the `author` field (required)
     pub fn author(
         mut self,
         value: impl Into<app_view_defs::Author<S>>,
-    ) -> HydratedOekakiBuilder<'a, hydrated_oekaki_state::SetAuthor<S>> {
+    ) -> HydratedOekakiBuilder<S, hydrated_oekaki_state::SetAuthor<St>> {
         self._fields.2 = Option::Some(value.into());
         HydratedOekakiBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> HydratedOekakiBuilder<'a, S>
+impl<S: BosStr, St> HydratedOekakiBuilder<S, St>
 where
-    S: hydrated_oekaki_state::State,
-    S::Cid: hydrated_oekaki_state::IsUnset,
+    St: hydrated_oekaki_state::State,
+    St::Cid: hydrated_oekaki_state::IsUnset,
 {
     /// Set the `cid` field (required)
     pub fn cid(
         mut self,
         value: impl Into<Cid<S>>,
-    ) -> HydratedOekakiBuilder<'a, hydrated_oekaki_state::SetCid<S>> {
+    ) -> HydratedOekakiBuilder<S, hydrated_oekaki_state::SetCid<St>> {
         self._fields.3 = Option::Some(value.into());
         HydratedOekakiBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> HydratedOekakiBuilder<'a, S>
+impl<S: BosStr, St> HydratedOekakiBuilder<S, St>
 where
-    S: hydrated_oekaki_state::State,
-    S::CreationTime: hydrated_oekaki_state::IsUnset,
+    St: hydrated_oekaki_state::State,
+    St::CreationTime: hydrated_oekaki_state::IsUnset,
 {
     /// Set the `creationTime` field (required)
     pub fn creation_time(
         mut self,
         value: impl Into<Datetime>,
-    ) -> HydratedOekakiBuilder<'a, hydrated_oekaki_state::SetCreationTime<S>> {
+    ) -> HydratedOekakiBuilder<S, hydrated_oekaki_state::SetCreationTime<St>> {
         self._fields.4 = Option::Some(value.into());
         HydratedOekakiBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> HydratedOekakiBuilder<'a, S>
+impl<S: BosStr, St> HydratedOekakiBuilder<S, St>
 where
-    S: hydrated_oekaki_state::State,
-    S::Image: hydrated_oekaki_state::IsUnset,
+    St: hydrated_oekaki_state::State,
+    St::Image: hydrated_oekaki_state::IsUnset,
 {
     /// Set the `image` field (required)
     pub fn image(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> HydratedOekakiBuilder<'a, hydrated_oekaki_state::SetImage<S>> {
+    ) -> HydratedOekakiBuilder<S, hydrated_oekaki_state::SetImage<St>> {
         self._fields.5 = Option::Some(value.into());
         HydratedOekakiBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> HydratedOekakiBuilder<'a, S>
+impl<S: BosStr, St> HydratedOekakiBuilder<S, St>
 where
-    S: hydrated_oekaki_state::State,
-    S::Nsfw: hydrated_oekaki_state::IsUnset,
+    St: hydrated_oekaki_state::State,
+    St::Nsfw: hydrated_oekaki_state::IsUnset,
 {
     /// Set the `nsfw` field (required)
     pub fn nsfw(
         mut self,
         value: impl Into<bool>,
-    ) -> HydratedOekakiBuilder<'a, hydrated_oekaki_state::SetNsfw<S>> {
+    ) -> HydratedOekakiBuilder<S, hydrated_oekaki_state::SetNsfw<St>> {
         self._fields.6 = Option::Some(value.into());
         HydratedOekakiBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: hydrated_oekaki_state::State> HydratedOekakiBuilder<'a, S> {
+impl<S: BosStr, St: hydrated_oekaki_state::State> HydratedOekakiBuilder<S, St> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.7 = value.into();
@@ -739,18 +739,18 @@ impl<'a, S: hydrated_oekaki_state::State> HydratedOekakiBuilder<'a, S> {
     }
 }
 
-impl<'a, S> HydratedOekakiBuilder<'a, S>
+impl<S: BosStr, St> HydratedOekakiBuilder<S, St>
 where
-    S: hydrated_oekaki_state::State,
-    S::Nsfw: hydrated_oekaki_state::IsSet,
-    S::CreationTime: hydrated_oekaki_state::IsSet,
-    S::Author: hydrated_oekaki_state::IsSet,
-    S::At: hydrated_oekaki_state::IsSet,
-    S::Cid: hydrated_oekaki_state::IsSet,
-    S::Image: hydrated_oekaki_state::IsSet,
+    St: hydrated_oekaki_state::State,
+    St::Nsfw: hydrated_oekaki_state::IsSet,
+    St::Cid: hydrated_oekaki_state::IsSet,
+    St::Author: hydrated_oekaki_state::IsSet,
+    St::Image: hydrated_oekaki_state::IsSet,
+    St::CreationTime: hydrated_oekaki_state::IsSet,
+    St::At: hydrated_oekaki_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> HydratedOekaki<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> HydratedOekaki<S> {
         HydratedOekaki {
             alt: self._fields.0,
             at: self._fields.1.unwrap(),
@@ -763,11 +763,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> HydratedOekaki<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> HydratedOekaki<S> {
         HydratedOekaki {
             alt: self._fields.0,
             at: self._fields.1.unwrap(),
@@ -801,9 +801,9 @@ pub mod oekaki_tombstone_state {
         type FormerAt = Unset;
     }
     ///State transition - sets the `former_at` field to Set
-    pub struct SetFormerAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFormerAt<S> {}
-    impl<S: State> State for SetFormerAt<S> {
+    pub struct SetFormerAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetFormerAt<St> {}
+    impl<St: State> State for SetFormerAt<St> {
         type FormerAt = Set<members::former_at>;
     }
     /// Marker types for field names
@@ -814,67 +814,67 @@ pub mod oekaki_tombstone_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct OekakiTombstoneBuilder<'a, S: oekaki_tombstone_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct OekakiTombstoneBuilder<S: BosStr, St: oekaki_tombstone_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> OekakiTombstone<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> OekakiTombstoneBuilder<'a, oekaki_tombstone_state::Empty> {
+impl<S: BosStr> OekakiTombstone<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> OekakiTombstoneBuilder<S, oekaki_tombstone_state::Empty> {
         OekakiTombstoneBuilder::new()
     }
 }
 
-impl<'a> OekakiTombstoneBuilder<'a, oekaki_tombstone_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> OekakiTombstoneBuilder<S, oekaki_tombstone_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         OekakiTombstoneBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> OekakiTombstoneBuilder<'a, S>
+impl<S: BosStr, St> OekakiTombstoneBuilder<S, St>
 where
-    S: oekaki_tombstone_state::State,
-    S::FormerAt: oekaki_tombstone_state::IsUnset,
+    St: oekaki_tombstone_state::State,
+    St::FormerAt: oekaki_tombstone_state::IsUnset,
 {
     /// Set the `formerAt` field (required)
     pub fn former_at(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> OekakiTombstoneBuilder<'a, oekaki_tombstone_state::SetFormerAt<S>> {
+    ) -> OekakiTombstoneBuilder<S, oekaki_tombstone_state::SetFormerAt<St>> {
         self._fields.0 = Option::Some(value.into());
         OekakiTombstoneBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> OekakiTombstoneBuilder<'a, S>
+impl<S: BosStr, St> OekakiTombstoneBuilder<S, St>
 where
-    S: oekaki_tombstone_state::State,
-    S::FormerAt: oekaki_tombstone_state::IsSet,
+    St: oekaki_tombstone_state::State,
+    St::FormerAt: oekaki_tombstone_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> OekakiTombstone<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> OekakiTombstone<S> {
         OekakiTombstone {
             former_at: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> OekakiTombstone<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> OekakiTombstone<S> {
         OekakiTombstone {
             former_at: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

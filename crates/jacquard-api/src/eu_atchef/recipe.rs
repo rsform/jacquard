@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use serde::{Serialize, Deserialize};
     rename = "eu.atchef.recipe",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Recipe<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Recipe<S: BosStr = DefaultStr> {
     ///Recipe content in Cooklang format
     pub content: S,
     ///Cooking time in minutes
@@ -78,18 +78,18 @@ pub struct Recipe<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct RecipeGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct RecipeGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Recipe<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Recipe<S> {
+impl<S: BosStr> Recipe<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, RecipeRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -102,17 +102,17 @@ pub struct RecipeRecord;
 impl XrpcResp for RecipeRecord {
     const NSID: &'static str = "eu.atchef.recipe";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = RecipeGetRecordOutput<S>;
+    type Output<S: BosStr> = RecipeGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<RecipeGetRecordOutput<S>> for Recipe<S> {
+impl<S: BosStr> From<RecipeGetRecordOutput<S>> for Recipe<S> {
     fn from(output: RecipeGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Recipe<S> {
+impl<S: BosStr> Collection for Recipe<S> {
     const NSID: &'static str = "eu.atchef.recipe";
     type Record = RecipeRecord;
 }
@@ -122,7 +122,7 @@ impl Collection for RecipeRecord {
     type Record = RecipeRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Recipe<S> {
+impl<S: BosStr> LexiconSchema for Recipe<S> {
     fn nsid() -> &'static str {
         "eu.atchef.recipe"
     }
@@ -295,56 +295,56 @@ pub mod recipe_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CreatedAt;
-        type Content;
         type Name;
+        type Content;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CreatedAt = Unset;
-        type Content = Unset;
         type Name = Unset;
+        type Content = Unset;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
-        type Content = S::Content;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type CreatedAt = S::CreatedAt;
-        type Content = Set<members::content>;
-        type Name = S::Name;
+        type Name = St::Name;
+        type Content = St::Content;
     }
     ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type CreatedAt = S::CreatedAt;
-        type Content = S::Content;
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type CreatedAt = St::CreatedAt;
         type Name = Set<members::name>;
+        type Content = St::Content;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetContent<St> {}
+    impl<St: State> State for SetContent<St> {
+        type CreatedAt = St::CreatedAt;
+        type Name = St::Name;
+        type Content = Set<members::content>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `content` field
-        pub struct content(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `content` field
+        pub struct content(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct RecipeBuilder<'a, S: recipe_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct RecipeBuilder<S: BosStr, St: recipe_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
         Option<i64>,
@@ -357,47 +357,47 @@ pub struct RecipeBuilder<'a, S: recipe_state::State> {
         Option<i64>,
         Option<Datetime>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Recipe<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> RecipeBuilder<'a, recipe_state::Empty> {
+impl<S: BosStr> Recipe<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> RecipeBuilder<S, recipe_state::Empty> {
         RecipeBuilder::new()
     }
 }
 
-impl<'a> RecipeBuilder<'a, recipe_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> RecipeBuilder<S, recipe_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         RecipeBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RecipeBuilder<'a, S>
+impl<S: BosStr, St> RecipeBuilder<S, St>
 where
-    S: recipe_state::State,
-    S::Content: recipe_state::IsUnset,
+    St: recipe_state::State,
+    St::Content: recipe_state::IsUnset,
 {
     /// Set the `content` field (required)
     pub fn content(
         mut self,
         value: impl Into<S>,
-    ) -> RecipeBuilder<'a, recipe_state::SetContent<S>> {
+    ) -> RecipeBuilder<S, recipe_state::SetContent<St>> {
         self._fields.0 = Option::Some(value.into());
         RecipeBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `cookTime` field (optional)
     pub fn cook_time(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -410,26 +410,26 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S> RecipeBuilder<'a, S>
+impl<S: BosStr, St> RecipeBuilder<S, St>
 where
-    S: recipe_state::State,
-    S::CreatedAt: recipe_state::IsUnset,
+    St: recipe_state::State,
+    St::CreatedAt: recipe_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> RecipeBuilder<'a, recipe_state::SetCreatedAt<S>> {
+    ) -> RecipeBuilder<S, recipe_state::SetCreatedAt<St>> {
         self._fields.2 = Option::Some(value.into());
         RecipeBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -442,7 +442,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `image` field (optional)
     pub fn image(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -455,26 +455,26 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S> RecipeBuilder<'a, S>
+impl<S: BosStr, St> RecipeBuilder<S, St>
 where
-    S: recipe_state::State,
-    S::Name: recipe_state::IsUnset,
+    St: recipe_state::State,
+    St::Name: recipe_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> RecipeBuilder<'a, recipe_state::SetName<S>> {
+    ) -> RecipeBuilder<S, recipe_state::SetName<St>> {
         self._fields.5 = Option::Some(value.into());
         RecipeBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `portions` field (optional)
     pub fn portions(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.6 = value.into();
@@ -487,7 +487,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `prepTime` field (optional)
     pub fn prep_time(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.7 = value.into();
@@ -500,7 +500,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `time` field (optional)
     pub fn time(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.8 = value.into();
@@ -513,7 +513,7 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
+impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.9 = value.into();
@@ -526,15 +526,15 @@ impl<'a, S: recipe_state::State> RecipeBuilder<'a, S> {
     }
 }
 
-impl<'a, S> RecipeBuilder<'a, S>
+impl<S: BosStr, St> RecipeBuilder<S, St>
 where
-    S: recipe_state::State,
-    S::CreatedAt: recipe_state::IsSet,
-    S::Content: recipe_state::IsSet,
-    S::Name: recipe_state::IsSet,
+    St: recipe_state::State,
+    St::CreatedAt: recipe_state::IsSet,
+    St::Name: recipe_state::IsSet,
+    St::Content: recipe_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Recipe<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Recipe<S> {
         Recipe {
             content: self._fields.0.unwrap(),
             cook_time: self._fields.1,
@@ -549,8 +549,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Recipe<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Recipe<S> {
         Recipe {
             content: self._fields.0.unwrap(),
             cook_time: self._fields.1,

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use serde::{Serialize, Deserialize};
     rename = "pub.quizzy.team",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Team<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Team<S: BosStr = DefaultStr> {
     ///Small image to be displayed near the team name
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avatar: Option<BlobRef<S>>,
@@ -60,18 +60,18 @@ pub struct Team<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct TeamGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct TeamGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Team<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Team<S> {
+impl<S: BosStr> Team<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, TeamRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -84,17 +84,17 @@ pub struct TeamRecord;
 impl XrpcResp for TeamRecord {
     const NSID: &'static str = "pub.quizzy.team";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = TeamGetRecordOutput<S>;
+    type Output<S: BosStr> = TeamGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<TeamGetRecordOutput<S>> for Team<S> {
+impl<S: BosStr> From<TeamGetRecordOutput<S>> for Team<S> {
     fn from(output: TeamGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Team<S> {
+impl<S: BosStr> Collection for Team<S> {
     const NSID: &'static str = "pub.quizzy.team";
     type Record = TeamRecord;
 }
@@ -104,7 +104,7 @@ impl Collection for TeamRecord {
     type Record = TeamRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Team<S> {
+impl<S: BosStr> LexiconSchema for Team<S> {
     fn nsid() -> &'static str {
         "pub.quizzy.team"
     }
@@ -248,17 +248,17 @@ pub mod team_state {
         type Name = Unset;
     }
     ///State transition - sets the `members` field to Set
-    pub struct SetMembers<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMembers<S> {}
-    impl<S: State> State for SetMembers<S> {
+    pub struct SetMembers<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMembers<St> {}
+    impl<St: State> State for SetMembers<St> {
         type Members = Set<members::members>;
-        type Name = S::Name;
+        type Name = St::Name;
     }
     ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Members = S::Members;
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Members = St::Members;
         type Name = Set<members::name>;
     }
     /// Marker types for field names
@@ -271,32 +271,32 @@ pub mod team_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct TeamBuilder<'a, S: team_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct TeamBuilder<S: BosStr, St: team_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<BlobRef<S>>, Option<S>, Option<Vec<Did<S>>>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Team<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> TeamBuilder<'a, team_state::Empty> {
+impl<S: BosStr> Team<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> TeamBuilder<S, team_state::Empty> {
         TeamBuilder::new()
     }
 }
 
-impl<'a> TeamBuilder<'a, team_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> TeamBuilder<S, team_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         TeamBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: team_state::State> TeamBuilder<'a, S> {
+impl<S: BosStr, St: team_state::State> TeamBuilder<S, St> {
     /// Set the `avatar` field (optional)
     pub fn avatar(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -309,7 +309,7 @@ impl<'a, S: team_state::State> TeamBuilder<'a, S> {
     }
 }
 
-impl<'a, S: team_state::State> TeamBuilder<'a, S> {
+impl<S: BosStr, St: team_state::State> TeamBuilder<S, St> {
     /// Set the `avatarAlt` field (optional)
     pub fn avatar_alt(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -322,52 +322,52 @@ impl<'a, S: team_state::State> TeamBuilder<'a, S> {
     }
 }
 
-impl<'a, S> TeamBuilder<'a, S>
+impl<S: BosStr, St> TeamBuilder<S, St>
 where
-    S: team_state::State,
-    S::Members: team_state::IsUnset,
+    St: team_state::State,
+    St::Members: team_state::IsUnset,
 {
     /// Set the `members` field (required)
     pub fn members(
         mut self,
         value: impl Into<Vec<Did<S>>>,
-    ) -> TeamBuilder<'a, team_state::SetMembers<S>> {
+    ) -> TeamBuilder<S, team_state::SetMembers<St>> {
         self._fields.2 = Option::Some(value.into());
         TeamBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> TeamBuilder<'a, S>
+impl<S: BosStr, St> TeamBuilder<S, St>
 where
-    S: team_state::State,
-    S::Name: team_state::IsUnset,
+    St: team_state::State,
+    St::Name: team_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> TeamBuilder<'a, team_state::SetName<S>> {
+    ) -> TeamBuilder<S, team_state::SetName<St>> {
         self._fields.3 = Option::Some(value.into());
         TeamBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> TeamBuilder<'a, S>
+impl<S: BosStr, St> TeamBuilder<S, St>
 where
-    S: team_state::State,
-    S::Members: team_state::IsSet,
-    S::Name: team_state::IsSet,
+    St: team_state::State,
+    St::Members: team_state::IsSet,
+    St::Name: team_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Team<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Team<S> {
         Team {
             avatar: self._fields.0,
             avatar_alt: self._fields.1,
@@ -376,8 +376,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Team<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Team<S> {
         Team {
             avatar: self._fields.0,
             avatar_alt: self._fields.1,

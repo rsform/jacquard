@@ -10,44 +10,40 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DeleteWebhook<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DeleteWebhook<S: BosStr = DefaultStr> {
     ///The ID of the webhook to delete.
     pub id: S,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DeleteWebhookOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DeleteWebhookOutput<S: BosStr = DefaultStr> {
     ///Whether the webhook was successfully deleted.
     pub success: bool,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -109,12 +105,11 @@ pub struct DeleteWebhookResponse;
 impl jacquard_common::xrpc::XrpcResp for DeleteWebhookResponse {
     const NSID: &'static str = "place.stream.server.deleteWebhook";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = DeleteWebhookOutput<S>;
+    type Output<S: BosStr> = DeleteWebhookOutput<S>;
     type Err = DeleteWebhookError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for DeleteWebhook<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for DeleteWebhook<S> {
     const NSID: &'static str = "place.stream.server.deleteWebhook";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -129,6 +124,6 @@ impl jacquard_common::xrpc::XrpcEndpoint for DeleteWebhookRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = DeleteWebhook<S>;
+    type Request<S: BosStr> = DeleteWebhook<S>;
     type Response = DeleteWebhookResponse;
 }

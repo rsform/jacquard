@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Handle;
 use jacquard_common::types::value::Data;
@@ -18,19 +18,17 @@ use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct UpdateHandle<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct UpdateHandle<S: BosStr = DefaultStr> {
     ///The new handle.
     pub handle: Handle<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -39,12 +37,11 @@ pub struct UpdateHandleResponse;
 impl jacquard_common::xrpc::XrpcResp for UpdateHandleResponse {
     const NSID: &'static str = "app.ocho.auth.updateHandle";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ();
+    type Output<S: BosStr> = ();
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for UpdateHandle<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UpdateHandle<S> {
     const NSID: &'static str = "app.ocho.auth.updateHandle";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -59,7 +56,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for UpdateHandleRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = UpdateHandle<S>;
+    type Request<S: BosStr> = UpdateHandle<S>;
     type Response = UpdateHandleResponse;
 }
 
@@ -82,9 +79,9 @@ pub mod update_handle_state {
         type Handle = Unset;
     }
     ///State transition - sets the `handle` field to Set
-    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHandle<S> {}
-    impl<S: State> State for SetHandle<S> {
+    pub struct SetHandle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHandle<St> {}
+    impl<St: State> State for SetHandle<St> {
         type Handle = Set<members::handle>;
     }
     /// Marker types for field names
@@ -95,67 +92,67 @@ pub mod update_handle_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct UpdateHandleBuilder<'a, S: update_handle_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct UpdateHandleBuilder<S: BosStr, St: update_handle_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Handle<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> UpdateHandle<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> UpdateHandleBuilder<'a, update_handle_state::Empty> {
+impl<S: BosStr> UpdateHandle<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> UpdateHandleBuilder<S, update_handle_state::Empty> {
         UpdateHandleBuilder::new()
     }
 }
 
-impl<'a> UpdateHandleBuilder<'a, update_handle_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> UpdateHandleBuilder<S, update_handle_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         UpdateHandleBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> UpdateHandleBuilder<'a, S>
+impl<S: BosStr, St> UpdateHandleBuilder<S, St>
 where
-    S: update_handle_state::State,
-    S::Handle: update_handle_state::IsUnset,
+    St: update_handle_state::State,
+    St::Handle: update_handle_state::IsUnset,
 {
     /// Set the `handle` field (required)
     pub fn handle(
         mut self,
         value: impl Into<Handle<S>>,
-    ) -> UpdateHandleBuilder<'a, update_handle_state::SetHandle<S>> {
+    ) -> UpdateHandleBuilder<S, update_handle_state::SetHandle<St>> {
         self._fields.0 = Option::Some(value.into());
         UpdateHandleBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> UpdateHandleBuilder<'a, S>
+impl<S: BosStr, St> UpdateHandleBuilder<S, St>
 where
-    S: update_handle_state::State,
-    S::Handle: update_handle_state::IsSet,
+    St: update_handle_state::State,
+    St::Handle: update_handle_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> UpdateHandle<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> UpdateHandle<S> {
         UpdateHandle {
             handle: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> UpdateHandle<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> UpdateHandle<S> {
         UpdateHandle {
             handle: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

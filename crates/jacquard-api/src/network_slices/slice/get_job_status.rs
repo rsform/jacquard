@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -30,11 +30,11 @@ use crate::network_slices::slice::get_job_status;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct JobStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct JobStatus<S: BosStr = DefaultStr> {
     ///When the job completed
     #[serde(skip_serializing_if = "Option::is_none")]
     pub completed_at: Option<Datetime>,
@@ -61,34 +61,30 @@ pub struct JobStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetJobStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct GetJobStatus<S: BosStr = DefaultStr> {
     pub job_id: S,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetJobStatusOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetJobStatusOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
-    #[serde(borrow)]
     pub value: Data<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -97,11 +93,11 @@ pub struct GetJobStatusOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SyncJobResult<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SyncJobResult<S: BosStr = DefaultStr> {
     ///List of collection NSIDs that were synced
     pub collections_synced: Vec<Nsid<S>>,
     ///Human-readable message about the job completion
@@ -116,7 +112,7 @@ pub struct SyncJobResult<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for JobStatus<S> {
+impl<S: BosStr> LexiconSchema for JobStatus<S> {
     fn nsid() -> &'static str {
         "network.slices.slice.getJobStatus"
     }
@@ -136,12 +132,11 @@ pub struct GetJobStatusResponse;
 impl jacquard_common::xrpc::XrpcResp for GetJobStatusResponse {
     const NSID: &'static str = "network.slices.slice.getJobStatus";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetJobStatusOutput<S>;
+    type Output<S: BosStr> = GetJobStatusOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetJobStatus<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetJobStatus<S> {
     const NSID: &'static str = "network.slices.slice.getJobStatus";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetJobStatusResponse;
@@ -152,11 +147,11 @@ pub struct GetJobStatusRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetJobStatusRequest {
     const PATH: &'static str = "/xrpc/network.slices.slice.getJobStatus";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetJobStatus<S>;
+    type Request<S: BosStr> = GetJobStatus<S>;
     type Response = GetJobStatusResponse;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for SyncJobResult<S> {
+impl<S: BosStr> LexiconSchema for SyncJobResult<S> {
     fn nsid() -> &'static str {
         "network.slices.slice.getJobStatus"
     }
@@ -196,39 +191,39 @@ pub mod job_status_state {
         type Status = Unset;
     }
     ///State transition - sets the `retry_count` field to Set
-    pub struct SetRetryCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRetryCount<S> {}
-    impl<S: State> State for SetRetryCount<S> {
+    pub struct SetRetryCount<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRetryCount<St> {}
+    impl<St: State> State for SetRetryCount<St> {
         type RetryCount = Set<members::retry_count>;
-        type JobId = S::JobId;
-        type CreatedAt = S::CreatedAt;
-        type Status = S::Status;
+        type JobId = St::JobId;
+        type CreatedAt = St::CreatedAt;
+        type Status = St::Status;
     }
     ///State transition - sets the `job_id` field to Set
-    pub struct SetJobId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetJobId<S> {}
-    impl<S: State> State for SetJobId<S> {
-        type RetryCount = S::RetryCount;
+    pub struct SetJobId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetJobId<St> {}
+    impl<St: State> State for SetJobId<St> {
+        type RetryCount = St::RetryCount;
         type JobId = Set<members::job_id>;
-        type CreatedAt = S::CreatedAt;
-        type Status = S::Status;
+        type CreatedAt = St::CreatedAt;
+        type Status = St::Status;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type RetryCount = S::RetryCount;
-        type JobId = S::JobId;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type RetryCount = St::RetryCount;
+        type JobId = St::JobId;
         type CreatedAt = Set<members::created_at>;
-        type Status = S::Status;
+        type Status = St::Status;
     }
     ///State transition - sets the `status` field to Set
-    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStatus<S> {}
-    impl<S: State> State for SetStatus<S> {
-        type RetryCount = S::RetryCount;
-        type JobId = S::JobId;
-        type CreatedAt = S::CreatedAt;
+    pub struct SetStatus<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStatus<St> {}
+    impl<St: State> State for SetStatus<St> {
+        type RetryCount = St::RetryCount;
+        type JobId = St::JobId;
+        type CreatedAt = St::CreatedAt;
         type Status = Set<members::status>;
     }
     /// Marker types for field names
@@ -245,9 +240,9 @@ pub mod job_status_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct JobStatusBuilder<'a, S: job_status_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct JobStatusBuilder<S: BosStr, St: job_status_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
         Option<Datetime>,
@@ -258,28 +253,28 @@ pub struct JobStatusBuilder<'a, S: job_status_state::State> {
         Option<Datetime>,
         Option<S>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> JobStatus<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> JobStatusBuilder<'a, job_status_state::Empty> {
+impl<S: BosStr> JobStatus<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> JobStatusBuilder<S, job_status_state::Empty> {
         JobStatusBuilder::new()
     }
 }
 
-impl<'a> JobStatusBuilder<'a, job_status_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> JobStatusBuilder<S, job_status_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         JobStatusBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: job_status_state::State> JobStatusBuilder<'a, S> {
+impl<S: BosStr, St: job_status_state::State> JobStatusBuilder<S, St> {
     /// Set the `completedAt` field (optional)
     pub fn completed_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.0 = value.into();
@@ -292,26 +287,26 @@ impl<'a, S: job_status_state::State> JobStatusBuilder<'a, S> {
     }
 }
 
-impl<'a, S> JobStatusBuilder<'a, S>
+impl<S: BosStr, St> JobStatusBuilder<S, St>
 where
-    S: job_status_state::State,
-    S::CreatedAt: job_status_state::IsUnset,
+    St: job_status_state::State,
+    St::CreatedAt: job_status_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> JobStatusBuilder<'a, job_status_state::SetCreatedAt<S>> {
+    ) -> JobStatusBuilder<S, job_status_state::SetCreatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         JobStatusBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: job_status_state::State> JobStatusBuilder<'a, S> {
+impl<S: BosStr, St: job_status_state::State> JobStatusBuilder<S, St> {
     /// Set the `error` field (optional)
     pub fn error(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -324,26 +319,26 @@ impl<'a, S: job_status_state::State> JobStatusBuilder<'a, S> {
     }
 }
 
-impl<'a, S> JobStatusBuilder<'a, S>
+impl<S: BosStr, St> JobStatusBuilder<S, St>
 where
-    S: job_status_state::State,
-    S::JobId: job_status_state::IsUnset,
+    St: job_status_state::State,
+    St::JobId: job_status_state::IsUnset,
 {
     /// Set the `jobId` field (required)
     pub fn job_id(
         mut self,
         value: impl Into<S>,
-    ) -> JobStatusBuilder<'a, job_status_state::SetJobId<S>> {
+    ) -> JobStatusBuilder<S, job_status_state::SetJobId<St>> {
         self._fields.3 = Option::Some(value.into());
         JobStatusBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: job_status_state::State> JobStatusBuilder<'a, S> {
+impl<S: BosStr, St: job_status_state::State> JobStatusBuilder<S, St> {
     /// Set the `result` field (optional)
     pub fn result(
         mut self,
@@ -362,26 +357,26 @@ impl<'a, S: job_status_state::State> JobStatusBuilder<'a, S> {
     }
 }
 
-impl<'a, S> JobStatusBuilder<'a, S>
+impl<S: BosStr, St> JobStatusBuilder<S, St>
 where
-    S: job_status_state::State,
-    S::RetryCount: job_status_state::IsUnset,
+    St: job_status_state::State,
+    St::RetryCount: job_status_state::IsUnset,
 {
     /// Set the `retryCount` field (required)
     pub fn retry_count(
         mut self,
         value: impl Into<i64>,
-    ) -> JobStatusBuilder<'a, job_status_state::SetRetryCount<S>> {
+    ) -> JobStatusBuilder<S, job_status_state::SetRetryCount<St>> {
         self._fields.5 = Option::Some(value.into());
         JobStatusBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: job_status_state::State> JobStatusBuilder<'a, S> {
+impl<S: BosStr, St: job_status_state::State> JobStatusBuilder<S, St> {
     /// Set the `startedAt` field (optional)
     pub fn started_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.6 = value.into();
@@ -394,35 +389,35 @@ impl<'a, S: job_status_state::State> JobStatusBuilder<'a, S> {
     }
 }
 
-impl<'a, S> JobStatusBuilder<'a, S>
+impl<S: BosStr, St> JobStatusBuilder<S, St>
 where
-    S: job_status_state::State,
-    S::Status: job_status_state::IsUnset,
+    St: job_status_state::State,
+    St::Status: job_status_state::IsUnset,
 {
     /// Set the `status` field (required)
     pub fn status(
         mut self,
         value: impl Into<S>,
-    ) -> JobStatusBuilder<'a, job_status_state::SetStatus<S>> {
+    ) -> JobStatusBuilder<S, job_status_state::SetStatus<St>> {
         self._fields.7 = Option::Some(value.into());
         JobStatusBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> JobStatusBuilder<'a, S>
+impl<S: BosStr, St> JobStatusBuilder<S, St>
 where
-    S: job_status_state::State,
-    S::RetryCount: job_status_state::IsSet,
-    S::JobId: job_status_state::IsSet,
-    S::CreatedAt: job_status_state::IsSet,
-    S::Status: job_status_state::IsSet,
+    St: job_status_state::State,
+    St::RetryCount: job_status_state::IsSet,
+    St::JobId: job_status_state::IsSet,
+    St::CreatedAt: job_status_state::IsSet,
+    St::Status: job_status_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> JobStatus<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> JobStatus<S> {
         JobStatus {
             completed_at: self._fields.0,
             created_at: self._fields.1.unwrap(),
@@ -435,11 +430,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> JobStatus<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> JobStatus<S> {
         JobStatus {
             completed_at: self._fields.0,
             created_at: self._fields.1.unwrap(),
@@ -665,9 +660,9 @@ pub mod get_job_status_state {
         type JobId = Unset;
     }
     ///State transition - sets the `job_id` field to Set
-    pub struct SetJobId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetJobId<S> {}
-    impl<S: State> State for SetJobId<S> {
+    pub struct SetJobId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetJobId<St> {}
+    impl<St: State> State for SetJobId<St> {
         type JobId = Set<members::job_id>;
     }
     /// Marker types for field names
@@ -678,57 +673,57 @@ pub mod get_job_status_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetJobStatusBuilder<'a, S: get_job_status_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetJobStatusBuilder<S: BosStr, St: get_job_status_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetJobStatus<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetJobStatusBuilder<'a, get_job_status_state::Empty> {
+impl<S: BosStr> GetJobStatus<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetJobStatusBuilder<S, get_job_status_state::Empty> {
         GetJobStatusBuilder::new()
     }
 }
 
-impl<'a> GetJobStatusBuilder<'a, get_job_status_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetJobStatusBuilder<S, get_job_status_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetJobStatusBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetJobStatusBuilder<'a, S>
+impl<S: BosStr, St> GetJobStatusBuilder<S, St>
 where
-    S: get_job_status_state::State,
-    S::JobId: get_job_status_state::IsUnset,
+    St: get_job_status_state::State,
+    St::JobId: get_job_status_state::IsUnset,
 {
     /// Set the `jobId` field (required)
     pub fn job_id(
         mut self,
         value: impl Into<S>,
-    ) -> GetJobStatusBuilder<'a, get_job_status_state::SetJobId<S>> {
+    ) -> GetJobStatusBuilder<S, get_job_status_state::SetJobId<St>> {
         self._fields.0 = Option::Some(value.into());
         GetJobStatusBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetJobStatusBuilder<'a, S>
+impl<S: BosStr, St> GetJobStatusBuilder<S, St>
 where
-    S: get_job_status_state::State,
-    S::JobId: get_job_status_state::IsSet,
+    St: get_job_status_state::State,
+    St::JobId: get_job_status_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetJobStatus<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetJobStatus<S> {
         GetJobStatus {
             job_id: self._fields.0.unwrap(),
         }
@@ -745,9 +740,9 @@ pub mod sync_job_result_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CollectionsSynced;
         type Message;
         type Success;
-        type CollectionsSynced;
         type ReposProcessed;
         type TotalRecords;
     }
@@ -755,71 +750,71 @@ pub mod sync_job_result_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CollectionsSynced = Unset;
         type Message = Unset;
         type Success = Unset;
-        type CollectionsSynced = Unset;
         type ReposProcessed = Unset;
         type TotalRecords = Unset;
     }
+    ///State transition - sets the `collections_synced` field to Set
+    pub struct SetCollectionsSynced<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCollectionsSynced<St> {}
+    impl<St: State> State for SetCollectionsSynced<St> {
+        type CollectionsSynced = Set<members::collections_synced>;
+        type Message = St::Message;
+        type Success = St::Success;
+        type ReposProcessed = St::ReposProcessed;
+        type TotalRecords = St::TotalRecords;
+    }
     ///State transition - sets the `message` field to Set
-    pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMessage<S> {}
-    impl<S: State> State for SetMessage<S> {
+    pub struct SetMessage<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMessage<St> {}
+    impl<St: State> State for SetMessage<St> {
+        type CollectionsSynced = St::CollectionsSynced;
         type Message = Set<members::message>;
-        type Success = S::Success;
-        type CollectionsSynced = S::CollectionsSynced;
-        type ReposProcessed = S::ReposProcessed;
-        type TotalRecords = S::TotalRecords;
+        type Success = St::Success;
+        type ReposProcessed = St::ReposProcessed;
+        type TotalRecords = St::TotalRecords;
     }
     ///State transition - sets the `success` field to Set
-    pub struct SetSuccess<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSuccess<S> {}
-    impl<S: State> State for SetSuccess<S> {
-        type Message = S::Message;
+    pub struct SetSuccess<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSuccess<St> {}
+    impl<St: State> State for SetSuccess<St> {
+        type CollectionsSynced = St::CollectionsSynced;
+        type Message = St::Message;
         type Success = Set<members::success>;
-        type CollectionsSynced = S::CollectionsSynced;
-        type ReposProcessed = S::ReposProcessed;
-        type TotalRecords = S::TotalRecords;
-    }
-    ///State transition - sets the `collections_synced` field to Set
-    pub struct SetCollectionsSynced<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCollectionsSynced<S> {}
-    impl<S: State> State for SetCollectionsSynced<S> {
-        type Message = S::Message;
-        type Success = S::Success;
-        type CollectionsSynced = Set<members::collections_synced>;
-        type ReposProcessed = S::ReposProcessed;
-        type TotalRecords = S::TotalRecords;
+        type ReposProcessed = St::ReposProcessed;
+        type TotalRecords = St::TotalRecords;
     }
     ///State transition - sets the `repos_processed` field to Set
-    pub struct SetReposProcessed<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetReposProcessed<S> {}
-    impl<S: State> State for SetReposProcessed<S> {
-        type Message = S::Message;
-        type Success = S::Success;
-        type CollectionsSynced = S::CollectionsSynced;
+    pub struct SetReposProcessed<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetReposProcessed<St> {}
+    impl<St: State> State for SetReposProcessed<St> {
+        type CollectionsSynced = St::CollectionsSynced;
+        type Message = St::Message;
+        type Success = St::Success;
         type ReposProcessed = Set<members::repos_processed>;
-        type TotalRecords = S::TotalRecords;
+        type TotalRecords = St::TotalRecords;
     }
     ///State transition - sets the `total_records` field to Set
-    pub struct SetTotalRecords<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTotalRecords<S> {}
-    impl<S: State> State for SetTotalRecords<S> {
-        type Message = S::Message;
-        type Success = S::Success;
-        type CollectionsSynced = S::CollectionsSynced;
-        type ReposProcessed = S::ReposProcessed;
+    pub struct SetTotalRecords<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTotalRecords<St> {}
+    impl<St: State> State for SetTotalRecords<St> {
+        type CollectionsSynced = St::CollectionsSynced;
+        type Message = St::Message;
+        type Success = St::Success;
+        type ReposProcessed = St::ReposProcessed;
         type TotalRecords = Set<members::total_records>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `collections_synced` field
+        pub struct collections_synced(());
         ///Marker type for the `message` field
         pub struct message(());
         ///Marker type for the `success` field
         pub struct success(());
-        ///Marker type for the `collections_synced` field
-        pub struct collections_synced(());
         ///Marker type for the `repos_processed` field
         pub struct repos_processed(());
         ///Marker type for the `total_records` field
@@ -827,137 +822,137 @@ pub mod sync_job_result_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct SyncJobResultBuilder<'a, S: sync_job_result_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct SyncJobResultBuilder<S: BosStr, St: sync_job_result_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<Nsid<S>>>, Option<S>, Option<i64>, Option<bool>, Option<i64>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> SyncJobResult<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> SyncJobResultBuilder<'a, sync_job_result_state::Empty> {
+impl<S: BosStr> SyncJobResult<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> SyncJobResultBuilder<S, sync_job_result_state::Empty> {
         SyncJobResultBuilder::new()
     }
 }
 
-impl<'a> SyncJobResultBuilder<'a, sync_job_result_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> SyncJobResultBuilder<S, sync_job_result_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SyncJobResultBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SyncJobResultBuilder<'a, S>
+impl<S: BosStr, St> SyncJobResultBuilder<S, St>
 where
-    S: sync_job_result_state::State,
-    S::CollectionsSynced: sync_job_result_state::IsUnset,
+    St: sync_job_result_state::State,
+    St::CollectionsSynced: sync_job_result_state::IsUnset,
 {
     /// Set the `collectionsSynced` field (required)
     pub fn collections_synced(
         mut self,
         value: impl Into<Vec<Nsid<S>>>,
-    ) -> SyncJobResultBuilder<'a, sync_job_result_state::SetCollectionsSynced<S>> {
+    ) -> SyncJobResultBuilder<S, sync_job_result_state::SetCollectionsSynced<St>> {
         self._fields.0 = Option::Some(value.into());
         SyncJobResultBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SyncJobResultBuilder<'a, S>
+impl<S: BosStr, St> SyncJobResultBuilder<S, St>
 where
-    S: sync_job_result_state::State,
-    S::Message: sync_job_result_state::IsUnset,
+    St: sync_job_result_state::State,
+    St::Message: sync_job_result_state::IsUnset,
 {
     /// Set the `message` field (required)
     pub fn message(
         mut self,
         value: impl Into<S>,
-    ) -> SyncJobResultBuilder<'a, sync_job_result_state::SetMessage<S>> {
+    ) -> SyncJobResultBuilder<S, sync_job_result_state::SetMessage<St>> {
         self._fields.1 = Option::Some(value.into());
         SyncJobResultBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SyncJobResultBuilder<'a, S>
+impl<S: BosStr, St> SyncJobResultBuilder<S, St>
 where
-    S: sync_job_result_state::State,
-    S::ReposProcessed: sync_job_result_state::IsUnset,
+    St: sync_job_result_state::State,
+    St::ReposProcessed: sync_job_result_state::IsUnset,
 {
     /// Set the `reposProcessed` field (required)
     pub fn repos_processed(
         mut self,
         value: impl Into<i64>,
-    ) -> SyncJobResultBuilder<'a, sync_job_result_state::SetReposProcessed<S>> {
+    ) -> SyncJobResultBuilder<S, sync_job_result_state::SetReposProcessed<St>> {
         self._fields.2 = Option::Some(value.into());
         SyncJobResultBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SyncJobResultBuilder<'a, S>
+impl<S: BosStr, St> SyncJobResultBuilder<S, St>
 where
-    S: sync_job_result_state::State,
-    S::Success: sync_job_result_state::IsUnset,
+    St: sync_job_result_state::State,
+    St::Success: sync_job_result_state::IsUnset,
 {
     /// Set the `success` field (required)
     pub fn success(
         mut self,
         value: impl Into<bool>,
-    ) -> SyncJobResultBuilder<'a, sync_job_result_state::SetSuccess<S>> {
+    ) -> SyncJobResultBuilder<S, sync_job_result_state::SetSuccess<St>> {
         self._fields.3 = Option::Some(value.into());
         SyncJobResultBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SyncJobResultBuilder<'a, S>
+impl<S: BosStr, St> SyncJobResultBuilder<S, St>
 where
-    S: sync_job_result_state::State,
-    S::TotalRecords: sync_job_result_state::IsUnset,
+    St: sync_job_result_state::State,
+    St::TotalRecords: sync_job_result_state::IsUnset,
 {
     /// Set the `totalRecords` field (required)
     pub fn total_records(
         mut self,
         value: impl Into<i64>,
-    ) -> SyncJobResultBuilder<'a, sync_job_result_state::SetTotalRecords<S>> {
+    ) -> SyncJobResultBuilder<S, sync_job_result_state::SetTotalRecords<St>> {
         self._fields.4 = Option::Some(value.into());
         SyncJobResultBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SyncJobResultBuilder<'a, S>
+impl<S: BosStr, St> SyncJobResultBuilder<S, St>
 where
-    S: sync_job_result_state::State,
-    S::Message: sync_job_result_state::IsSet,
-    S::Success: sync_job_result_state::IsSet,
-    S::CollectionsSynced: sync_job_result_state::IsSet,
-    S::ReposProcessed: sync_job_result_state::IsSet,
-    S::TotalRecords: sync_job_result_state::IsSet,
+    St: sync_job_result_state::State,
+    St::CollectionsSynced: sync_job_result_state::IsSet,
+    St::Message: sync_job_result_state::IsSet,
+    St::Success: sync_job_result_state::IsSet,
+    St::ReposProcessed: sync_job_result_state::IsSet,
+    St::TotalRecords: sync_job_result_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> SyncJobResult<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> SyncJobResult<S> {
         SyncJobResult {
             collections_synced: self._fields.0.unwrap(),
             message: self._fields.1.unwrap(),
@@ -967,11 +962,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> SyncJobResult<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> SyncJobResult<S> {
         SyncJobResult {
             collections_synced: self._fields.0.unwrap(),
             message: self._fields.1.unwrap(),

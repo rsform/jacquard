@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::value::Data;
@@ -19,18 +19,16 @@ use serde::{Serialize, Deserialize};
 use crate::fm_teal::alpha::feed::PlayView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetActorFeed<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct GetActorFeed<S: BosStr = DefaultStr> {
     pub author_did: AtIdentifier<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub cursor: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
@@ -38,18 +36,16 @@ pub struct GetActorFeed<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetActorFeedOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetActorFeedOutput<S: BosStr = DefaultStr> {
     pub plays: Vec<PlayView<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -58,12 +54,11 @@ pub struct GetActorFeedResponse;
 impl jacquard_common::xrpc::XrpcResp for GetActorFeedResponse {
     const NSID: &'static str = "fm.teal.alpha.feed.getActorFeed";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetActorFeedOutput<S>;
+    type Output<S: BosStr> = GetActorFeedOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetActorFeed<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetActorFeed<S> {
     const NSID: &'static str = "fm.teal.alpha.feed.getActorFeed";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetActorFeedResponse;
@@ -74,7 +69,7 @@ pub struct GetActorFeedRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetActorFeedRequest {
     const PATH: &'static str = "/xrpc/fm.teal.alpha.feed.getActorFeed";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetActorFeed<S>;
+    type Request<S: BosStr> = GetActorFeed<S>;
     type Response = GetActorFeedResponse;
 }
 
@@ -97,9 +92,9 @@ pub mod get_actor_feed_state {
         type AuthorDid = Unset;
     }
     ///State transition - sets the `author_did` field to Set
-    pub struct SetAuthorDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthorDid<S> {}
-    impl<S: State> State for SetAuthorDid<S> {
+    pub struct SetAuthorDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAuthorDid<St> {}
+    impl<St: State> State for SetAuthorDid<St> {
         type AuthorDid = Set<members::author_did>;
     }
     /// Marker types for field names
@@ -110,51 +105,51 @@ pub mod get_actor_feed_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetActorFeedBuilder<'a, S: get_actor_feed_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetActorFeedBuilder<S: BosStr, St: get_actor_feed_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtIdentifier<S>>, Option<S>, Option<i64>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetActorFeed<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetActorFeedBuilder<'a, get_actor_feed_state::Empty> {
+impl<S: BosStr> GetActorFeed<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetActorFeedBuilder<S, get_actor_feed_state::Empty> {
         GetActorFeedBuilder::new()
     }
 }
 
-impl<'a> GetActorFeedBuilder<'a, get_actor_feed_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetActorFeedBuilder<S, get_actor_feed_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetActorFeedBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetActorFeedBuilder<'a, S>
+impl<S: BosStr, St> GetActorFeedBuilder<S, St>
 where
-    S: get_actor_feed_state::State,
-    S::AuthorDid: get_actor_feed_state::IsUnset,
+    St: get_actor_feed_state::State,
+    St::AuthorDid: get_actor_feed_state::IsUnset,
 {
     /// Set the `authorDID` field (required)
     pub fn author_did(
         mut self,
         value: impl Into<AtIdentifier<S>>,
-    ) -> GetActorFeedBuilder<'a, get_actor_feed_state::SetAuthorDid<S>> {
+    ) -> GetActorFeedBuilder<S, get_actor_feed_state::SetAuthorDid<St>> {
         self._fields.0 = Option::Some(value.into());
         GetActorFeedBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: get_actor_feed_state::State> GetActorFeedBuilder<'a, S> {
+impl<S: BosStr, St: get_actor_feed_state::State> GetActorFeedBuilder<S, St> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -167,7 +162,7 @@ impl<'a, S: get_actor_feed_state::State> GetActorFeedBuilder<'a, S> {
     }
 }
 
-impl<'a, S: get_actor_feed_state::State> GetActorFeedBuilder<'a, S> {
+impl<S: BosStr, St: get_actor_feed_state::State> GetActorFeedBuilder<S, St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -180,13 +175,13 @@ impl<'a, S: get_actor_feed_state::State> GetActorFeedBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GetActorFeedBuilder<'a, S>
+impl<S: BosStr, St> GetActorFeedBuilder<S, St>
 where
-    S: get_actor_feed_state::State,
-    S::AuthorDid: get_actor_feed_state::IsSet,
+    St: get_actor_feed_state::State,
+    St::AuthorDid: get_actor_feed_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetActorFeed<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetActorFeed<S> {
         GetActorFeed {
             author_did: self._fields.0.unwrap(),
             cursor: self._fields.1,

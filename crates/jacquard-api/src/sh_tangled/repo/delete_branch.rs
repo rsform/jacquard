@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
@@ -18,19 +18,17 @@ use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DeleteBranch<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DeleteBranch<S: BosStr = DefaultStr> {
     pub branch: S,
     pub repo: AtUri<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -39,12 +37,11 @@ pub struct DeleteBranchResponse;
 impl jacquard_common::xrpc::XrpcResp for DeleteBranchResponse {
     const NSID: &'static str = "sh.tangled.repo.deleteBranch";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ();
+    type Output<S: BosStr> = ();
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for DeleteBranch<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for DeleteBranch<S> {
     const NSID: &'static str = "sh.tangled.repo.deleteBranch";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -59,7 +56,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for DeleteBranchRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = DeleteBranch<S>;
+    type Request<S: BosStr> = DeleteBranch<S>;
     type Response = DeleteBranchResponse;
 }
 
@@ -84,17 +81,17 @@ pub mod delete_branch_state {
         type Branch = Unset;
     }
     ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
+    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRepo<St> {}
+    impl<St: State> State for SetRepo<St> {
         type Repo = Set<members::repo>;
-        type Branch = S::Branch;
+        type Branch = St::Branch;
     }
     ///State transition - sets the `branch` field to Set
-    pub struct SetBranch<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBranch<S> {}
-    impl<S: State> State for SetBranch<S> {
-        type Repo = S::Repo;
+    pub struct SetBranch<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBranch<St> {}
+    impl<St: State> State for SetBranch<St> {
+        type Repo = St::Repo;
         type Branch = Set<members::branch>;
     }
     /// Marker types for field names
@@ -107,88 +104,88 @@ pub mod delete_branch_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct DeleteBranchBuilder<'a, S: delete_branch_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct DeleteBranchBuilder<S: BosStr, St: delete_branch_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<AtUri<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> DeleteBranch<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> DeleteBranchBuilder<'a, delete_branch_state::Empty> {
+impl<S: BosStr> DeleteBranch<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> DeleteBranchBuilder<S, delete_branch_state::Empty> {
         DeleteBranchBuilder::new()
     }
 }
 
-impl<'a> DeleteBranchBuilder<'a, delete_branch_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> DeleteBranchBuilder<S, delete_branch_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         DeleteBranchBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DeleteBranchBuilder<'a, S>
+impl<S: BosStr, St> DeleteBranchBuilder<S, St>
 where
-    S: delete_branch_state::State,
-    S::Branch: delete_branch_state::IsUnset,
+    St: delete_branch_state::State,
+    St::Branch: delete_branch_state::IsUnset,
 {
     /// Set the `branch` field (required)
     pub fn branch(
         mut self,
         value: impl Into<S>,
-    ) -> DeleteBranchBuilder<'a, delete_branch_state::SetBranch<S>> {
+    ) -> DeleteBranchBuilder<S, delete_branch_state::SetBranch<St>> {
         self._fields.0 = Option::Some(value.into());
         DeleteBranchBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DeleteBranchBuilder<'a, S>
+impl<S: BosStr, St> DeleteBranchBuilder<S, St>
 where
-    S: delete_branch_state::State,
-    S::Repo: delete_branch_state::IsUnset,
+    St: delete_branch_state::State,
+    St::Repo: delete_branch_state::IsUnset,
 {
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> DeleteBranchBuilder<'a, delete_branch_state::SetRepo<S>> {
+    ) -> DeleteBranchBuilder<S, delete_branch_state::SetRepo<St>> {
         self._fields.1 = Option::Some(value.into());
         DeleteBranchBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DeleteBranchBuilder<'a, S>
+impl<S: BosStr, St> DeleteBranchBuilder<S, St>
 where
-    S: delete_branch_state::State,
-    S::Repo: delete_branch_state::IsSet,
-    S::Branch: delete_branch_state::IsSet,
+    St: delete_branch_state::State,
+    St::Repo: delete_branch_state::IsSet,
+    St::Branch: delete_branch_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> DeleteBranch<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> DeleteBranch<S> {
         DeleteBranch {
             branch: self._fields.0.unwrap(),
             repo: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> DeleteBranch<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> DeleteBranch<S> {
         DeleteBranch {
             branch: self._fields.0.unwrap(),
             repo: self._fields.1.unwrap(),

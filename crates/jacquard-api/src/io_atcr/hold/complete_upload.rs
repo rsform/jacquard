@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,43 +26,39 @@ use serde::{Serialize, Deserialize};
 use crate::io_atcr::hold::complete_upload;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CompleteUpload<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CompleteUpload<S: BosStr = DefaultStr> {
     ///Final blob digest (e.g., sha256:abc123...)
     pub digest: S,
     ///List of uploaded parts with their ETags
     pub parts: Vec<complete_upload::PartInfo<S>>,
     ///Upload session ID from initiateUpload
     pub upload_id: S,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CompleteUploadOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CompleteUploadOutput<S: BosStr = DefaultStr> {
     ///The digest of the completed blob
     pub digest: S,
     ///Always 'completed' on success
     pub status: S,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -141,11 +137,11 @@ impl core::fmt::Display for CompleteUploadError {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct PartInfo<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct PartInfo<S: BosStr = DefaultStr> {
     ///ETag returned when the part was uploaded
     pub etag: S,
     ///Part sequence number (1-indexed)
@@ -159,12 +155,11 @@ pub struct CompleteUploadResponse;
 impl jacquard_common::xrpc::XrpcResp for CompleteUploadResponse {
     const NSID: &'static str = "io.atcr.hold.completeUpload";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = CompleteUploadOutput<S>;
+    type Output<S: BosStr> = CompleteUploadOutput<S>;
     type Err = CompleteUploadError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for CompleteUpload<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for CompleteUpload<S> {
     const NSID: &'static str = "io.atcr.hold.completeUpload";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -179,11 +174,11 @@ impl jacquard_common::xrpc::XrpcEndpoint for CompleteUploadRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = CompleteUpload<S>;
+    type Request<S: BosStr> = CompleteUpload<S>;
     type Response = CompleteUploadResponse;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for PartInfo<S> {
+impl<S: BosStr> LexiconSchema for PartInfo<S> {
     fn nsid() -> &'static str {
         "io.atcr.hold.completeUpload"
     }
@@ -230,144 +225,144 @@ pub mod complete_upload_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Digest;
-        type UploadId;
         type Parts;
+        type UploadId;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Digest = Unset;
-        type UploadId = Unset;
         type Parts = Unset;
+        type UploadId = Unset;
     }
     ///State transition - sets the `digest` field to Set
-    pub struct SetDigest<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDigest<S> {}
-    impl<S: State> State for SetDigest<S> {
+    pub struct SetDigest<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDigest<St> {}
+    impl<St: State> State for SetDigest<St> {
         type Digest = Set<members::digest>;
-        type UploadId = S::UploadId;
-        type Parts = S::Parts;
-    }
-    ///State transition - sets the `upload_id` field to Set
-    pub struct SetUploadId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUploadId<S> {}
-    impl<S: State> State for SetUploadId<S> {
-        type Digest = S::Digest;
-        type UploadId = Set<members::upload_id>;
-        type Parts = S::Parts;
+        type Parts = St::Parts;
+        type UploadId = St::UploadId;
     }
     ///State transition - sets the `parts` field to Set
-    pub struct SetParts<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetParts<S> {}
-    impl<S: State> State for SetParts<S> {
-        type Digest = S::Digest;
-        type UploadId = S::UploadId;
+    pub struct SetParts<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetParts<St> {}
+    impl<St: State> State for SetParts<St> {
+        type Digest = St::Digest;
         type Parts = Set<members::parts>;
+        type UploadId = St::UploadId;
+    }
+    ///State transition - sets the `upload_id` field to Set
+    pub struct SetUploadId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUploadId<St> {}
+    impl<St: State> State for SetUploadId<St> {
+        type Digest = St::Digest;
+        type Parts = St::Parts;
+        type UploadId = Set<members::upload_id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `digest` field
         pub struct digest(());
-        ///Marker type for the `upload_id` field
-        pub struct upload_id(());
         ///Marker type for the `parts` field
         pub struct parts(());
+        ///Marker type for the `upload_id` field
+        pub struct upload_id(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct CompleteUploadBuilder<'a, S: complete_upload_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct CompleteUploadBuilder<S: BosStr, St: complete_upload_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<Vec<complete_upload::PartInfo<S>>>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> CompleteUpload<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> CompleteUploadBuilder<'a, complete_upload_state::Empty> {
+impl<S: BosStr> CompleteUpload<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> CompleteUploadBuilder<S, complete_upload_state::Empty> {
         CompleteUploadBuilder::new()
     }
 }
 
-impl<'a> CompleteUploadBuilder<'a, complete_upload_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> CompleteUploadBuilder<S, complete_upload_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         CompleteUploadBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CompleteUploadBuilder<'a, S>
+impl<S: BosStr, St> CompleteUploadBuilder<S, St>
 where
-    S: complete_upload_state::State,
-    S::Digest: complete_upload_state::IsUnset,
+    St: complete_upload_state::State,
+    St::Digest: complete_upload_state::IsUnset,
 {
     /// Set the `digest` field (required)
     pub fn digest(
         mut self,
         value: impl Into<S>,
-    ) -> CompleteUploadBuilder<'a, complete_upload_state::SetDigest<S>> {
+    ) -> CompleteUploadBuilder<S, complete_upload_state::SetDigest<St>> {
         self._fields.0 = Option::Some(value.into());
         CompleteUploadBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CompleteUploadBuilder<'a, S>
+impl<S: BosStr, St> CompleteUploadBuilder<S, St>
 where
-    S: complete_upload_state::State,
-    S::Parts: complete_upload_state::IsUnset,
+    St: complete_upload_state::State,
+    St::Parts: complete_upload_state::IsUnset,
 {
     /// Set the `parts` field (required)
     pub fn parts(
         mut self,
         value: impl Into<Vec<complete_upload::PartInfo<S>>>,
-    ) -> CompleteUploadBuilder<'a, complete_upload_state::SetParts<S>> {
+    ) -> CompleteUploadBuilder<S, complete_upload_state::SetParts<St>> {
         self._fields.1 = Option::Some(value.into());
         CompleteUploadBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CompleteUploadBuilder<'a, S>
+impl<S: BosStr, St> CompleteUploadBuilder<S, St>
 where
-    S: complete_upload_state::State,
-    S::UploadId: complete_upload_state::IsUnset,
+    St: complete_upload_state::State,
+    St::UploadId: complete_upload_state::IsUnset,
 {
     /// Set the `uploadId` field (required)
     pub fn upload_id(
         mut self,
         value: impl Into<S>,
-    ) -> CompleteUploadBuilder<'a, complete_upload_state::SetUploadId<S>> {
+    ) -> CompleteUploadBuilder<S, complete_upload_state::SetUploadId<St>> {
         self._fields.2 = Option::Some(value.into());
         CompleteUploadBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CompleteUploadBuilder<'a, S>
+impl<S: BosStr, St> CompleteUploadBuilder<S, St>
 where
-    S: complete_upload_state::State,
-    S::Digest: complete_upload_state::IsSet,
-    S::UploadId: complete_upload_state::IsSet,
-    S::Parts: complete_upload_state::IsSet,
+    St: complete_upload_state::State,
+    St::Digest: complete_upload_state::IsSet,
+    St::Parts: complete_upload_state::IsSet,
+    St::UploadId: complete_upload_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> CompleteUpload<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> CompleteUpload<S> {
         CompleteUpload {
             digest: self._fields.0.unwrap(),
             parts: self._fields.1.unwrap(),
@@ -375,11 +370,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> CompleteUpload<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> CompleteUpload<S> {
         CompleteUpload {
             digest: self._fields.0.unwrap(),
             parts: self._fields.1.unwrap(),
@@ -399,122 +394,119 @@ pub mod part_info_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Etag;
         type PartNumber;
+        type Etag;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Etag = Unset;
         type PartNumber = Unset;
-    }
-    ///State transition - sets the `etag` field to Set
-    pub struct SetEtag<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEtag<S> {}
-    impl<S: State> State for SetEtag<S> {
-        type Etag = Set<members::etag>;
-        type PartNumber = S::PartNumber;
+        type Etag = Unset;
     }
     ///State transition - sets the `part_number` field to Set
-    pub struct SetPartNumber<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPartNumber<S> {}
-    impl<S: State> State for SetPartNumber<S> {
-        type Etag = S::Etag;
+    pub struct SetPartNumber<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPartNumber<St> {}
+    impl<St: State> State for SetPartNumber<St> {
         type PartNumber = Set<members::part_number>;
+        type Etag = St::Etag;
+    }
+    ///State transition - sets the `etag` field to Set
+    pub struct SetEtag<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetEtag<St> {}
+    impl<St: State> State for SetEtag<St> {
+        type PartNumber = St::PartNumber;
+        type Etag = Set<members::etag>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `etag` field
-        pub struct etag(());
         ///Marker type for the `part_number` field
         pub struct part_number(());
+        ///Marker type for the `etag` field
+        pub struct etag(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct PartInfoBuilder<'a, S: part_info_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct PartInfoBuilder<S: BosStr, St: part_info_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> PartInfo<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> PartInfoBuilder<'a, part_info_state::Empty> {
+impl<S: BosStr> PartInfo<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> PartInfoBuilder<S, part_info_state::Empty> {
         PartInfoBuilder::new()
     }
 }
 
-impl<'a> PartInfoBuilder<'a, part_info_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> PartInfoBuilder<S, part_info_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         PartInfoBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PartInfoBuilder<'a, S>
+impl<S: BosStr, St> PartInfoBuilder<S, St>
 where
-    S: part_info_state::State,
-    S::Etag: part_info_state::IsUnset,
+    St: part_info_state::State,
+    St::Etag: part_info_state::IsUnset,
 {
     /// Set the `etag` field (required)
     pub fn etag(
         mut self,
         value: impl Into<S>,
-    ) -> PartInfoBuilder<'a, part_info_state::SetEtag<S>> {
+    ) -> PartInfoBuilder<S, part_info_state::SetEtag<St>> {
         self._fields.0 = Option::Some(value.into());
         PartInfoBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PartInfoBuilder<'a, S>
+impl<S: BosStr, St> PartInfoBuilder<S, St>
 where
-    S: part_info_state::State,
-    S::PartNumber: part_info_state::IsUnset,
+    St: part_info_state::State,
+    St::PartNumber: part_info_state::IsUnset,
 {
     /// Set the `partNumber` field (required)
     pub fn part_number(
         mut self,
         value: impl Into<i64>,
-    ) -> PartInfoBuilder<'a, part_info_state::SetPartNumber<S>> {
+    ) -> PartInfoBuilder<S, part_info_state::SetPartNumber<St>> {
         self._fields.1 = Option::Some(value.into());
         PartInfoBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PartInfoBuilder<'a, S>
+impl<S: BosStr, St> PartInfoBuilder<S, St>
 where
-    S: part_info_state::State,
-    S::Etag: part_info_state::IsSet,
-    S::PartNumber: part_info_state::IsSet,
+    St: part_info_state::State,
+    St::PartNumber: part_info_state::IsSet,
+    St::Etag: part_info_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> PartInfo<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> PartInfo<S> {
         PartInfo {
             etag: self._fields.0.unwrap(),
             part_number: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> PartInfo<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> PartInfo<S> {
         PartInfo {
             etag: self._fields.0.unwrap(),
             part_number: self._fields.1.unwrap(),

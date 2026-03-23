@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "computer.aesthetic.mood",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Mood<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Mood<S: BosStr = DefaultStr> {
     ///The mood text content
     pub mood: S,
     ///Reference to source database record for bidirectional sync
@@ -56,18 +56,18 @@ pub struct Mood<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct MoodGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct MoodGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Mood<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Mood<S> {
+impl<S: BosStr> Mood<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, MoodRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -80,17 +80,17 @@ pub struct MoodRecord;
 impl XrpcResp for MoodRecord {
     const NSID: &'static str = "computer.aesthetic.mood";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = MoodGetRecordOutput<S>;
+    type Output<S: BosStr> = MoodGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<MoodGetRecordOutput<S>> for Mood<S> {
+impl<S: BosStr> From<MoodGetRecordOutput<S>> for Mood<S> {
     fn from(output: MoodGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Mood<S> {
+impl<S: BosStr> Collection for Mood<S> {
     const NSID: &'static str = "computer.aesthetic.mood";
     type Record = MoodRecord;
 }
@@ -100,7 +100,7 @@ impl Collection for MoodRecord {
     type Record = MoodRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Mood<S> {
+impl<S: BosStr> LexiconSchema for Mood<S> {
     fn nsid() -> &'static str {
         "computer.aesthetic.mood"
     }
@@ -136,145 +136,145 @@ pub mod mood_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Mood;
         type When;
         type Ref;
+        type Mood;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Mood = Unset;
         type When = Unset;
         type Ref = Unset;
-    }
-    ///State transition - sets the `mood` field to Set
-    pub struct SetMood<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMood<S> {}
-    impl<S: State> State for SetMood<S> {
-        type Mood = Set<members::mood>;
-        type When = S::When;
-        type Ref = S::Ref;
+        type Mood = Unset;
     }
     ///State transition - sets the `when` field to Set
-    pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWhen<S> {}
-    impl<S: State> State for SetWhen<S> {
-        type Mood = S::Mood;
+    pub struct SetWhen<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetWhen<St> {}
+    impl<St: State> State for SetWhen<St> {
         type When = Set<members::when>;
-        type Ref = S::Ref;
+        type Ref = St::Ref;
+        type Mood = St::Mood;
     }
     ///State transition - sets the `ref` field to Set
-    pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRef<S> {}
-    impl<S: State> State for SetRef<S> {
-        type Mood = S::Mood;
-        type When = S::When;
+    pub struct SetRef<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRef<St> {}
+    impl<St: State> State for SetRef<St> {
+        type When = St::When;
         type Ref = Set<members::r#ref>;
+        type Mood = St::Mood;
+    }
+    ///State transition - sets the `mood` field to Set
+    pub struct SetMood<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMood<St> {}
+    impl<St: State> State for SetMood<St> {
+        type When = St::When;
+        type Ref = St::Ref;
+        type Mood = Set<members::mood>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `mood` field
-        pub struct mood(());
         ///Marker type for the `when` field
         pub struct when(());
         ///Marker type for the `ref` field
         pub struct r#ref(());
+        ///Marker type for the `mood` field
+        pub struct mood(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct MoodBuilder<'a, S: mood_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct MoodBuilder<S: BosStr, St: mood_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>, Option<Datetime>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Mood<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> MoodBuilder<'a, mood_state::Empty> {
+impl<S: BosStr> Mood<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> MoodBuilder<S, mood_state::Empty> {
         MoodBuilder::new()
     }
 }
 
-impl<'a> MoodBuilder<'a, mood_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> MoodBuilder<S, mood_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         MoodBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> MoodBuilder<'a, S>
+impl<S: BosStr, St> MoodBuilder<S, St>
 where
-    S: mood_state::State,
-    S::Mood: mood_state::IsUnset,
+    St: mood_state::State,
+    St::Mood: mood_state::IsUnset,
 {
     /// Set the `mood` field (required)
     pub fn mood(
         mut self,
         value: impl Into<S>,
-    ) -> MoodBuilder<'a, mood_state::SetMood<S>> {
+    ) -> MoodBuilder<S, mood_state::SetMood<St>> {
         self._fields.0 = Option::Some(value.into());
         MoodBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> MoodBuilder<'a, S>
+impl<S: BosStr, St> MoodBuilder<S, St>
 where
-    S: mood_state::State,
-    S::Ref: mood_state::IsUnset,
+    St: mood_state::State,
+    St::Ref: mood_state::IsUnset,
 {
     /// Set the `ref` field (required)
     pub fn r#ref(
         mut self,
         value: impl Into<S>,
-    ) -> MoodBuilder<'a, mood_state::SetRef<S>> {
+    ) -> MoodBuilder<S, mood_state::SetRef<St>> {
         self._fields.1 = Option::Some(value.into());
         MoodBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> MoodBuilder<'a, S>
+impl<S: BosStr, St> MoodBuilder<S, St>
 where
-    S: mood_state::State,
-    S::When: mood_state::IsUnset,
+    St: mood_state::State,
+    St::When: mood_state::IsUnset,
 {
     /// Set the `when` field (required)
     pub fn when(
         mut self,
         value: impl Into<Datetime>,
-    ) -> MoodBuilder<'a, mood_state::SetWhen<S>> {
+    ) -> MoodBuilder<S, mood_state::SetWhen<St>> {
         self._fields.2 = Option::Some(value.into());
         MoodBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> MoodBuilder<'a, S>
+impl<S: BosStr, St> MoodBuilder<S, St>
 where
-    S: mood_state::State,
-    S::Mood: mood_state::IsSet,
-    S::When: mood_state::IsSet,
-    S::Ref: mood_state::IsSet,
+    St: mood_state::State,
+    St::When: mood_state::IsSet,
+    St::Ref: mood_state::IsSet,
+    St::Mood: mood_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Mood<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Mood<S> {
         Mood {
             mood: self._fields.0.unwrap(),
             r#ref: self._fields.1.unwrap(),
@@ -282,8 +282,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Mood<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Mood<S> {
         Mood {
             mood: self._fields.0.unwrap(),
             r#ref: self._fields.1.unwrap(),

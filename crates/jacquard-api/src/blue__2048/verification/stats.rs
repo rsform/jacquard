@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use crate::blue__2048::verification::VerificationRef;
     rename = "blue.2048.verification.stats",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Stats<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Stats<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
     ///This is the record that holds the publicly verifiable signature of a stats record
@@ -56,18 +56,18 @@ pub struct Stats<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct StatsGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct StatsGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Stats<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Stats<S> {
+impl<S: BosStr> Stats<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, StatsRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -80,17 +80,17 @@ pub struct StatsRecord;
 impl XrpcResp for StatsRecord {
     const NSID: &'static str = "blue.2048.verification.stats";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = StatsGetRecordOutput<S>;
+    type Output<S: BosStr> = StatsGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<StatsGetRecordOutput<S>> for Stats<S> {
+impl<S: BosStr> From<StatsGetRecordOutput<S>> for Stats<S> {
     fn from(output: StatsGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Stats<S> {
+impl<S: BosStr> Collection for Stats<S> {
     const NSID: &'static str = "blue.2048.verification.stats";
     type Record = StatsRecord;
 }
@@ -100,7 +100,7 @@ impl Collection for StatsRecord {
     type Record = StatsRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Stats<S> {
+impl<S: BosStr> LexiconSchema for Stats<S> {
     fn nsid() -> &'static str {
         "blue.2048.verification.stats"
     }
@@ -134,32 +134,32 @@ pub mod stats_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct StatsBuilder<'a, S: stats_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct StatsBuilder<S: BosStr, St: stats_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<VerificationRef<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Stats<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> StatsBuilder<'a, stats_state::Empty> {
+impl<S: BosStr> Stats<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> StatsBuilder<S, stats_state::Empty> {
         StatsBuilder::new()
     }
 }
 
-impl<'a> StatsBuilder<'a, stats_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> StatsBuilder<S, stats_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         StatsBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: stats_state::State> StatsBuilder<'a, S> {
+impl<S: BosStr, St: stats_state::State> StatsBuilder<S, St> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.0 = value.into();
@@ -172,7 +172,7 @@ impl<'a, S: stats_state::State> StatsBuilder<'a, S> {
     }
 }
 
-impl<'a, S: stats_state::State> StatsBuilder<'a, S> {
+impl<S: BosStr, St: stats_state::State> StatsBuilder<S, St> {
     /// Set the `verifiedRef` field (optional)
     pub fn verified_ref(mut self, value: impl Into<Option<VerificationRef<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -185,20 +185,20 @@ impl<'a, S: stats_state::State> StatsBuilder<'a, S> {
     }
 }
 
-impl<'a, S> StatsBuilder<'a, S>
+impl<S: BosStr, St> StatsBuilder<S, St>
 where
-    S: stats_state::State,
+    St: stats_state::State,
 {
-    /// Build the final struct
-    pub fn build(self) -> Stats<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Stats<S> {
         Stats {
             created_at: self._fields.0,
             verified_ref: self._fields.1,
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Stats<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Stats<S> {
         Stats {
             created_at: self._fields.0,
             verified_ref: self._fields.1,

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -29,11 +29,11 @@ use serde::{Serialize, Deserialize};
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct BackgroundImage<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct BackgroundImage<S: BosStr = DefaultStr> {
     pub image: BlobRef<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub repeat: Option<bool>,
@@ -43,7 +43,7 @@ pub struct BackgroundImage<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for BackgroundImage<S> {
+impl<S: BosStr> LexiconSchema for BackgroundImage<S> {
     fn nsid() -> &'static str {
         "pub.leaflet.theme.backgroundImage"
     }
@@ -117,9 +117,9 @@ pub mod background_image_state {
         type Image = Unset;
     }
     ///State transition - sets the `image` field to Set
-    pub struct SetImage<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetImage<S> {}
-    impl<S: State> State for SetImage<S> {
+    pub struct SetImage<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetImage<St> {}
+    impl<St: State> State for SetImage<St> {
         type Image = Set<members::image>;
     }
     /// Marker types for field names
@@ -130,51 +130,51 @@ pub mod background_image_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct BackgroundImageBuilder<'a, S: background_image_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct BackgroundImageBuilder<S: BosStr, St: background_image_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<BlobRef<S>>, Option<bool>, Option<i64>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> BackgroundImage<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> BackgroundImageBuilder<'a, background_image_state::Empty> {
+impl<S: BosStr> BackgroundImage<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> BackgroundImageBuilder<S, background_image_state::Empty> {
         BackgroundImageBuilder::new()
     }
 }
 
-impl<'a> BackgroundImageBuilder<'a, background_image_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> BackgroundImageBuilder<S, background_image_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         BackgroundImageBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BackgroundImageBuilder<'a, S>
+impl<S: BosStr, St> BackgroundImageBuilder<S, St>
 where
-    S: background_image_state::State,
-    S::Image: background_image_state::IsUnset,
+    St: background_image_state::State,
+    St::Image: background_image_state::IsUnset,
 {
     /// Set the `image` field (required)
     pub fn image(
         mut self,
         value: impl Into<BlobRef<S>>,
-    ) -> BackgroundImageBuilder<'a, background_image_state::SetImage<S>> {
+    ) -> BackgroundImageBuilder<S, background_image_state::SetImage<St>> {
         self._fields.0 = Option::Some(value.into());
         BackgroundImageBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: background_image_state::State> BackgroundImageBuilder<'a, S> {
+impl<S: BosStr, St: background_image_state::State> BackgroundImageBuilder<S, St> {
     /// Set the `repeat` field (optional)
     pub fn repeat(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.1 = value.into();
@@ -187,7 +187,7 @@ impl<'a, S: background_image_state::State> BackgroundImageBuilder<'a, S> {
     }
 }
 
-impl<'a, S: background_image_state::State> BackgroundImageBuilder<'a, S> {
+impl<S: BosStr, St: background_image_state::State> BackgroundImageBuilder<S, St> {
     /// Set the `width` field (optional)
     pub fn width(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -200,13 +200,13 @@ impl<'a, S: background_image_state::State> BackgroundImageBuilder<'a, S> {
     }
 }
 
-impl<'a, S> BackgroundImageBuilder<'a, S>
+impl<S: BosStr, St> BackgroundImageBuilder<S, St>
 where
-    S: background_image_state::State,
-    S::Image: background_image_state::IsSet,
+    St: background_image_state::State,
+    St::Image: background_image_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> BackgroundImage<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> BackgroundImage<S> {
         BackgroundImage {
             image: self._fields.0.unwrap(),
             repeat: self._fields.1,
@@ -214,11 +214,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> BackgroundImage<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> BackgroundImage<S> {
         BackgroundImage {
             image: self._fields.0.unwrap(),
             repeat: self._fields.1,

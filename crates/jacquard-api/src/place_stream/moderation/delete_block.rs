@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, AtUri};
 use jacquard_common::types::value::Data;
@@ -18,37 +18,33 @@ use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DeleteBlock<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DeleteBlock<S: BosStr = DefaultStr> {
     ///The AT-URI of the block record to delete.
     pub block_uri: AtUri<S>,
     ///The DID of the streamer.
     pub streamer: Did<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DeleteBlockOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+pub struct DeleteBlockOutput<S: BosStr = DefaultStr> {
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -120,12 +116,11 @@ pub struct DeleteBlockResponse;
 impl jacquard_common::xrpc::XrpcResp for DeleteBlockResponse {
     const NSID: &'static str = "place.stream.moderation.deleteBlock";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = DeleteBlockOutput<S>;
+    type Output<S: BosStr> = DeleteBlockOutput<S>;
     type Err = DeleteBlockError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for DeleteBlock<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for DeleteBlock<S> {
     const NSID: &'static str = "place.stream.moderation.deleteBlock";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -140,7 +135,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for DeleteBlockRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = DeleteBlock<S>;
+    type Request<S: BosStr> = DeleteBlock<S>;
     type Response = DeleteBlockResponse;
 }
 
@@ -165,17 +160,17 @@ pub mod delete_block_state {
         type BlockUri = Unset;
     }
     ///State transition - sets the `streamer` field to Set
-    pub struct SetStreamer<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStreamer<S> {}
-    impl<S: State> State for SetStreamer<S> {
+    pub struct SetStreamer<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStreamer<St> {}
+    impl<St: State> State for SetStreamer<St> {
         type Streamer = Set<members::streamer>;
-        type BlockUri = S::BlockUri;
+        type BlockUri = St::BlockUri;
     }
     ///State transition - sets the `block_uri` field to Set
-    pub struct SetBlockUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBlockUri<S> {}
-    impl<S: State> State for SetBlockUri<S> {
-        type Streamer = S::Streamer;
+    pub struct SetBlockUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBlockUri<St> {}
+    impl<St: State> State for SetBlockUri<St> {
+        type Streamer = St::Streamer;
         type BlockUri = Set<members::block_uri>;
     }
     /// Marker types for field names
@@ -188,88 +183,88 @@ pub mod delete_block_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct DeleteBlockBuilder<'a, S: delete_block_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct DeleteBlockBuilder<S: BosStr, St: delete_block_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>, Option<Did<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> DeleteBlock<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> DeleteBlockBuilder<'a, delete_block_state::Empty> {
+impl<S: BosStr> DeleteBlock<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> DeleteBlockBuilder<S, delete_block_state::Empty> {
         DeleteBlockBuilder::new()
     }
 }
 
-impl<'a> DeleteBlockBuilder<'a, delete_block_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> DeleteBlockBuilder<S, delete_block_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         DeleteBlockBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DeleteBlockBuilder<'a, S>
+impl<S: BosStr, St> DeleteBlockBuilder<S, St>
 where
-    S: delete_block_state::State,
-    S::BlockUri: delete_block_state::IsUnset,
+    St: delete_block_state::State,
+    St::BlockUri: delete_block_state::IsUnset,
 {
     /// Set the `blockUri` field (required)
     pub fn block_uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> DeleteBlockBuilder<'a, delete_block_state::SetBlockUri<S>> {
+    ) -> DeleteBlockBuilder<S, delete_block_state::SetBlockUri<St>> {
         self._fields.0 = Option::Some(value.into());
         DeleteBlockBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DeleteBlockBuilder<'a, S>
+impl<S: BosStr, St> DeleteBlockBuilder<S, St>
 where
-    S: delete_block_state::State,
-    S::Streamer: delete_block_state::IsUnset,
+    St: delete_block_state::State,
+    St::Streamer: delete_block_state::IsUnset,
 {
     /// Set the `streamer` field (required)
     pub fn streamer(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> DeleteBlockBuilder<'a, delete_block_state::SetStreamer<S>> {
+    ) -> DeleteBlockBuilder<S, delete_block_state::SetStreamer<St>> {
         self._fields.1 = Option::Some(value.into());
         DeleteBlockBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DeleteBlockBuilder<'a, S>
+impl<S: BosStr, St> DeleteBlockBuilder<S, St>
 where
-    S: delete_block_state::State,
-    S::Streamer: delete_block_state::IsSet,
-    S::BlockUri: delete_block_state::IsSet,
+    St: delete_block_state::State,
+    St::Streamer: delete_block_state::IsSet,
+    St::BlockUri: delete_block_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> DeleteBlock<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> DeleteBlock<S> {
         DeleteBlock {
             block_uri: self._fields.0.unwrap(),
             streamer: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> DeleteBlock<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> DeleteBlock<S> {
         DeleteBlock {
             block_uri: self._fields.0.unwrap(),
             streamer: self._fields.1.unwrap(),

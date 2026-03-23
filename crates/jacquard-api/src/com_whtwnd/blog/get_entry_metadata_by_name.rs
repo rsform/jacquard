@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::string::{AtUri, Cid, Datetime};
@@ -19,38 +19,34 @@ use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetEntryMetadataByName<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct GetEntryMetadataByName<S: BosStr = DefaultStr> {
     pub author: AtIdentifier<S>,
-    #[serde(borrow)]
     pub entry_title: S,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetEntryMetadataByNameOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetEntryMetadataByNameOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub entry_uri: AtUri<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_update: Option<Datetime>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -102,12 +98,11 @@ pub struct GetEntryMetadataByNameResponse;
 impl jacquard_common::xrpc::XrpcResp for GetEntryMetadataByNameResponse {
     const NSID: &'static str = "com.whtwnd.blog.getEntryMetadataByName";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetEntryMetadataByNameOutput<S>;
+    type Output<S: BosStr> = GetEntryMetadataByNameOutput<S>;
     type Err = GetEntryMetadataByNameError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetEntryMetadataByName<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetEntryMetadataByName<S> {
     const NSID: &'static str = "com.whtwnd.blog.getEntryMetadataByName";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetEntryMetadataByNameResponse;
@@ -118,7 +113,7 @@ pub struct GetEntryMetadataByNameRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetEntryMetadataByNameRequest {
     const PATH: &'static str = "/xrpc/com.whtwnd.blog.getEntryMetadataByName";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetEntryMetadataByName<S>;
+    type Request<S: BosStr> = GetEntryMetadataByName<S>;
     type Response = GetEntryMetadataByNameResponse;
 }
 
@@ -132,123 +127,125 @@ pub mod get_entry_metadata_by_name_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Author;
         type EntryTitle;
+        type Author;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Author = Unset;
         type EntryTitle = Unset;
-    }
-    ///State transition - sets the `author` field to Set
-    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthor<S> {}
-    impl<S: State> State for SetAuthor<S> {
-        type Author = Set<members::author>;
-        type EntryTitle = S::EntryTitle;
+        type Author = Unset;
     }
     ///State transition - sets the `entry_title` field to Set
-    pub struct SetEntryTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEntryTitle<S> {}
-    impl<S: State> State for SetEntryTitle<S> {
-        type Author = S::Author;
+    pub struct SetEntryTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetEntryTitle<St> {}
+    impl<St: State> State for SetEntryTitle<St> {
         type EntryTitle = Set<members::entry_title>;
+        type Author = St::Author;
+    }
+    ///State transition - sets the `author` field to Set
+    pub struct SetAuthor<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAuthor<St> {}
+    impl<St: State> State for SetAuthor<St> {
+        type EntryTitle = St::EntryTitle;
+        type Author = Set<members::author>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `author` field
-        pub struct author(());
         ///Marker type for the `entry_title` field
         pub struct entry_title(());
+        ///Marker type for the `author` field
+        pub struct author(());
     }
 }
 
-/// Builder for constructing an instance of this type
+/// Builder for constructing an instance of this type.
 pub struct GetEntryMetadataByNameBuilder<
-    'a,
-    S: get_entry_metadata_by_name_state::State,
+    S: BosStr,
+    St: get_entry_metadata_by_name_state::State,
 > {
-    _state: PhantomData<fn() -> S>,
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtIdentifier<S>>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetEntryMetadataByName<'a> {
-    /// Create a new builder for this type
+impl<S: BosStr> GetEntryMetadataByName<S> {
+    /// Create a new builder for this type.
     pub fn new() -> GetEntryMetadataByNameBuilder<
-        'a,
+        S,
         get_entry_metadata_by_name_state::Empty,
     > {
         GetEntryMetadataByNameBuilder::new()
     }
 }
 
-impl<'a> GetEntryMetadataByNameBuilder<'a, get_entry_metadata_by_name_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<
+    S: BosStr,
+> GetEntryMetadataByNameBuilder<S, get_entry_metadata_by_name_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetEntryMetadataByNameBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetEntryMetadataByNameBuilder<'a, S>
+impl<S: BosStr, St> GetEntryMetadataByNameBuilder<S, St>
 where
-    S: get_entry_metadata_by_name_state::State,
-    S::Author: get_entry_metadata_by_name_state::IsUnset,
+    St: get_entry_metadata_by_name_state::State,
+    St::Author: get_entry_metadata_by_name_state::IsUnset,
 {
     /// Set the `author` field (required)
     pub fn author(
         mut self,
         value: impl Into<AtIdentifier<S>>,
     ) -> GetEntryMetadataByNameBuilder<
-        'a,
-        get_entry_metadata_by_name_state::SetAuthor<S>,
+        S,
+        get_entry_metadata_by_name_state::SetAuthor<St>,
     > {
         self._fields.0 = Option::Some(value.into());
         GetEntryMetadataByNameBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetEntryMetadataByNameBuilder<'a, S>
+impl<S: BosStr, St> GetEntryMetadataByNameBuilder<S, St>
 where
-    S: get_entry_metadata_by_name_state::State,
-    S::EntryTitle: get_entry_metadata_by_name_state::IsUnset,
+    St: get_entry_metadata_by_name_state::State,
+    St::EntryTitle: get_entry_metadata_by_name_state::IsUnset,
 {
     /// Set the `entryTitle` field (required)
     pub fn entry_title(
         mut self,
         value: impl Into<S>,
     ) -> GetEntryMetadataByNameBuilder<
-        'a,
-        get_entry_metadata_by_name_state::SetEntryTitle<S>,
+        S,
+        get_entry_metadata_by_name_state::SetEntryTitle<St>,
     > {
         self._fields.1 = Option::Some(value.into());
         GetEntryMetadataByNameBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetEntryMetadataByNameBuilder<'a, S>
+impl<S: BosStr, St> GetEntryMetadataByNameBuilder<S, St>
 where
-    S: get_entry_metadata_by_name_state::State,
-    S::Author: get_entry_metadata_by_name_state::IsSet,
-    S::EntryTitle: get_entry_metadata_by_name_state::IsSet,
+    St: get_entry_metadata_by_name_state::State,
+    St::EntryTitle: get_entry_metadata_by_name_state::IsSet,
+    St::Author: get_entry_metadata_by_name_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetEntryMetadataByName<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetEntryMetadataByName<S> {
         GetEntryMetadataByName {
             author: self._fields.0.unwrap(),
             entry_title: self._fields.1.unwrap(),

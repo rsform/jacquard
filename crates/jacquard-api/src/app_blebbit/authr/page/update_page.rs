@@ -10,56 +10,53 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct UpdatePageParams<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct UpdatePageParams<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub id: Option<S>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct UpdatePage<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct UpdatePage<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub public: Option<bool>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct UpdatePageOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct UpdatePageOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub content: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -68,9 +65,7 @@ pub struct UpdatePageOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub name: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub public: Option<bool>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -79,12 +74,11 @@ pub struct UpdatePageResponse;
 impl jacquard_common::xrpc::XrpcResp for UpdatePageResponse {
     const NSID: &'static str = "app.blebbit.authr.page.updatePage";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = UpdatePageOutput<S>;
+    type Output<S: BosStr> = UpdatePageOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for UpdatePage<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UpdatePage<S> {
     const NSID: &'static str = "app.blebbit.authr.page.updatePage";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -99,7 +93,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for UpdatePageRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = UpdatePage<S>;
+    type Request<S: BosStr> = UpdatePage<S>;
     type Response = UpdatePageResponse;
 }
 
@@ -122,32 +116,32 @@ pub mod update_page_params_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct UpdatePageParamsBuilder<'a, S: update_page_params_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct UpdatePageParamsBuilder<S: BosStr, St: update_page_params_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> UpdatePageParams<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> UpdatePageParamsBuilder<'a, update_page_params_state::Empty> {
+impl<S: BosStr> UpdatePageParams<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> UpdatePageParamsBuilder<S, update_page_params_state::Empty> {
         UpdatePageParamsBuilder::new()
     }
 }
 
-impl<'a> UpdatePageParamsBuilder<'a, update_page_params_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> UpdatePageParamsBuilder<S, update_page_params_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         UpdatePageParamsBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: update_page_params_state::State> UpdatePageParamsBuilder<'a, S> {
+impl<S: BosStr, St: update_page_params_state::State> UpdatePageParamsBuilder<S, St> {
     /// Set the `id` field (optional)
     pub fn id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -160,12 +154,12 @@ impl<'a, S: update_page_params_state::State> UpdatePageParamsBuilder<'a, S> {
     }
 }
 
-impl<'a, S> UpdatePageParamsBuilder<'a, S>
+impl<S: BosStr, St> UpdatePageParamsBuilder<S, St>
 where
-    S: update_page_params_state::State,
+    St: update_page_params_state::State,
 {
-    /// Build the final struct
-    pub fn build(self) -> UpdatePageParams<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> UpdatePageParams<S> {
         UpdatePageParams {
             id: self._fields.0,
         }

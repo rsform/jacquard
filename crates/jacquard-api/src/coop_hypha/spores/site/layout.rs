@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "coop.hypha.spores.site.layout",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Layout<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Layout<S: BosStr = DefaultStr> {
     ///Ordered list of section AT-URIs to display
     pub sections: Vec<AtUri<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -52,18 +52,18 @@ pub struct Layout<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct LayoutGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct LayoutGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Layout<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Layout<S> {
+impl<S: BosStr> Layout<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, LayoutRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -76,17 +76,17 @@ pub struct LayoutRecord;
 impl XrpcResp for LayoutRecord {
     const NSID: &'static str = "coop.hypha.spores.site.layout";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = LayoutGetRecordOutput<S>;
+    type Output<S: BosStr> = LayoutGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<LayoutGetRecordOutput<S>> for Layout<S> {
+impl<S: BosStr> From<LayoutGetRecordOutput<S>> for Layout<S> {
     fn from(output: LayoutGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Layout<S> {
+impl<S: BosStr> Collection for Layout<S> {
     const NSID: &'static str = "coop.hypha.spores.site.layout";
     type Record = LayoutRecord;
 }
@@ -96,7 +96,7 @@ impl Collection for LayoutRecord {
     type Record = LayoutRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Layout<S> {
+impl<S: BosStr> LexiconSchema for Layout<S> {
     fn nsid() -> &'static str {
         "coop.hypha.spores.site.layout"
     }
@@ -130,9 +130,9 @@ pub mod layout_state {
         type Sections = Unset;
     }
     ///State transition - sets the `sections` field to Set
-    pub struct SetSections<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSections<S> {}
-    impl<S: State> State for SetSections<S> {
+    pub struct SetSections<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSections<St> {}
+    impl<St: State> State for SetSections<St> {
         type Sections = Set<members::sections>;
     }
     /// Marker types for field names
@@ -143,64 +143,64 @@ pub mod layout_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct LayoutBuilder<'a, S: layout_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct LayoutBuilder<S: BosStr, St: layout_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<AtUri<S>>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Layout<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> LayoutBuilder<'a, layout_state::Empty> {
+impl<S: BosStr> Layout<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> LayoutBuilder<S, layout_state::Empty> {
         LayoutBuilder::new()
     }
 }
 
-impl<'a> LayoutBuilder<'a, layout_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> LayoutBuilder<S, layout_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         LayoutBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LayoutBuilder<'a, S>
+impl<S: BosStr, St> LayoutBuilder<S, St>
 where
-    S: layout_state::State,
-    S::Sections: layout_state::IsUnset,
+    St: layout_state::State,
+    St::Sections: layout_state::IsUnset,
 {
     /// Set the `sections` field (required)
     pub fn sections(
         mut self,
         value: impl Into<Vec<AtUri<S>>>,
-    ) -> LayoutBuilder<'a, layout_state::SetSections<S>> {
+    ) -> LayoutBuilder<S, layout_state::SetSections<St>> {
         self._fields.0 = Option::Some(value.into());
         LayoutBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LayoutBuilder<'a, S>
+impl<S: BosStr, St> LayoutBuilder<S, St>
 where
-    S: layout_state::State,
-    S::Sections: layout_state::IsSet,
+    St: layout_state::State,
+    St::Sections: layout_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Layout<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Layout<S> {
         Layout {
             sections: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Layout<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Layout<S> {
         Layout {
             sections: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

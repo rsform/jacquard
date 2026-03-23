@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
@@ -22,18 +22,16 @@ use crate::place_stream::ingest::Ingest;
 pub struct GetIngestUrls;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetIngestUrlsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetIngestUrlsOutput<S: BosStr = DefaultStr> {
     pub ingests: Vec<Ingest<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -75,7 +73,7 @@ pub struct GetIngestUrlsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetIngestUrlsResponse {
     const NSID: &'static str = "place.stream.ingest.getIngestUrls";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetIngestUrlsOutput<S>;
+    type Output<S: BosStr> = GetIngestUrlsOutput<S>;
     type Err = GetIngestUrlsError;
 }
 
@@ -90,6 +88,6 @@ pub struct GetIngestUrlsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetIngestUrlsRequest {
     const PATH: &'static str = "/xrpc/place.stream.ingest.getIngestUrls";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetIngestUrls;
+    type Request<S: BosStr> = GetIngestUrls;
     type Response = GetIngestUrlsResponse;
 }

@@ -1,11 +1,11 @@
 use crate::error::Result;
 use crate::lexicon::{LexArrayItem, LexObjectProperty, LexString, LexStringFormat};
+use crate::ref_utils::{NsidPath, RefPath};
 use heck::ToSnakeCase;
 use proc_macro2::TokenStream;
 use quote::quote;
 
 use super::CodeGenerator;
-use super::nsid_utils::{NsidPath, RefPath};
 use super::prettify::{CommonType, ExternalImport, ResolvedImports};
 use super::utils::{join_module_path, join_path_parts, namespace_prefix, sanitize_name_cow};
 

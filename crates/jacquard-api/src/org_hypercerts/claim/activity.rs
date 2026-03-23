@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -39,11 +39,11 @@ use crate::org_hypercerts::claim::activity;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Contributor<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Contributor<S: BosStr = DefaultStr> {
     ///Inline contribution role object with a role string via org.hypercerts.claim.activity#contributorRole, or a strong reference to a contribution details record. The record referenced must conform with the lexicon org.hypercerts.claim.contribution.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub contribution_details: Option<ContributorContributionDetails<S>>,
@@ -62,11 +62,11 @@ pub struct Contributor<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ContributorContributionDetails<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ContributorContributionDetails<S: BosStr = DefaultStr> {
     #[serde(rename = "org.hypercerts.claim.activity#contributorRole")]
     ContributorRole(Box<activity::ContributorRole<S>>),
     #[serde(rename = "com.atproto.repo.strongRef")]
@@ -79,11 +79,11 @@ pub enum ContributorContributionDetails<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ContributorContributorIdentity<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ContributorContributorIdentity<S: BosStr = DefaultStr> {
     #[serde(rename = "org.hypercerts.claim.activity#contributorIdentity")]
     ContributorIdentity(Box<activity::ContributorIdentity<S>>),
     #[serde(rename = "com.atproto.repo.strongRef")]
@@ -96,11 +96,11 @@ pub enum ContributorContributorIdentity<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ContributorIdentity<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ContributorIdentity<S: BosStr = DefaultStr> {
     ///The contributor identity string (DID or identifier).
     pub identity: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -113,11 +113,11 @@ pub struct ContributorIdentity<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ContributorRole<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ContributorRole<S: BosStr = DefaultStr> {
     ///The contribution role or details.
     pub role: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -132,11 +132,11 @@ pub struct ContributorRole<S: Bos<str> + AsRef<str> = DefaultStr> {
     rename = "org.hypercerts.claim.activity",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Activity<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Activity<S: BosStr = DefaultStr> {
     ///An array of contributor objects, each containing contributor information, weight, and contribution details.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub contributors: Option<Vec<activity::Contributor<S>>>,
@@ -180,11 +180,11 @@ pub struct Activity<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ActivityImage<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ActivityImage<S: BosStr = DefaultStr> {
     #[serde(rename = "org.hypercerts.defs#uri")]
     Uri(Box<Uri<S>>),
     #[serde(rename = "org.hypercerts.defs#smallImage")]
@@ -197,11 +197,11 @@ pub enum ActivityImage<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ActivityWorkScope<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ActivityWorkScope<S: BosStr = DefaultStr> {
     #[serde(rename = "org.hypercerts.workscope.cel")]
     Cel(Box<Cel<S>>),
     #[serde(rename = "org.hypercerts.claim.activity#workScopeString")]
@@ -214,11 +214,11 @@ pub enum ActivityWorkScope<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ActivityGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ActivityGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
@@ -231,24 +231,24 @@ pub struct ActivityGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct WorkScopeString<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct WorkScopeString<S: BosStr = DefaultStr> {
     ///The work scope description string.
     pub scope: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Activity<S> {
+impl<S: BosStr> Activity<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, ActivityRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Contributor<S> {
+impl<S: BosStr> LexiconSchema for Contributor<S> {
     fn nsid() -> &'static str {
         "org.hypercerts.claim.activity"
     }
@@ -273,7 +273,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Contributor<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ContributorIdentity<S> {
+impl<S: BosStr> LexiconSchema for ContributorIdentity<S> {
     fn nsid() -> &'static str {
         "org.hypercerts.claim.activity"
     }
@@ -312,7 +312,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for ContributorIdentity<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ContributorRole<S> {
+impl<S: BosStr> LexiconSchema for ContributorRole<S> {
     fn nsid() -> &'static str {
         "org.hypercerts.claim.activity"
     }
@@ -358,17 +358,17 @@ pub struct ActivityRecord;
 impl XrpcResp for ActivityRecord {
     const NSID: &'static str = "org.hypercerts.claim.activity";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ActivityGetRecordOutput<S>;
+    type Output<S: BosStr> = ActivityGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<ActivityGetRecordOutput<S>> for Activity<S> {
+impl<S: BosStr> From<ActivityGetRecordOutput<S>> for Activity<S> {
     fn from(output: ActivityGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Activity<S> {
+impl<S: BosStr> Collection for Activity<S> {
     const NSID: &'static str = "org.hypercerts.claim.activity";
     type Record = ActivityRecord;
 }
@@ -378,7 +378,7 @@ impl Collection for ActivityRecord {
     type Record = ActivityRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Activity<S> {
+impl<S: BosStr> LexiconSchema for Activity<S> {
     fn nsid() -> &'static str {
         "org.hypercerts.claim.activity"
     }
@@ -448,7 +448,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Activity<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for WorkScopeString<S> {
+impl<S: BosStr> LexiconSchema for WorkScopeString<S> {
     fn nsid() -> &'static str {
         "org.hypercerts.claim.activity"
     }
@@ -506,9 +506,9 @@ pub mod contributor_state {
         type ContributorIdentity = Unset;
     }
     ///State transition - sets the `contributor_identity` field to Set
-    pub struct SetContributorIdentity<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContributorIdentity<S> {}
-    impl<S: State> State for SetContributorIdentity<S> {
+    pub struct SetContributorIdentity<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetContributorIdentity<St> {}
+    impl<St: State> State for SetContributorIdentity<St> {
         type ContributorIdentity = Set<members::contributor_identity>;
     }
     /// Marker types for field names
@@ -519,36 +519,36 @@ pub mod contributor_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ContributorBuilder<'a, S: contributor_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ContributorBuilder<S: BosStr, St: contributor_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<ContributorContributionDetails<S>>,
         Option<S>,
         Option<ContributorContributorIdentity<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Contributor<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ContributorBuilder<'a, contributor_state::Empty> {
+impl<S: BosStr> Contributor<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ContributorBuilder<S, contributor_state::Empty> {
         ContributorBuilder::new()
     }
 }
 
-impl<'a> ContributorBuilder<'a, contributor_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ContributorBuilder<S, contributor_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ContributorBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: contributor_state::State> ContributorBuilder<'a, S> {
+impl<S: BosStr, St: contributor_state::State> ContributorBuilder<S, St> {
     /// Set the `contributionDetails` field (optional)
     pub fn contribution_details(
         mut self,
@@ -567,7 +567,7 @@ impl<'a, S: contributor_state::State> ContributorBuilder<'a, S> {
     }
 }
 
-impl<'a, S: contributor_state::State> ContributorBuilder<'a, S> {
+impl<S: BosStr, St: contributor_state::State> ContributorBuilder<S, St> {
     /// Set the `contributionWeight` field (optional)
     pub fn contribution_weight(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -580,32 +580,32 @@ impl<'a, S: contributor_state::State> ContributorBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ContributorBuilder<'a, S>
+impl<S: BosStr, St> ContributorBuilder<S, St>
 where
-    S: contributor_state::State,
-    S::ContributorIdentity: contributor_state::IsUnset,
+    St: contributor_state::State,
+    St::ContributorIdentity: contributor_state::IsUnset,
 {
     /// Set the `contributorIdentity` field (required)
     pub fn contributor_identity(
         mut self,
         value: impl Into<ContributorContributorIdentity<S>>,
-    ) -> ContributorBuilder<'a, contributor_state::SetContributorIdentity<S>> {
+    ) -> ContributorBuilder<S, contributor_state::SetContributorIdentity<St>> {
         self._fields.2 = Option::Some(value.into());
         ContributorBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ContributorBuilder<'a, S>
+impl<S: BosStr, St> ContributorBuilder<S, St>
 where
-    S: contributor_state::State,
-    S::ContributorIdentity: contributor_state::IsSet,
+    St: contributor_state::State,
+    St::ContributorIdentity: contributor_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Contributor<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Contributor<S> {
         Contributor {
             contribution_details: self._fields.0,
             contribution_weight: self._fields.1,
@@ -613,11 +613,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Contributor<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Contributor<S> {
         Contributor {
             contribution_details: self._fields.0,
             contribution_weight: self._fields.1,
@@ -966,57 +966,57 @@ pub mod activity_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
         type Title;
         type ShortDescription;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
         type Title = Unset;
         type ShortDescription = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type ShortDescription = S::ShortDescription;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `short_description` field to Set
-    pub struct SetShortDescription<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetShortDescription<S> {}
-    impl<S: State> State for SetShortDescription<S> {
-        type Title = S::Title;
-        type ShortDescription = Set<members::short_description>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Title = S::Title;
-        type ShortDescription = S::ShortDescription;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
+        type Title = St::Title;
+        type ShortDescription = St::ShortDescription;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
+        type CreatedAt = St::CreatedAt;
+        type Title = Set<members::title>;
+        type ShortDescription = St::ShortDescription;
+    }
+    ///State transition - sets the `short_description` field to Set
+    pub struct SetShortDescription<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetShortDescription<St> {}
+    impl<St: State> State for SetShortDescription<St> {
+        type CreatedAt = St::CreatedAt;
+        type Title = St::Title;
+        type ShortDescription = Set<members::short_description>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `title` field
         pub struct title(());
         ///Marker type for the `short_description` field
         pub struct short_description(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ActivityBuilder<'a, S: activity_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ActivityBuilder<S: BosStr, St: activity_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<activity::Contributor<S>>>,
         Option<Datetime>,
@@ -1031,18 +1031,18 @@ pub struct ActivityBuilder<'a, S: activity_state::State> {
         Option<S>,
         Option<ActivityWorkScope<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Activity<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ActivityBuilder<'a, activity_state::Empty> {
+impl<S: BosStr> Activity<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ActivityBuilder<S, activity_state::Empty> {
         ActivityBuilder::new()
     }
 }
 
-impl<'a> ActivityBuilder<'a, activity_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ActivityBuilder<S, activity_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ActivityBuilder {
             _state: PhantomData,
@@ -1060,12 +1060,12 @@ impl<'a> ActivityBuilder<'a, activity_state::Empty> {
                 None,
                 None,
             ),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
+impl<S: BosStr, St: activity_state::State> ActivityBuilder<S, St> {
     /// Set the `contributors` field (optional)
     pub fn contributors(
         mut self,
@@ -1084,26 +1084,26 @@ impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ActivityBuilder<'a, S>
+impl<S: BosStr, St> ActivityBuilder<S, St>
 where
-    S: activity_state::State,
-    S::CreatedAt: activity_state::IsUnset,
+    St: activity_state::State,
+    St::CreatedAt: activity_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ActivityBuilder<'a, activity_state::SetCreatedAt<S>> {
+    ) -> ActivityBuilder<S, activity_state::SetCreatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         ActivityBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
+impl<S: BosStr, St: activity_state::State> ActivityBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<LinearDocument<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -1116,7 +1116,7 @@ impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
     }
 }
 
-impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
+impl<S: BosStr, St: activity_state::State> ActivityBuilder<S, St> {
     /// Set the `endDate` field (optional)
     pub fn end_date(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.3 = value.into();
@@ -1129,7 +1129,7 @@ impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
     }
 }
 
-impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
+impl<S: BosStr, St: activity_state::State> ActivityBuilder<S, St> {
     /// Set the `image` field (optional)
     pub fn image(mut self, value: impl Into<Option<ActivityImage<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -1142,7 +1142,7 @@ impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
     }
 }
 
-impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
+impl<S: BosStr, St: activity_state::State> ActivityBuilder<S, St> {
     /// Set the `locations` field (optional)
     pub fn locations(mut self, value: impl Into<Option<Vec<StrongRef<S>>>>) -> Self {
         self._fields.5 = value.into();
@@ -1155,7 +1155,7 @@ impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
     }
 }
 
-impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
+impl<S: BosStr, St: activity_state::State> ActivityBuilder<S, St> {
     /// Set the `rights` field (optional)
     pub fn rights(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -1168,26 +1168,26 @@ impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ActivityBuilder<'a, S>
+impl<S: BosStr, St> ActivityBuilder<S, St>
 where
-    S: activity_state::State,
-    S::ShortDescription: activity_state::IsUnset,
+    St: activity_state::State,
+    St::ShortDescription: activity_state::IsUnset,
 {
     /// Set the `shortDescription` field (required)
     pub fn short_description(
         mut self,
         value: impl Into<S>,
-    ) -> ActivityBuilder<'a, activity_state::SetShortDescription<S>> {
+    ) -> ActivityBuilder<S, activity_state::SetShortDescription<St>> {
         self._fields.7 = Option::Some(value.into());
         ActivityBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
+impl<S: BosStr, St: activity_state::State> ActivityBuilder<S, St> {
     /// Set the `shortDescriptionFacets` field (optional)
     pub fn short_description_facets(
         mut self,
@@ -1206,7 +1206,7 @@ impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
     }
 }
 
-impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
+impl<S: BosStr, St: activity_state::State> ActivityBuilder<S, St> {
     /// Set the `startDate` field (optional)
     pub fn start_date(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.9 = value.into();
@@ -1219,26 +1219,26 @@ impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ActivityBuilder<'a, S>
+impl<S: BosStr, St> ActivityBuilder<S, St>
 where
-    S: activity_state::State,
-    S::Title: activity_state::IsUnset,
+    St: activity_state::State,
+    St::Title: activity_state::IsUnset,
 {
     /// Set the `title` field (required)
     pub fn title(
         mut self,
         value: impl Into<S>,
-    ) -> ActivityBuilder<'a, activity_state::SetTitle<S>> {
+    ) -> ActivityBuilder<S, activity_state::SetTitle<St>> {
         self._fields.10 = Option::Some(value.into());
         ActivityBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
+impl<S: BosStr, St: activity_state::State> ActivityBuilder<S, St> {
     /// Set the `workScope` field (optional)
     pub fn work_scope(mut self, value: impl Into<Option<ActivityWorkScope<S>>>) -> Self {
         self._fields.11 = value.into();
@@ -1251,15 +1251,15 @@ impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ActivityBuilder<'a, S>
+impl<S: BosStr, St> ActivityBuilder<S, St>
 where
-    S: activity_state::State,
-    S::Title: activity_state::IsSet,
-    S::ShortDescription: activity_state::IsSet,
-    S::CreatedAt: activity_state::IsSet,
+    St: activity_state::State,
+    St::CreatedAt: activity_state::IsSet,
+    St::Title: activity_state::IsSet,
+    St::ShortDescription: activity_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Activity<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Activity<S> {
         Activity {
             contributors: self._fields.0,
             created_at: self._fields.1.unwrap(),
@@ -1276,11 +1276,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Activity<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Activity<S> {
         Activity {
             contributors: self._fields.0,
             created_at: self._fields.1.unwrap(),

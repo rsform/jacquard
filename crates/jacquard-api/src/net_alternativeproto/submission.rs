@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use serde::{Serialize, Deserialize};
     rename = "net.alternativeproto.submission",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Submission<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Submission<S: BosStr = DefaultStr> {
     ///Services this project is an alternative to
     #[serde(skip_serializing_if = "Option::is_none")]
     pub alternative_to: Option<Vec<S>>,
@@ -73,14 +73,14 @@ pub struct Submission<S: Bos<str> + AsRef<str> = DefaultStr> {
 /// Authentication method used by the project
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum SubmissionAuthType<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum SubmissionAuthType<S: BosStr = DefaultStr> {
     Oauth,
     AppPassword,
     None,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> SubmissionAuthType<S> {
+impl<S: BosStr> SubmissionAuthType<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Oauth => "oauth",
@@ -100,19 +100,19 @@ impl<S: Bos<str> + AsRef<str>> SubmissionAuthType<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for SubmissionAuthType<S> {
+impl<S: BosStr> core::fmt::Display for SubmissionAuthType<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for SubmissionAuthType<S> {
+impl<S: BosStr> AsRef<str> for SubmissionAuthType<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for SubmissionAuthType<S> {
+impl<S: BosStr> Serialize for SubmissionAuthType<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -121,8 +121,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for SubmissionAuthType<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for SubmissionAuthType<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for SubmissionAuthType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -132,14 +131,18 @@ for SubmissionAuthType<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for SubmissionAuthType<S> {
+impl<S: BosStr + Default> Default for SubmissionAuthType<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for SubmissionAuthType<S> {
-    type Output = SubmissionAuthType<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for SubmissionAuthType<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = SubmissionAuthType<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             SubmissionAuthType::Oauth => SubmissionAuthType::Oauth,
@@ -156,18 +159,18 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for SubmissionAuthType<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SubmissionGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SubmissionGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Submission<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Submission<S> {
+impl<S: BosStr> Submission<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, SubmissionRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -180,17 +183,17 @@ pub struct SubmissionRecord;
 impl XrpcResp for SubmissionRecord {
     const NSID: &'static str = "net.alternativeproto.submission";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = SubmissionGetRecordOutput<S>;
+    type Output<S: BosStr> = SubmissionGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<SubmissionGetRecordOutput<S>> for Submission<S> {
+impl<S: BosStr> From<SubmissionGetRecordOutput<S>> for Submission<S> {
     fn from(output: SubmissionGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Submission<S> {
+impl<S: BosStr> Collection for Submission<S> {
     const NSID: &'static str = "net.alternativeproto.submission";
     type Record = SubmissionRecord;
 }
@@ -200,7 +203,7 @@ impl Collection for SubmissionRecord {
     type Record = SubmissionRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Submission<S> {
+impl<S: BosStr> LexiconSchema for Submission<S> {
     fn nsid() -> &'static str {
         "net.alternativeproto.submission"
     }
@@ -298,90 +301,90 @@ pub mod submission_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CreatedAt;
+        type Url;
         type Name;
         type AuthType;
         type Description;
-        type Url;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CreatedAt = Unset;
+        type Url = Unset;
         type Name = Unset;
         type AuthType = Unset;
         type Description = Unset;
-        type Url = Unset;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
-        type Name = S::Name;
-        type AuthType = S::AuthType;
-        type Description = S::Description;
-        type Url = S::Url;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type CreatedAt = S::CreatedAt;
-        type Name = Set<members::name>;
-        type AuthType = S::AuthType;
-        type Description = S::Description;
-        type Url = S::Url;
-    }
-    ///State transition - sets the `auth_type` field to Set
-    pub struct SetAuthType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthType<S> {}
-    impl<S: State> State for SetAuthType<S> {
-        type CreatedAt = S::CreatedAt;
-        type Name = S::Name;
-        type AuthType = Set<members::auth_type>;
-        type Description = S::Description;
-        type Url = S::Url;
-    }
-    ///State transition - sets the `description` field to Set
-    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDescription<S> {}
-    impl<S: State> State for SetDescription<S> {
-        type CreatedAt = S::CreatedAt;
-        type Name = S::Name;
-        type AuthType = S::AuthType;
-        type Description = Set<members::description>;
-        type Url = S::Url;
+        type Url = St::Url;
+        type Name = St::Name;
+        type AuthType = St::AuthType;
+        type Description = St::Description;
     }
     ///State transition - sets the `url` field to Set
-    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrl<S> {}
-    impl<S: State> State for SetUrl<S> {
-        type CreatedAt = S::CreatedAt;
-        type Name = S::Name;
-        type AuthType = S::AuthType;
-        type Description = S::Description;
+    pub struct SetUrl<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUrl<St> {}
+    impl<St: State> State for SetUrl<St> {
+        type CreatedAt = St::CreatedAt;
         type Url = Set<members::url>;
+        type Name = St::Name;
+        type AuthType = St::AuthType;
+        type Description = St::Description;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type CreatedAt = St::CreatedAt;
+        type Url = St::Url;
+        type Name = Set<members::name>;
+        type AuthType = St::AuthType;
+        type Description = St::Description;
+    }
+    ///State transition - sets the `auth_type` field to Set
+    pub struct SetAuthType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAuthType<St> {}
+    impl<St: State> State for SetAuthType<St> {
+        type CreatedAt = St::CreatedAt;
+        type Url = St::Url;
+        type Name = St::Name;
+        type AuthType = Set<members::auth_type>;
+        type Description = St::Description;
+    }
+    ///State transition - sets the `description` field to Set
+    pub struct SetDescription<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDescription<St> {}
+    impl<St: State> State for SetDescription<St> {
+        type CreatedAt = St::CreatedAt;
+        type Url = St::Url;
+        type Name = St::Name;
+        type AuthType = St::AuthType;
+        type Description = Set<members::description>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `url` field
+        pub struct url(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `auth_type` field
         pub struct auth_type(());
         ///Marker type for the `description` field
         pub struct description(());
-        ///Marker type for the `url` field
-        pub struct url(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct SubmissionBuilder<'a, S: submission_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct SubmissionBuilder<S: BosStr, St: submission_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<S>>,
         Option<SubmissionAuthType<S>>,
@@ -394,28 +397,28 @@ pub struct SubmissionBuilder<'a, S: submission_state::State> {
         Option<Vec<S>>,
         Option<UriValue<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Submission<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> SubmissionBuilder<'a, submission_state::Empty> {
+impl<S: BosStr> Submission<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> SubmissionBuilder<S, submission_state::Empty> {
         SubmissionBuilder::new()
     }
 }
 
-impl<'a> SubmissionBuilder<'a, submission_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> SubmissionBuilder<S, submission_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SubmissionBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: submission_state::State> SubmissionBuilder<'a, S> {
+impl<S: BosStr, St: submission_state::State> SubmissionBuilder<S, St> {
     /// Set the `alternativeTo` field (optional)
     pub fn alternative_to(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -428,64 +431,64 @@ impl<'a, S: submission_state::State> SubmissionBuilder<'a, S> {
     }
 }
 
-impl<'a, S> SubmissionBuilder<'a, S>
+impl<S: BosStr, St> SubmissionBuilder<S, St>
 where
-    S: submission_state::State,
-    S::AuthType: submission_state::IsUnset,
+    St: submission_state::State,
+    St::AuthType: submission_state::IsUnset,
 {
     /// Set the `authType` field (required)
     pub fn auth_type(
         mut self,
         value: impl Into<SubmissionAuthType<S>>,
-    ) -> SubmissionBuilder<'a, submission_state::SetAuthType<S>> {
+    ) -> SubmissionBuilder<S, submission_state::SetAuthType<St>> {
         self._fields.1 = Option::Some(value.into());
         SubmissionBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SubmissionBuilder<'a, S>
+impl<S: BosStr, St> SubmissionBuilder<S, St>
 where
-    S: submission_state::State,
-    S::CreatedAt: submission_state::IsUnset,
+    St: submission_state::State,
+    St::CreatedAt: submission_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> SubmissionBuilder<'a, submission_state::SetCreatedAt<S>> {
+    ) -> SubmissionBuilder<S, submission_state::SetCreatedAt<St>> {
         self._fields.2 = Option::Some(value.into());
         SubmissionBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SubmissionBuilder<'a, S>
+impl<S: BosStr, St> SubmissionBuilder<S, St>
 where
-    S: submission_state::State,
-    S::Description: submission_state::IsUnset,
+    St: submission_state::State,
+    St::Description: submission_state::IsUnset,
 {
     /// Set the `description` field (required)
     pub fn description(
         mut self,
         value: impl Into<S>,
-    ) -> SubmissionBuilder<'a, submission_state::SetDescription<S>> {
+    ) -> SubmissionBuilder<S, submission_state::SetDescription<St>> {
         self._fields.3 = Option::Some(value.into());
         SubmissionBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: submission_state::State> SubmissionBuilder<'a, S> {
+impl<S: BosStr, St: submission_state::State> SubmissionBuilder<S, St> {
     /// Set the `icon` field (optional)
     pub fn icon(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -498,7 +501,7 @@ impl<'a, S: submission_state::State> SubmissionBuilder<'a, S> {
     }
 }
 
-impl<'a, S: submission_state::State> SubmissionBuilder<'a, S> {
+impl<S: BosStr, St: submission_state::State> SubmissionBuilder<S, St> {
     /// Set the `isOpenSource` field (optional)
     pub fn is_open_source(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.5 = value.into();
@@ -511,26 +514,26 @@ impl<'a, S: submission_state::State> SubmissionBuilder<'a, S> {
     }
 }
 
-impl<'a, S> SubmissionBuilder<'a, S>
+impl<S: BosStr, St> SubmissionBuilder<S, St>
 where
-    S: submission_state::State,
-    S::Name: submission_state::IsUnset,
+    St: submission_state::State,
+    St::Name: submission_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> SubmissionBuilder<'a, submission_state::SetName<S>> {
+    ) -> SubmissionBuilder<S, submission_state::SetName<St>> {
         self._fields.6 = Option::Some(value.into());
         SubmissionBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: submission_state::State> SubmissionBuilder<'a, S> {
+impl<S: BosStr, St: submission_state::State> SubmissionBuilder<S, St> {
     /// Set the `repositoryUrl` field (optional)
     pub fn repository_url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.7 = value.into();
@@ -543,7 +546,7 @@ impl<'a, S: submission_state::State> SubmissionBuilder<'a, S> {
     }
 }
 
-impl<'a, S: submission_state::State> SubmissionBuilder<'a, S> {
+impl<S: BosStr, St: submission_state::State> SubmissionBuilder<S, St> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.8 = value.into();
@@ -556,36 +559,36 @@ impl<'a, S: submission_state::State> SubmissionBuilder<'a, S> {
     }
 }
 
-impl<'a, S> SubmissionBuilder<'a, S>
+impl<S: BosStr, St> SubmissionBuilder<S, St>
 where
-    S: submission_state::State,
-    S::Url: submission_state::IsUnset,
+    St: submission_state::State,
+    St::Url: submission_state::IsUnset,
 {
     /// Set the `url` field (required)
     pub fn url(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> SubmissionBuilder<'a, submission_state::SetUrl<S>> {
+    ) -> SubmissionBuilder<S, submission_state::SetUrl<St>> {
         self._fields.9 = Option::Some(value.into());
         SubmissionBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SubmissionBuilder<'a, S>
+impl<S: BosStr, St> SubmissionBuilder<S, St>
 where
-    S: submission_state::State,
-    S::CreatedAt: submission_state::IsSet,
-    S::Name: submission_state::IsSet,
-    S::AuthType: submission_state::IsSet,
-    S::Description: submission_state::IsSet,
-    S::Url: submission_state::IsSet,
+    St: submission_state::State,
+    St::CreatedAt: submission_state::IsSet,
+    St::Url: submission_state::IsSet,
+    St::Name: submission_state::IsSet,
+    St::AuthType: submission_state::IsSet,
+    St::Description: submission_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Submission<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Submission<S> {
         Submission {
             alternative_to: self._fields.0,
             auth_type: self._fields.1.unwrap(),
@@ -600,11 +603,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Submission<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Submission<S> {
         Submission {
             alternative_to: self._fields.0,
             auth_type: self._fields.1.unwrap(),

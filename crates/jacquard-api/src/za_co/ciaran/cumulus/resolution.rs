@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
     rename = "za.co.ciaran.cumulus.resolution",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Resolution<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Resolution<S: BosStr = DefaultStr> {
     pub answer: S,
     pub created_at: Datetime,
     ///The record containing the Cumulus Market for this Resolution
@@ -55,18 +55,18 @@ pub struct Resolution<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ResolutionGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ResolutionGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Resolution<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Resolution<S> {
+impl<S: BosStr> Resolution<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, ResolutionRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -79,17 +79,17 @@ pub struct ResolutionRecord;
 impl XrpcResp for ResolutionRecord {
     const NSID: &'static str = "za.co.ciaran.cumulus.resolution";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ResolutionGetRecordOutput<S>;
+    type Output<S: BosStr> = ResolutionGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<ResolutionGetRecordOutput<S>> for Resolution<S> {
+impl<S: BosStr> From<ResolutionGetRecordOutput<S>> for Resolution<S> {
     fn from(output: ResolutionGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Resolution<S> {
+impl<S: BosStr> Collection for Resolution<S> {
     const NSID: &'static str = "za.co.ciaran.cumulus.resolution";
     type Record = ResolutionRecord;
 }
@@ -99,7 +99,7 @@ impl Collection for ResolutionRecord {
     type Record = ResolutionRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Resolution<S> {
+impl<S: BosStr> LexiconSchema for Resolution<S> {
     fn nsid() -> &'static str {
         "za.co.ciaran.cumulus.resolution"
     }
@@ -159,27 +159,27 @@ pub mod resolution_state {
         type CreatedAt = Unset;
     }
     ///State transition - sets the `market` field to Set
-    pub struct SetMarket<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMarket<S> {}
-    impl<S: State> State for SetMarket<S> {
+    pub struct SetMarket<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMarket<St> {}
+    impl<St: State> State for SetMarket<St> {
         type Market = Set<members::market>;
-        type Answer = S::Answer;
-        type CreatedAt = S::CreatedAt;
+        type Answer = St::Answer;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `answer` field to Set
-    pub struct SetAnswer<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAnswer<S> {}
-    impl<S: State> State for SetAnswer<S> {
-        type Market = S::Market;
+    pub struct SetAnswer<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAnswer<St> {}
+    impl<St: State> State for SetAnswer<St> {
+        type Market = St::Market;
         type Answer = Set<members::answer>;
-        type CreatedAt = S::CreatedAt;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Market = S::Market;
-        type Answer = S::Answer;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Market = St::Market;
+        type Answer = St::Answer;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
@@ -194,97 +194,97 @@ pub mod resolution_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ResolutionBuilder<'a, S: resolution_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ResolutionBuilder<S: BosStr, St: resolution_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<Datetime>, Option<StrongRef<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Resolution<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ResolutionBuilder<'a, resolution_state::Empty> {
+impl<S: BosStr> Resolution<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ResolutionBuilder<S, resolution_state::Empty> {
         ResolutionBuilder::new()
     }
 }
 
-impl<'a> ResolutionBuilder<'a, resolution_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ResolutionBuilder<S, resolution_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ResolutionBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ResolutionBuilder<'a, S>
+impl<S: BosStr, St> ResolutionBuilder<S, St>
 where
-    S: resolution_state::State,
-    S::Answer: resolution_state::IsUnset,
+    St: resolution_state::State,
+    St::Answer: resolution_state::IsUnset,
 {
     /// Set the `answer` field (required)
     pub fn answer(
         mut self,
         value: impl Into<S>,
-    ) -> ResolutionBuilder<'a, resolution_state::SetAnswer<S>> {
+    ) -> ResolutionBuilder<S, resolution_state::SetAnswer<St>> {
         self._fields.0 = Option::Some(value.into());
         ResolutionBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ResolutionBuilder<'a, S>
+impl<S: BosStr, St> ResolutionBuilder<S, St>
 where
-    S: resolution_state::State,
-    S::CreatedAt: resolution_state::IsUnset,
+    St: resolution_state::State,
+    St::CreatedAt: resolution_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ResolutionBuilder<'a, resolution_state::SetCreatedAt<S>> {
+    ) -> ResolutionBuilder<S, resolution_state::SetCreatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         ResolutionBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ResolutionBuilder<'a, S>
+impl<S: BosStr, St> ResolutionBuilder<S, St>
 where
-    S: resolution_state::State,
-    S::Market: resolution_state::IsUnset,
+    St: resolution_state::State,
+    St::Market: resolution_state::IsUnset,
 {
     /// Set the `market` field (required)
     pub fn market(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> ResolutionBuilder<'a, resolution_state::SetMarket<S>> {
+    ) -> ResolutionBuilder<S, resolution_state::SetMarket<St>> {
         self._fields.2 = Option::Some(value.into());
         ResolutionBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ResolutionBuilder<'a, S>
+impl<S: BosStr, St> ResolutionBuilder<S, St>
 where
-    S: resolution_state::State,
-    S::Market: resolution_state::IsSet,
-    S::Answer: resolution_state::IsSet,
-    S::CreatedAt: resolution_state::IsSet,
+    St: resolution_state::State,
+    St::Market: resolution_state::IsSet,
+    St::Answer: resolution_state::IsSet,
+    St::CreatedAt: resolution_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Resolution<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Resolution<S> {
         Resolution {
             answer: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
@@ -292,11 +292,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Resolution<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Resolution<S> {
         Resolution {
             answer: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "coop.hypha.spores.site.config",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Config<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Config<S: BosStr = DefaultStr> {
     ///Body font ID
     #[serde(skip_serializing_if = "Option::is_none")]
     pub body_font: Option<ConfigBodyFont<S>>,
@@ -65,7 +65,7 @@ pub struct Config<S: Bos<str> + AsRef<str> = DefaultStr> {
 /// Body font ID
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ConfigBodyFont<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ConfigBodyFont<S: BosStr = DefaultStr> {
     WorkSans,
     Georgia,
     JetbrainsMono,
@@ -73,7 +73,7 @@ pub enum ConfigBodyFont<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> ConfigBodyFont<S> {
+impl<S: BosStr> ConfigBodyFont<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::WorkSans => "work-sans",
@@ -95,19 +95,19 @@ impl<S: Bos<str> + AsRef<str>> ConfigBodyFont<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ConfigBodyFont<S> {
+impl<S: BosStr> core::fmt::Display for ConfigBodyFont<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for ConfigBodyFont<S> {
+impl<S: BosStr> AsRef<str> for ConfigBodyFont<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for ConfigBodyFont<S> {
+impl<S: BosStr> Serialize for ConfigBodyFont<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -116,8 +116,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for ConfigBodyFont<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for ConfigBodyFont<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ConfigBodyFont<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -127,14 +126,18 @@ for ConfigBodyFont<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for ConfigBodyFont<S> {
+impl<S: BosStr + Default> Default for ConfigBodyFont<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for ConfigBodyFont<S> {
-    type Output = ConfigBodyFont<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for ConfigBodyFont<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ConfigBodyFont<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             ConfigBodyFont::WorkSans => ConfigBodyFont::WorkSans,
@@ -149,7 +152,7 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for ConfigBodyFont<S> {
 /// Deprecated legacy key for body font ID
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ConfigFontBody<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ConfigFontBody<S: BosStr = DefaultStr> {
     WorkSans,
     Georgia,
     JetbrainsMono,
@@ -157,7 +160,7 @@ pub enum ConfigFontBody<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> ConfigFontBody<S> {
+impl<S: BosStr> ConfigFontBody<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::WorkSans => "work-sans",
@@ -179,19 +182,19 @@ impl<S: Bos<str> + AsRef<str>> ConfigFontBody<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ConfigFontBody<S> {
+impl<S: BosStr> core::fmt::Display for ConfigFontBody<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for ConfigFontBody<S> {
+impl<S: BosStr> AsRef<str> for ConfigFontBody<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for ConfigFontBody<S> {
+impl<S: BosStr> Serialize for ConfigFontBody<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -200,8 +203,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for ConfigFontBody<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for ConfigFontBody<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ConfigFontBody<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -211,14 +213,18 @@ for ConfigFontBody<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for ConfigFontBody<S> {
+impl<S: BosStr + Default> Default for ConfigFontBody<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for ConfigFontBody<S> {
-    type Output = ConfigFontBody<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for ConfigFontBody<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ConfigFontBody<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             ConfigFontBody::WorkSans => ConfigFontBody::WorkSans,
@@ -233,7 +239,7 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for ConfigFontBody<S> {
 /// Deprecated legacy key for heading font ID
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ConfigFontHeading<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ConfigFontHeading<S: BosStr = DefaultStr> {
     WorkSans,
     Georgia,
     JetbrainsMono,
@@ -241,7 +247,7 @@ pub enum ConfigFontHeading<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> ConfigFontHeading<S> {
+impl<S: BosStr> ConfigFontHeading<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::WorkSans => "work-sans",
@@ -263,19 +269,19 @@ impl<S: Bos<str> + AsRef<str>> ConfigFontHeading<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ConfigFontHeading<S> {
+impl<S: BosStr> core::fmt::Display for ConfigFontHeading<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for ConfigFontHeading<S> {
+impl<S: BosStr> AsRef<str> for ConfigFontHeading<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for ConfigFontHeading<S> {
+impl<S: BosStr> Serialize for ConfigFontHeading<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -284,8 +290,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for ConfigFontHeading<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for ConfigFontHeading<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ConfigFontHeading<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -295,14 +300,18 @@ for ConfigFontHeading<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for ConfigFontHeading<S> {
+impl<S: BosStr + Default> Default for ConfigFontHeading<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for ConfigFontHeading<S> {
-    type Output = ConfigFontHeading<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for ConfigFontHeading<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ConfigFontHeading<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             ConfigFontHeading::WorkSans => ConfigFontHeading::WorkSans,
@@ -317,7 +326,7 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for ConfigFontHeading<S> {
 /// Heading font ID
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ConfigHeadingFont<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ConfigHeadingFont<S: BosStr = DefaultStr> {
     WorkSans,
     Georgia,
     JetbrainsMono,
@@ -325,7 +334,7 @@ pub enum ConfigHeadingFont<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> ConfigHeadingFont<S> {
+impl<S: BosStr> ConfigHeadingFont<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::WorkSans => "work-sans",
@@ -347,19 +356,19 @@ impl<S: Bos<str> + AsRef<str>> ConfigHeadingFont<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ConfigHeadingFont<S> {
+impl<S: BosStr> core::fmt::Display for ConfigHeadingFont<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for ConfigHeadingFont<S> {
+impl<S: BosStr> AsRef<str> for ConfigHeadingFont<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for ConfigHeadingFont<S> {
+impl<S: BosStr> Serialize for ConfigHeadingFont<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -368,8 +377,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for ConfigHeadingFont<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for ConfigHeadingFont<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ConfigHeadingFont<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -379,14 +387,18 @@ for ConfigHeadingFont<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for ConfigHeadingFont<S> {
+impl<S: BosStr + Default> Default for ConfigHeadingFont<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for ConfigHeadingFont<S> {
-    type Output = ConfigHeadingFont<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for ConfigHeadingFont<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ConfigHeadingFont<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             ConfigHeadingFont::WorkSans => ConfigHeadingFont::WorkSans,
@@ -404,18 +416,18 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for ConfigHeadingFont<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ConfigGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ConfigGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Config<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Config<S> {
+impl<S: BosStr> Config<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, ConfigRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -428,17 +440,17 @@ pub struct ConfigRecord;
 impl XrpcResp for ConfigRecord {
     const NSID: &'static str = "coop.hypha.spores.site.config";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ConfigGetRecordOutput<S>;
+    type Output<S: BosStr> = ConfigGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<ConfigGetRecordOutput<S>> for Config<S> {
+impl<S: BosStr> From<ConfigGetRecordOutput<S>> for Config<S> {
     fn from(output: ConfigGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Config<S> {
+impl<S: BosStr> Collection for Config<S> {
     const NSID: &'static str = "coop.hypha.spores.site.config";
     type Record = ConfigRecord;
 }
@@ -448,7 +460,7 @@ impl Collection for ConfigRecord {
     type Record = ConfigRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Config<S> {
+impl<S: BosStr> LexiconSchema for Config<S> {
     fn nsid() -> &'static str {
         "coop.hypha.spores.site.config"
     }
@@ -566,9 +578,9 @@ pub mod config_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct ConfigBuilder<'a, S: config_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ConfigBuilder<S: BosStr, St: config_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<ConfigBodyFont<S>>,
         Option<ConfigFontBody<S>>,
@@ -577,28 +589,28 @@ pub struct ConfigBuilder<'a, S: config_state::State> {
         Option<S>,
         Option<S>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Config<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ConfigBuilder<'a, config_state::Empty> {
+impl<S: BosStr> Config<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ConfigBuilder<S, config_state::Empty> {
         ConfigBuilder::new()
     }
 }
 
-impl<'a> ConfigBuilder<'a, config_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ConfigBuilder<S, config_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ConfigBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: config_state::State> ConfigBuilder<'a, S> {
+impl<S: BosStr, St: config_state::State> ConfigBuilder<S, St> {
     /// Set the `bodyFont` field (optional)
     pub fn body_font(mut self, value: impl Into<Option<ConfigBodyFont<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -611,7 +623,7 @@ impl<'a, S: config_state::State> ConfigBuilder<'a, S> {
     }
 }
 
-impl<'a, S: config_state::State> ConfigBuilder<'a, S> {
+impl<S: BosStr, St: config_state::State> ConfigBuilder<S, St> {
     /// Set the `fontBody` field (optional)
     pub fn font_body(mut self, value: impl Into<Option<ConfigFontBody<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -624,7 +636,7 @@ impl<'a, S: config_state::State> ConfigBuilder<'a, S> {
     }
 }
 
-impl<'a, S: config_state::State> ConfigBuilder<'a, S> {
+impl<S: BosStr, St: config_state::State> ConfigBuilder<S, St> {
     /// Set the `fontHeading` field (optional)
     pub fn font_heading(
         mut self,
@@ -640,7 +652,7 @@ impl<'a, S: config_state::State> ConfigBuilder<'a, S> {
     }
 }
 
-impl<'a, S: config_state::State> ConfigBuilder<'a, S> {
+impl<S: BosStr, St: config_state::State> ConfigBuilder<S, St> {
     /// Set the `headingFont` field (optional)
     pub fn heading_font(
         mut self,
@@ -656,7 +668,7 @@ impl<'a, S: config_state::State> ConfigBuilder<'a, S> {
     }
 }
 
-impl<'a, S: config_state::State> ConfigBuilder<'a, S> {
+impl<S: BosStr, St: config_state::State> ConfigBuilder<S, St> {
     /// Set the `subtitle` field (optional)
     pub fn subtitle(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
@@ -669,7 +681,7 @@ impl<'a, S: config_state::State> ConfigBuilder<'a, S> {
     }
 }
 
-impl<'a, S: config_state::State> ConfigBuilder<'a, S> {
+impl<S: BosStr, St: config_state::State> ConfigBuilder<S, St> {
     /// Set the `title` field (optional)
     pub fn title(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
@@ -682,12 +694,12 @@ impl<'a, S: config_state::State> ConfigBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ConfigBuilder<'a, S>
+impl<S: BosStr, St> ConfigBuilder<S, St>
 where
-    S: config_state::State,
+    St: config_state::State,
 {
-    /// Build the final struct
-    pub fn build(self) -> Config<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Config<S> {
         Config {
             body_font: self._fields.0,
             font_body: self._fields.1,
@@ -698,8 +710,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Config<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Config<S> {
         Config {
             body_font: self._fields.0,
             font_body: self._fields.1,

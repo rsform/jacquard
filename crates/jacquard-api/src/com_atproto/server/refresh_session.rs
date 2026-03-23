@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, Handle};
 use jacquard_common::types::value::Data;
@@ -18,14 +18,14 @@ use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct RefreshSessionOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct RefreshSessionOutput<S: BosStr = DefaultStr> {
     pub access_jwt: S,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub active: Option<bool>,
@@ -43,23 +43,21 @@ pub struct RefreshSessionOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Hosting status of the account. If not specified, then assume 'active'.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub status: Option<RefreshSessionOutputStatus<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Hosting status of the account. If not specified, then assume 'active'.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum RefreshSessionOutputStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum RefreshSessionOutputStatus<S: BosStr = DefaultStr> {
     Takendown,
     Suspended,
     Deactivated,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> RefreshSessionOutputStatus<S> {
+impl<S: BosStr> RefreshSessionOutputStatus<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Takendown => "takendown",
@@ -79,19 +77,19 @@ impl<S: Bos<str> + AsRef<str>> RefreshSessionOutputStatus<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for RefreshSessionOutputStatus<S> {
+impl<S: BosStr> core::fmt::Display for RefreshSessionOutputStatus<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for RefreshSessionOutputStatus<S> {
+impl<S: BosStr> AsRef<str> for RefreshSessionOutputStatus<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for RefreshSessionOutputStatus<S> {
+impl<S: BosStr> Serialize for RefreshSessionOutputStatus<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -100,7 +98,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for RefreshSessionOutputStatus<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
 for RefreshSessionOutputStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
@@ -111,14 +109,18 @@ for RefreshSessionOutputStatus<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for RefreshSessionOutputStatus<S> {
+impl<S: BosStr + Default> Default for RefreshSessionOutputStatus<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for RefreshSessionOutputStatus<S> {
-    type Output = RefreshSessionOutputStatus<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for RefreshSessionOutputStatus<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = RefreshSessionOutputStatus<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             RefreshSessionOutputStatus::Takendown => {
@@ -206,7 +208,7 @@ pub struct RefreshSessionResponse;
 impl jacquard_common::xrpc::XrpcResp for RefreshSessionResponse {
     const NSID: &'static str = "com.atproto.server.refreshSession";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = RefreshSessionOutput<S>;
+    type Output<S: BosStr> = RefreshSessionOutput<S>;
     type Err = RefreshSessionError;
 }
 
@@ -225,6 +227,6 @@ impl jacquard_common::xrpc::XrpcEndpoint for RefreshSessionRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = RefreshSession;
+    type Request<S: BosStr> = RefreshSession;
     type Response = RefreshSessionResponse;
 }

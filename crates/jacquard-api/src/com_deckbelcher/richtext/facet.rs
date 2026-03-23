@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -33,11 +33,11 @@ Typically rendered as `<strong>` in HTML.*/
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Bold<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Bold<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
@@ -50,11 +50,11 @@ Indices are zero-indexed, counting bytes of the UTF-8 encoded text.*/
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ByteSlice<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ByteSlice<S: BosStr = DefaultStr> {
     pub byte_end: i64,
     pub byte_start: i64,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -69,11 +69,11 @@ The text is usually the card name.*/
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CardRef<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CardRef<S: BosStr = DefaultStr> {
     ///Reference to the card (scryfall printing + oracle card).
     pub r#ref: com_deckbelcher::CardRef<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -87,11 +87,11 @@ Typically rendered as `<code>` in HTML.*/
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Code<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Code<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
@@ -103,11 +103,11 @@ Typically rendered as `<pre><code>` in HTML.*/
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CodeBlock<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CodeBlock<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
@@ -119,11 +119,11 @@ Typically rendered as `<em>` in HTML.*/
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Italic<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Italic<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
@@ -135,11 +135,11 @@ The text URL may have been simplified or truncated, but the facet reference shou
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Link<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Link<S: BosStr = DefaultStr> {
     pub uri: UriValue<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -152,11 +152,11 @@ Extends Bluesky's facet system to support DeckBelcher-specific features.*/
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Facet<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Facet<S: BosStr = DefaultStr> {
     pub features: Vec<FacetFeaturesItem<S>>,
     pub index: facet::ByteSlice<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -169,11 +169,11 @@ pub struct Facet<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum FacetFeaturesItem<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum FacetFeaturesItem<S: BosStr = DefaultStr> {
     #[serde(rename = "com.deckbelcher.richtext.facet#mention")]
     Mention(Box<facet::Mention<S>>),
     #[serde(rename = "com.deckbelcher.richtext.facet#link")]
@@ -199,11 +199,11 @@ The text is usually a handle, including an `@` prefix, but the facet reference i
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Mention<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Mention<S: BosStr = DefaultStr> {
     pub did: Did<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -216,17 +216,17 @@ The text usually includes a '#' prefix, but the facet reference should not.*/
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Tag<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Tag<S: BosStr = DefaultStr> {
     pub tag: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Bold<S> {
+impl<S: BosStr> LexiconSchema for Bold<S> {
     fn nsid() -> &'static str {
         "com.deckbelcher.richtext.facet"
     }
@@ -241,7 +241,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Bold<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ByteSlice<S> {
+impl<S: BosStr> LexiconSchema for ByteSlice<S> {
     fn nsid() -> &'static str {
         "com.deckbelcher.richtext.facet"
     }
@@ -276,7 +276,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for ByteSlice<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for CardRef<S> {
+impl<S: BosStr> LexiconSchema for CardRef<S> {
     fn nsid() -> &'static str {
         "com.deckbelcher.richtext.facet"
     }
@@ -291,7 +291,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for CardRef<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Code<S> {
+impl<S: BosStr> LexiconSchema for Code<S> {
     fn nsid() -> &'static str {
         "com.deckbelcher.richtext.facet"
     }
@@ -306,7 +306,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Code<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for CodeBlock<S> {
+impl<S: BosStr> LexiconSchema for CodeBlock<S> {
     fn nsid() -> &'static str {
         "com.deckbelcher.richtext.facet"
     }
@@ -321,7 +321,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for CodeBlock<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Italic<S> {
+impl<S: BosStr> LexiconSchema for Italic<S> {
     fn nsid() -> &'static str {
         "com.deckbelcher.richtext.facet"
     }
@@ -336,7 +336,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Italic<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Link<S> {
+impl<S: BosStr> LexiconSchema for Link<S> {
     fn nsid() -> &'static str {
         "com.deckbelcher.richtext.facet"
     }
@@ -351,7 +351,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Link<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Facet<S> {
+impl<S: BosStr> LexiconSchema for Facet<S> {
     fn nsid() -> &'static str {
         "com.deckbelcher.richtext.facet"
     }
@@ -366,7 +366,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Facet<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Mention<S> {
+impl<S: BosStr> LexiconSchema for Mention<S> {
     fn nsid() -> &'static str {
         "com.deckbelcher.richtext.facet"
     }
@@ -381,7 +381,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Mention<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Tag<S> {
+impl<S: BosStr> LexiconSchema for Tag<S> {
     fn nsid() -> &'static str {
         "com.deckbelcher.richtext.facet"
     }
@@ -698,17 +698,17 @@ pub mod byte_slice_state {
         type ByteEnd = Unset;
     }
     ///State transition - sets the `byte_start` field to Set
-    pub struct SetByteStart<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetByteStart<S> {}
-    impl<S: State> State for SetByteStart<S> {
+    pub struct SetByteStart<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetByteStart<St> {}
+    impl<St: State> State for SetByteStart<St> {
         type ByteStart = Set<members::byte_start>;
-        type ByteEnd = S::ByteEnd;
+        type ByteEnd = St::ByteEnd;
     }
     ///State transition - sets the `byte_end` field to Set
-    pub struct SetByteEnd<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetByteEnd<S> {}
-    impl<S: State> State for SetByteEnd<S> {
-        type ByteStart = S::ByteStart;
+    pub struct SetByteEnd<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetByteEnd<St> {}
+    impl<St: State> State for SetByteEnd<St> {
+        type ByteStart = St::ByteStart;
         type ByteEnd = Set<members::byte_end>;
     }
     /// Marker types for field names
@@ -721,88 +721,88 @@ pub mod byte_slice_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ByteSliceBuilder<'a, S: byte_slice_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ByteSliceBuilder<S: BosStr, St: byte_slice_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<i64>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ByteSlice<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ByteSliceBuilder<'a, byte_slice_state::Empty> {
+impl<S: BosStr> ByteSlice<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ByteSliceBuilder<S, byte_slice_state::Empty> {
         ByteSliceBuilder::new()
     }
 }
 
-impl<'a> ByteSliceBuilder<'a, byte_slice_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ByteSliceBuilder<S, byte_slice_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ByteSliceBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ByteSliceBuilder<'a, S>
+impl<S: BosStr, St> ByteSliceBuilder<S, St>
 where
-    S: byte_slice_state::State,
-    S::ByteEnd: byte_slice_state::IsUnset,
+    St: byte_slice_state::State,
+    St::ByteEnd: byte_slice_state::IsUnset,
 {
     /// Set the `byteEnd` field (required)
     pub fn byte_end(
         mut self,
         value: impl Into<i64>,
-    ) -> ByteSliceBuilder<'a, byte_slice_state::SetByteEnd<S>> {
+    ) -> ByteSliceBuilder<S, byte_slice_state::SetByteEnd<St>> {
         self._fields.0 = Option::Some(value.into());
         ByteSliceBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ByteSliceBuilder<'a, S>
+impl<S: BosStr, St> ByteSliceBuilder<S, St>
 where
-    S: byte_slice_state::State,
-    S::ByteStart: byte_slice_state::IsUnset,
+    St: byte_slice_state::State,
+    St::ByteStart: byte_slice_state::IsUnset,
 {
     /// Set the `byteStart` field (required)
     pub fn byte_start(
         mut self,
         value: impl Into<i64>,
-    ) -> ByteSliceBuilder<'a, byte_slice_state::SetByteStart<S>> {
+    ) -> ByteSliceBuilder<S, byte_slice_state::SetByteStart<St>> {
         self._fields.1 = Option::Some(value.into());
         ByteSliceBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ByteSliceBuilder<'a, S>
+impl<S: BosStr, St> ByteSliceBuilder<S, St>
 where
-    S: byte_slice_state::State,
-    S::ByteStart: byte_slice_state::IsSet,
-    S::ByteEnd: byte_slice_state::IsSet,
+    St: byte_slice_state::State,
+    St::ByteStart: byte_slice_state::IsSet,
+    St::ByteEnd: byte_slice_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ByteSlice<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ByteSlice<S> {
         ByteSlice {
             byte_end: self._fields.0.unwrap(),
             byte_start: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> ByteSlice<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ByteSlice<S> {
         ByteSlice {
             byte_end: self._fields.0.unwrap(),
             byte_start: self._fields.1.unwrap(),
@@ -830,9 +830,9 @@ pub mod card_ref_state {
         type Ref = Unset;
     }
     ///State transition - sets the `ref` field to Set
-    pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRef<S> {}
-    impl<S: State> State for SetRef<S> {
+    pub struct SetRef<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRef<St> {}
+    impl<St: State> State for SetRef<St> {
         type Ref = Set<members::r#ref>;
     }
     /// Marker types for field names
@@ -843,67 +843,64 @@ pub mod card_ref_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct CardRefBuilder<'a, S: card_ref_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct CardRefBuilder<S: BosStr, St: card_ref_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<com_deckbelcher::CardRef<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> CardRef<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> CardRefBuilder<'a, card_ref_state::Empty> {
+impl<S: BosStr> CardRef<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> CardRefBuilder<S, card_ref_state::Empty> {
         CardRefBuilder::new()
     }
 }
 
-impl<'a> CardRefBuilder<'a, card_ref_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> CardRefBuilder<S, card_ref_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         CardRefBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CardRefBuilder<'a, S>
+impl<S: BosStr, St> CardRefBuilder<S, St>
 where
-    S: card_ref_state::State,
-    S::Ref: card_ref_state::IsUnset,
+    St: card_ref_state::State,
+    St::Ref: card_ref_state::IsUnset,
 {
     /// Set the `ref` field (required)
     pub fn r#ref(
         mut self,
         value: impl Into<com_deckbelcher::CardRef<S>>,
-    ) -> CardRefBuilder<'a, card_ref_state::SetRef<S>> {
+    ) -> CardRefBuilder<S, card_ref_state::SetRef<St>> {
         self._fields.0 = Option::Some(value.into());
         CardRefBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CardRefBuilder<'a, S>
+impl<S: BosStr, St> CardRefBuilder<S, St>
 where
-    S: card_ref_state::State,
-    S::Ref: card_ref_state::IsSet,
+    St: card_ref_state::State,
+    St::Ref: card_ref_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> CardRef<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> CardRef<S> {
         CardRef {
             r#ref: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> CardRef<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CardRef<S> {
         CardRef {
             r#ref: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -930,9 +927,9 @@ pub mod link_state {
         type Uri = Unset;
     }
     ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
         type Uri = Set<members::uri>;
     }
     /// Marker types for field names
@@ -943,64 +940,64 @@ pub mod link_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct LinkBuilder<'a, S: link_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct LinkBuilder<S: BosStr, St: link_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<UriValue<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Link<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> LinkBuilder<'a, link_state::Empty> {
+impl<S: BosStr> Link<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> LinkBuilder<S, link_state::Empty> {
         LinkBuilder::new()
     }
 }
 
-impl<'a> LinkBuilder<'a, link_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> LinkBuilder<S, link_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         LinkBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LinkBuilder<'a, S>
+impl<S: BosStr, St> LinkBuilder<S, St>
 where
-    S: link_state::State,
-    S::Uri: link_state::IsUnset,
+    St: link_state::State,
+    St::Uri: link_state::IsUnset,
 {
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> LinkBuilder<'a, link_state::SetUri<S>> {
+    ) -> LinkBuilder<S, link_state::SetUri<St>> {
         self._fields.0 = Option::Some(value.into());
         LinkBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LinkBuilder<'a, S>
+impl<S: BosStr, St> LinkBuilder<S, St>
 where
-    S: link_state::State,
-    S::Uri: link_state::IsSet,
+    St: link_state::State,
+    St::Uri: link_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Link<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Link<S> {
         Link {
             uri: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Link<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Link<S> {
         Link {
             uri: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -1029,17 +1026,17 @@ pub mod facet_state {
         type Features = Unset;
     }
     ///State transition - sets the `index` field to Set
-    pub struct SetIndex<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIndex<S> {}
-    impl<S: State> State for SetIndex<S> {
+    pub struct SetIndex<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIndex<St> {}
+    impl<St: State> State for SetIndex<St> {
         type Index = Set<members::index>;
-        type Features = S::Features;
+        type Features = St::Features;
     }
     ///State transition - sets the `features` field to Set
-    pub struct SetFeatures<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFeatures<S> {}
-    impl<S: State> State for SetFeatures<S> {
-        type Index = S::Index;
+    pub struct SetFeatures<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetFeatures<St> {}
+    impl<St: State> State for SetFeatures<St> {
+        type Index = St::Index;
         type Features = Set<members::features>;
     }
     /// Marker types for field names
@@ -1052,85 +1049,85 @@ pub mod facet_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct FacetBuilder<'a, S: facet_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct FacetBuilder<S: BosStr, St: facet_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<FacetFeaturesItem<S>>>, Option<facet::ByteSlice<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Facet<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> FacetBuilder<'a, facet_state::Empty> {
+impl<S: BosStr> Facet<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> FacetBuilder<S, facet_state::Empty> {
         FacetBuilder::new()
     }
 }
 
-impl<'a> FacetBuilder<'a, facet_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> FacetBuilder<S, facet_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         FacetBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> FacetBuilder<'a, S>
+impl<S: BosStr, St> FacetBuilder<S, St>
 where
-    S: facet_state::State,
-    S::Features: facet_state::IsUnset,
+    St: facet_state::State,
+    St::Features: facet_state::IsUnset,
 {
     /// Set the `features` field (required)
     pub fn features(
         mut self,
         value: impl Into<Vec<FacetFeaturesItem<S>>>,
-    ) -> FacetBuilder<'a, facet_state::SetFeatures<S>> {
+    ) -> FacetBuilder<S, facet_state::SetFeatures<St>> {
         self._fields.0 = Option::Some(value.into());
         FacetBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> FacetBuilder<'a, S>
+impl<S: BosStr, St> FacetBuilder<S, St>
 where
-    S: facet_state::State,
-    S::Index: facet_state::IsUnset,
+    St: facet_state::State,
+    St::Index: facet_state::IsUnset,
 {
     /// Set the `index` field (required)
     pub fn index(
         mut self,
         value: impl Into<facet::ByteSlice<S>>,
-    ) -> FacetBuilder<'a, facet_state::SetIndex<S>> {
+    ) -> FacetBuilder<S, facet_state::SetIndex<St>> {
         self._fields.1 = Option::Some(value.into());
         FacetBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> FacetBuilder<'a, S>
+impl<S: BosStr, St> FacetBuilder<S, St>
 where
-    S: facet_state::State,
-    S::Index: facet_state::IsSet,
-    S::Features: facet_state::IsSet,
+    St: facet_state::State,
+    St::Index: facet_state::IsSet,
+    St::Features: facet_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Facet<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Facet<S> {
         Facet {
             features: self._fields.0.unwrap(),
             index: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Facet<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Facet<S> {
         Facet {
             features: self._fields.0.unwrap(),
             index: self._fields.1.unwrap(),
@@ -1158,9 +1155,9 @@ pub mod mention_state {
         type Did = Unset;
     }
     ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
         type Did = Set<members::did>;
     }
     /// Marker types for field names
@@ -1171,67 +1168,64 @@ pub mod mention_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct MentionBuilder<'a, S: mention_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct MentionBuilder<S: BosStr, St: mention_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Mention<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> MentionBuilder<'a, mention_state::Empty> {
+impl<S: BosStr> Mention<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> MentionBuilder<S, mention_state::Empty> {
         MentionBuilder::new()
     }
 }
 
-impl<'a> MentionBuilder<'a, mention_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> MentionBuilder<S, mention_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         MentionBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> MentionBuilder<'a, S>
+impl<S: BosStr, St> MentionBuilder<S, St>
 where
-    S: mention_state::State,
-    S::Did: mention_state::IsUnset,
+    St: mention_state::State,
+    St::Did: mention_state::IsUnset,
 {
     /// Set the `did` field (required)
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> MentionBuilder<'a, mention_state::SetDid<S>> {
+    ) -> MentionBuilder<S, mention_state::SetDid<St>> {
         self._fields.0 = Option::Some(value.into());
         MentionBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> MentionBuilder<'a, S>
+impl<S: BosStr, St> MentionBuilder<S, St>
 where
-    S: mention_state::State,
-    S::Did: mention_state::IsSet,
+    St: mention_state::State,
+    St::Did: mention_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Mention<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Mention<S> {
         Mention {
             did: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Mention<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Mention<S> {
         Mention {
             did: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

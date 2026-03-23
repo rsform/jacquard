@@ -12,7 +12,7 @@
 use bon::Builder;
 use bytes::Bytes;
 use http::StatusCode;
-use jacquard_common::bos::Bos;
+use jacquard_common::BosStr;
 use jacquard_common::deps::fluent_uri::Uri;
 use jacquard_common::error::BoxError;
 use jacquard_common::types::did::Did;
@@ -315,7 +315,7 @@ pub trait IdentityResolver {
 
     /// Resolve handle
     #[cfg(not(target_arch = "wasm32"))]
-    fn resolve_handle<S: Bos<str> + AsRef<str> + Sync>(
+    fn resolve_handle<S: BosStr + Sync>(
         &self,
         handle: &Handle<S>,
     ) -> impl Future<Output = Result<Did>>
@@ -324,14 +324,14 @@ pub trait IdentityResolver {
 
     /// Resolve handle
     #[cfg(target_arch = "wasm32")]
-    fn resolve_handle<S: Bos<str> + AsRef<str> + Sync>(
+    fn resolve_handle<S: BosStr + Sync>(
         &self,
         handle: &Handle<S>,
     ) -> impl Future<Output = Result<Did>>;
 
     /// Resolve DID document
     #[cfg(not(target_arch = "wasm32"))]
-    fn resolve_did_doc<S: Bos<str> + AsRef<str> + Sync>(
+    fn resolve_did_doc<S: BosStr + Sync>(
         &self,
         did: &Did<S>,
     ) -> impl Future<Output = Result<DidDocResponse>>
@@ -340,14 +340,14 @@ pub trait IdentityResolver {
 
     /// Resolve DID document
     #[cfg(target_arch = "wasm32")]
-    fn resolve_did_doc<S: Bos<str> + AsRef<str> + Sync>(
+    fn resolve_did_doc<S: BosStr + Sync>(
         &self,
         did: &Did<S>,
     ) -> impl Future<Output = Result<DidDocResponse>>;
 
     /// Resolve DID doc from an identifier
     #[cfg(not(target_arch = "wasm32"))]
-    fn resolve_ident<S: Bos<str> + AsRef<str> + Sync>(
+    fn resolve_ident<S: BosStr + Sync>(
         &self,
         actor: &AtIdentifier<S>,
     ) -> impl Future<Output = Result<DidDocResponse>>
@@ -367,7 +367,7 @@ pub trait IdentityResolver {
 
     /// Resolve DID doc from an identifier
     #[cfg(target_arch = "wasm32")]
-    fn resolve_ident<S: Bos<str> + AsRef<str> + Sync>(
+    fn resolve_ident<S: BosStr + Sync>(
         &self,
         actor: &AtIdentifier<S>,
     ) -> impl Future<Output = Result<DidDocResponse>> {
@@ -384,7 +384,7 @@ pub trait IdentityResolver {
 
     /// Resolve DID doc from an identifier
     #[cfg(not(target_arch = "wasm32"))]
-    fn resolve_ident_owned<S: Bos<str> + AsRef<str> + Sync>(
+    fn resolve_ident_owned<S: BosStr + Sync>(
         &self,
         actor: &AtIdentifier<S>,
     ) -> impl Future<Output = Result<DidDocument>>
@@ -404,7 +404,7 @@ pub trait IdentityResolver {
 
     /// Resolve DID doc from an identifier
     #[cfg(target_arch = "wasm32")]
-    fn resolve_ident_owned<S: Bos<str> + AsRef<str> + Sync>(
+    fn resolve_ident_owned<S: BosStr + Sync>(
         &self,
         actor: &AtIdentifier<S>,
     ) -> impl Future<Output = Result<DidDocument>> {
@@ -421,7 +421,7 @@ pub trait IdentityResolver {
 
     /// Resolve the DID document and return an owned version
     #[cfg(not(target_arch = "wasm32"))]
-    fn resolve_did_doc_owned<S: Bos<str> + AsRef<str> + Sync>(
+    fn resolve_did_doc_owned<S: BosStr + Sync>(
         &self,
         did: &Did<S>,
     ) -> impl Future<Output = Result<DidDocument>>
@@ -433,7 +433,7 @@ pub trait IdentityResolver {
 
     /// Resolve the DID document and return an owned version
     #[cfg(target_arch = "wasm32")]
-    fn resolve_did_doc_owned<S: Bos<str> + AsRef<str> + Sync>(
+    fn resolve_did_doc_owned<S: BosStr + Sync>(
         &self,
         did: &Did<S>,
     ) -> impl Future<Output = Result<DidDocument>> {
@@ -442,7 +442,7 @@ pub trait IdentityResolver {
 
     /// Return the PDS url for a DID
     #[cfg(not(target_arch = "wasm32"))]
-    fn pds_for_did<S: Bos<str> + AsRef<str> + Sync>(
+    fn pds_for_did<S: BosStr + Sync>(
         &self,
         did: &Did<S>,
     ) -> impl Future<Output = Result<jacquard_common::deps::fluent_uri::Uri<String>>>
@@ -477,7 +477,7 @@ pub trait IdentityResolver {
 
     /// Return the PDS url for a DID
     #[cfg(target_arch = "wasm32")]
-    fn pds_for_did<S: Bos<str> + AsRef<str> + Sync>(
+    fn pds_for_did<S: BosStr + Sync>(
         &self,
         did: &Did<S>,
     ) -> impl Future<Output = Result<jacquard_common::deps::fluent_uri::Uri<String>>> {
@@ -509,7 +509,7 @@ pub trait IdentityResolver {
 
     /// Return the DID and PDS url for a handle
     #[cfg(not(target_arch = "wasm32"))]
-    fn pds_for_handle<S: Bos<str> + AsRef<str> + Sync>(
+    fn pds_for_handle<S: BosStr + Sync>(
         &self,
         handle: &Handle<S>,
     ) -> impl Future<Output = Result<(Did, jacquard_common::deps::fluent_uri::Uri<String>)>>
@@ -525,7 +525,7 @@ pub trait IdentityResolver {
 
     /// Return the DID and PDS url for a handle
     #[cfg(target_arch = "wasm32")]
-    fn pds_for_handle<S: Bos<str> + AsRef<str> + Sync>(
+    fn pds_for_handle<S: BosStr + Sync>(
         &self,
         handle: &Handle<S>,
     ) -> impl Future<Output = Result<(Did, jacquard_common::deps::fluent_uri::Uri<String>)>> {
@@ -544,18 +544,12 @@ impl<T: IdentityResolver + Sync> IdentityResolver for std::sync::Arc<T> {
     }
 
     /// Resolve handle
-    async fn resolve_handle<S: Bos<str> + AsRef<str> + Sync>(
-        &self,
-        handle: &Handle<S>,
-    ) -> Result<Did> {
+    async fn resolve_handle<S: BosStr + Sync>(&self, handle: &Handle<S>) -> Result<Did> {
         self.as_ref().resolve_handle(handle).await
     }
 
     /// Resolve DID document
-    async fn resolve_did_doc<S: Bos<str> + AsRef<str> + Sync>(
-        &self,
-        did: &Did<S>,
-    ) -> Result<DidDocResponse> {
+    async fn resolve_did_doc<S: BosStr + Sync>(&self, did: &Did<S>) -> Result<DidDocResponse> {
         self.as_ref().resolve_did_doc(did).await
     }
 }
@@ -567,18 +561,12 @@ impl<T: IdentityResolver> IdentityResolver for std::sync::Arc<T> {
     }
 
     /// Resolve handle
-    async fn resolve_handle<S: Bos<str> + AsRef<str> + Sync>(
-        &self,
-        handle: &Handle<S>,
-    ) -> Result<Did> {
+    async fn resolve_handle<S: BosStr + Sync>(&self, handle: &Handle<S>) -> Result<Did> {
         self.as_ref().resolve_handle(handle).await
     }
 
     /// Resolve DID document
-    async fn resolve_did_doc<S: Bos<str> + AsRef<str> + Sync>(
-        &self,
-        did: &Did<S>,
-    ) -> Result<DidDocResponse> {
+    async fn resolve_did_doc<S: BosStr + Sync>(&self, did: &Did<S>) -> Result<DidDocResponse> {
         self.as_ref().resolve_did_doc(did).await
     }
 }

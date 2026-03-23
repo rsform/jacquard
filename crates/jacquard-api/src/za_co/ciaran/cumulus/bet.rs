@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
     rename = "za.co.ciaran.cumulus.bet",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Bet<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Bet<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     ///The record containing the Cumulus Market for this Bet
     pub market: StrongRef<S>,
@@ -55,18 +55,18 @@ pub struct Bet<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct BetGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct BetGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Bet<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Bet<S> {
+impl<S: BosStr> Bet<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, BetRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -79,17 +79,17 @@ pub struct BetRecord;
 impl XrpcResp for BetRecord {
     const NSID: &'static str = "za.co.ciaran.cumulus.bet";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = BetGetRecordOutput<S>;
+    type Output<S: BosStr> = BetGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<BetGetRecordOutput<S>> for Bet<S> {
+impl<S: BosStr> From<BetGetRecordOutput<S>> for Bet<S> {
     fn from(output: BetGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Bet<S> {
+impl<S: BosStr> Collection for Bet<S> {
     const NSID: &'static str = "za.co.ciaran.cumulus.bet";
     type Record = BetRecord;
 }
@@ -99,7 +99,7 @@ impl Collection for BetRecord {
     type Record = BetRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Bet<S> {
+impl<S: BosStr> LexiconSchema for Bet<S> {
     fn nsid() -> &'static str {
         "za.co.ciaran.cumulus.bet"
     }
@@ -146,145 +146,145 @@ pub mod bet_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Market;
-        type CreatedAt;
         type Position;
+        type CreatedAt;
+        type Market;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Market = Unset;
-        type CreatedAt = Unset;
         type Position = Unset;
-    }
-    ///State transition - sets the `market` field to Set
-    pub struct SetMarket<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMarket<S> {}
-    impl<S: State> State for SetMarket<S> {
-        type Market = Set<members::market>;
-        type CreatedAt = S::CreatedAt;
-        type Position = S::Position;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Market = S::Market;
-        type CreatedAt = Set<members::created_at>;
-        type Position = S::Position;
+        type CreatedAt = Unset;
+        type Market = Unset;
     }
     ///State transition - sets the `position` field to Set
-    pub struct SetPosition<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPosition<S> {}
-    impl<S: State> State for SetPosition<S> {
-        type Market = S::Market;
-        type CreatedAt = S::CreatedAt;
+    pub struct SetPosition<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPosition<St> {}
+    impl<St: State> State for SetPosition<St> {
         type Position = Set<members::position>;
+        type CreatedAt = St::CreatedAt;
+        type Market = St::Market;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Position = St::Position;
+        type CreatedAt = Set<members::created_at>;
+        type Market = St::Market;
+    }
+    ///State transition - sets the `market` field to Set
+    pub struct SetMarket<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMarket<St> {}
+    impl<St: State> State for SetMarket<St> {
+        type Position = St::Position;
+        type CreatedAt = St::CreatedAt;
+        type Market = Set<members::market>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `market` field
-        pub struct market(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `position` field
         pub struct position(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `market` field
+        pub struct market(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct BetBuilder<'a, S: bet_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct BetBuilder<S: BosStr, St: bet_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<StrongRef<S>>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Bet<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> BetBuilder<'a, bet_state::Empty> {
+impl<S: BosStr> Bet<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> BetBuilder<S, bet_state::Empty> {
         BetBuilder::new()
     }
 }
 
-impl<'a> BetBuilder<'a, bet_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> BetBuilder<S, bet_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         BetBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BetBuilder<'a, S>
+impl<S: BosStr, St> BetBuilder<S, St>
 where
-    S: bet_state::State,
-    S::CreatedAt: bet_state::IsUnset,
+    St: bet_state::State,
+    St::CreatedAt: bet_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> BetBuilder<'a, bet_state::SetCreatedAt<S>> {
+    ) -> BetBuilder<S, bet_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         BetBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BetBuilder<'a, S>
+impl<S: BosStr, St> BetBuilder<S, St>
 where
-    S: bet_state::State,
-    S::Market: bet_state::IsUnset,
+    St: bet_state::State,
+    St::Market: bet_state::IsUnset,
 {
     /// Set the `market` field (required)
     pub fn market(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> BetBuilder<'a, bet_state::SetMarket<S>> {
+    ) -> BetBuilder<S, bet_state::SetMarket<St>> {
         self._fields.1 = Option::Some(value.into());
         BetBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BetBuilder<'a, S>
+impl<S: BosStr, St> BetBuilder<S, St>
 where
-    S: bet_state::State,
-    S::Position: bet_state::IsUnset,
+    St: bet_state::State,
+    St::Position: bet_state::IsUnset,
 {
     /// Set the `position` field (required)
     pub fn position(
         mut self,
         value: impl Into<S>,
-    ) -> BetBuilder<'a, bet_state::SetPosition<S>> {
+    ) -> BetBuilder<S, bet_state::SetPosition<St>> {
         self._fields.2 = Option::Some(value.into());
         BetBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BetBuilder<'a, S>
+impl<S: BosStr, St> BetBuilder<S, St>
 where
-    S: bet_state::State,
-    S::Market: bet_state::IsSet,
-    S::CreatedAt: bet_state::IsSet,
-    S::Position: bet_state::IsSet,
+    St: bet_state::State,
+    St::Position: bet_state::IsSet,
+    St::CreatedAt: bet_state::IsSet,
+    St::Market: bet_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Bet<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Bet<S> {
         Bet {
             created_at: self._fields.0.unwrap(),
             market: self._fields.1.unwrap(),
@@ -292,8 +292,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Bet<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Bet<S> {
         Bet {
             created_at: self._fields.0.unwrap(),
             market: self._fields.1.unwrap(),

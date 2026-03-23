@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -30,11 +30,11 @@ use crate::fyi_questionable::richtext::list;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct List<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct List<S: BosStr = DefaultStr> {
     pub items: Vec<ListItemsItem<S>>,
     /// Defaults to `false`.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -50,18 +50,18 @@ pub struct List<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ListItemsItem<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ListItemsItem<S: BosStr = DefaultStr> {
     #[serde(rename = "fyi.questionable.richtext.text")]
     Text(Box<Text<S>>),
     #[serde(rename = "fyi.questionable.richtext.list")]
     List(Box<list::List<S>>),
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for List<S> {
+impl<S: BosStr> LexiconSchema for List<S> {
     fn nsid() -> &'static str {
         "fyi.questionable.richtext.list"
     }
@@ -99,9 +99,9 @@ pub mod list_state {
         type Items = Unset;
     }
     ///State transition - sets the `items` field to Set
-    pub struct SetItems<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetItems<S> {}
-    impl<S: State> State for SetItems<S> {
+    pub struct SetItems<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetItems<St> {}
+    impl<St: State> State for SetItems<St> {
         type Items = Set<members::items>;
     }
     /// Marker types for field names
@@ -112,51 +112,51 @@ pub mod list_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ListBuilder<'a, S: list_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ListBuilder<S: BosStr, St: list_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<ListItemsItem<S>>>, Option<bool>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> List<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ListBuilder<'a, list_state::Empty> {
+impl<S: BosStr> List<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ListBuilder<S, list_state::Empty> {
         ListBuilder::new()
     }
 }
 
-impl<'a> ListBuilder<'a, list_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ListBuilder<S, list_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ListBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ListBuilder<'a, S>
+impl<S: BosStr, St> ListBuilder<S, St>
 where
-    S: list_state::State,
-    S::Items: list_state::IsUnset,
+    St: list_state::State,
+    St::Items: list_state::IsUnset,
 {
     /// Set the `items` field (required)
     pub fn items(
         mut self,
         value: impl Into<Vec<ListItemsItem<S>>>,
-    ) -> ListBuilder<'a, list_state::SetItems<S>> {
+    ) -> ListBuilder<S, list_state::SetItems<St>> {
         self._fields.0 = Option::Some(value.into());
         ListBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: list_state::State> ListBuilder<'a, S> {
+impl<S: BosStr, St: list_state::State> ListBuilder<S, St> {
     /// Set the `ordered` field (optional)
     pub fn ordered(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.1 = value.into();
@@ -169,21 +169,21 @@ impl<'a, S: list_state::State> ListBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ListBuilder<'a, S>
+impl<S: BosStr, St> ListBuilder<S, St>
 where
-    S: list_state::State,
-    S::Items: list_state::IsSet,
+    St: list_state::State,
+    St::Items: list_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> List<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> List<S> {
         List {
             items: self._fields.0.unwrap(),
             ordered: self._fields.1.or_else(|| Some(false)),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> List<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> List<S> {
         List {
             items: self._fields.0.unwrap(),
             ordered: self._fields.1.or_else(|| Some(false)),

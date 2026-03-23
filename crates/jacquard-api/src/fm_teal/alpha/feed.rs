@@ -15,7 +15,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use crate::fm_teal::alpha::feed;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Artist<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Artist<S: BosStr = DefaultStr> {
     ///The Musicbrainz ID of the artist
     #[serde(skip_serializing_if = "Option::is_none")]
     pub artist_mb_id: Option<S>,
@@ -54,11 +54,11 @@ pub struct Artist<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct PlayView<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct PlayView<S: BosStr = DefaultStr> {
     ///Array of artists in order of original appearance.
     pub artists: Vec<feed::Artist<S>>,
     ///The length of the track in seconds
@@ -97,7 +97,7 @@ pub struct PlayView<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Artist<S> {
+impl<S: BosStr> LexiconSchema for Artist<S> {
     fn nsid() -> &'static str {
         "fm.teal.alpha.feed.defs"
     }
@@ -147,7 +147,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Artist<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for PlayView<S> {
+impl<S: BosStr> LexiconSchema for PlayView<S> {
     fn nsid() -> &'static str {
         "fm.teal.alpha.feed.defs"
     }
@@ -446,43 +446,43 @@ pub mod play_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type TrackName;
         type Artists;
+        type TrackName;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type TrackName = Unset;
         type Artists = Unset;
-    }
-    ///State transition - sets the `track_name` field to Set
-    pub struct SetTrackName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTrackName<S> {}
-    impl<S: State> State for SetTrackName<S> {
-        type TrackName = Set<members::track_name>;
-        type Artists = S::Artists;
+        type TrackName = Unset;
     }
     ///State transition - sets the `artists` field to Set
-    pub struct SetArtists<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetArtists<S> {}
-    impl<S: State> State for SetArtists<S> {
-        type TrackName = S::TrackName;
+    pub struct SetArtists<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetArtists<St> {}
+    impl<St: State> State for SetArtists<St> {
         type Artists = Set<members::artists>;
+        type TrackName = St::TrackName;
+    }
+    ///State transition - sets the `track_name` field to Set
+    pub struct SetTrackName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTrackName<St> {}
+    impl<St: State> State for SetTrackName<St> {
+        type Artists = St::Artists;
+        type TrackName = Set<members::track_name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `track_name` field
-        pub struct track_name(());
         ///Marker type for the `artists` field
         pub struct artists(());
+        ///Marker type for the `track_name` field
+        pub struct track_name(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct PlayViewBuilder<'a, S: play_view_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct PlayViewBuilder<S: BosStr, St: play_view_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<feed::Artist<S>>>,
         Option<i64>,
@@ -497,18 +497,18 @@ pub struct PlayViewBuilder<'a, S: play_view_state::State> {
         Option<S>,
         Option<S>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> PlayView<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> PlayViewBuilder<'a, play_view_state::Empty> {
+impl<S: BosStr> PlayView<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> PlayViewBuilder<S, play_view_state::Empty> {
         PlayViewBuilder::new()
     }
 }
 
-impl<'a> PlayViewBuilder<'a, play_view_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> PlayViewBuilder<S, play_view_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         PlayViewBuilder {
             _state: PhantomData,
@@ -526,31 +526,31 @@ impl<'a> PlayViewBuilder<'a, play_view_state::Empty> {
                 None,
                 None,
             ),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PlayViewBuilder<'a, S>
+impl<S: BosStr, St> PlayViewBuilder<S, St>
 where
-    S: play_view_state::State,
-    S::Artists: play_view_state::IsUnset,
+    St: play_view_state::State,
+    St::Artists: play_view_state::IsUnset,
 {
     /// Set the `artists` field (required)
     pub fn artists(
         mut self,
         value: impl Into<Vec<feed::Artist<S>>>,
-    ) -> PlayViewBuilder<'a, play_view_state::SetArtists<S>> {
+    ) -> PlayViewBuilder<S, play_view_state::SetArtists<St>> {
         self._fields.0 = Option::Some(value.into());
         PlayViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: play_view_state::State> PlayViewBuilder<'a, S> {
+impl<S: BosStr, St: play_view_state::State> PlayViewBuilder<S, St> {
     /// Set the `duration` field (optional)
     pub fn duration(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -563,7 +563,7 @@ impl<'a, S: play_view_state::State> PlayViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: play_view_state::State> PlayViewBuilder<'a, S> {
+impl<S: BosStr, St: play_view_state::State> PlayViewBuilder<S, St> {
     /// Set the `isrc` field (optional)
     pub fn isrc(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -576,7 +576,7 @@ impl<'a, S: play_view_state::State> PlayViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: play_view_state::State> PlayViewBuilder<'a, S> {
+impl<S: BosStr, St: play_view_state::State> PlayViewBuilder<S, St> {
     /// Set the `musicServiceBaseDomain` field (optional)
     pub fn music_service_base_domain(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -589,7 +589,7 @@ impl<'a, S: play_view_state::State> PlayViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: play_view_state::State> PlayViewBuilder<'a, S> {
+impl<S: BosStr, St: play_view_state::State> PlayViewBuilder<S, St> {
     /// Set the `originUrl` field (optional)
     pub fn origin_url(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
@@ -602,7 +602,7 @@ impl<'a, S: play_view_state::State> PlayViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: play_view_state::State> PlayViewBuilder<'a, S> {
+impl<S: BosStr, St: play_view_state::State> PlayViewBuilder<S, St> {
     /// Set the `playedTime` field (optional)
     pub fn played_time(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.5 = value.into();
@@ -615,7 +615,7 @@ impl<'a, S: play_view_state::State> PlayViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: play_view_state::State> PlayViewBuilder<'a, S> {
+impl<S: BosStr, St: play_view_state::State> PlayViewBuilder<S, St> {
     /// Set the `recordingMbId` field (optional)
     pub fn recording_mb_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.6 = value.into();
@@ -628,7 +628,7 @@ impl<'a, S: play_view_state::State> PlayViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: play_view_state::State> PlayViewBuilder<'a, S> {
+impl<S: BosStr, St: play_view_state::State> PlayViewBuilder<S, St> {
     /// Set the `releaseMbId` field (optional)
     pub fn release_mb_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.7 = value.into();
@@ -641,7 +641,7 @@ impl<'a, S: play_view_state::State> PlayViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: play_view_state::State> PlayViewBuilder<'a, S> {
+impl<S: BosStr, St: play_view_state::State> PlayViewBuilder<S, St> {
     /// Set the `releaseName` field (optional)
     pub fn release_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.8 = value.into();
@@ -654,7 +654,7 @@ impl<'a, S: play_view_state::State> PlayViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: play_view_state::State> PlayViewBuilder<'a, S> {
+impl<S: BosStr, St: play_view_state::State> PlayViewBuilder<S, St> {
     /// Set the `submissionClientAgent` field (optional)
     pub fn submission_client_agent(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.9 = value.into();
@@ -667,7 +667,7 @@ impl<'a, S: play_view_state::State> PlayViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: play_view_state::State> PlayViewBuilder<'a, S> {
+impl<S: BosStr, St: play_view_state::State> PlayViewBuilder<S, St> {
     /// Set the `trackMbId` field (optional)
     pub fn track_mb_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.10 = value.into();
@@ -680,33 +680,33 @@ impl<'a, S: play_view_state::State> PlayViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S> PlayViewBuilder<'a, S>
+impl<S: BosStr, St> PlayViewBuilder<S, St>
 where
-    S: play_view_state::State,
-    S::TrackName: play_view_state::IsUnset,
+    St: play_view_state::State,
+    St::TrackName: play_view_state::IsUnset,
 {
     /// Set the `trackName` field (required)
     pub fn track_name(
         mut self,
         value: impl Into<S>,
-    ) -> PlayViewBuilder<'a, play_view_state::SetTrackName<S>> {
+    ) -> PlayViewBuilder<S, play_view_state::SetTrackName<St>> {
         self._fields.11 = Option::Some(value.into());
         PlayViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PlayViewBuilder<'a, S>
+impl<S: BosStr, St> PlayViewBuilder<S, St>
 where
-    S: play_view_state::State,
-    S::TrackName: play_view_state::IsSet,
-    S::Artists: play_view_state::IsSet,
+    St: play_view_state::State,
+    St::Artists: play_view_state::IsSet,
+    St::TrackName: play_view_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> PlayView<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> PlayView<S> {
         PlayView {
             artists: self._fields.0.unwrap(),
             duration: self._fields.1,
@@ -723,11 +723,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> PlayView<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> PlayView<S> {
         PlayView {
             artists: self._fields.0.unwrap(),
             duration: self._fields.1,

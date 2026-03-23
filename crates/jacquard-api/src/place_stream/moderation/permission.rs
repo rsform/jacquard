@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "place.stream.moderation.permission",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Permission<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Permission<S: BosStr = DefaultStr> {
     ///Client-declared timestamp when this moderator was added.
     pub created_at: Datetime,
     ///Optional expiration time for this delegation. If set, the delegation is invalid after this time.
@@ -59,18 +59,18 @@ pub struct Permission<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct PermissionGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct PermissionGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Permission<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Permission<S> {
+impl<S: BosStr> Permission<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, PermissionRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -83,17 +83,17 @@ pub struct PermissionRecord;
 impl XrpcResp for PermissionRecord {
     const NSID: &'static str = "place.stream.moderation.permission";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = PermissionGetRecordOutput<S>;
+    type Output<S: BosStr> = PermissionGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<PermissionGetRecordOutput<S>> for Permission<S> {
+impl<S: BosStr> From<PermissionGetRecordOutput<S>> for Permission<S> {
     fn from(output: PermissionGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Permission<S> {
+impl<S: BosStr> Collection for Permission<S> {
     const NSID: &'static str = "place.stream.moderation.permission";
     type Record = PermissionRecord;
 }
@@ -103,7 +103,7 @@ impl Collection for PermissionRecord {
     type Record = PermissionRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Permission<S> {
+impl<S: BosStr> LexiconSchema for Permission<S> {
     fn nsid() -> &'static str {
         "place.stream.moderation.permission"
     }
@@ -128,99 +128,99 @@ pub mod permission_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Moderator;
         type Permissions;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Moderator = Unset;
         type Permissions = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Moderator = S::Moderator;
-        type Permissions = S::Permissions;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `moderator` field to Set
-    pub struct SetModerator<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetModerator<S> {}
-    impl<S: State> State for SetModerator<S> {
-        type CreatedAt = S::CreatedAt;
+    pub struct SetModerator<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetModerator<St> {}
+    impl<St: State> State for SetModerator<St> {
         type Moderator = Set<members::moderator>;
-        type Permissions = S::Permissions;
+        type Permissions = St::Permissions;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `permissions` field to Set
-    pub struct SetPermissions<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPermissions<S> {}
-    impl<S: State> State for SetPermissions<S> {
-        type CreatedAt = S::CreatedAt;
-        type Moderator = S::Moderator;
+    pub struct SetPermissions<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPermissions<St> {}
+    impl<St: State> State for SetPermissions<St> {
+        type Moderator = St::Moderator;
         type Permissions = Set<members::permissions>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Moderator = St::Moderator;
+        type Permissions = St::Permissions;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `moderator` field
         pub struct moderator(());
         ///Marker type for the `permissions` field
         pub struct permissions(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct PermissionBuilder<'a, S: permission_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct PermissionBuilder<S: BosStr, St: permission_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<Datetime>, Option<Did<S>>, Option<Vec<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Permission<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> PermissionBuilder<'a, permission_state::Empty> {
+impl<S: BosStr> Permission<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> PermissionBuilder<S, permission_state::Empty> {
         PermissionBuilder::new()
     }
 }
 
-impl<'a> PermissionBuilder<'a, permission_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> PermissionBuilder<S, permission_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         PermissionBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PermissionBuilder<'a, S>
+impl<S: BosStr, St> PermissionBuilder<S, St>
 where
-    S: permission_state::State,
-    S::CreatedAt: permission_state::IsUnset,
+    St: permission_state::State,
+    St::CreatedAt: permission_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> PermissionBuilder<'a, permission_state::SetCreatedAt<S>> {
+    ) -> PermissionBuilder<S, permission_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         PermissionBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: permission_state::State> PermissionBuilder<'a, S> {
+impl<S: BosStr, St: permission_state::State> PermissionBuilder<S, St> {
     /// Set the `expirationTime` field (optional)
     pub fn expiration_time(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.1 = value.into();
@@ -233,53 +233,53 @@ impl<'a, S: permission_state::State> PermissionBuilder<'a, S> {
     }
 }
 
-impl<'a, S> PermissionBuilder<'a, S>
+impl<S: BosStr, St> PermissionBuilder<S, St>
 where
-    S: permission_state::State,
-    S::Moderator: permission_state::IsUnset,
+    St: permission_state::State,
+    St::Moderator: permission_state::IsUnset,
 {
     /// Set the `moderator` field (required)
     pub fn moderator(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> PermissionBuilder<'a, permission_state::SetModerator<S>> {
+    ) -> PermissionBuilder<S, permission_state::SetModerator<St>> {
         self._fields.2 = Option::Some(value.into());
         PermissionBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PermissionBuilder<'a, S>
+impl<S: BosStr, St> PermissionBuilder<S, St>
 where
-    S: permission_state::State,
-    S::Permissions: permission_state::IsUnset,
+    St: permission_state::State,
+    St::Permissions: permission_state::IsUnset,
 {
     /// Set the `permissions` field (required)
     pub fn permissions(
         mut self,
         value: impl Into<Vec<S>>,
-    ) -> PermissionBuilder<'a, permission_state::SetPermissions<S>> {
+    ) -> PermissionBuilder<S, permission_state::SetPermissions<St>> {
         self._fields.3 = Option::Some(value.into());
         PermissionBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PermissionBuilder<'a, S>
+impl<S: BosStr, St> PermissionBuilder<S, St>
 where
-    S: permission_state::State,
-    S::CreatedAt: permission_state::IsSet,
-    S::Moderator: permission_state::IsSet,
-    S::Permissions: permission_state::IsSet,
+    St: permission_state::State,
+    St::Moderator: permission_state::IsSet,
+    St::Permissions: permission_state::IsSet,
+    St::CreatedAt: permission_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Permission<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Permission<S> {
         Permission {
             created_at: self._fields.0.unwrap(),
             expiration_time: self._fields.1,
@@ -288,11 +288,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Permission<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Permission<S> {
         Permission {
             created_at: self._fields.0.unwrap(),
             expiration_time: self._fields.1,

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -29,11 +29,11 @@ use crate::app_offprint::block::image_grid::GridImage;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ImageCarousel<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ImageCarousel<S: BosStr = DefaultStr> {
     ///Auto-advance slides  Defaults to `false`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_image_carousel_autoplay")]
@@ -51,7 +51,7 @@ pub struct ImageCarousel<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ImageCarousel<S> {
+impl<S: BosStr> LexiconSchema for ImageCarousel<S> {
     fn nsid() -> &'static str {
         "app.offprint.block.imageCarousel"
     }
@@ -115,9 +115,9 @@ pub mod image_carousel_state {
         type Images = Unset;
     }
     ///State transition - sets the `images` field to Set
-    pub struct SetImages<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetImages<S> {}
-    impl<S: State> State for SetImages<S> {
+    pub struct SetImages<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetImages<St> {}
+    impl<St: State> State for SetImages<St> {
         type Images = Set<members::images>;
     }
     /// Marker types for field names
@@ -128,32 +128,32 @@ pub mod image_carousel_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ImageCarouselBuilder<'a, S: image_carousel_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ImageCarouselBuilder<S: BosStr, St: image_carousel_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<bool>, Option<S>, Option<Vec<GridImage<S>>>, Option<i64>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ImageCarousel<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ImageCarouselBuilder<'a, image_carousel_state::Empty> {
+impl<S: BosStr> ImageCarousel<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ImageCarouselBuilder<S, image_carousel_state::Empty> {
         ImageCarouselBuilder::new()
     }
 }
 
-impl<'a> ImageCarouselBuilder<'a, image_carousel_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ImageCarouselBuilder<S, image_carousel_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ImageCarouselBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: image_carousel_state::State> ImageCarouselBuilder<'a, S> {
+impl<S: BosStr, St: image_carousel_state::State> ImageCarouselBuilder<S, St> {
     /// Set the `autoplay` field (optional)
     pub fn autoplay(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.0 = value.into();
@@ -166,7 +166,7 @@ impl<'a, S: image_carousel_state::State> ImageCarouselBuilder<'a, S> {
     }
 }
 
-impl<'a, S: image_carousel_state::State> ImageCarouselBuilder<'a, S> {
+impl<S: BosStr, St: image_carousel_state::State> ImageCarouselBuilder<S, St> {
     /// Set the `caption` field (optional)
     pub fn caption(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -179,26 +179,26 @@ impl<'a, S: image_carousel_state::State> ImageCarouselBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ImageCarouselBuilder<'a, S>
+impl<S: BosStr, St> ImageCarouselBuilder<S, St>
 where
-    S: image_carousel_state::State,
-    S::Images: image_carousel_state::IsUnset,
+    St: image_carousel_state::State,
+    St::Images: image_carousel_state::IsUnset,
 {
     /// Set the `images` field (required)
     pub fn images(
         mut self,
         value: impl Into<Vec<GridImage<S>>>,
-    ) -> ImageCarouselBuilder<'a, image_carousel_state::SetImages<S>> {
+    ) -> ImageCarouselBuilder<S, image_carousel_state::SetImages<St>> {
         self._fields.2 = Option::Some(value.into());
         ImageCarouselBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: image_carousel_state::State> ImageCarouselBuilder<'a, S> {
+impl<S: BosStr, St: image_carousel_state::State> ImageCarouselBuilder<S, St> {
     /// Set the `interval` field (optional)
     pub fn interval(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.3 = value.into();
@@ -211,13 +211,13 @@ impl<'a, S: image_carousel_state::State> ImageCarouselBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ImageCarouselBuilder<'a, S>
+impl<S: BosStr, St> ImageCarouselBuilder<S, St>
 where
-    S: image_carousel_state::State,
-    S::Images: image_carousel_state::IsSet,
+    St: image_carousel_state::State,
+    St::Images: image_carousel_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ImageCarousel<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ImageCarousel<S> {
         ImageCarousel {
             autoplay: self._fields.0.or_else(|| Some(false)),
             caption: self._fields.1,
@@ -226,11 +226,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> ImageCarousel<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ImageCarousel<S> {
         ImageCarousel {
             autoplay: self._fields.0.or_else(|| Some(false)),
             caption: self._fields.1,

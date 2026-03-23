@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "science.alt.dataset.label",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Label<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Label<S: BosStr = DefaultStr> {
     ///Timestamp when this label was created
     pub created_at: Datetime,
     ///AT-URI pointing to the dataset entry this label refers to
@@ -62,18 +62,18 @@ pub struct Label<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct LabelGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct LabelGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Label<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Label<S> {
+impl<S: BosStr> Label<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, LabelRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -86,17 +86,17 @@ pub struct LabelRecord;
 impl XrpcResp for LabelRecord {
     const NSID: &'static str = "science.alt.dataset.label";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = LabelGetRecordOutput<S>;
+    type Output<S: BosStr> = LabelGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<LabelGetRecordOutput<S>> for Label<S> {
+impl<S: BosStr> From<LabelGetRecordOutput<S>> for Label<S> {
     fn from(output: LabelGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Label<S> {
+impl<S: BosStr> Collection for Label<S> {
     const NSID: &'static str = "science.alt.dataset.label";
     type Record = LabelRecord;
 }
@@ -106,7 +106,7 @@ impl Collection for LabelRecord {
     type Record = LabelRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Label<S> {
+impl<S: BosStr> LexiconSchema for Label<S> {
     fn nsid() -> &'static str {
         "science.alt.dataset.label"
     }
@@ -173,118 +173,118 @@ pub mod label_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Name;
         type CreatedAt;
         type DatasetUri;
-        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Name = Unset;
         type CreatedAt = Unset;
         type DatasetUri = Unset;
-        type Name = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type DatasetUri = S::DatasetUri;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `dataset_uri` field to Set
-    pub struct SetDatasetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDatasetUri<S> {}
-    impl<S: State> State for SetDatasetUri<S> {
-        type CreatedAt = S::CreatedAt;
-        type DatasetUri = Set<members::dataset_uri>;
-        type Name = S::Name;
     }
     ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type CreatedAt = S::CreatedAt;
-        type DatasetUri = S::DatasetUri;
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
         type Name = Set<members::name>;
+        type CreatedAt = St::CreatedAt;
+        type DatasetUri = St::DatasetUri;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Name = St::Name;
+        type CreatedAt = Set<members::created_at>;
+        type DatasetUri = St::DatasetUri;
+    }
+    ///State transition - sets the `dataset_uri` field to Set
+    pub struct SetDatasetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDatasetUri<St> {}
+    impl<St: State> State for SetDatasetUri<St> {
+        type Name = St::Name;
+        type CreatedAt = St::CreatedAt;
+        type DatasetUri = Set<members::dataset_uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `dataset_uri` field
         pub struct dataset_uri(());
-        ///Marker type for the `name` field
-        pub struct name(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct LabelBuilder<'a, S: label_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct LabelBuilder<S: BosStr, St: label_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<AtUri<S>>, Option<S>, Option<S>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Label<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> LabelBuilder<'a, label_state::Empty> {
+impl<S: BosStr> Label<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> LabelBuilder<S, label_state::Empty> {
         LabelBuilder::new()
     }
 }
 
-impl<'a> LabelBuilder<'a, label_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> LabelBuilder<S, label_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         LabelBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LabelBuilder<'a, S>
+impl<S: BosStr, St> LabelBuilder<S, St>
 where
-    S: label_state::State,
-    S::CreatedAt: label_state::IsUnset,
+    St: label_state::State,
+    St::CreatedAt: label_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> LabelBuilder<'a, label_state::SetCreatedAt<S>> {
+    ) -> LabelBuilder<S, label_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         LabelBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LabelBuilder<'a, S>
+impl<S: BosStr, St> LabelBuilder<S, St>
 where
-    S: label_state::State,
-    S::DatasetUri: label_state::IsUnset,
+    St: label_state::State,
+    St::DatasetUri: label_state::IsUnset,
 {
     /// Set the `datasetUri` field (required)
     pub fn dataset_uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> LabelBuilder<'a, label_state::SetDatasetUri<S>> {
+    ) -> LabelBuilder<S, label_state::SetDatasetUri<St>> {
         self._fields.1 = Option::Some(value.into());
         LabelBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: label_state::State> LabelBuilder<'a, S> {
+impl<S: BosStr, St: label_state::State> LabelBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -297,26 +297,26 @@ impl<'a, S: label_state::State> LabelBuilder<'a, S> {
     }
 }
 
-impl<'a, S> LabelBuilder<'a, S>
+impl<S: BosStr, St> LabelBuilder<S, St>
 where
-    S: label_state::State,
-    S::Name: label_state::IsUnset,
+    St: label_state::State,
+    St::Name: label_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> LabelBuilder<'a, label_state::SetName<S>> {
+    ) -> LabelBuilder<S, label_state::SetName<St>> {
         self._fields.3 = Option::Some(value.into());
         LabelBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: label_state::State> LabelBuilder<'a, S> {
+impl<S: BosStr, St: label_state::State> LabelBuilder<S, St> {
     /// Set the `version` field (optional)
     pub fn version(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
@@ -329,15 +329,15 @@ impl<'a, S: label_state::State> LabelBuilder<'a, S> {
     }
 }
 
-impl<'a, S> LabelBuilder<'a, S>
+impl<S: BosStr, St> LabelBuilder<S, St>
 where
-    S: label_state::State,
-    S::CreatedAt: label_state::IsSet,
-    S::DatasetUri: label_state::IsSet,
-    S::Name: label_state::IsSet,
+    St: label_state::State,
+    St::Name: label_state::IsSet,
+    St::CreatedAt: label_state::IsSet,
+    St::DatasetUri: label_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Label<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Label<S> {
         Label {
             created_at: self._fields.0.unwrap(),
             dataset_uri: self._fields.1.unwrap(),
@@ -347,8 +347,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Label<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Label<S> {
         Label {
             created_at: self._fields.0.unwrap(),
             dataset_uri: self._fields.1.unwrap(),

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use serde::{Serialize, Deserialize};
     rename = "com.yuna0x0.guestbook.sign",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Sign<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Sign<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     pub message: S,
     pub subject: AtIdentifier<S>,
@@ -54,18 +54,18 @@ pub struct Sign<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SignGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SignGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Sign<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Sign<S> {
+impl<S: BosStr> Sign<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, SignRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -78,17 +78,17 @@ pub struct SignRecord;
 impl XrpcResp for SignRecord {
     const NSID: &'static str = "com.yuna0x0.guestbook.sign";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = SignGetRecordOutput<S>;
+    type Output<S: BosStr> = SignGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<SignGetRecordOutput<S>> for Sign<S> {
+impl<S: BosStr> From<SignGetRecordOutput<S>> for Sign<S> {
     fn from(output: SignGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Sign<S> {
+impl<S: BosStr> Collection for Sign<S> {
     const NSID: &'static str = "com.yuna0x0.guestbook.sign";
     type Record = SignRecord;
 }
@@ -98,7 +98,7 @@ impl Collection for SignRecord {
     type Record = SignRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Sign<S> {
+impl<S: BosStr> LexiconSchema for Sign<S> {
     fn nsid() -> &'static str {
         "com.yuna0x0.guestbook.sign"
     }
@@ -134,145 +134,145 @@ pub mod sign_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Subject;
-        type CreatedAt;
         type Message;
+        type CreatedAt;
+        type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Subject = Unset;
-        type CreatedAt = Unset;
         type Message = Unset;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type Subject = Set<members::subject>;
-        type CreatedAt = S::CreatedAt;
-        type Message = S::Message;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Subject = S::Subject;
-        type CreatedAt = Set<members::created_at>;
-        type Message = S::Message;
+        type CreatedAt = Unset;
+        type Subject = Unset;
     }
     ///State transition - sets the `message` field to Set
-    pub struct SetMessage<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMessage<S> {}
-    impl<S: State> State for SetMessage<S> {
-        type Subject = S::Subject;
-        type CreatedAt = S::CreatedAt;
+    pub struct SetMessage<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMessage<St> {}
+    impl<St: State> State for SetMessage<St> {
         type Message = Set<members::message>;
+        type CreatedAt = St::CreatedAt;
+        type Subject = St::Subject;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Message = St::Message;
+        type CreatedAt = Set<members::created_at>;
+        type Subject = St::Subject;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubject<St> {}
+    impl<St: State> State for SetSubject<St> {
+        type Message = St::Message;
+        type CreatedAt = St::CreatedAt;
+        type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `subject` field
-        pub struct subject(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `message` field
         pub struct message(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct SignBuilder<'a, S: sign_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct SignBuilder<S: BosStr, St: sign_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<S>, Option<AtIdentifier<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Sign<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> SignBuilder<'a, sign_state::Empty> {
+impl<S: BosStr> Sign<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> SignBuilder<S, sign_state::Empty> {
         SignBuilder::new()
     }
 }
 
-impl<'a> SignBuilder<'a, sign_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> SignBuilder<S, sign_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SignBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SignBuilder<'a, S>
+impl<S: BosStr, St> SignBuilder<S, St>
 where
-    S: sign_state::State,
-    S::CreatedAt: sign_state::IsUnset,
+    St: sign_state::State,
+    St::CreatedAt: sign_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> SignBuilder<'a, sign_state::SetCreatedAt<S>> {
+    ) -> SignBuilder<S, sign_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         SignBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SignBuilder<'a, S>
+impl<S: BosStr, St> SignBuilder<S, St>
 where
-    S: sign_state::State,
-    S::Message: sign_state::IsUnset,
+    St: sign_state::State,
+    St::Message: sign_state::IsUnset,
 {
     /// Set the `message` field (required)
     pub fn message(
         mut self,
         value: impl Into<S>,
-    ) -> SignBuilder<'a, sign_state::SetMessage<S>> {
+    ) -> SignBuilder<S, sign_state::SetMessage<St>> {
         self._fields.1 = Option::Some(value.into());
         SignBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SignBuilder<'a, S>
+impl<S: BosStr, St> SignBuilder<S, St>
 where
-    S: sign_state::State,
-    S::Subject: sign_state::IsUnset,
+    St: sign_state::State,
+    St::Subject: sign_state::IsUnset,
 {
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
         value: impl Into<AtIdentifier<S>>,
-    ) -> SignBuilder<'a, sign_state::SetSubject<S>> {
+    ) -> SignBuilder<S, sign_state::SetSubject<St>> {
         self._fields.2 = Option::Some(value.into());
         SignBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SignBuilder<'a, S>
+impl<S: BosStr, St> SignBuilder<S, St>
 where
-    S: sign_state::State,
-    S::Subject: sign_state::IsSet,
-    S::CreatedAt: sign_state::IsSet,
-    S::Message: sign_state::IsSet,
+    St: sign_state::State,
+    St::Message: sign_state::IsSet,
+    St::CreatedAt: sign_state::IsSet,
+    St::Subject: sign_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Sign<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Sign<S> {
         Sign {
             created_at: self._fields.0.unwrap(),
             message: self._fields.1.unwrap(),
@@ -280,8 +280,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Sign<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Sign<S> {
         Sign {
             created_at: self._fields.0.unwrap(),
             message: self._fields.1.unwrap(),

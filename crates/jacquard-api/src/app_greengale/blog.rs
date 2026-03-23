@@ -13,7 +13,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use crate::app_greengale::blog;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct BlobMetadata<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct BlobMetadata<S: BosStr = DefaultStr> {
     ///Alt text for accessibility
     #[serde(skip_serializing_if = "Option::is_none")]
     pub alt: Option<S>,
@@ -61,11 +61,11 @@ pub struct BlobMetadata<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CustomColors<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CustomColors<S: BosStr = DefaultStr> {
     ///Accent/link color
     #[serde(skip_serializing_if = "Option::is_none")]
     pub accent: Option<S>,
@@ -88,11 +88,11 @@ pub struct CustomColors<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Ogp<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Ogp<S: BosStr = DefaultStr> {
     ///Image height in pixels
     #[serde(skip_serializing_if = "Option::is_none")]
     pub height: Option<i64>,
@@ -111,11 +111,11 @@ pub struct Ogp<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SelfLabel<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SelfLabel<S: BosStr = DefaultStr> {
     ///The short string name of the value or type of this label
     pub val: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -128,11 +128,11 @@ pub struct SelfLabel<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SelfLabels<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SelfLabels<S: BosStr = DefaultStr> {
     pub values: Vec<blog::SelfLabel<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -144,11 +144,11 @@ pub struct SelfLabels<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Theme<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Theme<S: BosStr = DefaultStr> {
     ///Custom color overrides
     #[serde(skip_serializing_if = "Option::is_none")]
     pub custom: Option<blog::CustomColors<S>>,
@@ -165,11 +165,11 @@ pub struct Theme<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct VoiceTheme<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct VoiceTheme<S: BosStr = DefaultStr> {
     ///Pitch multiplier x100 (100 = normal, range 50-150)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub pitch: Option<i64>,
@@ -183,7 +183,7 @@ pub struct VoiceTheme<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for BlobMetadata<S> {
+impl<S: BosStr> LexiconSchema for BlobMetadata<S> {
     fn nsid() -> &'static str {
         "app.greengale.blog.defs"
     }
@@ -245,7 +245,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for BlobMetadata<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for CustomColors<S> {
+impl<S: BosStr> LexiconSchema for CustomColors<S> {
     fn nsid() -> &'static str {
         "app.greengale.blog.defs"
     }
@@ -300,7 +300,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for CustomColors<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Ogp<S> {
+impl<S: BosStr> LexiconSchema for Ogp<S> {
     fn nsid() -> &'static str {
         "app.greengale.blog.defs"
     }
@@ -326,7 +326,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Ogp<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for SelfLabel<S> {
+impl<S: BosStr> LexiconSchema for SelfLabel<S> {
     fn nsid() -> &'static str {
         "app.greengale.blog.defs"
     }
@@ -352,7 +352,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for SelfLabel<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for SelfLabels<S> {
+impl<S: BosStr> LexiconSchema for SelfLabels<S> {
     fn nsid() -> &'static str {
         "app.greengale.blog.defs"
     }
@@ -378,7 +378,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for SelfLabels<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Theme<S> {
+impl<S: BosStr> LexiconSchema for Theme<S> {
     fn nsid() -> &'static str {
         "app.greengale.blog.defs"
     }
@@ -403,7 +403,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Theme<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for VoiceTheme<S> {
+impl<S: BosStr> LexiconSchema for VoiceTheme<S> {
     fn nsid() -> &'static str {
         "app.greengale.blog.defs"
     }
@@ -447,9 +447,9 @@ pub mod blob_metadata_state {
         type Blobref = Unset;
     }
     ///State transition - sets the `blobref` field to Set
-    pub struct SetBlobref<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBlobref<S> {}
-    impl<S: State> State for SetBlobref<S> {
+    pub struct SetBlobref<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBlobref<St> {}
+    impl<St: State> State for SetBlobref<St> {
         type Blobref = Set<members::blobref>;
     }
     /// Marker types for field names
@@ -460,32 +460,32 @@ pub mod blob_metadata_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct BlobMetadataBuilder<'a, S: blob_metadata_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct BlobMetadataBuilder<S: BosStr, St: blob_metadata_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<BlobRef<S>>, Option<blog::SelfLabels<S>>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> BlobMetadata<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> BlobMetadataBuilder<'a, blob_metadata_state::Empty> {
+impl<S: BosStr> BlobMetadata<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> BlobMetadataBuilder<S, blob_metadata_state::Empty> {
         BlobMetadataBuilder::new()
     }
 }
 
-impl<'a> BlobMetadataBuilder<'a, blob_metadata_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> BlobMetadataBuilder<S, blob_metadata_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         BlobMetadataBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: blob_metadata_state::State> BlobMetadataBuilder<'a, S> {
+impl<S: BosStr, St: blob_metadata_state::State> BlobMetadataBuilder<S, St> {
     /// Set the `alt` field (optional)
     pub fn alt(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -498,26 +498,26 @@ impl<'a, S: blob_metadata_state::State> BlobMetadataBuilder<'a, S> {
     }
 }
 
-impl<'a, S> BlobMetadataBuilder<'a, S>
+impl<S: BosStr, St> BlobMetadataBuilder<S, St>
 where
-    S: blob_metadata_state::State,
-    S::Blobref: blob_metadata_state::IsUnset,
+    St: blob_metadata_state::State,
+    St::Blobref: blob_metadata_state::IsUnset,
 {
     /// Set the `blobref` field (required)
     pub fn blobref(
         mut self,
         value: impl Into<BlobRef<S>>,
-    ) -> BlobMetadataBuilder<'a, blob_metadata_state::SetBlobref<S>> {
+    ) -> BlobMetadataBuilder<S, blob_metadata_state::SetBlobref<St>> {
         self._fields.1 = Option::Some(value.into());
         BlobMetadataBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: blob_metadata_state::State> BlobMetadataBuilder<'a, S> {
+impl<S: BosStr, St: blob_metadata_state::State> BlobMetadataBuilder<S, St> {
     /// Set the `labels` field (optional)
     pub fn labels(mut self, value: impl Into<Option<blog::SelfLabels<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -530,7 +530,7 @@ impl<'a, S: blob_metadata_state::State> BlobMetadataBuilder<'a, S> {
     }
 }
 
-impl<'a, S: blob_metadata_state::State> BlobMetadataBuilder<'a, S> {
+impl<S: BosStr, St: blob_metadata_state::State> BlobMetadataBuilder<S, St> {
     /// Set the `name` field (optional)
     pub fn name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -543,13 +543,13 @@ impl<'a, S: blob_metadata_state::State> BlobMetadataBuilder<'a, S> {
     }
 }
 
-impl<'a, S> BlobMetadataBuilder<'a, S>
+impl<S: BosStr, St> BlobMetadataBuilder<S, St>
 where
-    S: blob_metadata_state::State,
-    S::Blobref: blob_metadata_state::IsSet,
+    St: blob_metadata_state::State,
+    St::Blobref: blob_metadata_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> BlobMetadata<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> BlobMetadata<S> {
         BlobMetadata {
             alt: self._fields.0,
             blobref: self._fields.1.unwrap(),
@@ -558,11 +558,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> BlobMetadata<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> BlobMetadata<S> {
         BlobMetadata {
             alt: self._fields.0,
             blobref: self._fields.1.unwrap(),
@@ -866,9 +866,9 @@ pub mod ogp_state {
         type Url = Unset;
     }
     ///State transition - sets the `url` field to Set
-    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrl<S> {}
-    impl<S: State> State for SetUrl<S> {
+    pub struct SetUrl<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUrl<St> {}
+    impl<St: State> State for SetUrl<St> {
         type Url = Set<members::url>;
     }
     /// Marker types for field names
@@ -879,32 +879,32 @@ pub mod ogp_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct OgpBuilder<'a, S: ogp_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct OgpBuilder<S: BosStr, St: ogp_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<UriValue<S>>, Option<i64>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Ogp<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> OgpBuilder<'a, ogp_state::Empty> {
+impl<S: BosStr> Ogp<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> OgpBuilder<S, ogp_state::Empty> {
         OgpBuilder::new()
     }
 }
 
-impl<'a> OgpBuilder<'a, ogp_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> OgpBuilder<S, ogp_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         OgpBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: ogp_state::State> OgpBuilder<'a, S> {
+impl<S: BosStr, St: ogp_state::State> OgpBuilder<S, St> {
     /// Set the `height` field (optional)
     pub fn height(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
@@ -917,26 +917,26 @@ impl<'a, S: ogp_state::State> OgpBuilder<'a, S> {
     }
 }
 
-impl<'a, S> OgpBuilder<'a, S>
+impl<S: BosStr, St> OgpBuilder<S, St>
 where
-    S: ogp_state::State,
-    S::Url: ogp_state::IsUnset,
+    St: ogp_state::State,
+    St::Url: ogp_state::IsUnset,
 {
     /// Set the `url` field (required)
     pub fn url(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> OgpBuilder<'a, ogp_state::SetUrl<S>> {
+    ) -> OgpBuilder<S, ogp_state::SetUrl<St>> {
         self._fields.1 = Option::Some(value.into());
         OgpBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: ogp_state::State> OgpBuilder<'a, S> {
+impl<S: BosStr, St: ogp_state::State> OgpBuilder<S, St> {
     /// Set the `width` field (optional)
     pub fn width(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -949,13 +949,13 @@ impl<'a, S: ogp_state::State> OgpBuilder<'a, S> {
     }
 }
 
-impl<'a, S> OgpBuilder<'a, S>
+impl<S: BosStr, St> OgpBuilder<S, St>
 where
-    S: ogp_state::State,
-    S::Url: ogp_state::IsSet,
+    St: ogp_state::State,
+    St::Url: ogp_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Ogp<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Ogp<S> {
         Ogp {
             height: self._fields.0,
             url: self._fields.1.unwrap(),
@@ -963,8 +963,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Ogp<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Ogp<S> {
         Ogp {
             height: self._fields.0,
             url: self._fields.1.unwrap(),
@@ -993,9 +993,9 @@ pub mod self_labels_state {
         type Values = Unset;
     }
     ///State transition - sets the `values` field to Set
-    pub struct SetValues<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValues<S> {}
-    impl<S: State> State for SetValues<S> {
+    pub struct SetValues<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetValues<St> {}
+    impl<St: State> State for SetValues<St> {
         type Values = Set<members::values>;
     }
     /// Marker types for field names
@@ -1006,67 +1006,67 @@ pub mod self_labels_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct SelfLabelsBuilder<'a, S: self_labels_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct SelfLabelsBuilder<S: BosStr, St: self_labels_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<blog::SelfLabel<S>>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> SelfLabels<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> SelfLabelsBuilder<'a, self_labels_state::Empty> {
+impl<S: BosStr> SelfLabels<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> SelfLabelsBuilder<S, self_labels_state::Empty> {
         SelfLabelsBuilder::new()
     }
 }
 
-impl<'a> SelfLabelsBuilder<'a, self_labels_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> SelfLabelsBuilder<S, self_labels_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SelfLabelsBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SelfLabelsBuilder<'a, S>
+impl<S: BosStr, St> SelfLabelsBuilder<S, St>
 where
-    S: self_labels_state::State,
-    S::Values: self_labels_state::IsUnset,
+    St: self_labels_state::State,
+    St::Values: self_labels_state::IsUnset,
 {
     /// Set the `values` field (required)
     pub fn values(
         mut self,
         value: impl Into<Vec<blog::SelfLabel<S>>>,
-    ) -> SelfLabelsBuilder<'a, self_labels_state::SetValues<S>> {
+    ) -> SelfLabelsBuilder<S, self_labels_state::SetValues<St>> {
         self._fields.0 = Option::Some(value.into());
         SelfLabelsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SelfLabelsBuilder<'a, S>
+impl<S: BosStr, St> SelfLabelsBuilder<S, St>
 where
-    S: self_labels_state::State,
-    S::Values: self_labels_state::IsSet,
+    St: self_labels_state::State,
+    St::Values: self_labels_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> SelfLabels<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> SelfLabels<S> {
         SelfLabels {
             values: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> SelfLabels<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> SelfLabels<S> {
         SelfLabels {
             values: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

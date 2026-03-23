@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "app.gainforest.organization.observations.dendogram",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Dendogram<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Dendogram<S: BosStr = DefaultStr> {
     ///The date and time of the creation of the record
     pub created_at: Datetime,
     ///An SVG of the dendogram uploaded as blob
@@ -54,18 +54,18 @@ pub struct Dendogram<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DendogramGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DendogramGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Dendogram<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Dendogram<S> {
+impl<S: BosStr> Dendogram<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, DendogramRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -78,17 +78,17 @@ pub struct DendogramRecord;
 impl XrpcResp for DendogramRecord {
     const NSID: &'static str = "app.gainforest.organization.observations.dendogram";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = DendogramGetRecordOutput<S>;
+    type Output<S: BosStr> = DendogramGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<DendogramGetRecordOutput<S>> for Dendogram<S> {
+impl<S: BosStr> From<DendogramGetRecordOutput<S>> for Dendogram<S> {
     fn from(output: DendogramGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Dendogram<S> {
+impl<S: BosStr> Collection for Dendogram<S> {
     const NSID: &'static str = "app.gainforest.organization.observations.dendogram";
     type Record = DendogramRecord;
 }
@@ -98,7 +98,7 @@ impl Collection for DendogramRecord {
     type Record = DendogramRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Dendogram<S> {
+impl<S: BosStr> LexiconSchema for Dendogram<S> {
     fn nsid() -> &'static str {
         "app.gainforest.organization.observations.dendogram"
     }
@@ -123,122 +123,122 @@ pub mod dendogram_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Dendogram;
         type CreatedAt;
+        type Dendogram;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Dendogram = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `dendogram` field to Set
-    pub struct SetDendogram<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDendogram<S> {}
-    impl<S: State> State for SetDendogram<S> {
-        type Dendogram = Set<members::dendogram>;
-        type CreatedAt = S::CreatedAt;
+        type Dendogram = Unset;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Dendogram = S::Dendogram;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
+        type Dendogram = St::Dendogram;
+    }
+    ///State transition - sets the `dendogram` field to Set
+    pub struct SetDendogram<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDendogram<St> {}
+    impl<St: State> State for SetDendogram<St> {
+        type CreatedAt = St::CreatedAt;
+        type Dendogram = Set<members::dendogram>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `dendogram` field
-        pub struct dendogram(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `dendogram` field
+        pub struct dendogram(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct DendogramBuilder<'a, S: dendogram_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct DendogramBuilder<S: BosStr, St: dendogram_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<Data<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Dendogram<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> DendogramBuilder<'a, dendogram_state::Empty> {
+impl<S: BosStr> Dendogram<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> DendogramBuilder<S, dendogram_state::Empty> {
         DendogramBuilder::new()
     }
 }
 
-impl<'a> DendogramBuilder<'a, dendogram_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> DendogramBuilder<S, dendogram_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         DendogramBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DendogramBuilder<'a, S>
+impl<S: BosStr, St> DendogramBuilder<S, St>
 where
-    S: dendogram_state::State,
-    S::CreatedAt: dendogram_state::IsUnset,
+    St: dendogram_state::State,
+    St::CreatedAt: dendogram_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> DendogramBuilder<'a, dendogram_state::SetCreatedAt<S>> {
+    ) -> DendogramBuilder<S, dendogram_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         DendogramBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DendogramBuilder<'a, S>
+impl<S: BosStr, St> DendogramBuilder<S, St>
 where
-    S: dendogram_state::State,
-    S::Dendogram: dendogram_state::IsUnset,
+    St: dendogram_state::State,
+    St::Dendogram: dendogram_state::IsUnset,
 {
     /// Set the `dendogram` field (required)
     pub fn dendogram(
         mut self,
         value: impl Into<Data<S>>,
-    ) -> DendogramBuilder<'a, dendogram_state::SetDendogram<S>> {
+    ) -> DendogramBuilder<S, dendogram_state::SetDendogram<St>> {
         self._fields.1 = Option::Some(value.into());
         DendogramBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DendogramBuilder<'a, S>
+impl<S: BosStr, St> DendogramBuilder<S, St>
 where
-    S: dendogram_state::State,
-    S::Dendogram: dendogram_state::IsSet,
-    S::CreatedAt: dendogram_state::IsSet,
+    St: dendogram_state::State,
+    St::CreatedAt: dendogram_state::IsSet,
+    St::Dendogram: dendogram_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Dendogram<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Dendogram<S> {
         Dendogram {
             created_at: self._fields.0.unwrap(),
             dendogram: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Dendogram<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Dendogram<S> {
         Dendogram {
             created_at: self._fields.0.unwrap(),
             dendogram: self._fields.1.unwrap(),

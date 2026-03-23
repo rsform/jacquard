@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "io.whiteley.luke.ATlas.pin",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Pin<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Pin<S: BosStr = DefaultStr> {
     pub description: S,
     pub did: Did<S>,
     pub latitude: S,
@@ -57,18 +57,18 @@ pub struct Pin<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct PinGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct PinGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Pin<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Pin<S> {
+impl<S: BosStr> Pin<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, PinRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -81,17 +81,17 @@ pub struct PinRecord;
 impl XrpcResp for PinRecord {
     const NSID: &'static str = "io.whiteley.luke.ATlas.pin";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = PinGetRecordOutput<S>;
+    type Output<S: BosStr> = PinGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<PinGetRecordOutput<S>> for Pin<S> {
+impl<S: BosStr> From<PinGetRecordOutput<S>> for Pin<S> {
     fn from(output: PinGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Pin<S> {
+impl<S: BosStr> Collection for Pin<S> {
     const NSID: &'static str = "io.whiteley.luke.ATlas.pin";
     type Record = PinRecord;
 }
@@ -101,7 +101,7 @@ impl Collection for PinRecord {
     type Record = PinRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Pin<S> {
+impl<S: BosStr> LexiconSchema for Pin<S> {
     fn nsid() -> &'static str {
         "io.whiteley.luke.ATlas.pin"
     }
@@ -169,91 +169,91 @@ pub mod pin_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
-        type Latitude;
-        type Longitude;
         type PlacedAt;
+        type Latitude;
+        type Did;
+        type Longitude;
         type Description;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
-        type Latitude = Unset;
-        type Longitude = Unset;
         type PlacedAt = Unset;
+        type Latitude = Unset;
+        type Did = Unset;
+        type Longitude = Unset;
         type Description = Unset;
     }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Did = Set<members::did>;
-        type Latitude = S::Latitude;
-        type Longitude = S::Longitude;
-        type PlacedAt = S::PlacedAt;
-        type Description = S::Description;
+    ///State transition - sets the `placed_at` field to Set
+    pub struct SetPlacedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPlacedAt<St> {}
+    impl<St: State> State for SetPlacedAt<St> {
+        type PlacedAt = Set<members::placed_at>;
+        type Latitude = St::Latitude;
+        type Did = St::Did;
+        type Longitude = St::Longitude;
+        type Description = St::Description;
     }
     ///State transition - sets the `latitude` field to Set
-    pub struct SetLatitude<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLatitude<S> {}
-    impl<S: State> State for SetLatitude<S> {
-        type Did = S::Did;
+    pub struct SetLatitude<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLatitude<St> {}
+    impl<St: State> State for SetLatitude<St> {
+        type PlacedAt = St::PlacedAt;
         type Latitude = Set<members::latitude>;
-        type Longitude = S::Longitude;
-        type PlacedAt = S::PlacedAt;
-        type Description = S::Description;
+        type Did = St::Did;
+        type Longitude = St::Longitude;
+        type Description = St::Description;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
+        type PlacedAt = St::PlacedAt;
+        type Latitude = St::Latitude;
+        type Did = Set<members::did>;
+        type Longitude = St::Longitude;
+        type Description = St::Description;
     }
     ///State transition - sets the `longitude` field to Set
-    pub struct SetLongitude<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLongitude<S> {}
-    impl<S: State> State for SetLongitude<S> {
-        type Did = S::Did;
-        type Latitude = S::Latitude;
+    pub struct SetLongitude<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLongitude<St> {}
+    impl<St: State> State for SetLongitude<St> {
+        type PlacedAt = St::PlacedAt;
+        type Latitude = St::Latitude;
+        type Did = St::Did;
         type Longitude = Set<members::longitude>;
-        type PlacedAt = S::PlacedAt;
-        type Description = S::Description;
-    }
-    ///State transition - sets the `placed_at` field to Set
-    pub struct SetPlacedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPlacedAt<S> {}
-    impl<S: State> State for SetPlacedAt<S> {
-        type Did = S::Did;
-        type Latitude = S::Latitude;
-        type Longitude = S::Longitude;
-        type PlacedAt = Set<members::placed_at>;
-        type Description = S::Description;
+        type Description = St::Description;
     }
     ///State transition - sets the `description` field to Set
-    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDescription<S> {}
-    impl<S: State> State for SetDescription<S> {
-        type Did = S::Did;
-        type Latitude = S::Latitude;
-        type Longitude = S::Longitude;
-        type PlacedAt = S::PlacedAt;
+    pub struct SetDescription<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDescription<St> {}
+    impl<St: State> State for SetDescription<St> {
+        type PlacedAt = St::PlacedAt;
+        type Latitude = St::Latitude;
+        type Did = St::Did;
+        type Longitude = St::Longitude;
         type Description = Set<members::description>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
-        ///Marker type for the `latitude` field
-        pub struct latitude(());
-        ///Marker type for the `longitude` field
-        pub struct longitude(());
         ///Marker type for the `placed_at` field
         pub struct placed_at(());
+        ///Marker type for the `latitude` field
+        pub struct latitude(());
+        ///Marker type for the `did` field
+        pub struct did(());
+        ///Marker type for the `longitude` field
+        pub struct longitude(());
         ///Marker type for the `description` field
         pub struct description(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct PinBuilder<'a, S: pin_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct PinBuilder<S: BosStr, St: pin_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
         Option<Did<S>>,
@@ -262,123 +262,123 @@ pub struct PinBuilder<'a, S: pin_state::State> {
         Option<Datetime>,
         Option<S>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Pin<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> PinBuilder<'a, pin_state::Empty> {
+impl<S: BosStr> Pin<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> PinBuilder<S, pin_state::Empty> {
         PinBuilder::new()
     }
 }
 
-impl<'a> PinBuilder<'a, pin_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> PinBuilder<S, pin_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         PinBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PinBuilder<'a, S>
+impl<S: BosStr, St> PinBuilder<S, St>
 where
-    S: pin_state::State,
-    S::Description: pin_state::IsUnset,
+    St: pin_state::State,
+    St::Description: pin_state::IsUnset,
 {
     /// Set the `description` field (required)
     pub fn description(
         mut self,
         value: impl Into<S>,
-    ) -> PinBuilder<'a, pin_state::SetDescription<S>> {
+    ) -> PinBuilder<S, pin_state::SetDescription<St>> {
         self._fields.0 = Option::Some(value.into());
         PinBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PinBuilder<'a, S>
+impl<S: BosStr, St> PinBuilder<S, St>
 where
-    S: pin_state::State,
-    S::Did: pin_state::IsUnset,
+    St: pin_state::State,
+    St::Did: pin_state::IsUnset,
 {
     /// Set the `did` field (required)
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> PinBuilder<'a, pin_state::SetDid<S>> {
+    ) -> PinBuilder<S, pin_state::SetDid<St>> {
         self._fields.1 = Option::Some(value.into());
         PinBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PinBuilder<'a, S>
+impl<S: BosStr, St> PinBuilder<S, St>
 where
-    S: pin_state::State,
-    S::Latitude: pin_state::IsUnset,
+    St: pin_state::State,
+    St::Latitude: pin_state::IsUnset,
 {
     /// Set the `latitude` field (required)
     pub fn latitude(
         mut self,
         value: impl Into<S>,
-    ) -> PinBuilder<'a, pin_state::SetLatitude<S>> {
+    ) -> PinBuilder<S, pin_state::SetLatitude<St>> {
         self._fields.2 = Option::Some(value.into());
         PinBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PinBuilder<'a, S>
+impl<S: BosStr, St> PinBuilder<S, St>
 where
-    S: pin_state::State,
-    S::Longitude: pin_state::IsUnset,
+    St: pin_state::State,
+    St::Longitude: pin_state::IsUnset,
 {
     /// Set the `longitude` field (required)
     pub fn longitude(
         mut self,
         value: impl Into<S>,
-    ) -> PinBuilder<'a, pin_state::SetLongitude<S>> {
+    ) -> PinBuilder<S, pin_state::SetLongitude<St>> {
         self._fields.3 = Option::Some(value.into());
         PinBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PinBuilder<'a, S>
+impl<S: BosStr, St> PinBuilder<S, St>
 where
-    S: pin_state::State,
-    S::PlacedAt: pin_state::IsUnset,
+    St: pin_state::State,
+    St::PlacedAt: pin_state::IsUnset,
 {
     /// Set the `placedAt` field (required)
     pub fn placed_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> PinBuilder<'a, pin_state::SetPlacedAt<S>> {
+    ) -> PinBuilder<S, pin_state::SetPlacedAt<St>> {
         self._fields.4 = Option::Some(value.into());
         PinBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: pin_state::State> PinBuilder<'a, S> {
+impl<S: BosStr, St: pin_state::State> PinBuilder<S, St> {
     /// Set the `website` field (optional)
     pub fn website(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
@@ -391,17 +391,17 @@ impl<'a, S: pin_state::State> PinBuilder<'a, S> {
     }
 }
 
-impl<'a, S> PinBuilder<'a, S>
+impl<S: BosStr, St> PinBuilder<S, St>
 where
-    S: pin_state::State,
-    S::Did: pin_state::IsSet,
-    S::Latitude: pin_state::IsSet,
-    S::Longitude: pin_state::IsSet,
-    S::PlacedAt: pin_state::IsSet,
-    S::Description: pin_state::IsSet,
+    St: pin_state::State,
+    St::PlacedAt: pin_state::IsSet,
+    St::Latitude: pin_state::IsSet,
+    St::Did: pin_state::IsSet,
+    St::Longitude: pin_state::IsSet,
+    St::Description: pin_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Pin<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Pin<S> {
         Pin {
             description: self._fields.0.unwrap(),
             did: self._fields.1.unwrap(),
@@ -412,8 +412,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Pin<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Pin<S> {
         Pin {
             description: self._fields.0.unwrap(),
             did: self._fields.1.unwrap(),

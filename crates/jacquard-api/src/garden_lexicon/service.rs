@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use crate::garden_lexicon::service;
     rename = "garden.lexicon.service",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Service<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Service<S: BosStr = DefaultStr> {
     ///Description of what this service provides.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
@@ -62,11 +62,11 @@ pub struct Service<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ServiceGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ServiceGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
@@ -78,11 +78,11 @@ pub struct ServiceGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Method<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Method<S: BosStr = DefaultStr> {
     ///Authentication methods supported by this method.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub auth_methods: Option<Vec<S>>,
@@ -100,11 +100,11 @@ pub struct Method<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct UrlTemplate<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct UrlTemplate<S: BosStr = DefaultStr> {
     ///NSIDs of collections this URL template applies to.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub collections: Option<Vec<Nsid<S>>>,
@@ -117,7 +117,7 @@ pub struct UrlTemplate<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Service<S> {
+impl<S: BosStr> Service<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, ServiceRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -130,17 +130,17 @@ pub struct ServiceRecord;
 impl XrpcResp for ServiceRecord {
     const NSID: &'static str = "garden.lexicon.service";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ServiceGetRecordOutput<S>;
+    type Output<S: BosStr> = ServiceGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<ServiceGetRecordOutput<S>> for Service<S> {
+impl<S: BosStr> From<ServiceGetRecordOutput<S>> for Service<S> {
     fn from(output: ServiceGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Service<S> {
+impl<S: BosStr> Collection for Service<S> {
     const NSID: &'static str = "garden.lexicon.service";
     type Record = ServiceRecord;
 }
@@ -150,7 +150,7 @@ impl Collection for ServiceRecord {
     type Record = ServiceRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Service<S> {
+impl<S: BosStr> LexiconSchema for Service<S> {
     fn nsid() -> &'static str {
         "garden.lexicon.service"
     }
@@ -186,7 +186,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Service<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Method<S> {
+impl<S: BosStr> LexiconSchema for Method<S> {
     fn nsid() -> &'static str {
         "garden.lexicon.service"
     }
@@ -201,7 +201,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Method<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for UrlTemplate<S> {
+impl<S: BosStr> LexiconSchema for UrlTemplate<S> {
     fn nsid() -> &'static str {
         "garden.lexicon.service"
     }
@@ -256,9 +256,9 @@ pub mod service_state {
         type ServiceType = Unset;
     }
     ///State transition - sets the `service_type` field to Set
-    pub struct SetServiceType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetServiceType<S> {}
-    impl<S: State> State for SetServiceType<S> {
+    pub struct SetServiceType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetServiceType<St> {}
+    impl<St: State> State for SetServiceType<St> {
         type ServiceType = Set<members::service_type>;
     }
     /// Marker types for field names
@@ -269,37 +269,37 @@ pub mod service_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ServiceBuilder<'a, S: service_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ServiceBuilder<S: BosStr, St: service_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
         Option<Vec<service::Method<S>>>,
         Option<S>,
         Option<Vec<service::UrlTemplate<S>>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Service<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ServiceBuilder<'a, service_state::Empty> {
+impl<S: BosStr> Service<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ServiceBuilder<S, service_state::Empty> {
         ServiceBuilder::new()
     }
 }
 
-impl<'a> ServiceBuilder<'a, service_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ServiceBuilder<S, service_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ServiceBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
+impl<S: BosStr, St: service_state::State> ServiceBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -312,7 +312,7 @@ impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
+impl<S: BosStr, St: service_state::State> ServiceBuilder<S, St> {
     /// Set the `methods` field (optional)
     pub fn methods(mut self, value: impl Into<Option<Vec<service::Method<S>>>>) -> Self {
         self._fields.1 = value.into();
@@ -325,26 +325,26 @@ impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ServiceBuilder<'a, S>
+impl<S: BosStr, St> ServiceBuilder<S, St>
 where
-    S: service_state::State,
-    S::ServiceType: service_state::IsUnset,
+    St: service_state::State,
+    St::ServiceType: service_state::IsUnset,
 {
     /// Set the `serviceType` field (required)
     pub fn service_type(
         mut self,
         value: impl Into<S>,
-    ) -> ServiceBuilder<'a, service_state::SetServiceType<S>> {
+    ) -> ServiceBuilder<S, service_state::SetServiceType<St>> {
         self._fields.2 = Option::Some(value.into());
         ServiceBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
+impl<S: BosStr, St: service_state::State> ServiceBuilder<S, St> {
     /// Set the `urlTemplates` field (optional)
     pub fn url_templates(
         mut self,
@@ -363,13 +363,13 @@ impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ServiceBuilder<'a, S>
+impl<S: BosStr, St> ServiceBuilder<S, St>
 where
-    S: service_state::State,
-    S::ServiceType: service_state::IsSet,
+    St: service_state::State,
+    St::ServiceType: service_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Service<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Service<S> {
         Service {
             description: self._fields.0,
             methods: self._fields.1,
@@ -378,11 +378,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Service<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Service<S> {
         Service {
             description: self._fields.0,
             methods: self._fields.1,
@@ -595,9 +592,9 @@ pub mod method_state {
         type Lexicon = Unset;
     }
     ///State transition - sets the `lexicon` field to Set
-    pub struct SetLexicon<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLexicon<S> {}
-    impl<S: State> State for SetLexicon<S> {
+    pub struct SetLexicon<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLexicon<St> {}
+    impl<St: State> State for SetLexicon<St> {
         type Lexicon = Set<members::lexicon>;
     }
     /// Marker types for field names
@@ -608,32 +605,32 @@ pub mod method_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct MethodBuilder<'a, S: method_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct MethodBuilder<S: BosStr, St: method_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<S>>, Option<bool>, Option<AtUri<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Method<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> MethodBuilder<'a, method_state::Empty> {
+impl<S: BosStr> Method<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> MethodBuilder<S, method_state::Empty> {
         MethodBuilder::new()
     }
 }
 
-impl<'a> MethodBuilder<'a, method_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> MethodBuilder<S, method_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         MethodBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: method_state::State> MethodBuilder<'a, S> {
+impl<S: BosStr, St: method_state::State> MethodBuilder<S, St> {
     /// Set the `authMethods` field (optional)
     pub fn auth_methods(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -646,7 +643,7 @@ impl<'a, S: method_state::State> MethodBuilder<'a, S> {
     }
 }
 
-impl<'a, S: method_state::State> MethodBuilder<'a, S> {
+impl<S: BosStr, St: method_state::State> MethodBuilder<S, St> {
     /// Set the `deprecated` field (optional)
     pub fn deprecated(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.1 = value.into();
@@ -659,32 +656,32 @@ impl<'a, S: method_state::State> MethodBuilder<'a, S> {
     }
 }
 
-impl<'a, S> MethodBuilder<'a, S>
+impl<S: BosStr, St> MethodBuilder<S, St>
 where
-    S: method_state::State,
-    S::Lexicon: method_state::IsUnset,
+    St: method_state::State,
+    St::Lexicon: method_state::IsUnset,
 {
     /// Set the `lexicon` field (required)
     pub fn lexicon(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> MethodBuilder<'a, method_state::SetLexicon<S>> {
+    ) -> MethodBuilder<S, method_state::SetLexicon<St>> {
         self._fields.2 = Option::Some(value.into());
         MethodBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> MethodBuilder<'a, S>
+impl<S: BosStr, St> MethodBuilder<S, St>
 where
-    S: method_state::State,
-    S::Lexicon: method_state::IsSet,
+    St: method_state::State,
+    St::Lexicon: method_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Method<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Method<S> {
         Method {
             auth_methods: self._fields.0,
             deprecated: self._fields.1,
@@ -692,8 +689,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Method<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Method<S> {
         Method {
             auth_methods: self._fields.0,
             deprecated: self._fields.1,

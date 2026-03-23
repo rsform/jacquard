@@ -6,8 +6,13 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[allow(unused_imports)]
+use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::tools_ozone::moderation::ModEventViewDetail;
@@ -20,26 +25,18 @@ pub struct GetEvent {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetEventOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetEventOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
-    #[serde(borrow)]
     pub value: ModEventViewDetail<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
-    pub extra_data: Option<
-        alloc::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<S>,
-        >,
-    >,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for tools.ozone.moderation.getEvent
@@ -47,7 +44,7 @@ pub struct GetEventResponse;
 impl jacquard_common::xrpc::XrpcResp for GetEventResponse {
     const NSID: &'static str = "tools.ozone.moderation.getEvent";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetEventOutput<S>;
+    type Output<S: BosStr> = GetEventOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
@@ -62,7 +59,7 @@ pub struct GetEventRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetEventRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.moderation.getEvent";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetEvent;
+    type Request<S: BosStr> = GetEvent;
     type Response = GetEventResponse;
 }
 
@@ -85,9 +82,9 @@ pub mod get_event_state {
         type Id = Unset;
     }
     ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
+    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetId<St> {}
+    impl<St: State> State for SetId<St> {
         type Id = Set<members::id>;
     }
     /// Marker types for field names
@@ -98,21 +95,21 @@ pub mod get_event_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetEventBuilder<S: get_event_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetEventBuilder<St: get_event_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>,),
 }
 
 impl GetEvent {
-    /// Create a new builder for this type
+    /// Create a new builder for this type.
     pub fn new() -> GetEventBuilder<get_event_state::Empty> {
         GetEventBuilder::new()
     }
 }
 
 impl GetEventBuilder<get_event_state::Empty> {
-    /// Create a new builder with all fields unset
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetEventBuilder {
             _state: PhantomData,
@@ -121,16 +118,16 @@ impl GetEventBuilder<get_event_state::Empty> {
     }
 }
 
-impl<S> GetEventBuilder<S>
+impl<St> GetEventBuilder<St>
 where
-    S: get_event_state::State,
-    S::Id: get_event_state::IsUnset,
+    St: get_event_state::State,
+    St::Id: get_event_state::IsUnset,
 {
     /// Set the `id` field (required)
     pub fn id(
         mut self,
         value: impl Into<i64>,
-    ) -> GetEventBuilder<get_event_state::SetId<S>> {
+    ) -> GetEventBuilder<get_event_state::SetId<St>> {
         self._fields.0 = Option::Some(value.into());
         GetEventBuilder {
             _state: PhantomData,
@@ -139,12 +136,12 @@ where
     }
 }
 
-impl<S> GetEventBuilder<S>
+impl<St> GetEventBuilder<St>
 where
-    S: get_event_state::State,
-    S::Id: get_event_state::IsSet,
+    St: get_event_state::State,
+    St::Id: get_event_state::IsSet,
 {
-    /// Build the final struct
+    /// Build the final struct.
     pub fn build(self) -> GetEvent {
         GetEvent {
             id: self._fields.0.unwrap(),

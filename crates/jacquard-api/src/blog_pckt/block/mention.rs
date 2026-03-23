@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -29,11 +29,11 @@ use serde::{Serialize, Deserialize};
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Mention<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Mention<S: BosStr = DefaultStr> {
     ///The DID of the mentioned user (e.g., did:plc:abc123xyz). This is the canonical reference that persists even if the user changes their handle, following app.bsky.richtext.facet#mention
     pub did: Did<S>,
     ///The handle of the mentioned user at the time of mention (e.g., alice.bsky.social). Used for display text and byte offset calculation in facets.
@@ -42,7 +42,7 @@ pub struct Mention<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Mention<S> {
+impl<S: BosStr> LexiconSchema for Mention<S> {
     fn nsid() -> &'static str {
         "blog.pckt.block.mention"
     }
@@ -89,17 +89,17 @@ pub mod mention_state {
         type Handle = Unset;
     }
     ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
         type Did = Set<members::did>;
-        type Handle = S::Handle;
+        type Handle = St::Handle;
     }
     ///State transition - sets the `handle` field to Set
-    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHandle<S> {}
-    impl<S: State> State for SetHandle<S> {
-        type Did = S::Did;
+    pub struct SetHandle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHandle<St> {}
+    impl<St: State> State for SetHandle<St> {
+        type Did = St::Did;
         type Handle = Set<members::handle>;
     }
     /// Marker types for field names
@@ -112,88 +112,85 @@ pub mod mention_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct MentionBuilder<'a, S: mention_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct MentionBuilder<S: BosStr, St: mention_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>, Option<Handle<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Mention<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> MentionBuilder<'a, mention_state::Empty> {
+impl<S: BosStr> Mention<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> MentionBuilder<S, mention_state::Empty> {
         MentionBuilder::new()
     }
 }
 
-impl<'a> MentionBuilder<'a, mention_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> MentionBuilder<S, mention_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         MentionBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> MentionBuilder<'a, S>
+impl<S: BosStr, St> MentionBuilder<S, St>
 where
-    S: mention_state::State,
-    S::Did: mention_state::IsUnset,
+    St: mention_state::State,
+    St::Did: mention_state::IsUnset,
 {
     /// Set the `did` field (required)
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> MentionBuilder<'a, mention_state::SetDid<S>> {
+    ) -> MentionBuilder<S, mention_state::SetDid<St>> {
         self._fields.0 = Option::Some(value.into());
         MentionBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> MentionBuilder<'a, S>
+impl<S: BosStr, St> MentionBuilder<S, St>
 where
-    S: mention_state::State,
-    S::Handle: mention_state::IsUnset,
+    St: mention_state::State,
+    St::Handle: mention_state::IsUnset,
 {
     /// Set the `handle` field (required)
     pub fn handle(
         mut self,
         value: impl Into<Handle<S>>,
-    ) -> MentionBuilder<'a, mention_state::SetHandle<S>> {
+    ) -> MentionBuilder<S, mention_state::SetHandle<St>> {
         self._fields.1 = Option::Some(value.into());
         MentionBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> MentionBuilder<'a, S>
+impl<S: BosStr, St> MentionBuilder<S, St>
 where
-    S: mention_state::State,
-    S::Did: mention_state::IsSet,
-    S::Handle: mention_state::IsSet,
+    St: mention_state::State,
+    St::Did: mention_state::IsSet,
+    St::Handle: mention_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Mention<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Mention<S> {
         Mention {
             did: self._fields.0.unwrap(),
             handle: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Mention<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Mention<S> {
         Mention {
             did: self._fields.0.unwrap(),
             handle: self._fields.1.unwrap(),

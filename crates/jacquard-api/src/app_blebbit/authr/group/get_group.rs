@@ -10,35 +10,34 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetGroup<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct GetGroup<S: BosStr = DefaultStr> {
     pub id: S,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetGroupOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetGroupOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cuid: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -49,9 +48,7 @@ pub struct GetGroupOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub name: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub public: Option<bool>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -60,12 +57,11 @@ pub struct GetGroupResponse;
 impl jacquard_common::xrpc::XrpcResp for GetGroupResponse {
     const NSID: &'static str = "app.blebbit.authr.group.getGroup";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetGroupOutput<S>;
+    type Output<S: BosStr> = GetGroupOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetGroup<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetGroup<S> {
     const NSID: &'static str = "app.blebbit.authr.group.getGroup";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetGroupResponse;
@@ -76,7 +72,7 @@ pub struct GetGroupRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetGroupRequest {
     const PATH: &'static str = "/xrpc/app.blebbit.authr.group.getGroup";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetGroup<S>;
+    type Request<S: BosStr> = GetGroup<S>;
     type Response = GetGroupResponse;
 }
 
@@ -99,9 +95,9 @@ pub mod get_group_state {
         type Id = Unset;
     }
     ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
+    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetId<St> {}
+    impl<St: State> State for SetId<St> {
         type Id = Set<members::id>;
     }
     /// Marker types for field names
@@ -112,57 +108,57 @@ pub mod get_group_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetGroupBuilder<'a, S: get_group_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetGroupBuilder<S: BosStr, St: get_group_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetGroup<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetGroupBuilder<'a, get_group_state::Empty> {
+impl<S: BosStr> GetGroup<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetGroupBuilder<S, get_group_state::Empty> {
         GetGroupBuilder::new()
     }
 }
 
-impl<'a> GetGroupBuilder<'a, get_group_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetGroupBuilder<S, get_group_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetGroupBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetGroupBuilder<'a, S>
+impl<S: BosStr, St> GetGroupBuilder<S, St>
 where
-    S: get_group_state::State,
-    S::Id: get_group_state::IsUnset,
+    St: get_group_state::State,
+    St::Id: get_group_state::IsUnset,
 {
     /// Set the `id` field (required)
     pub fn id(
         mut self,
         value: impl Into<S>,
-    ) -> GetGroupBuilder<'a, get_group_state::SetId<S>> {
+    ) -> GetGroupBuilder<S, get_group_state::SetId<St>> {
         self._fields.0 = Option::Some(value.into());
         GetGroupBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetGroupBuilder<'a, S>
+impl<S: BosStr, St> GetGroupBuilder<S, St>
 where
-    S: get_group_state::State,
-    S::Id: get_group_state::IsSet,
+    St: get_group_state::State,
+    St::Id: get_group_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetGroup<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetGroup<S> {
         GetGroup {
             id: self._fields.0.unwrap(),
         }

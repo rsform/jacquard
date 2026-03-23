@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,11 +34,11 @@ use serde::{Serialize, Deserialize};
     rename = "net.aftertheinter.coolthingtwo",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Coolthingtwo<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Coolthingtwo<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     pub status: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -51,18 +51,18 @@ pub struct Coolthingtwo<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CoolthingtwoGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CoolthingtwoGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Coolthingtwo<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Coolthingtwo<S> {
+impl<S: BosStr> Coolthingtwo<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, CoolthingtwoRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -75,17 +75,17 @@ pub struct CoolthingtwoRecord;
 impl XrpcResp for CoolthingtwoRecord {
     const NSID: &'static str = "net.aftertheinter.coolthingtwo";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = CoolthingtwoGetRecordOutput<S>;
+    type Output<S: BosStr> = CoolthingtwoGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<CoolthingtwoGetRecordOutput<S>> for Coolthingtwo<S> {
+impl<S: BosStr> From<CoolthingtwoGetRecordOutput<S>> for Coolthingtwo<S> {
     fn from(output: CoolthingtwoGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Coolthingtwo<S> {
+impl<S: BosStr> Collection for Coolthingtwo<S> {
     const NSID: &'static str = "net.aftertheinter.coolthingtwo";
     type Record = CoolthingtwoRecord;
 }
@@ -95,7 +95,7 @@ impl Collection for CoolthingtwoRecord {
     type Record = CoolthingtwoRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Coolthingtwo<S> {
+impl<S: BosStr> LexiconSchema for Coolthingtwo<S> {
     fn nsid() -> &'static str {
         "net.aftertheinter.coolthingtwo"
     }
@@ -155,122 +155,122 @@ pub mod coolthingtwo_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Status;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Status = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Status = S::Status;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `status` field to Set
-    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStatus<S> {}
-    impl<S: State> State for SetStatus<S> {
-        type CreatedAt = S::CreatedAt;
+    pub struct SetStatus<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStatus<St> {}
+    impl<St: State> State for SetStatus<St> {
         type Status = Set<members::status>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Status = St::Status;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `status` field
         pub struct status(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct CoolthingtwoBuilder<'a, S: coolthingtwo_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct CoolthingtwoBuilder<S: BosStr, St: coolthingtwo_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Coolthingtwo<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> CoolthingtwoBuilder<'a, coolthingtwo_state::Empty> {
+impl<S: BosStr> Coolthingtwo<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> CoolthingtwoBuilder<S, coolthingtwo_state::Empty> {
         CoolthingtwoBuilder::new()
     }
 }
 
-impl<'a> CoolthingtwoBuilder<'a, coolthingtwo_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> CoolthingtwoBuilder<S, coolthingtwo_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         CoolthingtwoBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CoolthingtwoBuilder<'a, S>
+impl<S: BosStr, St> CoolthingtwoBuilder<S, St>
 where
-    S: coolthingtwo_state::State,
-    S::CreatedAt: coolthingtwo_state::IsUnset,
+    St: coolthingtwo_state::State,
+    St::CreatedAt: coolthingtwo_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> CoolthingtwoBuilder<'a, coolthingtwo_state::SetCreatedAt<S>> {
+    ) -> CoolthingtwoBuilder<S, coolthingtwo_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         CoolthingtwoBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CoolthingtwoBuilder<'a, S>
+impl<S: BosStr, St> CoolthingtwoBuilder<S, St>
 where
-    S: coolthingtwo_state::State,
-    S::Status: coolthingtwo_state::IsUnset,
+    St: coolthingtwo_state::State,
+    St::Status: coolthingtwo_state::IsUnset,
 {
     /// Set the `status` field (required)
     pub fn status(
         mut self,
         value: impl Into<S>,
-    ) -> CoolthingtwoBuilder<'a, coolthingtwo_state::SetStatus<S>> {
+    ) -> CoolthingtwoBuilder<S, coolthingtwo_state::SetStatus<St>> {
         self._fields.1 = Option::Some(value.into());
         CoolthingtwoBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CoolthingtwoBuilder<'a, S>
+impl<S: BosStr, St> CoolthingtwoBuilder<S, St>
 where
-    S: coolthingtwo_state::State,
-    S::CreatedAt: coolthingtwo_state::IsSet,
-    S::Status: coolthingtwo_state::IsSet,
+    St: coolthingtwo_state::State,
+    St::Status: coolthingtwo_state::IsSet,
+    St::CreatedAt: coolthingtwo_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Coolthingtwo<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Coolthingtwo<S> {
         Coolthingtwo {
             created_at: self._fields.0.unwrap(),
             status: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Coolthingtwo<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Coolthingtwo<S> {
         Coolthingtwo {
             created_at: self._fields.0.unwrap(),
             status: self._fields.1.unwrap(),

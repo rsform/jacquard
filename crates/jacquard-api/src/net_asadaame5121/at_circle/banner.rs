@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -37,11 +37,11 @@ use crate::net_asadaame5121::at_circle::RingRef;
     rename = "net.asadaame5121.at-circle.banner",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Banner<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Banner<S: BosStr = DefaultStr> {
     pub banner: BlobRef<S>,
     pub created_at: Datetime,
     pub ring: RingRef<S>,
@@ -55,18 +55,18 @@ pub struct Banner<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct BannerGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct BannerGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Banner<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Banner<S> {
+impl<S: BosStr> Banner<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, BannerRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -79,17 +79,17 @@ pub struct BannerRecord;
 impl XrpcResp for BannerRecord {
     const NSID: &'static str = "net.asadaame5121.at-circle.banner";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = BannerGetRecordOutput<S>;
+    type Output<S: BosStr> = BannerGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<BannerGetRecordOutput<S>> for Banner<S> {
+impl<S: BosStr> From<BannerGetRecordOutput<S>> for Banner<S> {
     fn from(output: BannerGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Banner<S> {
+impl<S: BosStr> Collection for Banner<S> {
     const NSID: &'static str = "net.asadaame5121.at-circle.banner";
     type Record = BannerRecord;
 }
@@ -99,7 +99,7 @@ impl Collection for BannerRecord {
     type Record = BannerRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Banner<S> {
+impl<S: BosStr> LexiconSchema for Banner<S> {
     fn nsid() -> &'static str {
         "net.asadaame5121.at-circle.banner"
     }
@@ -164,145 +164,145 @@ pub mod banner_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Banner;
         type CreatedAt;
         type Ring;
+        type Banner;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Banner = Unset;
         type CreatedAt = Unset;
         type Ring = Unset;
-    }
-    ///State transition - sets the `banner` field to Set
-    pub struct SetBanner<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBanner<S> {}
-    impl<S: State> State for SetBanner<S> {
-        type Banner = Set<members::banner>;
-        type CreatedAt = S::CreatedAt;
-        type Ring = S::Ring;
+        type Banner = Unset;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Banner = S::Banner;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
-        type Ring = S::Ring;
+        type Ring = St::Ring;
+        type Banner = St::Banner;
     }
     ///State transition - sets the `ring` field to Set
-    pub struct SetRing<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRing<S> {}
-    impl<S: State> State for SetRing<S> {
-        type Banner = S::Banner;
-        type CreatedAt = S::CreatedAt;
+    pub struct SetRing<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRing<St> {}
+    impl<St: State> State for SetRing<St> {
+        type CreatedAt = St::CreatedAt;
         type Ring = Set<members::ring>;
+        type Banner = St::Banner;
+    }
+    ///State transition - sets the `banner` field to Set
+    pub struct SetBanner<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBanner<St> {}
+    impl<St: State> State for SetBanner<St> {
+        type CreatedAt = St::CreatedAt;
+        type Ring = St::Ring;
+        type Banner = Set<members::banner>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `banner` field
-        pub struct banner(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `ring` field
         pub struct ring(());
+        ///Marker type for the `banner` field
+        pub struct banner(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct BannerBuilder<'a, S: banner_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct BannerBuilder<S: BosStr, St: banner_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<BlobRef<S>>, Option<Datetime>, Option<RingRef<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Banner<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> BannerBuilder<'a, banner_state::Empty> {
+impl<S: BosStr> Banner<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> BannerBuilder<S, banner_state::Empty> {
         BannerBuilder::new()
     }
 }
 
-impl<'a> BannerBuilder<'a, banner_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> BannerBuilder<S, banner_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         BannerBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BannerBuilder<'a, S>
+impl<S: BosStr, St> BannerBuilder<S, St>
 where
-    S: banner_state::State,
-    S::Banner: banner_state::IsUnset,
+    St: banner_state::State,
+    St::Banner: banner_state::IsUnset,
 {
     /// Set the `banner` field (required)
     pub fn banner(
         mut self,
         value: impl Into<BlobRef<S>>,
-    ) -> BannerBuilder<'a, banner_state::SetBanner<S>> {
+    ) -> BannerBuilder<S, banner_state::SetBanner<St>> {
         self._fields.0 = Option::Some(value.into());
         BannerBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BannerBuilder<'a, S>
+impl<S: BosStr, St> BannerBuilder<S, St>
 where
-    S: banner_state::State,
-    S::CreatedAt: banner_state::IsUnset,
+    St: banner_state::State,
+    St::CreatedAt: banner_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> BannerBuilder<'a, banner_state::SetCreatedAt<S>> {
+    ) -> BannerBuilder<S, banner_state::SetCreatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         BannerBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BannerBuilder<'a, S>
+impl<S: BosStr, St> BannerBuilder<S, St>
 where
-    S: banner_state::State,
-    S::Ring: banner_state::IsUnset,
+    St: banner_state::State,
+    St::Ring: banner_state::IsUnset,
 {
     /// Set the `ring` field (required)
     pub fn ring(
         mut self,
         value: impl Into<RingRef<S>>,
-    ) -> BannerBuilder<'a, banner_state::SetRing<S>> {
+    ) -> BannerBuilder<S, banner_state::SetRing<St>> {
         self._fields.2 = Option::Some(value.into());
         BannerBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BannerBuilder<'a, S>
+impl<S: BosStr, St> BannerBuilder<S, St>
 where
-    S: banner_state::State,
-    S::Banner: banner_state::IsSet,
-    S::CreatedAt: banner_state::IsSet,
-    S::Ring: banner_state::IsSet,
+    St: banner_state::State,
+    St::CreatedAt: banner_state::IsSet,
+    St::Ring: banner_state::IsSet,
+    St::Banner: banner_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Banner<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Banner<S> {
         Banner {
             banner: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
@@ -310,8 +310,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Banner<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Banner<S> {
         Banner {
             banner: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),

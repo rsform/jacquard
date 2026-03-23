@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "io.atcr.hold.stats",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Stats<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Stats<S: BosStr = DefaultStr> {
     ///RFC3339 timestamp of last pull
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_pull: Option<Datetime>,
@@ -66,18 +66,18 @@ pub struct Stats<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct StatsGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct StatsGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Stats<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Stats<S> {
+impl<S: BosStr> Stats<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, StatsRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -90,17 +90,17 @@ pub struct StatsRecord;
 impl XrpcResp for StatsRecord {
     const NSID: &'static str = "io.atcr.hold.stats";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = StatsGetRecordOutput<S>;
+    type Output<S: BosStr> = StatsGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<StatsGetRecordOutput<S>> for Stats<S> {
+impl<S: BosStr> From<StatsGetRecordOutput<S>> for Stats<S> {
     fn from(output: StatsGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Stats<S> {
+impl<S: BosStr> Collection for Stats<S> {
     const NSID: &'static str = "io.atcr.hold.stats";
     type Record = StatsRecord;
 }
@@ -110,7 +110,7 @@ impl Collection for StatsRecord {
     type Record = StatsRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Stats<S> {
+impl<S: BosStr> LexiconSchema for Stats<S> {
     fn nsid() -> &'static str {
         "io.atcr.hold.stats"
     }
@@ -167,90 +167,90 @@ pub mod stats_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type UpdatedAt;
-        type PullCount;
-        type OwnerDid;
         type PushCount;
         type Repository;
+        type PullCount;
+        type OwnerDid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type UpdatedAt = Unset;
-        type PullCount = Unset;
-        type OwnerDid = Unset;
         type PushCount = Unset;
         type Repository = Unset;
+        type PullCount = Unset;
+        type OwnerDid = Unset;
     }
     ///State transition - sets the `updated_at` field to Set
-    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
-    impl<S: State> State for SetUpdatedAt<S> {
+    pub struct SetUpdatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUpdatedAt<St> {}
+    impl<St: State> State for SetUpdatedAt<St> {
         type UpdatedAt = Set<members::updated_at>;
-        type PullCount = S::PullCount;
-        type OwnerDid = S::OwnerDid;
-        type PushCount = S::PushCount;
-        type Repository = S::Repository;
-    }
-    ///State transition - sets the `pull_count` field to Set
-    pub struct SetPullCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPullCount<S> {}
-    impl<S: State> State for SetPullCount<S> {
-        type UpdatedAt = S::UpdatedAt;
-        type PullCount = Set<members::pull_count>;
-        type OwnerDid = S::OwnerDid;
-        type PushCount = S::PushCount;
-        type Repository = S::Repository;
-    }
-    ///State transition - sets the `owner_did` field to Set
-    pub struct SetOwnerDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetOwnerDid<S> {}
-    impl<S: State> State for SetOwnerDid<S> {
-        type UpdatedAt = S::UpdatedAt;
-        type PullCount = S::PullCount;
-        type OwnerDid = Set<members::owner_did>;
-        type PushCount = S::PushCount;
-        type Repository = S::Repository;
+        type PushCount = St::PushCount;
+        type Repository = St::Repository;
+        type PullCount = St::PullCount;
+        type OwnerDid = St::OwnerDid;
     }
     ///State transition - sets the `push_count` field to Set
-    pub struct SetPushCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPushCount<S> {}
-    impl<S: State> State for SetPushCount<S> {
-        type UpdatedAt = S::UpdatedAt;
-        type PullCount = S::PullCount;
-        type OwnerDid = S::OwnerDid;
+    pub struct SetPushCount<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPushCount<St> {}
+    impl<St: State> State for SetPushCount<St> {
+        type UpdatedAt = St::UpdatedAt;
         type PushCount = Set<members::push_count>;
-        type Repository = S::Repository;
+        type Repository = St::Repository;
+        type PullCount = St::PullCount;
+        type OwnerDid = St::OwnerDid;
     }
     ///State transition - sets the `repository` field to Set
-    pub struct SetRepository<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepository<S> {}
-    impl<S: State> State for SetRepository<S> {
-        type UpdatedAt = S::UpdatedAt;
-        type PullCount = S::PullCount;
-        type OwnerDid = S::OwnerDid;
-        type PushCount = S::PushCount;
+    pub struct SetRepository<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRepository<St> {}
+    impl<St: State> State for SetRepository<St> {
+        type UpdatedAt = St::UpdatedAt;
+        type PushCount = St::PushCount;
         type Repository = Set<members::repository>;
+        type PullCount = St::PullCount;
+        type OwnerDid = St::OwnerDid;
+    }
+    ///State transition - sets the `pull_count` field to Set
+    pub struct SetPullCount<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPullCount<St> {}
+    impl<St: State> State for SetPullCount<St> {
+        type UpdatedAt = St::UpdatedAt;
+        type PushCount = St::PushCount;
+        type Repository = St::Repository;
+        type PullCount = Set<members::pull_count>;
+        type OwnerDid = St::OwnerDid;
+    }
+    ///State transition - sets the `owner_did` field to Set
+    pub struct SetOwnerDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetOwnerDid<St> {}
+    impl<St: State> State for SetOwnerDid<St> {
+        type UpdatedAt = St::UpdatedAt;
+        type PushCount = St::PushCount;
+        type Repository = St::Repository;
+        type PullCount = St::PullCount;
+        type OwnerDid = Set<members::owner_did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `updated_at` field
         pub struct updated_at(());
-        ///Marker type for the `pull_count` field
-        pub struct pull_count(());
-        ///Marker type for the `owner_did` field
-        pub struct owner_did(());
         ///Marker type for the `push_count` field
         pub struct push_count(());
         ///Marker type for the `repository` field
         pub struct repository(());
+        ///Marker type for the `pull_count` field
+        pub struct pull_count(());
+        ///Marker type for the `owner_did` field
+        pub struct owner_did(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct StatsBuilder<'a, S: stats_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct StatsBuilder<S: BosStr, St: stats_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
         Option<Datetime>,
@@ -260,28 +260,28 @@ pub struct StatsBuilder<'a, S: stats_state::State> {
         Option<S>,
         Option<Datetime>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Stats<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> StatsBuilder<'a, stats_state::Empty> {
+impl<S: BosStr> Stats<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> StatsBuilder<S, stats_state::Empty> {
         StatsBuilder::new()
     }
 }
 
-impl<'a> StatsBuilder<'a, stats_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> StatsBuilder<S, stats_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         StatsBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: stats_state::State> StatsBuilder<'a, S> {
+impl<S: BosStr, St: stats_state::State> StatsBuilder<S, St> {
     /// Set the `lastPull` field (optional)
     pub fn last_pull(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.0 = value.into();
@@ -294,7 +294,7 @@ impl<'a, S: stats_state::State> StatsBuilder<'a, S> {
     }
 }
 
-impl<'a, S: stats_state::State> StatsBuilder<'a, S> {
+impl<S: BosStr, St: stats_state::State> StatsBuilder<S, St> {
     /// Set the `lastPush` field (optional)
     pub fn last_push(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.1 = value.into();
@@ -307,112 +307,112 @@ impl<'a, S: stats_state::State> StatsBuilder<'a, S> {
     }
 }
 
-impl<'a, S> StatsBuilder<'a, S>
+impl<S: BosStr, St> StatsBuilder<S, St>
 where
-    S: stats_state::State,
-    S::OwnerDid: stats_state::IsUnset,
+    St: stats_state::State,
+    St::OwnerDid: stats_state::IsUnset,
 {
     /// Set the `ownerDid` field (required)
     pub fn owner_did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> StatsBuilder<'a, stats_state::SetOwnerDid<S>> {
+    ) -> StatsBuilder<S, stats_state::SetOwnerDid<St>> {
         self._fields.2 = Option::Some(value.into());
         StatsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> StatsBuilder<'a, S>
+impl<S: BosStr, St> StatsBuilder<S, St>
 where
-    S: stats_state::State,
-    S::PullCount: stats_state::IsUnset,
+    St: stats_state::State,
+    St::PullCount: stats_state::IsUnset,
 {
     /// Set the `pullCount` field (required)
     pub fn pull_count(
         mut self,
         value: impl Into<i64>,
-    ) -> StatsBuilder<'a, stats_state::SetPullCount<S>> {
+    ) -> StatsBuilder<S, stats_state::SetPullCount<St>> {
         self._fields.3 = Option::Some(value.into());
         StatsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> StatsBuilder<'a, S>
+impl<S: BosStr, St> StatsBuilder<S, St>
 where
-    S: stats_state::State,
-    S::PushCount: stats_state::IsUnset,
+    St: stats_state::State,
+    St::PushCount: stats_state::IsUnset,
 {
     /// Set the `pushCount` field (required)
     pub fn push_count(
         mut self,
         value: impl Into<i64>,
-    ) -> StatsBuilder<'a, stats_state::SetPushCount<S>> {
+    ) -> StatsBuilder<S, stats_state::SetPushCount<St>> {
         self._fields.4 = Option::Some(value.into());
         StatsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> StatsBuilder<'a, S>
+impl<S: BosStr, St> StatsBuilder<S, St>
 where
-    S: stats_state::State,
-    S::Repository: stats_state::IsUnset,
+    St: stats_state::State,
+    St::Repository: stats_state::IsUnset,
 {
     /// Set the `repository` field (required)
     pub fn repository(
         mut self,
         value: impl Into<S>,
-    ) -> StatsBuilder<'a, stats_state::SetRepository<S>> {
+    ) -> StatsBuilder<S, stats_state::SetRepository<St>> {
         self._fields.5 = Option::Some(value.into());
         StatsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> StatsBuilder<'a, S>
+impl<S: BosStr, St> StatsBuilder<S, St>
 where
-    S: stats_state::State,
-    S::UpdatedAt: stats_state::IsUnset,
+    St: stats_state::State,
+    St::UpdatedAt: stats_state::IsUnset,
 {
     /// Set the `updatedAt` field (required)
     pub fn updated_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> StatsBuilder<'a, stats_state::SetUpdatedAt<S>> {
+    ) -> StatsBuilder<S, stats_state::SetUpdatedAt<St>> {
         self._fields.6 = Option::Some(value.into());
         StatsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> StatsBuilder<'a, S>
+impl<S: BosStr, St> StatsBuilder<S, St>
 where
-    S: stats_state::State,
-    S::UpdatedAt: stats_state::IsSet,
-    S::PullCount: stats_state::IsSet,
-    S::OwnerDid: stats_state::IsSet,
-    S::PushCount: stats_state::IsSet,
-    S::Repository: stats_state::IsSet,
+    St: stats_state::State,
+    St::UpdatedAt: stats_state::IsSet,
+    St::PushCount: stats_state::IsSet,
+    St::Repository: stats_state::IsSet,
+    St::PullCount: stats_state::IsSet,
+    St::OwnerDid: stats_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Stats<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Stats<S> {
         Stats {
             last_pull: self._fields.0,
             last_push: self._fields.1,
@@ -424,8 +424,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Stats<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Stats<S> {
         Stats {
             last_pull: self._fields.0,
             last_push: self._fields.1,

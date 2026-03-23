@@ -25,12 +25,10 @@ pub mod request_crawl;
 #[cfg(feature = "streaming")]
 pub mod subscribe_repos;
 
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum HostStatus<
-    S: jacquard_common::Bos<str> + AsRef<str> = jacquard_common::DefaultStr,
-> {
+pub enum HostStatus<S: BosStr = DefaultStr> {
     Active,
     Idle,
     Offline,
@@ -39,7 +37,7 @@ pub enum HostStatus<
     Other(S),
 }
 
-impl<S: jacquard_common::Bos<str> + AsRef<str>> HostStatus<S> {
+impl<S: BosStr> HostStatus<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Active => "active",
@@ -63,19 +61,19 @@ impl<S: jacquard_common::Bos<str> + AsRef<str>> HostStatus<S> {
     }
 }
 
-impl<S: jacquard_common::Bos<str> + AsRef<str>> AsRef<str> for HostStatus<S> {
+impl<S: BosStr> AsRef<str> for HostStatus<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: jacquard_common::Bos<str> + AsRef<str>> core::fmt::Display for HostStatus<S> {
+impl<S: BosStr> core::fmt::Display for HostStatus<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: jacquard_common::Bos<str> + AsRef<str>> serde::Serialize for HostStatus<S> {
+impl<S: BosStr> serde::Serialize for HostStatus<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -84,10 +82,8 @@ impl<S: jacquard_common::Bos<str> + AsRef<str>> serde::Serialize for HostStatus<
     }
 }
 
-impl<
-    'de,
-    S: serde::Deserialize<'de> + jacquard_common::Bos<str> + AsRef<str>,
-> serde::Deserialize<'de> for HostStatus<S> {
+impl<'de, S: serde::Deserialize<'de> + BosStr> serde::Deserialize<'de>
+for HostStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -97,9 +93,12 @@ impl<
     }
 }
 
-impl<S: jacquard_common::Bos<str> + AsRef<str>> jacquard_derive::IntoStatic
-for HostStatus<S> {
-    type Output = HostStatus<jacquard_common::DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for HostStatus<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = HostStatus<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             HostStatus::Active => HostStatus::Active,

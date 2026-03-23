@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use crate::science_alt::dataset::lens_verification;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CodeHash<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CodeHash<S: BosStr = DefaultStr> {
     ///Hash algorithm identifier (e.g., 'sha256', 'blake3')
     pub algorithm: S,
     ///Hex-encoded hash digest
@@ -57,11 +57,11 @@ pub struct CodeHash<S: Bos<str> + AsRef<str> = DefaultStr> {
     rename = "science.alt.dataset.lensVerification",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct LensVerification<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct LensVerification<S: BosStr = DefaultStr> {
     ///Hash of the code at the referenced commit. Required for signedHash method.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub code_hash: Option<lens_verification::CodeHash<S>>,
@@ -89,24 +89,24 @@ pub struct LensVerification<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct LensVerificationGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct LensVerificationGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: LensVerification<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LensVerification<S> {
+impl<S: BosStr> LensVerification<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, LensVerificationRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for CodeHash<S> {
+impl<S: BosStr> LexiconSchema for CodeHash<S> {
     fn nsid() -> &'static str {
         "science.alt.dataset.lensVerification"
     }
@@ -150,18 +150,17 @@ pub struct LensVerificationRecord;
 impl XrpcResp for LensVerificationRecord {
     const NSID: &'static str = "science.alt.dataset.lensVerification";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = LensVerificationGetRecordOutput<S>;
+    type Output<S: BosStr> = LensVerificationGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<LensVerificationGetRecordOutput<S>>
-for LensVerification<S> {
+impl<S: BosStr> From<LensVerificationGetRecordOutput<S>> for LensVerification<S> {
     fn from(output: LensVerificationGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for LensVerification<S> {
+impl<S: BosStr> Collection for LensVerification<S> {
     const NSID: &'static str = "science.alt.dataset.lensVerification";
     type Record = LensVerificationRecord;
 }
@@ -171,7 +170,7 @@ impl Collection for LensVerificationRecord {
     type Record = LensVerificationRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for LensVerification<S> {
+impl<S: BosStr> LexiconSchema for LensVerification<S> {
     fn nsid() -> &'static str {
         "science.alt.dataset.lensVerification"
     }
@@ -390,73 +389,73 @@ pub mod lens_verification_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type LensCommit;
-        type CreatedAt;
         type VerificationMethod;
         type Lens;
+        type LensCommit;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type LensCommit = Unset;
-        type CreatedAt = Unset;
         type VerificationMethod = Unset;
         type Lens = Unset;
-    }
-    ///State transition - sets the `lens_commit` field to Set
-    pub struct SetLensCommit<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLensCommit<S> {}
-    impl<S: State> State for SetLensCommit<S> {
-        type LensCommit = Set<members::lens_commit>;
-        type CreatedAt = S::CreatedAt;
-        type VerificationMethod = S::VerificationMethod;
-        type Lens = S::Lens;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type LensCommit = S::LensCommit;
-        type CreatedAt = Set<members::created_at>;
-        type VerificationMethod = S::VerificationMethod;
-        type Lens = S::Lens;
+        type LensCommit = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `verification_method` field to Set
-    pub struct SetVerificationMethod<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVerificationMethod<S> {}
-    impl<S: State> State for SetVerificationMethod<S> {
-        type LensCommit = S::LensCommit;
-        type CreatedAt = S::CreatedAt;
+    pub struct SetVerificationMethod<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetVerificationMethod<St> {}
+    impl<St: State> State for SetVerificationMethod<St> {
         type VerificationMethod = Set<members::verification_method>;
-        type Lens = S::Lens;
+        type Lens = St::Lens;
+        type LensCommit = St::LensCommit;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `lens` field to Set
-    pub struct SetLens<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLens<S> {}
-    impl<S: State> State for SetLens<S> {
-        type LensCommit = S::LensCommit;
-        type CreatedAt = S::CreatedAt;
-        type VerificationMethod = S::VerificationMethod;
+    pub struct SetLens<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLens<St> {}
+    impl<St: State> State for SetLens<St> {
+        type VerificationMethod = St::VerificationMethod;
         type Lens = Set<members::lens>;
+        type LensCommit = St::LensCommit;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `lens_commit` field to Set
+    pub struct SetLensCommit<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLensCommit<St> {}
+    impl<St: State> State for SetLensCommit<St> {
+        type VerificationMethod = St::VerificationMethod;
+        type Lens = St::Lens;
+        type LensCommit = Set<members::lens_commit>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type VerificationMethod = St::VerificationMethod;
+        type Lens = St::Lens;
+        type LensCommit = St::LensCommit;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `lens_commit` field
-        pub struct lens_commit(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `verification_method` field
         pub struct verification_method(());
         ///Marker type for the `lens` field
         pub struct lens(());
+        ///Marker type for the `lens_commit` field
+        pub struct lens_commit(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct LensVerificationBuilder<'a, S: lens_verification_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct LensVerificationBuilder<S: BosStr, St: lens_verification_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<lens_verification::CodeHash<S>>,
         Option<Datetime>,
@@ -466,28 +465,28 @@ pub struct LensVerificationBuilder<'a, S: lens_verification_state::State> {
         Option<CodeReference<S>>,
         Option<VerificationMethod<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> LensVerification<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> LensVerificationBuilder<'a, lens_verification_state::Empty> {
+impl<S: BosStr> LensVerification<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> LensVerificationBuilder<S, lens_verification_state::Empty> {
         LensVerificationBuilder::new()
     }
 }
 
-impl<'a> LensVerificationBuilder<'a, lens_verification_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> LensVerificationBuilder<S, lens_verification_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         LensVerificationBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: lens_verification_state::State> LensVerificationBuilder<'a, S> {
+impl<S: BosStr, St: lens_verification_state::State> LensVerificationBuilder<S, St> {
     /// Set the `codeHash` field (optional)
     pub fn code_hash(
         mut self,
@@ -506,26 +505,26 @@ impl<'a, S: lens_verification_state::State> LensVerificationBuilder<'a, S> {
     }
 }
 
-impl<'a, S> LensVerificationBuilder<'a, S>
+impl<S: BosStr, St> LensVerificationBuilder<S, St>
 where
-    S: lens_verification_state::State,
-    S::CreatedAt: lens_verification_state::IsUnset,
+    St: lens_verification_state::State,
+    St::CreatedAt: lens_verification_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> LensVerificationBuilder<'a, lens_verification_state::SetCreatedAt<S>> {
+    ) -> LensVerificationBuilder<S, lens_verification_state::SetCreatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         LensVerificationBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: lens_verification_state::State> LensVerificationBuilder<'a, S> {
+impl<S: BosStr, St: lens_verification_state::State> LensVerificationBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -538,45 +537,45 @@ impl<'a, S: lens_verification_state::State> LensVerificationBuilder<'a, S> {
     }
 }
 
-impl<'a, S> LensVerificationBuilder<'a, S>
+impl<S: BosStr, St> LensVerificationBuilder<S, St>
 where
-    S: lens_verification_state::State,
-    S::Lens: lens_verification_state::IsUnset,
+    St: lens_verification_state::State,
+    St::Lens: lens_verification_state::IsUnset,
 {
     /// Set the `lens` field (required)
     pub fn lens(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> LensVerificationBuilder<'a, lens_verification_state::SetLens<S>> {
+    ) -> LensVerificationBuilder<S, lens_verification_state::SetLens<St>> {
         self._fields.3 = Option::Some(value.into());
         LensVerificationBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LensVerificationBuilder<'a, S>
+impl<S: BosStr, St> LensVerificationBuilder<S, St>
 where
-    S: lens_verification_state::State,
-    S::LensCommit: lens_verification_state::IsUnset,
+    St: lens_verification_state::State,
+    St::LensCommit: lens_verification_state::IsUnset,
 {
     /// Set the `lensCommit` field (required)
     pub fn lens_commit(
         mut self,
         value: impl Into<S>,
-    ) -> LensVerificationBuilder<'a, lens_verification_state::SetLensCommit<S>> {
+    ) -> LensVerificationBuilder<S, lens_verification_state::SetLensCommit<St>> {
         self._fields.4 = Option::Some(value.into());
         LensVerificationBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: lens_verification_state::State> LensVerificationBuilder<'a, S> {
+impl<S: BosStr, St: lens_verification_state::State> LensVerificationBuilder<S, St> {
     /// Set the `proofRef` field (optional)
     pub fn proof_ref(mut self, value: impl Into<Option<CodeReference<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -589,35 +588,35 @@ impl<'a, S: lens_verification_state::State> LensVerificationBuilder<'a, S> {
     }
 }
 
-impl<'a, S> LensVerificationBuilder<'a, S>
+impl<S: BosStr, St> LensVerificationBuilder<S, St>
 where
-    S: lens_verification_state::State,
-    S::VerificationMethod: lens_verification_state::IsUnset,
+    St: lens_verification_state::State,
+    St::VerificationMethod: lens_verification_state::IsUnset,
 {
     /// Set the `verificationMethod` field (required)
     pub fn verification_method(
         mut self,
         value: impl Into<VerificationMethod<S>>,
-    ) -> LensVerificationBuilder<'a, lens_verification_state::SetVerificationMethod<S>> {
+    ) -> LensVerificationBuilder<S, lens_verification_state::SetVerificationMethod<St>> {
         self._fields.6 = Option::Some(value.into());
         LensVerificationBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LensVerificationBuilder<'a, S>
+impl<S: BosStr, St> LensVerificationBuilder<S, St>
 where
-    S: lens_verification_state::State,
-    S::LensCommit: lens_verification_state::IsSet,
-    S::CreatedAt: lens_verification_state::IsSet,
-    S::VerificationMethod: lens_verification_state::IsSet,
-    S::Lens: lens_verification_state::IsSet,
+    St: lens_verification_state::State,
+    St::VerificationMethod: lens_verification_state::IsSet,
+    St::Lens: lens_verification_state::IsSet,
+    St::LensCommit: lens_verification_state::IsSet,
+    St::CreatedAt: lens_verification_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> LensVerification<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> LensVerification<S> {
         LensVerification {
             code_hash: self._fields.0,
             created_at: self._fields.1.unwrap(),
@@ -629,11 +628,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> LensVerification<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> LensVerification<S> {
         LensVerification {
             code_hash: self._fields.0,
             created_at: self._fields.1.unwrap(),

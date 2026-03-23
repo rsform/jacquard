@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,11 +34,11 @@ use serde::{Serialize, Deserialize};
     rename = "dev.ocbwoy3.blueboard.board",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Board<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Board<S: BosStr = DefaultStr> {
     ///The date and time when the board was created
     pub created_at: Datetime,
     ///A short description of the board
@@ -57,18 +57,18 @@ pub struct Board<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct BoardGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct BoardGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Board<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Board<S> {
+impl<S: BosStr> Board<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, BoardRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -81,17 +81,17 @@ pub struct BoardRecord;
 impl XrpcResp for BoardRecord {
     const NSID: &'static str = "dev.ocbwoy3.blueboard.board";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = BoardGetRecordOutput<S>;
+    type Output<S: BosStr> = BoardGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<BoardGetRecordOutput<S>> for Board<S> {
+impl<S: BosStr> From<BoardGetRecordOutput<S>> for Board<S> {
     fn from(output: BoardGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Board<S> {
+impl<S: BosStr> Collection for Board<S> {
     const NSID: &'static str = "dev.ocbwoy3.blueboard.board";
     type Record = BoardRecord;
 }
@@ -101,7 +101,7 @@ impl Collection for BoardRecord {
     type Record = BoardRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Board<S> {
+impl<S: BosStr> LexiconSchema for Board<S> {
     fn nsid() -> &'static str {
         "dev.ocbwoy3.blueboard.board"
     }
@@ -150,181 +150,181 @@ pub mod board_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Description;
         type Nsfw;
+        type Description;
         type Title;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Description = Unset;
         type Nsfw = Unset;
+        type Description = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Description = S::Description;
-        type Nsfw = S::Nsfw;
-        type Title = S::Title;
-    }
-    ///State transition - sets the `description` field to Set
-    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDescription<S> {}
-    impl<S: State> State for SetDescription<S> {
-        type CreatedAt = S::CreatedAt;
-        type Description = Set<members::description>;
-        type Nsfw = S::Nsfw;
-        type Title = S::Title;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `nsfw` field to Set
-    pub struct SetNsfw<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNsfw<S> {}
-    impl<S: State> State for SetNsfw<S> {
-        type CreatedAt = S::CreatedAt;
-        type Description = S::Description;
+    pub struct SetNsfw<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetNsfw<St> {}
+    impl<St: State> State for SetNsfw<St> {
         type Nsfw = Set<members::nsfw>;
-        type Title = S::Title;
+        type Description = St::Description;
+        type Title = St::Title;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `description` field to Set
+    pub struct SetDescription<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDescription<St> {}
+    impl<St: State> State for SetDescription<St> {
+        type Nsfw = St::Nsfw;
+        type Description = Set<members::description>;
+        type Title = St::Title;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type CreatedAt = S::CreatedAt;
-        type Description = S::Description;
-        type Nsfw = S::Nsfw;
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
+        type Nsfw = St::Nsfw;
+        type Description = St::Description;
         type Title = Set<members::title>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Nsfw = St::Nsfw;
+        type Description = St::Description;
+        type Title = St::Title;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `description` field
-        pub struct description(());
         ///Marker type for the `nsfw` field
         pub struct nsfw(());
+        ///Marker type for the `description` field
+        pub struct description(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct BoardBuilder<'a, S: board_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct BoardBuilder<S: BosStr, St: board_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<S>, Option<bool>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Board<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> BoardBuilder<'a, board_state::Empty> {
+impl<S: BosStr> Board<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> BoardBuilder<S, board_state::Empty> {
         BoardBuilder::new()
     }
 }
 
-impl<'a> BoardBuilder<'a, board_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> BoardBuilder<S, board_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         BoardBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BoardBuilder<'a, S>
+impl<S: BosStr, St> BoardBuilder<S, St>
 where
-    S: board_state::State,
-    S::CreatedAt: board_state::IsUnset,
+    St: board_state::State,
+    St::CreatedAt: board_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> BoardBuilder<'a, board_state::SetCreatedAt<S>> {
+    ) -> BoardBuilder<S, board_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         BoardBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BoardBuilder<'a, S>
+impl<S: BosStr, St> BoardBuilder<S, St>
 where
-    S: board_state::State,
-    S::Description: board_state::IsUnset,
+    St: board_state::State,
+    St::Description: board_state::IsUnset,
 {
     /// Set the `description` field (required)
     pub fn description(
         mut self,
         value: impl Into<S>,
-    ) -> BoardBuilder<'a, board_state::SetDescription<S>> {
+    ) -> BoardBuilder<S, board_state::SetDescription<St>> {
         self._fields.1 = Option::Some(value.into());
         BoardBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BoardBuilder<'a, S>
+impl<S: BosStr, St> BoardBuilder<S, St>
 where
-    S: board_state::State,
-    S::Nsfw: board_state::IsUnset,
+    St: board_state::State,
+    St::Nsfw: board_state::IsUnset,
 {
     /// Set the `nsfw` field (required)
     pub fn nsfw(
         mut self,
         value: impl Into<bool>,
-    ) -> BoardBuilder<'a, board_state::SetNsfw<S>> {
+    ) -> BoardBuilder<S, board_state::SetNsfw<St>> {
         self._fields.2 = Option::Some(value.into());
         BoardBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BoardBuilder<'a, S>
+impl<S: BosStr, St> BoardBuilder<S, St>
 where
-    S: board_state::State,
-    S::Title: board_state::IsUnset,
+    St: board_state::State,
+    St::Title: board_state::IsUnset,
 {
     /// Set the `title` field (required)
     pub fn title(
         mut self,
         value: impl Into<S>,
-    ) -> BoardBuilder<'a, board_state::SetTitle<S>> {
+    ) -> BoardBuilder<S, board_state::SetTitle<St>> {
         self._fields.3 = Option::Some(value.into());
         BoardBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BoardBuilder<'a, S>
+impl<S: BosStr, St> BoardBuilder<S, St>
 where
-    S: board_state::State,
-    S::CreatedAt: board_state::IsSet,
-    S::Description: board_state::IsSet,
-    S::Nsfw: board_state::IsSet,
-    S::Title: board_state::IsSet,
+    St: board_state::State,
+    St::Nsfw: board_state::IsSet,
+    St::Description: board_state::IsSet,
+    St::Title: board_state::IsSet,
+    St::CreatedAt: board_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Board<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Board<S> {
         Board {
             created_at: self._fields.0.unwrap(),
             description: self._fields.1.unwrap(),
@@ -333,8 +333,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Board<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Board<S> {
         Board {
             created_at: self._fields.0.unwrap(),
             description: self._fields.1.unwrap(),

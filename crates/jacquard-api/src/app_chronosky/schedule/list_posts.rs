@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -42,11 +42,11 @@ use crate::app_chronosky::schedule::list_posts;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ImageView<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ImageView<S: BosStr = DefaultStr> {
     ///List of image views with CID references.
     pub images: Vec<list_posts::ImageViewImage<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -59,11 +59,11 @@ pub struct ImageView<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ImageViewImage<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ImageViewImage<S: BosStr = DefaultStr> {
     ///Alt text for the image.
     pub alt: S,
     ///CID of the image blob. Use this value with updatePost#imagesEmbed to reference this image without re-uploading.
@@ -79,14 +79,14 @@ pub struct ImageViewImage<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ListPosts<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ListPosts<S: BosStr = DefaultStr> {
     ///Defaults to `20`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -97,25 +97,22 @@ pub struct ListPosts<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub page: Option<i64>,
     ///(max length: 20)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub status: Option<S>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ListPostsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ListPostsOutput<S: BosStr = DefaultStr> {
     pub pagination: list_posts::Pagination<S>,
     pub posts: Vec<list_posts::ScheduledPost<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -125,11 +122,11 @@ pub struct ListPostsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Pagination<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Pagination<S: BosStr = DefaultStr> {
     ///Posts per page.
     pub limit: i64,
     ///Current page number.
@@ -148,11 +145,11 @@ pub struct Pagination<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ScheduledPost<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ScheduledPost<S: BosStr = DefaultStr> {
     ///AT Protocol record key. Present after successful execution.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub at_rkey: Option<S>,
@@ -232,11 +229,11 @@ pub struct ScheduledPost<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ScheduledPostEmbed<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ScheduledPostEmbed<S: BosStr = DefaultStr> {
     #[serde(rename = "app.bsky.embed.images")]
     Images(Box<Images<S>>),
     #[serde(rename = "app.chronosky.schedule.listPosts#imageView")]
@@ -257,11 +254,11 @@ pub enum ScheduledPostEmbed<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ScheduledPostThreadgateRulesItem<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ScheduledPostThreadgateRulesItem<S: BosStr = DefaultStr> {
     #[serde(rename = "app.bsky.feed.threadgate#mentionRule")]
     ThreadgateMentionRule(Box<MentionRule<S>>),
     #[serde(rename = "app.bsky.feed.threadgate#followerRule")]
@@ -272,7 +269,7 @@ pub enum ScheduledPostThreadgateRulesItem<S: Bos<str> + AsRef<str> = DefaultStr>
     ThreadgateListRule(Box<ListRule<S>>),
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ImageView<S> {
+impl<S: BosStr> LexiconSchema for ImageView<S> {
     fn nsid() -> &'static str {
         "app.chronosky.schedule.listPosts"
     }
@@ -298,7 +295,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for ImageView<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ImageViewImage<S> {
+impl<S: BosStr> LexiconSchema for ImageViewImage<S> {
     fn nsid() -> &'static str {
         "app.chronosky.schedule.listPosts"
     }
@@ -328,12 +325,11 @@ pub struct ListPostsResponse;
 impl jacquard_common::xrpc::XrpcResp for ListPostsResponse {
     const NSID: &'static str = "app.chronosky.schedule.listPosts";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ListPostsOutput<S>;
+    type Output<S: BosStr> = ListPostsOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for ListPosts<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ListPosts<S> {
     const NSID: &'static str = "app.chronosky.schedule.listPosts";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ListPostsResponse;
@@ -344,11 +340,11 @@ pub struct ListPostsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListPostsRequest {
     const PATH: &'static str = "/xrpc/app.chronosky.schedule.listPosts";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = ListPosts<S>;
+    type Request<S: BosStr> = ListPosts<S>;
     type Response = ListPostsResponse;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Pagination<S> {
+impl<S: BosStr> LexiconSchema for Pagination<S> {
     fn nsid() -> &'static str {
         "app.chronosky.schedule.listPosts"
     }
@@ -403,7 +399,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Pagination<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ScheduledPost<S> {
+impl<S: BosStr> LexiconSchema for ScheduledPost<S> {
     fn nsid() -> &'static str {
         "app.chronosky.schedule.listPosts"
     }
@@ -623,9 +619,9 @@ pub mod image_view_state {
         type Images = Unset;
     }
     ///State transition - sets the `images` field to Set
-    pub struct SetImages<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetImages<S> {}
-    impl<S: State> State for SetImages<S> {
+    pub struct SetImages<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetImages<St> {}
+    impl<St: State> State for SetImages<St> {
         type Images = Set<members::images>;
     }
     /// Marker types for field names
@@ -636,67 +632,67 @@ pub mod image_view_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ImageViewBuilder<'a, S: image_view_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ImageViewBuilder<S: BosStr, St: image_view_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<list_posts::ImageViewImage<S>>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ImageView<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ImageViewBuilder<'a, image_view_state::Empty> {
+impl<S: BosStr> ImageView<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ImageViewBuilder<S, image_view_state::Empty> {
         ImageViewBuilder::new()
     }
 }
 
-impl<'a> ImageViewBuilder<'a, image_view_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ImageViewBuilder<S, image_view_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ImageViewBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ImageViewBuilder<'a, S>
+impl<S: BosStr, St> ImageViewBuilder<S, St>
 where
-    S: image_view_state::State,
-    S::Images: image_view_state::IsUnset,
+    St: image_view_state::State,
+    St::Images: image_view_state::IsUnset,
 {
     /// Set the `images` field (required)
     pub fn images(
         mut self,
         value: impl Into<Vec<list_posts::ImageViewImage<S>>>,
-    ) -> ImageViewBuilder<'a, image_view_state::SetImages<S>> {
+    ) -> ImageViewBuilder<S, image_view_state::SetImages<St>> {
         self._fields.0 = Option::Some(value.into());
         ImageViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ImageViewBuilder<'a, S>
+impl<S: BosStr, St> ImageViewBuilder<S, St>
 where
-    S: image_view_state::State,
-    S::Images: image_view_state::IsSet,
+    St: image_view_state::State,
+    St::Images: image_view_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ImageView<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ImageView<S> {
         ImageView {
             images: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> ImageView<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ImageView<S> {
         ImageView {
             images: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -1259,32 +1255,32 @@ pub mod list_posts_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct ListPostsBuilder<'a, S: list_posts_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ListPostsBuilder<S: BosStr, St: list_posts_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<i64>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ListPosts<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ListPostsBuilder<'a, list_posts_state::Empty> {
+impl<S: BosStr> ListPosts<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ListPostsBuilder<S, list_posts_state::Empty> {
         ListPostsBuilder::new()
     }
 }
 
-impl<'a> ListPostsBuilder<'a, list_posts_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ListPostsBuilder<S, list_posts_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ListPostsBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: list_posts_state::State> ListPostsBuilder<'a, S> {
+impl<S: BosStr, St: list_posts_state::State> ListPostsBuilder<S, St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
@@ -1297,7 +1293,7 @@ impl<'a, S: list_posts_state::State> ListPostsBuilder<'a, S> {
     }
 }
 
-impl<'a, S: list_posts_state::State> ListPostsBuilder<'a, S> {
+impl<S: BosStr, St: list_posts_state::State> ListPostsBuilder<S, St> {
     /// Set the `page` field (optional)
     pub fn page(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -1310,7 +1306,7 @@ impl<'a, S: list_posts_state::State> ListPostsBuilder<'a, S> {
     }
 }
 
-impl<'a, S: list_posts_state::State> ListPostsBuilder<'a, S> {
+impl<S: BosStr, St: list_posts_state::State> ListPostsBuilder<S, St> {
     /// Set the `status` field (optional)
     pub fn status(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -1323,12 +1319,12 @@ impl<'a, S: list_posts_state::State> ListPostsBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ListPostsBuilder<'a, S>
+impl<S: BosStr, St> ListPostsBuilder<S, St>
 where
-    S: list_posts_state::State,
+    St: list_posts_state::State,
 {
-    /// Build the final struct
-    pub fn build(self) -> ListPosts<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ListPosts<S> {
         ListPosts {
             limit: self._fields.0,
             page: self._fields.1,
@@ -1347,181 +1343,181 @@ pub mod pagination_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Page;
-        type Limit;
         type Total;
         type TotalPages;
+        type Page;
+        type Limit;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Page = Unset;
-        type Limit = Unset;
         type Total = Unset;
         type TotalPages = Unset;
-    }
-    ///State transition - sets the `page` field to Set
-    pub struct SetPage<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPage<S> {}
-    impl<S: State> State for SetPage<S> {
-        type Page = Set<members::page>;
-        type Limit = S::Limit;
-        type Total = S::Total;
-        type TotalPages = S::TotalPages;
-    }
-    ///State transition - sets the `limit` field to Set
-    pub struct SetLimit<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLimit<S> {}
-    impl<S: State> State for SetLimit<S> {
-        type Page = S::Page;
-        type Limit = Set<members::limit>;
-        type Total = S::Total;
-        type TotalPages = S::TotalPages;
+        type Page = Unset;
+        type Limit = Unset;
     }
     ///State transition - sets the `total` field to Set
-    pub struct SetTotal<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTotal<S> {}
-    impl<S: State> State for SetTotal<S> {
-        type Page = S::Page;
-        type Limit = S::Limit;
+    pub struct SetTotal<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTotal<St> {}
+    impl<St: State> State for SetTotal<St> {
         type Total = Set<members::total>;
-        type TotalPages = S::TotalPages;
+        type TotalPages = St::TotalPages;
+        type Page = St::Page;
+        type Limit = St::Limit;
     }
     ///State transition - sets the `total_pages` field to Set
-    pub struct SetTotalPages<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTotalPages<S> {}
-    impl<S: State> State for SetTotalPages<S> {
-        type Page = S::Page;
-        type Limit = S::Limit;
-        type Total = S::Total;
+    pub struct SetTotalPages<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTotalPages<St> {}
+    impl<St: State> State for SetTotalPages<St> {
+        type Total = St::Total;
         type TotalPages = Set<members::total_pages>;
+        type Page = St::Page;
+        type Limit = St::Limit;
+    }
+    ///State transition - sets the `page` field to Set
+    pub struct SetPage<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPage<St> {}
+    impl<St: State> State for SetPage<St> {
+        type Total = St::Total;
+        type TotalPages = St::TotalPages;
+        type Page = Set<members::page>;
+        type Limit = St::Limit;
+    }
+    ///State transition - sets the `limit` field to Set
+    pub struct SetLimit<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLimit<St> {}
+    impl<St: State> State for SetLimit<St> {
+        type Total = St::Total;
+        type TotalPages = St::TotalPages;
+        type Page = St::Page;
+        type Limit = Set<members::limit>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `page` field
-        pub struct page(());
-        ///Marker type for the `limit` field
-        pub struct limit(());
         ///Marker type for the `total` field
         pub struct total(());
         ///Marker type for the `total_pages` field
         pub struct total_pages(());
+        ///Marker type for the `page` field
+        pub struct page(());
+        ///Marker type for the `limit` field
+        pub struct limit(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct PaginationBuilder<'a, S: pagination_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct PaginationBuilder<S: BosStr, St: pagination_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<i64>, Option<i64>, Option<i64>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Pagination<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> PaginationBuilder<'a, pagination_state::Empty> {
+impl<S: BosStr> Pagination<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> PaginationBuilder<S, pagination_state::Empty> {
         PaginationBuilder::new()
     }
 }
 
-impl<'a> PaginationBuilder<'a, pagination_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> PaginationBuilder<S, pagination_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         PaginationBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PaginationBuilder<'a, S>
+impl<S: BosStr, St> PaginationBuilder<S, St>
 where
-    S: pagination_state::State,
-    S::Limit: pagination_state::IsUnset,
+    St: pagination_state::State,
+    St::Limit: pagination_state::IsUnset,
 {
     /// Set the `limit` field (required)
     pub fn limit(
         mut self,
         value: impl Into<i64>,
-    ) -> PaginationBuilder<'a, pagination_state::SetLimit<S>> {
+    ) -> PaginationBuilder<S, pagination_state::SetLimit<St>> {
         self._fields.0 = Option::Some(value.into());
         PaginationBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PaginationBuilder<'a, S>
+impl<S: BosStr, St> PaginationBuilder<S, St>
 where
-    S: pagination_state::State,
-    S::Page: pagination_state::IsUnset,
+    St: pagination_state::State,
+    St::Page: pagination_state::IsUnset,
 {
     /// Set the `page` field (required)
     pub fn page(
         mut self,
         value: impl Into<i64>,
-    ) -> PaginationBuilder<'a, pagination_state::SetPage<S>> {
+    ) -> PaginationBuilder<S, pagination_state::SetPage<St>> {
         self._fields.1 = Option::Some(value.into());
         PaginationBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PaginationBuilder<'a, S>
+impl<S: BosStr, St> PaginationBuilder<S, St>
 where
-    S: pagination_state::State,
-    S::Total: pagination_state::IsUnset,
+    St: pagination_state::State,
+    St::Total: pagination_state::IsUnset,
 {
     /// Set the `total` field (required)
     pub fn total(
         mut self,
         value: impl Into<i64>,
-    ) -> PaginationBuilder<'a, pagination_state::SetTotal<S>> {
+    ) -> PaginationBuilder<S, pagination_state::SetTotal<St>> {
         self._fields.2 = Option::Some(value.into());
         PaginationBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PaginationBuilder<'a, S>
+impl<S: BosStr, St> PaginationBuilder<S, St>
 where
-    S: pagination_state::State,
-    S::TotalPages: pagination_state::IsUnset,
+    St: pagination_state::State,
+    St::TotalPages: pagination_state::IsUnset,
 {
     /// Set the `totalPages` field (required)
     pub fn total_pages(
         mut self,
         value: impl Into<i64>,
-    ) -> PaginationBuilder<'a, pagination_state::SetTotalPages<S>> {
+    ) -> PaginationBuilder<S, pagination_state::SetTotalPages<St>> {
         self._fields.3 = Option::Some(value.into());
         PaginationBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PaginationBuilder<'a, S>
+impl<S: BosStr, St> PaginationBuilder<S, St>
 where
-    S: pagination_state::State,
-    S::Page: pagination_state::IsSet,
-    S::Limit: pagination_state::IsSet,
-    S::Total: pagination_state::IsSet,
-    S::TotalPages: pagination_state::IsSet,
+    St: pagination_state::State,
+    St::Total: pagination_state::IsSet,
+    St::TotalPages: pagination_state::IsSet,
+    St::Page: pagination_state::IsSet,
+    St::Limit: pagination_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Pagination<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Pagination<S> {
         Pagination {
             limit: self._fields.0.unwrap(),
             page: self._fields.1.unwrap(),
@@ -1530,11 +1526,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Pagination<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Pagination<S> {
         Pagination {
             limit: self._fields.0.unwrap(),
             page: self._fields.1.unwrap(),
@@ -1556,182 +1552,182 @@ pub mod scheduled_post_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Id;
-        type CreatedAt;
         type RetryCount;
+        type CreatedAt;
         type UpdatedAt;
-        type UserId;
-        type Text;
         type ScheduledAt;
+        type UserId;
         type Status;
         type Langs;
+        type Text;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Id = Unset;
-        type CreatedAt = Unset;
         type RetryCount = Unset;
+        type CreatedAt = Unset;
         type UpdatedAt = Unset;
-        type UserId = Unset;
-        type Text = Unset;
         type ScheduledAt = Unset;
+        type UserId = Unset;
         type Status = Unset;
         type Langs = Unset;
+        type Text = Unset;
     }
     ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
+    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetId<St> {}
+    impl<St: State> State for SetId<St> {
         type Id = Set<members::id>;
-        type CreatedAt = S::CreatedAt;
-        type RetryCount = S::RetryCount;
-        type UpdatedAt = S::UpdatedAt;
-        type UserId = S::UserId;
-        type Text = S::Text;
-        type ScheduledAt = S::ScheduledAt;
-        type Status = S::Status;
-        type Langs = S::Langs;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Id = S::Id;
-        type CreatedAt = Set<members::created_at>;
-        type RetryCount = S::RetryCount;
-        type UpdatedAt = S::UpdatedAt;
-        type UserId = S::UserId;
-        type Text = S::Text;
-        type ScheduledAt = S::ScheduledAt;
-        type Status = S::Status;
-        type Langs = S::Langs;
+        type RetryCount = St::RetryCount;
+        type CreatedAt = St::CreatedAt;
+        type UpdatedAt = St::UpdatedAt;
+        type ScheduledAt = St::ScheduledAt;
+        type UserId = St::UserId;
+        type Status = St::Status;
+        type Langs = St::Langs;
+        type Text = St::Text;
     }
     ///State transition - sets the `retry_count` field to Set
-    pub struct SetRetryCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRetryCount<S> {}
-    impl<S: State> State for SetRetryCount<S> {
-        type Id = S::Id;
-        type CreatedAt = S::CreatedAt;
+    pub struct SetRetryCount<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRetryCount<St> {}
+    impl<St: State> State for SetRetryCount<St> {
+        type Id = St::Id;
         type RetryCount = Set<members::retry_count>;
-        type UpdatedAt = S::UpdatedAt;
-        type UserId = S::UserId;
-        type Text = S::Text;
-        type ScheduledAt = S::ScheduledAt;
-        type Status = S::Status;
-        type Langs = S::Langs;
+        type CreatedAt = St::CreatedAt;
+        type UpdatedAt = St::UpdatedAt;
+        type ScheduledAt = St::ScheduledAt;
+        type UserId = St::UserId;
+        type Status = St::Status;
+        type Langs = St::Langs;
+        type Text = St::Text;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Id = St::Id;
+        type RetryCount = St::RetryCount;
+        type CreatedAt = Set<members::created_at>;
+        type UpdatedAt = St::UpdatedAt;
+        type ScheduledAt = St::ScheduledAt;
+        type UserId = St::UserId;
+        type Status = St::Status;
+        type Langs = St::Langs;
+        type Text = St::Text;
     }
     ///State transition - sets the `updated_at` field to Set
-    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
-    impl<S: State> State for SetUpdatedAt<S> {
-        type Id = S::Id;
-        type CreatedAt = S::CreatedAt;
-        type RetryCount = S::RetryCount;
+    pub struct SetUpdatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUpdatedAt<St> {}
+    impl<St: State> State for SetUpdatedAt<St> {
+        type Id = St::Id;
+        type RetryCount = St::RetryCount;
+        type CreatedAt = St::CreatedAt;
         type UpdatedAt = Set<members::updated_at>;
-        type UserId = S::UserId;
-        type Text = S::Text;
-        type ScheduledAt = S::ScheduledAt;
-        type Status = S::Status;
-        type Langs = S::Langs;
-    }
-    ///State transition - sets the `user_id` field to Set
-    pub struct SetUserId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUserId<S> {}
-    impl<S: State> State for SetUserId<S> {
-        type Id = S::Id;
-        type CreatedAt = S::CreatedAt;
-        type RetryCount = S::RetryCount;
-        type UpdatedAt = S::UpdatedAt;
-        type UserId = Set<members::user_id>;
-        type Text = S::Text;
-        type ScheduledAt = S::ScheduledAt;
-        type Status = S::Status;
-        type Langs = S::Langs;
-    }
-    ///State transition - sets the `text` field to Set
-    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetText<S> {}
-    impl<S: State> State for SetText<S> {
-        type Id = S::Id;
-        type CreatedAt = S::CreatedAt;
-        type RetryCount = S::RetryCount;
-        type UpdatedAt = S::UpdatedAt;
-        type UserId = S::UserId;
-        type Text = Set<members::text>;
-        type ScheduledAt = S::ScheduledAt;
-        type Status = S::Status;
-        type Langs = S::Langs;
+        type ScheduledAt = St::ScheduledAt;
+        type UserId = St::UserId;
+        type Status = St::Status;
+        type Langs = St::Langs;
+        type Text = St::Text;
     }
     ///State transition - sets the `scheduled_at` field to Set
-    pub struct SetScheduledAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetScheduledAt<S> {}
-    impl<S: State> State for SetScheduledAt<S> {
-        type Id = S::Id;
-        type CreatedAt = S::CreatedAt;
-        type RetryCount = S::RetryCount;
-        type UpdatedAt = S::UpdatedAt;
-        type UserId = S::UserId;
-        type Text = S::Text;
+    pub struct SetScheduledAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetScheduledAt<St> {}
+    impl<St: State> State for SetScheduledAt<St> {
+        type Id = St::Id;
+        type RetryCount = St::RetryCount;
+        type CreatedAt = St::CreatedAt;
+        type UpdatedAt = St::UpdatedAt;
         type ScheduledAt = Set<members::scheduled_at>;
-        type Status = S::Status;
-        type Langs = S::Langs;
+        type UserId = St::UserId;
+        type Status = St::Status;
+        type Langs = St::Langs;
+        type Text = St::Text;
+    }
+    ///State transition - sets the `user_id` field to Set
+    pub struct SetUserId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUserId<St> {}
+    impl<St: State> State for SetUserId<St> {
+        type Id = St::Id;
+        type RetryCount = St::RetryCount;
+        type CreatedAt = St::CreatedAt;
+        type UpdatedAt = St::UpdatedAt;
+        type ScheduledAt = St::ScheduledAt;
+        type UserId = Set<members::user_id>;
+        type Status = St::Status;
+        type Langs = St::Langs;
+        type Text = St::Text;
     }
     ///State transition - sets the `status` field to Set
-    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStatus<S> {}
-    impl<S: State> State for SetStatus<S> {
-        type Id = S::Id;
-        type CreatedAt = S::CreatedAt;
-        type RetryCount = S::RetryCount;
-        type UpdatedAt = S::UpdatedAt;
-        type UserId = S::UserId;
-        type Text = S::Text;
-        type ScheduledAt = S::ScheduledAt;
+    pub struct SetStatus<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStatus<St> {}
+    impl<St: State> State for SetStatus<St> {
+        type Id = St::Id;
+        type RetryCount = St::RetryCount;
+        type CreatedAt = St::CreatedAt;
+        type UpdatedAt = St::UpdatedAt;
+        type ScheduledAt = St::ScheduledAt;
+        type UserId = St::UserId;
         type Status = Set<members::status>;
-        type Langs = S::Langs;
+        type Langs = St::Langs;
+        type Text = St::Text;
     }
     ///State transition - sets the `langs` field to Set
-    pub struct SetLangs<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLangs<S> {}
-    impl<S: State> State for SetLangs<S> {
-        type Id = S::Id;
-        type CreatedAt = S::CreatedAt;
-        type RetryCount = S::RetryCount;
-        type UpdatedAt = S::UpdatedAt;
-        type UserId = S::UserId;
-        type Text = S::Text;
-        type ScheduledAt = S::ScheduledAt;
-        type Status = S::Status;
+    pub struct SetLangs<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLangs<St> {}
+    impl<St: State> State for SetLangs<St> {
+        type Id = St::Id;
+        type RetryCount = St::RetryCount;
+        type CreatedAt = St::CreatedAt;
+        type UpdatedAt = St::UpdatedAt;
+        type ScheduledAt = St::ScheduledAt;
+        type UserId = St::UserId;
+        type Status = St::Status;
         type Langs = Set<members::langs>;
+        type Text = St::Text;
+    }
+    ///State transition - sets the `text` field to Set
+    pub struct SetText<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetText<St> {}
+    impl<St: State> State for SetText<St> {
+        type Id = St::Id;
+        type RetryCount = St::RetryCount;
+        type CreatedAt = St::CreatedAt;
+        type UpdatedAt = St::UpdatedAt;
+        type ScheduledAt = St::ScheduledAt;
+        type UserId = St::UserId;
+        type Status = St::Status;
+        type Langs = St::Langs;
+        type Text = Set<members::text>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `id` field
         pub struct id(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `retry_count` field
         pub struct retry_count(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `updated_at` field
         pub struct updated_at(());
-        ///Marker type for the `user_id` field
-        pub struct user_id(());
-        ///Marker type for the `text` field
-        pub struct text(());
         ///Marker type for the `scheduled_at` field
         pub struct scheduled_at(());
+        ///Marker type for the `user_id` field
+        pub struct user_id(());
         ///Marker type for the `status` field
         pub struct status(());
         ///Marker type for the `langs` field
         pub struct langs(());
+        ///Marker type for the `text` field
+        pub struct text(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ScheduledPostBuilder<'a, S: scheduled_post_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ScheduledPostBuilder<S: BosStr, St: scheduled_post_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
         Option<S>,
@@ -1760,18 +1756,18 @@ pub struct ScheduledPostBuilder<'a, S: scheduled_post_state::State> {
         Option<Datetime>,
         Option<S>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ScheduledPost<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ScheduledPostBuilder<'a, scheduled_post_state::Empty> {
+impl<S: BosStr> ScheduledPost<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ScheduledPostBuilder<S, scheduled_post_state::Empty> {
         ScheduledPostBuilder::new()
     }
 }
 
-impl<'a> ScheduledPostBuilder<'a, scheduled_post_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ScheduledPostBuilder<S, scheduled_post_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ScheduledPostBuilder {
             _state: PhantomData,
@@ -1803,12 +1799,12 @@ impl<'a> ScheduledPostBuilder<'a, scheduled_post_state::Empty> {
                 None,
                 None,
             ),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
+impl<S: BosStr, St: scheduled_post_state::State> ScheduledPostBuilder<S, St> {
     /// Set the `atRkey` field (optional)
     pub fn at_rkey(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -1821,7 +1817,7 @@ impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
     }
 }
 
-impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
+impl<S: BosStr, St: scheduled_post_state::State> ScheduledPostBuilder<S, St> {
     /// Set the `atUri` field (optional)
     pub fn at_uri(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -1834,7 +1830,7 @@ impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
     }
 }
 
-impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
+impl<S: BosStr, St: scheduled_post_state::State> ScheduledPostBuilder<S, St> {
     /// Set the `children` field (optional)
     pub fn children(
         mut self,
@@ -1853,26 +1849,26 @@ impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ScheduledPostBuilder<'a, S>
+impl<S: BosStr, St> ScheduledPostBuilder<S, St>
 where
-    S: scheduled_post_state::State,
-    S::CreatedAt: scheduled_post_state::IsUnset,
+    St: scheduled_post_state::State,
+    St::CreatedAt: scheduled_post_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ScheduledPostBuilder<'a, scheduled_post_state::SetCreatedAt<S>> {
+    ) -> ScheduledPostBuilder<S, scheduled_post_state::SetCreatedAt<St>> {
         self._fields.3 = Option::Some(value.into());
         ScheduledPostBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
+impl<S: BosStr, St: scheduled_post_state::State> ScheduledPostBuilder<S, St> {
     /// Set the `embed` field (optional)
     pub fn embed(mut self, value: impl Into<Option<ScheduledPostEmbed<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -1885,7 +1881,7 @@ impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
     }
 }
 
-impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
+impl<S: BosStr, St: scheduled_post_state::State> ScheduledPostBuilder<S, St> {
     /// Set the `errorMsg` field (optional)
     pub fn error_msg(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
@@ -1898,7 +1894,7 @@ impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
     }
 }
 
-impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
+impl<S: BosStr, St: scheduled_post_state::State> ScheduledPostBuilder<S, St> {
     /// Set the `executedAt` field (optional)
     pub fn executed_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.6 = value.into();
@@ -1911,7 +1907,7 @@ impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
     }
 }
 
-impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
+impl<S: BosStr, St: scheduled_post_state::State> ScheduledPostBuilder<S, St> {
     /// Set the `facets` field (optional)
     pub fn facets(mut self, value: impl Into<Option<Vec<Facet<S>>>>) -> Self {
         self._fields.7 = value.into();
@@ -1924,26 +1920,26 @@ impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ScheduledPostBuilder<'a, S>
+impl<S: BosStr, St> ScheduledPostBuilder<S, St>
 where
-    S: scheduled_post_state::State,
-    S::Id: scheduled_post_state::IsUnset,
+    St: scheduled_post_state::State,
+    St::Id: scheduled_post_state::IsUnset,
 {
     /// Set the `id` field (required)
     pub fn id(
         mut self,
         value: impl Into<S>,
-    ) -> ScheduledPostBuilder<'a, scheduled_post_state::SetId<S>> {
+    ) -> ScheduledPostBuilder<S, scheduled_post_state::SetId<St>> {
         self._fields.8 = Option::Some(value.into());
         ScheduledPostBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
+impl<S: BosStr, St: scheduled_post_state::State> ScheduledPostBuilder<S, St> {
     /// Set the `labels` field (optional)
     pub fn labels(mut self, value: impl Into<Option<SelfLabels<S>>>) -> Self {
         self._fields.9 = value.into();
@@ -1956,26 +1952,26 @@ impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ScheduledPostBuilder<'a, S>
+impl<S: BosStr, St> ScheduledPostBuilder<S, St>
 where
-    S: scheduled_post_state::State,
-    S::Langs: scheduled_post_state::IsUnset,
+    St: scheduled_post_state::State,
+    St::Langs: scheduled_post_state::IsUnset,
 {
     /// Set the `langs` field (required)
     pub fn langs(
         mut self,
         value: impl Into<Vec<Language>>,
-    ) -> ScheduledPostBuilder<'a, scheduled_post_state::SetLangs<S>> {
+    ) -> ScheduledPostBuilder<S, scheduled_post_state::SetLangs<St>> {
         self._fields.10 = Option::Some(value.into());
         ScheduledPostBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
+impl<S: BosStr, St: scheduled_post_state::State> ScheduledPostBuilder<S, St> {
     /// Set the `parentPostId` field (optional)
     pub fn parent_post_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.11 = value.into();
@@ -1988,7 +1984,7 @@ impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
     }
 }
 
-impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
+impl<S: BosStr, St: scheduled_post_state::State> ScheduledPostBuilder<S, St> {
     /// Set the `postgateCid` field (optional)
     pub fn postgate_cid(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.12 = value.into();
@@ -2001,7 +1997,7 @@ impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
     }
 }
 
-impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
+impl<S: BosStr, St: scheduled_post_state::State> ScheduledPostBuilder<S, St> {
     /// Set the `postgateDisableEmbedding` field (optional)
     pub fn postgate_disable_embedding(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.13 = value.into();
@@ -2014,7 +2010,7 @@ impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
     }
 }
 
-impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
+impl<S: BosStr, St: scheduled_post_state::State> ScheduledPostBuilder<S, St> {
     /// Set the `postgateUri` field (optional)
     pub fn postgate_uri(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.14 = value.into();
@@ -2027,83 +2023,83 @@ impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ScheduledPostBuilder<'a, S>
+impl<S: BosStr, St> ScheduledPostBuilder<S, St>
 where
-    S: scheduled_post_state::State,
-    S::RetryCount: scheduled_post_state::IsUnset,
+    St: scheduled_post_state::State,
+    St::RetryCount: scheduled_post_state::IsUnset,
 {
     /// Set the `retryCount` field (required)
     pub fn retry_count(
         mut self,
         value: impl Into<i64>,
-    ) -> ScheduledPostBuilder<'a, scheduled_post_state::SetRetryCount<S>> {
+    ) -> ScheduledPostBuilder<S, scheduled_post_state::SetRetryCount<St>> {
         self._fields.15 = Option::Some(value.into());
         ScheduledPostBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ScheduledPostBuilder<'a, S>
+impl<S: BosStr, St> ScheduledPostBuilder<S, St>
 where
-    S: scheduled_post_state::State,
-    S::ScheduledAt: scheduled_post_state::IsUnset,
+    St: scheduled_post_state::State,
+    St::ScheduledAt: scheduled_post_state::IsUnset,
 {
     /// Set the `scheduledAt` field (required)
     pub fn scheduled_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ScheduledPostBuilder<'a, scheduled_post_state::SetScheduledAt<S>> {
+    ) -> ScheduledPostBuilder<S, scheduled_post_state::SetScheduledAt<St>> {
         self._fields.16 = Option::Some(value.into());
         ScheduledPostBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ScheduledPostBuilder<'a, S>
+impl<S: BosStr, St> ScheduledPostBuilder<S, St>
 where
-    S: scheduled_post_state::State,
-    S::Status: scheduled_post_state::IsUnset,
+    St: scheduled_post_state::State,
+    St::Status: scheduled_post_state::IsUnset,
 {
     /// Set the `status` field (required)
     pub fn status(
         mut self,
         value: impl Into<S>,
-    ) -> ScheduledPostBuilder<'a, scheduled_post_state::SetStatus<S>> {
+    ) -> ScheduledPostBuilder<S, scheduled_post_state::SetStatus<St>> {
         self._fields.17 = Option::Some(value.into());
         ScheduledPostBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ScheduledPostBuilder<'a, S>
+impl<S: BosStr, St> ScheduledPostBuilder<S, St>
 where
-    S: scheduled_post_state::State,
-    S::Text: scheduled_post_state::IsUnset,
+    St: scheduled_post_state::State,
+    St::Text: scheduled_post_state::IsUnset,
 {
     /// Set the `text` field (required)
     pub fn text(
         mut self,
         value: impl Into<S>,
-    ) -> ScheduledPostBuilder<'a, scheduled_post_state::SetText<S>> {
+    ) -> ScheduledPostBuilder<S, scheduled_post_state::SetText<St>> {
         self._fields.18 = Option::Some(value.into());
         ScheduledPostBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
+impl<S: BosStr, St: scheduled_post_state::State> ScheduledPostBuilder<S, St> {
     /// Set the `threadDepth` field (optional)
     pub fn thread_depth(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.19 = value.into();
@@ -2116,7 +2112,7 @@ impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
     }
 }
 
-impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
+impl<S: BosStr, St: scheduled_post_state::State> ScheduledPostBuilder<S, St> {
     /// Set the `threadPosition` field (optional)
     pub fn thread_position(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.20 = value.into();
@@ -2129,7 +2125,7 @@ impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
     }
 }
 
-impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
+impl<S: BosStr, St: scheduled_post_state::State> ScheduledPostBuilder<S, St> {
     /// Set the `threadgateCid` field (optional)
     pub fn threadgate_cid(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.21 = value.into();
@@ -2142,7 +2138,7 @@ impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
     }
 }
 
-impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
+impl<S: BosStr, St: scheduled_post_state::State> ScheduledPostBuilder<S, St> {
     /// Set the `threadgateRules` field (optional)
     pub fn threadgate_rules(
         mut self,
@@ -2161,7 +2157,7 @@ impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
     }
 }
 
-impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
+impl<S: BosStr, St: scheduled_post_state::State> ScheduledPostBuilder<S, St> {
     /// Set the `threadgateUri` field (optional)
     pub fn threadgate_uri(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.23 = value.into();
@@ -2174,59 +2170,59 @@ impl<'a, S: scheduled_post_state::State> ScheduledPostBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ScheduledPostBuilder<'a, S>
+impl<S: BosStr, St> ScheduledPostBuilder<S, St>
 where
-    S: scheduled_post_state::State,
-    S::UpdatedAt: scheduled_post_state::IsUnset,
+    St: scheduled_post_state::State,
+    St::UpdatedAt: scheduled_post_state::IsUnset,
 {
     /// Set the `updatedAt` field (required)
     pub fn updated_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ScheduledPostBuilder<'a, scheduled_post_state::SetUpdatedAt<S>> {
+    ) -> ScheduledPostBuilder<S, scheduled_post_state::SetUpdatedAt<St>> {
         self._fields.24 = Option::Some(value.into());
         ScheduledPostBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ScheduledPostBuilder<'a, S>
+impl<S: BosStr, St> ScheduledPostBuilder<S, St>
 where
-    S: scheduled_post_state::State,
-    S::UserId: scheduled_post_state::IsUnset,
+    St: scheduled_post_state::State,
+    St::UserId: scheduled_post_state::IsUnset,
 {
     /// Set the `userId` field (required)
     pub fn user_id(
         mut self,
         value: impl Into<S>,
-    ) -> ScheduledPostBuilder<'a, scheduled_post_state::SetUserId<S>> {
+    ) -> ScheduledPostBuilder<S, scheduled_post_state::SetUserId<St>> {
         self._fields.25 = Option::Some(value.into());
         ScheduledPostBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ScheduledPostBuilder<'a, S>
+impl<S: BosStr, St> ScheduledPostBuilder<S, St>
 where
-    S: scheduled_post_state::State,
-    S::Id: scheduled_post_state::IsSet,
-    S::CreatedAt: scheduled_post_state::IsSet,
-    S::RetryCount: scheduled_post_state::IsSet,
-    S::UpdatedAt: scheduled_post_state::IsSet,
-    S::UserId: scheduled_post_state::IsSet,
-    S::Text: scheduled_post_state::IsSet,
-    S::ScheduledAt: scheduled_post_state::IsSet,
-    S::Status: scheduled_post_state::IsSet,
-    S::Langs: scheduled_post_state::IsSet,
+    St: scheduled_post_state::State,
+    St::Id: scheduled_post_state::IsSet,
+    St::RetryCount: scheduled_post_state::IsSet,
+    St::CreatedAt: scheduled_post_state::IsSet,
+    St::UpdatedAt: scheduled_post_state::IsSet,
+    St::ScheduledAt: scheduled_post_state::IsSet,
+    St::UserId: scheduled_post_state::IsSet,
+    St::Status: scheduled_post_state::IsSet,
+    St::Langs: scheduled_post_state::IsSet,
+    St::Text: scheduled_post_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ScheduledPost<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ScheduledPost<S> {
         ScheduledPost {
             at_rkey: self._fields.0,
             at_uri: self._fields.1,
@@ -2257,11 +2253,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> ScheduledPost<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ScheduledPost<S> {
         ScheduledPost {
             at_rkey: self._fields.0,
             at_uri: self._fields.1,

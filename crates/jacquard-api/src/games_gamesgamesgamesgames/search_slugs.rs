@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -27,36 +27,33 @@ use serde::{Serialize, Deserialize};
 use crate::games_gamesgamesgamesgames::search_slugs;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SearchSlugs<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SearchSlugs<S: BosStr = DefaultStr> {
     ///Defaults to `10`. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
-    #[serde(borrow)]
     pub slug: S,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SearchSlugsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SearchSlugsOutput<S: BosStr = DefaultStr> {
     pub slugs: Vec<search_slugs::SlugResult<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -65,11 +62,11 @@ pub struct SearchSlugsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SlugResult<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SlugResult<S: BosStr = DefaultStr> {
     pub r#ref: AtUri<S>,
     pub slug: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -81,12 +78,11 @@ pub struct SearchSlugsResponse;
 impl jacquard_common::xrpc::XrpcResp for SearchSlugsResponse {
     const NSID: &'static str = "games.gamesgamesgamesgames.searchSlugs";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = SearchSlugsOutput<S>;
+    type Output<S: BosStr> = SearchSlugsOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for SearchSlugs<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for SearchSlugs<S> {
     const NSID: &'static str = "games.gamesgamesgamesgames.searchSlugs";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = SearchSlugsResponse;
@@ -97,11 +93,11 @@ pub struct SearchSlugsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SearchSlugsRequest {
     const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.searchSlugs";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = SearchSlugs<S>;
+    type Request<S: BosStr> = SearchSlugs<S>;
     type Response = SearchSlugsResponse;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for SlugResult<S> {
+impl<S: BosStr> LexiconSchema for SlugResult<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.searchSlugs"
     }
@@ -139,9 +135,9 @@ pub mod search_slugs_state {
         type Slug = Unset;
     }
     ///State transition - sets the `slug` field to Set
-    pub struct SetSlug<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSlug<S> {}
-    impl<S: State> State for SetSlug<S> {
+    pub struct SetSlug<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSlug<St> {}
+    impl<St: State> State for SetSlug<St> {
         type Slug = Set<members::slug>;
     }
     /// Marker types for field names
@@ -152,32 +148,32 @@ pub mod search_slugs_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct SearchSlugsBuilder<'a, S: search_slugs_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct SearchSlugsBuilder<S: BosStr, St: search_slugs_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> SearchSlugs<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> SearchSlugsBuilder<'a, search_slugs_state::Empty> {
+impl<S: BosStr> SearchSlugs<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> SearchSlugsBuilder<S, search_slugs_state::Empty> {
         SearchSlugsBuilder::new()
     }
 }
 
-impl<'a> SearchSlugsBuilder<'a, search_slugs_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> SearchSlugsBuilder<S, search_slugs_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SearchSlugsBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: search_slugs_state::State> SearchSlugsBuilder<'a, S> {
+impl<S: BosStr, St: search_slugs_state::State> SearchSlugsBuilder<S, St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
@@ -190,32 +186,32 @@ impl<'a, S: search_slugs_state::State> SearchSlugsBuilder<'a, S> {
     }
 }
 
-impl<'a, S> SearchSlugsBuilder<'a, S>
+impl<S: BosStr, St> SearchSlugsBuilder<S, St>
 where
-    S: search_slugs_state::State,
-    S::Slug: search_slugs_state::IsUnset,
+    St: search_slugs_state::State,
+    St::Slug: search_slugs_state::IsUnset,
 {
     /// Set the `slug` field (required)
     pub fn slug(
         mut self,
         value: impl Into<S>,
-    ) -> SearchSlugsBuilder<'a, search_slugs_state::SetSlug<S>> {
+    ) -> SearchSlugsBuilder<S, search_slugs_state::SetSlug<St>> {
         self._fields.1 = Option::Some(value.into());
         SearchSlugsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SearchSlugsBuilder<'a, S>
+impl<S: BosStr, St> SearchSlugsBuilder<S, St>
 where
-    S: search_slugs_state::State,
-    S::Slug: search_slugs_state::IsSet,
+    St: search_slugs_state::State,
+    St::Slug: search_slugs_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> SearchSlugs<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> SearchSlugs<S> {
         SearchSlugs {
             limit: self._fields.0,
             slug: self._fields.1.unwrap(),
@@ -233,122 +229,122 @@ pub mod slug_result_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Ref;
         type Slug;
+        type Ref;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Ref = Unset;
         type Slug = Unset;
-    }
-    ///State transition - sets the `ref` field to Set
-    pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRef<S> {}
-    impl<S: State> State for SetRef<S> {
-        type Ref = Set<members::r#ref>;
-        type Slug = S::Slug;
+        type Ref = Unset;
     }
     ///State transition - sets the `slug` field to Set
-    pub struct SetSlug<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSlug<S> {}
-    impl<S: State> State for SetSlug<S> {
-        type Ref = S::Ref;
+    pub struct SetSlug<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSlug<St> {}
+    impl<St: State> State for SetSlug<St> {
         type Slug = Set<members::slug>;
+        type Ref = St::Ref;
+    }
+    ///State transition - sets the `ref` field to Set
+    pub struct SetRef<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRef<St> {}
+    impl<St: State> State for SetRef<St> {
+        type Slug = St::Slug;
+        type Ref = Set<members::r#ref>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `ref` field
-        pub struct r#ref(());
         ///Marker type for the `slug` field
         pub struct slug(());
+        ///Marker type for the `ref` field
+        pub struct r#ref(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct SlugResultBuilder<'a, S: slug_result_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct SlugResultBuilder<S: BosStr, St: slug_result_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> SlugResult<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> SlugResultBuilder<'a, slug_result_state::Empty> {
+impl<S: BosStr> SlugResult<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> SlugResultBuilder<S, slug_result_state::Empty> {
         SlugResultBuilder::new()
     }
 }
 
-impl<'a> SlugResultBuilder<'a, slug_result_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> SlugResultBuilder<S, slug_result_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SlugResultBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SlugResultBuilder<'a, S>
+impl<S: BosStr, St> SlugResultBuilder<S, St>
 where
-    S: slug_result_state::State,
-    S::Ref: slug_result_state::IsUnset,
+    St: slug_result_state::State,
+    St::Ref: slug_result_state::IsUnset,
 {
     /// Set the `ref` field (required)
     pub fn r#ref(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> SlugResultBuilder<'a, slug_result_state::SetRef<S>> {
+    ) -> SlugResultBuilder<S, slug_result_state::SetRef<St>> {
         self._fields.0 = Option::Some(value.into());
         SlugResultBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SlugResultBuilder<'a, S>
+impl<S: BosStr, St> SlugResultBuilder<S, St>
 where
-    S: slug_result_state::State,
-    S::Slug: slug_result_state::IsUnset,
+    St: slug_result_state::State,
+    St::Slug: slug_result_state::IsUnset,
 {
     /// Set the `slug` field (required)
     pub fn slug(
         mut self,
         value: impl Into<S>,
-    ) -> SlugResultBuilder<'a, slug_result_state::SetSlug<S>> {
+    ) -> SlugResultBuilder<S, slug_result_state::SetSlug<St>> {
         self._fields.1 = Option::Some(value.into());
         SlugResultBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SlugResultBuilder<'a, S>
+impl<S: BosStr, St> SlugResultBuilder<S, St>
 where
-    S: slug_result_state::State,
-    S::Ref: slug_result_state::IsSet,
-    S::Slug: slug_result_state::IsSet,
+    St: slug_result_state::State,
+    St::Slug: slug_result_state::IsSet,
+    St::Ref: slug_result_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> SlugResult<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> SlugResult<S> {
         SlugResult {
             r#ref: self._fields.0.unwrap(),
             slug: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> SlugResult<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> SlugResult<S> {
         SlugResult {
             r#ref: self._fields.0.unwrap(),
             slug: self._fields.1.unwrap(),

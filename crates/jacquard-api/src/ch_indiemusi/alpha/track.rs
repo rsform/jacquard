@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use serde::{Serialize, Deserialize};
     rename = "ch.indiemusi.alpha.track",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Track<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Track<S: BosStr = DefaultStr> {
     ///The encrypted audio file
     pub audio_blob: BlobRef<S>,
     ///Timestamp when the track was uploaded
@@ -63,18 +63,18 @@ pub struct Track<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct TrackGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct TrackGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Track<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Track<S> {
+impl<S: BosStr> Track<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, TrackRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -87,17 +87,17 @@ pub struct TrackRecord;
 impl XrpcResp for TrackRecord {
     const NSID: &'static str = "ch.indiemusi.alpha.track";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = TrackGetRecordOutput<S>;
+    type Output<S: BosStr> = TrackGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<TrackGetRecordOutput<S>> for Track<S> {
+impl<S: BosStr> From<TrackGetRecordOutput<S>> for Track<S> {
     fn from(output: TrackGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Track<S> {
+impl<S: BosStr> Collection for Track<S> {
     const NSID: &'static str = "ch.indiemusi.alpha.track";
     type Record = TrackRecord;
 }
@@ -107,7 +107,7 @@ impl Collection for TrackRecord {
     type Record = TrackRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Track<S> {
+impl<S: BosStr> LexiconSchema for Track<S> {
     fn nsid() -> &'static str {
         "ch.indiemusi.alpha.track"
     }
@@ -184,10 +184,8 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Track<S> {
     }
 }
 
-fn _default_track_encryption_algorithm<S: From<&'static str>>() -> ::core::option::Option<
-    S,
-> {
-    Some(S::from("AES-GCM-256"))
+fn _default_track_encryption_algorithm<S: FromStaticStr>() -> ::core::option::Option<S> {
+    Some(S::from_static("AES-GCM-256"))
 }
 
 pub mod track_state {
@@ -200,153 +198,153 @@ pub mod track_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type EncryptedContentIv;
+        type CreatedAt;
         type Title;
         type AudioBlob;
-        type CreatedAt;
+        type EncryptedContentIv;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type EncryptedContentIv = Unset;
+        type CreatedAt = Unset;
         type Title = Unset;
         type AudioBlob = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `encrypted_content_iv` field to Set
-    pub struct SetEncryptedContentIv<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEncryptedContentIv<S> {}
-    impl<S: State> State for SetEncryptedContentIv<S> {
-        type EncryptedContentIv = Set<members::encrypted_content_iv>;
-        type Title = S::Title;
-        type AudioBlob = S::AudioBlob;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type EncryptedContentIv = S::EncryptedContentIv;
-        type Title = Set<members::title>;
-        type AudioBlob = S::AudioBlob;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `audio_blob` field to Set
-    pub struct SetAudioBlob<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAudioBlob<S> {}
-    impl<S: State> State for SetAudioBlob<S> {
-        type EncryptedContentIv = S::EncryptedContentIv;
-        type Title = S::Title;
-        type AudioBlob = Set<members::audio_blob>;
-        type CreatedAt = S::CreatedAt;
+        type EncryptedContentIv = Unset;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type EncryptedContentIv = S::EncryptedContentIv;
-        type Title = S::Title;
-        type AudioBlob = S::AudioBlob;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
+        type Title = St::Title;
+        type AudioBlob = St::AudioBlob;
+        type EncryptedContentIv = St::EncryptedContentIv;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
+        type CreatedAt = St::CreatedAt;
+        type Title = Set<members::title>;
+        type AudioBlob = St::AudioBlob;
+        type EncryptedContentIv = St::EncryptedContentIv;
+    }
+    ///State transition - sets the `audio_blob` field to Set
+    pub struct SetAudioBlob<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAudioBlob<St> {}
+    impl<St: State> State for SetAudioBlob<St> {
+        type CreatedAt = St::CreatedAt;
+        type Title = St::Title;
+        type AudioBlob = Set<members::audio_blob>;
+        type EncryptedContentIv = St::EncryptedContentIv;
+    }
+    ///State transition - sets the `encrypted_content_iv` field to Set
+    pub struct SetEncryptedContentIv<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetEncryptedContentIv<St> {}
+    impl<St: State> State for SetEncryptedContentIv<St> {
+        type CreatedAt = St::CreatedAt;
+        type Title = St::Title;
+        type AudioBlob = St::AudioBlob;
+        type EncryptedContentIv = Set<members::encrypted_content_iv>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `encrypted_content_iv` field
-        pub struct encrypted_content_iv(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `title` field
         pub struct title(());
         ///Marker type for the `audio_blob` field
         pub struct audio_blob(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
+        ///Marker type for the `encrypted_content_iv` field
+        pub struct encrypted_content_iv(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct TrackBuilder<'a, S: track_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct TrackBuilder<S: BosStr, St: track_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<BlobRef<S>>, Option<Datetime>, Option<S>, Option<S>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Track<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> TrackBuilder<'a, track_state::Empty> {
+impl<S: BosStr> Track<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> TrackBuilder<S, track_state::Empty> {
         TrackBuilder::new()
     }
 }
 
-impl<'a> TrackBuilder<'a, track_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> TrackBuilder<S, track_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         TrackBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> TrackBuilder<'a, S>
+impl<S: BosStr, St> TrackBuilder<S, St>
 where
-    S: track_state::State,
-    S::AudioBlob: track_state::IsUnset,
+    St: track_state::State,
+    St::AudioBlob: track_state::IsUnset,
 {
     /// Set the `audioBlob` field (required)
     pub fn audio_blob(
         mut self,
         value: impl Into<BlobRef<S>>,
-    ) -> TrackBuilder<'a, track_state::SetAudioBlob<S>> {
+    ) -> TrackBuilder<S, track_state::SetAudioBlob<St>> {
         self._fields.0 = Option::Some(value.into());
         TrackBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> TrackBuilder<'a, S>
+impl<S: BosStr, St> TrackBuilder<S, St>
 where
-    S: track_state::State,
-    S::CreatedAt: track_state::IsUnset,
+    St: track_state::State,
+    St::CreatedAt: track_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> TrackBuilder<'a, track_state::SetCreatedAt<S>> {
+    ) -> TrackBuilder<S, track_state::SetCreatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         TrackBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> TrackBuilder<'a, S>
+impl<S: BosStr, St> TrackBuilder<S, St>
 where
-    S: track_state::State,
-    S::EncryptedContentIv: track_state::IsUnset,
+    St: track_state::State,
+    St::EncryptedContentIv: track_state::IsUnset,
 {
     /// Set the `encryptedContentIv` field (required)
     pub fn encrypted_content_iv(
         mut self,
         value: impl Into<S>,
-    ) -> TrackBuilder<'a, track_state::SetEncryptedContentIv<S>> {
+    ) -> TrackBuilder<S, track_state::SetEncryptedContentIv<St>> {
         self._fields.2 = Option::Some(value.into());
         TrackBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: track_state::State> TrackBuilder<'a, S> {
+impl<S: BosStr, St: track_state::State> TrackBuilder<S, St> {
     /// Set the `encryptionAlgorithm` field (optional)
     pub fn encryption_algorithm(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -359,35 +357,35 @@ impl<'a, S: track_state::State> TrackBuilder<'a, S> {
     }
 }
 
-impl<'a, S> TrackBuilder<'a, S>
+impl<S: BosStr, St> TrackBuilder<S, St>
 where
-    S: track_state::State,
-    S::Title: track_state::IsUnset,
+    St: track_state::State,
+    St::Title: track_state::IsUnset,
 {
     /// Set the `title` field (required)
     pub fn title(
         mut self,
         value: impl Into<S>,
-    ) -> TrackBuilder<'a, track_state::SetTitle<S>> {
+    ) -> TrackBuilder<S, track_state::SetTitle<St>> {
         self._fields.4 = Option::Some(value.into());
         TrackBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> TrackBuilder<'a, S>
+impl<S: BosStr, St> TrackBuilder<S, St>
 where
-    S: track_state::State,
-    S::EncryptedContentIv: track_state::IsSet,
-    S::Title: track_state::IsSet,
-    S::AudioBlob: track_state::IsSet,
-    S::CreatedAt: track_state::IsSet,
+    St: track_state::State,
+    St::CreatedAt: track_state::IsSet,
+    St::Title: track_state::IsSet,
+    St::AudioBlob: track_state::IsSet,
+    St::EncryptedContentIv: track_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Track<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Track<S> {
         Track {
             audio_blob: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
@@ -395,13 +393,13 @@ where
             encryption_algorithm: self
                 ._fields
                 .3
-                .or_else(|| Some(CowStr::from("AES-GCM-256"))),
+                .or_else(|| Some(SmolStr::from("AES-GCM-256"))),
             title: self._fields.4.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Track<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Track<S> {
         Track {
             audio_blob: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
@@ -409,7 +407,7 @@ where
             encryption_algorithm: self
                 ._fields
                 .3
-                .or_else(|| Some(CowStr::from("AES-GCM-256"))),
+                .or_else(|| Some(SmolStr::from("AES-GCM-256"))),
             title: self._fields.4.unwrap(),
             extra_data: Some(extra_data),
         }

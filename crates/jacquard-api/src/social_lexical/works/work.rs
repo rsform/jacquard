@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "social.lexical.works.work",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Work<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Work<S: BosStr = DefaultStr> {
     ///
     #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<S>,
@@ -57,12 +57,12 @@ pub struct Work<S: Bos<str> + AsRef<str> = DefaultStr> {
 ///
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum WorkWorkType<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum WorkWorkType<S: BosStr = DefaultStr> {
     Movie,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> WorkWorkType<S> {
+impl<S: BosStr> WorkWorkType<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Movie => "Movie",
@@ -78,19 +78,19 @@ impl<S: Bos<str> + AsRef<str>> WorkWorkType<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for WorkWorkType<S> {
+impl<S: BosStr> core::fmt::Display for WorkWorkType<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for WorkWorkType<S> {
+impl<S: BosStr> AsRef<str> for WorkWorkType<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for WorkWorkType<S> {
+impl<S: BosStr> Serialize for WorkWorkType<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -99,8 +99,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for WorkWorkType<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for WorkWorkType<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for WorkWorkType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -110,14 +109,18 @@ for WorkWorkType<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for WorkWorkType<S> {
+impl<S: BosStr + Default> Default for WorkWorkType<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for WorkWorkType<S> {
-    type Output = WorkWorkType<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for WorkWorkType<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = WorkWorkType<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             WorkWorkType::Movie => WorkWorkType::Movie,
@@ -132,18 +135,18 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for WorkWorkType<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct WorkGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct WorkGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Work<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Work<S> {
+impl<S: BosStr> Work<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, WorkRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -156,17 +159,17 @@ pub struct WorkRecord;
 impl XrpcResp for WorkRecord {
     const NSID: &'static str = "social.lexical.works.work";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = WorkGetRecordOutput<S>;
+    type Output<S: BosStr> = WorkGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<WorkGetRecordOutput<S>> for Work<S> {
+impl<S: BosStr> From<WorkGetRecordOutput<S>> for Work<S> {
     fn from(output: WorkGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Work<S> {
+impl<S: BosStr> Collection for Work<S> {
     const NSID: &'static str = "social.lexical.works.work";
     type Record = WorkRecord;
 }
@@ -176,7 +179,7 @@ impl Collection for WorkRecord {
     type Record = WorkRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Work<S> {
+impl<S: BosStr> LexiconSchema for Work<S> {
     fn nsid() -> &'static str {
         "social.lexical.works.work"
     }
@@ -300,17 +303,17 @@ pub mod work_state {
         type WorkType = Unset;
     }
     ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
         type Title = Set<members::title>;
-        type WorkType = S::WorkType;
+        type WorkType = St::WorkType;
     }
     ///State transition - sets the `work_type` field to Set
-    pub struct SetWorkType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWorkType<S> {}
-    impl<S: State> State for SetWorkType<S> {
-        type Title = S::Title;
+    pub struct SetWorkType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetWorkType<St> {}
+    impl<St: State> State for SetWorkType<St> {
+        type Title = St::Title;
         type WorkType = Set<members::work_type>;
     }
     /// Marker types for field names
@@ -323,32 +326,32 @@ pub mod work_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct WorkBuilder<'a, S: work_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct WorkBuilder<S: BosStr, St: work_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>, Option<WorkWorkType<S>>, Option<i64>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Work<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> WorkBuilder<'a, work_state::Empty> {
+impl<S: BosStr> Work<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> WorkBuilder<S, work_state::Empty> {
         WorkBuilder::new()
     }
 }
 
-impl<'a> WorkBuilder<'a, work_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> WorkBuilder<S, work_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         WorkBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: work_state::State> WorkBuilder<'a, S> {
+impl<S: BosStr, St: work_state::State> WorkBuilder<S, St> {
     /// Set the `id` field (optional)
     pub fn id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -361,45 +364,45 @@ impl<'a, S: work_state::State> WorkBuilder<'a, S> {
     }
 }
 
-impl<'a, S> WorkBuilder<'a, S>
+impl<S: BosStr, St> WorkBuilder<S, St>
 where
-    S: work_state::State,
-    S::Title: work_state::IsUnset,
+    St: work_state::State,
+    St::Title: work_state::IsUnset,
 {
     /// Set the `title` field (required)
     pub fn title(
         mut self,
         value: impl Into<S>,
-    ) -> WorkBuilder<'a, work_state::SetTitle<S>> {
+    ) -> WorkBuilder<S, work_state::SetTitle<St>> {
         self._fields.1 = Option::Some(value.into());
         WorkBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> WorkBuilder<'a, S>
+impl<S: BosStr, St> WorkBuilder<S, St>
 where
-    S: work_state::State,
-    S::WorkType: work_state::IsUnset,
+    St: work_state::State,
+    St::WorkType: work_state::IsUnset,
 {
     /// Set the `workType` field (required)
     pub fn work_type(
         mut self,
         value: impl Into<WorkWorkType<S>>,
-    ) -> WorkBuilder<'a, work_state::SetWorkType<S>> {
+    ) -> WorkBuilder<S, work_state::SetWorkType<St>> {
         self._fields.2 = Option::Some(value.into());
         WorkBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: work_state::State> WorkBuilder<'a, S> {
+impl<S: BosStr, St: work_state::State> WorkBuilder<S, St> {
     /// Set the `year` field (optional)
     pub fn year(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.3 = value.into();
@@ -412,14 +415,14 @@ impl<'a, S: work_state::State> WorkBuilder<'a, S> {
     }
 }
 
-impl<'a, S> WorkBuilder<'a, S>
+impl<S: BosStr, St> WorkBuilder<S, St>
 where
-    S: work_state::State,
-    S::Title: work_state::IsSet,
-    S::WorkType: work_state::IsSet,
+    St: work_state::State,
+    St::Title: work_state::IsSet,
+    St::WorkType: work_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Work<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Work<S> {
         Work {
             id: self._fields.0,
             title: self._fields.1.unwrap(),
@@ -428,8 +431,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Work<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Work<S> {
         Work {
             id: self._fields.0,
             title: self._fields.1.unwrap(),

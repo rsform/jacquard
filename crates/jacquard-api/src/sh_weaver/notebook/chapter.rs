@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -41,11 +41,11 @@ use crate::sh_weaver::notebook::Title;
     rename = "sh.weaver.notebook.chapter",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Chapter<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Chapter<S: BosStr = DefaultStr> {
     pub authors: Vec<Author<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub content_warnings: Option<ContentWarnings<S>>,
@@ -71,18 +71,18 @@ pub struct Chapter<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ChapterGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ChapterGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Chapter<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Chapter<S> {
+impl<S: BosStr> Chapter<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, ChapterRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -95,17 +95,17 @@ pub struct ChapterRecord;
 impl XrpcResp for ChapterRecord {
     const NSID: &'static str = "sh.weaver.notebook.chapter";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ChapterGetRecordOutput<S>;
+    type Output<S: BosStr> = ChapterGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<ChapterGetRecordOutput<S>> for Chapter<S> {
+impl<S: BosStr> From<ChapterGetRecordOutput<S>> for Chapter<S> {
     fn from(output: ChapterGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Chapter<S> {
+impl<S: BosStr> Collection for Chapter<S> {
     const NSID: &'static str = "sh.weaver.notebook.chapter";
     type Record = ChapterRecord;
 }
@@ -115,7 +115,7 @@ impl Collection for ChapterRecord {
     type Record = ChapterRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Chapter<S> {
+impl<S: BosStr> LexiconSchema for Chapter<S> {
     fn nsid() -> &'static str {
         "sh.weaver.notebook.chapter"
     }
@@ -141,56 +141,56 @@ pub mod chapter_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type EntryList;
-        type Notebook;
         type Authors;
+        type Notebook;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type EntryList = Unset;
-        type Notebook = Unset;
         type Authors = Unset;
+        type Notebook = Unset;
     }
     ///State transition - sets the `entry_list` field to Set
-    pub struct SetEntryList<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEntryList<S> {}
-    impl<S: State> State for SetEntryList<S> {
+    pub struct SetEntryList<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetEntryList<St> {}
+    impl<St: State> State for SetEntryList<St> {
         type EntryList = Set<members::entry_list>;
-        type Notebook = S::Notebook;
-        type Authors = S::Authors;
-    }
-    ///State transition - sets the `notebook` field to Set
-    pub struct SetNotebook<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNotebook<S> {}
-    impl<S: State> State for SetNotebook<S> {
-        type EntryList = S::EntryList;
-        type Notebook = Set<members::notebook>;
-        type Authors = S::Authors;
+        type Authors = St::Authors;
+        type Notebook = St::Notebook;
     }
     ///State transition - sets the `authors` field to Set
-    pub struct SetAuthors<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthors<S> {}
-    impl<S: State> State for SetAuthors<S> {
-        type EntryList = S::EntryList;
-        type Notebook = S::Notebook;
+    pub struct SetAuthors<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAuthors<St> {}
+    impl<St: State> State for SetAuthors<St> {
+        type EntryList = St::EntryList;
         type Authors = Set<members::authors>;
+        type Notebook = St::Notebook;
+    }
+    ///State transition - sets the `notebook` field to Set
+    pub struct SetNotebook<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetNotebook<St> {}
+    impl<St: State> State for SetNotebook<St> {
+        type EntryList = St::EntryList;
+        type Authors = St::Authors;
+        type Notebook = Set<members::notebook>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `entry_list` field
         pub struct entry_list(());
-        ///Marker type for the `notebook` field
-        pub struct notebook(());
         ///Marker type for the `authors` field
         pub struct authors(());
+        ///Marker type for the `notebook` field
+        pub struct notebook(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ChapterBuilder<'a, S: chapter_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ChapterBuilder<S: BosStr, St: chapter_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<Author<S>>>,
         Option<ContentWarnings<S>>,
@@ -201,47 +201,47 @@ pub struct ChapterBuilder<'a, S: chapter_state::State> {
         Option<Tags<S>>,
         Option<Title<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Chapter<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ChapterBuilder<'a, chapter_state::Empty> {
+impl<S: BosStr> Chapter<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ChapterBuilder<S, chapter_state::Empty> {
         ChapterBuilder::new()
     }
 }
 
-impl<'a> ChapterBuilder<'a, chapter_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ChapterBuilder<S, chapter_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ChapterBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ChapterBuilder<'a, S>
+impl<S: BosStr, St> ChapterBuilder<S, St>
 where
-    S: chapter_state::State,
-    S::Authors: chapter_state::IsUnset,
+    St: chapter_state::State,
+    St::Authors: chapter_state::IsUnset,
 {
     /// Set the `authors` field (required)
     pub fn authors(
         mut self,
         value: impl Into<Vec<Author<S>>>,
-    ) -> ChapterBuilder<'a, chapter_state::SetAuthors<S>> {
+    ) -> ChapterBuilder<S, chapter_state::SetAuthors<St>> {
         self._fields.0 = Option::Some(value.into());
         ChapterBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: chapter_state::State> ChapterBuilder<'a, S> {
+impl<S: BosStr, St: chapter_state::State> ChapterBuilder<S, St> {
     /// Set the `contentWarnings` field (optional)
     pub fn content_warnings(
         mut self,
@@ -257,7 +257,7 @@ impl<'a, S: chapter_state::State> ChapterBuilder<'a, S> {
     }
 }
 
-impl<'a, S: chapter_state::State> ChapterBuilder<'a, S> {
+impl<S: BosStr, St: chapter_state::State> ChapterBuilder<S, St> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.2 = value.into();
@@ -270,45 +270,45 @@ impl<'a, S: chapter_state::State> ChapterBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ChapterBuilder<'a, S>
+impl<S: BosStr, St> ChapterBuilder<S, St>
 where
-    S: chapter_state::State,
-    S::EntryList: chapter_state::IsUnset,
+    St: chapter_state::State,
+    St::EntryList: chapter_state::IsUnset,
 {
     /// Set the `entryList` field (required)
     pub fn entry_list(
         mut self,
         value: impl Into<Vec<StrongRef<S>>>,
-    ) -> ChapterBuilder<'a, chapter_state::SetEntryList<S>> {
+    ) -> ChapterBuilder<S, chapter_state::SetEntryList<St>> {
         self._fields.3 = Option::Some(value.into());
         ChapterBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ChapterBuilder<'a, S>
+impl<S: BosStr, St> ChapterBuilder<S, St>
 where
-    S: chapter_state::State,
-    S::Notebook: chapter_state::IsUnset,
+    St: chapter_state::State,
+    St::Notebook: chapter_state::IsUnset,
 {
     /// Set the `notebook` field (required)
     pub fn notebook(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> ChapterBuilder<'a, chapter_state::SetNotebook<S>> {
+    ) -> ChapterBuilder<S, chapter_state::SetNotebook<St>> {
         self._fields.4 = Option::Some(value.into());
         ChapterBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: chapter_state::State> ChapterBuilder<'a, S> {
+impl<S: BosStr, St: chapter_state::State> ChapterBuilder<S, St> {
     /// Set the `rating` field (optional)
     pub fn rating(mut self, value: impl Into<Option<ContentRating<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -321,7 +321,7 @@ impl<'a, S: chapter_state::State> ChapterBuilder<'a, S> {
     }
 }
 
-impl<'a, S: chapter_state::State> ChapterBuilder<'a, S> {
+impl<S: BosStr, St: chapter_state::State> ChapterBuilder<S, St> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Tags<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -334,7 +334,7 @@ impl<'a, S: chapter_state::State> ChapterBuilder<'a, S> {
     }
 }
 
-impl<'a, S: chapter_state::State> ChapterBuilder<'a, S> {
+impl<S: BosStr, St: chapter_state::State> ChapterBuilder<S, St> {
     /// Set the `title` field (optional)
     pub fn title(mut self, value: impl Into<Option<Title<S>>>) -> Self {
         self._fields.7 = value.into();
@@ -347,15 +347,15 @@ impl<'a, S: chapter_state::State> ChapterBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ChapterBuilder<'a, S>
+impl<S: BosStr, St> ChapterBuilder<S, St>
 where
-    S: chapter_state::State,
-    S::EntryList: chapter_state::IsSet,
-    S::Notebook: chapter_state::IsSet,
-    S::Authors: chapter_state::IsSet,
+    St: chapter_state::State,
+    St::EntryList: chapter_state::IsSet,
+    St::Authors: chapter_state::IsSet,
+    St::Notebook: chapter_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Chapter<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Chapter<S> {
         Chapter {
             authors: self._fields.0.unwrap(),
             content_warnings: self._fields.1,
@@ -368,11 +368,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Chapter<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Chapter<S> {
         Chapter {
             authors: self._fields.0.unwrap(),
             content_warnings: self._fields.1,

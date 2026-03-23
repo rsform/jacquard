@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "io.whiteside.linkedAccount",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct LinkedAccount<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct LinkedAccount<S: BosStr = DefaultStr> {
     ///Icon identifier or URL for the linked account
     pub icon: S,
     ///URL to the linked account
@@ -59,18 +59,18 @@ pub struct LinkedAccount<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct LinkedAccountGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct LinkedAccountGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: LinkedAccount<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LinkedAccount<S> {
+impl<S: BosStr> LinkedAccount<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, LinkedAccountRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -83,18 +83,17 @@ pub struct LinkedAccountRecord;
 impl XrpcResp for LinkedAccountRecord {
     const NSID: &'static str = "io.whiteside.linkedAccount";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = LinkedAccountGetRecordOutput<S>;
+    type Output<S: BosStr> = LinkedAccountGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<LinkedAccountGetRecordOutput<S>>
-for LinkedAccount<S> {
+impl<S: BosStr> From<LinkedAccountGetRecordOutput<S>> for LinkedAccount<S> {
     fn from(output: LinkedAccountGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for LinkedAccount<S> {
+impl<S: BosStr> Collection for LinkedAccount<S> {
     const NSID: &'static str = "io.whiteside.linkedAccount";
     type Record = LinkedAccountRecord;
 }
@@ -104,7 +103,7 @@ impl Collection for LinkedAccountRecord {
     type Record = LinkedAccountRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for LinkedAccount<S> {
+impl<S: BosStr> LexiconSchema for LinkedAccount<S> {
     fn nsid() -> &'static str {
         "io.whiteside.linkedAccount"
     }
@@ -130,136 +129,136 @@ pub mod linked_account_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Name;
-        type Link;
         type Icon;
+        type Link;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Name = Unset;
-        type Link = Unset;
         type Icon = Unset;
+        type Link = Unset;
     }
     ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
         type Name = Set<members::name>;
-        type Link = S::Link;
-        type Icon = S::Icon;
-    }
-    ///State transition - sets the `link` field to Set
-    pub struct SetLink<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLink<S> {}
-    impl<S: State> State for SetLink<S> {
-        type Name = S::Name;
-        type Link = Set<members::link>;
-        type Icon = S::Icon;
+        type Icon = St::Icon;
+        type Link = St::Link;
     }
     ///State transition - sets the `icon` field to Set
-    pub struct SetIcon<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIcon<S> {}
-    impl<S: State> State for SetIcon<S> {
-        type Name = S::Name;
-        type Link = S::Link;
+    pub struct SetIcon<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIcon<St> {}
+    impl<St: State> State for SetIcon<St> {
+        type Name = St::Name;
         type Icon = Set<members::icon>;
+        type Link = St::Link;
+    }
+    ///State transition - sets the `link` field to Set
+    pub struct SetLink<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLink<St> {}
+    impl<St: State> State for SetLink<St> {
+        type Name = St::Name;
+        type Icon = St::Icon;
+        type Link = Set<members::link>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `name` field
         pub struct name(());
-        ///Marker type for the `link` field
-        pub struct link(());
         ///Marker type for the `icon` field
         pub struct icon(());
+        ///Marker type for the `link` field
+        pub struct link(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct LinkedAccountBuilder<'a, S: linked_account_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct LinkedAccountBuilder<S: BosStr, St: linked_account_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<UriValue<S>>, Option<S>, Option<i64>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> LinkedAccount<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> LinkedAccountBuilder<'a, linked_account_state::Empty> {
+impl<S: BosStr> LinkedAccount<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> LinkedAccountBuilder<S, linked_account_state::Empty> {
         LinkedAccountBuilder::new()
     }
 }
 
-impl<'a> LinkedAccountBuilder<'a, linked_account_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> LinkedAccountBuilder<S, linked_account_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         LinkedAccountBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LinkedAccountBuilder<'a, S>
+impl<S: BosStr, St> LinkedAccountBuilder<S, St>
 where
-    S: linked_account_state::State,
-    S::Icon: linked_account_state::IsUnset,
+    St: linked_account_state::State,
+    St::Icon: linked_account_state::IsUnset,
 {
     /// Set the `icon` field (required)
     pub fn icon(
         mut self,
         value: impl Into<S>,
-    ) -> LinkedAccountBuilder<'a, linked_account_state::SetIcon<S>> {
+    ) -> LinkedAccountBuilder<S, linked_account_state::SetIcon<St>> {
         self._fields.0 = Option::Some(value.into());
         LinkedAccountBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LinkedAccountBuilder<'a, S>
+impl<S: BosStr, St> LinkedAccountBuilder<S, St>
 where
-    S: linked_account_state::State,
-    S::Link: linked_account_state::IsUnset,
+    St: linked_account_state::State,
+    St::Link: linked_account_state::IsUnset,
 {
     /// Set the `link` field (required)
     pub fn link(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> LinkedAccountBuilder<'a, linked_account_state::SetLink<S>> {
+    ) -> LinkedAccountBuilder<S, linked_account_state::SetLink<St>> {
         self._fields.1 = Option::Some(value.into());
         LinkedAccountBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LinkedAccountBuilder<'a, S>
+impl<S: BosStr, St> LinkedAccountBuilder<S, St>
 where
-    S: linked_account_state::State,
-    S::Name: linked_account_state::IsUnset,
+    St: linked_account_state::State,
+    St::Name: linked_account_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> LinkedAccountBuilder<'a, linked_account_state::SetName<S>> {
+    ) -> LinkedAccountBuilder<S, linked_account_state::SetName<St>> {
         self._fields.2 = Option::Some(value.into());
         LinkedAccountBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: linked_account_state::State> LinkedAccountBuilder<'a, S> {
+impl<S: BosStr, St: linked_account_state::State> LinkedAccountBuilder<S, St> {
     /// Set the `order` field (optional)
     pub fn order(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.3 = value.into();
@@ -272,15 +271,15 @@ impl<'a, S: linked_account_state::State> LinkedAccountBuilder<'a, S> {
     }
 }
 
-impl<'a, S> LinkedAccountBuilder<'a, S>
+impl<S: BosStr, St> LinkedAccountBuilder<S, St>
 where
-    S: linked_account_state::State,
-    S::Name: linked_account_state::IsSet,
-    S::Link: linked_account_state::IsSet,
-    S::Icon: linked_account_state::IsSet,
+    St: linked_account_state::State,
+    St::Name: linked_account_state::IsSet,
+    St::Icon: linked_account_state::IsSet,
+    St::Link: linked_account_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> LinkedAccount<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> LinkedAccount<S> {
         LinkedAccount {
             icon: self._fields.0.unwrap(),
             link: self._fields.1.unwrap(),
@@ -289,11 +288,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> LinkedAccount<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> LinkedAccount<S> {
         LinkedAccount {
             icon: self._fields.0.unwrap(),
             link: self._fields.1.unwrap(),

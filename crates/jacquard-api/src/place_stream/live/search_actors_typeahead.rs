@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -30,11 +30,11 @@ use crate::place_stream::live::search_actors_typeahead;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Actor<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Actor<S: BosStr = DefaultStr> {
     ///The actor's DID
     pub did: Did<S>,
     ///The actor's handle
@@ -45,41 +45,38 @@ pub struct Actor<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SearchActorsTypeahead<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SearchActorsTypeahead<S: BosStr = DefaultStr> {
     ///Defaults to `10`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub q: Option<S>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SearchActorsTypeaheadOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SearchActorsTypeaheadOutput<S: BosStr = DefaultStr> {
     pub actors: Vec<search_actors_typeahead::Actor<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Actor<S> {
+impl<S: BosStr> LexiconSchema for Actor<S> {
     fn nsid() -> &'static str {
         "place.stream.live.searchActorsTypeahead"
     }
@@ -99,12 +96,11 @@ pub struct SearchActorsTypeaheadResponse;
 impl jacquard_common::xrpc::XrpcResp for SearchActorsTypeaheadResponse {
     const NSID: &'static str = "place.stream.live.searchActorsTypeahead";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = SearchActorsTypeaheadOutput<S>;
+    type Output<S: BosStr> = SearchActorsTypeaheadOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for SearchActorsTypeahead<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for SearchActorsTypeahead<S> {
     const NSID: &'static str = "place.stream.live.searchActorsTypeahead";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = SearchActorsTypeaheadResponse;
@@ -115,7 +111,7 @@ pub struct SearchActorsTypeaheadRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SearchActorsTypeaheadRequest {
     const PATH: &'static str = "/xrpc/place.stream.live.searchActorsTypeahead";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = SearchActorsTypeahead<S>;
+    type Request<S: BosStr> = SearchActorsTypeahead<S>;
     type Response = SearchActorsTypeaheadResponse;
 }
 
@@ -129,119 +125,119 @@ pub mod actor_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
         type Handle;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
         type Handle = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Did = Set<members::did>;
-        type Handle = S::Handle;
+        type Did = Unset;
     }
     ///State transition - sets the `handle` field to Set
-    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHandle<S> {}
-    impl<S: State> State for SetHandle<S> {
-        type Did = S::Did;
+    pub struct SetHandle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHandle<St> {}
+    impl<St: State> State for SetHandle<St> {
         type Handle = Set<members::handle>;
+        type Did = St::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
+        type Handle = St::Handle;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `handle` field
         pub struct handle(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ActorBuilder<'a, S: actor_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ActorBuilder<S: BosStr, St: actor_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>, Option<Handle<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Actor<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ActorBuilder<'a, actor_state::Empty> {
+impl<S: BosStr> Actor<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ActorBuilder<S, actor_state::Empty> {
         ActorBuilder::new()
     }
 }
 
-impl<'a> ActorBuilder<'a, actor_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ActorBuilder<S, actor_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ActorBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ActorBuilder<'a, S>
+impl<S: BosStr, St> ActorBuilder<S, St>
 where
-    S: actor_state::State,
-    S::Did: actor_state::IsUnset,
+    St: actor_state::State,
+    St::Did: actor_state::IsUnset,
 {
     /// Set the `did` field (required)
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> ActorBuilder<'a, actor_state::SetDid<S>> {
+    ) -> ActorBuilder<S, actor_state::SetDid<St>> {
         self._fields.0 = Option::Some(value.into());
         ActorBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ActorBuilder<'a, S>
+impl<S: BosStr, St> ActorBuilder<S, St>
 where
-    S: actor_state::State,
-    S::Handle: actor_state::IsUnset,
+    St: actor_state::State,
+    St::Handle: actor_state::IsUnset,
 {
     /// Set the `handle` field (required)
     pub fn handle(
         mut self,
         value: impl Into<Handle<S>>,
-    ) -> ActorBuilder<'a, actor_state::SetHandle<S>> {
+    ) -> ActorBuilder<S, actor_state::SetHandle<St>> {
         self._fields.1 = Option::Some(value.into());
         ActorBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ActorBuilder<'a, S>
+impl<S: BosStr, St> ActorBuilder<S, St>
 where
-    S: actor_state::State,
-    S::Did: actor_state::IsSet,
-    S::Handle: actor_state::IsSet,
+    St: actor_state::State,
+    St::Handle: actor_state::IsSet,
+    St::Did: actor_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Actor<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Actor<S> {
         Actor {
             did: self._fields.0.unwrap(),
             handle: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Actor<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Actor<S> {
         Actor {
             did: self._fields.0.unwrap(),
             handle: self._fields.1.unwrap(),
@@ -352,35 +348,41 @@ pub mod search_actors_typeahead_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct SearchActorsTypeaheadBuilder<'a, S: search_actors_typeahead_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct SearchActorsTypeaheadBuilder<
+    S: BosStr,
+    St: search_actors_typeahead_state::State,
+> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> SearchActorsTypeahead<'a> {
-    /// Create a new builder for this type
+impl<S: BosStr> SearchActorsTypeahead<S> {
+    /// Create a new builder for this type.
     pub fn new() -> SearchActorsTypeaheadBuilder<
-        'a,
+        S,
         search_actors_typeahead_state::Empty,
     > {
         SearchActorsTypeaheadBuilder::new()
     }
 }
 
-impl<'a> SearchActorsTypeaheadBuilder<'a, search_actors_typeahead_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> SearchActorsTypeaheadBuilder<S, search_actors_typeahead_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SearchActorsTypeaheadBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: search_actors_typeahead_state::State> SearchActorsTypeaheadBuilder<'a, S> {
+impl<
+    S: BosStr,
+    St: search_actors_typeahead_state::State,
+> SearchActorsTypeaheadBuilder<S, St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
@@ -393,7 +395,10 @@ impl<'a, S: search_actors_typeahead_state::State> SearchActorsTypeaheadBuilder<'
     }
 }
 
-impl<'a, S: search_actors_typeahead_state::State> SearchActorsTypeaheadBuilder<'a, S> {
+impl<
+    S: BosStr,
+    St: search_actors_typeahead_state::State,
+> SearchActorsTypeaheadBuilder<S, St> {
     /// Set the `q` field (optional)
     pub fn q(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -406,12 +411,12 @@ impl<'a, S: search_actors_typeahead_state::State> SearchActorsTypeaheadBuilder<'
     }
 }
 
-impl<'a, S> SearchActorsTypeaheadBuilder<'a, S>
+impl<S: BosStr, St> SearchActorsTypeaheadBuilder<S, St>
 where
-    S: search_actors_typeahead_state::State,
+    St: search_actors_typeahead_state::State,
 {
-    /// Build the final struct
-    pub fn build(self) -> SearchActorsTypeahead<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> SearchActorsTypeahead<S> {
         SearchActorsTypeahead {
             limit: self._fields.0,
             q: self._fields.1,

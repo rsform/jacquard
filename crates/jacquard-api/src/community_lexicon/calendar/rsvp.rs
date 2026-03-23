@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -56,11 +56,11 @@ impl core::fmt::Display for Interested {
     rename = "community.lexicon.calendar.rsvp",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Rsvp<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Rsvp<S: BosStr = DefaultStr> {
     pub status: RsvpStatus<S>,
     pub subject: StrongRef<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -69,14 +69,14 @@ pub struct Rsvp<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum RsvpStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum RsvpStatus<S: BosStr = DefaultStr> {
     Interested,
     Going,
     Notgoing,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> RsvpStatus<S> {
+impl<S: BosStr> RsvpStatus<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Interested => "community.lexicon.calendar.rsvp#interested",
@@ -96,19 +96,19 @@ impl<S: Bos<str> + AsRef<str>> RsvpStatus<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for RsvpStatus<S> {
+impl<S: BosStr> core::fmt::Display for RsvpStatus<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for RsvpStatus<S> {
+impl<S: BosStr> AsRef<str> for RsvpStatus<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for RsvpStatus<S> {
+impl<S: BosStr> Serialize for RsvpStatus<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -117,8 +117,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for RsvpStatus<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for RsvpStatus<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for RsvpStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -128,14 +127,18 @@ for RsvpStatus<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for RsvpStatus<S> {
+impl<S: BosStr + Default> Default for RsvpStatus<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for RsvpStatus<S> {
-    type Output = RsvpStatus<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for RsvpStatus<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = RsvpStatus<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             RsvpStatus::Interested => RsvpStatus::Interested,
@@ -152,11 +155,11 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for RsvpStatus<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct RsvpGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct RsvpGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
@@ -173,7 +176,7 @@ impl core::fmt::Display for Notgoing {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Rsvp<S> {
+impl<S: BosStr> Rsvp<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, RsvpRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -186,17 +189,17 @@ pub struct RsvpRecord;
 impl XrpcResp for RsvpRecord {
     const NSID: &'static str = "community.lexicon.calendar.rsvp";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = RsvpGetRecordOutput<S>;
+    type Output<S: BosStr> = RsvpGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<RsvpGetRecordOutput<S>> for Rsvp<S> {
+impl<S: BosStr> From<RsvpGetRecordOutput<S>> for Rsvp<S> {
     fn from(output: RsvpGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Rsvp<S> {
+impl<S: BosStr> Collection for Rsvp<S> {
     const NSID: &'static str = "community.lexicon.calendar.rsvp";
     type Record = RsvpRecord;
 }
@@ -206,7 +209,7 @@ impl Collection for RsvpRecord {
     type Record = RsvpRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Rsvp<S> {
+impl<S: BosStr> LexiconSchema for Rsvp<S> {
     fn nsid() -> &'static str {
         "community.lexicon.calendar.rsvp"
     }
@@ -242,17 +245,17 @@ pub mod rsvp_state {
         type Subject = Unset;
     }
     ///State transition - sets the `status` field to Set
-    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStatus<S> {}
-    impl<S: State> State for SetStatus<S> {
+    pub struct SetStatus<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStatus<St> {}
+    impl<St: State> State for SetStatus<St> {
         type Status = Set<members::status>;
-        type Subject = S::Subject;
+        type Subject = St::Subject;
     }
     ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type Status = S::Status;
+    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubject<St> {}
+    impl<St: State> State for SetSubject<St> {
+        type Status = St::Status;
         type Subject = Set<members::subject>;
     }
     /// Marker types for field names
@@ -265,85 +268,85 @@ pub mod rsvp_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct RsvpBuilder<'a, S: rsvp_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct RsvpBuilder<S: BosStr, St: rsvp_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<RsvpStatus<S>>, Option<StrongRef<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Rsvp<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> RsvpBuilder<'a, rsvp_state::Empty> {
+impl<S: BosStr> Rsvp<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> RsvpBuilder<S, rsvp_state::Empty> {
         RsvpBuilder::new()
     }
 }
 
-impl<'a> RsvpBuilder<'a, rsvp_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> RsvpBuilder<S, rsvp_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         RsvpBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RsvpBuilder<'a, S>
+impl<S: BosStr, St> RsvpBuilder<S, St>
 where
-    S: rsvp_state::State,
-    S::Status: rsvp_state::IsUnset,
+    St: rsvp_state::State,
+    St::Status: rsvp_state::IsUnset,
 {
     /// Set the `status` field (required)
     pub fn status(
         mut self,
         value: impl Into<RsvpStatus<S>>,
-    ) -> RsvpBuilder<'a, rsvp_state::SetStatus<S>> {
+    ) -> RsvpBuilder<S, rsvp_state::SetStatus<St>> {
         self._fields.0 = Option::Some(value.into());
         RsvpBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RsvpBuilder<'a, S>
+impl<S: BosStr, St> RsvpBuilder<S, St>
 where
-    S: rsvp_state::State,
-    S::Subject: rsvp_state::IsUnset,
+    St: rsvp_state::State,
+    St::Subject: rsvp_state::IsUnset,
 {
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> RsvpBuilder<'a, rsvp_state::SetSubject<S>> {
+    ) -> RsvpBuilder<S, rsvp_state::SetSubject<St>> {
         self._fields.1 = Option::Some(value.into());
         RsvpBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RsvpBuilder<'a, S>
+impl<S: BosStr, St> RsvpBuilder<S, St>
 where
-    S: rsvp_state::State,
-    S::Status: rsvp_state::IsSet,
-    S::Subject: rsvp_state::IsSet,
+    St: rsvp_state::State,
+    St::Status: rsvp_state::IsSet,
+    St::Subject: rsvp_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Rsvp<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Rsvp<S> {
         Rsvp {
             status: self._fields.0.unwrap(),
             subject: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Rsvp<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Rsvp<S> {
         Rsvp {
             status: self._fields.0.unwrap(),
             subject: self._fields.1.unwrap(),

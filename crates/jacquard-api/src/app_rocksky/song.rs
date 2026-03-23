@@ -16,7 +16,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -43,11 +43,11 @@ use crate::app_rocksky::artist::ArtistMbid;
     rename = "app.rocksky.song",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Song<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Song<S: BosStr = DefaultStr> {
     ///The album of the song.
     pub album: S,
     ///The album art of the song.
@@ -127,11 +127,11 @@ pub struct Song<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SongGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SongGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
@@ -143,11 +143,11 @@ pub struct SongGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SongViewBasic<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SongViewBasic<S: BosStr = DefaultStr> {
     ///The album of the song.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub album: Option<S>,
@@ -207,11 +207,11 @@ pub struct SongViewBasic<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SongViewDetailed<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SongViewDetailed<S: BosStr = DefaultStr> {
     ///The album of the song.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub album: Option<S>,
@@ -266,7 +266,7 @@ pub struct SongViewDetailed<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Song<S> {
+impl<S: BosStr> Song<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, SongRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -279,17 +279,17 @@ pub struct SongRecord;
 impl XrpcResp for SongRecord {
     const NSID: &'static str = "app.rocksky.song";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = SongGetRecordOutput<S>;
+    type Output<S: BosStr> = SongGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<SongGetRecordOutput<S>> for Song<S> {
+impl<S: BosStr> From<SongGetRecordOutput<S>> for Song<S> {
     fn from(output: SongGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Song<S> {
+impl<S: BosStr> Collection for Song<S> {
     const NSID: &'static str = "app.rocksky.song";
     type Record = SongRecord;
 }
@@ -299,7 +299,7 @@ impl Collection for SongRecord {
     type Record = SongRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Song<S> {
+impl<S: BosStr> LexiconSchema for Song<S> {
     fn nsid() -> &'static str {
         "app.rocksky.song"
     }
@@ -540,7 +540,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Song<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for SongViewBasic<S> {
+impl<S: BosStr> LexiconSchema for SongViewBasic<S> {
     fn nsid() -> &'static str {
         "app.rocksky.song.defs"
     }
@@ -573,7 +573,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for SongViewBasic<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for SongViewDetailed<S> {
+impl<S: BosStr> LexiconSchema for SongViewDetailed<S> {
     fn nsid() -> &'static str {
         "app.rocksky.song.defs"
     }
@@ -616,111 +616,111 @@ pub mod song_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Album;
-        type AlbumArtist;
         type Duration;
+        type Album;
         type Title;
+        type CreatedAt;
         type Artist;
+        type AlbumArtist;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Album = Unset;
-        type AlbumArtist = Unset;
         type Duration = Unset;
+        type Album = Unset;
         type Title = Unset;
+        type CreatedAt = Unset;
         type Artist = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Album = S::Album;
-        type AlbumArtist = S::AlbumArtist;
-        type Duration = S::Duration;
-        type Title = S::Title;
-        type Artist = S::Artist;
-    }
-    ///State transition - sets the `album` field to Set
-    pub struct SetAlbum<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAlbum<S> {}
-    impl<S: State> State for SetAlbum<S> {
-        type CreatedAt = S::CreatedAt;
-        type Album = Set<members::album>;
-        type AlbumArtist = S::AlbumArtist;
-        type Duration = S::Duration;
-        type Title = S::Title;
-        type Artist = S::Artist;
-    }
-    ///State transition - sets the `album_artist` field to Set
-    pub struct SetAlbumArtist<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAlbumArtist<S> {}
-    impl<S: State> State for SetAlbumArtist<S> {
-        type CreatedAt = S::CreatedAt;
-        type Album = S::Album;
-        type AlbumArtist = Set<members::album_artist>;
-        type Duration = S::Duration;
-        type Title = S::Title;
-        type Artist = S::Artist;
+        type AlbumArtist = Unset;
     }
     ///State transition - sets the `duration` field to Set
-    pub struct SetDuration<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDuration<S> {}
-    impl<S: State> State for SetDuration<S> {
-        type CreatedAt = S::CreatedAt;
-        type Album = S::Album;
-        type AlbumArtist = S::AlbumArtist;
+    pub struct SetDuration<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDuration<St> {}
+    impl<St: State> State for SetDuration<St> {
         type Duration = Set<members::duration>;
-        type Title = S::Title;
-        type Artist = S::Artist;
+        type Album = St::Album;
+        type Title = St::Title;
+        type CreatedAt = St::CreatedAt;
+        type Artist = St::Artist;
+        type AlbumArtist = St::AlbumArtist;
+    }
+    ///State transition - sets the `album` field to Set
+    pub struct SetAlbum<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAlbum<St> {}
+    impl<St: State> State for SetAlbum<St> {
+        type Duration = St::Duration;
+        type Album = Set<members::album>;
+        type Title = St::Title;
+        type CreatedAt = St::CreatedAt;
+        type Artist = St::Artist;
+        type AlbumArtist = St::AlbumArtist;
     }
     ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type CreatedAt = S::CreatedAt;
-        type Album = S::Album;
-        type AlbumArtist = S::AlbumArtist;
-        type Duration = S::Duration;
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
+        type Duration = St::Duration;
+        type Album = St::Album;
         type Title = Set<members::title>;
-        type Artist = S::Artist;
+        type CreatedAt = St::CreatedAt;
+        type Artist = St::Artist;
+        type AlbumArtist = St::AlbumArtist;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Duration = St::Duration;
+        type Album = St::Album;
+        type Title = St::Title;
+        type CreatedAt = Set<members::created_at>;
+        type Artist = St::Artist;
+        type AlbumArtist = St::AlbumArtist;
     }
     ///State transition - sets the `artist` field to Set
-    pub struct SetArtist<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetArtist<S> {}
-    impl<S: State> State for SetArtist<S> {
-        type CreatedAt = S::CreatedAt;
-        type Album = S::Album;
-        type AlbumArtist = S::AlbumArtist;
-        type Duration = S::Duration;
-        type Title = S::Title;
+    pub struct SetArtist<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetArtist<St> {}
+    impl<St: State> State for SetArtist<St> {
+        type Duration = St::Duration;
+        type Album = St::Album;
+        type Title = St::Title;
+        type CreatedAt = St::CreatedAt;
         type Artist = Set<members::artist>;
+        type AlbumArtist = St::AlbumArtist;
+    }
+    ///State transition - sets the `album_artist` field to Set
+    pub struct SetAlbumArtist<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAlbumArtist<St> {}
+    impl<St: State> State for SetAlbumArtist<St> {
+        type Duration = St::Duration;
+        type Album = St::Album;
+        type Title = St::Title;
+        type CreatedAt = St::CreatedAt;
+        type Artist = St::Artist;
+        type AlbumArtist = Set<members::album_artist>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `album` field
-        pub struct album(());
-        ///Marker type for the `album_artist` field
-        pub struct album_artist(());
         ///Marker type for the `duration` field
         pub struct duration(());
+        ///Marker type for the `album` field
+        pub struct album(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `artist` field
         pub struct artist(());
+        ///Marker type for the `album_artist` field
+        pub struct album_artist(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct SongBuilder<'a, S: song_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct SongBuilder<S: BosStr, St: song_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
         Option<BlobRef<S>>,
@@ -748,18 +748,18 @@ pub struct SongBuilder<'a, S: song_state::State> {
         Option<i64>,
         Option<UriValue<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Song<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> SongBuilder<'a, song_state::Empty> {
+impl<S: BosStr> Song<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> SongBuilder<S, song_state::Empty> {
         SongBuilder::new()
     }
 }
 
-impl<'a> SongBuilder<'a, song_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> SongBuilder<S, song_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SongBuilder {
             _state: PhantomData,
@@ -790,31 +790,31 @@ impl<'a> SongBuilder<'a, song_state::Empty> {
                 None,
                 None,
             ),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SongBuilder<'a, S>
+impl<S: BosStr, St> SongBuilder<S, St>
 where
-    S: song_state::State,
-    S::Album: song_state::IsUnset,
+    St: song_state::State,
+    St::Album: song_state::IsUnset,
 {
     /// Set the `album` field (required)
     pub fn album(
         mut self,
         value: impl Into<S>,
-    ) -> SongBuilder<'a, song_state::SetAlbum<S>> {
+    ) -> SongBuilder<S, song_state::SetAlbum<St>> {
         self._fields.0 = Option::Some(value.into());
         SongBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: song_state::State> SongBuilder<'a, S> {
+impl<S: BosStr, St: song_state::State> SongBuilder<S, St> {
     /// Set the `albumArt` field (optional)
     pub fn album_art(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -827,7 +827,7 @@ impl<'a, S: song_state::State> SongBuilder<'a, S> {
     }
 }
 
-impl<'a, S: song_state::State> SongBuilder<'a, S> {
+impl<S: BosStr, St: song_state::State> SongBuilder<S, St> {
     /// Set the `albumArtUrl` field (optional)
     pub fn album_art_url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -840,26 +840,26 @@ impl<'a, S: song_state::State> SongBuilder<'a, S> {
     }
 }
 
-impl<'a, S> SongBuilder<'a, S>
+impl<S: BosStr, St> SongBuilder<S, St>
 where
-    S: song_state::State,
-    S::AlbumArtist: song_state::IsUnset,
+    St: song_state::State,
+    St::AlbumArtist: song_state::IsUnset,
 {
     /// Set the `albumArtist` field (required)
     pub fn album_artist(
         mut self,
         value: impl Into<S>,
-    ) -> SongBuilder<'a, song_state::SetAlbumArtist<S>> {
+    ) -> SongBuilder<S, song_state::SetAlbumArtist<St>> {
         self._fields.3 = Option::Some(value.into());
         SongBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: song_state::State> SongBuilder<'a, S> {
+impl<S: BosStr, St: song_state::State> SongBuilder<S, St> {
     /// Set the `appleMusicLink` field (optional)
     pub fn apple_music_link(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -872,26 +872,26 @@ impl<'a, S: song_state::State> SongBuilder<'a, S> {
     }
 }
 
-impl<'a, S> SongBuilder<'a, S>
+impl<S: BosStr, St> SongBuilder<S, St>
 where
-    S: song_state::State,
-    S::Artist: song_state::IsUnset,
+    St: song_state::State,
+    St::Artist: song_state::IsUnset,
 {
     /// Set the `artist` field (required)
     pub fn artist(
         mut self,
         value: impl Into<S>,
-    ) -> SongBuilder<'a, song_state::SetArtist<S>> {
+    ) -> SongBuilder<S, song_state::SetArtist<St>> {
         self._fields.5 = Option::Some(value.into());
         SongBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: song_state::State> SongBuilder<'a, S> {
+impl<S: BosStr, St: song_state::State> SongBuilder<S, St> {
     /// Set the `artists` field (optional)
     pub fn artists(mut self, value: impl Into<Option<Vec<ArtistMbid<S>>>>) -> Self {
         self._fields.6 = value.into();
@@ -904,7 +904,7 @@ impl<'a, S: song_state::State> SongBuilder<'a, S> {
     }
 }
 
-impl<'a, S: song_state::State> SongBuilder<'a, S> {
+impl<S: BosStr, St: song_state::State> SongBuilder<S, St> {
     /// Set the `composer` field (optional)
     pub fn composer(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.7 = value.into();
@@ -917,7 +917,7 @@ impl<'a, S: song_state::State> SongBuilder<'a, S> {
     }
 }
 
-impl<'a, S: song_state::State> SongBuilder<'a, S> {
+impl<S: BosStr, St: song_state::State> SongBuilder<S, St> {
     /// Set the `copyrightMessage` field (optional)
     pub fn copyright_message(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.8 = value.into();
@@ -930,26 +930,26 @@ impl<'a, S: song_state::State> SongBuilder<'a, S> {
     }
 }
 
-impl<'a, S> SongBuilder<'a, S>
+impl<S: BosStr, St> SongBuilder<S, St>
 where
-    S: song_state::State,
-    S::CreatedAt: song_state::IsUnset,
+    St: song_state::State,
+    St::CreatedAt: song_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> SongBuilder<'a, song_state::SetCreatedAt<S>> {
+    ) -> SongBuilder<S, song_state::SetCreatedAt<St>> {
         self._fields.9 = Option::Some(value.into());
         SongBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: song_state::State> SongBuilder<'a, S> {
+impl<S: BosStr, St: song_state::State> SongBuilder<S, St> {
     /// Set the `discNumber` field (optional)
     pub fn disc_number(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.10 = value.into();
@@ -962,26 +962,26 @@ impl<'a, S: song_state::State> SongBuilder<'a, S> {
     }
 }
 
-impl<'a, S> SongBuilder<'a, S>
+impl<S: BosStr, St> SongBuilder<S, St>
 where
-    S: song_state::State,
-    S::Duration: song_state::IsUnset,
+    St: song_state::State,
+    St::Duration: song_state::IsUnset,
 {
     /// Set the `duration` field (required)
     pub fn duration(
         mut self,
         value: impl Into<i64>,
-    ) -> SongBuilder<'a, song_state::SetDuration<S>> {
+    ) -> SongBuilder<S, song_state::SetDuration<St>> {
         self._fields.11 = Option::Some(value.into());
         SongBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: song_state::State> SongBuilder<'a, S> {
+impl<S: BosStr, St: song_state::State> SongBuilder<S, St> {
     /// Set the `genre` field (optional)
     pub fn genre(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.12 = value.into();
@@ -994,7 +994,7 @@ impl<'a, S: song_state::State> SongBuilder<'a, S> {
     }
 }
 
-impl<'a, S: song_state::State> SongBuilder<'a, S> {
+impl<S: BosStr, St: song_state::State> SongBuilder<S, St> {
     /// Set the `label` field (optional)
     pub fn label(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.13 = value.into();
@@ -1007,7 +1007,7 @@ impl<'a, S: song_state::State> SongBuilder<'a, S> {
     }
 }
 
-impl<'a, S: song_state::State> SongBuilder<'a, S> {
+impl<S: BosStr, St: song_state::State> SongBuilder<S, St> {
     /// Set the `lyrics` field (optional)
     pub fn lyrics(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.14 = value.into();
@@ -1020,7 +1020,7 @@ impl<'a, S: song_state::State> SongBuilder<'a, S> {
     }
 }
 
-impl<'a, S: song_state::State> SongBuilder<'a, S> {
+impl<S: BosStr, St: song_state::State> SongBuilder<S, St> {
     /// Set the `mbid` field (optional)
     pub fn mbid(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.15 = value.into();
@@ -1033,7 +1033,7 @@ impl<'a, S: song_state::State> SongBuilder<'a, S> {
     }
 }
 
-impl<'a, S: song_state::State> SongBuilder<'a, S> {
+impl<S: BosStr, St: song_state::State> SongBuilder<S, St> {
     /// Set the `releaseDate` field (optional)
     pub fn release_date(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.16 = value.into();
@@ -1046,7 +1046,7 @@ impl<'a, S: song_state::State> SongBuilder<'a, S> {
     }
 }
 
-impl<'a, S: song_state::State> SongBuilder<'a, S> {
+impl<S: BosStr, St: song_state::State> SongBuilder<S, St> {
     /// Set the `spotifyLink` field (optional)
     pub fn spotify_link(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.17 = value.into();
@@ -1059,7 +1059,7 @@ impl<'a, S: song_state::State> SongBuilder<'a, S> {
     }
 }
 
-impl<'a, S: song_state::State> SongBuilder<'a, S> {
+impl<S: BosStr, St: song_state::State> SongBuilder<S, St> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.18 = value.into();
@@ -1072,7 +1072,7 @@ impl<'a, S: song_state::State> SongBuilder<'a, S> {
     }
 }
 
-impl<'a, S: song_state::State> SongBuilder<'a, S> {
+impl<S: BosStr, St: song_state::State> SongBuilder<S, St> {
     /// Set the `tidalLink` field (optional)
     pub fn tidal_link(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.19 = value.into();
@@ -1085,26 +1085,26 @@ impl<'a, S: song_state::State> SongBuilder<'a, S> {
     }
 }
 
-impl<'a, S> SongBuilder<'a, S>
+impl<S: BosStr, St> SongBuilder<S, St>
 where
-    S: song_state::State,
-    S::Title: song_state::IsUnset,
+    St: song_state::State,
+    St::Title: song_state::IsUnset,
 {
     /// Set the `title` field (required)
     pub fn title(
         mut self,
         value: impl Into<S>,
-    ) -> SongBuilder<'a, song_state::SetTitle<S>> {
+    ) -> SongBuilder<S, song_state::SetTitle<St>> {
         self._fields.20 = Option::Some(value.into());
         SongBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: song_state::State> SongBuilder<'a, S> {
+impl<S: BosStr, St: song_state::State> SongBuilder<S, St> {
     /// Set the `trackNumber` field (optional)
     pub fn track_number(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.21 = value.into();
@@ -1117,7 +1117,7 @@ impl<'a, S: song_state::State> SongBuilder<'a, S> {
     }
 }
 
-impl<'a, S: song_state::State> SongBuilder<'a, S> {
+impl<S: BosStr, St: song_state::State> SongBuilder<S, St> {
     /// Set the `wiki` field (optional)
     pub fn wiki(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.22 = value.into();
@@ -1130,7 +1130,7 @@ impl<'a, S: song_state::State> SongBuilder<'a, S> {
     }
 }
 
-impl<'a, S: song_state::State> SongBuilder<'a, S> {
+impl<S: BosStr, St: song_state::State> SongBuilder<S, St> {
     /// Set the `year` field (optional)
     pub fn year(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.23 = value.into();
@@ -1143,7 +1143,7 @@ impl<'a, S: song_state::State> SongBuilder<'a, S> {
     }
 }
 
-impl<'a, S: song_state::State> SongBuilder<'a, S> {
+impl<S: BosStr, St: song_state::State> SongBuilder<S, St> {
     /// Set the `youtubeLink` field (optional)
     pub fn youtube_link(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.24 = value.into();
@@ -1156,18 +1156,18 @@ impl<'a, S: song_state::State> SongBuilder<'a, S> {
     }
 }
 
-impl<'a, S> SongBuilder<'a, S>
+impl<S: BosStr, St> SongBuilder<S, St>
 where
-    S: song_state::State,
-    S::CreatedAt: song_state::IsSet,
-    S::Album: song_state::IsSet,
-    S::AlbumArtist: song_state::IsSet,
-    S::Duration: song_state::IsSet,
-    S::Title: song_state::IsSet,
-    S::Artist: song_state::IsSet,
+    St: song_state::State,
+    St::Duration: song_state::IsSet,
+    St::Album: song_state::IsSet,
+    St::Title: song_state::IsSet,
+    St::CreatedAt: song_state::IsSet,
+    St::Artist: song_state::IsSet,
+    St::AlbumArtist: song_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Song<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Song<S> {
         Song {
             album: self._fields.0.unwrap(),
             album_art: self._fields.1,
@@ -1197,8 +1197,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Song<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Song<S> {
         Song {
             album: self._fields.0.unwrap(),
             album_art: self._fields.1,

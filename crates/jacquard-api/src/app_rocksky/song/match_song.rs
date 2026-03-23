@@ -6,49 +6,44 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[allow(unused_imports)]
+use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::app_rocksky::song::SongViewDetailed;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct MatchSong<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct MatchSong<S: BosStr = DefaultStr> {
     pub artist: S,
-    #[serde(borrow)]
     pub title: S,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct MatchSongOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct MatchSongOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
-    #[serde(borrow)]
     pub value: SongViewDetailed<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
-    pub extra_data: Option<
-        alloc::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<S>,
-        >,
-    >,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for app.rocksky.song.matchSong
@@ -56,12 +51,11 @@ pub struct MatchSongResponse;
 impl jacquard_common::xrpc::XrpcResp for MatchSongResponse {
     const NSID: &'static str = "app.rocksky.song.matchSong";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = MatchSongOutput<S>;
+    type Output<S: BosStr> = MatchSongOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for MatchSong<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for MatchSong<S> {
     const NSID: &'static str = "app.rocksky.song.matchSong";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = MatchSongResponse;
@@ -72,7 +66,7 @@ pub struct MatchSongRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for MatchSongRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.song.matchSong";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = MatchSong<S>;
+    type Request<S: BosStr> = MatchSong<S>;
     type Response = MatchSongResponse;
 }
 
@@ -86,111 +80,111 @@ pub mod match_song_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
         type Artist;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
         type Artist = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type Artist = S::Artist;
+        type Title = Unset;
     }
     ///State transition - sets the `artist` field to Set
-    pub struct SetArtist<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetArtist<S> {}
-    impl<S: State> State for SetArtist<S> {
-        type Title = S::Title;
+    pub struct SetArtist<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetArtist<St> {}
+    impl<St: State> State for SetArtist<St> {
         type Artist = Set<members::artist>;
+        type Title = St::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
+        type Artist = St::Artist;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `artist` field
         pub struct artist(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct MatchSongBuilder<'a, S: match_song_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct MatchSongBuilder<S: BosStr, St: match_song_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> MatchSong<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> MatchSongBuilder<'a, match_song_state::Empty> {
+impl<S: BosStr> MatchSong<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> MatchSongBuilder<S, match_song_state::Empty> {
         MatchSongBuilder::new()
     }
 }
 
-impl<'a> MatchSongBuilder<'a, match_song_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> MatchSongBuilder<S, match_song_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         MatchSongBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> MatchSongBuilder<'a, S>
+impl<S: BosStr, St> MatchSongBuilder<S, St>
 where
-    S: match_song_state::State,
-    S::Artist: match_song_state::IsUnset,
+    St: match_song_state::State,
+    St::Artist: match_song_state::IsUnset,
 {
     /// Set the `artist` field (required)
     pub fn artist(
         mut self,
         value: impl Into<S>,
-    ) -> MatchSongBuilder<'a, match_song_state::SetArtist<S>> {
+    ) -> MatchSongBuilder<S, match_song_state::SetArtist<St>> {
         self._fields.0 = Option::Some(value.into());
         MatchSongBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> MatchSongBuilder<'a, S>
+impl<S: BosStr, St> MatchSongBuilder<S, St>
 where
-    S: match_song_state::State,
-    S::Title: match_song_state::IsUnset,
+    St: match_song_state::State,
+    St::Title: match_song_state::IsUnset,
 {
     /// Set the `title` field (required)
     pub fn title(
         mut self,
         value: impl Into<S>,
-    ) -> MatchSongBuilder<'a, match_song_state::SetTitle<S>> {
+    ) -> MatchSongBuilder<S, match_song_state::SetTitle<St>> {
         self._fields.1 = Option::Some(value.into());
         MatchSongBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> MatchSongBuilder<'a, S>
+impl<S: BosStr, St> MatchSongBuilder<S, St>
 where
-    S: match_song_state::State,
-    S::Title: match_song_state::IsSet,
-    S::Artist: match_song_state::IsSet,
+    St: match_song_state::State,
+    St::Artist: match_song_state::IsSet,
+    St::Title: match_song_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> MatchSong<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> MatchSong<S> {
         MatchSong {
             artist: self._fields.0.unwrap(),
             title: self._fields.1.unwrap(),

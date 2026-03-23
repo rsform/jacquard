@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -28,38 +28,17 @@ use crate::at_inlay::Response;
 use crate::org_atsui::tabs;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Tabs<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Tabs<S: BosStr = DefaultStr> {
     ///Tabs to display.
     pub items: Vec<tabs::Tab<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
-    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
-}
-
-
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
-#[serde(
-    bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
-    )
-)]
-pub struct TabsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(flatten)]
-    #[serde(borrow)]
-    pub value: Response<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -68,11 +47,27 @@ pub struct TabsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Tab<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct TabsOutput<S: BosStr = DefaultStr> {
+    #[serde(flatten)]
+    pub value: Response<S>,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
+}
+
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
+#[serde(
+    rename_all = "camelCase",
+    bound(
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
+    )
+)]
+pub struct Tab<S: BosStr = DefaultStr> {
     ///Element to render as tab content.
     pub content: Element<S>,
     ///Stable key that identifies the tab among its siblings.
@@ -88,12 +83,11 @@ pub struct TabsResponse;
 impl jacquard_common::xrpc::XrpcResp for TabsResponse {
     const NSID: &'static str = "org.atsui.Tabs";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = TabsOutput<S>;
+    type Output<S: BosStr> = TabsOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for Tabs<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Tabs<S> {
     const NSID: &'static str = "org.atsui.Tabs";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -108,11 +102,11 @@ impl jacquard_common::xrpc::XrpcEndpoint for TabsRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = Tabs<S>;
+    type Request<S: BosStr> = Tabs<S>;
     type Response = TabsResponse;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Tab<S> {
+impl<S: BosStr> LexiconSchema for Tab<S> {
     fn nsid() -> &'static str {
         "org.atsui.Tabs"
     }
@@ -168,9 +162,9 @@ pub mod tabs_state {
         type Items = Unset;
     }
     ///State transition - sets the `items` field to Set
-    pub struct SetItems<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetItems<S> {}
-    impl<S: State> State for SetItems<S> {
+    pub struct SetItems<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetItems<St> {}
+    impl<St: State> State for SetItems<St> {
         type Items = Set<members::items>;
     }
     /// Marker types for field names
@@ -181,64 +175,64 @@ pub mod tabs_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct TabsBuilder<'a, S: tabs_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct TabsBuilder<S: BosStr, St: tabs_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<tabs::Tab<S>>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Tabs<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> TabsBuilder<'a, tabs_state::Empty> {
+impl<S: BosStr> Tabs<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> TabsBuilder<S, tabs_state::Empty> {
         TabsBuilder::new()
     }
 }
 
-impl<'a> TabsBuilder<'a, tabs_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> TabsBuilder<S, tabs_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         TabsBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> TabsBuilder<'a, S>
+impl<S: BosStr, St> TabsBuilder<S, St>
 where
-    S: tabs_state::State,
-    S::Items: tabs_state::IsUnset,
+    St: tabs_state::State,
+    St::Items: tabs_state::IsUnset,
 {
     /// Set the `items` field (required)
     pub fn items(
         mut self,
         value: impl Into<Vec<tabs::Tab<S>>>,
-    ) -> TabsBuilder<'a, tabs_state::SetItems<S>> {
+    ) -> TabsBuilder<S, tabs_state::SetItems<St>> {
         self._fields.0 = Option::Some(value.into());
         TabsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> TabsBuilder<'a, S>
+impl<S: BosStr, St> TabsBuilder<S, St>
 where
-    S: tabs_state::State,
-    S::Items: tabs_state::IsSet,
+    St: tabs_state::State,
+    St::Items: tabs_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Tabs<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Tabs<S> {
         Tabs {
             items: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Tabs<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Tabs<S> {
         Tabs {
             items: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -256,142 +250,142 @@ pub mod tab_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Label;
         type Content;
         type Key;
+        type Label;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Label = Unset;
         type Content = Unset;
         type Key = Unset;
-    }
-    ///State transition - sets the `label` field to Set
-    pub struct SetLabel<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLabel<S> {}
-    impl<S: State> State for SetLabel<S> {
-        type Label = Set<members::label>;
-        type Content = S::Content;
-        type Key = S::Key;
+        type Label = Unset;
     }
     ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type Label = S::Label;
+    pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetContent<St> {}
+    impl<St: State> State for SetContent<St> {
         type Content = Set<members::content>;
-        type Key = S::Key;
+        type Key = St::Key;
+        type Label = St::Label;
     }
     ///State transition - sets the `key` field to Set
-    pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetKey<S> {}
-    impl<S: State> State for SetKey<S> {
-        type Label = S::Label;
-        type Content = S::Content;
+    pub struct SetKey<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetKey<St> {}
+    impl<St: State> State for SetKey<St> {
+        type Content = St::Content;
         type Key = Set<members::key>;
+        type Label = St::Label;
+    }
+    ///State transition - sets the `label` field to Set
+    pub struct SetLabel<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLabel<St> {}
+    impl<St: State> State for SetLabel<St> {
+        type Content = St::Content;
+        type Key = St::Key;
+        type Label = Set<members::label>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `label` field
-        pub struct label(());
         ///Marker type for the `content` field
         pub struct content(());
         ///Marker type for the `key` field
         pub struct key(());
+        ///Marker type for the `label` field
+        pub struct label(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct TabBuilder<'a, S: tab_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct TabBuilder<S: BosStr, St: tab_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Element<S>>, Option<S>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Tab<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> TabBuilder<'a, tab_state::Empty> {
+impl<S: BosStr> Tab<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> TabBuilder<S, tab_state::Empty> {
         TabBuilder::new()
     }
 }
 
-impl<'a> TabBuilder<'a, tab_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> TabBuilder<S, tab_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         TabBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> TabBuilder<'a, S>
+impl<S: BosStr, St> TabBuilder<S, St>
 where
-    S: tab_state::State,
-    S::Content: tab_state::IsUnset,
+    St: tab_state::State,
+    St::Content: tab_state::IsUnset,
 {
     /// Set the `content` field (required)
     pub fn content(
         mut self,
         value: impl Into<Element<S>>,
-    ) -> TabBuilder<'a, tab_state::SetContent<S>> {
+    ) -> TabBuilder<S, tab_state::SetContent<St>> {
         self._fields.0 = Option::Some(value.into());
         TabBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> TabBuilder<'a, S>
+impl<S: BosStr, St> TabBuilder<S, St>
 where
-    S: tab_state::State,
-    S::Key: tab_state::IsUnset,
+    St: tab_state::State,
+    St::Key: tab_state::IsUnset,
 {
     /// Set the `key` field (required)
-    pub fn key(mut self, value: impl Into<S>) -> TabBuilder<'a, tab_state::SetKey<S>> {
+    pub fn key(mut self, value: impl Into<S>) -> TabBuilder<S, tab_state::SetKey<St>> {
         self._fields.1 = Option::Some(value.into());
         TabBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> TabBuilder<'a, S>
+impl<S: BosStr, St> TabBuilder<S, St>
 where
-    S: tab_state::State,
-    S::Label: tab_state::IsUnset,
+    St: tab_state::State,
+    St::Label: tab_state::IsUnset,
 {
     /// Set the `label` field (required)
     pub fn label(
         mut self,
         value: impl Into<S>,
-    ) -> TabBuilder<'a, tab_state::SetLabel<S>> {
+    ) -> TabBuilder<S, tab_state::SetLabel<St>> {
         self._fields.2 = Option::Some(value.into());
         TabBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> TabBuilder<'a, S>
+impl<S: BosStr, St> TabBuilder<S, St>
 where
-    S: tab_state::State,
-    S::Label: tab_state::IsSet,
-    S::Content: tab_state::IsSet,
-    S::Key: tab_state::IsSet,
+    St: tab_state::State,
+    St::Content: tab_state::IsSet,
+    St::Key: tab_state::IsSet,
+    St::Label: tab_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Tab<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Tab<S> {
         Tab {
             content: self._fields.0.unwrap(),
             key: self._fields.1.unwrap(),
@@ -399,8 +393,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Tab<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Tab<S> {
         Tab {
             content: self._fields.0.unwrap(),
             key: self._fields.1.unwrap(),

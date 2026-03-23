@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::value::Data;
@@ -19,28 +19,27 @@ use serde::{Serialize, Deserialize};
 use crate::app_bsky::actor::ProfileView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetSuggestedFollowsByActor<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct GetSuggestedFollowsByActor<S: BosStr = DefaultStr> {
     pub actor: AtIdentifier<S>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetSuggestedFollowsByActorOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetSuggestedFollowsByActorOutput<S: BosStr = DefaultStr> {
     ///DEPRECATED, unused. Previously: if true, response has fallen-back to generic results, and is not scoped using relativeToDid  Defaults to `false`.
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_get_suggested_follows_by_actor_output_is_fallback")]
@@ -52,9 +51,7 @@ pub struct GetSuggestedFollowsByActorOutput<S: Bos<str> + AsRef<str> = DefaultSt
     #[serde(skip_serializing_if = "Option::is_none")]
     pub rec_id_str: Option<S>,
     pub suggestions: Vec<ProfileView<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -63,12 +60,11 @@ pub struct GetSuggestedFollowsByActorResponse;
 impl jacquard_common::xrpc::XrpcResp for GetSuggestedFollowsByActorResponse {
     const NSID: &'static str = "app.bsky.graph.getSuggestedFollowsByActor";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetSuggestedFollowsByActorOutput<S>;
+    type Output<S: BosStr> = GetSuggestedFollowsByActorOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetSuggestedFollowsByActor<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetSuggestedFollowsByActor<S> {
     const NSID: &'static str = "app.bsky.graph.getSuggestedFollowsByActor";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetSuggestedFollowsByActorResponse;
@@ -79,7 +75,7 @@ pub struct GetSuggestedFollowsByActorRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetSuggestedFollowsByActorRequest {
     const PATH: &'static str = "/xrpc/app.bsky.graph.getSuggestedFollowsByActor";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetSuggestedFollowsByActor<S>;
+    type Request<S: BosStr> = GetSuggestedFollowsByActor<S>;
     type Response = GetSuggestedFollowsByActorResponse;
 }
 
@@ -102,9 +98,9 @@ pub mod get_suggested_follows_by_actor_state {
         type Actor = Unset;
     }
     ///State transition - sets the `actor` field to Set
-    pub struct SetActor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetActor<S> {}
-    impl<S: State> State for SetActor<S> {
+    pub struct SetActor<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetActor<St> {}
+    impl<St: State> State for SetActor<St> {
         type Actor = Set<members::actor>;
     }
     /// Marker types for field names
@@ -115,20 +111,20 @@ pub mod get_suggested_follows_by_actor_state {
     }
 }
 
-/// Builder for constructing an instance of this type
+/// Builder for constructing an instance of this type.
 pub struct GetSuggestedFollowsByActorBuilder<
-    'a,
-    S: get_suggested_follows_by_actor_state::State,
+    S: BosStr,
+    St: get_suggested_follows_by_actor_state::State,
 > {
-    _state: PhantomData<fn() -> S>,
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtIdentifier<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetSuggestedFollowsByActor<'a> {
-    /// Create a new builder for this type
+impl<S: BosStr> GetSuggestedFollowsByActor<S> {
+    /// Create a new builder for this type.
     pub fn new() -> GetSuggestedFollowsByActorBuilder<
-        'a,
+        S,
         get_suggested_follows_by_actor_state::Empty,
     > {
         GetSuggestedFollowsByActorBuilder::new()
@@ -136,47 +132,47 @@ impl<'a> GetSuggestedFollowsByActor<'a> {
 }
 
 impl<
-    'a,
-> GetSuggestedFollowsByActorBuilder<'a, get_suggested_follows_by_actor_state::Empty> {
-    /// Create a new builder with all fields unset
+    S: BosStr,
+> GetSuggestedFollowsByActorBuilder<S, get_suggested_follows_by_actor_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetSuggestedFollowsByActorBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetSuggestedFollowsByActorBuilder<'a, S>
+impl<S: BosStr, St> GetSuggestedFollowsByActorBuilder<S, St>
 where
-    S: get_suggested_follows_by_actor_state::State,
-    S::Actor: get_suggested_follows_by_actor_state::IsUnset,
+    St: get_suggested_follows_by_actor_state::State,
+    St::Actor: get_suggested_follows_by_actor_state::IsUnset,
 {
     /// Set the `actor` field (required)
     pub fn actor(
         mut self,
         value: impl Into<AtIdentifier<S>>,
     ) -> GetSuggestedFollowsByActorBuilder<
-        'a,
-        get_suggested_follows_by_actor_state::SetActor<S>,
+        S,
+        get_suggested_follows_by_actor_state::SetActor<St>,
     > {
         self._fields.0 = Option::Some(value.into());
         GetSuggestedFollowsByActorBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetSuggestedFollowsByActorBuilder<'a, S>
+impl<S: BosStr, St> GetSuggestedFollowsByActorBuilder<S, St>
 where
-    S: get_suggested_follows_by_actor_state::State,
-    S::Actor: get_suggested_follows_by_actor_state::IsSet,
+    St: get_suggested_follows_by_actor_state::State,
+    St::Actor: get_suggested_follows_by_actor_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetSuggestedFollowsByActor<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetSuggestedFollowsByActor<S> {
         GetSuggestedFollowsByActor {
             actor: self._fields.0.unwrap(),
         }

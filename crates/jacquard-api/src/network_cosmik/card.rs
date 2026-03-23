@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -38,11 +38,11 @@ use crate::network_cosmik::card;
     rename = "network.cosmik.card",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Card<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Card<S: BosStr = DefaultStr> {
     ///The specific content of the card, determined by the card type.
     pub content: CardContent<S>,
     ///Timestamp when this card was created (usually set by PDS).
@@ -72,11 +72,11 @@ pub struct Card<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum CardContent<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum CardContent<S: BosStr = DefaultStr> {
     #[serde(rename = "network.cosmik.card#urlContent")]
     UrlContent(Box<card::UrlContent<S>>),
     #[serde(rename = "network.cosmik.card#noteContent")]
@@ -86,13 +86,13 @@ pub enum CardContent<S: Bos<str> + AsRef<str> = DefaultStr> {
 /// The type of card
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum CardType<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum CardType<S: BosStr = DefaultStr> {
     Url,
     Note,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> CardType<S> {
+impl<S: BosStr> CardType<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Url => "URL",
@@ -110,19 +110,19 @@ impl<S: Bos<str> + AsRef<str>> CardType<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for CardType<S> {
+impl<S: BosStr> core::fmt::Display for CardType<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for CardType<S> {
+impl<S: BosStr> AsRef<str> for CardType<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for CardType<S> {
+impl<S: BosStr> Serialize for CardType<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -131,7 +131,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for CardType<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de> for CardType<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for CardType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -141,14 +141,18 @@ impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de> for Card
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for CardType<S> {
+impl<S: BosStr + Default> Default for CardType<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for CardType<S> {
-    type Output = CardType<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for CardType<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = CardType<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             CardType::Url => CardType::Url,
@@ -164,11 +168,11 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for CardType<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CardGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CardGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
@@ -181,11 +185,11 @@ pub struct CardGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct NoteContent<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct NoteContent<S: BosStr = DefaultStr> {
     ///The note text content
     pub text: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -198,11 +202,11 @@ pub struct NoteContent<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct UrlContent<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct UrlContent<S: BosStr = DefaultStr> {
     ///Optional metadata about the URL
     #[serde(skip_serializing_if = "Option::is_none")]
     pub metadata: Option<card::UrlMetadata<S>>,
@@ -218,11 +222,11 @@ pub struct UrlContent<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct UrlMetadata<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct UrlMetadata<S: BosStr = DefaultStr> {
     ///Author of the content
     #[serde(skip_serializing_if = "Option::is_none")]
     pub author: Option<S>,
@@ -257,7 +261,7 @@ pub struct UrlMetadata<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Card<S> {
+impl<S: BosStr> Card<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, CardRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -270,17 +274,17 @@ pub struct CardRecord;
 impl XrpcResp for CardRecord {
     const NSID: &'static str = "network.cosmik.card";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = CardGetRecordOutput<S>;
+    type Output<S: BosStr> = CardGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<CardGetRecordOutput<S>> for Card<S> {
+impl<S: BosStr> From<CardGetRecordOutput<S>> for Card<S> {
     fn from(output: CardGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Card<S> {
+impl<S: BosStr> Collection for Card<S> {
     const NSID: &'static str = "network.cosmik.card";
     type Record = CardRecord;
 }
@@ -290,7 +294,7 @@ impl Collection for CardRecord {
     type Record = CardRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Card<S> {
+impl<S: BosStr> LexiconSchema for Card<S> {
     fn nsid() -> &'static str {
         "network.cosmik.card"
     }
@@ -305,7 +309,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Card<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for NoteContent<S> {
+impl<S: BosStr> LexiconSchema for NoteContent<S> {
     fn nsid() -> &'static str {
         "network.cosmik.card"
     }
@@ -331,7 +335,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for NoteContent<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for UrlContent<S> {
+impl<S: BosStr> LexiconSchema for UrlContent<S> {
     fn nsid() -> &'static str {
         "network.cosmik.card"
     }
@@ -346,7 +350,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for UrlContent<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for UrlMetadata<S> {
+impl<S: BosStr> LexiconSchema for UrlMetadata<S> {
     fn nsid() -> &'static str {
         "network.cosmik.card"
     }
@@ -371,43 +375,43 @@ pub mod card_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Type;
         type Content;
+        type Type;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Type = Unset;
         type Content = Unset;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type Type = Set<members::r#type>;
-        type Content = S::Content;
+        type Type = Unset;
     }
     ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type Type = S::Type;
+    pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetContent<St> {}
+    impl<St: State> State for SetContent<St> {
         type Content = Set<members::content>;
+        type Type = St::Type;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetType<St> {}
+    impl<St: State> State for SetType<St> {
+        type Content = St::Content;
+        type Type = Set<members::r#type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `type` field
-        pub struct r#type(());
         ///Marker type for the `content` field
         pub struct content(());
+        ///Marker type for the `type` field
+        pub struct r#type(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct CardBuilder<'a, S: card_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct CardBuilder<S: BosStr, St: card_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<CardContent<S>>,
         Option<Datetime>,
@@ -417,47 +421,47 @@ pub struct CardBuilder<'a, S: card_state::State> {
         Option<CardType<S>>,
         Option<UriValue<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Card<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> CardBuilder<'a, card_state::Empty> {
+impl<S: BosStr> Card<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> CardBuilder<S, card_state::Empty> {
         CardBuilder::new()
     }
 }
 
-impl<'a> CardBuilder<'a, card_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> CardBuilder<S, card_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         CardBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CardBuilder<'a, S>
+impl<S: BosStr, St> CardBuilder<S, St>
 where
-    S: card_state::State,
-    S::Content: card_state::IsUnset,
+    St: card_state::State,
+    St::Content: card_state::IsUnset,
 {
     /// Set the `content` field (required)
     pub fn content(
         mut self,
         value: impl Into<CardContent<S>>,
-    ) -> CardBuilder<'a, card_state::SetContent<S>> {
+    ) -> CardBuilder<S, card_state::SetContent<St>> {
         self._fields.0 = Option::Some(value.into());
         CardBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: card_state::State> CardBuilder<'a, S> {
+impl<S: BosStr, St: card_state::State> CardBuilder<S, St> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.1 = value.into();
@@ -470,7 +474,7 @@ impl<'a, S: card_state::State> CardBuilder<'a, S> {
     }
 }
 
-impl<'a, S: card_state::State> CardBuilder<'a, S> {
+impl<S: BosStr, St: card_state::State> CardBuilder<S, St> {
     /// Set the `originalCard` field (optional)
     pub fn original_card(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -483,7 +487,7 @@ impl<'a, S: card_state::State> CardBuilder<'a, S> {
     }
 }
 
-impl<'a, S: card_state::State> CardBuilder<'a, S> {
+impl<S: BosStr, St: card_state::State> CardBuilder<S, St> {
     /// Set the `parentCard` field (optional)
     pub fn parent_card(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -496,7 +500,7 @@ impl<'a, S: card_state::State> CardBuilder<'a, S> {
     }
 }
 
-impl<'a, S: card_state::State> CardBuilder<'a, S> {
+impl<S: BosStr, St: card_state::State> CardBuilder<S, St> {
     /// Set the `provenance` field (optional)
     pub fn provenance(mut self, value: impl Into<Option<Provenance<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -509,26 +513,26 @@ impl<'a, S: card_state::State> CardBuilder<'a, S> {
     }
 }
 
-impl<'a, S> CardBuilder<'a, S>
+impl<S: BosStr, St> CardBuilder<S, St>
 where
-    S: card_state::State,
-    S::Type: card_state::IsUnset,
+    St: card_state::State,
+    St::Type: card_state::IsUnset,
 {
     /// Set the `type` field (required)
     pub fn r#type(
         mut self,
         value: impl Into<CardType<S>>,
-    ) -> CardBuilder<'a, card_state::SetType<S>> {
+    ) -> CardBuilder<S, card_state::SetType<St>> {
         self._fields.5 = Option::Some(value.into());
         CardBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: card_state::State> CardBuilder<'a, S> {
+impl<S: BosStr, St: card_state::State> CardBuilder<S, St> {
     /// Set the `url` field (optional)
     pub fn url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -541,14 +545,14 @@ impl<'a, S: card_state::State> CardBuilder<'a, S> {
     }
 }
 
-impl<'a, S> CardBuilder<'a, S>
+impl<S: BosStr, St> CardBuilder<S, St>
 where
-    S: card_state::State,
-    S::Type: card_state::IsSet,
-    S::Content: card_state::IsSet,
+    St: card_state::State,
+    St::Content: card_state::IsSet,
+    St::Type: card_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Card<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Card<S> {
         Card {
             content: self._fields.0.unwrap(),
             created_at: self._fields.1,
@@ -560,8 +564,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Card<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Card<S> {
         Card {
             content: self._fields.0.unwrap(),
             created_at: self._fields.1,
@@ -864,9 +868,9 @@ pub mod url_content_state {
         type Url = Unset;
     }
     ///State transition - sets the `url` field to Set
-    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrl<S> {}
-    impl<S: State> State for SetUrl<S> {
+    pub struct SetUrl<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUrl<St> {}
+    impl<St: State> State for SetUrl<St> {
         type Url = Set<members::url>;
     }
     /// Marker types for field names
@@ -877,32 +881,32 @@ pub mod url_content_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct UrlContentBuilder<'a, S: url_content_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct UrlContentBuilder<S: BosStr, St: url_content_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<card::UrlMetadata<S>>, Option<UriValue<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> UrlContent<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> UrlContentBuilder<'a, url_content_state::Empty> {
+impl<S: BosStr> UrlContent<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> UrlContentBuilder<S, url_content_state::Empty> {
         UrlContentBuilder::new()
     }
 }
 
-impl<'a> UrlContentBuilder<'a, url_content_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> UrlContentBuilder<S, url_content_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         UrlContentBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: url_content_state::State> UrlContentBuilder<'a, S> {
+impl<S: BosStr, St: url_content_state::State> UrlContentBuilder<S, St> {
     /// Set the `metadata` field (optional)
     pub fn metadata(mut self, value: impl Into<Option<card::UrlMetadata<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -915,43 +919,43 @@ impl<'a, S: url_content_state::State> UrlContentBuilder<'a, S> {
     }
 }
 
-impl<'a, S> UrlContentBuilder<'a, S>
+impl<S: BosStr, St> UrlContentBuilder<S, St>
 where
-    S: url_content_state::State,
-    S::Url: url_content_state::IsUnset,
+    St: url_content_state::State,
+    St::Url: url_content_state::IsUnset,
 {
     /// Set the `url` field (required)
     pub fn url(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> UrlContentBuilder<'a, url_content_state::SetUrl<S>> {
+    ) -> UrlContentBuilder<S, url_content_state::SetUrl<St>> {
         self._fields.1 = Option::Some(value.into());
         UrlContentBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> UrlContentBuilder<'a, S>
+impl<S: BosStr, St> UrlContentBuilder<S, St>
 where
-    S: url_content_state::State,
-    S::Url: url_content_state::IsSet,
+    St: url_content_state::State,
+    St::Url: url_content_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> UrlContent<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> UrlContent<S> {
         UrlContent {
             metadata: self._fields.0,
             url: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> UrlContent<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> UrlContent<S> {
         UrlContent {
             metadata: self._fields.0,
             url: self._fields.1.unwrap(),

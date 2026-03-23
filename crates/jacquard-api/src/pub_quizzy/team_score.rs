@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -37,11 +37,11 @@ use crate::pub_quizzy::team_score;
     rename = "pub.quizzy.teamScore",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct TeamScore<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct TeamScore<S: BosStr = DefaultStr> {
     ///Scored answers for this team
     pub answers: Vec<team_score::ScoredAnswer<S>>,
     ///Reference to the quizBegin record
@@ -58,11 +58,11 @@ pub struct TeamScore<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct TeamScoreGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct TeamScoreGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
@@ -75,11 +75,11 @@ pub struct TeamScoreGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ScoredAnswer<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ScoredAnswer<S: BosStr = DefaultStr> {
     ///Reference to the answer record
     pub answer: StrongRef<S>,
     ///Optional commentary from the quiz master
@@ -91,7 +91,7 @@ pub struct ScoredAnswer<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> TeamScore<S> {
+impl<S: BosStr> TeamScore<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, TeamScoreRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -104,17 +104,17 @@ pub struct TeamScoreRecord;
 impl XrpcResp for TeamScoreRecord {
     const NSID: &'static str = "pub.quizzy.teamScore";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = TeamScoreGetRecordOutput<S>;
+    type Output<S: BosStr> = TeamScoreGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<TeamScoreGetRecordOutput<S>> for TeamScore<S> {
+impl<S: BosStr> From<TeamScoreGetRecordOutput<S>> for TeamScore<S> {
     fn from(output: TeamScoreGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for TeamScore<S> {
+impl<S: BosStr> Collection for TeamScore<S> {
     const NSID: &'static str = "pub.quizzy.teamScore";
     type Record = TeamScoreRecord;
 }
@@ -124,7 +124,7 @@ impl Collection for TeamScoreRecord {
     type Record = TeamScoreRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for TeamScore<S> {
+impl<S: BosStr> LexiconSchema for TeamScore<S> {
     fn nsid() -> &'static str {
         "pub.quizzy.teamScore"
     }
@@ -150,7 +150,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for TeamScore<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ScoredAnswer<S> {
+impl<S: BosStr> LexiconSchema for ScoredAnswer<S> {
     fn nsid() -> &'static str {
         "pub.quizzy.teamScore"
     }
@@ -219,149 +219,149 @@ pub mod team_score_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type QuizBegin;
         type Team;
         type Answers;
-        type QuizBegin;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type QuizBegin = Unset;
         type Team = Unset;
         type Answers = Unset;
-        type QuizBegin = Unset;
-    }
-    ///State transition - sets the `team` field to Set
-    pub struct SetTeam<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTeam<S> {}
-    impl<S: State> State for SetTeam<S> {
-        type Team = Set<members::team>;
-        type Answers = S::Answers;
-        type QuizBegin = S::QuizBegin;
-    }
-    ///State transition - sets the `answers` field to Set
-    pub struct SetAnswers<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAnswers<S> {}
-    impl<S: State> State for SetAnswers<S> {
-        type Team = S::Team;
-        type Answers = Set<members::answers>;
-        type QuizBegin = S::QuizBegin;
     }
     ///State transition - sets the `quiz_begin` field to Set
-    pub struct SetQuizBegin<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetQuizBegin<S> {}
-    impl<S: State> State for SetQuizBegin<S> {
-        type Team = S::Team;
-        type Answers = S::Answers;
+    pub struct SetQuizBegin<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetQuizBegin<St> {}
+    impl<St: State> State for SetQuizBegin<St> {
         type QuizBegin = Set<members::quiz_begin>;
+        type Team = St::Team;
+        type Answers = St::Answers;
+    }
+    ///State transition - sets the `team` field to Set
+    pub struct SetTeam<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTeam<St> {}
+    impl<St: State> State for SetTeam<St> {
+        type QuizBegin = St::QuizBegin;
+        type Team = Set<members::team>;
+        type Answers = St::Answers;
+    }
+    ///State transition - sets the `answers` field to Set
+    pub struct SetAnswers<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAnswers<St> {}
+    impl<St: State> State for SetAnswers<St> {
+        type QuizBegin = St::QuizBegin;
+        type Team = St::Team;
+        type Answers = Set<members::answers>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `quiz_begin` field
+        pub struct quiz_begin(());
         ///Marker type for the `team` field
         pub struct team(());
         ///Marker type for the `answers` field
         pub struct answers(());
-        ///Marker type for the `quiz_begin` field
-        pub struct quiz_begin(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct TeamScoreBuilder<'a, S: team_score_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct TeamScoreBuilder<S: BosStr, St: team_score_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<team_score::ScoredAnswer<S>>>,
         Option<StrongRef<S>>,
         Option<StrongRef<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> TeamScore<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> TeamScoreBuilder<'a, team_score_state::Empty> {
+impl<S: BosStr> TeamScore<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> TeamScoreBuilder<S, team_score_state::Empty> {
         TeamScoreBuilder::new()
     }
 }
 
-impl<'a> TeamScoreBuilder<'a, team_score_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> TeamScoreBuilder<S, team_score_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         TeamScoreBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> TeamScoreBuilder<'a, S>
+impl<S: BosStr, St> TeamScoreBuilder<S, St>
 where
-    S: team_score_state::State,
-    S::Answers: team_score_state::IsUnset,
+    St: team_score_state::State,
+    St::Answers: team_score_state::IsUnset,
 {
     /// Set the `answers` field (required)
     pub fn answers(
         mut self,
         value: impl Into<Vec<team_score::ScoredAnswer<S>>>,
-    ) -> TeamScoreBuilder<'a, team_score_state::SetAnswers<S>> {
+    ) -> TeamScoreBuilder<S, team_score_state::SetAnswers<St>> {
         self._fields.0 = Option::Some(value.into());
         TeamScoreBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> TeamScoreBuilder<'a, S>
+impl<S: BosStr, St> TeamScoreBuilder<S, St>
 where
-    S: team_score_state::State,
-    S::QuizBegin: team_score_state::IsUnset,
+    St: team_score_state::State,
+    St::QuizBegin: team_score_state::IsUnset,
 {
     /// Set the `quizBegin` field (required)
     pub fn quiz_begin(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> TeamScoreBuilder<'a, team_score_state::SetQuizBegin<S>> {
+    ) -> TeamScoreBuilder<S, team_score_state::SetQuizBegin<St>> {
         self._fields.1 = Option::Some(value.into());
         TeamScoreBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> TeamScoreBuilder<'a, S>
+impl<S: BosStr, St> TeamScoreBuilder<S, St>
 where
-    S: team_score_state::State,
-    S::Team: team_score_state::IsUnset,
+    St: team_score_state::State,
+    St::Team: team_score_state::IsUnset,
 {
     /// Set the `team` field (required)
     pub fn team(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> TeamScoreBuilder<'a, team_score_state::SetTeam<S>> {
+    ) -> TeamScoreBuilder<S, team_score_state::SetTeam<St>> {
         self._fields.2 = Option::Some(value.into());
         TeamScoreBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> TeamScoreBuilder<'a, S>
+impl<S: BosStr, St> TeamScoreBuilder<S, St>
 where
-    S: team_score_state::State,
-    S::Team: team_score_state::IsSet,
-    S::Answers: team_score_state::IsSet,
-    S::QuizBegin: team_score_state::IsSet,
+    St: team_score_state::State,
+    St::QuizBegin: team_score_state::IsSet,
+    St::Team: team_score_state::IsSet,
+    St::Answers: team_score_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> TeamScore<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> TeamScore<S> {
         TeamScore {
             answers: self._fields.0.unwrap(),
             quiz_begin: self._fields.1.unwrap(),
@@ -369,11 +369,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> TeamScore<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> TeamScore<S> {
         TeamScore {
             answers: self._fields.0.unwrap(),
             quiz_begin: self._fields.1.unwrap(),
@@ -518,85 +518,85 @@ pub mod scored_answer_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Answer;
         type Scores;
+        type Answer;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Answer = Unset;
         type Scores = Unset;
-    }
-    ///State transition - sets the `answer` field to Set
-    pub struct SetAnswer<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAnswer<S> {}
-    impl<S: State> State for SetAnswer<S> {
-        type Answer = Set<members::answer>;
-        type Scores = S::Scores;
+        type Answer = Unset;
     }
     ///State transition - sets the `scores` field to Set
-    pub struct SetScores<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetScores<S> {}
-    impl<S: State> State for SetScores<S> {
-        type Answer = S::Answer;
+    pub struct SetScores<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetScores<St> {}
+    impl<St: State> State for SetScores<St> {
         type Scores = Set<members::scores>;
+        type Answer = St::Answer;
+    }
+    ///State transition - sets the `answer` field to Set
+    pub struct SetAnswer<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAnswer<St> {}
+    impl<St: State> State for SetAnswer<St> {
+        type Scores = St::Scores;
+        type Answer = Set<members::answer>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `answer` field
-        pub struct answer(());
         ///Marker type for the `scores` field
         pub struct scores(());
+        ///Marker type for the `answer` field
+        pub struct answer(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ScoredAnswerBuilder<'a, S: scored_answer_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ScoredAnswerBuilder<S: BosStr, St: scored_answer_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<StrongRef<S>>, Option<S>, Option<Vec<i64>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ScoredAnswer<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ScoredAnswerBuilder<'a, scored_answer_state::Empty> {
+impl<S: BosStr> ScoredAnswer<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ScoredAnswerBuilder<S, scored_answer_state::Empty> {
         ScoredAnswerBuilder::new()
     }
 }
 
-impl<'a> ScoredAnswerBuilder<'a, scored_answer_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ScoredAnswerBuilder<S, scored_answer_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ScoredAnswerBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ScoredAnswerBuilder<'a, S>
+impl<S: BosStr, St> ScoredAnswerBuilder<S, St>
 where
-    S: scored_answer_state::State,
-    S::Answer: scored_answer_state::IsUnset,
+    St: scored_answer_state::State,
+    St::Answer: scored_answer_state::IsUnset,
 {
     /// Set the `answer` field (required)
     pub fn answer(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> ScoredAnswerBuilder<'a, scored_answer_state::SetAnswer<S>> {
+    ) -> ScoredAnswerBuilder<S, scored_answer_state::SetAnswer<St>> {
         self._fields.0 = Option::Some(value.into());
         ScoredAnswerBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: scored_answer_state::State> ScoredAnswerBuilder<'a, S> {
+impl<S: BosStr, St: scored_answer_state::State> ScoredAnswerBuilder<S, St> {
     /// Set the `commentary` field (optional)
     pub fn commentary(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -609,33 +609,33 @@ impl<'a, S: scored_answer_state::State> ScoredAnswerBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ScoredAnswerBuilder<'a, S>
+impl<S: BosStr, St> ScoredAnswerBuilder<S, St>
 where
-    S: scored_answer_state::State,
-    S::Scores: scored_answer_state::IsUnset,
+    St: scored_answer_state::State,
+    St::Scores: scored_answer_state::IsUnset,
 {
     /// Set the `scores` field (required)
     pub fn scores(
         mut self,
         value: impl Into<Vec<i64>>,
-    ) -> ScoredAnswerBuilder<'a, scored_answer_state::SetScores<S>> {
+    ) -> ScoredAnswerBuilder<S, scored_answer_state::SetScores<St>> {
         self._fields.2 = Option::Some(value.into());
         ScoredAnswerBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ScoredAnswerBuilder<'a, S>
+impl<S: BosStr, St> ScoredAnswerBuilder<S, St>
 where
-    S: scored_answer_state::State,
-    S::Answer: scored_answer_state::IsSet,
-    S::Scores: scored_answer_state::IsSet,
+    St: scored_answer_state::State,
+    St::Scores: scored_answer_state::IsSet,
+    St::Answer: scored_answer_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ScoredAnswer<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ScoredAnswer<S> {
         ScoredAnswer {
             answer: self._fields.0.unwrap(),
             commentary: self._fields.1,
@@ -643,11 +643,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> ScoredAnswer<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ScoredAnswer<S> {
         ScoredAnswer {
             answer: self._fields.0.unwrap(),
             commentary: self._fields.1,

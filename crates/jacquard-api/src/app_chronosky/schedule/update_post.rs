@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -44,11 +44,11 @@ use crate::app_chronosky::schedule::update_post;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ImageRef<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ImageRef<S: BosStr = DefaultStr> {
     ///Alt text for the image.
     pub alt: S,
     ///CID of an image blob. Can reference an existing image in the post or a newly uploaded image via media.uploadBlob.
@@ -67,11 +67,11 @@ pub struct ImageRef<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ImagesEmbed<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ImagesEmbed<S: BosStr = DefaultStr> {
     pub images: Vec<update_post::ImageRef<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -79,14 +79,14 @@ pub struct ImagesEmbed<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct UpdatePost<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct UpdatePost<S: BosStr = DefaultStr> {
     ///Whether to disable quote posts
     #[serde(skip_serializing_if = "Option::is_none")]
     pub disable_quote_posts: Option<bool>,
@@ -113,9 +113,7 @@ pub struct UpdatePost<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Thread gate rules to control who can reply
     #[serde(skip_serializing_if = "Option::is_none")]
     pub threadgate_rules: Option<Vec<UpdatePostThreadgateRulesItem<S>>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -125,11 +123,11 @@ pub struct UpdatePost<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum UpdatePostEmbed<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum UpdatePostEmbed<S: BosStr = DefaultStr> {
     #[serde(rename = "app.chronosky.schedule.updatePost#imagesEmbed")]
     ImagesEmbed(Box<update_post::ImagesEmbed<S>>),
     #[serde(rename = "app.bsky.embed.images")]
@@ -150,11 +148,11 @@ pub enum UpdatePostEmbed<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum UpdatePostThreadgateRulesItem<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum UpdatePostThreadgateRulesItem<S: BosStr = DefaultStr> {
     #[serde(rename = "app.bsky.feed.threadgate#mentionRule")]
     ThreadgateMentionRule(Box<MentionRule<S>>),
     #[serde(rename = "app.bsky.feed.threadgate#followerRule")]
@@ -167,18 +165,16 @@ pub enum UpdatePostThreadgateRulesItem<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct UpdatePostOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct UpdatePostOutput<S: BosStr = DefaultStr> {
     pub post: ScheduledPost<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -242,7 +238,7 @@ impl core::fmt::Display for UpdatePostError {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ImageRef<S> {
+impl<S: BosStr> LexiconSchema for ImageRef<S> {
     fn nsid() -> &'static str {
         "app.chronosky.schedule.updatePost"
     }
@@ -324,7 +320,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for ImageRef<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ImagesEmbed<S> {
+impl<S: BosStr> LexiconSchema for ImagesEmbed<S> {
     fn nsid() -> &'static str {
         "app.chronosky.schedule.updatePost"
     }
@@ -355,12 +351,11 @@ pub struct UpdatePostResponse;
 impl jacquard_common::xrpc::XrpcResp for UpdatePostResponse {
     const NSID: &'static str = "app.chronosky.schedule.updatePost";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = UpdatePostOutput<S>;
+    type Output<S: BosStr> = UpdatePostOutput<S>;
     type Err = UpdatePostError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for UpdatePost<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UpdatePost<S> {
     const NSID: &'static str = "app.chronosky.schedule.updatePost";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -375,7 +370,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for UpdatePostRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = UpdatePost<S>;
+    type Request<S: BosStr> = UpdatePost<S>;
     type Response = UpdatePostResponse;
 }
 
@@ -622,9 +617,9 @@ pub mod images_embed_state {
         type Images = Unset;
     }
     ///State transition - sets the `images` field to Set
-    pub struct SetImages<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetImages<S> {}
-    impl<S: State> State for SetImages<S> {
+    pub struct SetImages<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetImages<St> {}
+    impl<St: State> State for SetImages<St> {
         type Images = Set<members::images>;
     }
     /// Marker types for field names
@@ -635,67 +630,67 @@ pub mod images_embed_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ImagesEmbedBuilder<'a, S: images_embed_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ImagesEmbedBuilder<S: BosStr, St: images_embed_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<update_post::ImageRef<S>>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ImagesEmbed<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ImagesEmbedBuilder<'a, images_embed_state::Empty> {
+impl<S: BosStr> ImagesEmbed<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ImagesEmbedBuilder<S, images_embed_state::Empty> {
         ImagesEmbedBuilder::new()
     }
 }
 
-impl<'a> ImagesEmbedBuilder<'a, images_embed_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ImagesEmbedBuilder<S, images_embed_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ImagesEmbedBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ImagesEmbedBuilder<'a, S>
+impl<S: BosStr, St> ImagesEmbedBuilder<S, St>
 where
-    S: images_embed_state::State,
-    S::Images: images_embed_state::IsUnset,
+    St: images_embed_state::State,
+    St::Images: images_embed_state::IsUnset,
 {
     /// Set the `images` field (required)
     pub fn images(
         mut self,
         value: impl Into<Vec<update_post::ImageRef<S>>>,
-    ) -> ImagesEmbedBuilder<'a, images_embed_state::SetImages<S>> {
+    ) -> ImagesEmbedBuilder<S, images_embed_state::SetImages<St>> {
         self._fields.0 = Option::Some(value.into());
         ImagesEmbedBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ImagesEmbedBuilder<'a, S>
+impl<S: BosStr, St> ImagesEmbedBuilder<S, St>
 where
-    S: images_embed_state::State,
-    S::Images: images_embed_state::IsSet,
+    St: images_embed_state::State,
+    St::Images: images_embed_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ImagesEmbed<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ImagesEmbed<S> {
         ImagesEmbed {
             images: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> ImagesEmbed<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ImagesEmbed<S> {
         ImagesEmbed {
             images: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

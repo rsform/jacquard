@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use serde::{Serialize, Deserialize};
     rename = "coop.hypha.spores.content.image",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Image<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Image<S: BosStr = DefaultStr> {
     ///Client-declared timestamp when the image was uploaded.
     pub created_at: Datetime,
     ///Optional Bluesky-compatible image embed payload.
@@ -61,18 +61,18 @@ pub struct Image<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ImageGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ImageGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Image<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Image<S> {
+impl<S: BosStr> Image<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, ImageRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -85,17 +85,17 @@ pub struct ImageRecord;
 impl XrpcResp for ImageRecord {
     const NSID: &'static str = "coop.hypha.spores.content.image";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ImageGetRecordOutput<S>;
+    type Output<S: BosStr> = ImageGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<ImageGetRecordOutput<S>> for Image<S> {
+impl<S: BosStr> From<ImageGetRecordOutput<S>> for Image<S> {
     fn from(output: ImageGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Image<S> {
+impl<S: BosStr> Collection for Image<S> {
     const NSID: &'static str = "coop.hypha.spores.content.image";
     type Record = ImageRecord;
 }
@@ -105,7 +105,7 @@ impl Collection for ImageRecord {
     type Record = ImageRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Image<S> {
+impl<S: BosStr> LexiconSchema for Image<S> {
     fn nsid() -> &'static str {
         "coop.hypha.spores.content.image"
     }
@@ -192,85 +192,85 @@ pub mod image_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Image;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Image = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Image = S::Image;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `image` field to Set
-    pub struct SetImage<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetImage<S> {}
-    impl<S: State> State for SetImage<S> {
-        type CreatedAt = S::CreatedAt;
+    pub struct SetImage<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetImage<St> {}
+    impl<St: State> State for SetImage<St> {
         type Image = Set<members::image>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Image = St::Image;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `image` field
         pub struct image(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ImageBuilder<'a, S: image_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ImageBuilder<S: BosStr, St: image_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<Data<S>>, Option<BlobRef<S>>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Image<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ImageBuilder<'a, image_state::Empty> {
+impl<S: BosStr> Image<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ImageBuilder<S, image_state::Empty> {
         ImageBuilder::new()
     }
 }
 
-impl<'a> ImageBuilder<'a, image_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ImageBuilder<S, image_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ImageBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ImageBuilder<'a, S>
+impl<S: BosStr, St> ImageBuilder<S, St>
 where
-    S: image_state::State,
-    S::CreatedAt: image_state::IsUnset,
+    St: image_state::State,
+    St::CreatedAt: image_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ImageBuilder<'a, image_state::SetCreatedAt<S>> {
+    ) -> ImageBuilder<S, image_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         ImageBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: image_state::State> ImageBuilder<'a, S> {
+impl<S: BosStr, St: image_state::State> ImageBuilder<S, St> {
     /// Set the `embed` field (optional)
     pub fn embed(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -283,26 +283,26 @@ impl<'a, S: image_state::State> ImageBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ImageBuilder<'a, S>
+impl<S: BosStr, St> ImageBuilder<S, St>
 where
-    S: image_state::State,
-    S::Image: image_state::IsUnset,
+    St: image_state::State,
+    St::Image: image_state::IsUnset,
 {
     /// Set the `image` field (required)
     pub fn image(
         mut self,
         value: impl Into<BlobRef<S>>,
-    ) -> ImageBuilder<'a, image_state::SetImage<S>> {
+    ) -> ImageBuilder<S, image_state::SetImage<St>> {
         self._fields.2 = Option::Some(value.into());
         ImageBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: image_state::State> ImageBuilder<'a, S> {
+impl<S: BosStr, St: image_state::State> ImageBuilder<S, St> {
     /// Set the `title` field (optional)
     pub fn title(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -315,14 +315,14 @@ impl<'a, S: image_state::State> ImageBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ImageBuilder<'a, S>
+impl<S: BosStr, St> ImageBuilder<S, St>
 where
-    S: image_state::State,
-    S::CreatedAt: image_state::IsSet,
-    S::Image: image_state::IsSet,
+    St: image_state::State,
+    St::Image: image_state::IsSet,
+    St::CreatedAt: image_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Image<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Image<S> {
         Image {
             created_at: self._fields.0.unwrap(),
             embed: self._fields.1,
@@ -331,8 +331,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Image<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Image<S> {
         Image {
             created_at: self._fields.0.unwrap(),
             embed: self._fields.1,

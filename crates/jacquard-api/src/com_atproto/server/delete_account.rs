@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
@@ -18,20 +18,18 @@ use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DeleteAccount<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DeleteAccount<S: BosStr = DefaultStr> {
     pub did: Did<S>,
     pub password: S,
     pub token: S,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -91,12 +89,11 @@ pub struct DeleteAccountResponse;
 impl jacquard_common::xrpc::XrpcResp for DeleteAccountResponse {
     const NSID: &'static str = "com.atproto.server.deleteAccount";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ();
+    type Output<S: BosStr> = ();
     type Err = DeleteAccountError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for DeleteAccount<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for DeleteAccount<S> {
     const NSID: &'static str = "com.atproto.server.deleteAccount";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -111,7 +108,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for DeleteAccountRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = DeleteAccount<S>;
+    type Request<S: BosStr> = DeleteAccount<S>;
     type Response = DeleteAccountResponse;
 }
 
@@ -125,145 +122,145 @@ pub mod delete_account_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Did;
         type Password;
         type Token;
-        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Did = Unset;
         type Password = Unset;
         type Token = Unset;
-        type Did = Unset;
-    }
-    ///State transition - sets the `password` field to Set
-    pub struct SetPassword<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPassword<S> {}
-    impl<S: State> State for SetPassword<S> {
-        type Password = Set<members::password>;
-        type Token = S::Token;
-        type Did = S::Did;
-    }
-    ///State transition - sets the `token` field to Set
-    pub struct SetToken<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetToken<S> {}
-    impl<S: State> State for SetToken<S> {
-        type Password = S::Password;
-        type Token = Set<members::token>;
-        type Did = S::Did;
     }
     ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Password = S::Password;
-        type Token = S::Token;
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
         type Did = Set<members::did>;
+        type Password = St::Password;
+        type Token = St::Token;
+    }
+    ///State transition - sets the `password` field to Set
+    pub struct SetPassword<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPassword<St> {}
+    impl<St: State> State for SetPassword<St> {
+        type Did = St::Did;
+        type Password = Set<members::password>;
+        type Token = St::Token;
+    }
+    ///State transition - sets the `token` field to Set
+    pub struct SetToken<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetToken<St> {}
+    impl<St: State> State for SetToken<St> {
+        type Did = St::Did;
+        type Password = St::Password;
+        type Token = Set<members::token>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `did` field
+        pub struct did(());
         ///Marker type for the `password` field
         pub struct password(());
         ///Marker type for the `token` field
         pub struct token(());
-        ///Marker type for the `did` field
-        pub struct did(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct DeleteAccountBuilder<'a, S: delete_account_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct DeleteAccountBuilder<S: BosStr, St: delete_account_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>, Option<S>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> DeleteAccount<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> DeleteAccountBuilder<'a, delete_account_state::Empty> {
+impl<S: BosStr> DeleteAccount<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> DeleteAccountBuilder<S, delete_account_state::Empty> {
         DeleteAccountBuilder::new()
     }
 }
 
-impl<'a> DeleteAccountBuilder<'a, delete_account_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> DeleteAccountBuilder<S, delete_account_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         DeleteAccountBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DeleteAccountBuilder<'a, S>
+impl<S: BosStr, St> DeleteAccountBuilder<S, St>
 where
-    S: delete_account_state::State,
-    S::Did: delete_account_state::IsUnset,
+    St: delete_account_state::State,
+    St::Did: delete_account_state::IsUnset,
 {
     /// Set the `did` field (required)
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> DeleteAccountBuilder<'a, delete_account_state::SetDid<S>> {
+    ) -> DeleteAccountBuilder<S, delete_account_state::SetDid<St>> {
         self._fields.0 = Option::Some(value.into());
         DeleteAccountBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DeleteAccountBuilder<'a, S>
+impl<S: BosStr, St> DeleteAccountBuilder<S, St>
 where
-    S: delete_account_state::State,
-    S::Password: delete_account_state::IsUnset,
+    St: delete_account_state::State,
+    St::Password: delete_account_state::IsUnset,
 {
     /// Set the `password` field (required)
     pub fn password(
         mut self,
         value: impl Into<S>,
-    ) -> DeleteAccountBuilder<'a, delete_account_state::SetPassword<S>> {
+    ) -> DeleteAccountBuilder<S, delete_account_state::SetPassword<St>> {
         self._fields.1 = Option::Some(value.into());
         DeleteAccountBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DeleteAccountBuilder<'a, S>
+impl<S: BosStr, St> DeleteAccountBuilder<S, St>
 where
-    S: delete_account_state::State,
-    S::Token: delete_account_state::IsUnset,
+    St: delete_account_state::State,
+    St::Token: delete_account_state::IsUnset,
 {
     /// Set the `token` field (required)
     pub fn token(
         mut self,
         value: impl Into<S>,
-    ) -> DeleteAccountBuilder<'a, delete_account_state::SetToken<S>> {
+    ) -> DeleteAccountBuilder<S, delete_account_state::SetToken<St>> {
         self._fields.2 = Option::Some(value.into());
         DeleteAccountBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DeleteAccountBuilder<'a, S>
+impl<S: BosStr, St> DeleteAccountBuilder<S, St>
 where
-    S: delete_account_state::State,
-    S::Password: delete_account_state::IsSet,
-    S::Token: delete_account_state::IsSet,
-    S::Did: delete_account_state::IsSet,
+    St: delete_account_state::State,
+    St::Did: delete_account_state::IsSet,
+    St::Password: delete_account_state::IsSet,
+    St::Token: delete_account_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> DeleteAccount<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> DeleteAccount<S> {
         DeleteAccount {
             did: self._fields.0.unwrap(),
             password: self._fields.1.unwrap(),
@@ -271,11 +268,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> DeleteAccount<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> DeleteAccount<S> {
         DeleteAccount {
             did: self._fields.0.unwrap(),
             password: self._fields.1.unwrap(),

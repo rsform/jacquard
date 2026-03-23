@@ -6,22 +6,26 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[allow(unused_imports)]
+use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetBlob<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct GetBlob<S: BosStr = DefaultStr> {
     pub cid: S,
 }
 
@@ -48,16 +52,13 @@ pub struct GetBlobOutput {
 pub enum GetBlobError {
     /// The requested blob was not found.
     #[serde(rename = "BlobNotFound")]
-    BlobNotFound(Option<jacquard_common::deps::smol_str::SmolStr>),
+    BlobNotFound(Option<SmolStr>),
     /// Invalid CID format or missing parameters.
     #[serde(rename = "InvalidRequest")]
-    InvalidRequest(Option<jacquard_common::deps::smol_str::SmolStr>),
+    InvalidRequest(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: jacquard_common::deps::smol_str::SmolStr,
-        message: Option<jacquard_common::deps::smol_str::SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for GetBlobError {
@@ -93,9 +94,9 @@ pub struct GetBlobResponse;
 impl jacquard_common::xrpc::XrpcResp for GetBlobResponse {
     const NSID: &'static str = "app.chronosky.media.getBlob";
     const ENCODING: &'static str = "*/*";
-    type Output<S: Bos<str> + AsRef<str>> = GetBlobOutput;
+    type Output<S: BosStr> = GetBlobOutput;
     type Err = GetBlobError;
-    fn encode_output<S: Bos<str> + AsRef<str>>(
+    fn encode_output<S: BosStr>(
         output: &Self::Output<S>,
     ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError>
     where
@@ -107,7 +108,7 @@ impl jacquard_common::xrpc::XrpcResp for GetBlobResponse {
         body: &'de [u8],
     ) -> Result<Self::Output<S>, jacquard_common::error::DecodeError>
     where
-        S: Bos<str> + AsRef<str> + Deserialize<'de>,
+        S: BosStr + Deserialize<'de>,
         Self::Output<S>: Deserialize<'de>,
     {
         Ok(GetBlobOutput {
@@ -116,8 +117,7 @@ impl jacquard_common::xrpc::XrpcResp for GetBlobResponse {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetBlob<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetBlob<S> {
     const NSID: &'static str = "app.chronosky.media.getBlob";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetBlobResponse;
@@ -128,7 +128,7 @@ pub struct GetBlobRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetBlobRequest {
     const PATH: &'static str = "/xrpc/app.chronosky.media.getBlob";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetBlob<S>;
+    type Request<S: BosStr> = GetBlob<S>;
     type Response = GetBlobResponse;
 }
 
@@ -151,9 +151,9 @@ pub mod get_blob_state {
         type Cid = Unset;
     }
     ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
+    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCid<St> {}
+    impl<St: State> State for SetCid<St> {
         type Cid = Set<members::cid>;
     }
     /// Marker types for field names
@@ -164,57 +164,57 @@ pub mod get_blob_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetBlobBuilder<'a, S: get_blob_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetBlobBuilder<S: BosStr, St: get_blob_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetBlob<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetBlobBuilder<'a, get_blob_state::Empty> {
+impl<S: BosStr> GetBlob<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetBlobBuilder<S, get_blob_state::Empty> {
         GetBlobBuilder::new()
     }
 }
 
-impl<'a> GetBlobBuilder<'a, get_blob_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetBlobBuilder<S, get_blob_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetBlobBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetBlobBuilder<'a, S>
+impl<S: BosStr, St> GetBlobBuilder<S, St>
 where
-    S: get_blob_state::State,
-    S::Cid: get_blob_state::IsUnset,
+    St: get_blob_state::State,
+    St::Cid: get_blob_state::IsUnset,
 {
     /// Set the `cid` field (required)
     pub fn cid(
         mut self,
         value: impl Into<S>,
-    ) -> GetBlobBuilder<'a, get_blob_state::SetCid<S>> {
+    ) -> GetBlobBuilder<S, get_blob_state::SetCid<St>> {
         self._fields.0 = Option::Some(value.into());
         GetBlobBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetBlobBuilder<'a, S>
+impl<S: BosStr, St> GetBlobBuilder<S, St>
 where
-    S: get_blob_state::State,
-    S::Cid: get_blob_state::IsSet,
+    St: get_blob_state::State,
+    St::Cid: get_blob_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetBlob<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetBlob<S> {
         GetBlob {
             cid: self._fields.0.unwrap(),
         }

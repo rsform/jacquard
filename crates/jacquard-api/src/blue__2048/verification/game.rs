@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use crate::blue__2048::verification::VerificationRef;
     rename = "blue.2048.verification.game",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Game<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Game<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
     ///This is the record that holds the publicly verifiable signature of a game record
@@ -56,18 +56,18 @@ pub struct Game<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GameGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GameGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Game<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Game<S> {
+impl<S: BosStr> Game<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, GameRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -80,17 +80,17 @@ pub struct GameRecord;
 impl XrpcResp for GameRecord {
     const NSID: &'static str = "blue.2048.verification.game";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GameGetRecordOutput<S>;
+    type Output<S: BosStr> = GameGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<GameGetRecordOutput<S>> for Game<S> {
+impl<S: BosStr> From<GameGetRecordOutput<S>> for Game<S> {
     fn from(output: GameGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Game<S> {
+impl<S: BosStr> Collection for Game<S> {
     const NSID: &'static str = "blue.2048.verification.game";
     type Record = GameRecord;
 }
@@ -100,7 +100,7 @@ impl Collection for GameRecord {
     type Record = GameRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Game<S> {
+impl<S: BosStr> LexiconSchema for Game<S> {
     fn nsid() -> &'static str {
         "blue.2048.verification.game"
     }
@@ -134,32 +134,32 @@ pub mod game_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct GameBuilder<'a, S: game_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GameBuilder<S: BosStr, St: game_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<VerificationRef<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Game<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GameBuilder<'a, game_state::Empty> {
+impl<S: BosStr> Game<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GameBuilder<S, game_state::Empty> {
         GameBuilder::new()
     }
 }
 
-impl<'a> GameBuilder<'a, game_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GameBuilder<S, game_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GameBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: game_state::State> GameBuilder<'a, S> {
+impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.0 = value.into();
@@ -172,7 +172,7 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
     }
 }
 
-impl<'a, S: game_state::State> GameBuilder<'a, S> {
+impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
     /// Set the `verifiedRef` field (optional)
     pub fn verified_ref(mut self, value: impl Into<Option<VerificationRef<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -185,20 +185,20 @@ impl<'a, S: game_state::State> GameBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GameBuilder<'a, S>
+impl<S: BosStr, St> GameBuilder<S, St>
 where
-    S: game_state::State,
+    St: game_state::State,
 {
-    /// Build the final struct
-    pub fn build(self) -> Game<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Game<S> {
         Game {
             created_at: self._fields.0,
             verified_ref: self._fields.1,
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Game<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Game<S> {
         Game {
             created_at: self._fields.0,
             verified_ref: self._fields.1,

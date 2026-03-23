@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "events.smokesignal.calendar.eventConfiguration",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct EventConfiguration<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct EventConfiguration<S: BosStr = DefaultStr> {
     ///When true, the RSVP button redirects to an external ticketing URL instead of creating a direct RSVP.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub disable_direct_rsvp: Option<bool>,
@@ -59,18 +59,18 @@ pub struct EventConfiguration<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct EventConfigurationGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct EventConfigurationGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: EventConfiguration<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> EventConfiguration<S> {
+impl<S: BosStr> EventConfiguration<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, EventConfigurationRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -83,18 +83,17 @@ pub struct EventConfigurationRecord;
 impl XrpcResp for EventConfigurationRecord {
     const NSID: &'static str = "events.smokesignal.calendar.eventConfiguration";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = EventConfigurationGetRecordOutput<S>;
+    type Output<S: BosStr> = EventConfigurationGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<EventConfigurationGetRecordOutput<S>>
-for EventConfiguration<S> {
+impl<S: BosStr> From<EventConfigurationGetRecordOutput<S>> for EventConfiguration<S> {
     fn from(output: EventConfigurationGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for EventConfiguration<S> {
+impl<S: BosStr> Collection for EventConfiguration<S> {
     const NSID: &'static str = "events.smokesignal.calendar.eventConfiguration";
     type Record = EventConfigurationRecord;
 }
@@ -104,7 +103,7 @@ impl Collection for EventConfigurationRecord {
     type Record = EventConfigurationRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for EventConfiguration<S> {
+impl<S: BosStr> LexiconSchema for EventConfiguration<S> {
     fn nsid() -> &'static str {
         "events.smokesignal.calendar.eventConfiguration"
     }
@@ -148,32 +147,32 @@ pub mod event_configuration_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct EventConfigurationBuilder<'a, S: event_configuration_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct EventConfigurationBuilder<S: BosStr, St: event_configuration_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<bool>, Option<bool>, Option<UriValue<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> EventConfiguration<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> EventConfigurationBuilder<'a, event_configuration_state::Empty> {
+impl<S: BosStr> EventConfiguration<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> EventConfigurationBuilder<S, event_configuration_state::Empty> {
         EventConfigurationBuilder::new()
     }
 }
 
-impl<'a> EventConfigurationBuilder<'a, event_configuration_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> EventConfigurationBuilder<S, event_configuration_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         EventConfigurationBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: event_configuration_state::State> EventConfigurationBuilder<'a, S> {
+impl<S: BosStr, St: event_configuration_state::State> EventConfigurationBuilder<S, St> {
     /// Set the `disableDirectRsvp` field (optional)
     pub fn disable_direct_rsvp(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.0 = value.into();
@@ -186,7 +185,7 @@ impl<'a, S: event_configuration_state::State> EventConfigurationBuilder<'a, S> {
     }
 }
 
-impl<'a, S: event_configuration_state::State> EventConfigurationBuilder<'a, S> {
+impl<S: BosStr, St: event_configuration_state::State> EventConfigurationBuilder<S, St> {
     /// Set the `requireConfirmedEmail` field (optional)
     pub fn require_confirmed_email(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.1 = value.into();
@@ -199,7 +198,7 @@ impl<'a, S: event_configuration_state::State> EventConfigurationBuilder<'a, S> {
     }
 }
 
-impl<'a, S: event_configuration_state::State> EventConfigurationBuilder<'a, S> {
+impl<S: BosStr, St: event_configuration_state::State> EventConfigurationBuilder<S, St> {
     /// Set the `rsvpRedirectUrl` field (optional)
     pub fn rsvp_redirect_url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -212,12 +211,12 @@ impl<'a, S: event_configuration_state::State> EventConfigurationBuilder<'a, S> {
     }
 }
 
-impl<'a, S> EventConfigurationBuilder<'a, S>
+impl<S: BosStr, St> EventConfigurationBuilder<S, St>
 where
-    S: event_configuration_state::State,
+    St: event_configuration_state::State,
 {
-    /// Build the final struct
-    pub fn build(self) -> EventConfiguration<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> EventConfiguration<S> {
         EventConfiguration {
             disable_direct_rsvp: self._fields.0,
             require_confirmed_email: self._fields.1,
@@ -225,11 +224,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> EventConfiguration<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> EventConfiguration<S> {
         EventConfiguration {
             disable_direct_rsvp: self._fields.0,
             require_confirmed_email: self._fields.1,

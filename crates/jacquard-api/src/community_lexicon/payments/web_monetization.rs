@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "community.lexicon.payments.webMonetization",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct WebMonetization<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct WebMonetization<S: BosStr = DefaultStr> {
     ///Wallet address.
     pub address: UriValue<S>,
     ///Short, human-readable description of how this wallet is related to this account.
@@ -55,18 +55,18 @@ pub struct WebMonetization<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct WebMonetizationGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct WebMonetizationGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: WebMonetization<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> WebMonetization<S> {
+impl<S: BosStr> WebMonetization<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, WebMonetizationRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -79,18 +79,17 @@ pub struct WebMonetizationRecord;
 impl XrpcResp for WebMonetizationRecord {
     const NSID: &'static str = "community.lexicon.payments.webMonetization";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = WebMonetizationGetRecordOutput<S>;
+    type Output<S: BosStr> = WebMonetizationGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<WebMonetizationGetRecordOutput<S>>
-for WebMonetization<S> {
+impl<S: BosStr> From<WebMonetizationGetRecordOutput<S>> for WebMonetization<S> {
     fn from(output: WebMonetizationGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for WebMonetization<S> {
+impl<S: BosStr> Collection for WebMonetization<S> {
     const NSID: &'static str = "community.lexicon.payments.webMonetization";
     type Record = WebMonetizationRecord;
 }
@@ -100,7 +99,7 @@ impl Collection for WebMonetizationRecord {
     type Record = WebMonetizationRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for WebMonetization<S> {
+impl<S: BosStr> LexiconSchema for WebMonetization<S> {
     fn nsid() -> &'static str {
         "community.lexicon.payments.webMonetization"
     }
@@ -134,9 +133,9 @@ pub mod web_monetization_state {
         type Address = Unset;
     }
     ///State transition - sets the `address` field to Set
-    pub struct SetAddress<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAddress<S> {}
-    impl<S: State> State for SetAddress<S> {
+    pub struct SetAddress<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAddress<St> {}
+    impl<St: State> State for SetAddress<St> {
         type Address = Set<members::address>;
     }
     /// Marker types for field names
@@ -147,51 +146,51 @@ pub mod web_monetization_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct WebMonetizationBuilder<'a, S: web_monetization_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct WebMonetizationBuilder<S: BosStr, St: web_monetization_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<UriValue<S>>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> WebMonetization<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> WebMonetizationBuilder<'a, web_monetization_state::Empty> {
+impl<S: BosStr> WebMonetization<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> WebMonetizationBuilder<S, web_monetization_state::Empty> {
         WebMonetizationBuilder::new()
     }
 }
 
-impl<'a> WebMonetizationBuilder<'a, web_monetization_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> WebMonetizationBuilder<S, web_monetization_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         WebMonetizationBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> WebMonetizationBuilder<'a, S>
+impl<S: BosStr, St> WebMonetizationBuilder<S, St>
 where
-    S: web_monetization_state::State,
-    S::Address: web_monetization_state::IsUnset,
+    St: web_monetization_state::State,
+    St::Address: web_monetization_state::IsUnset,
 {
     /// Set the `address` field (required)
     pub fn address(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> WebMonetizationBuilder<'a, web_monetization_state::SetAddress<S>> {
+    ) -> WebMonetizationBuilder<S, web_monetization_state::SetAddress<St>> {
         self._fields.0 = Option::Some(value.into());
         WebMonetizationBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: web_monetization_state::State> WebMonetizationBuilder<'a, S> {
+impl<S: BosStr, St: web_monetization_state::State> WebMonetizationBuilder<S, St> {
     /// Set the `note` field (optional)
     pub fn note(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -204,24 +203,24 @@ impl<'a, S: web_monetization_state::State> WebMonetizationBuilder<'a, S> {
     }
 }
 
-impl<'a, S> WebMonetizationBuilder<'a, S>
+impl<S: BosStr, St> WebMonetizationBuilder<S, St>
 where
-    S: web_monetization_state::State,
-    S::Address: web_monetization_state::IsSet,
+    St: web_monetization_state::State,
+    St::Address: web_monetization_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> WebMonetization<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> WebMonetization<S> {
         WebMonetization {
             address: self._fields.0.unwrap(),
             note: self._fields.1,
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> WebMonetization<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> WebMonetization<S> {
         WebMonetization {
             address: self._fields.0.unwrap(),
             note: self._fields.1,

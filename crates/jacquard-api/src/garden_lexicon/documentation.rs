@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,11 +34,11 @@ use crate::garden_lexicon::documentation;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DefinitionDoc<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DefinitionDoc<S: BosStr = DefaultStr> {
     ///Localized descriptions for this definition.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<Vec<documentation::LocalizedString<S>>>,
@@ -57,11 +57,11 @@ pub struct DefinitionDoc<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct LocalizedString<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct LocalizedString<S: BosStr = DefaultStr> {
     ///ISO 639 language code (e.g., 'en', 'es', 'ja').
     pub lang: Language,
     ///The localized string value.
@@ -78,11 +78,11 @@ pub struct LocalizedString<S: Bos<str> + AsRef<str> = DefaultStr> {
     rename = "garden.lexicon.documentation",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Documentation<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Documentation<S: BosStr = DefaultStr> {
     ///Timestamp when this documentation was created.
     pub created_at: Datetime,
     ///Documentation for specific definitions within the lexicon (e.g., main, replyRef).
@@ -103,11 +103,11 @@ pub struct Documentation<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DocumentationGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DocumentationGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
@@ -120,11 +120,11 @@ pub struct DocumentationGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct PropertyDoc<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct PropertyDoc<S: BosStr = DefaultStr> {
     ///Localized descriptions for this property.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<Vec<documentation::LocalizedString<S>>>,
@@ -134,13 +134,13 @@ pub struct PropertyDoc<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Documentation<S> {
+impl<S: BosStr> Documentation<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, DocumentationRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for DefinitionDoc<S> {
+impl<S: BosStr> LexiconSchema for DefinitionDoc<S> {
     fn nsid() -> &'static str {
         "garden.lexicon.documentation"
     }
@@ -166,7 +166,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for DefinitionDoc<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for LocalizedString<S> {
+impl<S: BosStr> LexiconSchema for LocalizedString<S> {
     fn nsid() -> &'static str {
         "garden.lexicon.documentation"
     }
@@ -199,18 +199,17 @@ pub struct DocumentationRecord;
 impl XrpcResp for DocumentationRecord {
     const NSID: &'static str = "garden.lexicon.documentation";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = DocumentationGetRecordOutput<S>;
+    type Output<S: BosStr> = DocumentationGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<DocumentationGetRecordOutput<S>>
-for Documentation<S> {
+impl<S: BosStr> From<DocumentationGetRecordOutput<S>> for Documentation<S> {
     fn from(output: DocumentationGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Documentation<S> {
+impl<S: BosStr> Collection for Documentation<S> {
     const NSID: &'static str = "garden.lexicon.documentation";
     type Record = DocumentationRecord;
 }
@@ -220,7 +219,7 @@ impl Collection for DocumentationRecord {
     type Record = DocumentationRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Documentation<S> {
+impl<S: BosStr> LexiconSchema for Documentation<S> {
     fn nsid() -> &'static str {
         "garden.lexicon.documentation"
     }
@@ -235,7 +234,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Documentation<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for PropertyDoc<S> {
+impl<S: BosStr> LexiconSchema for PropertyDoc<S> {
     fn nsid() -> &'static str {
         "garden.lexicon.documentation"
     }
@@ -507,122 +506,122 @@ pub mod localized_string_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Value;
         type Lang;
+        type Value;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Value = Unset;
         type Lang = Unset;
-    }
-    ///State transition - sets the `value` field to Set
-    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValue<S> {}
-    impl<S: State> State for SetValue<S> {
-        type Value = Set<members::value>;
-        type Lang = S::Lang;
+        type Value = Unset;
     }
     ///State transition - sets the `lang` field to Set
-    pub struct SetLang<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLang<S> {}
-    impl<S: State> State for SetLang<S> {
-        type Value = S::Value;
+    pub struct SetLang<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLang<St> {}
+    impl<St: State> State for SetLang<St> {
         type Lang = Set<members::lang>;
+        type Value = St::Value;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetValue<St> {}
+    impl<St: State> State for SetValue<St> {
+        type Lang = St::Lang;
+        type Value = Set<members::value>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `value` field
-        pub struct value(());
         ///Marker type for the `lang` field
         pub struct lang(());
+        ///Marker type for the `value` field
+        pub struct value(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct LocalizedStringBuilder<'a, S: localized_string_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct LocalizedStringBuilder<S: BosStr, St: localized_string_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Language>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> LocalizedString<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> LocalizedStringBuilder<'a, localized_string_state::Empty> {
+impl<S: BosStr> LocalizedString<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> LocalizedStringBuilder<S, localized_string_state::Empty> {
         LocalizedStringBuilder::new()
     }
 }
 
-impl<'a> LocalizedStringBuilder<'a, localized_string_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> LocalizedStringBuilder<S, localized_string_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         LocalizedStringBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LocalizedStringBuilder<'a, S>
+impl<S: BosStr, St> LocalizedStringBuilder<S, St>
 where
-    S: localized_string_state::State,
-    S::Lang: localized_string_state::IsUnset,
+    St: localized_string_state::State,
+    St::Lang: localized_string_state::IsUnset,
 {
     /// Set the `lang` field (required)
     pub fn lang(
         mut self,
         value: impl Into<Language>,
-    ) -> LocalizedStringBuilder<'a, localized_string_state::SetLang<S>> {
+    ) -> LocalizedStringBuilder<S, localized_string_state::SetLang<St>> {
         self._fields.0 = Option::Some(value.into());
         LocalizedStringBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LocalizedStringBuilder<'a, S>
+impl<S: BosStr, St> LocalizedStringBuilder<S, St>
 where
-    S: localized_string_state::State,
-    S::Value: localized_string_state::IsUnset,
+    St: localized_string_state::State,
+    St::Value: localized_string_state::IsUnset,
 {
     /// Set the `value` field (required)
     pub fn value(
         mut self,
         value: impl Into<S>,
-    ) -> LocalizedStringBuilder<'a, localized_string_state::SetValue<S>> {
+    ) -> LocalizedStringBuilder<S, localized_string_state::SetValue<St>> {
         self._fields.1 = Option::Some(value.into());
         LocalizedStringBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LocalizedStringBuilder<'a, S>
+impl<S: BosStr, St> LocalizedStringBuilder<S, St>
 where
-    S: localized_string_state::State,
-    S::Value: localized_string_state::IsSet,
-    S::Lang: localized_string_state::IsSet,
+    St: localized_string_state::State,
+    St::Lang: localized_string_state::IsSet,
+    St::Value: localized_string_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> LocalizedString<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> LocalizedString<S> {
         LocalizedString {
             lang: self._fields.0.unwrap(),
             value: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> LocalizedString<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> LocalizedString<S> {
         LocalizedString {
             lang: self._fields.0.unwrap(),
             value: self._fields.1.unwrap(),
@@ -652,17 +651,17 @@ pub mod documentation_state {
         type Lexicon = Unset;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
-        type Lexicon = S::Lexicon;
+        type Lexicon = St::Lexicon;
     }
     ///State transition - sets the `lexicon` field to Set
-    pub struct SetLexicon<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLexicon<S> {}
-    impl<S: State> State for SetLexicon<S> {
-        type CreatedAt = S::CreatedAt;
+    pub struct SetLexicon<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLexicon<St> {}
+    impl<St: State> State for SetLexicon<St> {
+        type CreatedAt = St::CreatedAt;
         type Lexicon = Set<members::lexicon>;
     }
     /// Marker types for field names
@@ -675,56 +674,56 @@ pub mod documentation_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct DocumentationBuilder<'a, S: documentation_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct DocumentationBuilder<S: BosStr, St: documentation_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
         Option<Vec<documentation::DefinitionDoc<S>>>,
         Option<Vec<documentation::LocalizedString<S>>>,
         Option<Nsid<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Documentation<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> DocumentationBuilder<'a, documentation_state::Empty> {
+impl<S: BosStr> Documentation<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> DocumentationBuilder<S, documentation_state::Empty> {
         DocumentationBuilder::new()
     }
 }
 
-impl<'a> DocumentationBuilder<'a, documentation_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> DocumentationBuilder<S, documentation_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         DocumentationBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DocumentationBuilder<'a, S>
+impl<S: BosStr, St> DocumentationBuilder<S, St>
 where
-    S: documentation_state::State,
-    S::CreatedAt: documentation_state::IsUnset,
+    St: documentation_state::State,
+    St::CreatedAt: documentation_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> DocumentationBuilder<'a, documentation_state::SetCreatedAt<S>> {
+    ) -> DocumentationBuilder<S, documentation_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         DocumentationBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: documentation_state::State> DocumentationBuilder<'a, S> {
+impl<S: BosStr, St: documentation_state::State> DocumentationBuilder<S, St> {
     /// Set the `definitions` field (optional)
     pub fn definitions(
         mut self,
@@ -743,7 +742,7 @@ impl<'a, S: documentation_state::State> DocumentationBuilder<'a, S> {
     }
 }
 
-impl<'a, S: documentation_state::State> DocumentationBuilder<'a, S> {
+impl<S: BosStr, St: documentation_state::State> DocumentationBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(
         mut self,
@@ -762,33 +761,33 @@ impl<'a, S: documentation_state::State> DocumentationBuilder<'a, S> {
     }
 }
 
-impl<'a, S> DocumentationBuilder<'a, S>
+impl<S: BosStr, St> DocumentationBuilder<S, St>
 where
-    S: documentation_state::State,
-    S::Lexicon: documentation_state::IsUnset,
+    St: documentation_state::State,
+    St::Lexicon: documentation_state::IsUnset,
 {
     /// Set the `lexicon` field (required)
     pub fn lexicon(
         mut self,
         value: impl Into<Nsid<S>>,
-    ) -> DocumentationBuilder<'a, documentation_state::SetLexicon<S>> {
+    ) -> DocumentationBuilder<S, documentation_state::SetLexicon<St>> {
         self._fields.3 = Option::Some(value.into());
         DocumentationBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DocumentationBuilder<'a, S>
+impl<S: BosStr, St> DocumentationBuilder<S, St>
 where
-    S: documentation_state::State,
-    S::CreatedAt: documentation_state::IsSet,
-    S::Lexicon: documentation_state::IsSet,
+    St: documentation_state::State,
+    St::CreatedAt: documentation_state::IsSet,
+    St::Lexicon: documentation_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Documentation<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Documentation<S> {
         Documentation {
             created_at: self._fields.0.unwrap(),
             definitions: self._fields.1,
@@ -797,11 +796,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Documentation<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Documentation<S> {
         Documentation {
             created_at: self._fields.0.unwrap(),
             definitions: self._fields.1,

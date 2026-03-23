@@ -40,7 +40,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -64,11 +64,11 @@ use serde::{Serialize, Deserialize};
     rename = "sh.tangled.repo",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Repo<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Repo<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
@@ -101,18 +101,18 @@ pub struct Repo<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct RepoGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct RepoGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Repo<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Repo<S> {
+impl<S: BosStr> Repo<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, RepoRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -125,17 +125,17 @@ pub struct RepoRecord;
 impl XrpcResp for RepoRecord {
     const NSID: &'static str = "sh.tangled.repo";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = RepoGetRecordOutput<S>;
+    type Output<S: BosStr> = RepoGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<RepoGetRecordOutput<S>> for Repo<S> {
+impl<S: BosStr> From<RepoGetRecordOutput<S>> for Repo<S> {
     fn from(output: RepoGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Repo<S> {
+impl<S: BosStr> Collection for Repo<S> {
     const NSID: &'static str = "sh.tangled.repo";
     type Record = RepoRecord;
 }
@@ -145,7 +145,7 @@ impl Collection for RepoRecord {
     type Record = RepoRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Repo<S> {
+impl<S: BosStr> LexiconSchema for Repo<S> {
     fn nsid() -> &'static str {
         "sh.tangled.repo"
     }
@@ -204,57 +204,57 @@ pub mod repo_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Knot;
-        type CreatedAt;
         type Name;
+        type CreatedAt;
+        type Knot;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Knot = Unset;
-        type CreatedAt = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `knot` field to Set
-    pub struct SetKnot<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetKnot<S> {}
-    impl<S: State> State for SetKnot<S> {
-        type Knot = Set<members::knot>;
-        type CreatedAt = S::CreatedAt;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Knot = S::Knot;
-        type CreatedAt = Set<members::created_at>;
-        type Name = S::Name;
+        type CreatedAt = Unset;
+        type Knot = Unset;
     }
     ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Knot = S::Knot;
-        type CreatedAt = S::CreatedAt;
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
         type Name = Set<members::name>;
+        type CreatedAt = St::CreatedAt;
+        type Knot = St::Knot;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Name = St::Name;
+        type CreatedAt = Set<members::created_at>;
+        type Knot = St::Knot;
+    }
+    ///State transition - sets the `knot` field to Set
+    pub struct SetKnot<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetKnot<St> {}
+    impl<St: State> State for SetKnot<St> {
+        type Name = St::Name;
+        type CreatedAt = St::CreatedAt;
+        type Knot = Set<members::knot>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `knot` field
-        pub struct knot(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `knot` field
+        pub struct knot(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct RepoBuilder<'a, S: repo_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct RepoBuilder<S: BosStr, St: repo_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
         Option<S>,
@@ -266,47 +266,47 @@ pub struct RepoBuilder<'a, S: repo_state::State> {
         Option<Vec<S>>,
         Option<UriValue<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Repo<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> RepoBuilder<'a, repo_state::Empty> {
+impl<S: BosStr> Repo<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> RepoBuilder<S, repo_state::Empty> {
         RepoBuilder::new()
     }
 }
 
-impl<'a> RepoBuilder<'a, repo_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> RepoBuilder<S, repo_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         RepoBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RepoBuilder<'a, S>
+impl<S: BosStr, St> RepoBuilder<S, St>
 where
-    S: repo_state::State,
-    S::CreatedAt: repo_state::IsUnset,
+    St: repo_state::State,
+    St::CreatedAt: repo_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> RepoBuilder<'a, repo_state::SetCreatedAt<S>> {
+    ) -> RepoBuilder<S, repo_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         RepoBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: repo_state::State> RepoBuilder<'a, S> {
+impl<S: BosStr, St: repo_state::State> RepoBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -319,26 +319,26 @@ impl<'a, S: repo_state::State> RepoBuilder<'a, S> {
     }
 }
 
-impl<'a, S> RepoBuilder<'a, S>
+impl<S: BosStr, St> RepoBuilder<S, St>
 where
-    S: repo_state::State,
-    S::Knot: repo_state::IsUnset,
+    St: repo_state::State,
+    St::Knot: repo_state::IsUnset,
 {
     /// Set the `knot` field (required)
     pub fn knot(
         mut self,
         value: impl Into<S>,
-    ) -> RepoBuilder<'a, repo_state::SetKnot<S>> {
+    ) -> RepoBuilder<S, repo_state::SetKnot<St>> {
         self._fields.2 = Option::Some(value.into());
         RepoBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: repo_state::State> RepoBuilder<'a, S> {
+impl<S: BosStr, St: repo_state::State> RepoBuilder<S, St> {
     /// Set the `labels` field (optional)
     pub fn labels(mut self, value: impl Into<Option<Vec<AtUri<S>>>>) -> Self {
         self._fields.3 = value.into();
@@ -351,26 +351,26 @@ impl<'a, S: repo_state::State> RepoBuilder<'a, S> {
     }
 }
 
-impl<'a, S> RepoBuilder<'a, S>
+impl<S: BosStr, St> RepoBuilder<S, St>
 where
-    S: repo_state::State,
-    S::Name: repo_state::IsUnset,
+    St: repo_state::State,
+    St::Name: repo_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> RepoBuilder<'a, repo_state::SetName<S>> {
+    ) -> RepoBuilder<S, repo_state::SetName<St>> {
         self._fields.4 = Option::Some(value.into());
         RepoBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: repo_state::State> RepoBuilder<'a, S> {
+impl<S: BosStr, St: repo_state::State> RepoBuilder<S, St> {
     /// Set the `source` field (optional)
     pub fn source(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -383,7 +383,7 @@ impl<'a, S: repo_state::State> RepoBuilder<'a, S> {
     }
 }
 
-impl<'a, S: repo_state::State> RepoBuilder<'a, S> {
+impl<S: BosStr, St: repo_state::State> RepoBuilder<S, St> {
     /// Set the `spindle` field (optional)
     pub fn spindle(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.6 = value.into();
@@ -396,7 +396,7 @@ impl<'a, S: repo_state::State> RepoBuilder<'a, S> {
     }
 }
 
-impl<'a, S: repo_state::State> RepoBuilder<'a, S> {
+impl<S: BosStr, St: repo_state::State> RepoBuilder<S, St> {
     /// Set the `topics` field (optional)
     pub fn topics(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.7 = value.into();
@@ -409,7 +409,7 @@ impl<'a, S: repo_state::State> RepoBuilder<'a, S> {
     }
 }
 
-impl<'a, S: repo_state::State> RepoBuilder<'a, S> {
+impl<S: BosStr, St: repo_state::State> RepoBuilder<S, St> {
     /// Set the `website` field (optional)
     pub fn website(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.8 = value.into();
@@ -422,15 +422,15 @@ impl<'a, S: repo_state::State> RepoBuilder<'a, S> {
     }
 }
 
-impl<'a, S> RepoBuilder<'a, S>
+impl<S: BosStr, St> RepoBuilder<S, St>
 where
-    S: repo_state::State,
-    S::Knot: repo_state::IsSet,
-    S::CreatedAt: repo_state::IsSet,
-    S::Name: repo_state::IsSet,
+    St: repo_state::State,
+    St::Name: repo_state::IsSet,
+    St::CreatedAt: repo_state::IsSet,
+    St::Knot: repo_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Repo<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Repo<S> {
         Repo {
             created_at: self._fields.0.unwrap(),
             description: self._fields.1,
@@ -444,8 +444,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Repo<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Repo<S> {
         Repo {
             created_at: self._fields.0.unwrap(),
             description: self._fields.1,

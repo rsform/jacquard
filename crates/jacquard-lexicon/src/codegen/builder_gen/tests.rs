@@ -197,6 +197,7 @@ fn test_build_method_generation() {
         &schema,
         &fields,
         true,
+        false,
         &test_resolved(),
     );
     let code = tokens.to_string();
@@ -267,6 +268,7 @@ fn test_build_method_parameters() {
         &schema,
         &fields,
         true,
+        false,
         &test_resolved(),
     );
     let code = tokens.to_string();
@@ -352,6 +354,7 @@ fn test_complete_builder_object() {
         &schema,
         &required_fields,
         true,
+        false,
         &test_resolved(),
     );
 
@@ -450,6 +453,7 @@ fn test_print_complete_builder() {
         &schema,
         &required_fields,
         true,
+        false,
         &test_resolved(),
     );
 

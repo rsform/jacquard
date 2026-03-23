@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
@@ -20,39 +20,35 @@ use crate::sh_weaver::notebook::EntryView;
 use crate::sh_weaver::notebook::NotebookView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetEntryDetail<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct GetEntryDetail<S: BosStr = DefaultStr> {
     pub entry: AtUri<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub notebook_context: Option<AtUri<S>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetEntryDetailOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetEntryDetailOutput<S: BosStr = DefaultStr> {
     pub entry: EntryView<S>,
     pub notebook_count: i64,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub notebooks: Option<Vec<NotebookView<S>>>,
     pub record: Data<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -103,12 +99,11 @@ pub struct GetEntryDetailResponse;
 impl jacquard_common::xrpc::XrpcResp for GetEntryDetailResponse {
     const NSID: &'static str = "sh.weaver.notebook.getEntryDetail";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetEntryDetailOutput<S>;
+    type Output<S: BosStr> = GetEntryDetailOutput<S>;
     type Err = GetEntryDetailError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetEntryDetail<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetEntryDetail<S> {
     const NSID: &'static str = "sh.weaver.notebook.getEntryDetail";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetEntryDetailResponse;
@@ -119,7 +114,7 @@ pub struct GetEntryDetailRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetEntryDetailRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.notebook.getEntryDetail";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetEntryDetail<S>;
+    type Request<S: BosStr> = GetEntryDetail<S>;
     type Response = GetEntryDetailResponse;
 }
 
@@ -142,9 +137,9 @@ pub mod get_entry_detail_state {
         type Entry = Unset;
     }
     ///State transition - sets the `entry` field to Set
-    pub struct SetEntry<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEntry<S> {}
-    impl<S: State> State for SetEntry<S> {
+    pub struct SetEntry<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetEntry<St> {}
+    impl<St: State> State for SetEntry<St> {
         type Entry = Set<members::entry>;
     }
     /// Marker types for field names
@@ -155,51 +150,51 @@ pub mod get_entry_detail_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetEntryDetailBuilder<'a, S: get_entry_detail_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetEntryDetailBuilder<S: BosStr, St: get_entry_detail_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>, Option<AtUri<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetEntryDetail<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetEntryDetailBuilder<'a, get_entry_detail_state::Empty> {
+impl<S: BosStr> GetEntryDetail<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetEntryDetailBuilder<S, get_entry_detail_state::Empty> {
         GetEntryDetailBuilder::new()
     }
 }
 
-impl<'a> GetEntryDetailBuilder<'a, get_entry_detail_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetEntryDetailBuilder<S, get_entry_detail_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetEntryDetailBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetEntryDetailBuilder<'a, S>
+impl<S: BosStr, St> GetEntryDetailBuilder<S, St>
 where
-    S: get_entry_detail_state::State,
-    S::Entry: get_entry_detail_state::IsUnset,
+    St: get_entry_detail_state::State,
+    St::Entry: get_entry_detail_state::IsUnset,
 {
     /// Set the `entry` field (required)
     pub fn entry(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> GetEntryDetailBuilder<'a, get_entry_detail_state::SetEntry<S>> {
+    ) -> GetEntryDetailBuilder<S, get_entry_detail_state::SetEntry<St>> {
         self._fields.0 = Option::Some(value.into());
         GetEntryDetailBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: get_entry_detail_state::State> GetEntryDetailBuilder<'a, S> {
+impl<S: BosStr, St: get_entry_detail_state::State> GetEntryDetailBuilder<S, St> {
     /// Set the `notebookContext` field (optional)
     pub fn notebook_context(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -212,13 +207,13 @@ impl<'a, S: get_entry_detail_state::State> GetEntryDetailBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GetEntryDetailBuilder<'a, S>
+impl<S: BosStr, St> GetEntryDetailBuilder<S, St>
 where
-    S: get_entry_detail_state::State,
-    S::Entry: get_entry_detail_state::IsSet,
+    St: get_entry_detail_state::State,
+    St::Entry: get_entry_detail_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetEntryDetail<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetEntryDetail<S> {
         GetEntryDetail {
             entry: self._fields.0.unwrap(),
             notebook_context: self._fields.1,

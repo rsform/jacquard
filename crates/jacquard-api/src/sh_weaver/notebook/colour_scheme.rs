@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "sh.weaver.notebook.colourScheme",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ColourScheme<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ColourScheme<S: BosStr = DefaultStr> {
     pub colours: ColourSchemeColours<S>,
     ///Human-readable name for the colour scheme
     pub name: S,
@@ -54,11 +54,11 @@ pub struct ColourScheme<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ColourSchemeColours<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ColourSchemeColours<S: BosStr = DefaultStr> {
     ///Primary background for page/frame
     pub base: S,
     ///Border/divider colour
@@ -101,18 +101,18 @@ pub struct ColourSchemeColours<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ColourSchemeGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ColourSchemeGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: ColourScheme<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> ColourScheme<S> {
+impl<S: BosStr> ColourScheme<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, ColourSchemeRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -125,17 +125,17 @@ pub struct ColourSchemeRecord;
 impl XrpcResp for ColourSchemeRecord {
     const NSID: &'static str = "sh.weaver.notebook.colourScheme";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ColourSchemeGetRecordOutput<S>;
+    type Output<S: BosStr> = ColourSchemeGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<ColourSchemeGetRecordOutput<S>> for ColourScheme<S> {
+impl<S: BosStr> From<ColourSchemeGetRecordOutput<S>> for ColourScheme<S> {
     fn from(output: ColourSchemeGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for ColourScheme<S> {
+impl<S: BosStr> Collection for ColourScheme<S> {
     const NSID: &'static str = "sh.weaver.notebook.colourScheme";
     type Record = ColourSchemeRecord;
 }
@@ -145,7 +145,7 @@ impl Collection for ColourSchemeRecord {
     type Record = ColourSchemeRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ColourScheme<S> {
+impl<S: BosStr> LexiconSchema for ColourScheme<S> {
     fn nsid() -> &'static str {
         "sh.weaver.notebook.colourScheme"
     }
@@ -160,7 +160,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for ColourScheme<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ColourSchemeColours<S> {
+impl<S: BosStr> LexiconSchema for ColourSchemeColours<S> {
     fn nsid() -> &'static str {
         "sh.weaver.notebook.colourScheme"
     }
@@ -420,145 +420,145 @@ pub mod colour_scheme_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Colours;
         type Name;
         type Variant;
+        type Colours;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Colours = Unset;
         type Name = Unset;
         type Variant = Unset;
-    }
-    ///State transition - sets the `colours` field to Set
-    pub struct SetColours<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetColours<S> {}
-    impl<S: State> State for SetColours<S> {
-        type Colours = Set<members::colours>;
-        type Name = S::Name;
-        type Variant = S::Variant;
+        type Colours = Unset;
     }
     ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Colours = S::Colours;
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
         type Name = Set<members::name>;
-        type Variant = S::Variant;
+        type Variant = St::Variant;
+        type Colours = St::Colours;
     }
     ///State transition - sets the `variant` field to Set
-    pub struct SetVariant<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVariant<S> {}
-    impl<S: State> State for SetVariant<S> {
-        type Colours = S::Colours;
-        type Name = S::Name;
+    pub struct SetVariant<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetVariant<St> {}
+    impl<St: State> State for SetVariant<St> {
+        type Name = St::Name;
         type Variant = Set<members::variant>;
+        type Colours = St::Colours;
+    }
+    ///State transition - sets the `colours` field to Set
+    pub struct SetColours<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetColours<St> {}
+    impl<St: State> State for SetColours<St> {
+        type Name = St::Name;
+        type Variant = St::Variant;
+        type Colours = Set<members::colours>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `colours` field
-        pub struct colours(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `variant` field
         pub struct variant(());
+        ///Marker type for the `colours` field
+        pub struct colours(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ColourSchemeBuilder<'a, S: colour_scheme_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ColourSchemeBuilder<S: BosStr, St: colour_scheme_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<ColourSchemeColours<S>>, Option<S>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ColourScheme<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ColourSchemeBuilder<'a, colour_scheme_state::Empty> {
+impl<S: BosStr> ColourScheme<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ColourSchemeBuilder<S, colour_scheme_state::Empty> {
         ColourSchemeBuilder::new()
     }
 }
 
-impl<'a> ColourSchemeBuilder<'a, colour_scheme_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ColourSchemeBuilder<S, colour_scheme_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ColourSchemeBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ColourSchemeBuilder<'a, S>
+impl<S: BosStr, St> ColourSchemeBuilder<S, St>
 where
-    S: colour_scheme_state::State,
-    S::Colours: colour_scheme_state::IsUnset,
+    St: colour_scheme_state::State,
+    St::Colours: colour_scheme_state::IsUnset,
 {
     /// Set the `colours` field (required)
     pub fn colours(
         mut self,
         value: impl Into<ColourSchemeColours<S>>,
-    ) -> ColourSchemeBuilder<'a, colour_scheme_state::SetColours<S>> {
+    ) -> ColourSchemeBuilder<S, colour_scheme_state::SetColours<St>> {
         self._fields.0 = Option::Some(value.into());
         ColourSchemeBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ColourSchemeBuilder<'a, S>
+impl<S: BosStr, St> ColourSchemeBuilder<S, St>
 where
-    S: colour_scheme_state::State,
-    S::Name: colour_scheme_state::IsUnset,
+    St: colour_scheme_state::State,
+    St::Name: colour_scheme_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> ColourSchemeBuilder<'a, colour_scheme_state::SetName<S>> {
+    ) -> ColourSchemeBuilder<S, colour_scheme_state::SetName<St>> {
         self._fields.1 = Option::Some(value.into());
         ColourSchemeBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ColourSchemeBuilder<'a, S>
+impl<S: BosStr, St> ColourSchemeBuilder<S, St>
 where
-    S: colour_scheme_state::State,
-    S::Variant: colour_scheme_state::IsUnset,
+    St: colour_scheme_state::State,
+    St::Variant: colour_scheme_state::IsUnset,
 {
     /// Set the `variant` field (required)
     pub fn variant(
         mut self,
         value: impl Into<S>,
-    ) -> ColourSchemeBuilder<'a, colour_scheme_state::SetVariant<S>> {
+    ) -> ColourSchemeBuilder<S, colour_scheme_state::SetVariant<St>> {
         self._fields.2 = Option::Some(value.into());
         ColourSchemeBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ColourSchemeBuilder<'a, S>
+impl<S: BosStr, St> ColourSchemeBuilder<S, St>
 where
-    S: colour_scheme_state::State,
-    S::Colours: colour_scheme_state::IsSet,
-    S::Name: colour_scheme_state::IsSet,
-    S::Variant: colour_scheme_state::IsSet,
+    St: colour_scheme_state::State,
+    St::Name: colour_scheme_state::IsSet,
+    St::Variant: colour_scheme_state::IsSet,
+    St::Colours: colour_scheme_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ColourScheme<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ColourScheme<S> {
         ColourScheme {
             colours: self._fields.0.unwrap(),
             name: self._fields.1.unwrap(),
@@ -566,11 +566,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> ColourScheme<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ColourScheme<S> {
         ColourScheme {
             colours: self._fields.0.unwrap(),
             name: self._fields.1.unwrap(),

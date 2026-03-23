@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use serde::{Serialize, Deserialize};
     rename = "tech.lenooby09.didgit.object",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Object<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Object<S: BosStr = DefaultStr> {
     ///The git object content, stored as an AT Protocol blob.
     pub content: BlobRef<S>,
     ///The type of the git object.
@@ -52,7 +52,7 @@ pub struct Object<S: Bos<str> + AsRef<str> = DefaultStr> {
 /// The type of the git object.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ObjectObjectType<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ObjectObjectType<S: BosStr = DefaultStr> {
     Blob,
     Tree,
     Commit,
@@ -60,7 +60,7 @@ pub enum ObjectObjectType<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> ObjectObjectType<S> {
+impl<S: BosStr> ObjectObjectType<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Blob => "blob",
@@ -82,19 +82,19 @@ impl<S: Bos<str> + AsRef<str>> ObjectObjectType<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ObjectObjectType<S> {
+impl<S: BosStr> core::fmt::Display for ObjectObjectType<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for ObjectObjectType<S> {
+impl<S: BosStr> AsRef<str> for ObjectObjectType<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for ObjectObjectType<S> {
+impl<S: BosStr> Serialize for ObjectObjectType<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -103,8 +103,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for ObjectObjectType<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for ObjectObjectType<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ObjectObjectType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -114,14 +113,18 @@ for ObjectObjectType<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for ObjectObjectType<S> {
+impl<S: BosStr + Default> Default for ObjectObjectType<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for ObjectObjectType<S> {
-    type Output = ObjectObjectType<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for ObjectObjectType<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ObjectObjectType<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             ObjectObjectType::Blob => ObjectObjectType::Blob,
@@ -139,18 +142,18 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for ObjectObjectType<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ObjectGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ObjectGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Object<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Object<S> {
+impl<S: BosStr> Object<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, ObjectRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -163,17 +166,17 @@ pub struct ObjectRecord;
 impl XrpcResp for ObjectRecord {
     const NSID: &'static str = "tech.lenooby09.didgit.object";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ObjectGetRecordOutput<S>;
+    type Output<S: BosStr> = ObjectGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<ObjectGetRecordOutput<S>> for Object<S> {
+impl<S: BosStr> From<ObjectGetRecordOutput<S>> for Object<S> {
     fn from(output: ObjectGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Object<S> {
+impl<S: BosStr> Collection for Object<S> {
     const NSID: &'static str = "tech.lenooby09.didgit.object";
     type Record = ObjectRecord;
 }
@@ -183,7 +186,7 @@ impl Collection for ObjectRecord {
     type Record = ObjectRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Object<S> {
+impl<S: BosStr> LexiconSchema for Object<S> {
     fn nsid() -> &'static str {
         "tech.lenooby09.didgit.object"
     }
@@ -259,119 +262,119 @@ pub mod object_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ObjectType;
         type Content;
+        type ObjectType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ObjectType = Unset;
         type Content = Unset;
-    }
-    ///State transition - sets the `object_type` field to Set
-    pub struct SetObjectType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetObjectType<S> {}
-    impl<S: State> State for SetObjectType<S> {
-        type ObjectType = Set<members::object_type>;
-        type Content = S::Content;
+        type ObjectType = Unset;
     }
     ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type ObjectType = S::ObjectType;
+    pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetContent<St> {}
+    impl<St: State> State for SetContent<St> {
         type Content = Set<members::content>;
+        type ObjectType = St::ObjectType;
+    }
+    ///State transition - sets the `object_type` field to Set
+    pub struct SetObjectType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetObjectType<St> {}
+    impl<St: State> State for SetObjectType<St> {
+        type Content = St::Content;
+        type ObjectType = Set<members::object_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `object_type` field
-        pub struct object_type(());
         ///Marker type for the `content` field
         pub struct content(());
+        ///Marker type for the `object_type` field
+        pub struct object_type(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ObjectBuilder<'a, S: object_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ObjectBuilder<S: BosStr, St: object_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<BlobRef<S>>, Option<ObjectObjectType<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Object<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ObjectBuilder<'a, object_state::Empty> {
+impl<S: BosStr> Object<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ObjectBuilder<S, object_state::Empty> {
         ObjectBuilder::new()
     }
 }
 
-impl<'a> ObjectBuilder<'a, object_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ObjectBuilder<S, object_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ObjectBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ObjectBuilder<'a, S>
+impl<S: BosStr, St> ObjectBuilder<S, St>
 where
-    S: object_state::State,
-    S::Content: object_state::IsUnset,
+    St: object_state::State,
+    St::Content: object_state::IsUnset,
 {
     /// Set the `content` field (required)
     pub fn content(
         mut self,
         value: impl Into<BlobRef<S>>,
-    ) -> ObjectBuilder<'a, object_state::SetContent<S>> {
+    ) -> ObjectBuilder<S, object_state::SetContent<St>> {
         self._fields.0 = Option::Some(value.into());
         ObjectBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ObjectBuilder<'a, S>
+impl<S: BosStr, St> ObjectBuilder<S, St>
 where
-    S: object_state::State,
-    S::ObjectType: object_state::IsUnset,
+    St: object_state::State,
+    St::ObjectType: object_state::IsUnset,
 {
     /// Set the `objectType` field (required)
     pub fn object_type(
         mut self,
         value: impl Into<ObjectObjectType<S>>,
-    ) -> ObjectBuilder<'a, object_state::SetObjectType<S>> {
+    ) -> ObjectBuilder<S, object_state::SetObjectType<St>> {
         self._fields.1 = Option::Some(value.into());
         ObjectBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ObjectBuilder<'a, S>
+impl<S: BosStr, St> ObjectBuilder<S, St>
 where
-    S: object_state::State,
-    S::ObjectType: object_state::IsSet,
-    S::Content: object_state::IsSet,
+    St: object_state::State,
+    St::Content: object_state::IsSet,
+    St::ObjectType: object_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Object<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Object<S> {
         Object {
             content: self._fields.0.unwrap(),
             object_type: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Object<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Object<S> {
         Object {
             content: self._fields.0.unwrap(),
             object_type: self._fields.1.unwrap(),

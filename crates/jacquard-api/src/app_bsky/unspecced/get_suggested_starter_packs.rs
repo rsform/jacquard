@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
@@ -28,18 +28,16 @@ pub struct GetSuggestedStarterPacks {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetSuggestedStarterPacksOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetSuggestedStarterPacksOutput<S: BosStr = DefaultStr> {
     pub starter_packs: Vec<StarterPackView<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -48,7 +46,7 @@ pub struct GetSuggestedStarterPacksResponse;
 impl jacquard_common::xrpc::XrpcResp for GetSuggestedStarterPacksResponse {
     const NSID: &'static str = "app.bsky.unspecced.getSuggestedStarterPacks";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetSuggestedStarterPacksOutput<S>;
+    type Output<S: BosStr> = GetSuggestedStarterPacksOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
@@ -63,7 +61,7 @@ pub struct GetSuggestedStarterPacksRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetSuggestedStarterPacksRequest {
     const PATH: &'static str = "/xrpc/app.bsky.unspecced.getSuggestedStarterPacks";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetSuggestedStarterPacks;
+    type Request<S: BosStr> = GetSuggestedStarterPacks;
     type Response = GetSuggestedStarterPacksResponse;
 }
 
@@ -90,14 +88,16 @@ pub mod get_suggested_starter_packs_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetSuggestedStarterPacksBuilder<S: get_suggested_starter_packs_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetSuggestedStarterPacksBuilder<
+    St: get_suggested_starter_packs_state::State,
+> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>,),
 }
 
 impl GetSuggestedStarterPacks {
-    /// Create a new builder for this type
+    /// Create a new builder for this type.
     pub fn new() -> GetSuggestedStarterPacksBuilder<
         get_suggested_starter_packs_state::Empty,
     > {
@@ -106,7 +106,7 @@ impl GetSuggestedStarterPacks {
 }
 
 impl GetSuggestedStarterPacksBuilder<get_suggested_starter_packs_state::Empty> {
-    /// Create a new builder with all fields unset
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetSuggestedStarterPacksBuilder {
             _state: PhantomData,
@@ -115,7 +115,7 @@ impl GetSuggestedStarterPacksBuilder<get_suggested_starter_packs_state::Empty> {
     }
 }
 
-impl<S: get_suggested_starter_packs_state::State> GetSuggestedStarterPacksBuilder<S> {
+impl<St: get_suggested_starter_packs_state::State> GetSuggestedStarterPacksBuilder<St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
@@ -128,11 +128,11 @@ impl<S: get_suggested_starter_packs_state::State> GetSuggestedStarterPacksBuilde
     }
 }
 
-impl<S> GetSuggestedStarterPacksBuilder<S>
+impl<St> GetSuggestedStarterPacksBuilder<St>
 where
-    S: get_suggested_starter_packs_state::State,
+    St: get_suggested_starter_packs_state::State,
 {
-    /// Build the final struct
+    /// Build the final struct.
     pub fn build(self) -> GetSuggestedStarterPacks {
         GetSuggestedStarterPacks {
             limit: self._fields.0,

@@ -14,7 +14,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -42,11 +42,11 @@ use crate::app_rocksky::song::SongViewBasic;
     rename = "app.rocksky.playlist",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Playlist<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Playlist<S: BosStr = DefaultStr> {
     ///The Apple Music link of the playlist.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub apple_music_link: Option<S>,
@@ -82,11 +82,11 @@ pub struct Playlist<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct PlaylistGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct PlaylistGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
@@ -99,11 +99,11 @@ pub struct PlaylistGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct PlaylistViewBasic<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct PlaylistViewBasic<S: BosStr = DefaultStr> {
     ///The URL of the cover image for the playlist.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cover_image_url: Option<UriValue<S>>,
@@ -147,11 +147,11 @@ pub struct PlaylistViewBasic<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct PlaylistViewDetailed<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct PlaylistViewDetailed<S: BosStr = DefaultStr> {
     ///The URL of the cover image for the playlist.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cover_image_url: Option<UriValue<S>>,
@@ -189,7 +189,7 @@ pub struct PlaylistViewDetailed<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Playlist<S> {
+impl<S: BosStr> Playlist<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, PlaylistRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -202,17 +202,17 @@ pub struct PlaylistRecord;
 impl XrpcResp for PlaylistRecord {
     const NSID: &'static str = "app.rocksky.playlist";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = PlaylistGetRecordOutput<S>;
+    type Output<S: BosStr> = PlaylistGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<PlaylistGetRecordOutput<S>> for Playlist<S> {
+impl<S: BosStr> From<PlaylistGetRecordOutput<S>> for Playlist<S> {
     fn from(output: PlaylistGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Playlist<S> {
+impl<S: BosStr> Collection for Playlist<S> {
     const NSID: &'static str = "app.rocksky.playlist";
     type Record = PlaylistRecord;
 }
@@ -222,7 +222,7 @@ impl Collection for PlaylistRecord {
     type Record = PlaylistRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Playlist<S> {
+impl<S: BosStr> LexiconSchema for Playlist<S> {
     fn nsid() -> &'static str {
         "app.rocksky.playlist"
     }
@@ -319,7 +319,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Playlist<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for PlaylistViewBasic<S> {
+impl<S: BosStr> LexiconSchema for PlaylistViewBasic<S> {
     fn nsid() -> &'static str {
         "app.rocksky.playlist.defs"
     }
@@ -343,7 +343,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for PlaylistViewBasic<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for PlaylistViewDetailed<S> {
+impl<S: BosStr> LexiconSchema for PlaylistViewDetailed<S> {
     fn nsid() -> &'static str {
         "app.rocksky.playlist.defs"
     }
@@ -368,43 +368,43 @@ pub mod playlist_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Name;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Name = S::Name;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type CreatedAt = S::CreatedAt;
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
         type Name = Set<members::name>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Name = St::Name;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct PlaylistBuilder<'a, S: playlist_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct PlaylistBuilder<S: BosStr, St: playlist_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
         Option<Datetime>,
@@ -416,28 +416,28 @@ pub struct PlaylistBuilder<'a, S: playlist_state::State> {
         Option<Vec<Data<S>>>,
         Option<S>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Playlist<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> PlaylistBuilder<'a, playlist_state::Empty> {
+impl<S: BosStr> Playlist<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> PlaylistBuilder<S, playlist_state::Empty> {
         PlaylistBuilder::new()
     }
 }
 
-impl<'a> PlaylistBuilder<'a, playlist_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> PlaylistBuilder<S, playlist_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         PlaylistBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: playlist_state::State> PlaylistBuilder<'a, S> {
+impl<S: BosStr, St: playlist_state::State> PlaylistBuilder<S, St> {
     /// Set the `appleMusicLink` field (optional)
     pub fn apple_music_link(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -450,26 +450,26 @@ impl<'a, S: playlist_state::State> PlaylistBuilder<'a, S> {
     }
 }
 
-impl<'a, S> PlaylistBuilder<'a, S>
+impl<S: BosStr, St> PlaylistBuilder<S, St>
 where
-    S: playlist_state::State,
-    S::CreatedAt: playlist_state::IsUnset,
+    St: playlist_state::State,
+    St::CreatedAt: playlist_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> PlaylistBuilder<'a, playlist_state::SetCreatedAt<S>> {
+    ) -> PlaylistBuilder<S, playlist_state::SetCreatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         PlaylistBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: playlist_state::State> PlaylistBuilder<'a, S> {
+impl<S: BosStr, St: playlist_state::State> PlaylistBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -482,26 +482,26 @@ impl<'a, S: playlist_state::State> PlaylistBuilder<'a, S> {
     }
 }
 
-impl<'a, S> PlaylistBuilder<'a, S>
+impl<S: BosStr, St> PlaylistBuilder<S, St>
 where
-    S: playlist_state::State,
-    S::Name: playlist_state::IsUnset,
+    St: playlist_state::State,
+    St::Name: playlist_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> PlaylistBuilder<'a, playlist_state::SetName<S>> {
+    ) -> PlaylistBuilder<S, playlist_state::SetName<St>> {
         self._fields.3 = Option::Some(value.into());
         PlaylistBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: playlist_state::State> PlaylistBuilder<'a, S> {
+impl<S: BosStr, St: playlist_state::State> PlaylistBuilder<S, St> {
     /// Set the `picture` field (optional)
     pub fn picture(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -514,7 +514,7 @@ impl<'a, S: playlist_state::State> PlaylistBuilder<'a, S> {
     }
 }
 
-impl<'a, S: playlist_state::State> PlaylistBuilder<'a, S> {
+impl<S: BosStr, St: playlist_state::State> PlaylistBuilder<S, St> {
     /// Set the `spotifyLink` field (optional)
     pub fn spotify_link(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
@@ -527,7 +527,7 @@ impl<'a, S: playlist_state::State> PlaylistBuilder<'a, S> {
     }
 }
 
-impl<'a, S: playlist_state::State> PlaylistBuilder<'a, S> {
+impl<S: BosStr, St: playlist_state::State> PlaylistBuilder<S, St> {
     /// Set the `tidalLink` field (optional)
     pub fn tidal_link(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.6 = value.into();
@@ -540,7 +540,7 @@ impl<'a, S: playlist_state::State> PlaylistBuilder<'a, S> {
     }
 }
 
-impl<'a, S: playlist_state::State> PlaylistBuilder<'a, S> {
+impl<S: BosStr, St: playlist_state::State> PlaylistBuilder<S, St> {
     /// Set the `tracks` field (optional)
     pub fn tracks(mut self, value: impl Into<Option<Vec<Data<S>>>>) -> Self {
         self._fields.7 = value.into();
@@ -553,7 +553,7 @@ impl<'a, S: playlist_state::State> PlaylistBuilder<'a, S> {
     }
 }
 
-impl<'a, S: playlist_state::State> PlaylistBuilder<'a, S> {
+impl<S: BosStr, St: playlist_state::State> PlaylistBuilder<S, St> {
     /// Set the `youtubeLink` field (optional)
     pub fn youtube_link(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.8 = value.into();
@@ -566,14 +566,14 @@ impl<'a, S: playlist_state::State> PlaylistBuilder<'a, S> {
     }
 }
 
-impl<'a, S> PlaylistBuilder<'a, S>
+impl<S: BosStr, St> PlaylistBuilder<S, St>
 where
-    S: playlist_state::State,
-    S::CreatedAt: playlist_state::IsSet,
-    S::Name: playlist_state::IsSet,
+    St: playlist_state::State,
+    St::Name: playlist_state::IsSet,
+    St::CreatedAt: playlist_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Playlist<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Playlist<S> {
         Playlist {
             apple_music_link: self._fields.0,
             created_at: self._fields.1.unwrap(),
@@ -587,11 +587,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Playlist<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Playlist<S> {
         Playlist {
             apple_music_link: self._fields.0,
             created_at: self._fields.1.unwrap(),

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
@@ -18,37 +18,33 @@ use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SendNotification<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SendNotification<S: BosStr = DefaultStr> {
     ///The DID of who this notification comes from.
     pub from: Did<S>,
     ///The DID of who this notification should go to.
     pub to: Did<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SendNotificationOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+pub struct SendNotificationOutput<S: BosStr = DefaultStr> {
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -57,12 +53,11 @@ pub struct SendNotificationResponse;
 impl jacquard_common::xrpc::XrpcResp for SendNotificationResponse {
     const NSID: &'static str = "app.bsky.contact.sendNotification";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = SendNotificationOutput<S>;
+    type Output<S: BosStr> = SendNotificationOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for SendNotification<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for SendNotification<S> {
     const NSID: &'static str = "app.bsky.contact.sendNotification";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -77,7 +72,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for SendNotificationRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = SendNotification<S>;
+    type Request<S: BosStr> = SendNotification<S>;
     type Response = SendNotificationResponse;
 }
 
@@ -102,17 +97,17 @@ pub mod send_notification_state {
         type To = Unset;
     }
     ///State transition - sets the `from` field to Set
-    pub struct SetFrom<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFrom<S> {}
-    impl<S: State> State for SetFrom<S> {
+    pub struct SetFrom<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetFrom<St> {}
+    impl<St: State> State for SetFrom<St> {
         type From = Set<members::from>;
-        type To = S::To;
+        type To = St::To;
     }
     ///State transition - sets the `to` field to Set
-    pub struct SetTo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTo<S> {}
-    impl<S: State> State for SetTo<S> {
-        type From = S::From;
+    pub struct SetTo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTo<St> {}
+    impl<St: State> State for SetTo<St> {
+        type From = St::From;
         type To = Set<members::to>;
     }
     /// Marker types for field names
@@ -125,88 +120,88 @@ pub mod send_notification_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct SendNotificationBuilder<'a, S: send_notification_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct SendNotificationBuilder<S: BosStr, St: send_notification_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>, Option<Did<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> SendNotification<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> SendNotificationBuilder<'a, send_notification_state::Empty> {
+impl<S: BosStr> SendNotification<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> SendNotificationBuilder<S, send_notification_state::Empty> {
         SendNotificationBuilder::new()
     }
 }
 
-impl<'a> SendNotificationBuilder<'a, send_notification_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> SendNotificationBuilder<S, send_notification_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SendNotificationBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SendNotificationBuilder<'a, S>
+impl<S: BosStr, St> SendNotificationBuilder<S, St>
 where
-    S: send_notification_state::State,
-    S::From: send_notification_state::IsUnset,
+    St: send_notification_state::State,
+    St::From: send_notification_state::IsUnset,
 {
     /// Set the `from` field (required)
     pub fn from(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> SendNotificationBuilder<'a, send_notification_state::SetFrom<S>> {
+    ) -> SendNotificationBuilder<S, send_notification_state::SetFrom<St>> {
         self._fields.0 = Option::Some(value.into());
         SendNotificationBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SendNotificationBuilder<'a, S>
+impl<S: BosStr, St> SendNotificationBuilder<S, St>
 where
-    S: send_notification_state::State,
-    S::To: send_notification_state::IsUnset,
+    St: send_notification_state::State,
+    St::To: send_notification_state::IsUnset,
 {
     /// Set the `to` field (required)
     pub fn to(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> SendNotificationBuilder<'a, send_notification_state::SetTo<S>> {
+    ) -> SendNotificationBuilder<S, send_notification_state::SetTo<St>> {
         self._fields.1 = Option::Some(value.into());
         SendNotificationBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SendNotificationBuilder<'a, S>
+impl<S: BosStr, St> SendNotificationBuilder<S, St>
 where
-    S: send_notification_state::State,
-    S::From: send_notification_state::IsSet,
-    S::To: send_notification_state::IsSet,
+    St: send_notification_state::State,
+    St::From: send_notification_state::IsSet,
+    St::To: send_notification_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> SendNotification<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> SendNotification<S> {
         SendNotification {
             from: self._fields.0.unwrap(),
             to: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> SendNotification<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> SendNotification<S> {
         SendNotification {
             from: self._fields.0.unwrap(),
             to: self._fields.1.unwrap(),

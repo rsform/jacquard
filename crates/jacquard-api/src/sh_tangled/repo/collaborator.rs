@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,11 +34,11 @@ use serde::{Serialize, Deserialize};
     rename = "sh.tangled.repo.collaborator",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Collaborator<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Collaborator<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     ///repo to add this user to
     pub repo: AtUri<S>,
@@ -53,18 +53,18 @@ pub struct Collaborator<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CollaboratorGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CollaboratorGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Collaborator<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Collaborator<S> {
+impl<S: BosStr> Collaborator<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, CollaboratorRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -77,17 +77,17 @@ pub struct CollaboratorRecord;
 impl XrpcResp for CollaboratorRecord {
     const NSID: &'static str = "sh.tangled.repo.collaborator";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = CollaboratorGetRecordOutput<S>;
+    type Output<S: BosStr> = CollaboratorGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<CollaboratorGetRecordOutput<S>> for Collaborator<S> {
+impl<S: BosStr> From<CollaboratorGetRecordOutput<S>> for Collaborator<S> {
     fn from(output: CollaboratorGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Collaborator<S> {
+impl<S: BosStr> Collection for Collaborator<S> {
     const NSID: &'static str = "sh.tangled.repo.collaborator";
     type Record = CollaboratorRecord;
 }
@@ -97,7 +97,7 @@ impl Collection for CollaboratorRecord {
     type Record = CollaboratorRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Collaborator<S> {
+impl<S: BosStr> LexiconSchema for Collaborator<S> {
     fn nsid() -> &'static str {
         "sh.tangled.repo.collaborator"
     }
@@ -122,145 +122,145 @@ pub mod collaborator_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Subject;
-        type CreatedAt;
         type Repo;
+        type CreatedAt;
+        type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Subject = Unset;
-        type CreatedAt = Unset;
         type Repo = Unset;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type Subject = Set<members::subject>;
-        type CreatedAt = S::CreatedAt;
-        type Repo = S::Repo;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Subject = S::Subject;
-        type CreatedAt = Set<members::created_at>;
-        type Repo = S::Repo;
+        type CreatedAt = Unset;
+        type Subject = Unset;
     }
     ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
-        type Subject = S::Subject;
-        type CreatedAt = S::CreatedAt;
+    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRepo<St> {}
+    impl<St: State> State for SetRepo<St> {
         type Repo = Set<members::repo>;
+        type CreatedAt = St::CreatedAt;
+        type Subject = St::Subject;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Repo = St::Repo;
+        type CreatedAt = Set<members::created_at>;
+        type Subject = St::Subject;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubject<St> {}
+    impl<St: State> State for SetSubject<St> {
+        type Repo = St::Repo;
+        type CreatedAt = St::CreatedAt;
+        type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `subject` field
-        pub struct subject(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `repo` field
         pub struct repo(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct CollaboratorBuilder<'a, S: collaborator_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct CollaboratorBuilder<S: BosStr, St: collaborator_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<AtUri<S>>, Option<Did<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Collaborator<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> CollaboratorBuilder<'a, collaborator_state::Empty> {
+impl<S: BosStr> Collaborator<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> CollaboratorBuilder<S, collaborator_state::Empty> {
         CollaboratorBuilder::new()
     }
 }
 
-impl<'a> CollaboratorBuilder<'a, collaborator_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> CollaboratorBuilder<S, collaborator_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         CollaboratorBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CollaboratorBuilder<'a, S>
+impl<S: BosStr, St> CollaboratorBuilder<S, St>
 where
-    S: collaborator_state::State,
-    S::CreatedAt: collaborator_state::IsUnset,
+    St: collaborator_state::State,
+    St::CreatedAt: collaborator_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> CollaboratorBuilder<'a, collaborator_state::SetCreatedAt<S>> {
+    ) -> CollaboratorBuilder<S, collaborator_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         CollaboratorBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CollaboratorBuilder<'a, S>
+impl<S: BosStr, St> CollaboratorBuilder<S, St>
 where
-    S: collaborator_state::State,
-    S::Repo: collaborator_state::IsUnset,
+    St: collaborator_state::State,
+    St::Repo: collaborator_state::IsUnset,
 {
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> CollaboratorBuilder<'a, collaborator_state::SetRepo<S>> {
+    ) -> CollaboratorBuilder<S, collaborator_state::SetRepo<St>> {
         self._fields.1 = Option::Some(value.into());
         CollaboratorBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CollaboratorBuilder<'a, S>
+impl<S: BosStr, St> CollaboratorBuilder<S, St>
 where
-    S: collaborator_state::State,
-    S::Subject: collaborator_state::IsUnset,
+    St: collaborator_state::State,
+    St::Subject: collaborator_state::IsUnset,
 {
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> CollaboratorBuilder<'a, collaborator_state::SetSubject<S>> {
+    ) -> CollaboratorBuilder<S, collaborator_state::SetSubject<St>> {
         self._fields.2 = Option::Some(value.into());
         CollaboratorBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CollaboratorBuilder<'a, S>
+impl<S: BosStr, St> CollaboratorBuilder<S, St>
 where
-    S: collaborator_state::State,
-    S::Subject: collaborator_state::IsSet,
-    S::CreatedAt: collaborator_state::IsSet,
-    S::Repo: collaborator_state::IsSet,
+    St: collaborator_state::State,
+    St::Repo: collaborator_state::IsSet,
+    St::CreatedAt: collaborator_state::IsSet,
+    St::Subject: collaborator_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Collaborator<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Collaborator<S> {
         Collaborator {
             created_at: self._fields.0.unwrap(),
             repo: self._fields.1.unwrap(),
@@ -268,11 +268,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Collaborator<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Collaborator<S> {
         Collaborator {
             created_at: self._fields.0.unwrap(),
             repo: self._fields.1.unwrap(),

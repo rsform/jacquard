@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use crate::app_dropanchor::comment;
     rename = "app.dropanchor.comment",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Comment<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Comment<S: BosStr = DefaultStr> {
     ///Reference to the check-in being commented on
     pub checkin_ref: comment::StrongRef<S>,
     ///When the comment was created
@@ -57,11 +57,11 @@ pub struct Comment<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CommentGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CommentGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
@@ -74,11 +74,11 @@ pub struct CommentGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct StrongRef<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct StrongRef<S: BosStr = DefaultStr> {
     ///Content identifier (CID) of the referenced record
     pub cid: Cid<S>,
     ///AT Protocol URI of the referenced record
@@ -87,7 +87,7 @@ pub struct StrongRef<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Comment<S> {
+impl<S: BosStr> Comment<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, CommentRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -100,17 +100,17 @@ pub struct CommentRecord;
 impl XrpcResp for CommentRecord {
     const NSID: &'static str = "app.dropanchor.comment";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = CommentGetRecordOutput<S>;
+    type Output<S: BosStr> = CommentGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<CommentGetRecordOutput<S>> for Comment<S> {
+impl<S: BosStr> From<CommentGetRecordOutput<S>> for Comment<S> {
     fn from(output: CommentGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Comment<S> {
+impl<S: BosStr> Collection for Comment<S> {
     const NSID: &'static str = "app.dropanchor.comment";
     type Record = CommentRecord;
 }
@@ -120,7 +120,7 @@ impl Collection for CommentRecord {
     type Record = CommentRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Comment<S> {
+impl<S: BosStr> LexiconSchema for Comment<S> {
     fn nsid() -> &'static str {
         "app.dropanchor.comment"
     }
@@ -146,7 +146,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Comment<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for StrongRef<S> {
+impl<S: BosStr> LexiconSchema for StrongRef<S> {
     fn nsid() -> &'static str {
         "app.dropanchor.comment"
     }
@@ -171,145 +171,145 @@ pub mod comment_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Text;
         type CreatedAt;
+        type Text;
         type CheckinRef;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Text = Unset;
         type CreatedAt = Unset;
+        type Text = Unset;
         type CheckinRef = Unset;
     }
-    ///State transition - sets the `text` field to Set
-    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetText<S> {}
-    impl<S: State> State for SetText<S> {
-        type Text = Set<members::text>;
-        type CreatedAt = S::CreatedAt;
-        type CheckinRef = S::CheckinRef;
-    }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Text = S::Text;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
-        type CheckinRef = S::CheckinRef;
+        type Text = St::Text;
+        type CheckinRef = St::CheckinRef;
+    }
+    ///State transition - sets the `text` field to Set
+    pub struct SetText<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetText<St> {}
+    impl<St: State> State for SetText<St> {
+        type CreatedAt = St::CreatedAt;
+        type Text = Set<members::text>;
+        type CheckinRef = St::CheckinRef;
     }
     ///State transition - sets the `checkin_ref` field to Set
-    pub struct SetCheckinRef<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCheckinRef<S> {}
-    impl<S: State> State for SetCheckinRef<S> {
-        type Text = S::Text;
-        type CreatedAt = S::CreatedAt;
+    pub struct SetCheckinRef<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCheckinRef<St> {}
+    impl<St: State> State for SetCheckinRef<St> {
+        type CreatedAt = St::CreatedAt;
+        type Text = St::Text;
         type CheckinRef = Set<members::checkin_ref>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `text` field
-        pub struct text(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `text` field
+        pub struct text(());
         ///Marker type for the `checkin_ref` field
         pub struct checkin_ref(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct CommentBuilder<'a, S: comment_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct CommentBuilder<S: BosStr, St: comment_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<comment::StrongRef<S>>, Option<Datetime>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Comment<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> CommentBuilder<'a, comment_state::Empty> {
+impl<S: BosStr> Comment<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> CommentBuilder<S, comment_state::Empty> {
         CommentBuilder::new()
     }
 }
 
-impl<'a> CommentBuilder<'a, comment_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> CommentBuilder<S, comment_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         CommentBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CommentBuilder<'a, S>
+impl<S: BosStr, St> CommentBuilder<S, St>
 where
-    S: comment_state::State,
-    S::CheckinRef: comment_state::IsUnset,
+    St: comment_state::State,
+    St::CheckinRef: comment_state::IsUnset,
 {
     /// Set the `checkinRef` field (required)
     pub fn checkin_ref(
         mut self,
         value: impl Into<comment::StrongRef<S>>,
-    ) -> CommentBuilder<'a, comment_state::SetCheckinRef<S>> {
+    ) -> CommentBuilder<S, comment_state::SetCheckinRef<St>> {
         self._fields.0 = Option::Some(value.into());
         CommentBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CommentBuilder<'a, S>
+impl<S: BosStr, St> CommentBuilder<S, St>
 where
-    S: comment_state::State,
-    S::CreatedAt: comment_state::IsUnset,
+    St: comment_state::State,
+    St::CreatedAt: comment_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> CommentBuilder<'a, comment_state::SetCreatedAt<S>> {
+    ) -> CommentBuilder<S, comment_state::SetCreatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         CommentBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CommentBuilder<'a, S>
+impl<S: BosStr, St> CommentBuilder<S, St>
 where
-    S: comment_state::State,
-    S::Text: comment_state::IsUnset,
+    St: comment_state::State,
+    St::Text: comment_state::IsUnset,
 {
     /// Set the `text` field (required)
     pub fn text(
         mut self,
         value: impl Into<S>,
-    ) -> CommentBuilder<'a, comment_state::SetText<S>> {
+    ) -> CommentBuilder<S, comment_state::SetText<St>> {
         self._fields.2 = Option::Some(value.into());
         CommentBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CommentBuilder<'a, S>
+impl<S: BosStr, St> CommentBuilder<S, St>
 where
-    S: comment_state::State,
-    S::Text: comment_state::IsSet,
-    S::CreatedAt: comment_state::IsSet,
-    S::CheckinRef: comment_state::IsSet,
+    St: comment_state::State,
+    St::CreatedAt: comment_state::IsSet,
+    St::Text: comment_state::IsSet,
+    St::CheckinRef: comment_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Comment<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Comment<S> {
         Comment {
             checkin_ref: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
@@ -317,11 +317,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Comment<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Comment<S> {
         Comment {
             checkin_ref: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
@@ -463,17 +460,17 @@ pub mod strong_ref_state {
         type Cid = Unset;
     }
     ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
         type Uri = Set<members::uri>;
-        type Cid = S::Cid;
+        type Cid = St::Cid;
     }
     ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Uri = S::Uri;
+    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCid<St> {}
+    impl<St: State> State for SetCid<St> {
+        type Uri = St::Uri;
         type Cid = Set<members::cid>;
     }
     /// Marker types for field names
@@ -486,88 +483,88 @@ pub mod strong_ref_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct StrongRefBuilder<'a, S: strong_ref_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct StrongRefBuilder<S: BosStr, St: strong_ref_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Cid<S>>, Option<AtUri<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> StrongRef<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> StrongRefBuilder<'a, strong_ref_state::Empty> {
+impl<S: BosStr> StrongRef<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> StrongRefBuilder<S, strong_ref_state::Empty> {
         StrongRefBuilder::new()
     }
 }
 
-impl<'a> StrongRefBuilder<'a, strong_ref_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> StrongRefBuilder<S, strong_ref_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         StrongRefBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> StrongRefBuilder<'a, S>
+impl<S: BosStr, St> StrongRefBuilder<S, St>
 where
-    S: strong_ref_state::State,
-    S::Cid: strong_ref_state::IsUnset,
+    St: strong_ref_state::State,
+    St::Cid: strong_ref_state::IsUnset,
 {
     /// Set the `cid` field (required)
     pub fn cid(
         mut self,
         value: impl Into<Cid<S>>,
-    ) -> StrongRefBuilder<'a, strong_ref_state::SetCid<S>> {
+    ) -> StrongRefBuilder<S, strong_ref_state::SetCid<St>> {
         self._fields.0 = Option::Some(value.into());
         StrongRefBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> StrongRefBuilder<'a, S>
+impl<S: BosStr, St> StrongRefBuilder<S, St>
 where
-    S: strong_ref_state::State,
-    S::Uri: strong_ref_state::IsUnset,
+    St: strong_ref_state::State,
+    St::Uri: strong_ref_state::IsUnset,
 {
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> StrongRefBuilder<'a, strong_ref_state::SetUri<S>> {
+    ) -> StrongRefBuilder<S, strong_ref_state::SetUri<St>> {
         self._fields.1 = Option::Some(value.into());
         StrongRefBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> StrongRefBuilder<'a, S>
+impl<S: BosStr, St> StrongRefBuilder<S, St>
 where
-    S: strong_ref_state::State,
-    S::Uri: strong_ref_state::IsSet,
-    S::Cid: strong_ref_state::IsSet,
+    St: strong_ref_state::State,
+    St::Uri: strong_ref_state::IsSet,
+    St::Cid: strong_ref_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> StrongRef<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> StrongRef<S> {
         StrongRef {
             cid: self._fields.0.unwrap(),
             uri: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> StrongRef<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> StrongRef<S> {
         StrongRef {
             cid: self._fields.0.unwrap(),
             uri: self._fields.1.unwrap(),

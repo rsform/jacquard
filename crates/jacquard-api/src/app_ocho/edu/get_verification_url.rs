@@ -10,40 +10,37 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetVerificationUrl<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct GetVerificationUrl<S: BosStr = DefaultStr> {
     pub domain: S,
 }
 
 /// The intent data
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetVerificationUrlOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetVerificationUrlOutput<S: BosStr = DefaultStr> {
     pub url: S,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -52,12 +49,11 @@ pub struct GetVerificationUrlResponse;
 impl jacquard_common::xrpc::XrpcResp for GetVerificationUrlResponse {
     const NSID: &'static str = "app.ocho.edu.getVerificationUrl";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetVerificationUrlOutput<S>;
+    type Output<S: BosStr> = GetVerificationUrlOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetVerificationUrl<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetVerificationUrl<S> {
     const NSID: &'static str = "app.ocho.edu.getVerificationUrl";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetVerificationUrlResponse;
@@ -68,7 +64,7 @@ pub struct GetVerificationUrlRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetVerificationUrlRequest {
     const PATH: &'static str = "/xrpc/app.ocho.edu.getVerificationUrl";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetVerificationUrl<S>;
+    type Request<S: BosStr> = GetVerificationUrl<S>;
     type Response = GetVerificationUrlResponse;
 }
 
@@ -91,9 +87,9 @@ pub mod get_verification_url_state {
         type Domain = Unset;
     }
     ///State transition - sets the `domain` field to Set
-    pub struct SetDomain<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDomain<S> {}
-    impl<S: State> State for SetDomain<S> {
+    pub struct SetDomain<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDomain<St> {}
+    impl<St: State> State for SetDomain<St> {
         type Domain = Set<members::domain>;
     }
     /// Marker types for field names
@@ -104,57 +100,57 @@ pub mod get_verification_url_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetVerificationUrlBuilder<'a, S: get_verification_url_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetVerificationUrlBuilder<S: BosStr, St: get_verification_url_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetVerificationUrl<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetVerificationUrlBuilder<'a, get_verification_url_state::Empty> {
+impl<S: BosStr> GetVerificationUrl<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetVerificationUrlBuilder<S, get_verification_url_state::Empty> {
         GetVerificationUrlBuilder::new()
     }
 }
 
-impl<'a> GetVerificationUrlBuilder<'a, get_verification_url_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetVerificationUrlBuilder<S, get_verification_url_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetVerificationUrlBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetVerificationUrlBuilder<'a, S>
+impl<S: BosStr, St> GetVerificationUrlBuilder<S, St>
 where
-    S: get_verification_url_state::State,
-    S::Domain: get_verification_url_state::IsUnset,
+    St: get_verification_url_state::State,
+    St::Domain: get_verification_url_state::IsUnset,
 {
     /// Set the `domain` field (required)
     pub fn domain(
         mut self,
         value: impl Into<S>,
-    ) -> GetVerificationUrlBuilder<'a, get_verification_url_state::SetDomain<S>> {
+    ) -> GetVerificationUrlBuilder<S, get_verification_url_state::SetDomain<St>> {
         self._fields.0 = Option::Some(value.into());
         GetVerificationUrlBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetVerificationUrlBuilder<'a, S>
+impl<S: BosStr, St> GetVerificationUrlBuilder<S, St>
 where
-    S: get_verification_url_state::State,
-    S::Domain: get_verification_url_state::IsSet,
+    St: get_verification_url_state::State,
+    St::Domain: get_verification_url_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetVerificationUrl<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetVerificationUrl<S> {
         GetVerificationUrl {
             domain: self._fields.0.unwrap(),
         }

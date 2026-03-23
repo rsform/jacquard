@@ -17,7 +17,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -37,11 +37,11 @@ use serde::{Serialize, Deserialize};
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CardRef<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CardRef<S: BosStr = DefaultStr> {
     /**Oracle card URI (oracle:<uuid>) - for external indexing.
 Derived from scryfallUri; on conflict, scryfallUri takes precedence.*/
     pub oracle_uri: UriValue<S>,
@@ -51,7 +51,7 @@ Derived from scryfallUri; on conflict, scryfallUri takes precedence.*/
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for CardRef<S> {
+impl<S: BosStr> LexiconSchema for CardRef<S> {
     fn nsid() -> &'static str {
         "com.deckbelcher.defs"
     }
@@ -76,122 +76,119 @@ pub mod card_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ScryfallUri;
         type OracleUri;
+        type ScryfallUri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ScryfallUri = Unset;
         type OracleUri = Unset;
-    }
-    ///State transition - sets the `scryfall_uri` field to Set
-    pub struct SetScryfallUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetScryfallUri<S> {}
-    impl<S: State> State for SetScryfallUri<S> {
-        type ScryfallUri = Set<members::scryfall_uri>;
-        type OracleUri = S::OracleUri;
+        type ScryfallUri = Unset;
     }
     ///State transition - sets the `oracle_uri` field to Set
-    pub struct SetOracleUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetOracleUri<S> {}
-    impl<S: State> State for SetOracleUri<S> {
-        type ScryfallUri = S::ScryfallUri;
+    pub struct SetOracleUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetOracleUri<St> {}
+    impl<St: State> State for SetOracleUri<St> {
         type OracleUri = Set<members::oracle_uri>;
+        type ScryfallUri = St::ScryfallUri;
+    }
+    ///State transition - sets the `scryfall_uri` field to Set
+    pub struct SetScryfallUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetScryfallUri<St> {}
+    impl<St: State> State for SetScryfallUri<St> {
+        type OracleUri = St::OracleUri;
+        type ScryfallUri = Set<members::scryfall_uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `scryfall_uri` field
-        pub struct scryfall_uri(());
         ///Marker type for the `oracle_uri` field
         pub struct oracle_uri(());
+        ///Marker type for the `scryfall_uri` field
+        pub struct scryfall_uri(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct CardRefBuilder<'a, S: card_ref_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct CardRefBuilder<S: BosStr, St: card_ref_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<UriValue<S>>, Option<UriValue<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> CardRef<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> CardRefBuilder<'a, card_ref_state::Empty> {
+impl<S: BosStr> CardRef<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> CardRefBuilder<S, card_ref_state::Empty> {
         CardRefBuilder::new()
     }
 }
 
-impl<'a> CardRefBuilder<'a, card_ref_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> CardRefBuilder<S, card_ref_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         CardRefBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CardRefBuilder<'a, S>
+impl<S: BosStr, St> CardRefBuilder<S, St>
 where
-    S: card_ref_state::State,
-    S::OracleUri: card_ref_state::IsUnset,
+    St: card_ref_state::State,
+    St::OracleUri: card_ref_state::IsUnset,
 {
     /// Set the `oracleUri` field (required)
     pub fn oracle_uri(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> CardRefBuilder<'a, card_ref_state::SetOracleUri<S>> {
+    ) -> CardRefBuilder<S, card_ref_state::SetOracleUri<St>> {
         self._fields.0 = Option::Some(value.into());
         CardRefBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CardRefBuilder<'a, S>
+impl<S: BosStr, St> CardRefBuilder<S, St>
 where
-    S: card_ref_state::State,
-    S::ScryfallUri: card_ref_state::IsUnset,
+    St: card_ref_state::State,
+    St::ScryfallUri: card_ref_state::IsUnset,
 {
     /// Set the `scryfallUri` field (required)
     pub fn scryfall_uri(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> CardRefBuilder<'a, card_ref_state::SetScryfallUri<S>> {
+    ) -> CardRefBuilder<S, card_ref_state::SetScryfallUri<St>> {
         self._fields.1 = Option::Some(value.into());
         CardRefBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CardRefBuilder<'a, S>
+impl<S: BosStr, St> CardRefBuilder<S, St>
 where
-    S: card_ref_state::State,
-    S::ScryfallUri: card_ref_state::IsSet,
-    S::OracleUri: card_ref_state::IsSet,
+    St: card_ref_state::State,
+    St::OracleUri: card_ref_state::IsSet,
+    St::ScryfallUri: card_ref_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> CardRef<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> CardRef<S> {
         CardRef {
             oracle_uri: self._fields.0.unwrap(),
             scryfall_uri: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> CardRef<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CardRef<S> {
         CardRef {
             oracle_uri: self._fields.0.unwrap(),
             scryfall_uri: self._fields.1.unwrap(),

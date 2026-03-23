@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -30,14 +30,14 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
 use crate::com_atproto::moderation::create_report;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CreateReport<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CreateReport<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub mod_tool: Option<create_report::ModTool<S>>,
     ///Additional context about the content and violation.
@@ -46,9 +46,7 @@ pub struct CreateReport<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Indicates the broad category of violation the report is for.
     pub reason_type: ReasonType<S>,
     pub subject: CreateReportSubject<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -58,11 +56,11 @@ pub struct CreateReport<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum CreateReportSubject<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum CreateReportSubject<S: BosStr = DefaultStr> {
     #[serde(rename = "com.atproto.admin.defs#repoRef")]
     RepoRef(Box<RepoRef<S>>),
     #[serde(rename = "com.atproto.repo.strongRef")]
@@ -71,14 +69,14 @@ pub enum CreateReportSubject<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CreateReportOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CreateReportOutput<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     pub id: i64,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -86,9 +84,7 @@ pub struct CreateReportOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub reason_type: ReasonType<S>,
     pub reported_by: Did<S>,
     pub subject: CreateReportOutputSubject<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -98,11 +94,11 @@ pub struct CreateReportOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum CreateReportOutputSubject<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum CreateReportOutputSubject<S: BosStr = DefaultStr> {
     #[serde(rename = "com.atproto.admin.defs#repoRef")]
     RepoRef(Box<RepoRef<S>>),
     #[serde(rename = "com.atproto.repo.strongRef")]
@@ -115,11 +111,11 @@ pub enum CreateReportOutputSubject<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ModTool<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ModTool<S: BosStr = DefaultStr> {
     ///Additional arbitrary metadata about the source
     #[serde(skip_serializing_if = "Option::is_none")]
     pub meta: Option<Data<S>>,
@@ -134,12 +130,11 @@ pub struct CreateReportResponse;
 impl jacquard_common::xrpc::XrpcResp for CreateReportResponse {
     const NSID: &'static str = "com.atproto.moderation.createReport";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = CreateReportOutput<S>;
+    type Output<S: BosStr> = CreateReportOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for CreateReport<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for CreateReport<S> {
     const NSID: &'static str = "com.atproto.moderation.createReport";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -154,11 +149,11 @@ impl jacquard_common::xrpc::XrpcEndpoint for CreateReportRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = CreateReport<S>;
+    type Request<S: BosStr> = CreateReport<S>;
     type Response = CreateReportResponse;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ModTool<S> {
+impl<S: BosStr> LexiconSchema for ModTool<S> {
     fn nsid() -> &'static str {
         "com.atproto.moderation.createReport"
     }
@@ -194,17 +189,17 @@ pub mod create_report_state {
         type Subject = Unset;
     }
     ///State transition - sets the `reason_type` field to Set
-    pub struct SetReasonType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetReasonType<S> {}
-    impl<S: State> State for SetReasonType<S> {
+    pub struct SetReasonType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetReasonType<St> {}
+    impl<St: State> State for SetReasonType<St> {
         type ReasonType = Set<members::reason_type>;
-        type Subject = S::Subject;
+        type Subject = St::Subject;
     }
     ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type ReasonType = S::ReasonType;
+    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubject<St> {}
+    impl<St: State> State for SetSubject<St> {
+        type ReasonType = St::ReasonType;
         type Subject = Set<members::subject>;
     }
     /// Marker types for field names
@@ -217,37 +212,37 @@ pub mod create_report_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct CreateReportBuilder<'a, S: create_report_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct CreateReportBuilder<S: BosStr, St: create_report_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<create_report::ModTool<S>>,
         Option<S>,
         Option<ReasonType<S>>,
         Option<CreateReportSubject<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> CreateReport<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> CreateReportBuilder<'a, create_report_state::Empty> {
+impl<S: BosStr> CreateReport<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> CreateReportBuilder<S, create_report_state::Empty> {
         CreateReportBuilder::new()
     }
 }
 
-impl<'a> CreateReportBuilder<'a, create_report_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> CreateReportBuilder<S, create_report_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         CreateReportBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: create_report_state::State> CreateReportBuilder<'a, S> {
+impl<S: BosStr, St: create_report_state::State> CreateReportBuilder<S, St> {
     /// Set the `modTool` field (optional)
     pub fn mod_tool(
         mut self,
@@ -263,7 +258,7 @@ impl<'a, S: create_report_state::State> CreateReportBuilder<'a, S> {
     }
 }
 
-impl<'a, S: create_report_state::State> CreateReportBuilder<'a, S> {
+impl<S: BosStr, St: create_report_state::State> CreateReportBuilder<S, St> {
     /// Set the `reason` field (optional)
     pub fn reason(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -276,52 +271,52 @@ impl<'a, S: create_report_state::State> CreateReportBuilder<'a, S> {
     }
 }
 
-impl<'a, S> CreateReportBuilder<'a, S>
+impl<S: BosStr, St> CreateReportBuilder<S, St>
 where
-    S: create_report_state::State,
-    S::ReasonType: create_report_state::IsUnset,
+    St: create_report_state::State,
+    St::ReasonType: create_report_state::IsUnset,
 {
     /// Set the `reasonType` field (required)
     pub fn reason_type(
         mut self,
         value: impl Into<ReasonType<S>>,
-    ) -> CreateReportBuilder<'a, create_report_state::SetReasonType<S>> {
+    ) -> CreateReportBuilder<S, create_report_state::SetReasonType<St>> {
         self._fields.2 = Option::Some(value.into());
         CreateReportBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CreateReportBuilder<'a, S>
+impl<S: BosStr, St> CreateReportBuilder<S, St>
 where
-    S: create_report_state::State,
-    S::Subject: create_report_state::IsUnset,
+    St: create_report_state::State,
+    St::Subject: create_report_state::IsUnset,
 {
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
         value: impl Into<CreateReportSubject<S>>,
-    ) -> CreateReportBuilder<'a, create_report_state::SetSubject<S>> {
+    ) -> CreateReportBuilder<S, create_report_state::SetSubject<St>> {
         self._fields.3 = Option::Some(value.into());
         CreateReportBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CreateReportBuilder<'a, S>
+impl<S: BosStr, St> CreateReportBuilder<S, St>
 where
-    S: create_report_state::State,
-    S::ReasonType: create_report_state::IsSet,
-    S::Subject: create_report_state::IsSet,
+    St: create_report_state::State,
+    St::ReasonType: create_report_state::IsSet,
+    St::Subject: create_report_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> CreateReport<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> CreateReport<S> {
         CreateReport {
             mod_tool: self._fields.0,
             reason: self._fields.1,
@@ -330,11 +325,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> CreateReport<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> CreateReport<S> {
         CreateReport {
             mod_tool: self._fields.0,
             reason: self._fields.1,

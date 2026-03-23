@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
@@ -19,41 +19,37 @@ use serde::{Serialize, Deserialize};
 use crate::sh_weaver::notebook::ChapterView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetNotebookChapters<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetNotebookChapters<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub cursor: Option<S>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
-    #[serde(borrow)]
     pub notebook: AtUri<S>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetNotebookChaptersOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetNotebookChaptersOutput<S: BosStr = DefaultStr> {
     pub chapters: Vec<ChapterView<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -62,12 +58,11 @@ pub struct GetNotebookChaptersResponse;
 impl jacquard_common::xrpc::XrpcResp for GetNotebookChaptersResponse {
     const NSID: &'static str = "sh.weaver.notebook.getNotebookChapters";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetNotebookChaptersOutput<S>;
+    type Output<S: BosStr> = GetNotebookChaptersOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetNotebookChapters<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetNotebookChapters<S> {
     const NSID: &'static str = "sh.weaver.notebook.getNotebookChapters";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetNotebookChaptersResponse;
@@ -78,7 +73,7 @@ pub struct GetNotebookChaptersRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetNotebookChaptersRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.notebook.getNotebookChapters";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetNotebookChapters<S>;
+    type Request<S: BosStr> = GetNotebookChapters<S>;
     type Response = GetNotebookChaptersResponse;
 }
 
@@ -105,9 +100,9 @@ pub mod get_notebook_chapters_state {
         type Notebook = Unset;
     }
     ///State transition - sets the `notebook` field to Set
-    pub struct SetNotebook<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNotebook<S> {}
-    impl<S: State> State for SetNotebook<S> {
+    pub struct SetNotebook<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetNotebook<St> {}
+    impl<St: State> State for SetNotebook<St> {
         type Notebook = Set<members::notebook>;
     }
     /// Marker types for field names
@@ -118,32 +113,38 @@ pub mod get_notebook_chapters_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetNotebookChaptersBuilder<'a, S: get_notebook_chapters_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetNotebookChaptersBuilder<
+    S: BosStr,
+    St: get_notebook_chapters_state::State,
+> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>, Option<AtUri<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetNotebookChapters<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetNotebookChaptersBuilder<'a, get_notebook_chapters_state::Empty> {
+impl<S: BosStr> GetNotebookChapters<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetNotebookChaptersBuilder<S, get_notebook_chapters_state::Empty> {
         GetNotebookChaptersBuilder::new()
     }
 }
 
-impl<'a> GetNotebookChaptersBuilder<'a, get_notebook_chapters_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetNotebookChaptersBuilder<S, get_notebook_chapters_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetNotebookChaptersBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: get_notebook_chapters_state::State> GetNotebookChaptersBuilder<'a, S> {
+impl<
+    S: BosStr,
+    St: get_notebook_chapters_state::State,
+> GetNotebookChaptersBuilder<S, St> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -156,7 +157,10 @@ impl<'a, S: get_notebook_chapters_state::State> GetNotebookChaptersBuilder<'a, S
     }
 }
 
-impl<'a, S: get_notebook_chapters_state::State> GetNotebookChaptersBuilder<'a, S> {
+impl<
+    S: BosStr,
+    St: get_notebook_chapters_state::State,
+> GetNotebookChaptersBuilder<S, St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -169,32 +173,32 @@ impl<'a, S: get_notebook_chapters_state::State> GetNotebookChaptersBuilder<'a, S
     }
 }
 
-impl<'a, S> GetNotebookChaptersBuilder<'a, S>
+impl<S: BosStr, St> GetNotebookChaptersBuilder<S, St>
 where
-    S: get_notebook_chapters_state::State,
-    S::Notebook: get_notebook_chapters_state::IsUnset,
+    St: get_notebook_chapters_state::State,
+    St::Notebook: get_notebook_chapters_state::IsUnset,
 {
     /// Set the `notebook` field (required)
     pub fn notebook(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> GetNotebookChaptersBuilder<'a, get_notebook_chapters_state::SetNotebook<S>> {
+    ) -> GetNotebookChaptersBuilder<S, get_notebook_chapters_state::SetNotebook<St>> {
         self._fields.2 = Option::Some(value.into());
         GetNotebookChaptersBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetNotebookChaptersBuilder<'a, S>
+impl<S: BosStr, St> GetNotebookChaptersBuilder<S, St>
 where
-    S: get_notebook_chapters_state::State,
-    S::Notebook: get_notebook_chapters_state::IsSet,
+    St: get_notebook_chapters_state::State,
+    St::Notebook: get_notebook_chapters_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetNotebookChapters<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetNotebookChapters<S> {
         GetNotebookChapters {
             cursor: self._fields.0,
             limit: self._fields.1,

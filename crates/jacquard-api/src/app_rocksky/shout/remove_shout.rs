@@ -6,47 +6,43 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[allow(unused_imports)]
+use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::app_rocksky::shout::ShoutView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct RemoveShoutParams<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct RemoveShoutParams<S: BosStr = DefaultStr> {
     pub id: S,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct RemoveShoutOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct RemoveShoutOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
-    #[serde(borrow)]
     pub value: ShoutView<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
-    pub extra_data: Option<
-        alloc::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<S>,
-        >,
-    >,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// XRPC request marker type.
@@ -58,7 +54,7 @@ pub struct RemoveShoutResponse;
 impl jacquard_common::xrpc::XrpcResp for RemoveShoutResponse {
     const NSID: &'static str = "app.rocksky.shout.removeShout";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = RemoveShoutOutput<S>;
+    type Output<S: BosStr> = RemoveShoutOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
@@ -77,7 +73,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for RemoveShoutRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = RemoveShout;
+    type Request<S: BosStr> = RemoveShout;
     type Response = RemoveShoutResponse;
 }
 
@@ -100,9 +96,9 @@ pub mod remove_shout_params_state {
         type Id = Unset;
     }
     ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
+    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetId<St> {}
+    impl<St: State> State for SetId<St> {
         type Id = Set<members::id>;
     }
     /// Marker types for field names
@@ -113,57 +109,57 @@ pub mod remove_shout_params_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct RemoveShoutParamsBuilder<'a, S: remove_shout_params_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct RemoveShoutParamsBuilder<S: BosStr, St: remove_shout_params_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> RemoveShoutParams<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> RemoveShoutParamsBuilder<'a, remove_shout_params_state::Empty> {
+impl<S: BosStr> RemoveShoutParams<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> RemoveShoutParamsBuilder<S, remove_shout_params_state::Empty> {
         RemoveShoutParamsBuilder::new()
     }
 }
 
-impl<'a> RemoveShoutParamsBuilder<'a, remove_shout_params_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> RemoveShoutParamsBuilder<S, remove_shout_params_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         RemoveShoutParamsBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RemoveShoutParamsBuilder<'a, S>
+impl<S: BosStr, St> RemoveShoutParamsBuilder<S, St>
 where
-    S: remove_shout_params_state::State,
-    S::Id: remove_shout_params_state::IsUnset,
+    St: remove_shout_params_state::State,
+    St::Id: remove_shout_params_state::IsUnset,
 {
     /// Set the `id` field (required)
     pub fn id(
         mut self,
         value: impl Into<S>,
-    ) -> RemoveShoutParamsBuilder<'a, remove_shout_params_state::SetId<S>> {
+    ) -> RemoveShoutParamsBuilder<S, remove_shout_params_state::SetId<St>> {
         self._fields.0 = Option::Some(value.into());
         RemoveShoutParamsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RemoveShoutParamsBuilder<'a, S>
+impl<S: BosStr, St> RemoveShoutParamsBuilder<S, St>
 where
-    S: remove_shout_params_state::State,
-    S::Id: remove_shout_params_state::IsSet,
+    St: remove_shout_params_state::State,
+    St::Id: remove_shout_params_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> RemoveShoutParams<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> RemoveShoutParams<S> {
         RemoveShoutParams {
             id: self._fields.0.unwrap(),
         }

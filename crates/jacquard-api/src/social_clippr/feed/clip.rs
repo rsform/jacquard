@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
     rename = "social.clippr.feed.clip",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Clip<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Clip<S: BosStr = DefaultStr> {
     ///Client-declared timestamp when the bookmark is created
     pub created_at: Datetime,
     ///A description of the bookmark's content. This should be ripped from the URL metadata and be static for all records using the URL.
@@ -75,18 +75,18 @@ pub struct Clip<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ClipGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ClipGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Clip<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Clip<S> {
+impl<S: BosStr> Clip<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, ClipRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -99,17 +99,17 @@ pub struct ClipRecord;
 impl XrpcResp for ClipRecord {
     const NSID: &'static str = "social.clippr.feed.clip";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ClipGetRecordOutput<S>;
+    type Output<S: BosStr> = ClipGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<ClipGetRecordOutput<S>> for Clip<S> {
+impl<S: BosStr> From<ClipGetRecordOutput<S>> for Clip<S> {
     fn from(output: ClipGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Clip<S> {
+impl<S: BosStr> Collection for Clip<S> {
     const NSID: &'static str = "social.clippr.feed.clip";
     type Record = ClipRecord;
 }
@@ -119,7 +119,7 @@ impl Collection for ClipRecord {
     type Record = ClipRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Clip<S> {
+impl<S: BosStr> LexiconSchema for Clip<S> {
     fn nsid() -> &'static str {
         "social.clippr.feed.clip"
     }
@@ -273,53 +273,53 @@ pub mod clip_state {
         type CreatedAt = Unset;
     }
     ///State transition - sets the `url` field to Set
-    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrl<S> {}
-    impl<S: State> State for SetUrl<S> {
+    pub struct SetUrl<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUrl<St> {}
+    impl<St: State> State for SetUrl<St> {
         type Url = Set<members::url>;
-        type Title = S::Title;
-        type Unlisted = S::Unlisted;
-        type Description = S::Description;
-        type CreatedAt = S::CreatedAt;
+        type Title = St::Title;
+        type Unlisted = St::Unlisted;
+        type Description = St::Description;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Url = S::Url;
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
+        type Url = St::Url;
         type Title = Set<members::title>;
-        type Unlisted = S::Unlisted;
-        type Description = S::Description;
-        type CreatedAt = S::CreatedAt;
+        type Unlisted = St::Unlisted;
+        type Description = St::Description;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `unlisted` field to Set
-    pub struct SetUnlisted<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUnlisted<S> {}
-    impl<S: State> State for SetUnlisted<S> {
-        type Url = S::Url;
-        type Title = S::Title;
+    pub struct SetUnlisted<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUnlisted<St> {}
+    impl<St: State> State for SetUnlisted<St> {
+        type Url = St::Url;
+        type Title = St::Title;
         type Unlisted = Set<members::unlisted>;
-        type Description = S::Description;
-        type CreatedAt = S::CreatedAt;
+        type Description = St::Description;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `description` field to Set
-    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDescription<S> {}
-    impl<S: State> State for SetDescription<S> {
-        type Url = S::Url;
-        type Title = S::Title;
-        type Unlisted = S::Unlisted;
+    pub struct SetDescription<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDescription<St> {}
+    impl<St: State> State for SetDescription<St> {
+        type Url = St::Url;
+        type Title = St::Title;
+        type Unlisted = St::Unlisted;
         type Description = Set<members::description>;
-        type CreatedAt = S::CreatedAt;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Url = S::Url;
-        type Title = S::Title;
-        type Unlisted = S::Unlisted;
-        type Description = S::Description;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Url = St::Url;
+        type Title = St::Title;
+        type Unlisted = St::Unlisted;
+        type Description = St::Description;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
@@ -338,9 +338,9 @@ pub mod clip_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ClipBuilder<'a, S: clip_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ClipBuilder<S: BosStr, St: clip_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
         Option<S>,
@@ -352,66 +352,66 @@ pub struct ClipBuilder<'a, S: clip_state::State> {
         Option<bool>,
         Option<UriValue<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Clip<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ClipBuilder<'a, clip_state::Empty> {
+impl<S: BosStr> Clip<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ClipBuilder<S, clip_state::Empty> {
         ClipBuilder::new()
     }
 }
 
-impl<'a> ClipBuilder<'a, clip_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ClipBuilder<S, clip_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ClipBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ClipBuilder<'a, S>
+impl<S: BosStr, St> ClipBuilder<S, St>
 where
-    S: clip_state::State,
-    S::CreatedAt: clip_state::IsUnset,
+    St: clip_state::State,
+    St::CreatedAt: clip_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ClipBuilder<'a, clip_state::SetCreatedAt<S>> {
+    ) -> ClipBuilder<S, clip_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         ClipBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ClipBuilder<'a, S>
+impl<S: BosStr, St> ClipBuilder<S, St>
 where
-    S: clip_state::State,
-    S::Description: clip_state::IsUnset,
+    St: clip_state::State,
+    St::Description: clip_state::IsUnset,
 {
     /// Set the `description` field (required)
     pub fn description(
         mut self,
         value: impl Into<S>,
-    ) -> ClipBuilder<'a, clip_state::SetDescription<S>> {
+    ) -> ClipBuilder<S, clip_state::SetDescription<St>> {
         self._fields.1 = Option::Some(value.into());
         ClipBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+impl<S: BosStr, St: clip_state::State> ClipBuilder<S, St> {
     /// Set the `languages` field (optional)
     pub fn languages(mut self, value: impl Into<Option<Vec<Language>>>) -> Self {
         self._fields.2 = value.into();
@@ -424,7 +424,7 @@ impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
     }
 }
 
-impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+impl<S: BosStr, St: clip_state::State> ClipBuilder<S, St> {
     /// Set the `notes` field (optional)
     pub fn notes(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -437,7 +437,7 @@ impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
     }
 }
 
-impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+impl<S: BosStr, St: clip_state::State> ClipBuilder<S, St> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<StrongRef<S>>>>) -> Self {
         self._fields.4 = value.into();
@@ -450,45 +450,45 @@ impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ClipBuilder<'a, S>
+impl<S: BosStr, St> ClipBuilder<S, St>
 where
-    S: clip_state::State,
-    S::Title: clip_state::IsUnset,
+    St: clip_state::State,
+    St::Title: clip_state::IsUnset,
 {
     /// Set the `title` field (required)
     pub fn title(
         mut self,
         value: impl Into<S>,
-    ) -> ClipBuilder<'a, clip_state::SetTitle<S>> {
+    ) -> ClipBuilder<S, clip_state::SetTitle<St>> {
         self._fields.5 = Option::Some(value.into());
         ClipBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ClipBuilder<'a, S>
+impl<S: BosStr, St> ClipBuilder<S, St>
 where
-    S: clip_state::State,
-    S::Unlisted: clip_state::IsUnset,
+    St: clip_state::State,
+    St::Unlisted: clip_state::IsUnset,
 {
     /// Set the `unlisted` field (required)
     pub fn unlisted(
         mut self,
         value: impl Into<bool>,
-    ) -> ClipBuilder<'a, clip_state::SetUnlisted<S>> {
+    ) -> ClipBuilder<S, clip_state::SetUnlisted<St>> {
         self._fields.6 = Option::Some(value.into());
         ClipBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+impl<S: BosStr, St: clip_state::State> ClipBuilder<S, St> {
     /// Set the `unread` field (optional)
     pub fn unread(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.7 = value.into();
@@ -501,36 +501,36 @@ impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ClipBuilder<'a, S>
+impl<S: BosStr, St> ClipBuilder<S, St>
 where
-    S: clip_state::State,
-    S::Url: clip_state::IsUnset,
+    St: clip_state::State,
+    St::Url: clip_state::IsUnset,
 {
     /// Set the `url` field (required)
     pub fn url(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> ClipBuilder<'a, clip_state::SetUrl<S>> {
+    ) -> ClipBuilder<S, clip_state::SetUrl<St>> {
         self._fields.8 = Option::Some(value.into());
         ClipBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ClipBuilder<'a, S>
+impl<S: BosStr, St> ClipBuilder<S, St>
 where
-    S: clip_state::State,
-    S::Url: clip_state::IsSet,
-    S::Title: clip_state::IsSet,
-    S::Unlisted: clip_state::IsSet,
-    S::Description: clip_state::IsSet,
-    S::CreatedAt: clip_state::IsSet,
+    St: clip_state::State,
+    St::Url: clip_state::IsSet,
+    St::Title: clip_state::IsSet,
+    St::Unlisted: clip_state::IsSet,
+    St::Description: clip_state::IsSet,
+    St::CreatedAt: clip_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Clip<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Clip<S> {
         Clip {
             created_at: self._fields.0.unwrap(),
             description: self._fields.1.unwrap(),
@@ -544,8 +544,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Clip<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Clip<S> {
         Clip {
             created_at: self._fields.0.unwrap(),
             description: self._fields.1.unwrap(),

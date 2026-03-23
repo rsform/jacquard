@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "network.slices.waitlist.invite",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Invite<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Invite<S: BosStr = DefaultStr> {
     ///When this invitation was created
     pub created_at: Datetime,
     ///The DID being invited
@@ -59,18 +59,18 @@ pub struct Invite<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct InviteGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct InviteGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Invite<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Invite<S> {
+impl<S: BosStr> Invite<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, InviteRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -83,17 +83,17 @@ pub struct InviteRecord;
 impl XrpcResp for InviteRecord {
     const NSID: &'static str = "network.slices.waitlist.invite";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = InviteGetRecordOutput<S>;
+    type Output<S: BosStr> = InviteGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<InviteGetRecordOutput<S>> for Invite<S> {
+impl<S: BosStr> From<InviteGetRecordOutput<S>> for Invite<S> {
     fn from(output: InviteGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Invite<S> {
+impl<S: BosStr> Collection for Invite<S> {
     const NSID: &'static str = "network.slices.waitlist.invite";
     type Record = InviteRecord;
 }
@@ -103,7 +103,7 @@ impl Collection for InviteRecord {
     type Record = InviteRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Invite<S> {
+impl<S: BosStr> LexiconSchema for Invite<S> {
     fn nsid() -> &'static str {
         "network.slices.waitlist.invite"
     }
@@ -129,117 +129,117 @@ pub mod invite_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Slice;
-        type Did;
         type CreatedAt;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Slice = Unset;
-        type Did = Unset;
         type CreatedAt = Unset;
+        type Did = Unset;
     }
     ///State transition - sets the `slice` field to Set
-    pub struct SetSlice<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSlice<S> {}
-    impl<S: State> State for SetSlice<S> {
+    pub struct SetSlice<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSlice<St> {}
+    impl<St: State> State for SetSlice<St> {
         type Slice = Set<members::slice>;
-        type Did = S::Did;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Slice = S::Slice;
-        type Did = Set<members::did>;
-        type CreatedAt = S::CreatedAt;
+        type CreatedAt = St::CreatedAt;
+        type Did = St::Did;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Slice = S::Slice;
-        type Did = S::Did;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Slice = St::Slice;
         type CreatedAt = Set<members::created_at>;
+        type Did = St::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
+        type Slice = St::Slice;
+        type CreatedAt = St::CreatedAt;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `slice` field
         pub struct slice(());
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct InviteBuilder<'a, S: invite_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct InviteBuilder<S: BosStr, St: invite_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<Did<S>>, Option<Datetime>, Option<AtUri<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Invite<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> InviteBuilder<'a, invite_state::Empty> {
+impl<S: BosStr> Invite<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> InviteBuilder<S, invite_state::Empty> {
         InviteBuilder::new()
     }
 }
 
-impl<'a> InviteBuilder<'a, invite_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> InviteBuilder<S, invite_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         InviteBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> InviteBuilder<'a, S>
+impl<S: BosStr, St> InviteBuilder<S, St>
 where
-    S: invite_state::State,
-    S::CreatedAt: invite_state::IsUnset,
+    St: invite_state::State,
+    St::CreatedAt: invite_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> InviteBuilder<'a, invite_state::SetCreatedAt<S>> {
+    ) -> InviteBuilder<S, invite_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         InviteBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> InviteBuilder<'a, S>
+impl<S: BosStr, St> InviteBuilder<S, St>
 where
-    S: invite_state::State,
-    S::Did: invite_state::IsUnset,
+    St: invite_state::State,
+    St::Did: invite_state::IsUnset,
 {
     /// Set the `did` field (required)
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> InviteBuilder<'a, invite_state::SetDid<S>> {
+    ) -> InviteBuilder<S, invite_state::SetDid<St>> {
         self._fields.1 = Option::Some(value.into());
         InviteBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: invite_state::State> InviteBuilder<'a, S> {
+impl<S: BosStr, St: invite_state::State> InviteBuilder<S, St> {
     /// Set the `expiresAt` field (optional)
     pub fn expires_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.2 = value.into();
@@ -252,34 +252,34 @@ impl<'a, S: invite_state::State> InviteBuilder<'a, S> {
     }
 }
 
-impl<'a, S> InviteBuilder<'a, S>
+impl<S: BosStr, St> InviteBuilder<S, St>
 where
-    S: invite_state::State,
-    S::Slice: invite_state::IsUnset,
+    St: invite_state::State,
+    St::Slice: invite_state::IsUnset,
 {
     /// Set the `slice` field (required)
     pub fn slice(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> InviteBuilder<'a, invite_state::SetSlice<S>> {
+    ) -> InviteBuilder<S, invite_state::SetSlice<St>> {
         self._fields.3 = Option::Some(value.into());
         InviteBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> InviteBuilder<'a, S>
+impl<S: BosStr, St> InviteBuilder<S, St>
 where
-    S: invite_state::State,
-    S::Slice: invite_state::IsSet,
-    S::Did: invite_state::IsSet,
-    S::CreatedAt: invite_state::IsSet,
+    St: invite_state::State,
+    St::Slice: invite_state::IsSet,
+    St::CreatedAt: invite_state::IsSet,
+    St::Did: invite_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Invite<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Invite<S> {
         Invite {
             created_at: self._fields.0.unwrap(),
             did: self._fields.1.unwrap(),
@@ -288,8 +288,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Invite<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Invite<S> {
         Invite {
             created_at: self._fields.0.unwrap(),
             did: self._fields.1.unwrap(),

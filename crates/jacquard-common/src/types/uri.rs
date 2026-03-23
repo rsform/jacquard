@@ -1,7 +1,7 @@
 use crate::bos::Bos;
 use crate::deps::fluent_uri::Uri;
 use crate::{
-    CowStr, DefaultStr, IntoStatic,
+    DefaultStr, IntoStatic,
     types::{
         aturi::{AtUri, validate_and_index},
         cid::Cid,
@@ -14,7 +14,6 @@ use crate::{
 use alloc::string::{String, ToString};
 use core::{fmt::Display, marker::PhantomData, ops::Deref, str::FromStr};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
-use smol_str::SmolStr;
 
 /// Generic URI with type-specific parsing.
 ///
@@ -167,23 +166,13 @@ impl<S: Bos<str> + AsRef<str>> Serialize for UriValue<S> {
     }
 }
 
-impl<'de> Deserialize<'de> for UriValue<CowStr<'de>> {
+impl<'de, S: Bos<str> + AsRef<str> + Deserialize<'de>> Deserialize<'de> for UriValue<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: Deserializer<'de>,
     {
-        let value: CowStr<'de> = Deserialize::deserialize(deserializer)?;
+        let value: S = Deserialize::deserialize(deserializer)?;
         Self::new(value).map_err(serde::de::Error::custom)
-    }
-}
-
-impl<'de> Deserialize<'de> for UriValue<SmolStr> {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
-        let s: SmolStr = Deserialize::deserialize(deserializer)?;
-        Self::new(s).map_err(serde::de::Error::custom)
     }
 }
 
@@ -305,6 +294,10 @@ pub enum UriError {
 
 #[cfg(test)]
 mod tests {
+    use smol_str::SmolStr;
+
+    use crate::CowStr;
+
     use super::*;
 
     #[test]

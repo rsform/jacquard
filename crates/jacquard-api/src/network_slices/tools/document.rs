@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use crate::network_slices::tools::document;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CodeBlock<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CodeBlock<S: BosStr = DefaultStr> {
     pub code: S,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub lang: Option<S>,
@@ -54,11 +54,11 @@ pub struct CodeBlock<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Heading<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Heading<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub facets: Option<Vec<Facet<S>>>,
     pub level: i64,
@@ -73,11 +73,11 @@ pub struct Heading<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ImageEmbed<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ImageEmbed<S: BosStr = DefaultStr> {
     ///Alt text for accessibility
     #[serde(skip_serializing_if = "Option::is_none")]
     pub alt: Option<S>,
@@ -93,11 +93,11 @@ pub struct ImageEmbed<S: Bos<str> + AsRef<str> = DefaultStr> {
     rename = "network.slices.tools.document",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Document<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Document<S: BosStr = DefaultStr> {
     ///Document content as array of blocks
     pub blocks: Vec<DocumentBlocksItem<S>>,
     pub created_at: Datetime,
@@ -117,11 +117,11 @@ pub struct Document<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum DocumentBlocksItem<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum DocumentBlocksItem<S: BosStr = DefaultStr> {
     #[serde(rename = "network.slices.tools.document#paragraph")]
     Paragraph(Box<document::Paragraph<S>>),
     #[serde(rename = "network.slices.tools.document#heading")]
@@ -142,11 +142,11 @@ pub enum DocumentBlocksItem<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DocumentGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DocumentGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
@@ -159,11 +159,11 @@ pub struct DocumentGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Paragraph<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Paragraph<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub facets: Option<Vec<Facet<S>>>,
     pub text: S,
@@ -177,11 +177,11 @@ pub struct Paragraph<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Quote<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Quote<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub facets: Option<Vec<Facet<S>>>,
     pub text: S,
@@ -195,11 +195,11 @@ pub struct Quote<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct TangledEmbed<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct TangledEmbed<S: BosStr = DefaultStr> {
     ///The repo owner's handle
     pub handle: S,
     ///The repository name
@@ -208,13 +208,13 @@ pub struct TangledEmbed<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Document<S> {
+impl<S: BosStr> Document<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, DocumentRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for CodeBlock<S> {
+impl<S: BosStr> LexiconSchema for CodeBlock<S> {
     fn nsid() -> &'static str {
         "network.slices.tools.document"
     }
@@ -250,7 +250,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for CodeBlock<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Heading<S> {
+impl<S: BosStr> LexiconSchema for Heading<S> {
     fn nsid() -> &'static str {
         "network.slices.tools.document"
     }
@@ -296,7 +296,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Heading<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ImageEmbed<S> {
+impl<S: BosStr> LexiconSchema for ImageEmbed<S> {
     fn nsid() -> &'static str {
         "network.slices.tools.document"
     }
@@ -368,17 +368,17 @@ pub struct DocumentRecord;
 impl XrpcResp for DocumentRecord {
     const NSID: &'static str = "network.slices.tools.document";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = DocumentGetRecordOutput<S>;
+    type Output<S: BosStr> = DocumentGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<DocumentGetRecordOutput<S>> for Document<S> {
+impl<S: BosStr> From<DocumentGetRecordOutput<S>> for Document<S> {
     fn from(output: DocumentGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Document<S> {
+impl<S: BosStr> Collection for Document<S> {
     const NSID: &'static str = "network.slices.tools.document";
     type Record = DocumentRecord;
 }
@@ -388,7 +388,7 @@ impl Collection for DocumentRecord {
     type Record = DocumentRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Document<S> {
+impl<S: BosStr> LexiconSchema for Document<S> {
     fn nsid() -> &'static str {
         "network.slices.tools.document"
     }
@@ -425,7 +425,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Document<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Paragraph<S> {
+impl<S: BosStr> LexiconSchema for Paragraph<S> {
     fn nsid() -> &'static str {
         "network.slices.tools.document"
     }
@@ -451,7 +451,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Paragraph<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Quote<S> {
+impl<S: BosStr> LexiconSchema for Quote<S> {
     fn nsid() -> &'static str {
         "network.slices.tools.document"
     }
@@ -477,7 +477,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Quote<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for TangledEmbed<S> {
+impl<S: BosStr> LexiconSchema for TangledEmbed<S> {
     fn nsid() -> &'static str {
         "network.slices.tools.document"
     }
@@ -838,17 +838,17 @@ pub mod heading_state {
         type Text = Unset;
     }
     ///State transition - sets the `level` field to Set
-    pub struct SetLevel<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLevel<S> {}
-    impl<S: State> State for SetLevel<S> {
+    pub struct SetLevel<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLevel<St> {}
+    impl<St: State> State for SetLevel<St> {
         type Level = Set<members::level>;
-        type Text = S::Text;
+        type Text = St::Text;
     }
     ///State transition - sets the `text` field to Set
-    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetText<S> {}
-    impl<S: State> State for SetText<S> {
-        type Level = S::Level;
+    pub struct SetText<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetText<St> {}
+    impl<St: State> State for SetText<St> {
+        type Level = St::Level;
         type Text = Set<members::text>;
     }
     /// Marker types for field names
@@ -861,32 +861,32 @@ pub mod heading_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct HeadingBuilder<'a, S: heading_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct HeadingBuilder<S: BosStr, St: heading_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<Facet<S>>>, Option<i64>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Heading<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> HeadingBuilder<'a, heading_state::Empty> {
+impl<S: BosStr> Heading<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> HeadingBuilder<S, heading_state::Empty> {
         HeadingBuilder::new()
     }
 }
 
-impl<'a> HeadingBuilder<'a, heading_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> HeadingBuilder<S, heading_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         HeadingBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: heading_state::State> HeadingBuilder<'a, S> {
+impl<S: BosStr, St: heading_state::State> HeadingBuilder<S, St> {
     /// Set the `facets` field (optional)
     pub fn facets(mut self, value: impl Into<Option<Vec<Facet<S>>>>) -> Self {
         self._fields.0 = value.into();
@@ -899,52 +899,52 @@ impl<'a, S: heading_state::State> HeadingBuilder<'a, S> {
     }
 }
 
-impl<'a, S> HeadingBuilder<'a, S>
+impl<S: BosStr, St> HeadingBuilder<S, St>
 where
-    S: heading_state::State,
-    S::Level: heading_state::IsUnset,
+    St: heading_state::State,
+    St::Level: heading_state::IsUnset,
 {
     /// Set the `level` field (required)
     pub fn level(
         mut self,
         value: impl Into<i64>,
-    ) -> HeadingBuilder<'a, heading_state::SetLevel<S>> {
+    ) -> HeadingBuilder<S, heading_state::SetLevel<St>> {
         self._fields.1 = Option::Some(value.into());
         HeadingBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> HeadingBuilder<'a, S>
+impl<S: BosStr, St> HeadingBuilder<S, St>
 where
-    S: heading_state::State,
-    S::Text: heading_state::IsUnset,
+    St: heading_state::State,
+    St::Text: heading_state::IsUnset,
 {
     /// Set the `text` field (required)
     pub fn text(
         mut self,
         value: impl Into<S>,
-    ) -> HeadingBuilder<'a, heading_state::SetText<S>> {
+    ) -> HeadingBuilder<S, heading_state::SetText<St>> {
         self._fields.2 = Option::Some(value.into());
         HeadingBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> HeadingBuilder<'a, S>
+impl<S: BosStr, St> HeadingBuilder<S, St>
 where
-    S: heading_state::State,
-    S::Level: heading_state::IsSet,
-    S::Text: heading_state::IsSet,
+    St: heading_state::State,
+    St::Level: heading_state::IsSet,
+    St::Text: heading_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Heading<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Heading<S> {
         Heading {
             facets: self._fields.0,
             level: self._fields.1.unwrap(),
@@ -952,11 +952,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Heading<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Heading<S> {
         Heading {
             facets: self._fields.0,
             level: self._fields.1.unwrap(),
@@ -985,9 +982,9 @@ pub mod image_embed_state {
         type Image = Unset;
     }
     ///State transition - sets the `image` field to Set
-    pub struct SetImage<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetImage<S> {}
-    impl<S: State> State for SetImage<S> {
+    pub struct SetImage<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetImage<St> {}
+    impl<St: State> State for SetImage<St> {
         type Image = Set<members::image>;
     }
     /// Marker types for field names
@@ -998,32 +995,32 @@ pub mod image_embed_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ImageEmbedBuilder<'a, S: image_embed_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ImageEmbedBuilder<S: BosStr, St: image_embed_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<BlobRef<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ImageEmbed<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ImageEmbedBuilder<'a, image_embed_state::Empty> {
+impl<S: BosStr> ImageEmbed<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ImageEmbedBuilder<S, image_embed_state::Empty> {
         ImageEmbedBuilder::new()
     }
 }
 
-impl<'a> ImageEmbedBuilder<'a, image_embed_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ImageEmbedBuilder<S, image_embed_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ImageEmbedBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: image_embed_state::State> ImageEmbedBuilder<'a, S> {
+impl<S: BosStr, St: image_embed_state::State> ImageEmbedBuilder<S, St> {
     /// Set the `alt` field (optional)
     pub fn alt(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -1036,43 +1033,43 @@ impl<'a, S: image_embed_state::State> ImageEmbedBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ImageEmbedBuilder<'a, S>
+impl<S: BosStr, St> ImageEmbedBuilder<S, St>
 where
-    S: image_embed_state::State,
-    S::Image: image_embed_state::IsUnset,
+    St: image_embed_state::State,
+    St::Image: image_embed_state::IsUnset,
 {
     /// Set the `image` field (required)
     pub fn image(
         mut self,
         value: impl Into<BlobRef<S>>,
-    ) -> ImageEmbedBuilder<'a, image_embed_state::SetImage<S>> {
+    ) -> ImageEmbedBuilder<S, image_embed_state::SetImage<St>> {
         self._fields.1 = Option::Some(value.into());
         ImageEmbedBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ImageEmbedBuilder<'a, S>
+impl<S: BosStr, St> ImageEmbedBuilder<S, St>
 where
-    S: image_embed_state::State,
-    S::Image: image_embed_state::IsSet,
+    St: image_embed_state::State,
+    St::Image: image_embed_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ImageEmbed<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ImageEmbed<S> {
         ImageEmbed {
             alt: self._fields.0,
             image: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> ImageEmbed<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ImageEmbed<S> {
         ImageEmbed {
             alt: self._fields.0,
             image: self._fields.1.unwrap(),
@@ -1091,73 +1088,73 @@ pub mod document_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Slug;
-        type Title;
-        type Blocks;
         type CreatedAt;
+        type Title;
+        type Slug;
+        type Blocks;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Slug = Unset;
-        type Title = Unset;
-        type Blocks = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `slug` field to Set
-    pub struct SetSlug<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSlug<S> {}
-    impl<S: State> State for SetSlug<S> {
-        type Slug = Set<members::slug>;
-        type Title = S::Title;
-        type Blocks = S::Blocks;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Slug = S::Slug;
-        type Title = Set<members::title>;
-        type Blocks = S::Blocks;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `blocks` field to Set
-    pub struct SetBlocks<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBlocks<S> {}
-    impl<S: State> State for SetBlocks<S> {
-        type Slug = S::Slug;
-        type Title = S::Title;
-        type Blocks = Set<members::blocks>;
-        type CreatedAt = S::CreatedAt;
+        type Title = Unset;
+        type Slug = Unset;
+        type Blocks = Unset;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Slug = S::Slug;
-        type Title = S::Title;
-        type Blocks = S::Blocks;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
+        type Title = St::Title;
+        type Slug = St::Slug;
+        type Blocks = St::Blocks;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
+        type CreatedAt = St::CreatedAt;
+        type Title = Set<members::title>;
+        type Slug = St::Slug;
+        type Blocks = St::Blocks;
+    }
+    ///State transition - sets the `slug` field to Set
+    pub struct SetSlug<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSlug<St> {}
+    impl<St: State> State for SetSlug<St> {
+        type CreatedAt = St::CreatedAt;
+        type Title = St::Title;
+        type Slug = Set<members::slug>;
+        type Blocks = St::Blocks;
+    }
+    ///State transition - sets the `blocks` field to Set
+    pub struct SetBlocks<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBlocks<St> {}
+    impl<St: State> State for SetBlocks<St> {
+        type CreatedAt = St::CreatedAt;
+        type Title = St::Title;
+        type Slug = St::Slug;
+        type Blocks = Set<members::blocks>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `slug` field
-        pub struct slug(());
-        ///Marker type for the `title` field
-        pub struct title(());
-        ///Marker type for the `blocks` field
-        pub struct blocks(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `title` field
+        pub struct title(());
+        ///Marker type for the `slug` field
+        pub struct slug(());
+        ///Marker type for the `blocks` field
+        pub struct blocks(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct DocumentBuilder<'a, S: document_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct DocumentBuilder<S: BosStr, St: document_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<DocumentBlocksItem<S>>>,
         Option<Datetime>,
@@ -1165,104 +1162,104 @@ pub struct DocumentBuilder<'a, S: document_state::State> {
         Option<S>,
         Option<Datetime>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Document<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> DocumentBuilder<'a, document_state::Empty> {
+impl<S: BosStr> Document<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> DocumentBuilder<S, document_state::Empty> {
         DocumentBuilder::new()
     }
 }
 
-impl<'a> DocumentBuilder<'a, document_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> DocumentBuilder<S, document_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         DocumentBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DocumentBuilder<'a, S>
+impl<S: BosStr, St> DocumentBuilder<S, St>
 where
-    S: document_state::State,
-    S::Blocks: document_state::IsUnset,
+    St: document_state::State,
+    St::Blocks: document_state::IsUnset,
 {
     /// Set the `blocks` field (required)
     pub fn blocks(
         mut self,
         value: impl Into<Vec<DocumentBlocksItem<S>>>,
-    ) -> DocumentBuilder<'a, document_state::SetBlocks<S>> {
+    ) -> DocumentBuilder<S, document_state::SetBlocks<St>> {
         self._fields.0 = Option::Some(value.into());
         DocumentBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DocumentBuilder<'a, S>
+impl<S: BosStr, St> DocumentBuilder<S, St>
 where
-    S: document_state::State,
-    S::CreatedAt: document_state::IsUnset,
+    St: document_state::State,
+    St::CreatedAt: document_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> DocumentBuilder<'a, document_state::SetCreatedAt<S>> {
+    ) -> DocumentBuilder<S, document_state::SetCreatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         DocumentBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DocumentBuilder<'a, S>
+impl<S: BosStr, St> DocumentBuilder<S, St>
 where
-    S: document_state::State,
-    S::Slug: document_state::IsUnset,
+    St: document_state::State,
+    St::Slug: document_state::IsUnset,
 {
     /// Set the `slug` field (required)
     pub fn slug(
         mut self,
         value: impl Into<S>,
-    ) -> DocumentBuilder<'a, document_state::SetSlug<S>> {
+    ) -> DocumentBuilder<S, document_state::SetSlug<St>> {
         self._fields.2 = Option::Some(value.into());
         DocumentBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DocumentBuilder<'a, S>
+impl<S: BosStr, St> DocumentBuilder<S, St>
 where
-    S: document_state::State,
-    S::Title: document_state::IsUnset,
+    St: document_state::State,
+    St::Title: document_state::IsUnset,
 {
     /// Set the `title` field (required)
     pub fn title(
         mut self,
         value: impl Into<S>,
-    ) -> DocumentBuilder<'a, document_state::SetTitle<S>> {
+    ) -> DocumentBuilder<S, document_state::SetTitle<St>> {
         self._fields.3 = Option::Some(value.into());
         DocumentBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
+impl<S: BosStr, St: document_state::State> DocumentBuilder<S, St> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.4 = value.into();
@@ -1275,16 +1272,16 @@ impl<'a, S: document_state::State> DocumentBuilder<'a, S> {
     }
 }
 
-impl<'a, S> DocumentBuilder<'a, S>
+impl<S: BosStr, St> DocumentBuilder<S, St>
 where
-    S: document_state::State,
-    S::Slug: document_state::IsSet,
-    S::Title: document_state::IsSet,
-    S::Blocks: document_state::IsSet,
-    S::CreatedAt: document_state::IsSet,
+    St: document_state::State,
+    St::CreatedAt: document_state::IsSet,
+    St::Title: document_state::IsSet,
+    St::Slug: document_state::IsSet,
+    St::Blocks: document_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Document<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Document<S> {
         Document {
             blocks: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
@@ -1294,11 +1291,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Document<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Document<S> {
         Document {
             blocks: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),

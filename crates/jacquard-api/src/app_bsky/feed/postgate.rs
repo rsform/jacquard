@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,11 +34,11 @@ use crate::app_bsky::feed::postgate;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DisableRule<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DisableRule<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
@@ -51,11 +51,11 @@ pub struct DisableRule<S: Bos<str> + AsRef<str> = DefaultStr> {
     rename = "app.bsky.feed.postgate",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Postgate<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Postgate<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     ///List of AT-URIs embedding this post that the author has detached from.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -75,24 +75,24 @@ pub struct Postgate<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct PostgateGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct PostgateGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Postgate<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Postgate<S> {
+impl<S: BosStr> Postgate<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, PostgateRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for DisableRule<S> {
+impl<S: BosStr> LexiconSchema for DisableRule<S> {
     fn nsid() -> &'static str {
         "app.bsky.feed.postgate"
     }
@@ -114,17 +114,17 @@ pub struct PostgateRecord;
 impl XrpcResp for PostgateRecord {
     const NSID: &'static str = "app.bsky.feed.postgate";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = PostgateGetRecordOutput<S>;
+    type Output<S: BosStr> = PostgateGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<PostgateGetRecordOutput<S>> for Postgate<S> {
+impl<S: BosStr> From<PostgateGetRecordOutput<S>> for Postgate<S> {
     fn from(output: PostgateGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Postgate<S> {
+impl<S: BosStr> Collection for Postgate<S> {
     const NSID: &'static str = "app.bsky.feed.postgate";
     type Record = PostgateRecord;
 }
@@ -134,7 +134,7 @@ impl Collection for PostgateRecord {
     type Record = PostgateRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Postgate<S> {
+impl<S: BosStr> LexiconSchema for Postgate<S> {
     fn nsid() -> &'static str {
         "app.bsky.feed.postgate"
     }
@@ -295,17 +295,17 @@ pub mod postgate_state {
         type CreatedAt = Unset;
     }
     ///State transition - sets the `post` field to Set
-    pub struct SetPost<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPost<S> {}
-    impl<S: State> State for SetPost<S> {
+    pub struct SetPost<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPost<St> {}
+    impl<St: State> State for SetPost<St> {
         type Post = Set<members::post>;
-        type CreatedAt = S::CreatedAt;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Post = S::Post;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Post = St::Post;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
@@ -318,56 +318,56 @@ pub mod postgate_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct PostgateBuilder<'a, S: postgate_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct PostgateBuilder<S: BosStr, St: postgate_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
         Option<Vec<AtUri<S>>>,
         Option<Vec<postgate::DisableRule<S>>>,
         Option<AtUri<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Postgate<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> PostgateBuilder<'a, postgate_state::Empty> {
+impl<S: BosStr> Postgate<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> PostgateBuilder<S, postgate_state::Empty> {
         PostgateBuilder::new()
     }
 }
 
-impl<'a> PostgateBuilder<'a, postgate_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> PostgateBuilder<S, postgate_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         PostgateBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PostgateBuilder<'a, S>
+impl<S: BosStr, St> PostgateBuilder<S, St>
 where
-    S: postgate_state::State,
-    S::CreatedAt: postgate_state::IsUnset,
+    St: postgate_state::State,
+    St::CreatedAt: postgate_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> PostgateBuilder<'a, postgate_state::SetCreatedAt<S>> {
+    ) -> PostgateBuilder<S, postgate_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         PostgateBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: postgate_state::State> PostgateBuilder<'a, S> {
+impl<S: BosStr, St: postgate_state::State> PostgateBuilder<S, St> {
     /// Set the `detachedEmbeddingUris` field (optional)
     pub fn detached_embedding_uris(
         mut self,
@@ -386,7 +386,7 @@ impl<'a, S: postgate_state::State> PostgateBuilder<'a, S> {
     }
 }
 
-impl<'a, S: postgate_state::State> PostgateBuilder<'a, S> {
+impl<S: BosStr, St: postgate_state::State> PostgateBuilder<S, St> {
     /// Set the `embeddingRules` field (optional)
     pub fn embedding_rules(
         mut self,
@@ -405,33 +405,33 @@ impl<'a, S: postgate_state::State> PostgateBuilder<'a, S> {
     }
 }
 
-impl<'a, S> PostgateBuilder<'a, S>
+impl<S: BosStr, St> PostgateBuilder<S, St>
 where
-    S: postgate_state::State,
-    S::Post: postgate_state::IsUnset,
+    St: postgate_state::State,
+    St::Post: postgate_state::IsUnset,
 {
     /// Set the `post` field (required)
     pub fn post(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> PostgateBuilder<'a, postgate_state::SetPost<S>> {
+    ) -> PostgateBuilder<S, postgate_state::SetPost<St>> {
         self._fields.3 = Option::Some(value.into());
         PostgateBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PostgateBuilder<'a, S>
+impl<S: BosStr, St> PostgateBuilder<S, St>
 where
-    S: postgate_state::State,
-    S::Post: postgate_state::IsSet,
-    S::CreatedAt: postgate_state::IsSet,
+    St: postgate_state::State,
+    St::Post: postgate_state::IsSet,
+    St::CreatedAt: postgate_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Postgate<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Postgate<S> {
         Postgate {
             created_at: self._fields.0.unwrap(),
             detached_embedding_uris: self._fields.1,
@@ -440,11 +440,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Postgate<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Postgate<S> {
         Postgate {
             created_at: self._fields.0.unwrap(),
             detached_embedding_uris: self._fields.1,

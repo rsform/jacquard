@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -31,11 +31,11 @@ use crate::games_gamesgamesgamesgames::get_claim;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ClaimView<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ClaimView<S: BosStr = DefaultStr> {
     pub cid: S,
     pub claimant_did: Did<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -57,13 +57,13 @@ pub struct ClaimView<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ClaimViewType<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ClaimViewType<S: BosStr = DefaultStr> {
     Game,
     Org,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> ClaimViewType<S> {
+impl<S: BosStr> ClaimViewType<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Game => "game",
@@ -81,19 +81,19 @@ impl<S: Bos<str> + AsRef<str>> ClaimViewType<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ClaimViewType<S> {
+impl<S: BosStr> core::fmt::Display for ClaimViewType<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for ClaimViewType<S> {
+impl<S: BosStr> AsRef<str> for ClaimViewType<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for ClaimViewType<S> {
+impl<S: BosStr> Serialize for ClaimViewType<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -102,8 +102,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for ClaimViewType<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for ClaimViewType<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ClaimViewType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -113,14 +112,18 @@ for ClaimViewType<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for ClaimViewType<S> {
+impl<S: BosStr + Default> Default for ClaimViewType<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for ClaimViewType<S> {
-    type Output = ClaimViewType<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for ClaimViewType<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ClaimViewType<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             ClaimViewType::Game => ClaimViewType::Game,
@@ -132,32 +135,29 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for ClaimViewType<S> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetClaim<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct GetClaim<S: BosStr = DefaultStr> {
     pub uri: AtUri<S>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetClaimOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetClaimOutput<S: BosStr = DefaultStr> {
     pub claim: get_claim::ClaimView<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -166,11 +166,11 @@ pub struct GetClaimOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ReviewView<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ReviewView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub approved_games: Option<Vec<AtUri<S>>>,
     pub created_at: Datetime,
@@ -185,13 +185,13 @@ pub struct ReviewView<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ReviewViewStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ReviewViewStatus<S: BosStr = DefaultStr> {
     Approved,
     Denied,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> ReviewViewStatus<S> {
+impl<S: BosStr> ReviewViewStatus<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Approved => "approved",
@@ -209,19 +209,19 @@ impl<S: Bos<str> + AsRef<str>> ReviewViewStatus<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ReviewViewStatus<S> {
+impl<S: BosStr> core::fmt::Display for ReviewViewStatus<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for ReviewViewStatus<S> {
+impl<S: BosStr> AsRef<str> for ReviewViewStatus<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for ReviewViewStatus<S> {
+impl<S: BosStr> Serialize for ReviewViewStatus<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -230,8 +230,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for ReviewViewStatus<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for ReviewViewStatus<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ReviewViewStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -241,14 +240,18 @@ for ReviewViewStatus<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for ReviewViewStatus<S> {
+impl<S: BosStr + Default> Default for ReviewViewStatus<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for ReviewViewStatus<S> {
-    type Output = ReviewViewStatus<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for ReviewViewStatus<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ReviewViewStatus<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             ReviewViewStatus::Approved => ReviewViewStatus::Approved,
@@ -258,7 +261,7 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for ReviewViewStatus<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ClaimView<S> {
+impl<S: BosStr> LexiconSchema for ClaimView<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.getClaim"
     }
@@ -278,12 +281,11 @@ pub struct GetClaimResponse;
 impl jacquard_common::xrpc::XrpcResp for GetClaimResponse {
     const NSID: &'static str = "games.gamesgamesgamesgames.getClaim";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetClaimOutput<S>;
+    type Output<S: BosStr> = GetClaimOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetClaim<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetClaim<S> {
     const NSID: &'static str = "games.gamesgamesgamesgames.getClaim";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetClaimResponse;
@@ -294,11 +296,11 @@ pub struct GetClaimRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetClaimRequest {
     const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.getClaim";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetClaim<S>;
+    type Request<S: BosStr> = GetClaim<S>;
     type Response = GetClaimResponse;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ReviewView<S> {
+impl<S: BosStr> LexiconSchema for ReviewView<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.getClaim"
     }
@@ -323,91 +325,91 @@ pub mod claim_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Type;
-        type Uri;
         type Cid;
-        type CreatedAt;
+        type Type;
         type ClaimantDid;
+        type Uri;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Type = Unset;
-        type Uri = Unset;
         type Cid = Unset;
-        type CreatedAt = Unset;
+        type Type = Unset;
         type ClaimantDid = Unset;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type Type = Set<members::r#type>;
-        type Uri = S::Uri;
-        type Cid = S::Cid;
-        type CreatedAt = S::CreatedAt;
-        type ClaimantDid = S::ClaimantDid;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Type = S::Type;
-        type Uri = Set<members::uri>;
-        type Cid = S::Cid;
-        type CreatedAt = S::CreatedAt;
-        type ClaimantDid = S::ClaimantDid;
+        type Uri = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Type = S::Type;
-        type Uri = S::Uri;
+    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCid<St> {}
+    impl<St: State> State for SetCid<St> {
         type Cid = Set<members::cid>;
-        type CreatedAt = S::CreatedAt;
-        type ClaimantDid = S::ClaimantDid;
+        type Type = St::Type;
+        type ClaimantDid = St::ClaimantDid;
+        type Uri = St::Uri;
+        type CreatedAt = St::CreatedAt;
     }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Type = S::Type;
-        type Uri = S::Uri;
-        type Cid = S::Cid;
-        type CreatedAt = Set<members::created_at>;
-        type ClaimantDid = S::ClaimantDid;
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetType<St> {}
+    impl<St: State> State for SetType<St> {
+        type Cid = St::Cid;
+        type Type = Set<members::r#type>;
+        type ClaimantDid = St::ClaimantDid;
+        type Uri = St::Uri;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `claimant_did` field to Set
-    pub struct SetClaimantDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetClaimantDid<S> {}
-    impl<S: State> State for SetClaimantDid<S> {
-        type Type = S::Type;
-        type Uri = S::Uri;
-        type Cid = S::Cid;
-        type CreatedAt = S::CreatedAt;
+    pub struct SetClaimantDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetClaimantDid<St> {}
+    impl<St: State> State for SetClaimantDid<St> {
+        type Cid = St::Cid;
+        type Type = St::Type;
         type ClaimantDid = Set<members::claimant_did>;
+        type Uri = St::Uri;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Cid = St::Cid;
+        type Type = St::Type;
+        type ClaimantDid = St::ClaimantDid;
+        type Uri = Set<members::uri>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Cid = St::Cid;
+        type Type = St::Type;
+        type ClaimantDid = St::ClaimantDid;
+        type Uri = St::Uri;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `type` field
-        pub struct r#type(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `cid` field
         pub struct cid(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
+        ///Marker type for the `type` field
+        pub struct r#type(());
         ///Marker type for the `claimant_did` field
         pub struct claimant_did(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ClaimViewBuilder<'a, S: claim_view_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ClaimViewBuilder<S: BosStr, St: claim_view_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
         Option<Did<S>>,
@@ -420,66 +422,66 @@ pub struct ClaimViewBuilder<'a, S: claim_view_state::State> {
         Option<ClaimViewType<S>>,
         Option<AtUri<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ClaimView<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ClaimViewBuilder<'a, claim_view_state::Empty> {
+impl<S: BosStr> ClaimView<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ClaimViewBuilder<S, claim_view_state::Empty> {
         ClaimViewBuilder::new()
     }
 }
 
-impl<'a> ClaimViewBuilder<'a, claim_view_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ClaimViewBuilder<S, claim_view_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ClaimViewBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ClaimViewBuilder<'a, S>
+impl<S: BosStr, St> ClaimViewBuilder<S, St>
 where
-    S: claim_view_state::State,
-    S::Cid: claim_view_state::IsUnset,
+    St: claim_view_state::State,
+    St::Cid: claim_view_state::IsUnset,
 {
     /// Set the `cid` field (required)
     pub fn cid(
         mut self,
         value: impl Into<S>,
-    ) -> ClaimViewBuilder<'a, claim_view_state::SetCid<S>> {
+    ) -> ClaimViewBuilder<S, claim_view_state::SetCid<St>> {
         self._fields.0 = Option::Some(value.into());
         ClaimViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ClaimViewBuilder<'a, S>
+impl<S: BosStr, St> ClaimViewBuilder<S, St>
 where
-    S: claim_view_state::State,
-    S::ClaimantDid: claim_view_state::IsUnset,
+    St: claim_view_state::State,
+    St::ClaimantDid: claim_view_state::IsUnset,
 {
     /// Set the `claimantDid` field (required)
     pub fn claimant_did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> ClaimViewBuilder<'a, claim_view_state::SetClaimantDid<S>> {
+    ) -> ClaimViewBuilder<S, claim_view_state::SetClaimantDid<St>> {
         self._fields.1 = Option::Some(value.into());
         ClaimViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: claim_view_state::State> ClaimViewBuilder<'a, S> {
+impl<S: BosStr, St: claim_view_state::State> ClaimViewBuilder<S, St> {
     /// Set the `contact` field (optional)
     pub fn contact(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -492,26 +494,26 @@ impl<'a, S: claim_view_state::State> ClaimViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ClaimViewBuilder<'a, S>
+impl<S: BosStr, St> ClaimViewBuilder<S, St>
 where
-    S: claim_view_state::State,
-    S::CreatedAt: claim_view_state::IsUnset,
+    St: claim_view_state::State,
+    St::CreatedAt: claim_view_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ClaimViewBuilder<'a, claim_view_state::SetCreatedAt<S>> {
+    ) -> ClaimViewBuilder<S, claim_view_state::SetCreatedAt<St>> {
         self._fields.3 = Option::Some(value.into());
         ClaimViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: claim_view_state::State> ClaimViewBuilder<'a, S> {
+impl<S: BosStr, St: claim_view_state::State> ClaimViewBuilder<S, St> {
     /// Set the `games` field (optional)
     pub fn games(mut self, value: impl Into<Option<Vec<GameSummaryView<S>>>>) -> Self {
         self._fields.4 = value.into();
@@ -524,7 +526,7 @@ impl<'a, S: claim_view_state::State> ClaimViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: claim_view_state::State> ClaimViewBuilder<'a, S> {
+impl<S: BosStr, St: claim_view_state::State> ClaimViewBuilder<S, St> {
     /// Set the `message` field (optional)
     pub fn message(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
@@ -537,7 +539,7 @@ impl<'a, S: claim_view_state::State> ClaimViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: claim_view_state::State> ClaimViewBuilder<'a, S> {
+impl<S: BosStr, St: claim_view_state::State> ClaimViewBuilder<S, St> {
     /// Set the `org` field (optional)
     pub fn org(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -550,7 +552,7 @@ impl<'a, S: claim_view_state::State> ClaimViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: claim_view_state::State> ClaimViewBuilder<'a, S> {
+impl<S: BosStr, St: claim_view_state::State> ClaimViewBuilder<S, St> {
     /// Set the `review` field (optional)
     pub fn review(mut self, value: impl Into<Option<get_claim::ReviewView<S>>>) -> Self {
         self._fields.7 = value.into();
@@ -563,55 +565,55 @@ impl<'a, S: claim_view_state::State> ClaimViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ClaimViewBuilder<'a, S>
+impl<S: BosStr, St> ClaimViewBuilder<S, St>
 where
-    S: claim_view_state::State,
-    S::Type: claim_view_state::IsUnset,
+    St: claim_view_state::State,
+    St::Type: claim_view_state::IsUnset,
 {
     /// Set the `type` field (required)
     pub fn r#type(
         mut self,
         value: impl Into<ClaimViewType<S>>,
-    ) -> ClaimViewBuilder<'a, claim_view_state::SetType<S>> {
+    ) -> ClaimViewBuilder<S, claim_view_state::SetType<St>> {
         self._fields.8 = Option::Some(value.into());
         ClaimViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ClaimViewBuilder<'a, S>
+impl<S: BosStr, St> ClaimViewBuilder<S, St>
 where
-    S: claim_view_state::State,
-    S::Uri: claim_view_state::IsUnset,
+    St: claim_view_state::State,
+    St::Uri: claim_view_state::IsUnset,
 {
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> ClaimViewBuilder<'a, claim_view_state::SetUri<S>> {
+    ) -> ClaimViewBuilder<S, claim_view_state::SetUri<St>> {
         self._fields.9 = Option::Some(value.into());
         ClaimViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ClaimViewBuilder<'a, S>
+impl<S: BosStr, St> ClaimViewBuilder<S, St>
 where
-    S: claim_view_state::State,
-    S::Type: claim_view_state::IsSet,
-    S::Uri: claim_view_state::IsSet,
-    S::Cid: claim_view_state::IsSet,
-    S::CreatedAt: claim_view_state::IsSet,
-    S::ClaimantDid: claim_view_state::IsSet,
+    St: claim_view_state::State,
+    St::Cid: claim_view_state::IsSet,
+    St::Type: claim_view_state::IsSet,
+    St::ClaimantDid: claim_view_state::IsSet,
+    St::Uri: claim_view_state::IsSet,
+    St::CreatedAt: claim_view_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ClaimView<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ClaimView<S> {
         ClaimView {
             cid: self._fields.0.unwrap(),
             claimant_did: self._fields.1.unwrap(),
@@ -626,11 +628,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> ClaimView<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ClaimView<S> {
         ClaimView {
             cid: self._fields.0.unwrap(),
             claimant_did: self._fields.1.unwrap(),
@@ -845,9 +847,9 @@ pub mod get_claim_state {
         type Uri = Unset;
     }
     ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
         type Uri = Set<members::uri>;
     }
     /// Marker types for field names
@@ -858,57 +860,57 @@ pub mod get_claim_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetClaimBuilder<'a, S: get_claim_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetClaimBuilder<S: BosStr, St: get_claim_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetClaim<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetClaimBuilder<'a, get_claim_state::Empty> {
+impl<S: BosStr> GetClaim<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetClaimBuilder<S, get_claim_state::Empty> {
         GetClaimBuilder::new()
     }
 }
 
-impl<'a> GetClaimBuilder<'a, get_claim_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetClaimBuilder<S, get_claim_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetClaimBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetClaimBuilder<'a, S>
+impl<S: BosStr, St> GetClaimBuilder<S, St>
 where
-    S: get_claim_state::State,
-    S::Uri: get_claim_state::IsUnset,
+    St: get_claim_state::State,
+    St::Uri: get_claim_state::IsUnset,
 {
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> GetClaimBuilder<'a, get_claim_state::SetUri<S>> {
+    ) -> GetClaimBuilder<S, get_claim_state::SetUri<St>> {
         self._fields.0 = Option::Some(value.into());
         GetClaimBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetClaimBuilder<'a, S>
+impl<S: BosStr, St> GetClaimBuilder<S, St>
 where
-    S: get_claim_state::State,
-    S::Uri: get_claim_state::IsSet,
+    St: get_claim_state::State,
+    St::Uri: get_claim_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetClaim<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetClaim<S> {
         GetClaim {
             uri: self._fields.0.unwrap(),
         }
@@ -925,73 +927,73 @@ pub mod review_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
         type CreatedAt;
-        type ReviewedBy;
+        type Uri;
         type Status;
+        type ReviewedBy;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
         type CreatedAt = Unset;
-        type ReviewedBy = Unset;
+        type Uri = Unset;
         type Status = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Uri = Set<members::uri>;
-        type CreatedAt = S::CreatedAt;
-        type ReviewedBy = S::ReviewedBy;
-        type Status = S::Status;
+        type ReviewedBy = Unset;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Uri = S::Uri;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
-        type ReviewedBy = S::ReviewedBy;
-        type Status = S::Status;
+        type Uri = St::Uri;
+        type Status = St::Status;
+        type ReviewedBy = St::ReviewedBy;
     }
-    ///State transition - sets the `reviewed_by` field to Set
-    pub struct SetReviewedBy<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetReviewedBy<S> {}
-    impl<S: State> State for SetReviewedBy<S> {
-        type Uri = S::Uri;
-        type CreatedAt = S::CreatedAt;
-        type ReviewedBy = Set<members::reviewed_by>;
-        type Status = S::Status;
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type CreatedAt = St::CreatedAt;
+        type Uri = Set<members::uri>;
+        type Status = St::Status;
+        type ReviewedBy = St::ReviewedBy;
     }
     ///State transition - sets the `status` field to Set
-    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStatus<S> {}
-    impl<S: State> State for SetStatus<S> {
-        type Uri = S::Uri;
-        type CreatedAt = S::CreatedAt;
-        type ReviewedBy = S::ReviewedBy;
+    pub struct SetStatus<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStatus<St> {}
+    impl<St: State> State for SetStatus<St> {
+        type CreatedAt = St::CreatedAt;
+        type Uri = St::Uri;
         type Status = Set<members::status>;
+        type ReviewedBy = St::ReviewedBy;
+    }
+    ///State transition - sets the `reviewed_by` field to Set
+    pub struct SetReviewedBy<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetReviewedBy<St> {}
+    impl<St: State> State for SetReviewedBy<St> {
+        type CreatedAt = St::CreatedAt;
+        type Uri = St::Uri;
+        type Status = St::Status;
+        type ReviewedBy = Set<members::reviewed_by>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `reviewed_by` field
-        pub struct reviewed_by(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
         ///Marker type for the `status` field
         pub struct status(());
+        ///Marker type for the `reviewed_by` field
+        pub struct reviewed_by(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ReviewViewBuilder<'a, S: review_view_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ReviewViewBuilder<S: BosStr, St: review_view_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<AtUri<S>>>,
         Option<Datetime>,
@@ -1000,28 +1002,28 @@ pub struct ReviewViewBuilder<'a, S: review_view_state::State> {
         Option<ReviewViewStatus<S>>,
         Option<AtUri<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ReviewView<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ReviewViewBuilder<'a, review_view_state::Empty> {
+impl<S: BosStr> ReviewView<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ReviewViewBuilder<S, review_view_state::Empty> {
         ReviewViewBuilder::new()
     }
 }
 
-impl<'a> ReviewViewBuilder<'a, review_view_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ReviewViewBuilder<S, review_view_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ReviewViewBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: review_view_state::State> ReviewViewBuilder<'a, S> {
+impl<S: BosStr, St: review_view_state::State> ReviewViewBuilder<S, St> {
     /// Set the `approvedGames` field (optional)
     pub fn approved_games(mut self, value: impl Into<Option<Vec<AtUri<S>>>>) -> Self {
         self._fields.0 = value.into();
@@ -1034,26 +1036,26 @@ impl<'a, S: review_view_state::State> ReviewViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ReviewViewBuilder<'a, S>
+impl<S: BosStr, St> ReviewViewBuilder<S, St>
 where
-    S: review_view_state::State,
-    S::CreatedAt: review_view_state::IsUnset,
+    St: review_view_state::State,
+    St::CreatedAt: review_view_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ReviewViewBuilder<'a, review_view_state::SetCreatedAt<S>> {
+    ) -> ReviewViewBuilder<S, review_view_state::SetCreatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         ReviewViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: review_view_state::State> ReviewViewBuilder<'a, S> {
+impl<S: BosStr, St: review_view_state::State> ReviewViewBuilder<S, St> {
     /// Set the `reason` field (optional)
     pub fn reason(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -1066,73 +1068,73 @@ impl<'a, S: review_view_state::State> ReviewViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ReviewViewBuilder<'a, S>
+impl<S: BosStr, St> ReviewViewBuilder<S, St>
 where
-    S: review_view_state::State,
-    S::ReviewedBy: review_view_state::IsUnset,
+    St: review_view_state::State,
+    St::ReviewedBy: review_view_state::IsUnset,
 {
     /// Set the `reviewedBy` field (required)
     pub fn reviewed_by(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> ReviewViewBuilder<'a, review_view_state::SetReviewedBy<S>> {
+    ) -> ReviewViewBuilder<S, review_view_state::SetReviewedBy<St>> {
         self._fields.3 = Option::Some(value.into());
         ReviewViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ReviewViewBuilder<'a, S>
+impl<S: BosStr, St> ReviewViewBuilder<S, St>
 where
-    S: review_view_state::State,
-    S::Status: review_view_state::IsUnset,
+    St: review_view_state::State,
+    St::Status: review_view_state::IsUnset,
 {
     /// Set the `status` field (required)
     pub fn status(
         mut self,
         value: impl Into<ReviewViewStatus<S>>,
-    ) -> ReviewViewBuilder<'a, review_view_state::SetStatus<S>> {
+    ) -> ReviewViewBuilder<S, review_view_state::SetStatus<St>> {
         self._fields.4 = Option::Some(value.into());
         ReviewViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ReviewViewBuilder<'a, S>
+impl<S: BosStr, St> ReviewViewBuilder<S, St>
 where
-    S: review_view_state::State,
-    S::Uri: review_view_state::IsUnset,
+    St: review_view_state::State,
+    St::Uri: review_view_state::IsUnset,
 {
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> ReviewViewBuilder<'a, review_view_state::SetUri<S>> {
+    ) -> ReviewViewBuilder<S, review_view_state::SetUri<St>> {
         self._fields.5 = Option::Some(value.into());
         ReviewViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ReviewViewBuilder<'a, S>
+impl<S: BosStr, St> ReviewViewBuilder<S, St>
 where
-    S: review_view_state::State,
-    S::Uri: review_view_state::IsSet,
-    S::CreatedAt: review_view_state::IsSet,
-    S::ReviewedBy: review_view_state::IsSet,
-    S::Status: review_view_state::IsSet,
+    St: review_view_state::State,
+    St::CreatedAt: review_view_state::IsSet,
+    St::Uri: review_view_state::IsSet,
+    St::Status: review_view_state::IsSet,
+    St::ReviewedBy: review_view_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ReviewView<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ReviewView<S> {
         ReviewView {
             approved_games: self._fields.0,
             created_at: self._fields.1.unwrap(),
@@ -1143,11 +1145,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> ReviewView<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ReviewView<S> {
         ReviewView {
             approved_games: self._fields.0,
             created_at: self._fields.1.unwrap(),

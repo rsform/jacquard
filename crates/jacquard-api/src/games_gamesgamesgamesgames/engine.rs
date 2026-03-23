@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -37,11 +37,11 @@ use crate::games_gamesgamesgamesgames::Website;
     rename = "games.gamesgamesgamesgames.engine",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Engine<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Engine<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub companies: Option<Vec<AtUri<S>>>,
     pub created_at: Datetime,
@@ -64,18 +64,18 @@ pub struct Engine<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct EngineGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct EngineGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Engine<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Engine<S> {
+impl<S: BosStr> Engine<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, EngineRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -88,17 +88,17 @@ pub struct EngineRecord;
 impl XrpcResp for EngineRecord {
     const NSID: &'static str = "games.gamesgamesgamesgames.engine";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = EngineGetRecordOutput<S>;
+    type Output<S: BosStr> = EngineGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<EngineGetRecordOutput<S>> for Engine<S> {
+impl<S: BosStr> From<EngineGetRecordOutput<S>> for Engine<S> {
     fn from(output: EngineGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Engine<S> {
+impl<S: BosStr> Collection for Engine<S> {
     const NSID: &'static str = "games.gamesgamesgamesgames.engine";
     type Record = EngineRecord;
 }
@@ -108,7 +108,7 @@ impl Collection for EngineRecord {
     type Record = EngineRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Engine<S> {
+impl<S: BosStr> LexiconSchema for Engine<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.engine"
     }
@@ -144,17 +144,17 @@ pub mod engine_state {
         type Name = Unset;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
-        type Name = S::Name;
+        type Name = St::Name;
     }
     ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type CreatedAt = S::CreatedAt;
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type CreatedAt = St::CreatedAt;
         type Name = Set<members::name>;
     }
     /// Marker types for field names
@@ -167,9 +167,9 @@ pub mod engine_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct EngineBuilder<'a, S: engine_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct EngineBuilder<S: BosStr, St: engine_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<AtUri<S>>>,
         Option<Datetime>,
@@ -179,28 +179,28 @@ pub struct EngineBuilder<'a, S: engine_state::State> {
         Option<Vec<AtUri<S>>>,
         Option<Vec<Website<S>>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Engine<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> EngineBuilder<'a, engine_state::Empty> {
+impl<S: BosStr> Engine<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> EngineBuilder<S, engine_state::Empty> {
         EngineBuilder::new()
     }
 }
 
-impl<'a> EngineBuilder<'a, engine_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> EngineBuilder<S, engine_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         EngineBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: engine_state::State> EngineBuilder<'a, S> {
+impl<S: BosStr, St: engine_state::State> EngineBuilder<S, St> {
     /// Set the `companies` field (optional)
     pub fn companies(mut self, value: impl Into<Option<Vec<AtUri<S>>>>) -> Self {
         self._fields.0 = value.into();
@@ -213,26 +213,26 @@ impl<'a, S: engine_state::State> EngineBuilder<'a, S> {
     }
 }
 
-impl<'a, S> EngineBuilder<'a, S>
+impl<S: BosStr, St> EngineBuilder<S, St>
 where
-    S: engine_state::State,
-    S::CreatedAt: engine_state::IsUnset,
+    St: engine_state::State,
+    St::CreatedAt: engine_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> EngineBuilder<'a, engine_state::SetCreatedAt<S>> {
+    ) -> EngineBuilder<S, engine_state::SetCreatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         EngineBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: engine_state::State> EngineBuilder<'a, S> {
+impl<S: BosStr, St: engine_state::State> EngineBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -245,7 +245,7 @@ impl<'a, S: engine_state::State> EngineBuilder<'a, S> {
     }
 }
 
-impl<'a, S: engine_state::State> EngineBuilder<'a, S> {
+impl<S: BosStr, St: engine_state::State> EngineBuilder<S, St> {
     /// Set the `media` field (optional)
     pub fn media(mut self, value: impl Into<Option<Vec<MediaItem<S>>>>) -> Self {
         self._fields.3 = value.into();
@@ -258,26 +258,26 @@ impl<'a, S: engine_state::State> EngineBuilder<'a, S> {
     }
 }
 
-impl<'a, S> EngineBuilder<'a, S>
+impl<S: BosStr, St> EngineBuilder<S, St>
 where
-    S: engine_state::State,
-    S::Name: engine_state::IsUnset,
+    St: engine_state::State,
+    St::Name: engine_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> EngineBuilder<'a, engine_state::SetName<S>> {
+    ) -> EngineBuilder<S, engine_state::SetName<St>> {
         self._fields.4 = Option::Some(value.into());
         EngineBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: engine_state::State> EngineBuilder<'a, S> {
+impl<S: BosStr, St: engine_state::State> EngineBuilder<S, St> {
     /// Set the `platforms` field (optional)
     pub fn platforms(mut self, value: impl Into<Option<Vec<AtUri<S>>>>) -> Self {
         self._fields.5 = value.into();
@@ -290,7 +290,7 @@ impl<'a, S: engine_state::State> EngineBuilder<'a, S> {
     }
 }
 
-impl<'a, S: engine_state::State> EngineBuilder<'a, S> {
+impl<S: BosStr, St: engine_state::State> EngineBuilder<S, St> {
     /// Set the `websites` field (optional)
     pub fn websites(mut self, value: impl Into<Option<Vec<Website<S>>>>) -> Self {
         self._fields.6 = value.into();
@@ -303,14 +303,14 @@ impl<'a, S: engine_state::State> EngineBuilder<'a, S> {
     }
 }
 
-impl<'a, S> EngineBuilder<'a, S>
+impl<S: BosStr, St> EngineBuilder<S, St>
 where
-    S: engine_state::State,
-    S::CreatedAt: engine_state::IsSet,
-    S::Name: engine_state::IsSet,
+    St: engine_state::State,
+    St::CreatedAt: engine_state::IsSet,
+    St::Name: engine_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Engine<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Engine<S> {
         Engine {
             companies: self._fields.0,
             created_at: self._fields.1.unwrap(),
@@ -322,8 +322,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Engine<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Engine<S> {
         Engine {
             companies: self._fields.0,
             created_at: self._fields.1.unwrap(),

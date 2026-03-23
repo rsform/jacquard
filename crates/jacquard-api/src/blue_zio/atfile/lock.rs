@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "blue.zio.atfile.lock",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Lock<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Lock<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub lock: Option<bool>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -52,18 +52,18 @@ pub struct Lock<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct LockGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct LockGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Lock<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Lock<S> {
+impl<S: BosStr> Lock<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, LockRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -76,17 +76,17 @@ pub struct LockRecord;
 impl XrpcResp for LockRecord {
     const NSID: &'static str = "blue.zio.atfile.lock";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = LockGetRecordOutput<S>;
+    type Output<S: BosStr> = LockGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<LockGetRecordOutput<S>> for Lock<S> {
+impl<S: BosStr> From<LockGetRecordOutput<S>> for Lock<S> {
     fn from(output: LockGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Lock<S> {
+impl<S: BosStr> Collection for Lock<S> {
     const NSID: &'static str = "blue.zio.atfile.lock";
     type Record = LockRecord;
 }
@@ -96,7 +96,7 @@ impl Collection for LockRecord {
     type Record = LockRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Lock<S> {
+impl<S: BosStr> LexiconSchema for Lock<S> {
     fn nsid() -> &'static str {
         "blue.zio.atfile.lock"
     }
@@ -130,32 +130,32 @@ pub mod lock_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct LockBuilder<'a, S: lock_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct LockBuilder<S: BosStr, St: lock_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<bool>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Lock<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> LockBuilder<'a, lock_state::Empty> {
+impl<S: BosStr> Lock<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> LockBuilder<S, lock_state::Empty> {
         LockBuilder::new()
     }
 }
 
-impl<'a> LockBuilder<'a, lock_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> LockBuilder<S, lock_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         LockBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: lock_state::State> LockBuilder<'a, S> {
+impl<S: BosStr, St: lock_state::State> LockBuilder<S, St> {
     /// Set the `lock` field (optional)
     pub fn lock(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.0 = value.into();
@@ -168,19 +168,19 @@ impl<'a, S: lock_state::State> LockBuilder<'a, S> {
     }
 }
 
-impl<'a, S> LockBuilder<'a, S>
+impl<S: BosStr, St> LockBuilder<S, St>
 where
-    S: lock_state::State,
+    St: lock_state::State,
 {
-    /// Build the final struct
-    pub fn build(self) -> Lock<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Lock<S> {
         Lock {
             lock: self._fields.0,
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Lock<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Lock<S> {
         Lock {
             lock: self._fields.0,
             extra_data: Some(extra_data),

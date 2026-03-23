@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -38,11 +38,11 @@ use crate::social_pace::feed::Split;
     rename = "social.pace.feed.activity",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Activity<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Activity<S: BosStr = DefaultStr> {
     ///The number of active calories burned during the activity.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub calories: Option<i64>,
@@ -78,18 +78,18 @@ pub struct Activity<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ActivityGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ActivityGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Activity<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Activity<S> {
+impl<S: BosStr> Activity<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, ActivityRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -102,17 +102,17 @@ pub struct ActivityRecord;
 impl XrpcResp for ActivityRecord {
     const NSID: &'static str = "social.pace.feed.activity";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ActivityGetRecordOutput<S>;
+    type Output<S: BosStr> = ActivityGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<ActivityGetRecordOutput<S>> for Activity<S> {
+impl<S: BosStr> From<ActivityGetRecordOutput<S>> for Activity<S> {
     fn from(output: ActivityGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Activity<S> {
+impl<S: BosStr> Collection for Activity<S> {
     const NSID: &'static str = "social.pace.feed.activity";
     type Record = ActivityRecord;
 }
@@ -122,7 +122,7 @@ impl Collection for ActivityRecord {
     type Record = ActivityRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Activity<S> {
+impl<S: BosStr> LexiconSchema for Activity<S> {
     fn nsid() -> &'static str {
         "social.pace.feed.activity"
     }
@@ -189,73 +189,73 @@ pub mod activity_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type StartedAt;
+        type EndedAt;
         type Type;
         type CreatedAt;
-        type EndedAt;
-        type StartedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type StartedAt = Unset;
+        type EndedAt = Unset;
         type Type = Unset;
         type CreatedAt = Unset;
-        type EndedAt = Unset;
-        type StartedAt = Unset;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type Type = Set<members::r#type>;
-        type CreatedAt = S::CreatedAt;
-        type EndedAt = S::EndedAt;
-        type StartedAt = S::StartedAt;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Type = S::Type;
-        type CreatedAt = Set<members::created_at>;
-        type EndedAt = S::EndedAt;
-        type StartedAt = S::StartedAt;
-    }
-    ///State transition - sets the `ended_at` field to Set
-    pub struct SetEndedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEndedAt<S> {}
-    impl<S: State> State for SetEndedAt<S> {
-        type Type = S::Type;
-        type CreatedAt = S::CreatedAt;
-        type EndedAt = Set<members::ended_at>;
-        type StartedAt = S::StartedAt;
     }
     ///State transition - sets the `started_at` field to Set
-    pub struct SetStartedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStartedAt<S> {}
-    impl<S: State> State for SetStartedAt<S> {
-        type Type = S::Type;
-        type CreatedAt = S::CreatedAt;
-        type EndedAt = S::EndedAt;
+    pub struct SetStartedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStartedAt<St> {}
+    impl<St: State> State for SetStartedAt<St> {
         type StartedAt = Set<members::started_at>;
+        type EndedAt = St::EndedAt;
+        type Type = St::Type;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `ended_at` field to Set
+    pub struct SetEndedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetEndedAt<St> {}
+    impl<St: State> State for SetEndedAt<St> {
+        type StartedAt = St::StartedAt;
+        type EndedAt = Set<members::ended_at>;
+        type Type = St::Type;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetType<St> {}
+    impl<St: State> State for SetType<St> {
+        type StartedAt = St::StartedAt;
+        type EndedAt = St::EndedAt;
+        type Type = Set<members::r#type>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type StartedAt = St::StartedAt;
+        type EndedAt = St::EndedAt;
+        type Type = St::Type;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `started_at` field
+        pub struct started_at(());
+        ///Marker type for the `ended_at` field
+        pub struct ended_at(());
         ///Marker type for the `type` field
         pub struct r#type(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `ended_at` field
-        pub struct ended_at(());
-        ///Marker type for the `started_at` field
-        pub struct started_at(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ActivityBuilder<'a, S: activity_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ActivityBuilder<S: BosStr, St: activity_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<i64>,
         Option<Datetime>,
@@ -268,28 +268,28 @@ pub struct ActivityBuilder<'a, S: activity_state::State> {
         Option<i64>,
         Option<ActivityType<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Activity<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ActivityBuilder<'a, activity_state::Empty> {
+impl<S: BosStr> Activity<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ActivityBuilder<S, activity_state::Empty> {
         ActivityBuilder::new()
     }
 }
 
-impl<'a> ActivityBuilder<'a, activity_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ActivityBuilder<S, activity_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ActivityBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
+impl<S: BosStr, St: activity_state::State> ActivityBuilder<S, St> {
     /// Set the `calories` field (optional)
     pub fn calories(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
@@ -302,26 +302,26 @@ impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ActivityBuilder<'a, S>
+impl<S: BosStr, St> ActivityBuilder<S, St>
 where
-    S: activity_state::State,
-    S::CreatedAt: activity_state::IsUnset,
+    St: activity_state::State,
+    St::CreatedAt: activity_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ActivityBuilder<'a, activity_state::SetCreatedAt<S>> {
+    ) -> ActivityBuilder<S, activity_state::SetCreatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         ActivityBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
+impl<S: BosStr, St: activity_state::State> ActivityBuilder<S, St> {
     /// Set the `distance` field (optional)
     pub fn distance(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -334,7 +334,7 @@ impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
     }
 }
 
-impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
+impl<S: BosStr, St: activity_state::State> ActivityBuilder<S, St> {
     /// Set the `distanceUnits` field (optional)
     pub fn distance_units(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -347,26 +347,26 @@ impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ActivityBuilder<'a, S>
+impl<S: BosStr, St> ActivityBuilder<S, St>
 where
-    S: activity_state::State,
-    S::EndedAt: activity_state::IsUnset,
+    St: activity_state::State,
+    St::EndedAt: activity_state::IsUnset,
 {
     /// Set the `endedAt` field (required)
     pub fn ended_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ActivityBuilder<'a, activity_state::SetEndedAt<S>> {
+    ) -> ActivityBuilder<S, activity_state::SetEndedAt<St>> {
         self._fields.4 = Option::Some(value.into());
         ActivityBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
+impl<S: BosStr, St: activity_state::State> ActivityBuilder<S, St> {
     /// Set the `route` field (optional)
     pub fn route(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -379,7 +379,7 @@ impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
     }
 }
 
-impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
+impl<S: BosStr, St: activity_state::State> ActivityBuilder<S, St> {
     /// Set the `splits` field (optional)
     pub fn splits(mut self, value: impl Into<Option<Vec<Split<S>>>>) -> Self {
         self._fields.6 = value.into();
@@ -392,26 +392,26 @@ impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ActivityBuilder<'a, S>
+impl<S: BosStr, St> ActivityBuilder<S, St>
 where
-    S: activity_state::State,
-    S::StartedAt: activity_state::IsUnset,
+    St: activity_state::State,
+    St::StartedAt: activity_state::IsUnset,
 {
     /// Set the `startedAt` field (required)
     pub fn started_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ActivityBuilder<'a, activity_state::SetStartedAt<S>> {
+    ) -> ActivityBuilder<S, activity_state::SetStartedAt<St>> {
         self._fields.7 = Option::Some(value.into());
         ActivityBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
+impl<S: BosStr, St: activity_state::State> ActivityBuilder<S, St> {
     /// Set the `steps` field (optional)
     pub fn steps(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.8 = value.into();
@@ -424,35 +424,35 @@ impl<'a, S: activity_state::State> ActivityBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ActivityBuilder<'a, S>
+impl<S: BosStr, St> ActivityBuilder<S, St>
 where
-    S: activity_state::State,
-    S::Type: activity_state::IsUnset,
+    St: activity_state::State,
+    St::Type: activity_state::IsUnset,
 {
     /// Set the `type` field (required)
     pub fn r#type(
         mut self,
         value: impl Into<ActivityType<S>>,
-    ) -> ActivityBuilder<'a, activity_state::SetType<S>> {
+    ) -> ActivityBuilder<S, activity_state::SetType<St>> {
         self._fields.9 = Option::Some(value.into());
         ActivityBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ActivityBuilder<'a, S>
+impl<S: BosStr, St> ActivityBuilder<S, St>
 where
-    S: activity_state::State,
-    S::Type: activity_state::IsSet,
-    S::CreatedAt: activity_state::IsSet,
-    S::EndedAt: activity_state::IsSet,
-    S::StartedAt: activity_state::IsSet,
+    St: activity_state::State,
+    St::StartedAt: activity_state::IsSet,
+    St::EndedAt: activity_state::IsSet,
+    St::Type: activity_state::IsSet,
+    St::CreatedAt: activity_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Activity<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Activity<S> {
         Activity {
             calories: self._fields.0,
             created_at: self._fields.1.unwrap(),
@@ -467,11 +467,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Activity<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Activity<S> {
         Activity {
             calories: self._fields.0,
             created_at: self._fields.1.unwrap(),

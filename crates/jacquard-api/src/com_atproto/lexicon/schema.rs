@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "com.atproto.lexicon.schema",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Schema<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Schema<S: BosStr = DefaultStr> {
     ///Indicates the 'version' of the Lexicon language. Must be '1' for the current atproto/Lexicon schema system.
     pub lexicon: i64,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -52,18 +52,18 @@ pub struct Schema<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SchemaGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SchemaGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Schema<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Schema<S> {
+impl<S: BosStr> Schema<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, SchemaRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -76,17 +76,17 @@ pub struct SchemaRecord;
 impl XrpcResp for SchemaRecord {
     const NSID: &'static str = "com.atproto.lexicon.schema";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = SchemaGetRecordOutput<S>;
+    type Output<S: BosStr> = SchemaGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<SchemaGetRecordOutput<S>> for Schema<S> {
+impl<S: BosStr> From<SchemaGetRecordOutput<S>> for Schema<S> {
     fn from(output: SchemaGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Schema<S> {
+impl<S: BosStr> Collection for Schema<S> {
     const NSID: &'static str = "com.atproto.lexicon.schema";
     type Record = SchemaRecord;
 }
@@ -96,7 +96,7 @@ impl Collection for SchemaRecord {
     type Record = SchemaRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Schema<S> {
+impl<S: BosStr> LexiconSchema for Schema<S> {
     fn nsid() -> &'static str {
         "com.atproto.lexicon.schema"
     }
@@ -130,9 +130,9 @@ pub mod schema_state {
         type Lexicon = Unset;
     }
     ///State transition - sets the `lexicon` field to Set
-    pub struct SetLexicon<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLexicon<S> {}
-    impl<S: State> State for SetLexicon<S> {
+    pub struct SetLexicon<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLexicon<St> {}
+    impl<St: State> State for SetLexicon<St> {
         type Lexicon = Set<members::lexicon>;
     }
     /// Marker types for field names
@@ -143,64 +143,64 @@ pub mod schema_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct SchemaBuilder<'a, S: schema_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct SchemaBuilder<S: BosStr, St: schema_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Schema<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> SchemaBuilder<'a, schema_state::Empty> {
+impl<S: BosStr> Schema<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> SchemaBuilder<S, schema_state::Empty> {
         SchemaBuilder::new()
     }
 }
 
-impl<'a> SchemaBuilder<'a, schema_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> SchemaBuilder<S, schema_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SchemaBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SchemaBuilder<'a, S>
+impl<S: BosStr, St> SchemaBuilder<S, St>
 where
-    S: schema_state::State,
-    S::Lexicon: schema_state::IsUnset,
+    St: schema_state::State,
+    St::Lexicon: schema_state::IsUnset,
 {
     /// Set the `lexicon` field (required)
     pub fn lexicon(
         mut self,
         value: impl Into<i64>,
-    ) -> SchemaBuilder<'a, schema_state::SetLexicon<S>> {
+    ) -> SchemaBuilder<S, schema_state::SetLexicon<St>> {
         self._fields.0 = Option::Some(value.into());
         SchemaBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SchemaBuilder<'a, S>
+impl<S: BosStr, St> SchemaBuilder<S, St>
 where
-    S: schema_state::State,
-    S::Lexicon: schema_state::IsSet,
+    St: schema_state::State,
+    St::Lexicon: schema_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Schema<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Schema<S> {
         Schema {
             lexicon: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Schema<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Schema<S> {
         Schema {
             lexicon: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

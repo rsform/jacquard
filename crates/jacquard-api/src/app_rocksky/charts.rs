@@ -12,7 +12,7 @@ pub mod get_top_tracks;
 
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -32,11 +32,11 @@ use crate::app_rocksky::charts;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ChartsView<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ChartsView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub scrobbles: Option<Vec<charts::ScrobbleViewBasic<S>>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -48,11 +48,11 @@ pub struct ChartsView<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ScrobbleViewBasic<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ScrobbleViewBasic<S: BosStr = DefaultStr> {
     ///The number of scrobbles on this date.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub count: Option<i64>,
@@ -63,7 +63,7 @@ pub struct ScrobbleViewBasic<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ChartsView<S> {
+impl<S: BosStr> LexiconSchema for ChartsView<S> {
     fn nsid() -> &'static str {
         "app.rocksky.charts.defs"
     }
@@ -78,7 +78,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for ChartsView<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ScrobbleViewBasic<S> {
+impl<S: BosStr> LexiconSchema for ScrobbleViewBasic<S> {
     fn nsid() -> &'static str {
         "app.rocksky.charts.defs"
     }

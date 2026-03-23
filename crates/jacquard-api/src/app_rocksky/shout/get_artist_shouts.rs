@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
@@ -18,39 +18,36 @@ use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetArtistShouts<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetArtistShouts<S: BosStr = DefaultStr> {
     ///(min: 1)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
     ///(min: 0)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub offset: Option<i64>,
-    #[serde(borrow)]
     pub uri: AtUri<S>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetArtistShoutsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetArtistShoutsOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub shouts: Option<Vec<Data<S>>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -59,12 +56,11 @@ pub struct GetArtistShoutsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetArtistShoutsResponse {
     const NSID: &'static str = "app.rocksky.shout.getArtistShouts";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetArtistShoutsOutput<S>;
+    type Output<S: BosStr> = GetArtistShoutsOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetArtistShouts<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetArtistShouts<S> {
     const NSID: &'static str = "app.rocksky.shout.getArtistShouts";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetArtistShoutsResponse;
@@ -75,7 +71,7 @@ pub struct GetArtistShoutsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetArtistShoutsRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.shout.getArtistShouts";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetArtistShouts<S>;
+    type Request<S: BosStr> = GetArtistShouts<S>;
     type Response = GetArtistShoutsResponse;
 }
 
@@ -98,9 +94,9 @@ pub mod get_artist_shouts_state {
         type Uri = Unset;
     }
     ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
         type Uri = Set<members::uri>;
     }
     /// Marker types for field names
@@ -111,32 +107,32 @@ pub mod get_artist_shouts_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetArtistShoutsBuilder<'a, S: get_artist_shouts_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetArtistShoutsBuilder<S: BosStr, St: get_artist_shouts_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<i64>, Option<AtUri<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetArtistShouts<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetArtistShoutsBuilder<'a, get_artist_shouts_state::Empty> {
+impl<S: BosStr> GetArtistShouts<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetArtistShoutsBuilder<S, get_artist_shouts_state::Empty> {
         GetArtistShoutsBuilder::new()
     }
 }
 
-impl<'a> GetArtistShoutsBuilder<'a, get_artist_shouts_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetArtistShoutsBuilder<S, get_artist_shouts_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetArtistShoutsBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: get_artist_shouts_state::State> GetArtistShoutsBuilder<'a, S> {
+impl<S: BosStr, St: get_artist_shouts_state::State> GetArtistShoutsBuilder<S, St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
@@ -149,7 +145,7 @@ impl<'a, S: get_artist_shouts_state::State> GetArtistShoutsBuilder<'a, S> {
     }
 }
 
-impl<'a, S: get_artist_shouts_state::State> GetArtistShoutsBuilder<'a, S> {
+impl<S: BosStr, St: get_artist_shouts_state::State> GetArtistShoutsBuilder<S, St> {
     /// Set the `offset` field (optional)
     pub fn offset(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -162,32 +158,32 @@ impl<'a, S: get_artist_shouts_state::State> GetArtistShoutsBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GetArtistShoutsBuilder<'a, S>
+impl<S: BosStr, St> GetArtistShoutsBuilder<S, St>
 where
-    S: get_artist_shouts_state::State,
-    S::Uri: get_artist_shouts_state::IsUnset,
+    St: get_artist_shouts_state::State,
+    St::Uri: get_artist_shouts_state::IsUnset,
 {
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> GetArtistShoutsBuilder<'a, get_artist_shouts_state::SetUri<S>> {
+    ) -> GetArtistShoutsBuilder<S, get_artist_shouts_state::SetUri<St>> {
         self._fields.2 = Option::Some(value.into());
         GetArtistShoutsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetArtistShoutsBuilder<'a, S>
+impl<S: BosStr, St> GetArtistShoutsBuilder<S, St>
 where
-    S: get_artist_shouts_state::State,
-    S::Uri: get_artist_shouts_state::IsSet,
+    St: get_artist_shouts_state::State,
+    St::Uri: get_artist_shouts_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetArtistShouts<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetArtistShouts<S> {
         GetArtistShouts {
             limit: self._fields.0,
             offset: self._fields.1,

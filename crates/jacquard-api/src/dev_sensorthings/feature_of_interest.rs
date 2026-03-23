@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "dev.sensorthings.featureOfInterest",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct FeatureOfInterest<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct FeatureOfInterest<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
@@ -58,18 +58,18 @@ pub struct FeatureOfInterest<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct FeatureOfInterestGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct FeatureOfInterestGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: FeatureOfInterest<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> FeatureOfInterest<S> {
+impl<S: BosStr> FeatureOfInterest<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, FeatureOfInterestRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -82,18 +82,17 @@ pub struct FeatureOfInterestRecord;
 impl XrpcResp for FeatureOfInterestRecord {
     const NSID: &'static str = "dev.sensorthings.featureOfInterest";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = FeatureOfInterestGetRecordOutput<S>;
+    type Output<S: BosStr> = FeatureOfInterestGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<FeatureOfInterestGetRecordOutput<S>>
-for FeatureOfInterest<S> {
+impl<S: BosStr> From<FeatureOfInterestGetRecordOutput<S>> for FeatureOfInterest<S> {
     fn from(output: FeatureOfInterestGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for FeatureOfInterest<S> {
+impl<S: BosStr> Collection for FeatureOfInterest<S> {
     const NSID: &'static str = "dev.sensorthings.featureOfInterest";
     type Record = FeatureOfInterestRecord;
 }
@@ -103,7 +102,7 @@ impl Collection for FeatureOfInterestRecord {
     type Record = FeatureOfInterestRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for FeatureOfInterest<S> {
+impl<S: BosStr> LexiconSchema for FeatureOfInterest<S> {
     fn nsid() -> &'static str {
         "dev.sensorthings.featureOfInterest"
     }
@@ -160,115 +159,115 @@ pub mod feature_of_interest_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Feature;
         type EncodingType;
-        type Name;
+        type Feature;
         type CreatedAt;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Feature = Unset;
         type EncodingType = Unset;
-        type Name = Unset;
+        type Feature = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `feature` field to Set
-    pub struct SetFeature<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFeature<S> {}
-    impl<S: State> State for SetFeature<S> {
-        type Feature = Set<members::feature>;
-        type EncodingType = S::EncodingType;
-        type Name = S::Name;
-        type CreatedAt = S::CreatedAt;
+        type Name = Unset;
     }
     ///State transition - sets the `encoding_type` field to Set
-    pub struct SetEncodingType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEncodingType<S> {}
-    impl<S: State> State for SetEncodingType<S> {
-        type Feature = S::Feature;
+    pub struct SetEncodingType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetEncodingType<St> {}
+    impl<St: State> State for SetEncodingType<St> {
         type EncodingType = Set<members::encoding_type>;
-        type Name = S::Name;
-        type CreatedAt = S::CreatedAt;
+        type Feature = St::Feature;
+        type CreatedAt = St::CreatedAt;
+        type Name = St::Name;
     }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Feature = S::Feature;
-        type EncodingType = S::EncodingType;
-        type Name = Set<members::name>;
-        type CreatedAt = S::CreatedAt;
+    ///State transition - sets the `feature` field to Set
+    pub struct SetFeature<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetFeature<St> {}
+    impl<St: State> State for SetFeature<St> {
+        type EncodingType = St::EncodingType;
+        type Feature = Set<members::feature>;
+        type CreatedAt = St::CreatedAt;
+        type Name = St::Name;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Feature = S::Feature;
-        type EncodingType = S::EncodingType;
-        type Name = S::Name;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type EncodingType = St::EncodingType;
+        type Feature = St::Feature;
         type CreatedAt = Set<members::created_at>;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type EncodingType = St::EncodingType;
+        type Feature = St::Feature;
+        type CreatedAt = St::CreatedAt;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `feature` field
-        pub struct feature(());
         ///Marker type for the `encoding_type` field
         pub struct encoding_type(());
-        ///Marker type for the `name` field
-        pub struct name(());
+        ///Marker type for the `feature` field
+        pub struct feature(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct FeatureOfInterestBuilder<'a, S: feature_of_interest_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct FeatureOfInterestBuilder<S: BosStr, St: feature_of_interest_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<S>, Option<S>, Option<Data<S>>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> FeatureOfInterest<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> FeatureOfInterestBuilder<'a, feature_of_interest_state::Empty> {
+impl<S: BosStr> FeatureOfInterest<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> FeatureOfInterestBuilder<S, feature_of_interest_state::Empty> {
         FeatureOfInterestBuilder::new()
     }
 }
 
-impl<'a> FeatureOfInterestBuilder<'a, feature_of_interest_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> FeatureOfInterestBuilder<S, feature_of_interest_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         FeatureOfInterestBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> FeatureOfInterestBuilder<'a, S>
+impl<S: BosStr, St> FeatureOfInterestBuilder<S, St>
 where
-    S: feature_of_interest_state::State,
-    S::CreatedAt: feature_of_interest_state::IsUnset,
+    St: feature_of_interest_state::State,
+    St::CreatedAt: feature_of_interest_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> FeatureOfInterestBuilder<'a, feature_of_interest_state::SetCreatedAt<S>> {
+    ) -> FeatureOfInterestBuilder<S, feature_of_interest_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         FeatureOfInterestBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: feature_of_interest_state::State> FeatureOfInterestBuilder<'a, S> {
+impl<S: BosStr, St: feature_of_interest_state::State> FeatureOfInterestBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -281,73 +280,73 @@ impl<'a, S: feature_of_interest_state::State> FeatureOfInterestBuilder<'a, S> {
     }
 }
 
-impl<'a, S> FeatureOfInterestBuilder<'a, S>
+impl<S: BosStr, St> FeatureOfInterestBuilder<S, St>
 where
-    S: feature_of_interest_state::State,
-    S::EncodingType: feature_of_interest_state::IsUnset,
+    St: feature_of_interest_state::State,
+    St::EncodingType: feature_of_interest_state::IsUnset,
 {
     /// Set the `encodingType` field (required)
     pub fn encoding_type(
         mut self,
         value: impl Into<S>,
-    ) -> FeatureOfInterestBuilder<'a, feature_of_interest_state::SetEncodingType<S>> {
+    ) -> FeatureOfInterestBuilder<S, feature_of_interest_state::SetEncodingType<St>> {
         self._fields.2 = Option::Some(value.into());
         FeatureOfInterestBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> FeatureOfInterestBuilder<'a, S>
+impl<S: BosStr, St> FeatureOfInterestBuilder<S, St>
 where
-    S: feature_of_interest_state::State,
-    S::Feature: feature_of_interest_state::IsUnset,
+    St: feature_of_interest_state::State,
+    St::Feature: feature_of_interest_state::IsUnset,
 {
     /// Set the `feature` field (required)
     pub fn feature(
         mut self,
         value: impl Into<Data<S>>,
-    ) -> FeatureOfInterestBuilder<'a, feature_of_interest_state::SetFeature<S>> {
+    ) -> FeatureOfInterestBuilder<S, feature_of_interest_state::SetFeature<St>> {
         self._fields.3 = Option::Some(value.into());
         FeatureOfInterestBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> FeatureOfInterestBuilder<'a, S>
+impl<S: BosStr, St> FeatureOfInterestBuilder<S, St>
 where
-    S: feature_of_interest_state::State,
-    S::Name: feature_of_interest_state::IsUnset,
+    St: feature_of_interest_state::State,
+    St::Name: feature_of_interest_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> FeatureOfInterestBuilder<'a, feature_of_interest_state::SetName<S>> {
+    ) -> FeatureOfInterestBuilder<S, feature_of_interest_state::SetName<St>> {
         self._fields.4 = Option::Some(value.into());
         FeatureOfInterestBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> FeatureOfInterestBuilder<'a, S>
+impl<S: BosStr, St> FeatureOfInterestBuilder<S, St>
 where
-    S: feature_of_interest_state::State,
-    S::Feature: feature_of_interest_state::IsSet,
-    S::EncodingType: feature_of_interest_state::IsSet,
-    S::Name: feature_of_interest_state::IsSet,
-    S::CreatedAt: feature_of_interest_state::IsSet,
+    St: feature_of_interest_state::State,
+    St::EncodingType: feature_of_interest_state::IsSet,
+    St::Feature: feature_of_interest_state::IsSet,
+    St::CreatedAt: feature_of_interest_state::IsSet,
+    St::Name: feature_of_interest_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> FeatureOfInterest<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> FeatureOfInterest<S> {
         FeatureOfInterest {
             created_at: self._fields.0.unwrap(),
             description: self._fields.1,
@@ -357,11 +356,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> FeatureOfInterest<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> FeatureOfInterest<S> {
         FeatureOfInterest {
             created_at: self._fields.0.unwrap(),
             description: self._fields.1,

@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 /// JSON Schema Draft 7 format for sample type definitions. When schemaType is 'jsonSchema', the schema field must contain an object conforming to science.alt.dataset.schema#jsonSchemaFormat.
@@ -21,14 +21,12 @@ impl core::fmt::Display for JsonSchema {
 /// Schema type identifier for atdata sample definitions. Known values correspond to token definitions in this Lexicon. New schema types can be added as tokens without breaking changes.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum SchemaType<
-    S: jacquard_common::Bos<str> + AsRef<str> = jacquard_common::DefaultStr,
-> {
+pub enum SchemaType<S: BosStr = DefaultStr> {
     JsonSchema,
     Other(S),
 }
 
-impl<S: jacquard_common::Bos<str> + AsRef<str>> SchemaType<S> {
+impl<S: BosStr> SchemaType<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::JsonSchema => "jsonSchema",
@@ -44,19 +42,19 @@ impl<S: jacquard_common::Bos<str> + AsRef<str>> SchemaType<S> {
     }
 }
 
-impl<S: jacquard_common::Bos<str> + AsRef<str>> AsRef<str> for SchemaType<S> {
+impl<S: BosStr> AsRef<str> for SchemaType<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: jacquard_common::Bos<str> + AsRef<str>> core::fmt::Display for SchemaType<S> {
+impl<S: BosStr> core::fmt::Display for SchemaType<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: jacquard_common::Bos<str> + AsRef<str>> Serialize for SchemaType<S> {
+impl<S: BosStr> Serialize for SchemaType<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -65,8 +63,7 @@ impl<S: jacquard_common::Bos<str> + AsRef<str>> Serialize for SchemaType<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + jacquard_common::Bos<str> + AsRef<str>> Deserialize<'de>
-for SchemaType<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for SchemaType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -76,8 +73,12 @@ for SchemaType<S> {
     }
 }
 
-impl<S: jacquard_common::Bos<str> + AsRef<str>> IntoStatic for SchemaType<S> {
-    type Output = SchemaType<jacquard_common::DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for SchemaType<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = SchemaType<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             SchemaType::JsonSchema => SchemaType::JsonSchema,

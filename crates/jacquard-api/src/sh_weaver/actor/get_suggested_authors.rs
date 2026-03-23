@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
@@ -27,18 +27,16 @@ pub struct GetSuggestedAuthors {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetSuggestedAuthorsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetSuggestedAuthorsOutput<S: BosStr = DefaultStr> {
     pub authors: Vec<Data<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -47,7 +45,7 @@ pub struct GetSuggestedAuthorsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetSuggestedAuthorsResponse {
     const NSID: &'static str = "sh.weaver.actor.getSuggestedAuthors";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetSuggestedAuthorsOutput<S>;
+    type Output<S: BosStr> = GetSuggestedAuthorsOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
@@ -62,7 +60,7 @@ pub struct GetSuggestedAuthorsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetSuggestedAuthorsRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.actor.getSuggestedAuthors";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetSuggestedAuthors;
+    type Request<S: BosStr> = GetSuggestedAuthors;
     type Response = GetSuggestedAuthorsResponse;
 }
 
@@ -89,21 +87,21 @@ pub mod get_suggested_authors_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetSuggestedAuthorsBuilder<S: get_suggested_authors_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetSuggestedAuthorsBuilder<St: get_suggested_authors_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>,),
 }
 
 impl GetSuggestedAuthors {
-    /// Create a new builder for this type
+    /// Create a new builder for this type.
     pub fn new() -> GetSuggestedAuthorsBuilder<get_suggested_authors_state::Empty> {
         GetSuggestedAuthorsBuilder::new()
     }
 }
 
 impl GetSuggestedAuthorsBuilder<get_suggested_authors_state::Empty> {
-    /// Create a new builder with all fields unset
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetSuggestedAuthorsBuilder {
             _state: PhantomData,
@@ -112,7 +110,7 @@ impl GetSuggestedAuthorsBuilder<get_suggested_authors_state::Empty> {
     }
 }
 
-impl<S: get_suggested_authors_state::State> GetSuggestedAuthorsBuilder<S> {
+impl<St: get_suggested_authors_state::State> GetSuggestedAuthorsBuilder<St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
@@ -125,11 +123,11 @@ impl<S: get_suggested_authors_state::State> GetSuggestedAuthorsBuilder<S> {
     }
 }
 
-impl<S> GetSuggestedAuthorsBuilder<S>
+impl<St> GetSuggestedAuthorsBuilder<St>
 where
-    S: get_suggested_authors_state::State,
+    St: get_suggested_authors_state::State,
 {
-    /// Build the final struct
+    /// Build the final struct.
     pub fn build(self) -> GetSuggestedAuthors {
         GetSuggestedAuthors {
             limit: self._fields.0,

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use crate::garden_lexicon::exultant_zebra::distribution;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Artifact<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Artifact<S: BosStr = DefaultStr> {
     ///An optional description of this artifact.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
@@ -60,11 +60,11 @@ pub struct Artifact<S: Bos<str> + AsRef<str> = DefaultStr> {
     rename = "garden.lexicon.exultant-zebra.distribution",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Distribution<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Distribution<S: BosStr = DefaultStr> {
     ///The list of downloadable artifacts for this distribution.
     pub artifacts: Vec<distribution::Artifact<S>>,
     ///An optional description of this distribution.
@@ -82,24 +82,24 @@ pub struct Distribution<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DistributionGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DistributionGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Distribution<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Distribution<S> {
+impl<S: BosStr> Distribution<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, DistributionRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Artifact<S> {
+impl<S: BosStr> LexiconSchema for Artifact<S> {
     fn nsid() -> &'static str {
         "garden.lexicon.exultant-zebra.distribution"
     }
@@ -148,17 +148,17 @@ pub struct DistributionRecord;
 impl XrpcResp for DistributionRecord {
     const NSID: &'static str = "garden.lexicon.exultant-zebra.distribution";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = DistributionGetRecordOutput<S>;
+    type Output<S: BosStr> = DistributionGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<DistributionGetRecordOutput<S>> for Distribution<S> {
+impl<S: BosStr> From<DistributionGetRecordOutput<S>> for Distribution<S> {
     fn from(output: DistributionGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Distribution<S> {
+impl<S: BosStr> Collection for Distribution<S> {
     const NSID: &'static str = "garden.lexicon.exultant-zebra.distribution";
     type Record = DistributionRecord;
 }
@@ -168,7 +168,7 @@ impl Collection for DistributionRecord {
     type Record = DistributionRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Distribution<S> {
+impl<S: BosStr> LexiconSchema for Distribution<S> {
     fn nsid() -> &'static str {
         "garden.lexicon.exultant-zebra.distribution"
     }
@@ -202,9 +202,9 @@ pub mod artifact_state {
         type Download = Unset;
     }
     ///State transition - sets the `download` field to Set
-    pub struct SetDownload<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDownload<S> {}
-    impl<S: State> State for SetDownload<S> {
+    pub struct SetDownload<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDownload<St> {}
+    impl<St: State> State for SetDownload<St> {
         type Download = Set<members::download>;
     }
     /// Marker types for field names
@@ -215,32 +215,32 @@ pub mod artifact_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ArtifactBuilder<'a, S: artifact_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ArtifactBuilder<S: BosStr, St: artifact_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<BlobRef<S>>, Option<Vec<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Artifact<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ArtifactBuilder<'a, artifact_state::Empty> {
+impl<S: BosStr> Artifact<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ArtifactBuilder<S, artifact_state::Empty> {
         ArtifactBuilder::new()
     }
 }
 
-impl<'a> ArtifactBuilder<'a, artifact_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ArtifactBuilder<S, artifact_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ArtifactBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: artifact_state::State> ArtifactBuilder<'a, S> {
+impl<S: BosStr, St: artifact_state::State> ArtifactBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -253,26 +253,26 @@ impl<'a, S: artifact_state::State> ArtifactBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ArtifactBuilder<'a, S>
+impl<S: BosStr, St> ArtifactBuilder<S, St>
 where
-    S: artifact_state::State,
-    S::Download: artifact_state::IsUnset,
+    St: artifact_state::State,
+    St::Download: artifact_state::IsUnset,
 {
     /// Set the `download` field (required)
     pub fn download(
         mut self,
         value: impl Into<BlobRef<S>>,
-    ) -> ArtifactBuilder<'a, artifact_state::SetDownload<S>> {
+    ) -> ArtifactBuilder<S, artifact_state::SetDownload<St>> {
         self._fields.1 = Option::Some(value.into());
         ArtifactBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: artifact_state::State> ArtifactBuilder<'a, S> {
+impl<S: BosStr, St: artifact_state::State> ArtifactBuilder<S, St> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -285,13 +285,13 @@ impl<'a, S: artifact_state::State> ArtifactBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ArtifactBuilder<'a, S>
+impl<S: BosStr, St> ArtifactBuilder<S, St>
 where
-    S: artifact_state::State,
-    S::Download: artifact_state::IsSet,
+    St: artifact_state::State,
+    St::Download: artifact_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Artifact<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Artifact<S> {
         Artifact {
             description: self._fields.0,
             download: self._fields.1.unwrap(),
@@ -299,11 +299,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Artifact<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Artifact<S> {
         Artifact {
             description: self._fields.0,
             download: self._fields.1.unwrap(),
@@ -446,85 +443,85 @@ pub mod distribution_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Version;
         type Artifacts;
+        type Version;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Version = Unset;
         type Artifacts = Unset;
-    }
-    ///State transition - sets the `version` field to Set
-    pub struct SetVersion<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVersion<S> {}
-    impl<S: State> State for SetVersion<S> {
-        type Version = Set<members::version>;
-        type Artifacts = S::Artifacts;
+        type Version = Unset;
     }
     ///State transition - sets the `artifacts` field to Set
-    pub struct SetArtifacts<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetArtifacts<S> {}
-    impl<S: State> State for SetArtifacts<S> {
-        type Version = S::Version;
+    pub struct SetArtifacts<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetArtifacts<St> {}
+    impl<St: State> State for SetArtifacts<St> {
         type Artifacts = Set<members::artifacts>;
+        type Version = St::Version;
+    }
+    ///State transition - sets the `version` field to Set
+    pub struct SetVersion<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetVersion<St> {}
+    impl<St: State> State for SetVersion<St> {
+        type Artifacts = St::Artifacts;
+        type Version = Set<members::version>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `version` field
-        pub struct version(());
         ///Marker type for the `artifacts` field
         pub struct artifacts(());
+        ///Marker type for the `version` field
+        pub struct version(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct DistributionBuilder<'a, S: distribution_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct DistributionBuilder<S: BosStr, St: distribution_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<distribution::Artifact<S>>>, Option<S>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Distribution<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> DistributionBuilder<'a, distribution_state::Empty> {
+impl<S: BosStr> Distribution<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> DistributionBuilder<S, distribution_state::Empty> {
         DistributionBuilder::new()
     }
 }
 
-impl<'a> DistributionBuilder<'a, distribution_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> DistributionBuilder<S, distribution_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         DistributionBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DistributionBuilder<'a, S>
+impl<S: BosStr, St> DistributionBuilder<S, St>
 where
-    S: distribution_state::State,
-    S::Artifacts: distribution_state::IsUnset,
+    St: distribution_state::State,
+    St::Artifacts: distribution_state::IsUnset,
 {
     /// Set the `artifacts` field (required)
     pub fn artifacts(
         mut self,
         value: impl Into<Vec<distribution::Artifact<S>>>,
-    ) -> DistributionBuilder<'a, distribution_state::SetArtifacts<S>> {
+    ) -> DistributionBuilder<S, distribution_state::SetArtifacts<St>> {
         self._fields.0 = Option::Some(value.into());
         DistributionBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: distribution_state::State> DistributionBuilder<'a, S> {
+impl<S: BosStr, St: distribution_state::State> DistributionBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -537,33 +534,33 @@ impl<'a, S: distribution_state::State> DistributionBuilder<'a, S> {
     }
 }
 
-impl<'a, S> DistributionBuilder<'a, S>
+impl<S: BosStr, St> DistributionBuilder<S, St>
 where
-    S: distribution_state::State,
-    S::Version: distribution_state::IsUnset,
+    St: distribution_state::State,
+    St::Version: distribution_state::IsUnset,
 {
     /// Set the `version` field (required)
     pub fn version(
         mut self,
         value: impl Into<S>,
-    ) -> DistributionBuilder<'a, distribution_state::SetVersion<S>> {
+    ) -> DistributionBuilder<S, distribution_state::SetVersion<St>> {
         self._fields.2 = Option::Some(value.into());
         DistributionBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DistributionBuilder<'a, S>
+impl<S: BosStr, St> DistributionBuilder<S, St>
 where
-    S: distribution_state::State,
-    S::Version: distribution_state::IsSet,
-    S::Artifacts: distribution_state::IsSet,
+    St: distribution_state::State,
+    St::Artifacts: distribution_state::IsSet,
+    St::Version: distribution_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Distribution<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Distribution<S> {
         Distribution {
             artifacts: self._fields.0.unwrap(),
             description: self._fields.1,
@@ -571,11 +568,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Distribution<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Distribution<S> {
         Distribution {
             artifacts: self._fields.0.unwrap(),
             description: self._fields.1,

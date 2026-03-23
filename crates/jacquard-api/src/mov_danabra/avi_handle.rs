@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
@@ -19,37 +19,32 @@ use serde::{Serialize, Deserialize};
 use crate::at_inlay::Response;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct AviHandle<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct AviHandle<S: BosStr = DefaultStr> {
     pub uri: AtUri<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct AviHandleOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct AviHandleOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
-    #[serde(borrow)]
     pub value: Response<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -58,12 +53,11 @@ pub struct AviHandleResponse;
 impl jacquard_common::xrpc::XrpcResp for AviHandleResponse {
     const NSID: &'static str = "mov.danabra.AviHandle";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = AviHandleOutput<S>;
+    type Output<S: BosStr> = AviHandleOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for AviHandle<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for AviHandle<S> {
     const NSID: &'static str = "mov.danabra.AviHandle";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -78,7 +72,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for AviHandleRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = AviHandle<S>;
+    type Request<S: BosStr> = AviHandle<S>;
     type Response = AviHandleResponse;
 }
 
@@ -101,9 +95,9 @@ pub mod avi_handle_state {
         type Uri = Unset;
     }
     ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
         type Uri = Set<members::uri>;
     }
     /// Marker types for field names
@@ -114,67 +108,67 @@ pub mod avi_handle_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct AviHandleBuilder<'a, S: avi_handle_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct AviHandleBuilder<S: BosStr, St: avi_handle_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> AviHandle<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> AviHandleBuilder<'a, avi_handle_state::Empty> {
+impl<S: BosStr> AviHandle<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> AviHandleBuilder<S, avi_handle_state::Empty> {
         AviHandleBuilder::new()
     }
 }
 
-impl<'a> AviHandleBuilder<'a, avi_handle_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> AviHandleBuilder<S, avi_handle_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         AviHandleBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AviHandleBuilder<'a, S>
+impl<S: BosStr, St> AviHandleBuilder<S, St>
 where
-    S: avi_handle_state::State,
-    S::Uri: avi_handle_state::IsUnset,
+    St: avi_handle_state::State,
+    St::Uri: avi_handle_state::IsUnset,
 {
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> AviHandleBuilder<'a, avi_handle_state::SetUri<S>> {
+    ) -> AviHandleBuilder<S, avi_handle_state::SetUri<St>> {
         self._fields.0 = Option::Some(value.into());
         AviHandleBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AviHandleBuilder<'a, S>
+impl<S: BosStr, St> AviHandleBuilder<S, St>
 where
-    S: avi_handle_state::State,
-    S::Uri: avi_handle_state::IsSet,
+    St: avi_handle_state::State,
+    St::Uri: avi_handle_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> AviHandle<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> AviHandle<S> {
         AviHandle {
             uri: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> AviHandle<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> AviHandle<S> {
         AviHandle {
             uri: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

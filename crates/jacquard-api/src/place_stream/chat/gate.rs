@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "place.stream.chat.gate",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Gate<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Gate<S: BosStr = DefaultStr> {
     ///URI of the hidden chat message.
     pub hidden_message: AtUri<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -52,18 +52,18 @@ pub struct Gate<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GateGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GateGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Gate<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Gate<S> {
+impl<S: BosStr> Gate<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, GateRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -76,17 +76,17 @@ pub struct GateRecord;
 impl XrpcResp for GateRecord {
     const NSID: &'static str = "place.stream.chat.gate";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GateGetRecordOutput<S>;
+    type Output<S: BosStr> = GateGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<GateGetRecordOutput<S>> for Gate<S> {
+impl<S: BosStr> From<GateGetRecordOutput<S>> for Gate<S> {
     fn from(output: GateGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Gate<S> {
+impl<S: BosStr> Collection for Gate<S> {
     const NSID: &'static str = "place.stream.chat.gate";
     type Record = GateRecord;
 }
@@ -96,7 +96,7 @@ impl Collection for GateRecord {
     type Record = GateRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Gate<S> {
+impl<S: BosStr> LexiconSchema for Gate<S> {
     fn nsid() -> &'static str {
         "place.stream.chat.gate"
     }
@@ -130,9 +130,9 @@ pub mod gate_state {
         type HiddenMessage = Unset;
     }
     ///State transition - sets the `hidden_message` field to Set
-    pub struct SetHiddenMessage<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHiddenMessage<S> {}
-    impl<S: State> State for SetHiddenMessage<S> {
+    pub struct SetHiddenMessage<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHiddenMessage<St> {}
+    impl<St: State> State for SetHiddenMessage<St> {
         type HiddenMessage = Set<members::hidden_message>;
     }
     /// Marker types for field names
@@ -143,64 +143,64 @@ pub mod gate_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GateBuilder<'a, S: gate_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GateBuilder<S: BosStr, St: gate_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Gate<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GateBuilder<'a, gate_state::Empty> {
+impl<S: BosStr> Gate<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GateBuilder<S, gate_state::Empty> {
         GateBuilder::new()
     }
 }
 
-impl<'a> GateBuilder<'a, gate_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GateBuilder<S, gate_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GateBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GateBuilder<'a, S>
+impl<S: BosStr, St> GateBuilder<S, St>
 where
-    S: gate_state::State,
-    S::HiddenMessage: gate_state::IsUnset,
+    St: gate_state::State,
+    St::HiddenMessage: gate_state::IsUnset,
 {
     /// Set the `hiddenMessage` field (required)
     pub fn hidden_message(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> GateBuilder<'a, gate_state::SetHiddenMessage<S>> {
+    ) -> GateBuilder<S, gate_state::SetHiddenMessage<St>> {
         self._fields.0 = Option::Some(value.into());
         GateBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GateBuilder<'a, S>
+impl<S: BosStr, St> GateBuilder<S, St>
 where
-    S: gate_state::State,
-    S::HiddenMessage: gate_state::IsSet,
+    St: gate_state::State,
+    St::HiddenMessage: gate_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Gate<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Gate<S> {
         Gate {
             hidden_message: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Gate<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Gate<S> {
         Gate {
             hidden_message: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

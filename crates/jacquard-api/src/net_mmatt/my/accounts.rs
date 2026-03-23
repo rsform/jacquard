@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
     rename = "net.mmatt.my.accounts",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Accounts<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Accounts<S: BosStr = DefaultStr> {
     pub accounts: Vec<StrongRef<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -52,18 +52,18 @@ pub struct Accounts<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct AccountsGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct AccountsGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Accounts<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Accounts<S> {
+impl<S: BosStr> Accounts<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, AccountsRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -76,17 +76,17 @@ pub struct AccountsRecord;
 impl XrpcResp for AccountsRecord {
     const NSID: &'static str = "net.mmatt.my.accounts";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = AccountsGetRecordOutput<S>;
+    type Output<S: BosStr> = AccountsGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<AccountsGetRecordOutput<S>> for Accounts<S> {
+impl<S: BosStr> From<AccountsGetRecordOutput<S>> for Accounts<S> {
     fn from(output: AccountsGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Accounts<S> {
+impl<S: BosStr> Collection for Accounts<S> {
     const NSID: &'static str = "net.mmatt.my.accounts";
     type Record = AccountsRecord;
 }
@@ -96,7 +96,7 @@ impl Collection for AccountsRecord {
     type Record = AccountsRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Accounts<S> {
+impl<S: BosStr> LexiconSchema for Accounts<S> {
     fn nsid() -> &'static str {
         "net.mmatt.my.accounts"
     }
@@ -130,9 +130,9 @@ pub mod accounts_state {
         type Accounts = Unset;
     }
     ///State transition - sets the `accounts` field to Set
-    pub struct SetAccounts<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAccounts<S> {}
-    impl<S: State> State for SetAccounts<S> {
+    pub struct SetAccounts<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAccounts<St> {}
+    impl<St: State> State for SetAccounts<St> {
         type Accounts = Set<members::accounts>;
     }
     /// Marker types for field names
@@ -143,67 +143,64 @@ pub mod accounts_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct AccountsBuilder<'a, S: accounts_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct AccountsBuilder<S: BosStr, St: accounts_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<StrongRef<S>>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Accounts<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> AccountsBuilder<'a, accounts_state::Empty> {
+impl<S: BosStr> Accounts<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> AccountsBuilder<S, accounts_state::Empty> {
         AccountsBuilder::new()
     }
 }
 
-impl<'a> AccountsBuilder<'a, accounts_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> AccountsBuilder<S, accounts_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         AccountsBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AccountsBuilder<'a, S>
+impl<S: BosStr, St> AccountsBuilder<S, St>
 where
-    S: accounts_state::State,
-    S::Accounts: accounts_state::IsUnset,
+    St: accounts_state::State,
+    St::Accounts: accounts_state::IsUnset,
 {
     /// Set the `accounts` field (required)
     pub fn accounts(
         mut self,
         value: impl Into<Vec<StrongRef<S>>>,
-    ) -> AccountsBuilder<'a, accounts_state::SetAccounts<S>> {
+    ) -> AccountsBuilder<S, accounts_state::SetAccounts<St>> {
         self._fields.0 = Option::Some(value.into());
         AccountsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AccountsBuilder<'a, S>
+impl<S: BosStr, St> AccountsBuilder<S, St>
 where
-    S: accounts_state::State,
-    S::Accounts: accounts_state::IsSet,
+    St: accounts_state::State,
+    St::Accounts: accounts_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Accounts<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Accounts<S> {
         Accounts {
             accounts: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Accounts<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Accounts<S> {
         Accounts {
             accounts: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

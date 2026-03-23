@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, AtUri};
 use jacquard_common::types::value::Data;
@@ -18,39 +18,34 @@ use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetSuggestedStarterPacksSkeleton<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetSuggestedStarterPacksSkeleton<S: BosStr = DefaultStr> {
     ///Defaults to `10`. Min: 1. Max: 25.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub viewer: Option<Did<S>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetSuggestedStarterPacksSkeletonOutput<
-    S: Bos<str> + AsRef<str> = DefaultStr,
-> {
+pub struct GetSuggestedStarterPacksSkeletonOutput<S: BosStr = DefaultStr> {
     pub starter_packs: Vec<AtUri<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -59,11 +54,11 @@ pub struct GetSuggestedStarterPacksSkeletonResponse;
 impl jacquard_common::xrpc::XrpcResp for GetSuggestedStarterPacksSkeletonResponse {
     const NSID: &'static str = "app.bsky.unspecced.getSuggestedStarterPacksSkeleton";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetSuggestedStarterPacksSkeletonOutput<S>;
+    type Output<S: BosStr> = GetSuggestedStarterPacksSkeletonOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest
 for GetSuggestedStarterPacksSkeleton<S> {
     const NSID: &'static str = "app.bsky.unspecced.getSuggestedStarterPacksSkeleton";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
@@ -75,7 +70,7 @@ pub struct GetSuggestedStarterPacksSkeletonRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetSuggestedStarterPacksSkeletonRequest {
     const PATH: &'static str = "/xrpc/app.bsky.unspecced.getSuggestedStarterPacksSkeleton";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetSuggestedStarterPacksSkeleton<S>;
+    type Request<S: BosStr> = GetSuggestedStarterPacksSkeleton<S>;
     type Response = GetSuggestedStarterPacksSkeletonResponse;
 }
 
@@ -102,20 +97,20 @@ pub mod get_suggested_starter_packs_skeleton_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
+/// Builder for constructing an instance of this type.
 pub struct GetSuggestedStarterPacksSkeletonBuilder<
-    'a,
-    S: get_suggested_starter_packs_skeleton_state::State,
+    S: BosStr,
+    St: get_suggested_starter_packs_skeleton_state::State,
 > {
-    _state: PhantomData<fn() -> S>,
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<Did<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetSuggestedStarterPacksSkeleton<'a> {
-    /// Create a new builder for this type
+impl<S: BosStr> GetSuggestedStarterPacksSkeleton<S> {
+    /// Create a new builder for this type.
     pub fn new() -> GetSuggestedStarterPacksSkeletonBuilder<
-        'a,
+        S,
         get_suggested_starter_packs_skeleton_state::Empty,
     > {
         GetSuggestedStarterPacksSkeletonBuilder::new()
@@ -123,25 +118,25 @@ impl<'a> GetSuggestedStarterPacksSkeleton<'a> {
 }
 
 impl<
-    'a,
+    S: BosStr,
 > GetSuggestedStarterPacksSkeletonBuilder<
-    'a,
+    S,
     get_suggested_starter_packs_skeleton_state::Empty,
 > {
-    /// Create a new builder with all fields unset
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetSuggestedStarterPacksSkeletonBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
 impl<
-    'a,
-    S: get_suggested_starter_packs_skeleton_state::State,
-> GetSuggestedStarterPacksSkeletonBuilder<'a, S> {
+    S: BosStr,
+    St: get_suggested_starter_packs_skeleton_state::State,
+> GetSuggestedStarterPacksSkeletonBuilder<S, St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
@@ -155,9 +150,9 @@ impl<
 }
 
 impl<
-    'a,
-    S: get_suggested_starter_packs_skeleton_state::State,
-> GetSuggestedStarterPacksSkeletonBuilder<'a, S> {
+    S: BosStr,
+    St: get_suggested_starter_packs_skeleton_state::State,
+> GetSuggestedStarterPacksSkeletonBuilder<S, St> {
     /// Set the `viewer` field (optional)
     pub fn viewer(mut self, value: impl Into<Option<Did<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -170,12 +165,12 @@ impl<
     }
 }
 
-impl<'a, S> GetSuggestedStarterPacksSkeletonBuilder<'a, S>
+impl<S: BosStr, St> GetSuggestedStarterPacksSkeletonBuilder<S, St>
 where
-    S: get_suggested_starter_packs_skeleton_state::State,
+    St: get_suggested_starter_packs_skeleton_state::State,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetSuggestedStarterPacksSkeleton<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetSuggestedStarterPacksSkeleton<S> {
         GetSuggestedStarterPacksSkeleton {
             limit: self._fields.0,
             viewer: self._fields.1,

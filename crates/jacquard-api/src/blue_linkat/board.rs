@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -33,11 +33,11 @@ use crate::blue_linkat::board;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Card<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Card<S: BosStr = DefaultStr> {
     ///Emoji of the card
     #[serde(skip_serializing_if = "Option::is_none")]
     pub emoji: Option<S>,
@@ -59,11 +59,11 @@ pub struct Card<S: Bos<str> + AsRef<str> = DefaultStr> {
     rename = "blue.linkat.board",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Board<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Board<S: BosStr = DefaultStr> {
     ///List of cards in the board.
     pub cards: Vec<board::Card<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -76,24 +76,24 @@ pub struct Board<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct BoardGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct BoardGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Board<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Board<S> {
+impl<S: BosStr> Board<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, BoardRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Card<S> {
+impl<S: BosStr> LexiconSchema for Card<S> {
     fn nsid() -> &'static str {
         "blue.linkat.board"
     }
@@ -115,17 +115,17 @@ pub struct BoardRecord;
 impl XrpcResp for BoardRecord {
     const NSID: &'static str = "blue.linkat.board";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = BoardGetRecordOutput<S>;
+    type Output<S: BosStr> = BoardGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<BoardGetRecordOutput<S>> for Board<S> {
+impl<S: BosStr> From<BoardGetRecordOutput<S>> for Board<S> {
     fn from(output: BoardGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Board<S> {
+impl<S: BosStr> Collection for Board<S> {
     const NSID: &'static str = "blue.linkat.board";
     type Record = BoardRecord;
 }
@@ -135,7 +135,7 @@ impl Collection for BoardRecord {
     type Record = BoardRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Board<S> {
+impl<S: BosStr> LexiconSchema for Board<S> {
     fn nsid() -> &'static str {
         "blue.linkat.board"
     }
@@ -249,9 +249,9 @@ pub mod board_state {
         type Cards = Unset;
     }
     ///State transition - sets the `cards` field to Set
-    pub struct SetCards<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCards<S> {}
-    impl<S: State> State for SetCards<S> {
+    pub struct SetCards<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCards<St> {}
+    impl<St: State> State for SetCards<St> {
         type Cards = Set<members::cards>;
     }
     /// Marker types for field names
@@ -262,64 +262,64 @@ pub mod board_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct BoardBuilder<'a, S: board_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct BoardBuilder<S: BosStr, St: board_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<board::Card<S>>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Board<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> BoardBuilder<'a, board_state::Empty> {
+impl<S: BosStr> Board<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> BoardBuilder<S, board_state::Empty> {
         BoardBuilder::new()
     }
 }
 
-impl<'a> BoardBuilder<'a, board_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> BoardBuilder<S, board_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         BoardBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BoardBuilder<'a, S>
+impl<S: BosStr, St> BoardBuilder<S, St>
 where
-    S: board_state::State,
-    S::Cards: board_state::IsUnset,
+    St: board_state::State,
+    St::Cards: board_state::IsUnset,
 {
     /// Set the `cards` field (required)
     pub fn cards(
         mut self,
         value: impl Into<Vec<board::Card<S>>>,
-    ) -> BoardBuilder<'a, board_state::SetCards<S>> {
+    ) -> BoardBuilder<S, board_state::SetCards<St>> {
         self._fields.0 = Option::Some(value.into());
         BoardBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BoardBuilder<'a, S>
+impl<S: BosStr, St> BoardBuilder<S, St>
 where
-    S: board_state::State,
-    S::Cards: board_state::IsSet,
+    St: board_state::State,
+    St::Cards: board_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Board<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Board<S> {
         Board {
             cards: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Board<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Board<S> {
         Board {
             cards: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

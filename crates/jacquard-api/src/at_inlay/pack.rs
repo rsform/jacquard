@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -33,11 +33,11 @@ use crate::at_inlay::pack;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Export<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Export<S: BosStr = DefaultStr> {
     ///AT-URI of the component record
     pub component: AtUri<S>,
     ///NSID of the type being exported
@@ -54,11 +54,11 @@ pub struct Export<S: Bos<str> + AsRef<str> = DefaultStr> {
     rename = "at.inlay.pack",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Pack<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Pack<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
     ///Type to component mappings
@@ -75,24 +75,24 @@ pub struct Pack<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct PackGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct PackGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Pack<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Pack<S> {
+impl<S: BosStr> Pack<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, PackRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Export<S> {
+impl<S: BosStr> LexiconSchema for Export<S> {
     fn nsid() -> &'static str {
         "at.inlay.pack"
     }
@@ -114,17 +114,17 @@ pub struct PackRecord;
 impl XrpcResp for PackRecord {
     const NSID: &'static str = "at.inlay.pack";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = PackGetRecordOutput<S>;
+    type Output<S: BosStr> = PackGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<PackGetRecordOutput<S>> for Pack<S> {
+impl<S: BosStr> From<PackGetRecordOutput<S>> for Pack<S> {
     fn from(output: PackGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Pack<S> {
+impl<S: BosStr> Collection for Pack<S> {
     const NSID: &'static str = "at.inlay.pack";
     type Record = PackRecord;
 }
@@ -134,7 +134,7 @@ impl Collection for PackRecord {
     type Record = PackRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Pack<S> {
+impl<S: BosStr> LexiconSchema for Pack<S> {
     fn nsid() -> &'static str {
         "at.inlay.pack"
     }
@@ -170,119 +170,119 @@ pub mod export_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Component;
         type Type;
+        type Component;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Component = Unset;
         type Type = Unset;
-    }
-    ///State transition - sets the `component` field to Set
-    pub struct SetComponent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetComponent<S> {}
-    impl<S: State> State for SetComponent<S> {
-        type Component = Set<members::component>;
-        type Type = S::Type;
+        type Component = Unset;
     }
     ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type Component = S::Component;
+    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetType<St> {}
+    impl<St: State> State for SetType<St> {
         type Type = Set<members::r#type>;
+        type Component = St::Component;
+    }
+    ///State transition - sets the `component` field to Set
+    pub struct SetComponent<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetComponent<St> {}
+    impl<St: State> State for SetComponent<St> {
+        type Type = St::Type;
+        type Component = Set<members::component>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `component` field
-        pub struct component(());
         ///Marker type for the `type` field
         pub struct r#type(());
+        ///Marker type for the `component` field
+        pub struct component(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ExportBuilder<'a, S: export_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ExportBuilder<S: BosStr, St: export_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>, Option<Nsid<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Export<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ExportBuilder<'a, export_state::Empty> {
+impl<S: BosStr> Export<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ExportBuilder<S, export_state::Empty> {
         ExportBuilder::new()
     }
 }
 
-impl<'a> ExportBuilder<'a, export_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ExportBuilder<S, export_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ExportBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ExportBuilder<'a, S>
+impl<S: BosStr, St> ExportBuilder<S, St>
 where
-    S: export_state::State,
-    S::Component: export_state::IsUnset,
+    St: export_state::State,
+    St::Component: export_state::IsUnset,
 {
     /// Set the `component` field (required)
     pub fn component(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> ExportBuilder<'a, export_state::SetComponent<S>> {
+    ) -> ExportBuilder<S, export_state::SetComponent<St>> {
         self._fields.0 = Option::Some(value.into());
         ExportBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ExportBuilder<'a, S>
+impl<S: BosStr, St> ExportBuilder<S, St>
 where
-    S: export_state::State,
-    S::Type: export_state::IsUnset,
+    St: export_state::State,
+    St::Type: export_state::IsUnset,
 {
     /// Set the `type` field (required)
     pub fn r#type(
         mut self,
         value: impl Into<Nsid<S>>,
-    ) -> ExportBuilder<'a, export_state::SetType<S>> {
+    ) -> ExportBuilder<S, export_state::SetType<St>> {
         self._fields.1 = Option::Some(value.into());
         ExportBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ExportBuilder<'a, S>
+impl<S: BosStr, St> ExportBuilder<S, St>
 where
-    S: export_state::State,
-    S::Component: export_state::IsSet,
-    S::Type: export_state::IsSet,
+    St: export_state::State,
+    St::Type: export_state::IsSet,
+    St::Component: export_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Export<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Export<S> {
         Export {
             component: self._fields.0.unwrap(),
             r#type: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Export<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Export<S> {
         Export {
             component: self._fields.0.unwrap(),
             r#type: self._fields.1.unwrap(),
@@ -419,17 +419,17 @@ pub mod pack_state {
         type Exports = Unset;
     }
     ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
         type Name = Set<members::name>;
-        type Exports = S::Exports;
+        type Exports = St::Exports;
     }
     ///State transition - sets the `exports` field to Set
-    pub struct SetExports<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetExports<S> {}
-    impl<S: State> State for SetExports<S> {
-        type Name = S::Name;
+    pub struct SetExports<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetExports<St> {}
+    impl<St: State> State for SetExports<St> {
+        type Name = St::Name;
         type Exports = Set<members::exports>;
     }
     /// Marker types for field names
@@ -442,32 +442,32 @@ pub mod pack_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct PackBuilder<'a, S: pack_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct PackBuilder<S: BosStr, St: pack_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<Vec<pack::Export<S>>>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Pack<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> PackBuilder<'a, pack_state::Empty> {
+impl<S: BosStr> Pack<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> PackBuilder<S, pack_state::Empty> {
         PackBuilder::new()
     }
 }
 
-impl<'a> PackBuilder<'a, pack_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> PackBuilder<S, pack_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         PackBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: pack_state::State> PackBuilder<'a, S> {
+impl<S: BosStr, St: pack_state::State> PackBuilder<S, St> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.0 = value.into();
@@ -480,52 +480,52 @@ impl<'a, S: pack_state::State> PackBuilder<'a, S> {
     }
 }
 
-impl<'a, S> PackBuilder<'a, S>
+impl<S: BosStr, St> PackBuilder<S, St>
 where
-    S: pack_state::State,
-    S::Exports: pack_state::IsUnset,
+    St: pack_state::State,
+    St::Exports: pack_state::IsUnset,
 {
     /// Set the `exports` field (required)
     pub fn exports(
         mut self,
         value: impl Into<Vec<pack::Export<S>>>,
-    ) -> PackBuilder<'a, pack_state::SetExports<S>> {
+    ) -> PackBuilder<S, pack_state::SetExports<St>> {
         self._fields.1 = Option::Some(value.into());
         PackBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PackBuilder<'a, S>
+impl<S: BosStr, St> PackBuilder<S, St>
 where
-    S: pack_state::State,
-    S::Name: pack_state::IsUnset,
+    St: pack_state::State,
+    St::Name: pack_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> PackBuilder<'a, pack_state::SetName<S>> {
+    ) -> PackBuilder<S, pack_state::SetName<St>> {
         self._fields.2 = Option::Some(value.into());
         PackBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PackBuilder<'a, S>
+impl<S: BosStr, St> PackBuilder<S, St>
 where
-    S: pack_state::State,
-    S::Name: pack_state::IsSet,
-    S::Exports: pack_state::IsSet,
+    St: pack_state::State,
+    St::Name: pack_state::IsSet,
+    St::Exports: pack_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Pack<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Pack<S> {
         Pack {
             created_at: self._fields.0,
             exports: self._fields.1.unwrap(),
@@ -533,8 +533,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Pack<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Pack<S> {
         Pack {
             created_at: self._fields.0,
             exports: self._fields.1.unwrap(),

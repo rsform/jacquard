@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,11 +34,11 @@ use serde::{Serialize, Deserialize};
     rename = "dev.baileytownsend.health.steps",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Steps<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Steps<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     pub steps: i64,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -51,18 +51,18 @@ pub struct Steps<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct StepsGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct StepsGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Steps<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Steps<S> {
+impl<S: BosStr> Steps<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, StepsRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -75,17 +75,17 @@ pub struct StepsRecord;
 impl XrpcResp for StepsRecord {
     const NSID: &'static str = "dev.baileytownsend.health.steps";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = StepsGetRecordOutput<S>;
+    type Output<S: BosStr> = StepsGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<StepsGetRecordOutput<S>> for Steps<S> {
+impl<S: BosStr> From<StepsGetRecordOutput<S>> for Steps<S> {
     fn from(output: StepsGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Steps<S> {
+impl<S: BosStr> Collection for Steps<S> {
     const NSID: &'static str = "dev.baileytownsend.health.steps";
     type Record = StepsRecord;
 }
@@ -95,7 +95,7 @@ impl Collection for StepsRecord {
     type Record = StepsRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Steps<S> {
+impl<S: BosStr> LexiconSchema for Steps<S> {
     fn nsid() -> &'static str {
         "dev.baileytownsend.health.steps"
     }
@@ -131,17 +131,17 @@ pub mod steps_state {
         type Steps = Unset;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
-        type Steps = S::Steps;
+        type Steps = St::Steps;
     }
     ///State transition - sets the `steps` field to Set
-    pub struct SetSteps<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSteps<S> {}
-    impl<S: State> State for SetSteps<S> {
-        type CreatedAt = S::CreatedAt;
+    pub struct SetSteps<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSteps<St> {}
+    impl<St: State> State for SetSteps<St> {
+        type CreatedAt = St::CreatedAt;
         type Steps = Set<members::steps>;
     }
     /// Marker types for field names
@@ -154,85 +154,85 @@ pub mod steps_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct StepsBuilder<'a, S: steps_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct StepsBuilder<S: BosStr, St: steps_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<i64>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Steps<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> StepsBuilder<'a, steps_state::Empty> {
+impl<S: BosStr> Steps<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> StepsBuilder<S, steps_state::Empty> {
         StepsBuilder::new()
     }
 }
 
-impl<'a> StepsBuilder<'a, steps_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> StepsBuilder<S, steps_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         StepsBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> StepsBuilder<'a, S>
+impl<S: BosStr, St> StepsBuilder<S, St>
 where
-    S: steps_state::State,
-    S::CreatedAt: steps_state::IsUnset,
+    St: steps_state::State,
+    St::CreatedAt: steps_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> StepsBuilder<'a, steps_state::SetCreatedAt<S>> {
+    ) -> StepsBuilder<S, steps_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         StepsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> StepsBuilder<'a, S>
+impl<S: BosStr, St> StepsBuilder<S, St>
 where
-    S: steps_state::State,
-    S::Steps: steps_state::IsUnset,
+    St: steps_state::State,
+    St::Steps: steps_state::IsUnset,
 {
     /// Set the `steps` field (required)
     pub fn steps(
         mut self,
         value: impl Into<i64>,
-    ) -> StepsBuilder<'a, steps_state::SetSteps<S>> {
+    ) -> StepsBuilder<S, steps_state::SetSteps<St>> {
         self._fields.1 = Option::Some(value.into());
         StepsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> StepsBuilder<'a, S>
+impl<S: BosStr, St> StepsBuilder<S, St>
 where
-    S: steps_state::State,
-    S::CreatedAt: steps_state::IsSet,
-    S::Steps: steps_state::IsSet,
+    St: steps_state::State,
+    St::CreatedAt: steps_state::IsSet,
+    St::Steps: steps_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Steps<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Steps<S> {
         Steps {
             created_at: self._fields.0.unwrap(),
             steps: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Steps<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Steps<S> {
         Steps {
             created_at: self._fields.0.unwrap(),
             steps: self._fields.1.unwrap(),

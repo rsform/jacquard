@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "network.slices.waitlist.request",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Request<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Request<S: BosStr = DefaultStr> {
     ///When the user joined the waitlist
     pub created_at: Datetime,
     ///The AT URI of the slice being requested access to
@@ -54,18 +54,18 @@ pub struct Request<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct RequestGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct RequestGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Request<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Request<S> {
+impl<S: BosStr> Request<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, RequestRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -78,17 +78,17 @@ pub struct RequestRecord;
 impl XrpcResp for RequestRecord {
     const NSID: &'static str = "network.slices.waitlist.request";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = RequestGetRecordOutput<S>;
+    type Output<S: BosStr> = RequestGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<RequestGetRecordOutput<S>> for Request<S> {
+impl<S: BosStr> From<RequestGetRecordOutput<S>> for Request<S> {
     fn from(output: RequestGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Request<S> {
+impl<S: BosStr> Collection for Request<S> {
     const NSID: &'static str = "network.slices.waitlist.request";
     type Record = RequestRecord;
 }
@@ -98,7 +98,7 @@ impl Collection for RequestRecord {
     type Record = RequestRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Request<S> {
+impl<S: BosStr> LexiconSchema for Request<S> {
     fn nsid() -> &'static str {
         "network.slices.waitlist.request"
     }
@@ -134,17 +134,17 @@ pub mod request_state {
         type CreatedAt = Unset;
     }
     ///State transition - sets the `slice` field to Set
-    pub struct SetSlice<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSlice<S> {}
-    impl<S: State> State for SetSlice<S> {
+    pub struct SetSlice<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSlice<St> {}
+    impl<St: State> State for SetSlice<St> {
         type Slice = Set<members::slice>;
-        type CreatedAt = S::CreatedAt;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Slice = S::Slice;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Slice = St::Slice;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
@@ -157,88 +157,85 @@ pub mod request_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct RequestBuilder<'a, S: request_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct RequestBuilder<S: BosStr, St: request_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<AtUri<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Request<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> RequestBuilder<'a, request_state::Empty> {
+impl<S: BosStr> Request<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> RequestBuilder<S, request_state::Empty> {
         RequestBuilder::new()
     }
 }
 
-impl<'a> RequestBuilder<'a, request_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> RequestBuilder<S, request_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         RequestBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RequestBuilder<'a, S>
+impl<S: BosStr, St> RequestBuilder<S, St>
 where
-    S: request_state::State,
-    S::CreatedAt: request_state::IsUnset,
+    St: request_state::State,
+    St::CreatedAt: request_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> RequestBuilder<'a, request_state::SetCreatedAt<S>> {
+    ) -> RequestBuilder<S, request_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         RequestBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RequestBuilder<'a, S>
+impl<S: BosStr, St> RequestBuilder<S, St>
 where
-    S: request_state::State,
-    S::Slice: request_state::IsUnset,
+    St: request_state::State,
+    St::Slice: request_state::IsUnset,
 {
     /// Set the `slice` field (required)
     pub fn slice(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> RequestBuilder<'a, request_state::SetSlice<S>> {
+    ) -> RequestBuilder<S, request_state::SetSlice<St>> {
         self._fields.1 = Option::Some(value.into());
         RequestBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RequestBuilder<'a, S>
+impl<S: BosStr, St> RequestBuilder<S, St>
 where
-    S: request_state::State,
-    S::Slice: request_state::IsSet,
-    S::CreatedAt: request_state::IsSet,
+    St: request_state::State,
+    St::Slice: request_state::IsSet,
+    St::CreatedAt: request_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Request<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Request<S> {
         Request {
             created_at: self._fields.0.unwrap(),
             slice: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Request<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Request<S> {
         Request {
             created_at: self._fields.0.unwrap(),
             slice: self._fields.1.unwrap(),

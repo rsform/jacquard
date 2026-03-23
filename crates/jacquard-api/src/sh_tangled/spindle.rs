@@ -13,7 +13,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -37,11 +37,11 @@ use serde::{Serialize, Deserialize};
     rename = "sh.tangled.spindle",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Spindle<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Spindle<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -53,18 +53,18 @@ pub struct Spindle<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SpindleGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SpindleGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Spindle<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Spindle<S> {
+impl<S: BosStr> Spindle<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, SpindleRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -77,17 +77,17 @@ pub struct SpindleRecord;
 impl XrpcResp for SpindleRecord {
     const NSID: &'static str = "sh.tangled.spindle";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = SpindleGetRecordOutput<S>;
+    type Output<S: BosStr> = SpindleGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<SpindleGetRecordOutput<S>> for Spindle<S> {
+impl<S: BosStr> From<SpindleGetRecordOutput<S>> for Spindle<S> {
     fn from(output: SpindleGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Spindle<S> {
+impl<S: BosStr> Collection for Spindle<S> {
     const NSID: &'static str = "sh.tangled.spindle";
     type Record = SpindleRecord;
 }
@@ -97,7 +97,7 @@ impl Collection for SpindleRecord {
     type Record = SpindleRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Spindle<S> {
+impl<S: BosStr> LexiconSchema for Spindle<S> {
     fn nsid() -> &'static str {
         "sh.tangled.spindle"
     }
@@ -131,9 +131,9 @@ pub mod spindle_state {
         type CreatedAt = Unset;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
@@ -144,67 +144,64 @@ pub mod spindle_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct SpindleBuilder<'a, S: spindle_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct SpindleBuilder<S: BosStr, St: spindle_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Spindle<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> SpindleBuilder<'a, spindle_state::Empty> {
+impl<S: BosStr> Spindle<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> SpindleBuilder<S, spindle_state::Empty> {
         SpindleBuilder::new()
     }
 }
 
-impl<'a> SpindleBuilder<'a, spindle_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> SpindleBuilder<S, spindle_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SpindleBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SpindleBuilder<'a, S>
+impl<S: BosStr, St> SpindleBuilder<S, St>
 where
-    S: spindle_state::State,
-    S::CreatedAt: spindle_state::IsUnset,
+    St: spindle_state::State,
+    St::CreatedAt: spindle_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> SpindleBuilder<'a, spindle_state::SetCreatedAt<S>> {
+    ) -> SpindleBuilder<S, spindle_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         SpindleBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SpindleBuilder<'a, S>
+impl<S: BosStr, St> SpindleBuilder<S, St>
 where
-    S: spindle_state::State,
-    S::CreatedAt: spindle_state::IsSet,
+    St: spindle_state::State,
+    St::CreatedAt: spindle_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Spindle<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Spindle<S> {
         Spindle {
             created_at: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Spindle<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Spindle<S> {
         Spindle {
             created_at: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

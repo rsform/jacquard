@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -32,11 +32,11 @@ use crate::science_alt::dataset::storage_blobs;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct BlobEntry<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct BlobEntry<S: BosStr = DefaultStr> {
     ///Blob reference to a WebDataset tar archive
     pub blob: BlobRef<S>,
     ///Content hash for integrity verification (optional since PDS blobs have built-in CID integrity)
@@ -52,18 +52,18 @@ pub struct BlobEntry<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct StorageBlobs<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct StorageBlobs<S: BosStr = DefaultStr> {
     ///Array of blob entries for WebDataset tar files
     pub blobs: Vec<storage_blobs::BlobEntry<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for BlobEntry<S> {
+impl<S: BosStr> LexiconSchema for BlobEntry<S> {
     fn nsid() -> &'static str {
         "science.alt.dataset.storageBlobs"
     }
@@ -118,7 +118,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for BlobEntry<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for StorageBlobs<S> {
+impl<S: BosStr> LexiconSchema for StorageBlobs<S> {
     fn nsid() -> &'static str {
         "science.alt.dataset.storageBlobs"
     }
@@ -163,9 +163,9 @@ pub mod blob_entry_state {
         type Blob = Unset;
     }
     ///State transition - sets the `blob` field to Set
-    pub struct SetBlob<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBlob<S> {}
-    impl<S: State> State for SetBlob<S> {
+    pub struct SetBlob<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBlob<St> {}
+    impl<St: State> State for SetBlob<St> {
         type Blob = Set<members::blob>;
     }
     /// Marker types for field names
@@ -176,51 +176,51 @@ pub mod blob_entry_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct BlobEntryBuilder<'a, S: blob_entry_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct BlobEntryBuilder<S: BosStr, St: blob_entry_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<BlobRef<S>>, Option<ShardChecksum<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> BlobEntry<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> BlobEntryBuilder<'a, blob_entry_state::Empty> {
+impl<S: BosStr> BlobEntry<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> BlobEntryBuilder<S, blob_entry_state::Empty> {
         BlobEntryBuilder::new()
     }
 }
 
-impl<'a> BlobEntryBuilder<'a, blob_entry_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> BlobEntryBuilder<S, blob_entry_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         BlobEntryBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BlobEntryBuilder<'a, S>
+impl<S: BosStr, St> BlobEntryBuilder<S, St>
 where
-    S: blob_entry_state::State,
-    S::Blob: blob_entry_state::IsUnset,
+    St: blob_entry_state::State,
+    St::Blob: blob_entry_state::IsUnset,
 {
     /// Set the `blob` field (required)
     pub fn blob(
         mut self,
         value: impl Into<BlobRef<S>>,
-    ) -> BlobEntryBuilder<'a, blob_entry_state::SetBlob<S>> {
+    ) -> BlobEntryBuilder<S, blob_entry_state::SetBlob<St>> {
         self._fields.0 = Option::Some(value.into());
         BlobEntryBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: blob_entry_state::State> BlobEntryBuilder<'a, S> {
+impl<S: BosStr, St: blob_entry_state::State> BlobEntryBuilder<S, St> {
     /// Set the `checksum` field (optional)
     pub fn checksum(mut self, value: impl Into<Option<ShardChecksum<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -233,24 +233,24 @@ impl<'a, S: blob_entry_state::State> BlobEntryBuilder<'a, S> {
     }
 }
 
-impl<'a, S> BlobEntryBuilder<'a, S>
+impl<S: BosStr, St> BlobEntryBuilder<S, St>
 where
-    S: blob_entry_state::State,
-    S::Blob: blob_entry_state::IsSet,
+    St: blob_entry_state::State,
+    St::Blob: blob_entry_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> BlobEntry<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> BlobEntry<S> {
         BlobEntry {
             blob: self._fields.0.unwrap(),
             checksum: self._fields.1,
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> BlobEntry<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> BlobEntry<S> {
         BlobEntry {
             blob: self._fields.0.unwrap(),
             checksum: self._fields.1,
@@ -357,9 +357,9 @@ pub mod storage_blobs_state {
         type Blobs = Unset;
     }
     ///State transition - sets the `blobs` field to Set
-    pub struct SetBlobs<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBlobs<S> {}
-    impl<S: State> State for SetBlobs<S> {
+    pub struct SetBlobs<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBlobs<St> {}
+    impl<St: State> State for SetBlobs<St> {
         type Blobs = Set<members::blobs>;
     }
     /// Marker types for field names
@@ -370,67 +370,67 @@ pub mod storage_blobs_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct StorageBlobsBuilder<'a, S: storage_blobs_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct StorageBlobsBuilder<S: BosStr, St: storage_blobs_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<storage_blobs::BlobEntry<S>>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> StorageBlobs<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> StorageBlobsBuilder<'a, storage_blobs_state::Empty> {
+impl<S: BosStr> StorageBlobs<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> StorageBlobsBuilder<S, storage_blobs_state::Empty> {
         StorageBlobsBuilder::new()
     }
 }
 
-impl<'a> StorageBlobsBuilder<'a, storage_blobs_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> StorageBlobsBuilder<S, storage_blobs_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         StorageBlobsBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> StorageBlobsBuilder<'a, S>
+impl<S: BosStr, St> StorageBlobsBuilder<S, St>
 where
-    S: storage_blobs_state::State,
-    S::Blobs: storage_blobs_state::IsUnset,
+    St: storage_blobs_state::State,
+    St::Blobs: storage_blobs_state::IsUnset,
 {
     /// Set the `blobs` field (required)
     pub fn blobs(
         mut self,
         value: impl Into<Vec<storage_blobs::BlobEntry<S>>>,
-    ) -> StorageBlobsBuilder<'a, storage_blobs_state::SetBlobs<S>> {
+    ) -> StorageBlobsBuilder<S, storage_blobs_state::SetBlobs<St>> {
         self._fields.0 = Option::Some(value.into());
         StorageBlobsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> StorageBlobsBuilder<'a, S>
+impl<S: BosStr, St> StorageBlobsBuilder<S, St>
 where
-    S: storage_blobs_state::State,
-    S::Blobs: storage_blobs_state::IsSet,
+    St: storage_blobs_state::State,
+    St::Blobs: storage_blobs_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> StorageBlobs<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> StorageBlobs<S> {
         StorageBlobs {
             blobs: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> StorageBlobs<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> StorageBlobs<S> {
         StorageBlobs {
             blobs: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

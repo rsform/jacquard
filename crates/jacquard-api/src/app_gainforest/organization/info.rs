@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "app.gainforest.organization.info",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Info<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Info<S: BosStr = DefaultStr> {
     ///The country of the organization or project in two letter code (ISO 3166-1 alpha-2)
     pub country: S,
     ///Cover image for the organization
@@ -76,18 +76,18 @@ pub struct Info<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct InfoGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct InfoGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Info<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Info<S> {
+impl<S: BosStr> Info<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, InfoRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -100,17 +100,17 @@ pub struct InfoRecord;
 impl XrpcResp for InfoRecord {
     const NSID: &'static str = "app.gainforest.organization.info";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = InfoGetRecordOutput<S>;
+    type Output<S: BosStr> = InfoGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<InfoGetRecordOutput<S>> for Info<S> {
+impl<S: BosStr> From<InfoGetRecordOutput<S>> for Info<S> {
     fn from(output: InfoGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Info<S> {
+impl<S: BosStr> Collection for Info<S> {
     const NSID: &'static str = "app.gainforest.organization.info";
     type Record = InfoRecord;
 }
@@ -120,7 +120,7 @@ impl Collection for InfoRecord {
     type Record = InfoRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Info<S> {
+impl<S: BosStr> LexiconSchema for Info<S> {
     fn nsid() -> &'static str {
         "app.gainforest.organization.info"
     }
@@ -211,133 +211,133 @@ pub mod info_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type LongDescription;
-        type Country;
-        type DisplayName;
-        type Visibility;
         type ShortDescription;
+        type Visibility;
         type CreatedAt;
+        type LongDescription;
+        type DisplayName;
         type Objectives;
+        type Country;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type LongDescription = Unset;
-        type Country = Unset;
-        type DisplayName = Unset;
-        type Visibility = Unset;
         type ShortDescription = Unset;
+        type Visibility = Unset;
         type CreatedAt = Unset;
+        type LongDescription = Unset;
+        type DisplayName = Unset;
         type Objectives = Unset;
-    }
-    ///State transition - sets the `long_description` field to Set
-    pub struct SetLongDescription<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLongDescription<S> {}
-    impl<S: State> State for SetLongDescription<S> {
-        type LongDescription = Set<members::long_description>;
-        type Country = S::Country;
-        type DisplayName = S::DisplayName;
-        type Visibility = S::Visibility;
-        type ShortDescription = S::ShortDescription;
-        type CreatedAt = S::CreatedAt;
-        type Objectives = S::Objectives;
-    }
-    ///State transition - sets the `country` field to Set
-    pub struct SetCountry<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCountry<S> {}
-    impl<S: State> State for SetCountry<S> {
-        type LongDescription = S::LongDescription;
-        type Country = Set<members::country>;
-        type DisplayName = S::DisplayName;
-        type Visibility = S::Visibility;
-        type ShortDescription = S::ShortDescription;
-        type CreatedAt = S::CreatedAt;
-        type Objectives = S::Objectives;
-    }
-    ///State transition - sets the `display_name` field to Set
-    pub struct SetDisplayName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDisplayName<S> {}
-    impl<S: State> State for SetDisplayName<S> {
-        type LongDescription = S::LongDescription;
-        type Country = S::Country;
-        type DisplayName = Set<members::display_name>;
-        type Visibility = S::Visibility;
-        type ShortDescription = S::ShortDescription;
-        type CreatedAt = S::CreatedAt;
-        type Objectives = S::Objectives;
-    }
-    ///State transition - sets the `visibility` field to Set
-    pub struct SetVisibility<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVisibility<S> {}
-    impl<S: State> State for SetVisibility<S> {
-        type LongDescription = S::LongDescription;
-        type Country = S::Country;
-        type DisplayName = S::DisplayName;
-        type Visibility = Set<members::visibility>;
-        type ShortDescription = S::ShortDescription;
-        type CreatedAt = S::CreatedAt;
-        type Objectives = S::Objectives;
+        type Country = Unset;
     }
     ///State transition - sets the `short_description` field to Set
-    pub struct SetShortDescription<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetShortDescription<S> {}
-    impl<S: State> State for SetShortDescription<S> {
-        type LongDescription = S::LongDescription;
-        type Country = S::Country;
-        type DisplayName = S::DisplayName;
-        type Visibility = S::Visibility;
+    pub struct SetShortDescription<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetShortDescription<St> {}
+    impl<St: State> State for SetShortDescription<St> {
         type ShortDescription = Set<members::short_description>;
-        type CreatedAt = S::CreatedAt;
-        type Objectives = S::Objectives;
+        type Visibility = St::Visibility;
+        type CreatedAt = St::CreatedAt;
+        type LongDescription = St::LongDescription;
+        type DisplayName = St::DisplayName;
+        type Objectives = St::Objectives;
+        type Country = St::Country;
+    }
+    ///State transition - sets the `visibility` field to Set
+    pub struct SetVisibility<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetVisibility<St> {}
+    impl<St: State> State for SetVisibility<St> {
+        type ShortDescription = St::ShortDescription;
+        type Visibility = Set<members::visibility>;
+        type CreatedAt = St::CreatedAt;
+        type LongDescription = St::LongDescription;
+        type DisplayName = St::DisplayName;
+        type Objectives = St::Objectives;
+        type Country = St::Country;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type LongDescription = S::LongDescription;
-        type Country = S::Country;
-        type DisplayName = S::DisplayName;
-        type Visibility = S::Visibility;
-        type ShortDescription = S::ShortDescription;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type ShortDescription = St::ShortDescription;
+        type Visibility = St::Visibility;
         type CreatedAt = Set<members::created_at>;
-        type Objectives = S::Objectives;
+        type LongDescription = St::LongDescription;
+        type DisplayName = St::DisplayName;
+        type Objectives = St::Objectives;
+        type Country = St::Country;
+    }
+    ///State transition - sets the `long_description` field to Set
+    pub struct SetLongDescription<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLongDescription<St> {}
+    impl<St: State> State for SetLongDescription<St> {
+        type ShortDescription = St::ShortDescription;
+        type Visibility = St::Visibility;
+        type CreatedAt = St::CreatedAt;
+        type LongDescription = Set<members::long_description>;
+        type DisplayName = St::DisplayName;
+        type Objectives = St::Objectives;
+        type Country = St::Country;
+    }
+    ///State transition - sets the `display_name` field to Set
+    pub struct SetDisplayName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDisplayName<St> {}
+    impl<St: State> State for SetDisplayName<St> {
+        type ShortDescription = St::ShortDescription;
+        type Visibility = St::Visibility;
+        type CreatedAt = St::CreatedAt;
+        type LongDescription = St::LongDescription;
+        type DisplayName = Set<members::display_name>;
+        type Objectives = St::Objectives;
+        type Country = St::Country;
     }
     ///State transition - sets the `objectives` field to Set
-    pub struct SetObjectives<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetObjectives<S> {}
-    impl<S: State> State for SetObjectives<S> {
-        type LongDescription = S::LongDescription;
-        type Country = S::Country;
-        type DisplayName = S::DisplayName;
-        type Visibility = S::Visibility;
-        type ShortDescription = S::ShortDescription;
-        type CreatedAt = S::CreatedAt;
+    pub struct SetObjectives<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetObjectives<St> {}
+    impl<St: State> State for SetObjectives<St> {
+        type ShortDescription = St::ShortDescription;
+        type Visibility = St::Visibility;
+        type CreatedAt = St::CreatedAt;
+        type LongDescription = St::LongDescription;
+        type DisplayName = St::DisplayName;
         type Objectives = Set<members::objectives>;
+        type Country = St::Country;
+    }
+    ///State transition - sets the `country` field to Set
+    pub struct SetCountry<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCountry<St> {}
+    impl<St: State> State for SetCountry<St> {
+        type ShortDescription = St::ShortDescription;
+        type Visibility = St::Visibility;
+        type CreatedAt = St::CreatedAt;
+        type LongDescription = St::LongDescription;
+        type DisplayName = St::DisplayName;
+        type Objectives = St::Objectives;
+        type Country = Set<members::country>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `long_description` field
-        pub struct long_description(());
-        ///Marker type for the `country` field
-        pub struct country(());
-        ///Marker type for the `display_name` field
-        pub struct display_name(());
-        ///Marker type for the `visibility` field
-        pub struct visibility(());
         ///Marker type for the `short_description` field
         pub struct short_description(());
+        ///Marker type for the `visibility` field
+        pub struct visibility(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `long_description` field
+        pub struct long_description(());
+        ///Marker type for the `display_name` field
+        pub struct display_name(());
         ///Marker type for the `objectives` field
         pub struct objectives(());
+        ///Marker type for the `country` field
+        pub struct country(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct InfoBuilder<'a, S: info_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct InfoBuilder<S: BosStr, St: info_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
         Option<Data<S>>,
@@ -351,47 +351,47 @@ pub struct InfoBuilder<'a, S: info_state::State> {
         Option<S>,
         Option<UriValue<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Info<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> InfoBuilder<'a, info_state::Empty> {
+impl<S: BosStr> Info<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> InfoBuilder<S, info_state::Empty> {
         InfoBuilder::new()
     }
 }
 
-impl<'a> InfoBuilder<'a, info_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> InfoBuilder<S, info_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         InfoBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> InfoBuilder<'a, S>
+impl<S: BosStr, St> InfoBuilder<S, St>
 where
-    S: info_state::State,
-    S::Country: info_state::IsUnset,
+    St: info_state::State,
+    St::Country: info_state::IsUnset,
 {
     /// Set the `country` field (required)
     pub fn country(
         mut self,
         value: impl Into<S>,
-    ) -> InfoBuilder<'a, info_state::SetCountry<S>> {
+    ) -> InfoBuilder<S, info_state::SetCountry<St>> {
         self._fields.0 = Option::Some(value.into());
         InfoBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: info_state::State> InfoBuilder<'a, S> {
+impl<S: BosStr, St: info_state::State> InfoBuilder<S, St> {
     /// Set the `coverImage` field (optional)
     pub fn cover_image(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -404,45 +404,45 @@ impl<'a, S: info_state::State> InfoBuilder<'a, S> {
     }
 }
 
-impl<'a, S> InfoBuilder<'a, S>
+impl<S: BosStr, St> InfoBuilder<S, St>
 where
-    S: info_state::State,
-    S::CreatedAt: info_state::IsUnset,
+    St: info_state::State,
+    St::CreatedAt: info_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> InfoBuilder<'a, info_state::SetCreatedAt<S>> {
+    ) -> InfoBuilder<S, info_state::SetCreatedAt<St>> {
         self._fields.2 = Option::Some(value.into());
         InfoBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> InfoBuilder<'a, S>
+impl<S: BosStr, St> InfoBuilder<S, St>
 where
-    S: info_state::State,
-    S::DisplayName: info_state::IsUnset,
+    St: info_state::State,
+    St::DisplayName: info_state::IsUnset,
 {
     /// Set the `displayName` field (required)
     pub fn display_name(
         mut self,
         value: impl Into<S>,
-    ) -> InfoBuilder<'a, info_state::SetDisplayName<S>> {
+    ) -> InfoBuilder<S, info_state::SetDisplayName<St>> {
         self._fields.3 = Option::Some(value.into());
         InfoBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: info_state::State> InfoBuilder<'a, S> {
+impl<S: BosStr, St: info_state::State> InfoBuilder<S, St> {
     /// Set the `logo` field (optional)
     pub fn logo(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -455,64 +455,64 @@ impl<'a, S: info_state::State> InfoBuilder<'a, S> {
     }
 }
 
-impl<'a, S> InfoBuilder<'a, S>
+impl<S: BosStr, St> InfoBuilder<S, St>
 where
-    S: info_state::State,
-    S::LongDescription: info_state::IsUnset,
+    St: info_state::State,
+    St::LongDescription: info_state::IsUnset,
 {
     /// Set the `longDescription` field (required)
     pub fn long_description(
         mut self,
         value: impl Into<S>,
-    ) -> InfoBuilder<'a, info_state::SetLongDescription<S>> {
+    ) -> InfoBuilder<S, info_state::SetLongDescription<St>> {
         self._fields.5 = Option::Some(value.into());
         InfoBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> InfoBuilder<'a, S>
+impl<S: BosStr, St> InfoBuilder<S, St>
 where
-    S: info_state::State,
-    S::Objectives: info_state::IsUnset,
+    St: info_state::State,
+    St::Objectives: info_state::IsUnset,
 {
     /// Set the `objectives` field (required)
     pub fn objectives(
         mut self,
         value: impl Into<Vec<S>>,
-    ) -> InfoBuilder<'a, info_state::SetObjectives<S>> {
+    ) -> InfoBuilder<S, info_state::SetObjectives<St>> {
         self._fields.6 = Option::Some(value.into());
         InfoBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> InfoBuilder<'a, S>
+impl<S: BosStr, St> InfoBuilder<S, St>
 where
-    S: info_state::State,
-    S::ShortDescription: info_state::IsUnset,
+    St: info_state::State,
+    St::ShortDescription: info_state::IsUnset,
 {
     /// Set the `shortDescription` field (required)
     pub fn short_description(
         mut self,
         value: impl Into<S>,
-    ) -> InfoBuilder<'a, info_state::SetShortDescription<S>> {
+    ) -> InfoBuilder<S, info_state::SetShortDescription<St>> {
         self._fields.7 = Option::Some(value.into());
         InfoBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: info_state::State> InfoBuilder<'a, S> {
+impl<S: BosStr, St: info_state::State> InfoBuilder<S, St> {
     /// Set the `startDate` field (optional)
     pub fn start_date(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.8 = value.into();
@@ -525,26 +525,26 @@ impl<'a, S: info_state::State> InfoBuilder<'a, S> {
     }
 }
 
-impl<'a, S> InfoBuilder<'a, S>
+impl<S: BosStr, St> InfoBuilder<S, St>
 where
-    S: info_state::State,
-    S::Visibility: info_state::IsUnset,
+    St: info_state::State,
+    St::Visibility: info_state::IsUnset,
 {
     /// Set the `visibility` field (required)
     pub fn visibility(
         mut self,
         value: impl Into<S>,
-    ) -> InfoBuilder<'a, info_state::SetVisibility<S>> {
+    ) -> InfoBuilder<S, info_state::SetVisibility<St>> {
         self._fields.9 = Option::Some(value.into());
         InfoBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: info_state::State> InfoBuilder<'a, S> {
+impl<S: BosStr, St: info_state::State> InfoBuilder<S, St> {
     /// Set the `website` field (optional)
     pub fn website(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.10 = value.into();
@@ -557,19 +557,19 @@ impl<'a, S: info_state::State> InfoBuilder<'a, S> {
     }
 }
 
-impl<'a, S> InfoBuilder<'a, S>
+impl<S: BosStr, St> InfoBuilder<S, St>
 where
-    S: info_state::State,
-    S::LongDescription: info_state::IsSet,
-    S::Country: info_state::IsSet,
-    S::DisplayName: info_state::IsSet,
-    S::Visibility: info_state::IsSet,
-    S::ShortDescription: info_state::IsSet,
-    S::CreatedAt: info_state::IsSet,
-    S::Objectives: info_state::IsSet,
+    St: info_state::State,
+    St::ShortDescription: info_state::IsSet,
+    St::Visibility: info_state::IsSet,
+    St::CreatedAt: info_state::IsSet,
+    St::LongDescription: info_state::IsSet,
+    St::DisplayName: info_state::IsSet,
+    St::Objectives: info_state::IsSet,
+    St::Country: info_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Info<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Info<S> {
         Info {
             country: self._fields.0.unwrap(),
             cover_image: self._fields.1,
@@ -585,8 +585,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Info<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Info<S> {
         Info {
             country: self._fields.0.unwrap(),
             cover_image: self._fields.1,

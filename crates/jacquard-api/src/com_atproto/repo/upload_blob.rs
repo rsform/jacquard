@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::blob::BlobRef;
@@ -26,18 +26,16 @@ pub struct UploadBlob {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct UploadBlobOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct UploadBlobOutput<S: BosStr = DefaultStr> {
     pub blob: BlobRef<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -46,7 +44,7 @@ pub struct UploadBlobResponse;
 impl jacquard_common::xrpc::XrpcResp for UploadBlobResponse {
     const NSID: &'static str = "com.atproto.repo.uploadBlob";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = UploadBlobOutput<S>;
+    type Output<S: BosStr> = UploadBlobOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
@@ -56,20 +54,24 @@ impl jacquard_common::xrpc::XrpcRequest for UploadBlob {
         "*/*",
     );
     type Response = UploadBlobResponse;
-    fn encode_body(&self) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError> {
-        Ok(self.body.to_vec())
+    fn encode_body(
+        &self,
+        buffer: &mut [u8],
+    ) -> Result<(), jacquard_common::xrpc::EncodeError>
+    where
+        Self: Serialize,
+    {
+        Ok(buffer.copy_from_slice(self.body.as_ref()))
     }
     fn decode_body<'de>(
         body: &'de [u8],
-    ) -> Result<Box<Self>, jacquard_common::error::DecodeError>
+    ) -> Result<Self, jacquard_common::error::DecodeError>
     where
         Self: Deserialize<'de>,
     {
-        Ok(
-            Box::new(Self {
-                body: jacquard_common::deps::bytes::Bytes::copy_from_slice(body),
-            }),
-        )
+        Ok(Self {
+            body: jacquard_common::deps::bytes::Bytes::copy_from_slice(body),
+        })
     }
 }
 
@@ -80,6 +82,6 @@ impl jacquard_common::xrpc::XrpcEndpoint for UploadBlobRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "*/*",
     );
-    type Request<S: Bos<str> + AsRef<str>> = UploadBlob;
+    type Request<S: BosStr> = UploadBlob;
     type Response = UploadBlobResponse;
 }

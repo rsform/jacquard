@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,11 +34,11 @@ use serde::{Serialize, Deserialize};
     rename = "diy.razorgirl.winter.note",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Note<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Note<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub category: Option<S>,
     pub content: S,
@@ -60,18 +60,18 @@ pub struct Note<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct NoteGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct NoteGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Note<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Note<S> {
+impl<S: BosStr> Note<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, NoteRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -84,17 +84,17 @@ pub struct NoteRecord;
 impl XrpcResp for NoteRecord {
     const NSID: &'static str = "diy.razorgirl.winter.note";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = NoteGetRecordOutput<S>;
+    type Output<S: BosStr> = NoteGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<NoteGetRecordOutput<S>> for Note<S> {
+impl<S: BosStr> From<NoteGetRecordOutput<S>> for Note<S> {
     fn from(output: NoteGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Note<S> {
+impl<S: BosStr> Collection for Note<S> {
     const NSID: &'static str = "diy.razorgirl.winter.note";
     type Record = NoteRecord;
 }
@@ -104,7 +104,7 @@ impl Collection for NoteRecord {
     type Record = NoteRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Note<S> {
+impl<S: BosStr> LexiconSchema for Note<S> {
     fn nsid() -> &'static str {
         "diy.razorgirl.winter.note"
     }
@@ -171,73 +171,73 @@ pub mod note_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Content;
         type Title;
-        type CreatedAt;
         type LastUpdated;
+        type CreatedAt;
+        type Content;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Content = Unset;
         type Title = Unset;
-        type CreatedAt = Unset;
         type LastUpdated = Unset;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type Content = Set<members::content>;
-        type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
-        type LastUpdated = S::LastUpdated;
+        type CreatedAt = Unset;
+        type Content = Unset;
     }
     ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Content = S::Content;
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
         type Title = Set<members::title>;
-        type CreatedAt = S::CreatedAt;
-        type LastUpdated = S::LastUpdated;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Content = S::Content;
-        type Title = S::Title;
-        type CreatedAt = Set<members::created_at>;
-        type LastUpdated = S::LastUpdated;
+        type LastUpdated = St::LastUpdated;
+        type CreatedAt = St::CreatedAt;
+        type Content = St::Content;
     }
     ///State transition - sets the `last_updated` field to Set
-    pub struct SetLastUpdated<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLastUpdated<S> {}
-    impl<S: State> State for SetLastUpdated<S> {
-        type Content = S::Content;
-        type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
+    pub struct SetLastUpdated<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLastUpdated<St> {}
+    impl<St: State> State for SetLastUpdated<St> {
+        type Title = St::Title;
         type LastUpdated = Set<members::last_updated>;
+        type CreatedAt = St::CreatedAt;
+        type Content = St::Content;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Title = St::Title;
+        type LastUpdated = St::LastUpdated;
+        type CreatedAt = Set<members::created_at>;
+        type Content = St::Content;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetContent<St> {}
+    impl<St: State> State for SetContent<St> {
+        type Title = St::Title;
+        type LastUpdated = St::LastUpdated;
+        type CreatedAt = St::CreatedAt;
+        type Content = Set<members::content>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `content` field
-        pub struct content(());
         ///Marker type for the `title` field
         pub struct title(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `last_updated` field
         pub struct last_updated(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `content` field
+        pub struct content(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct NoteBuilder<'a, S: note_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct NoteBuilder<S: BosStr, St: note_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
         Option<S>,
@@ -247,28 +247,28 @@ pub struct NoteBuilder<'a, S: note_state::State> {
         Option<Vec<S>>,
         Option<S>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Note<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> NoteBuilder<'a, note_state::Empty> {
+impl<S: BosStr> Note<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> NoteBuilder<S, note_state::Empty> {
         NoteBuilder::new()
     }
 }
 
-impl<'a> NoteBuilder<'a, note_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> NoteBuilder<S, note_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         NoteBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: note_state::State> NoteBuilder<'a, S> {
+impl<S: BosStr, St: note_state::State> NoteBuilder<S, St> {
     /// Set the `category` field (optional)
     pub fn category(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -281,64 +281,64 @@ impl<'a, S: note_state::State> NoteBuilder<'a, S> {
     }
 }
 
-impl<'a, S> NoteBuilder<'a, S>
+impl<S: BosStr, St> NoteBuilder<S, St>
 where
-    S: note_state::State,
-    S::Content: note_state::IsUnset,
+    St: note_state::State,
+    St::Content: note_state::IsUnset,
 {
     /// Set the `content` field (required)
     pub fn content(
         mut self,
         value: impl Into<S>,
-    ) -> NoteBuilder<'a, note_state::SetContent<S>> {
+    ) -> NoteBuilder<S, note_state::SetContent<St>> {
         self._fields.1 = Option::Some(value.into());
         NoteBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> NoteBuilder<'a, S>
+impl<S: BosStr, St> NoteBuilder<S, St>
 where
-    S: note_state::State,
-    S::CreatedAt: note_state::IsUnset,
+    St: note_state::State,
+    St::CreatedAt: note_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> NoteBuilder<'a, note_state::SetCreatedAt<S>> {
+    ) -> NoteBuilder<S, note_state::SetCreatedAt<St>> {
         self._fields.2 = Option::Some(value.into());
         NoteBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> NoteBuilder<'a, S>
+impl<S: BosStr, St> NoteBuilder<S, St>
 where
-    S: note_state::State,
-    S::LastUpdated: note_state::IsUnset,
+    St: note_state::State,
+    St::LastUpdated: note_state::IsUnset,
 {
     /// Set the `lastUpdated` field (required)
     pub fn last_updated(
         mut self,
         value: impl Into<Datetime>,
-    ) -> NoteBuilder<'a, note_state::SetLastUpdated<S>> {
+    ) -> NoteBuilder<S, note_state::SetLastUpdated<St>> {
         self._fields.3 = Option::Some(value.into());
         NoteBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: note_state::State> NoteBuilder<'a, S> {
+impl<S: BosStr, St: note_state::State> NoteBuilder<S, St> {
     /// Set the `relatedFacts` field (optional)
     pub fn related_facts(mut self, value: impl Into<Option<Vec<AtUri<S>>>>) -> Self {
         self._fields.4 = value.into();
@@ -351,7 +351,7 @@ impl<'a, S: note_state::State> NoteBuilder<'a, S> {
     }
 }
 
-impl<'a, S: note_state::State> NoteBuilder<'a, S> {
+impl<S: BosStr, St: note_state::State> NoteBuilder<S, St> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -364,35 +364,35 @@ impl<'a, S: note_state::State> NoteBuilder<'a, S> {
     }
 }
 
-impl<'a, S> NoteBuilder<'a, S>
+impl<S: BosStr, St> NoteBuilder<S, St>
 where
-    S: note_state::State,
-    S::Title: note_state::IsUnset,
+    St: note_state::State,
+    St::Title: note_state::IsUnset,
 {
     /// Set the `title` field (required)
     pub fn title(
         mut self,
         value: impl Into<S>,
-    ) -> NoteBuilder<'a, note_state::SetTitle<S>> {
+    ) -> NoteBuilder<S, note_state::SetTitle<St>> {
         self._fields.6 = Option::Some(value.into());
         NoteBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> NoteBuilder<'a, S>
+impl<S: BosStr, St> NoteBuilder<S, St>
 where
-    S: note_state::State,
-    S::Content: note_state::IsSet,
-    S::Title: note_state::IsSet,
-    S::CreatedAt: note_state::IsSet,
-    S::LastUpdated: note_state::IsSet,
+    St: note_state::State,
+    St::Title: note_state::IsSet,
+    St::LastUpdated: note_state::IsSet,
+    St::CreatedAt: note_state::IsSet,
+    St::Content: note_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Note<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Note<S> {
         Note {
             category: self._fields.0,
             content: self._fields.1.unwrap(),
@@ -404,8 +404,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Note<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Note<S> {
         Note {
             category: self._fields.0,
             content: self._fields.1.unwrap(),

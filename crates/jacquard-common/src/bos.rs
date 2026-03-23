@@ -191,6 +191,57 @@ impl<'a> Bos<str> for CowStr<'a> {
 /// for strings of 22 bytes or fewer.
 pub type DefaultStr = SmolStr;
 
+/// Construct a value from a static string literal without allocation where possible.
+///
+/// For `SmolStr`, this uses `SmolStr::new_static()` which stores a pointer to the
+/// static string in the binary — zero allocation. For `CowStr`, it uses
+/// `CowStr::new_static()`. For `String` and `&'static str`, it does the obvious thing.
+pub trait FromStaticStr {
+    /// Construct from a `&'static str` without allocation where possible.
+    fn from_static(s: &'static str) -> Self;
+}
+
+impl FromStaticStr for SmolStr {
+    #[inline]
+    fn from_static(s: &'static str) -> Self {
+        SmolStr::new_static(s)
+    }
+}
+
+impl FromStaticStr for String {
+    #[inline]
+    fn from_static(s: &'static str) -> Self {
+        String::from(s)
+    }
+}
+
+impl<'a> FromStaticStr for CowStr<'a> {
+    #[inline]
+    fn from_static(s: &'static str) -> Self {
+        CowStr::new_static(s)
+    }
+}
+
+impl<'a> FromStaticStr for &'a str {
+    #[inline]
+    fn from_static(s: &'a str) -> Self {
+        s
+    }
+}
+
+/// Combined trait bound for AT Protocol string backing types.
+///
+/// This is the universal bound for generic string-parameterised types in jacquard.
+/// Instead of writing `S: Bos<str> + AsRef<str>` everywhere, use `S: BosStr`.
+///
+/// Includes:
+/// - [`Bos<str>`] — borrow-or-share semantics
+/// - [`AsRef<str>`] — string slice access
+/// - [`FromStaticStr`] — zero-alloc construction from string literals
+pub trait BosStr: Bos<str> + AsRef<str> + FromStaticStr {}
+
+impl<T> BosStr for T where T: Bos<str> + AsRef<str> + FromStaticStr {}
+
 #[cfg(test)]
 mod tests {
     use super::*;

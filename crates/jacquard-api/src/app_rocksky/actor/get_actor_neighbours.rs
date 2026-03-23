@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::value::Data;
@@ -19,33 +19,30 @@ use serde::{Serialize, Deserialize};
 use crate::app_rocksky::actor::NeighbourViewBasic;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetActorNeighbours<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct GetActorNeighbours<S: BosStr = DefaultStr> {
     pub did: AtIdentifier<S>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetActorNeighboursOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetActorNeighboursOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub neighbours: Option<Vec<NeighbourViewBasic<S>>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -54,12 +51,11 @@ pub struct GetActorNeighboursResponse;
 impl jacquard_common::xrpc::XrpcResp for GetActorNeighboursResponse {
     const NSID: &'static str = "app.rocksky.actor.getActorNeighbours";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetActorNeighboursOutput<S>;
+    type Output<S: BosStr> = GetActorNeighboursOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetActorNeighbours<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetActorNeighbours<S> {
     const NSID: &'static str = "app.rocksky.actor.getActorNeighbours";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetActorNeighboursResponse;
@@ -70,7 +66,7 @@ pub struct GetActorNeighboursRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetActorNeighboursRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.actor.getActorNeighbours";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetActorNeighbours<S>;
+    type Request<S: BosStr> = GetActorNeighbours<S>;
     type Response = GetActorNeighboursResponse;
 }
 
@@ -93,9 +89,9 @@ pub mod get_actor_neighbours_state {
         type Did = Unset;
     }
     ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
         type Did = Set<members::did>;
     }
     /// Marker types for field names
@@ -106,57 +102,57 @@ pub mod get_actor_neighbours_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetActorNeighboursBuilder<'a, S: get_actor_neighbours_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetActorNeighboursBuilder<S: BosStr, St: get_actor_neighbours_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtIdentifier<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetActorNeighbours<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetActorNeighboursBuilder<'a, get_actor_neighbours_state::Empty> {
+impl<S: BosStr> GetActorNeighbours<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetActorNeighboursBuilder<S, get_actor_neighbours_state::Empty> {
         GetActorNeighboursBuilder::new()
     }
 }
 
-impl<'a> GetActorNeighboursBuilder<'a, get_actor_neighbours_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetActorNeighboursBuilder<S, get_actor_neighbours_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetActorNeighboursBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetActorNeighboursBuilder<'a, S>
+impl<S: BosStr, St> GetActorNeighboursBuilder<S, St>
 where
-    S: get_actor_neighbours_state::State,
-    S::Did: get_actor_neighbours_state::IsUnset,
+    St: get_actor_neighbours_state::State,
+    St::Did: get_actor_neighbours_state::IsUnset,
 {
     /// Set the `did` field (required)
     pub fn did(
         mut self,
         value: impl Into<AtIdentifier<S>>,
-    ) -> GetActorNeighboursBuilder<'a, get_actor_neighbours_state::SetDid<S>> {
+    ) -> GetActorNeighboursBuilder<S, get_actor_neighbours_state::SetDid<St>> {
         self._fields.0 = Option::Some(value.into());
         GetActorNeighboursBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetActorNeighboursBuilder<'a, S>
+impl<S: BosStr, St> GetActorNeighboursBuilder<S, St>
 where
-    S: get_actor_neighbours_state::State,
-    S::Did: get_actor_neighbours_state::IsSet,
+    St: get_actor_neighbours_state::State,
+    St::Did: get_actor_neighbours_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetActorNeighbours<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetActorNeighbours<S> {
         GetActorNeighbours {
             did: self._fields.0.unwrap(),
         }

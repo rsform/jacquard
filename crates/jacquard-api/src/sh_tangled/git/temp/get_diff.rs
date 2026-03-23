@@ -6,27 +6,29 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[allow(unused_imports)]
+use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
+use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetDiff<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct GetDiff<S: BosStr = DefaultStr> {
     pub repo: AtUri<S>,
-    #[serde(borrow)]
     pub rev1: S,
-    #[serde(borrow)]
     pub rev2: S,
 }
 
@@ -54,22 +56,19 @@ pub struct GetDiffOutput {
 pub enum GetDiffError {
     /// Repository not found or access denied
     #[serde(rename = "RepoNotFound")]
-    RepoNotFound(Option<jacquard_common::deps::smol_str::SmolStr>),
+    RepoNotFound(Option<SmolStr>),
     /// One or both revisions not found
     #[serde(rename = "RevisionNotFound")]
-    RevisionNotFound(Option<jacquard_common::deps::smol_str::SmolStr>),
+    RevisionNotFound(Option<SmolStr>),
     /// Invalid request parameters
     #[serde(rename = "InvalidRequest")]
-    InvalidRequest(Option<jacquard_common::deps::smol_str::SmolStr>),
+    InvalidRequest(Option<SmolStr>),
     /// Failed to compare revisions
     #[serde(rename = "CompareError")]
-    CompareError(Option<jacquard_common::deps::smol_str::SmolStr>),
+    CompareError(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: jacquard_common::deps::smol_str::SmolStr,
-        message: Option<jacquard_common::deps::smol_str::SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for GetDiffError {
@@ -119,9 +118,9 @@ pub struct GetDiffResponse;
 impl jacquard_common::xrpc::XrpcResp for GetDiffResponse {
     const NSID: &'static str = "sh.tangled.git.temp.getDiff";
     const ENCODING: &'static str = "*/*";
-    type Output<S: Bos<str> + AsRef<str>> = GetDiffOutput;
+    type Output<S: BosStr> = GetDiffOutput;
     type Err = GetDiffError;
-    fn encode_output<S: Bos<str> + AsRef<str>>(
+    fn encode_output<S: BosStr>(
         output: &Self::Output<S>,
     ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError>
     where
@@ -133,7 +132,7 @@ impl jacquard_common::xrpc::XrpcResp for GetDiffResponse {
         body: &'de [u8],
     ) -> Result<Self::Output<S>, jacquard_common::error::DecodeError>
     where
-        S: Bos<str> + AsRef<str> + Deserialize<'de>,
+        S: BosStr + Deserialize<'de>,
         Self::Output<S>: Deserialize<'de>,
     {
         Ok(GetDiffOutput {
@@ -142,8 +141,7 @@ impl jacquard_common::xrpc::XrpcResp for GetDiffResponse {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetDiff<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetDiff<S> {
     const NSID: &'static str = "sh.tangled.git.temp.getDiff";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetDiffResponse;
@@ -154,7 +152,7 @@ pub struct GetDiffRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetDiffRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.git.temp.getDiff";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetDiff<S>;
+    type Request<S: BosStr> = GetDiff<S>;
     type Response = GetDiffResponse;
 }
 
@@ -169,144 +167,144 @@ pub mod get_diff_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Repo;
-        type Rev2;
         type Rev1;
+        type Rev2;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Repo = Unset;
-        type Rev2 = Unset;
         type Rev1 = Unset;
+        type Rev2 = Unset;
     }
     ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
+    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRepo<St> {}
+    impl<St: State> State for SetRepo<St> {
         type Repo = Set<members::repo>;
-        type Rev2 = S::Rev2;
-        type Rev1 = S::Rev1;
-    }
-    ///State transition - sets the `rev2` field to Set
-    pub struct SetRev2<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRev2<S> {}
-    impl<S: State> State for SetRev2<S> {
-        type Repo = S::Repo;
-        type Rev2 = Set<members::rev2>;
-        type Rev1 = S::Rev1;
+        type Rev1 = St::Rev1;
+        type Rev2 = St::Rev2;
     }
     ///State transition - sets the `rev1` field to Set
-    pub struct SetRev1<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRev1<S> {}
-    impl<S: State> State for SetRev1<S> {
-        type Repo = S::Repo;
-        type Rev2 = S::Rev2;
+    pub struct SetRev1<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRev1<St> {}
+    impl<St: State> State for SetRev1<St> {
+        type Repo = St::Repo;
         type Rev1 = Set<members::rev1>;
+        type Rev2 = St::Rev2;
+    }
+    ///State transition - sets the `rev2` field to Set
+    pub struct SetRev2<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRev2<St> {}
+    impl<St: State> State for SetRev2<St> {
+        type Repo = St::Repo;
+        type Rev1 = St::Rev1;
+        type Rev2 = Set<members::rev2>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `repo` field
         pub struct repo(());
-        ///Marker type for the `rev2` field
-        pub struct rev2(());
         ///Marker type for the `rev1` field
         pub struct rev1(());
+        ///Marker type for the `rev2` field
+        pub struct rev2(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetDiffBuilder<'a, S: get_diff_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetDiffBuilder<S: BosStr, St: get_diff_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>, Option<S>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetDiff<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetDiffBuilder<'a, get_diff_state::Empty> {
+impl<S: BosStr> GetDiff<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetDiffBuilder<S, get_diff_state::Empty> {
         GetDiffBuilder::new()
     }
 }
 
-impl<'a> GetDiffBuilder<'a, get_diff_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetDiffBuilder<S, get_diff_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetDiffBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetDiffBuilder<'a, S>
+impl<S: BosStr, St> GetDiffBuilder<S, St>
 where
-    S: get_diff_state::State,
-    S::Repo: get_diff_state::IsUnset,
+    St: get_diff_state::State,
+    St::Repo: get_diff_state::IsUnset,
 {
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> GetDiffBuilder<'a, get_diff_state::SetRepo<S>> {
+    ) -> GetDiffBuilder<S, get_diff_state::SetRepo<St>> {
         self._fields.0 = Option::Some(value.into());
         GetDiffBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetDiffBuilder<'a, S>
+impl<S: BosStr, St> GetDiffBuilder<S, St>
 where
-    S: get_diff_state::State,
-    S::Rev1: get_diff_state::IsUnset,
+    St: get_diff_state::State,
+    St::Rev1: get_diff_state::IsUnset,
 {
     /// Set the `rev1` field (required)
     pub fn rev1(
         mut self,
         value: impl Into<S>,
-    ) -> GetDiffBuilder<'a, get_diff_state::SetRev1<S>> {
+    ) -> GetDiffBuilder<S, get_diff_state::SetRev1<St>> {
         self._fields.1 = Option::Some(value.into());
         GetDiffBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetDiffBuilder<'a, S>
+impl<S: BosStr, St> GetDiffBuilder<S, St>
 where
-    S: get_diff_state::State,
-    S::Rev2: get_diff_state::IsUnset,
+    St: get_diff_state::State,
+    St::Rev2: get_diff_state::IsUnset,
 {
     /// Set the `rev2` field (required)
     pub fn rev2(
         mut self,
         value: impl Into<S>,
-    ) -> GetDiffBuilder<'a, get_diff_state::SetRev2<S>> {
+    ) -> GetDiffBuilder<S, get_diff_state::SetRev2<St>> {
         self._fields.2 = Option::Some(value.into());
         GetDiffBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetDiffBuilder<'a, S>
+impl<S: BosStr, St> GetDiffBuilder<S, St>
 where
-    S: get_diff_state::State,
-    S::Repo: get_diff_state::IsSet,
-    S::Rev2: get_diff_state::IsSet,
-    S::Rev1: get_diff_state::IsSet,
+    St: get_diff_state::State,
+    St::Repo: get_diff_state::IsSet,
+    St::Rev1: get_diff_state::IsSet,
+    St::Rev2: get_diff_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetDiff<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetDiff<S> {
         GetDiff {
             repo: self._fields.0.unwrap(),
             rev1: self._fields.1.unwrap(),

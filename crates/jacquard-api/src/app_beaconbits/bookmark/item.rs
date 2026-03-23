@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -37,11 +37,11 @@ use crate::community_lexicon::location::geo::Geo;
     rename = "app.beaconbits.bookmark.item",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Item<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Item<S: BosStr = DefaultStr> {
     ///Structured address using community lexicon
     #[serde(skip_serializing_if = "Option::is_none")]
     pub address_details: Option<Address<S>>,
@@ -76,18 +76,18 @@ pub struct Item<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ItemGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ItemGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Item<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Item<S> {
+impl<S: BosStr> Item<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, ItemRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -100,17 +100,17 @@ pub struct ItemRecord;
 impl XrpcResp for ItemRecord {
     const NSID: &'static str = "app.beaconbits.bookmark.item";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ItemGetRecordOutput<S>;
+    type Output<S: BosStr> = ItemGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<ItemGetRecordOutput<S>> for Item<S> {
+impl<S: BosStr> From<ItemGetRecordOutput<S>> for Item<S> {
     fn from(output: ItemGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Item<S> {
+impl<S: BosStr> Collection for Item<S> {
     const NSID: &'static str = "app.beaconbits.bookmark.item";
     type Record = ItemRecord;
 }
@@ -120,7 +120,7 @@ impl Collection for ItemRecord {
     type Record = ItemRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Item<S> {
+impl<S: BosStr> LexiconSchema for Item<S> {
     fn nsid() -> &'static str {
         "app.beaconbits.bookmark.item"
     }
@@ -208,56 +208,56 @@ pub mod item_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type VenueName;
-        type VenueUri;
         type CreatedAt;
+        type VenueUri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type VenueName = Unset;
-        type VenueUri = Unset;
         type CreatedAt = Unset;
+        type VenueUri = Unset;
     }
     ///State transition - sets the `venue_name` field to Set
-    pub struct SetVenueName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVenueName<S> {}
-    impl<S: State> State for SetVenueName<S> {
+    pub struct SetVenueName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetVenueName<St> {}
+    impl<St: State> State for SetVenueName<St> {
         type VenueName = Set<members::venue_name>;
-        type VenueUri = S::VenueUri;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `venue_uri` field to Set
-    pub struct SetVenueUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVenueUri<S> {}
-    impl<S: State> State for SetVenueUri<S> {
-        type VenueName = S::VenueName;
-        type VenueUri = Set<members::venue_uri>;
-        type CreatedAt = S::CreatedAt;
+        type CreatedAt = St::CreatedAt;
+        type VenueUri = St::VenueUri;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type VenueName = S::VenueName;
-        type VenueUri = S::VenueUri;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type VenueName = St::VenueName;
         type CreatedAt = Set<members::created_at>;
+        type VenueUri = St::VenueUri;
+    }
+    ///State transition - sets the `venue_uri` field to Set
+    pub struct SetVenueUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetVenueUri<St> {}
+    impl<St: State> State for SetVenueUri<St> {
+        type VenueName = St::VenueName;
+        type CreatedAt = St::CreatedAt;
+        type VenueUri = Set<members::venue_uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `venue_name` field
         pub struct venue_name(());
-        ///Marker type for the `venue_uri` field
-        pub struct venue_uri(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `venue_uri` field
+        pub struct venue_uri(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ItemBuilder<'a, S: item_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ItemBuilder<S: BosStr, St: item_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Address<S>>,
         Option<Datetime>,
@@ -269,28 +269,28 @@ pub struct ItemBuilder<'a, S: item_state::State> {
         Option<S>,
         Option<S>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Item<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ItemBuilder<'a, item_state::Empty> {
+impl<S: BosStr> Item<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ItemBuilder<S, item_state::Empty> {
         ItemBuilder::new()
     }
 }
 
-impl<'a> ItemBuilder<'a, item_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ItemBuilder<S, item_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ItemBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: item_state::State> ItemBuilder<'a, S> {
+impl<S: BosStr, St: item_state::State> ItemBuilder<S, St> {
     /// Set the `addressDetails` field (optional)
     pub fn address_details(mut self, value: impl Into<Option<Address<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -303,26 +303,26 @@ impl<'a, S: item_state::State> ItemBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ItemBuilder<'a, S>
+impl<S: BosStr, St> ItemBuilder<S, St>
 where
-    S: item_state::State,
-    S::CreatedAt: item_state::IsUnset,
+    St: item_state::State,
+    St::CreatedAt: item_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ItemBuilder<'a, item_state::SetCreatedAt<S>> {
+    ) -> ItemBuilder<S, item_state::SetCreatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         ItemBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: item_state::State> ItemBuilder<'a, S> {
+impl<S: BosStr, St: item_state::State> ItemBuilder<S, St> {
     /// Set the `folderUri` field (optional)
     pub fn folder_uri(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -335,7 +335,7 @@ impl<'a, S: item_state::State> ItemBuilder<'a, S> {
     }
 }
 
-impl<'a, S: item_state::State> ItemBuilder<'a, S> {
+impl<S: BosStr, St: item_state::State> ItemBuilder<S, St> {
     /// Set the `location` field (optional)
     pub fn location(mut self, value: impl Into<Option<Geo<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -348,7 +348,7 @@ impl<'a, S: item_state::State> ItemBuilder<'a, S> {
     }
 }
 
-impl<'a, S: item_state::State> ItemBuilder<'a, S> {
+impl<S: BosStr, St: item_state::State> ItemBuilder<S, St> {
     /// Set the `notes` field (optional)
     pub fn notes(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
@@ -361,7 +361,7 @@ impl<'a, S: item_state::State> ItemBuilder<'a, S> {
     }
 }
 
-impl<'a, S: item_state::State> ItemBuilder<'a, S> {
+impl<S: BosStr, St: item_state::State> ItemBuilder<S, St> {
     /// Set the `venueAddress` field (optional)
     pub fn venue_address(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
@@ -374,7 +374,7 @@ impl<'a, S: item_state::State> ItemBuilder<'a, S> {
     }
 }
 
-impl<'a, S: item_state::State> ItemBuilder<'a, S> {
+impl<S: BosStr, St: item_state::State> ItemBuilder<S, St> {
     /// Set the `venueCategory` field (optional)
     pub fn venue_category(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.6 = value.into();
@@ -387,53 +387,53 @@ impl<'a, S: item_state::State> ItemBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ItemBuilder<'a, S>
+impl<S: BosStr, St> ItemBuilder<S, St>
 where
-    S: item_state::State,
-    S::VenueName: item_state::IsUnset,
+    St: item_state::State,
+    St::VenueName: item_state::IsUnset,
 {
     /// Set the `venueName` field (required)
     pub fn venue_name(
         mut self,
         value: impl Into<S>,
-    ) -> ItemBuilder<'a, item_state::SetVenueName<S>> {
+    ) -> ItemBuilder<S, item_state::SetVenueName<St>> {
         self._fields.7 = Option::Some(value.into());
         ItemBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ItemBuilder<'a, S>
+impl<S: BosStr, St> ItemBuilder<S, St>
 where
-    S: item_state::State,
-    S::VenueUri: item_state::IsUnset,
+    St: item_state::State,
+    St::VenueUri: item_state::IsUnset,
 {
     /// Set the `venueUri` field (required)
     pub fn venue_uri(
         mut self,
         value: impl Into<S>,
-    ) -> ItemBuilder<'a, item_state::SetVenueUri<S>> {
+    ) -> ItemBuilder<S, item_state::SetVenueUri<St>> {
         self._fields.8 = Option::Some(value.into());
         ItemBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ItemBuilder<'a, S>
+impl<S: BosStr, St> ItemBuilder<S, St>
 where
-    S: item_state::State,
-    S::VenueName: item_state::IsSet,
-    S::VenueUri: item_state::IsSet,
-    S::CreatedAt: item_state::IsSet,
+    St: item_state::State,
+    St::VenueName: item_state::IsSet,
+    St::CreatedAt: item_state::IsSet,
+    St::VenueUri: item_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Item<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Item<S> {
         Item {
             address_details: self._fields.0,
             created_at: self._fields.1.unwrap(),
@@ -447,8 +447,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Item<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Item<S> {
         Item {
             address_details: self._fields.0,
             created_at: self._fields.1.unwrap(),

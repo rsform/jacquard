@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::value::Data;
@@ -18,18 +18,16 @@ use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct UnmuteActor<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct UnmuteActor<S: BosStr = DefaultStr> {
     pub actor: AtIdentifier<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -38,12 +36,11 @@ pub struct UnmuteActorResponse;
 impl jacquard_common::xrpc::XrpcResp for UnmuteActorResponse {
     const NSID: &'static str = "app.bsky.graph.unmuteActor";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ();
+    type Output<S: BosStr> = ();
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for UnmuteActor<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UnmuteActor<S> {
     const NSID: &'static str = "app.bsky.graph.unmuteActor";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -58,7 +55,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for UnmuteActorRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = UnmuteActor<S>;
+    type Request<S: BosStr> = UnmuteActor<S>;
     type Response = UnmuteActorResponse;
 }
 
@@ -81,9 +78,9 @@ pub mod unmute_actor_state {
         type Actor = Unset;
     }
     ///State transition - sets the `actor` field to Set
-    pub struct SetActor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetActor<S> {}
-    impl<S: State> State for SetActor<S> {
+    pub struct SetActor<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetActor<St> {}
+    impl<St: State> State for SetActor<St> {
         type Actor = Set<members::actor>;
     }
     /// Marker types for field names
@@ -94,67 +91,67 @@ pub mod unmute_actor_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct UnmuteActorBuilder<'a, S: unmute_actor_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct UnmuteActorBuilder<S: BosStr, St: unmute_actor_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtIdentifier<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> UnmuteActor<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> UnmuteActorBuilder<'a, unmute_actor_state::Empty> {
+impl<S: BosStr> UnmuteActor<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> UnmuteActorBuilder<S, unmute_actor_state::Empty> {
         UnmuteActorBuilder::new()
     }
 }
 
-impl<'a> UnmuteActorBuilder<'a, unmute_actor_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> UnmuteActorBuilder<S, unmute_actor_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         UnmuteActorBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> UnmuteActorBuilder<'a, S>
+impl<S: BosStr, St> UnmuteActorBuilder<S, St>
 where
-    S: unmute_actor_state::State,
-    S::Actor: unmute_actor_state::IsUnset,
+    St: unmute_actor_state::State,
+    St::Actor: unmute_actor_state::IsUnset,
 {
     /// Set the `actor` field (required)
     pub fn actor(
         mut self,
         value: impl Into<AtIdentifier<S>>,
-    ) -> UnmuteActorBuilder<'a, unmute_actor_state::SetActor<S>> {
+    ) -> UnmuteActorBuilder<S, unmute_actor_state::SetActor<St>> {
         self._fields.0 = Option::Some(value.into());
         UnmuteActorBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> UnmuteActorBuilder<'a, S>
+impl<S: BosStr, St> UnmuteActorBuilder<S, St>
 where
-    S: unmute_actor_state::State,
-    S::Actor: unmute_actor_state::IsSet,
+    St: unmute_actor_state::State,
+    St::Actor: unmute_actor_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> UnmuteActor<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> UnmuteActor<S> {
         UnmuteActor {
             actor: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> UnmuteActor<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> UnmuteActor<S> {
         UnmuteActor {
             actor: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

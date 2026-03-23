@@ -7,7 +7,7 @@
 use crate::resolver::{IdentityError, IdentityResolver};
 
 use jacquard_common::{
-    bos::Bos,
+    BosStr,
     deps::smol_str,
     types::{cid::Cid, did::Did, string::Nsid},
 };
@@ -23,7 +23,7 @@ pub trait LexiconAuthorityResolver {
     /// (e.g., `app.bsky.feed` → query `_lexicon.feed.bsky.app`).
     ///
     /// Note: No hierarchical fallback - per the spec, only exact authority match is checked.
-    async fn resolve_lexicon_authority<S: Bos<str> + AsRef<str> + Sync>(
+    async fn resolve_lexicon_authority<S: BosStr + Sync>(
         &self,
         nsid: &Nsid<S>,
     ) -> std::result::Result<Did, LexiconResolutionError>;
@@ -33,7 +33,7 @@ pub trait LexiconAuthorityResolver {
 #[cfg_attr(not(target_arch = "wasm32"), trait_variant::make(Send))]
 pub trait LexiconSchemaResolver {
     /// Resolve a complete lexicon schema for an NSID
-    async fn resolve_lexicon_schema<S: Bos<str> + AsRef<str> + Sync>(
+    async fn resolve_lexicon_schema<S: BosStr + Sync>(
         &self,
         nsid: &Nsid<S>,
     ) -> std::result::Result<ResolvedLexiconSchema<'static>, LexiconResolutionError>;
@@ -321,7 +321,7 @@ impl crate::JacquardResolver {
     ///
     /// Queries `_lexicon.{reversed-authority}` for a TXT record containing `did=...`
     #[cfg(all(feature = "dns", not(target_family = "wasm")))]
-    async fn resolve_lexicon_authority_dns<S: Bos<str> + AsRef<str> + Sync>(
+    async fn resolve_lexicon_authority_dns<S: BosStr + Sync>(
         &self,
         nsid: &Nsid<S>,
     ) -> std::result::Result<Did, LexiconResolutionError> {
@@ -361,7 +361,7 @@ impl crate::JacquardResolver {
 
 #[cfg(all(feature = "dns", not(target_family = "wasm")))]
 impl LexiconAuthorityResolver for crate::JacquardResolver {
-    async fn resolve_lexicon_authority<S: Bos<str> + AsRef<str> + Sync>(
+    async fn resolve_lexicon_authority<S: BosStr + Sync>(
         &self,
         nsid: &Nsid<S>,
     ) -> std::result::Result<Did, LexiconResolutionError> {
@@ -399,7 +399,7 @@ impl LexiconAuthorityResolver for crate::JacquardResolver {
 
 #[cfg(not(all(feature = "dns", not(target_family = "wasm"))))]
 impl LexiconAuthorityResolver for crate::JacquardResolver {
-    async fn resolve_lexicon_authority<S: Bos<str> + AsRef<str> + Sync>(
+    async fn resolve_lexicon_authority<S: BosStr + Sync>(
         &self,
         nsid: &Nsid<S>,
     ) -> std::result::Result<Did, LexiconResolutionError> {
@@ -411,7 +411,7 @@ impl LexiconAuthorityResolver for crate::JacquardResolver {
 impl crate::JacquardResolver {
     /// Resolve lexicon authority via DNS-over-HTTPS (for WASM compatibility)
     #[allow(dead_code)]
-    async fn resolve_lexicon_authority_doh<S: Bos<str> + AsRef<str> + Sync>(
+    async fn resolve_lexicon_authority_doh<S: BosStr + Sync>(
         &self,
         nsid: &Nsid<S>,
     ) -> std::result::Result<Did, LexiconResolutionError> {
@@ -477,7 +477,7 @@ impl crate::JacquardResolver {
 }
 
 impl LexiconSchemaResolver for crate::JacquardResolver {
-    async fn resolve_lexicon_schema<S: Bos<str> + AsRef<str> + Sync>(
+    async fn resolve_lexicon_schema<S: BosStr + Sync>(
         &self,
         nsid: &Nsid<S>,
     ) -> std::result::Result<ResolvedLexiconSchema<'static>, LexiconResolutionError> {

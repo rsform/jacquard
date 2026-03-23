@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
@@ -18,42 +18,38 @@ use serde::{Serialize, Deserialize};
 use crate::community_lexicon::bookmarks::bookmark::Bookmark;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetActorBookmarks<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetActorBookmarks<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub cursor: Option<S>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub tags: Option<Vec<S>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetActorBookmarksOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetActorBookmarksOutput<S: BosStr = DefaultStr> {
     pub bookmarks: Vec<Bookmark<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -62,12 +58,11 @@ pub struct GetActorBookmarksResponse;
 impl jacquard_common::xrpc::XrpcResp for GetActorBookmarksResponse {
     const NSID: &'static str = "community.lexicon.bookmarks.getActorBookmarks";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetActorBookmarksOutput<S>;
+    type Output<S: BosStr> = GetActorBookmarksOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetActorBookmarks<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetActorBookmarks<S> {
     const NSID: &'static str = "community.lexicon.bookmarks.getActorBookmarks";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetActorBookmarksResponse;
@@ -78,7 +73,7 @@ pub struct GetActorBookmarksRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetActorBookmarksRequest {
     const PATH: &'static str = "/xrpc/community.lexicon.bookmarks.getActorBookmarks";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetActorBookmarks<S>;
+    type Request<S: BosStr> = GetActorBookmarks<S>;
     type Response = GetActorBookmarksResponse;
 }
 
@@ -105,32 +100,32 @@ pub mod get_actor_bookmarks_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetActorBookmarksBuilder<'a, S: get_actor_bookmarks_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetActorBookmarksBuilder<S: BosStr, St: get_actor_bookmarks_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>, Option<Vec<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetActorBookmarks<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetActorBookmarksBuilder<'a, get_actor_bookmarks_state::Empty> {
+impl<S: BosStr> GetActorBookmarks<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetActorBookmarksBuilder<S, get_actor_bookmarks_state::Empty> {
         GetActorBookmarksBuilder::new()
     }
 }
 
-impl<'a> GetActorBookmarksBuilder<'a, get_actor_bookmarks_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetActorBookmarksBuilder<S, get_actor_bookmarks_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetActorBookmarksBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: get_actor_bookmarks_state::State> GetActorBookmarksBuilder<'a, S> {
+impl<S: BosStr, St: get_actor_bookmarks_state::State> GetActorBookmarksBuilder<S, St> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -143,7 +138,7 @@ impl<'a, S: get_actor_bookmarks_state::State> GetActorBookmarksBuilder<'a, S> {
     }
 }
 
-impl<'a, S: get_actor_bookmarks_state::State> GetActorBookmarksBuilder<'a, S> {
+impl<S: BosStr, St: get_actor_bookmarks_state::State> GetActorBookmarksBuilder<S, St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -156,7 +151,7 @@ impl<'a, S: get_actor_bookmarks_state::State> GetActorBookmarksBuilder<'a, S> {
     }
 }
 
-impl<'a, S: get_actor_bookmarks_state::State> GetActorBookmarksBuilder<'a, S> {
+impl<S: BosStr, St: get_actor_bookmarks_state::State> GetActorBookmarksBuilder<S, St> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -169,12 +164,12 @@ impl<'a, S: get_actor_bookmarks_state::State> GetActorBookmarksBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GetActorBookmarksBuilder<'a, S>
+impl<S: BosStr, St> GetActorBookmarksBuilder<S, St>
 where
-    S: get_actor_bookmarks_state::State,
+    St: get_actor_bookmarks_state::State,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetActorBookmarks<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetActorBookmarks<S> {
         GetActorBookmarks {
             cursor: self._fields.0,
             limit: self._fields.1,

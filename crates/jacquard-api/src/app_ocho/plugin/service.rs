@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use crate::app_ocho::plugin::Db;
     rename = "app.ocho.plugin.service",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Service<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Service<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub db: Option<Db<S>>,
     ///Additional metadata for the plugin, including Expo client and Go configurations.
@@ -55,18 +55,18 @@ pub struct Service<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ServiceGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ServiceGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Service<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Service<S> {
+impl<S: BosStr> Service<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, ServiceRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -79,17 +79,17 @@ pub struct ServiceRecord;
 impl XrpcResp for ServiceRecord {
     const NSID: &'static str = "app.ocho.plugin.service";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ServiceGetRecordOutput<S>;
+    type Output<S: BosStr> = ServiceGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<ServiceGetRecordOutput<S>> for Service<S> {
+impl<S: BosStr> From<ServiceGetRecordOutput<S>> for Service<S> {
     fn from(output: ServiceGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Service<S> {
+impl<S: BosStr> Collection for Service<S> {
     const NSID: &'static str = "app.ocho.plugin.service";
     type Record = ServiceRecord;
 }
@@ -99,7 +99,7 @@ impl Collection for ServiceRecord {
     type Record = ServiceRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Service<S> {
+impl<S: BosStr> LexiconSchema for Service<S> {
     fn nsid() -> &'static str {
         "app.ocho.plugin.service"
     }
@@ -133,9 +133,9 @@ pub mod service_state {
         type Permissions = Unset;
     }
     ///State transition - sets the `permissions` field to Set
-    pub struct SetPermissions<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPermissions<S> {}
-    impl<S: State> State for SetPermissions<S> {
+    pub struct SetPermissions<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPermissions<St> {}
+    impl<St: State> State for SetPermissions<St> {
         type Permissions = Set<members::permissions>;
     }
     /// Marker types for field names
@@ -146,32 +146,32 @@ pub mod service_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ServiceBuilder<'a, S: service_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ServiceBuilder<S: BosStr, St: service_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Db<S>>, Option<Vec<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Service<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ServiceBuilder<'a, service_state::Empty> {
+impl<S: BosStr> Service<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ServiceBuilder<S, service_state::Empty> {
         ServiceBuilder::new()
     }
 }
 
-impl<'a> ServiceBuilder<'a, service_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ServiceBuilder<S, service_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ServiceBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
+impl<S: BosStr, St: service_state::State> ServiceBuilder<S, St> {
     /// Set the `db` field (optional)
     pub fn db(mut self, value: impl Into<Option<Db<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -184,43 +184,40 @@ impl<'a, S: service_state::State> ServiceBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ServiceBuilder<'a, S>
+impl<S: BosStr, St> ServiceBuilder<S, St>
 where
-    S: service_state::State,
-    S::Permissions: service_state::IsUnset,
+    St: service_state::State,
+    St::Permissions: service_state::IsUnset,
 {
     /// Set the `permissions` field (required)
     pub fn permissions(
         mut self,
         value: impl Into<Vec<S>>,
-    ) -> ServiceBuilder<'a, service_state::SetPermissions<S>> {
+    ) -> ServiceBuilder<S, service_state::SetPermissions<St>> {
         self._fields.1 = Option::Some(value.into());
         ServiceBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ServiceBuilder<'a, S>
+impl<S: BosStr, St> ServiceBuilder<S, St>
 where
-    S: service_state::State,
-    S::Permissions: service_state::IsSet,
+    St: service_state::State,
+    St::Permissions: service_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Service<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Service<S> {
         Service {
             db: self._fields.0,
             permissions: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Service<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Service<S> {
         Service {
             db: self._fields.0,
             permissions: self._fields.1.unwrap(),

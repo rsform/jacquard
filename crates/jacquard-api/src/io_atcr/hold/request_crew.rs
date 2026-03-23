@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{AtUri, Cid};
 use jacquard_common::types::value::Data;
@@ -18,14 +18,14 @@ use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct RequestCrew<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct RequestCrew<S: BosStr = DefaultStr> {
     ///Requested permissions (default: ['blob:read', 'blob:write'])
     #[serde(skip_serializing_if = "Option::is_none")]
     pub permissions: Option<Vec<S>>,
@@ -33,22 +33,20 @@ pub struct RequestCrew<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default = "_default_request_crew_role")]
     pub role: Option<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct RequestCrewOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct RequestCrewOutput<S: BosStr = DefaultStr> {
     ///CID of the crew record
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -60,22 +58,20 @@ pub struct RequestCrewOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///AT-URI of the crew record (if created or already exists)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub uri: Option<AtUri<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Result status
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum RequestCrewOutputStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum RequestCrewOutputStatus<S: BosStr = DefaultStr> {
     Created,
     AlreadyMember,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> RequestCrewOutputStatus<S> {
+impl<S: BosStr> RequestCrewOutputStatus<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Created => "created",
@@ -93,19 +89,19 @@ impl<S: Bos<str> + AsRef<str>> RequestCrewOutputStatus<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for RequestCrewOutputStatus<S> {
+impl<S: BosStr> core::fmt::Display for RequestCrewOutputStatus<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for RequestCrewOutputStatus<S> {
+impl<S: BosStr> AsRef<str> for RequestCrewOutputStatus<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for RequestCrewOutputStatus<S> {
+impl<S: BosStr> Serialize for RequestCrewOutputStatus<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -114,8 +110,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for RequestCrewOutputStatus<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for RequestCrewOutputStatus<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for RequestCrewOutputStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -125,14 +120,18 @@ for RequestCrewOutputStatus<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for RequestCrewOutputStatus<S> {
+impl<S: BosStr + Default> Default for RequestCrewOutputStatus<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for RequestCrewOutputStatus<S> {
-    type Output = RequestCrewOutputStatus<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for RequestCrewOutputStatus<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = RequestCrewOutputStatus<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             RequestCrewOutputStatus::Created => RequestCrewOutputStatus::Created,
@@ -202,12 +201,11 @@ pub struct RequestCrewResponse;
 impl jacquard_common::xrpc::XrpcResp for RequestCrewResponse {
     const NSID: &'static str = "io.atcr.hold.requestCrew";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = RequestCrewOutput<S>;
+    type Output<S: BosStr> = RequestCrewOutput<S>;
     type Err = RequestCrewError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for RequestCrew<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for RequestCrew<S> {
     const NSID: &'static str = "io.atcr.hold.requestCrew";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -222,10 +220,10 @@ impl jacquard_common::xrpc::XrpcEndpoint for RequestCrewRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = RequestCrew<S>;
+    type Request<S: BosStr> = RequestCrew<S>;
     type Response = RequestCrewResponse;
 }
 
-fn _default_request_crew_role<S: From<&'static str>>() -> ::core::option::Option<S> {
-    Some(S::from("member"))
+fn _default_request_crew_role<S: FromStaticStr>() -> ::core::option::Option<S> {
+    Some(S::from_static("member"))
 }

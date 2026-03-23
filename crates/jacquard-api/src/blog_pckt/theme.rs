@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -30,11 +30,11 @@ use crate::blog_pckt::theme;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Theme<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Theme<S: BosStr = DefaultStr> {
     ///Dark mode color palette
     pub dark: theme::Palette<S>,
     ///Font family name (optional)
@@ -55,11 +55,11 @@ pub struct Theme<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Palette<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Palette<S: BosStr = DefaultStr> {
     ///Accent color (hex value)
     pub accent: S,
     ///Background color (hex value)
@@ -74,7 +74,7 @@ pub struct Palette<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Theme<S> {
+impl<S: BosStr> LexiconSchema for Theme<S> {
     fn nsid() -> &'static str {
         "blog.pckt.theme"
     }
@@ -117,7 +117,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Theme<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Palette<S> {
+impl<S: BosStr> LexiconSchema for Palette<S> {
     fn nsid() -> &'static str {
         "blog.pckt.theme"
     }
@@ -197,90 +197,90 @@ pub mod theme_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Light;
         type Dark;
+        type Light;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Light = Unset;
         type Dark = Unset;
-    }
-    ///State transition - sets the `light` field to Set
-    pub struct SetLight<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLight<S> {}
-    impl<S: State> State for SetLight<S> {
-        type Light = Set<members::light>;
-        type Dark = S::Dark;
+        type Light = Unset;
     }
     ///State transition - sets the `dark` field to Set
-    pub struct SetDark<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDark<S> {}
-    impl<S: State> State for SetDark<S> {
-        type Light = S::Light;
+    pub struct SetDark<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDark<St> {}
+    impl<St: State> State for SetDark<St> {
         type Dark = Set<members::dark>;
+        type Light = St::Light;
+    }
+    ///State transition - sets the `light` field to Set
+    pub struct SetLight<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLight<St> {}
+    impl<St: State> State for SetLight<St> {
+        type Dark = St::Dark;
+        type Light = Set<members::light>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `light` field
-        pub struct light(());
         ///Marker type for the `dark` field
         pub struct dark(());
+        ///Marker type for the `light` field
+        pub struct light(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ThemeBuilder<'a, S: theme_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ThemeBuilder<S: BosStr, St: theme_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<theme::Palette<S>>,
         Option<S>,
         Option<theme::Palette<S>>,
         Option<i64>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Theme<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ThemeBuilder<'a, theme_state::Empty> {
+impl<S: BosStr> Theme<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ThemeBuilder<S, theme_state::Empty> {
         ThemeBuilder::new()
     }
 }
 
-impl<'a> ThemeBuilder<'a, theme_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ThemeBuilder<S, theme_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ThemeBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ThemeBuilder<'a, S>
+impl<S: BosStr, St> ThemeBuilder<S, St>
 where
-    S: theme_state::State,
-    S::Dark: theme_state::IsUnset,
+    St: theme_state::State,
+    St::Dark: theme_state::IsUnset,
 {
     /// Set the `dark` field (required)
     pub fn dark(
         mut self,
         value: impl Into<theme::Palette<S>>,
-    ) -> ThemeBuilder<'a, theme_state::SetDark<S>> {
+    ) -> ThemeBuilder<S, theme_state::SetDark<St>> {
         self._fields.0 = Option::Some(value.into());
         ThemeBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: theme_state::State> ThemeBuilder<'a, S> {
+impl<S: BosStr, St: theme_state::State> ThemeBuilder<S, St> {
     /// Set the `font` field (optional)
     pub fn font(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -293,26 +293,26 @@ impl<'a, S: theme_state::State> ThemeBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ThemeBuilder<'a, S>
+impl<S: BosStr, St> ThemeBuilder<S, St>
 where
-    S: theme_state::State,
-    S::Light: theme_state::IsUnset,
+    St: theme_state::State,
+    St::Light: theme_state::IsUnset,
 {
     /// Set the `light` field (required)
     pub fn light(
         mut self,
         value: impl Into<theme::Palette<S>>,
-    ) -> ThemeBuilder<'a, theme_state::SetLight<S>> {
+    ) -> ThemeBuilder<S, theme_state::SetLight<St>> {
         self._fields.2 = Option::Some(value.into());
         ThemeBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: theme_state::State> ThemeBuilder<'a, S> {
+impl<S: BosStr, St: theme_state::State> ThemeBuilder<S, St> {
     /// Set the `transparency` field (optional)
     pub fn transparency(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.3 = value.into();
@@ -325,14 +325,14 @@ impl<'a, S: theme_state::State> ThemeBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ThemeBuilder<'a, S>
+impl<S: BosStr, St> ThemeBuilder<S, St>
 where
-    S: theme_state::State,
-    S::Light: theme_state::IsSet,
-    S::Dark: theme_state::IsSet,
+    St: theme_state::State,
+    St::Dark: theme_state::IsSet,
+    St::Light: theme_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Theme<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Theme<S> {
         Theme {
             dark: self._fields.0.unwrap(),
             font: self._fields.1,
@@ -341,8 +341,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Theme<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Theme<S> {
         Theme {
             dark: self._fields.0.unwrap(),
             font: self._fields.1,

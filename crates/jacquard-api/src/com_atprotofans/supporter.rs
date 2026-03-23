@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -38,11 +38,11 @@ use crate::com_atprotofans::supporter_proof::SupporterProof;
     rename = "com.atprotofans.supporter",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Supporter<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Supporter<S: BosStr = DefaultStr> {
     ///Attestation proofs for this support relationship.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub signatures: Option<Vec<SupporterSignaturesItem<S>>>,
@@ -58,11 +58,11 @@ pub struct Supporter<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum SupporterSignaturesItem<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum SupporterSignaturesItem<S: BosStr = DefaultStr> {
     #[serde(rename = "com.atproto.repo.strongRef")]
     StrongRef(Box<StrongRef<S>>),
     #[serde(rename = "com.atprotofans.supporterProof")]
@@ -77,18 +77,18 @@ pub enum SupporterSignaturesItem<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SupporterGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SupporterGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Supporter<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Supporter<S> {
+impl<S: BosStr> Supporter<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, SupporterRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -101,17 +101,17 @@ pub struct SupporterRecord;
 impl XrpcResp for SupporterRecord {
     const NSID: &'static str = "com.atprotofans.supporter";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = SupporterGetRecordOutput<S>;
+    type Output<S: BosStr> = SupporterGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<SupporterGetRecordOutput<S>> for Supporter<S> {
+impl<S: BosStr> From<SupporterGetRecordOutput<S>> for Supporter<S> {
     fn from(output: SupporterGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Supporter<S> {
+impl<S: BosStr> Collection for Supporter<S> {
     const NSID: &'static str = "com.atprotofans.supporter";
     type Record = SupporterRecord;
 }
@@ -121,7 +121,7 @@ impl Collection for SupporterRecord {
     type Record = SupporterRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Supporter<S> {
+impl<S: BosStr> LexiconSchema for Supporter<S> {
     fn nsid() -> &'static str {
         "com.atprotofans.supporter"
     }
@@ -155,9 +155,9 @@ pub mod supporter_state {
         type Subject = Unset;
     }
     ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
+    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubject<St> {}
+    impl<St: State> State for SetSubject<St> {
         type Subject = Set<members::subject>;
     }
     /// Marker types for field names
@@ -168,32 +168,32 @@ pub mod supporter_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct SupporterBuilder<'a, S: supporter_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct SupporterBuilder<S: BosStr, St: supporter_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<SupporterSignaturesItem<S>>>, Option<Did<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Supporter<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> SupporterBuilder<'a, supporter_state::Empty> {
+impl<S: BosStr> Supporter<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> SupporterBuilder<S, supporter_state::Empty> {
         SupporterBuilder::new()
     }
 }
 
-impl<'a> SupporterBuilder<'a, supporter_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> SupporterBuilder<S, supporter_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SupporterBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: supporter_state::State> SupporterBuilder<'a, S> {
+impl<S: BosStr, St: supporter_state::State> SupporterBuilder<S, St> {
     /// Set the `signatures` field (optional)
     pub fn signatures(
         mut self,
@@ -212,43 +212,43 @@ impl<'a, S: supporter_state::State> SupporterBuilder<'a, S> {
     }
 }
 
-impl<'a, S> SupporterBuilder<'a, S>
+impl<S: BosStr, St> SupporterBuilder<S, St>
 where
-    S: supporter_state::State,
-    S::Subject: supporter_state::IsUnset,
+    St: supporter_state::State,
+    St::Subject: supporter_state::IsUnset,
 {
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> SupporterBuilder<'a, supporter_state::SetSubject<S>> {
+    ) -> SupporterBuilder<S, supporter_state::SetSubject<St>> {
         self._fields.1 = Option::Some(value.into());
         SupporterBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SupporterBuilder<'a, S>
+impl<S: BosStr, St> SupporterBuilder<S, St>
 where
-    S: supporter_state::State,
-    S::Subject: supporter_state::IsSet,
+    St: supporter_state::State,
+    St::Subject: supporter_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Supporter<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Supporter<S> {
         Supporter {
             signatures: self._fields.0,
             subject: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Supporter<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Supporter<S> {
         Supporter {
             signatures: self._fields.0,
             subject: self._fields.1.unwrap(),

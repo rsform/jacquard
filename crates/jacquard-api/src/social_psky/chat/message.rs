@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -37,11 +37,11 @@ use crate::social_psky::richtext::facet::Facet;
     rename = "social.psky.chat.message",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Message<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Message<S: BosStr = DefaultStr> {
     ///Text content.
     pub content: S,
     ///Annotations of text (mentions, URLs, hashtags, etc)
@@ -60,18 +60,18 @@ pub struct Message<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct MessageGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct MessageGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Message<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Message<S> {
+impl<S: BosStr> Message<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, MessageRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -84,17 +84,17 @@ pub struct MessageRecord;
 impl XrpcResp for MessageRecord {
     const NSID: &'static str = "social.psky.chat.message";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = MessageGetRecordOutput<S>;
+    type Output<S: BosStr> = MessageGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<MessageGetRecordOutput<S>> for Message<S> {
+impl<S: BosStr> From<MessageGetRecordOutput<S>> for Message<S> {
     fn from(output: MessageGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Message<S> {
+impl<S: BosStr> Collection for Message<S> {
     const NSID: &'static str = "social.psky.chat.message";
     type Record = MessageRecord;
 }
@@ -104,7 +104,7 @@ impl Collection for MessageRecord {
     type Record = MessageRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Message<S> {
+impl<S: BosStr> LexiconSchema for Message<S> {
     fn nsid() -> &'static str {
         "social.psky.chat.message"
     }
@@ -153,85 +153,85 @@ pub mod message_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Content;
         type Room;
+        type Content;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Content = Unset;
         type Room = Unset;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type Content = Set<members::content>;
-        type Room = S::Room;
+        type Content = Unset;
     }
     ///State transition - sets the `room` field to Set
-    pub struct SetRoom<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRoom<S> {}
-    impl<S: State> State for SetRoom<S> {
-        type Content = S::Content;
+    pub struct SetRoom<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRoom<St> {}
+    impl<St: State> State for SetRoom<St> {
         type Room = Set<members::room>;
+        type Content = St::Content;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetContent<St> {}
+    impl<St: State> State for SetContent<St> {
+        type Room = St::Room;
+        type Content = Set<members::content>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `content` field
-        pub struct content(());
         ///Marker type for the `room` field
         pub struct room(());
+        ///Marker type for the `content` field
+        pub struct content(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct MessageBuilder<'a, S: message_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct MessageBuilder<S: BosStr, St: message_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<Vec<Facet<S>>>, Option<StrongRef<S>>, Option<AtUri<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Message<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> MessageBuilder<'a, message_state::Empty> {
+impl<S: BosStr> Message<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> MessageBuilder<S, message_state::Empty> {
         MessageBuilder::new()
     }
 }
 
-impl<'a> MessageBuilder<'a, message_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> MessageBuilder<S, message_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         MessageBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> MessageBuilder<'a, S>
+impl<S: BosStr, St> MessageBuilder<S, St>
 where
-    S: message_state::State,
-    S::Content: message_state::IsUnset,
+    St: message_state::State,
+    St::Content: message_state::IsUnset,
 {
     /// Set the `content` field (required)
     pub fn content(
         mut self,
         value: impl Into<S>,
-    ) -> MessageBuilder<'a, message_state::SetContent<S>> {
+    ) -> MessageBuilder<S, message_state::SetContent<St>> {
         self._fields.0 = Option::Some(value.into());
         MessageBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: message_state::State> MessageBuilder<'a, S> {
+impl<S: BosStr, St: message_state::State> MessageBuilder<S, St> {
     /// Set the `facets` field (optional)
     pub fn facets(mut self, value: impl Into<Option<Vec<Facet<S>>>>) -> Self {
         self._fields.1 = value.into();
@@ -244,7 +244,7 @@ impl<'a, S: message_state::State> MessageBuilder<'a, S> {
     }
 }
 
-impl<'a, S: message_state::State> MessageBuilder<'a, S> {
+impl<S: BosStr, St: message_state::State> MessageBuilder<S, St> {
     /// Set the `reply` field (optional)
     pub fn reply(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -257,33 +257,33 @@ impl<'a, S: message_state::State> MessageBuilder<'a, S> {
     }
 }
 
-impl<'a, S> MessageBuilder<'a, S>
+impl<S: BosStr, St> MessageBuilder<S, St>
 where
-    S: message_state::State,
-    S::Room: message_state::IsUnset,
+    St: message_state::State,
+    St::Room: message_state::IsUnset,
 {
     /// Set the `room` field (required)
     pub fn room(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> MessageBuilder<'a, message_state::SetRoom<S>> {
+    ) -> MessageBuilder<S, message_state::SetRoom<St>> {
         self._fields.3 = Option::Some(value.into());
         MessageBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> MessageBuilder<'a, S>
+impl<S: BosStr, St> MessageBuilder<S, St>
 where
-    S: message_state::State,
-    S::Content: message_state::IsSet,
-    S::Room: message_state::IsSet,
+    St: message_state::State,
+    St::Room: message_state::IsSet,
+    St::Content: message_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Message<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Message<S> {
         Message {
             content: self._fields.0.unwrap(),
             facets: self._fields.1,
@@ -292,11 +292,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Message<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Message<S> {
         Message {
             content: self._fields.0.unwrap(),
             facets: self._fields.1,

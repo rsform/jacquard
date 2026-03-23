@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, Datetime};
 use jacquard_common::types::value::Data;
@@ -18,28 +18,27 @@ use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Status<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct Status<S: BosStr = DefaultStr> {
     pub did: Did<S>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct StatusOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct StatusOutput<S: BosStr = DefaultStr> {
     ///Authoritative boundaries assigned. Only included when request is authenticated.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub boundaries: Option<Vec<Data<S>>>,
@@ -50,9 +49,7 @@ pub struct StatusOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///When the DID was enrolled, if enrolled.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub enrolled_at: Option<Datetime>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -61,12 +58,11 @@ pub struct StatusResponse;
 impl jacquard_common::xrpc::XrpcResp for StatusResponse {
     const NSID: &'static str = "zone.stratos.enrollment.status";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = StatusOutput<S>;
+    type Output<S: BosStr> = StatusOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for Status<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Status<S> {
     const NSID: &'static str = "zone.stratos.enrollment.status";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = StatusResponse;
@@ -77,7 +73,7 @@ pub struct StatusRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for StatusRequest {
     const PATH: &'static str = "/xrpc/zone.stratos.enrollment.status";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = Status<S>;
+    type Request<S: BosStr> = Status<S>;
     type Response = StatusResponse;
 }
 
@@ -100,9 +96,9 @@ pub mod status_state {
         type Did = Unset;
     }
     ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
         type Did = Set<members::did>;
     }
     /// Marker types for field names
@@ -113,57 +109,57 @@ pub mod status_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct StatusBuilder<'a, S: status_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct StatusBuilder<S: BosStr, St: status_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Status<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> StatusBuilder<'a, status_state::Empty> {
+impl<S: BosStr> Status<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> StatusBuilder<S, status_state::Empty> {
         StatusBuilder::new()
     }
 }
 
-impl<'a> StatusBuilder<'a, status_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> StatusBuilder<S, status_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         StatusBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> StatusBuilder<'a, S>
+impl<S: BosStr, St> StatusBuilder<S, St>
 where
-    S: status_state::State,
-    S::Did: status_state::IsUnset,
+    St: status_state::State,
+    St::Did: status_state::IsUnset,
 {
     /// Set the `did` field (required)
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> StatusBuilder<'a, status_state::SetDid<S>> {
+    ) -> StatusBuilder<S, status_state::SetDid<St>> {
         self._fields.0 = Option::Some(value.into());
         StatusBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> StatusBuilder<'a, S>
+impl<S: BosStr, St> StatusBuilder<S, St>
 where
-    S: status_state::State,
-    S::Did: status_state::IsSet,
+    St: status_state::State,
+    St::Did: status_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Status<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Status<S> {
         Status {
             did: self._fields.0.unwrap(),
         }

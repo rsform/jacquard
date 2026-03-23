@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::value::Data;
@@ -19,34 +19,30 @@ use serde::{Serialize, Deserialize};
 use crate::fm_teal::alpha::feed::PlayView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetPlay<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct GetPlay<S: BosStr = DefaultStr> {
     pub author_did: AtIdentifier<S>,
-    #[serde(borrow)]
     pub rkey: S,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetPlayOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetPlayOutput<S: BosStr = DefaultStr> {
     pub play: PlayView<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -55,12 +51,11 @@ pub struct GetPlayResponse;
 impl jacquard_common::xrpc::XrpcResp for GetPlayResponse {
     const NSID: &'static str = "fm.teal.alpha.feed.getPlay";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetPlayOutput<S>;
+    type Output<S: BosStr> = GetPlayOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetPlay<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetPlay<S> {
     const NSID: &'static str = "fm.teal.alpha.feed.getPlay";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetPlayResponse;
@@ -71,7 +66,7 @@ pub struct GetPlayRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetPlayRequest {
     const PATH: &'static str = "/xrpc/fm.teal.alpha.feed.getPlay";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetPlay<S>;
+    type Request<S: BosStr> = GetPlay<S>;
     type Response = GetPlayResponse;
 }
 
@@ -96,17 +91,17 @@ pub mod get_play_state {
         type Rkey = Unset;
     }
     ///State transition - sets the `author_did` field to Set
-    pub struct SetAuthorDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthorDid<S> {}
-    impl<S: State> State for SetAuthorDid<S> {
+    pub struct SetAuthorDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAuthorDid<St> {}
+    impl<St: State> State for SetAuthorDid<St> {
         type AuthorDid = Set<members::author_did>;
-        type Rkey = S::Rkey;
+        type Rkey = St::Rkey;
     }
     ///State transition - sets the `rkey` field to Set
-    pub struct SetRkey<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRkey<S> {}
-    impl<S: State> State for SetRkey<S> {
-        type AuthorDid = S::AuthorDid;
+    pub struct SetRkey<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRkey<St> {}
+    impl<St: State> State for SetRkey<St> {
+        type AuthorDid = St::AuthorDid;
         type Rkey = Set<members::rkey>;
     }
     /// Marker types for field names
@@ -119,77 +114,77 @@ pub mod get_play_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetPlayBuilder<'a, S: get_play_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetPlayBuilder<S: BosStr, St: get_play_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtIdentifier<S>>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetPlay<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetPlayBuilder<'a, get_play_state::Empty> {
+impl<S: BosStr> GetPlay<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetPlayBuilder<S, get_play_state::Empty> {
         GetPlayBuilder::new()
     }
 }
 
-impl<'a> GetPlayBuilder<'a, get_play_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetPlayBuilder<S, get_play_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetPlayBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetPlayBuilder<'a, S>
+impl<S: BosStr, St> GetPlayBuilder<S, St>
 where
-    S: get_play_state::State,
-    S::AuthorDid: get_play_state::IsUnset,
+    St: get_play_state::State,
+    St::AuthorDid: get_play_state::IsUnset,
 {
     /// Set the `authorDID` field (required)
     pub fn author_did(
         mut self,
         value: impl Into<AtIdentifier<S>>,
-    ) -> GetPlayBuilder<'a, get_play_state::SetAuthorDid<S>> {
+    ) -> GetPlayBuilder<S, get_play_state::SetAuthorDid<St>> {
         self._fields.0 = Option::Some(value.into());
         GetPlayBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetPlayBuilder<'a, S>
+impl<S: BosStr, St> GetPlayBuilder<S, St>
 where
-    S: get_play_state::State,
-    S::Rkey: get_play_state::IsUnset,
+    St: get_play_state::State,
+    St::Rkey: get_play_state::IsUnset,
 {
     /// Set the `rkey` field (required)
     pub fn rkey(
         mut self,
         value: impl Into<S>,
-    ) -> GetPlayBuilder<'a, get_play_state::SetRkey<S>> {
+    ) -> GetPlayBuilder<S, get_play_state::SetRkey<St>> {
         self._fields.1 = Option::Some(value.into());
         GetPlayBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetPlayBuilder<'a, S>
+impl<S: BosStr, St> GetPlayBuilder<S, St>
 where
-    S: get_play_state::State,
-    S::AuthorDid: get_play_state::IsSet,
-    S::Rkey: get_play_state::IsSet,
+    St: get_play_state::State,
+    St::AuthorDid: get_play_state::IsSet,
+    St::Rkey: get_play_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetPlay<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetPlay<S> {
         GetPlay {
             author_did: self._fields.0.unwrap(),
             rkey: self._fields.1.unwrap(),

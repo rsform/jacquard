@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
@@ -18,16 +18,15 @@ use serde::{Serialize, Deserialize};
 use crate::app_bsky::actor::ProfileView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetSuggestedUsers<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetSuggestedUsers<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub category: Option<S>,
     ///Defaults to `25`. Min: 1. Max: 50.
     #[serde(default = "_default_limit")]
@@ -37,14 +36,14 @@ pub struct GetSuggestedUsers<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetSuggestedUsersOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetSuggestedUsersOutput<S: BosStr = DefaultStr> {
     pub actors: Vec<ProfileView<S>>,
     ///DEPRECATED: use recIdStr instead.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -52,9 +51,7 @@ pub struct GetSuggestedUsersOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Snowflake for this recommendation, use when submitting recommendation events.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub rec_id_str: Option<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -63,12 +60,11 @@ pub struct GetSuggestedUsersResponse;
 impl jacquard_common::xrpc::XrpcResp for GetSuggestedUsersResponse {
     const NSID: &'static str = "app.bsky.unspecced.getSuggestedUsers";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetSuggestedUsersOutput<S>;
+    type Output<S: BosStr> = GetSuggestedUsersOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetSuggestedUsers<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetSuggestedUsers<S> {
     const NSID: &'static str = "app.bsky.unspecced.getSuggestedUsers";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetSuggestedUsersResponse;
@@ -79,7 +75,7 @@ pub struct GetSuggestedUsersRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetSuggestedUsersRequest {
     const PATH: &'static str = "/xrpc/app.bsky.unspecced.getSuggestedUsers";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetSuggestedUsers<S>;
+    type Request<S: BosStr> = GetSuggestedUsers<S>;
     type Response = GetSuggestedUsersResponse;
 }
 
@@ -106,32 +102,32 @@ pub mod get_suggested_users_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetSuggestedUsersBuilder<'a, S: get_suggested_users_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetSuggestedUsersBuilder<S: BosStr, St: get_suggested_users_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetSuggestedUsers<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetSuggestedUsersBuilder<'a, get_suggested_users_state::Empty> {
+impl<S: BosStr> GetSuggestedUsers<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetSuggestedUsersBuilder<S, get_suggested_users_state::Empty> {
         GetSuggestedUsersBuilder::new()
     }
 }
 
-impl<'a> GetSuggestedUsersBuilder<'a, get_suggested_users_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetSuggestedUsersBuilder<S, get_suggested_users_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetSuggestedUsersBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: get_suggested_users_state::State> GetSuggestedUsersBuilder<'a, S> {
+impl<S: BosStr, St: get_suggested_users_state::State> GetSuggestedUsersBuilder<S, St> {
     /// Set the `category` field (optional)
     pub fn category(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -144,7 +140,7 @@ impl<'a, S: get_suggested_users_state::State> GetSuggestedUsersBuilder<'a, S> {
     }
 }
 
-impl<'a, S: get_suggested_users_state::State> GetSuggestedUsersBuilder<'a, S> {
+impl<S: BosStr, St: get_suggested_users_state::State> GetSuggestedUsersBuilder<S, St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -157,12 +153,12 @@ impl<'a, S: get_suggested_users_state::State> GetSuggestedUsersBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GetSuggestedUsersBuilder<'a, S>
+impl<S: BosStr, St> GetSuggestedUsersBuilder<S, St>
 where
-    S: get_suggested_users_state::State,
+    St: get_suggested_users_state::State,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetSuggestedUsers<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetSuggestedUsers<S> {
         GetSuggestedUsers {
             category: self._fields.0,
             limit: self._fields.1,

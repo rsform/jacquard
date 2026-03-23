@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use serde::{Serialize, Deserialize};
     rename = "dev.fudgeu.experimental.atforumv1.feed.question",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Question<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Question<S: BosStr = DefaultStr> {
     pub content: S,
     pub created_at: Datetime,
     pub forum: AtIdentifier<S>,
@@ -59,18 +59,18 @@ pub struct Question<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct QuestionGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct QuestionGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Question<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Question<S> {
+impl<S: BosStr> Question<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, QuestionRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -83,17 +83,17 @@ pub struct QuestionRecord;
 impl XrpcResp for QuestionRecord {
     const NSID: &'static str = "dev.fudgeu.experimental.atforumv1.feed.question";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = QuestionGetRecordOutput<S>;
+    type Output<S: BosStr> = QuestionGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<QuestionGetRecordOutput<S>> for Question<S> {
+impl<S: BosStr> From<QuestionGetRecordOutput<S>> for Question<S> {
     fn from(output: QuestionGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Question<S> {
+impl<S: BosStr> Collection for Question<S> {
     const NSID: &'static str = "dev.fudgeu.experimental.atforumv1.feed.question";
     type Record = QuestionRecord;
 }
@@ -103,7 +103,7 @@ impl Collection for QuestionRecord {
     type Record = QuestionRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Question<S> {
+impl<S: BosStr> LexiconSchema for Question<S> {
     fn nsid() -> &'static str {
         "dev.fudgeu.experimental.atforumv1.feed.question"
     }
@@ -183,111 +183,111 @@ pub mod question_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type IsOpen;
         type Content;
         type Forum;
-        type Tags;
-        type Title;
-        type IsOpen;
         type CreatedAt;
+        type Title;
+        type Tags;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type IsOpen = Unset;
         type Content = Unset;
         type Forum = Unset;
-        type Tags = Unset;
-        type Title = Unset;
-        type IsOpen = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type Content = Set<members::content>;
-        type Forum = S::Forum;
-        type Tags = S::Tags;
-        type Title = S::Title;
-        type IsOpen = S::IsOpen;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `forum` field to Set
-    pub struct SetForum<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetForum<S> {}
-    impl<S: State> State for SetForum<S> {
-        type Content = S::Content;
-        type Forum = Set<members::forum>;
-        type Tags = S::Tags;
-        type Title = S::Title;
-        type IsOpen = S::IsOpen;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `tags` field to Set
-    pub struct SetTags<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTags<S> {}
-    impl<S: State> State for SetTags<S> {
-        type Content = S::Content;
-        type Forum = S::Forum;
-        type Tags = Set<members::tags>;
-        type Title = S::Title;
-        type IsOpen = S::IsOpen;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Content = S::Content;
-        type Forum = S::Forum;
-        type Tags = S::Tags;
-        type Title = Set<members::title>;
-        type IsOpen = S::IsOpen;
-        type CreatedAt = S::CreatedAt;
+        type Title = Unset;
+        type Tags = Unset;
     }
     ///State transition - sets the `is_open` field to Set
-    pub struct SetIsOpen<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIsOpen<S> {}
-    impl<S: State> State for SetIsOpen<S> {
-        type Content = S::Content;
-        type Forum = S::Forum;
-        type Tags = S::Tags;
-        type Title = S::Title;
+    pub struct SetIsOpen<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIsOpen<St> {}
+    impl<St: State> State for SetIsOpen<St> {
         type IsOpen = Set<members::is_open>;
-        type CreatedAt = S::CreatedAt;
+        type Content = St::Content;
+        type Forum = St::Forum;
+        type CreatedAt = St::CreatedAt;
+        type Title = St::Title;
+        type Tags = St::Tags;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetContent<St> {}
+    impl<St: State> State for SetContent<St> {
+        type IsOpen = St::IsOpen;
+        type Content = Set<members::content>;
+        type Forum = St::Forum;
+        type CreatedAt = St::CreatedAt;
+        type Title = St::Title;
+        type Tags = St::Tags;
+    }
+    ///State transition - sets the `forum` field to Set
+    pub struct SetForum<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetForum<St> {}
+    impl<St: State> State for SetForum<St> {
+        type IsOpen = St::IsOpen;
+        type Content = St::Content;
+        type Forum = Set<members::forum>;
+        type CreatedAt = St::CreatedAt;
+        type Title = St::Title;
+        type Tags = St::Tags;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Content = S::Content;
-        type Forum = S::Forum;
-        type Tags = S::Tags;
-        type Title = S::Title;
-        type IsOpen = S::IsOpen;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type IsOpen = St::IsOpen;
+        type Content = St::Content;
+        type Forum = St::Forum;
         type CreatedAt = Set<members::created_at>;
+        type Title = St::Title;
+        type Tags = St::Tags;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
+        type IsOpen = St::IsOpen;
+        type Content = St::Content;
+        type Forum = St::Forum;
+        type CreatedAt = St::CreatedAt;
+        type Title = Set<members::title>;
+        type Tags = St::Tags;
+    }
+    ///State transition - sets the `tags` field to Set
+    pub struct SetTags<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTags<St> {}
+    impl<St: State> State for SetTags<St> {
+        type IsOpen = St::IsOpen;
+        type Content = St::Content;
+        type Forum = St::Forum;
+        type CreatedAt = St::CreatedAt;
+        type Title = St::Title;
+        type Tags = Set<members::tags>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `is_open` field
+        pub struct is_open(());
         ///Marker type for the `content` field
         pub struct content(());
         ///Marker type for the `forum` field
         pub struct forum(());
-        ///Marker type for the `tags` field
-        pub struct tags(());
-        ///Marker type for the `title` field
-        pub struct title(());
-        ///Marker type for the `is_open` field
-        pub struct is_open(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `title` field
+        pub struct title(());
+        ///Marker type for the `tags` field
+        pub struct tags(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct QuestionBuilder<'a, S: question_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct QuestionBuilder<S: BosStr, St: question_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
         Option<Datetime>,
@@ -297,142 +297,142 @@ pub struct QuestionBuilder<'a, S: question_state::State> {
         Option<S>,
         Option<Datetime>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Question<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> QuestionBuilder<'a, question_state::Empty> {
+impl<S: BosStr> Question<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> QuestionBuilder<S, question_state::Empty> {
         QuestionBuilder::new()
     }
 }
 
-impl<'a> QuestionBuilder<'a, question_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> QuestionBuilder<S, question_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         QuestionBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> QuestionBuilder<'a, S>
+impl<S: BosStr, St> QuestionBuilder<S, St>
 where
-    S: question_state::State,
-    S::Content: question_state::IsUnset,
+    St: question_state::State,
+    St::Content: question_state::IsUnset,
 {
     /// Set the `content` field (required)
     pub fn content(
         mut self,
         value: impl Into<S>,
-    ) -> QuestionBuilder<'a, question_state::SetContent<S>> {
+    ) -> QuestionBuilder<S, question_state::SetContent<St>> {
         self._fields.0 = Option::Some(value.into());
         QuestionBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> QuestionBuilder<'a, S>
+impl<S: BosStr, St> QuestionBuilder<S, St>
 where
-    S: question_state::State,
-    S::CreatedAt: question_state::IsUnset,
+    St: question_state::State,
+    St::CreatedAt: question_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> QuestionBuilder<'a, question_state::SetCreatedAt<S>> {
+    ) -> QuestionBuilder<S, question_state::SetCreatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         QuestionBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> QuestionBuilder<'a, S>
+impl<S: BosStr, St> QuestionBuilder<S, St>
 where
-    S: question_state::State,
-    S::Forum: question_state::IsUnset,
+    St: question_state::State,
+    St::Forum: question_state::IsUnset,
 {
     /// Set the `forum` field (required)
     pub fn forum(
         mut self,
         value: impl Into<AtIdentifier<S>>,
-    ) -> QuestionBuilder<'a, question_state::SetForum<S>> {
+    ) -> QuestionBuilder<S, question_state::SetForum<St>> {
         self._fields.2 = Option::Some(value.into());
         QuestionBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> QuestionBuilder<'a, S>
+impl<S: BosStr, St> QuestionBuilder<S, St>
 where
-    S: question_state::State,
-    S::IsOpen: question_state::IsUnset,
+    St: question_state::State,
+    St::IsOpen: question_state::IsUnset,
 {
     /// Set the `isOpen` field (required)
     pub fn is_open(
         mut self,
         value: impl Into<bool>,
-    ) -> QuestionBuilder<'a, question_state::SetIsOpen<S>> {
+    ) -> QuestionBuilder<S, question_state::SetIsOpen<St>> {
         self._fields.3 = Option::Some(value.into());
         QuestionBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> QuestionBuilder<'a, S>
+impl<S: BosStr, St> QuestionBuilder<S, St>
 where
-    S: question_state::State,
-    S::Tags: question_state::IsUnset,
+    St: question_state::State,
+    St::Tags: question_state::IsUnset,
 {
     /// Set the `tags` field (required)
     pub fn tags(
         mut self,
         value: impl Into<Vec<S>>,
-    ) -> QuestionBuilder<'a, question_state::SetTags<S>> {
+    ) -> QuestionBuilder<S, question_state::SetTags<St>> {
         self._fields.4 = Option::Some(value.into());
         QuestionBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> QuestionBuilder<'a, S>
+impl<S: BosStr, St> QuestionBuilder<S, St>
 where
-    S: question_state::State,
-    S::Title: question_state::IsUnset,
+    St: question_state::State,
+    St::Title: question_state::IsUnset,
 {
     /// Set the `title` field (required)
     pub fn title(
         mut self,
         value: impl Into<S>,
-    ) -> QuestionBuilder<'a, question_state::SetTitle<S>> {
+    ) -> QuestionBuilder<S, question_state::SetTitle<St>> {
         self._fields.5 = Option::Some(value.into());
         QuestionBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: question_state::State> QuestionBuilder<'a, S> {
+impl<S: BosStr, St: question_state::State> QuestionBuilder<S, St> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.6 = value.into();
@@ -445,18 +445,18 @@ impl<'a, S: question_state::State> QuestionBuilder<'a, S> {
     }
 }
 
-impl<'a, S> QuestionBuilder<'a, S>
+impl<S: BosStr, St> QuestionBuilder<S, St>
 where
-    S: question_state::State,
-    S::Content: question_state::IsSet,
-    S::Forum: question_state::IsSet,
-    S::Tags: question_state::IsSet,
-    S::Title: question_state::IsSet,
-    S::IsOpen: question_state::IsSet,
-    S::CreatedAt: question_state::IsSet,
+    St: question_state::State,
+    St::IsOpen: question_state::IsSet,
+    St::Content: question_state::IsSet,
+    St::Forum: question_state::IsSet,
+    St::CreatedAt: question_state::IsSet,
+    St::Title: question_state::IsSet,
+    St::Tags: question_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Question<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Question<S> {
         Question {
             content: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
@@ -468,11 +468,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Question<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Question<S> {
         Question {
             content: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),

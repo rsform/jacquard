@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "garden.lexicon.example",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Example<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Example<S: BosStr = DefaultStr> {
     ///The user-supplied date and time the example was created.
     pub created_at: Datetime,
     ///A description of the example.
@@ -59,18 +59,18 @@ pub struct Example<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ExampleGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ExampleGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Example<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Example<S> {
+impl<S: BosStr> Example<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, ExampleRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -83,17 +83,17 @@ pub struct ExampleRecord;
 impl XrpcResp for ExampleRecord {
     const NSID: &'static str = "garden.lexicon.example";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ExampleGetRecordOutput<S>;
+    type Output<S: BosStr> = ExampleGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<ExampleGetRecordOutput<S>> for Example<S> {
+impl<S: BosStr> From<ExampleGetRecordOutput<S>> for Example<S> {
     fn from(output: ExampleGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Example<S> {
+impl<S: BosStr> Collection for Example<S> {
     const NSID: &'static str = "garden.lexicon.example";
     type Record = ExampleRecord;
 }
@@ -103,7 +103,7 @@ impl Collection for ExampleRecord {
     type Record = ExampleRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Example<S> {
+impl<S: BosStr> LexiconSchema for Example<S> {
     fn nsid() -> &'static str {
         "garden.lexicon.example"
     }
@@ -128,99 +128,99 @@ pub mod example_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Value;
         type Lexicon;
+        type Value;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Value = Unset;
         type Lexicon = Unset;
+        type Value = Unset;
         type CreatedAt = Unset;
     }
-    ///State transition - sets the `value` field to Set
-    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValue<S> {}
-    impl<S: State> State for SetValue<S> {
-        type Value = Set<members::value>;
-        type Lexicon = S::Lexicon;
-        type CreatedAt = S::CreatedAt;
-    }
     ///State transition - sets the `lexicon` field to Set
-    pub struct SetLexicon<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLexicon<S> {}
-    impl<S: State> State for SetLexicon<S> {
-        type Value = S::Value;
+    pub struct SetLexicon<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLexicon<St> {}
+    impl<St: State> State for SetLexicon<St> {
         type Lexicon = Set<members::lexicon>;
-        type CreatedAt = S::CreatedAt;
+        type Value = St::Value;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetValue<St> {}
+    impl<St: State> State for SetValue<St> {
+        type Lexicon = St::Lexicon;
+        type Value = Set<members::value>;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Value = S::Value;
-        type Lexicon = S::Lexicon;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Lexicon = St::Lexicon;
+        type Value = St::Value;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `value` field
-        pub struct value(());
         ///Marker type for the `lexicon` field
         pub struct lexicon(());
+        ///Marker type for the `value` field
+        pub struct value(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ExampleBuilder<'a, S: example_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ExampleBuilder<S: BosStr, St: example_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<S>, Option<Nsid<S>>, Option<Data<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Example<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ExampleBuilder<'a, example_state::Empty> {
+impl<S: BosStr> Example<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ExampleBuilder<S, example_state::Empty> {
         ExampleBuilder::new()
     }
 }
 
-impl<'a> ExampleBuilder<'a, example_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ExampleBuilder<S, example_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ExampleBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ExampleBuilder<'a, S>
+impl<S: BosStr, St> ExampleBuilder<S, St>
 where
-    S: example_state::State,
-    S::CreatedAt: example_state::IsUnset,
+    St: example_state::State,
+    St::CreatedAt: example_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ExampleBuilder<'a, example_state::SetCreatedAt<S>> {
+    ) -> ExampleBuilder<S, example_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         ExampleBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: example_state::State> ExampleBuilder<'a, S> {
+impl<S: BosStr, St: example_state::State> ExampleBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -233,53 +233,53 @@ impl<'a, S: example_state::State> ExampleBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ExampleBuilder<'a, S>
+impl<S: BosStr, St> ExampleBuilder<S, St>
 where
-    S: example_state::State,
-    S::Lexicon: example_state::IsUnset,
+    St: example_state::State,
+    St::Lexicon: example_state::IsUnset,
 {
     /// Set the `lexicon` field (required)
     pub fn lexicon(
         mut self,
         value: impl Into<Nsid<S>>,
-    ) -> ExampleBuilder<'a, example_state::SetLexicon<S>> {
+    ) -> ExampleBuilder<S, example_state::SetLexicon<St>> {
         self._fields.2 = Option::Some(value.into());
         ExampleBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ExampleBuilder<'a, S>
+impl<S: BosStr, St> ExampleBuilder<S, St>
 where
-    S: example_state::State,
-    S::Value: example_state::IsUnset,
+    St: example_state::State,
+    St::Value: example_state::IsUnset,
 {
     /// Set the `value` field (required)
     pub fn value(
         mut self,
         value: impl Into<Data<S>>,
-    ) -> ExampleBuilder<'a, example_state::SetValue<S>> {
+    ) -> ExampleBuilder<S, example_state::SetValue<St>> {
         self._fields.3 = Option::Some(value.into());
         ExampleBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ExampleBuilder<'a, S>
+impl<S: BosStr, St> ExampleBuilder<S, St>
 where
-    S: example_state::State,
-    S::Value: example_state::IsSet,
-    S::Lexicon: example_state::IsSet,
-    S::CreatedAt: example_state::IsSet,
+    St: example_state::State,
+    St::Lexicon: example_state::IsSet,
+    St::Value: example_state::IsSet,
+    St::CreatedAt: example_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Example<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Example<S> {
         Example {
             created_at: self._fields.0.unwrap(),
             description: self._fields.1,
@@ -288,11 +288,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Example<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Example<S> {
         Example {
             created_at: self._fields.0.unwrap(),
             description: self._fields.1,

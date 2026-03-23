@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,11 +34,11 @@ use serde::{Serialize, Deserialize};
     rename = "net.mmatt.vitals.car",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Car<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Car<S: BosStr = DefaultStr> {
     ///The car fuel amount remaining value (floating point string)
     pub amount_remaining: S,
     ///The car fuel range value in miles
@@ -68,18 +68,18 @@ pub struct Car<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CarGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CarGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Car<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Car<S> {
+impl<S: BosStr> Car<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, CarRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -92,17 +92,17 @@ pub struct CarRecord;
 impl XrpcResp for CarRecord {
     const NSID: &'static str = "net.mmatt.vitals.car";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = CarGetRecordOutput<S>;
+    type Output<S: BosStr> = CarGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<CarGetRecordOutput<S>> for Car<S> {
+impl<S: BosStr> From<CarGetRecordOutput<S>> for Car<S> {
     fn from(output: CarGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Car<S> {
+impl<S: BosStr> Collection for Car<S> {
     const NSID: &'static str = "net.mmatt.vitals.car";
     type Record = CarRecord;
 }
@@ -112,7 +112,7 @@ impl Collection for CarRecord {
     type Record = CarRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Car<S> {
+impl<S: BosStr> LexiconSchema for Car<S> {
     fn nsid() -> &'static str {
         "net.mmatt.vitals.car"
     }
@@ -138,9 +138,9 @@ pub mod car_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type AmountRemaining;
-        type CarPercentFuelRemaining;
         type CarFuelRange;
         type CarTraveledDistance;
+        type CarPercentFuelRemaining;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
@@ -148,59 +148,59 @@ pub mod car_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type AmountRemaining = Unset;
-        type CarPercentFuelRemaining = Unset;
         type CarFuelRange = Unset;
         type CarTraveledDistance = Unset;
+        type CarPercentFuelRemaining = Unset;
         type CreatedAt = Unset;
     }
     ///State transition - sets the `amount_remaining` field to Set
-    pub struct SetAmountRemaining<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAmountRemaining<S> {}
-    impl<S: State> State for SetAmountRemaining<S> {
+    pub struct SetAmountRemaining<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAmountRemaining<St> {}
+    impl<St: State> State for SetAmountRemaining<St> {
         type AmountRemaining = Set<members::amount_remaining>;
-        type CarPercentFuelRemaining = S::CarPercentFuelRemaining;
-        type CarFuelRange = S::CarFuelRange;
-        type CarTraveledDistance = S::CarTraveledDistance;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `car_percent_fuel_remaining` field to Set
-    pub struct SetCarPercentFuelRemaining<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCarPercentFuelRemaining<S> {}
-    impl<S: State> State for SetCarPercentFuelRemaining<S> {
-        type AmountRemaining = S::AmountRemaining;
-        type CarPercentFuelRemaining = Set<members::car_percent_fuel_remaining>;
-        type CarFuelRange = S::CarFuelRange;
-        type CarTraveledDistance = S::CarTraveledDistance;
-        type CreatedAt = S::CreatedAt;
+        type CarFuelRange = St::CarFuelRange;
+        type CarTraveledDistance = St::CarTraveledDistance;
+        type CarPercentFuelRemaining = St::CarPercentFuelRemaining;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `car_fuel_range` field to Set
-    pub struct SetCarFuelRange<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCarFuelRange<S> {}
-    impl<S: State> State for SetCarFuelRange<S> {
-        type AmountRemaining = S::AmountRemaining;
-        type CarPercentFuelRemaining = S::CarPercentFuelRemaining;
+    pub struct SetCarFuelRange<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCarFuelRange<St> {}
+    impl<St: State> State for SetCarFuelRange<St> {
+        type AmountRemaining = St::AmountRemaining;
         type CarFuelRange = Set<members::car_fuel_range>;
-        type CarTraveledDistance = S::CarTraveledDistance;
-        type CreatedAt = S::CreatedAt;
+        type CarTraveledDistance = St::CarTraveledDistance;
+        type CarPercentFuelRemaining = St::CarPercentFuelRemaining;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `car_traveled_distance` field to Set
-    pub struct SetCarTraveledDistance<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCarTraveledDistance<S> {}
-    impl<S: State> State for SetCarTraveledDistance<S> {
-        type AmountRemaining = S::AmountRemaining;
-        type CarPercentFuelRemaining = S::CarPercentFuelRemaining;
-        type CarFuelRange = S::CarFuelRange;
+    pub struct SetCarTraveledDistance<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCarTraveledDistance<St> {}
+    impl<St: State> State for SetCarTraveledDistance<St> {
+        type AmountRemaining = St::AmountRemaining;
+        type CarFuelRange = St::CarFuelRange;
         type CarTraveledDistance = Set<members::car_traveled_distance>;
-        type CreatedAt = S::CreatedAt;
+        type CarPercentFuelRemaining = St::CarPercentFuelRemaining;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `car_percent_fuel_remaining` field to Set
+    pub struct SetCarPercentFuelRemaining<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCarPercentFuelRemaining<St> {}
+    impl<St: State> State for SetCarPercentFuelRemaining<St> {
+        type AmountRemaining = St::AmountRemaining;
+        type CarFuelRange = St::CarFuelRange;
+        type CarTraveledDistance = St::CarTraveledDistance;
+        type CarPercentFuelRemaining = Set<members::car_percent_fuel_remaining>;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type AmountRemaining = S::AmountRemaining;
-        type CarPercentFuelRemaining = S::CarPercentFuelRemaining;
-        type CarFuelRange = S::CarFuelRange;
-        type CarTraveledDistance = S::CarTraveledDistance;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type AmountRemaining = St::AmountRemaining;
+        type CarFuelRange = St::CarFuelRange;
+        type CarTraveledDistance = St::CarTraveledDistance;
+        type CarPercentFuelRemaining = St::CarPercentFuelRemaining;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
@@ -208,20 +208,20 @@ pub mod car_state {
     pub mod members {
         ///Marker type for the `amount_remaining` field
         pub struct amount_remaining(());
-        ///Marker type for the `car_percent_fuel_remaining` field
-        pub struct car_percent_fuel_remaining(());
         ///Marker type for the `car_fuel_range` field
         pub struct car_fuel_range(());
         ///Marker type for the `car_traveled_distance` field
         pub struct car_traveled_distance(());
+        ///Marker type for the `car_percent_fuel_remaining` field
+        pub struct car_percent_fuel_remaining(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct CarBuilder<'a, S: car_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct CarBuilder<S: BosStr, St: car_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
         Option<i64>,
@@ -232,66 +232,66 @@ pub struct CarBuilder<'a, S: car_state::State> {
         Option<i64>,
         Option<Datetime>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Car<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> CarBuilder<'a, car_state::Empty> {
+impl<S: BosStr> Car<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> CarBuilder<S, car_state::Empty> {
         CarBuilder::new()
     }
 }
 
-impl<'a> CarBuilder<'a, car_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> CarBuilder<S, car_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         CarBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CarBuilder<'a, S>
+impl<S: BosStr, St> CarBuilder<S, St>
 where
-    S: car_state::State,
-    S::AmountRemaining: car_state::IsUnset,
+    St: car_state::State,
+    St::AmountRemaining: car_state::IsUnset,
 {
     /// Set the `amountRemaining` field (required)
     pub fn amount_remaining(
         mut self,
         value: impl Into<S>,
-    ) -> CarBuilder<'a, car_state::SetAmountRemaining<S>> {
+    ) -> CarBuilder<S, car_state::SetAmountRemaining<St>> {
         self._fields.0 = Option::Some(value.into());
         CarBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CarBuilder<'a, S>
+impl<S: BosStr, St> CarBuilder<S, St>
 where
-    S: car_state::State,
-    S::CarFuelRange: car_state::IsUnset,
+    St: car_state::State,
+    St::CarFuelRange: car_state::IsUnset,
 {
     /// Set the `carFuelRange` field (required)
     pub fn car_fuel_range(
         mut self,
         value: impl Into<i64>,
-    ) -> CarBuilder<'a, car_state::SetCarFuelRange<S>> {
+    ) -> CarBuilder<S, car_state::SetCarFuelRange<St>> {
         self._fields.1 = Option::Some(value.into());
         CarBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: car_state::State> CarBuilder<'a, S> {
+impl<S: BosStr, St: car_state::State> CarBuilder<S, St> {
     /// Set the `carMake` field (optional)
     pub fn car_make(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -304,7 +304,7 @@ impl<'a, S: car_state::State> CarBuilder<'a, S> {
     }
 }
 
-impl<'a, S: car_state::State> CarBuilder<'a, S> {
+impl<S: BosStr, St: car_state::State> CarBuilder<S, St> {
     /// Set the `carModel` field (optional)
     pub fn car_model(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -317,45 +317,45 @@ impl<'a, S: car_state::State> CarBuilder<'a, S> {
     }
 }
 
-impl<'a, S> CarBuilder<'a, S>
+impl<S: BosStr, St> CarBuilder<S, St>
 where
-    S: car_state::State,
-    S::CarPercentFuelRemaining: car_state::IsUnset,
+    St: car_state::State,
+    St::CarPercentFuelRemaining: car_state::IsUnset,
 {
     /// Set the `carPercentFuelRemaining` field (required)
     pub fn car_percent_fuel_remaining(
         mut self,
         value: impl Into<S>,
-    ) -> CarBuilder<'a, car_state::SetCarPercentFuelRemaining<S>> {
+    ) -> CarBuilder<S, car_state::SetCarPercentFuelRemaining<St>> {
         self._fields.4 = Option::Some(value.into());
         CarBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CarBuilder<'a, S>
+impl<S: BosStr, St> CarBuilder<S, St>
 where
-    S: car_state::State,
-    S::CarTraveledDistance: car_state::IsUnset,
+    St: car_state::State,
+    St::CarTraveledDistance: car_state::IsUnset,
 {
     /// Set the `carTraveledDistance` field (required)
     pub fn car_traveled_distance(
         mut self,
         value: impl Into<i64>,
-    ) -> CarBuilder<'a, car_state::SetCarTraveledDistance<S>> {
+    ) -> CarBuilder<S, car_state::SetCarTraveledDistance<St>> {
         self._fields.5 = Option::Some(value.into());
         CarBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: car_state::State> CarBuilder<'a, S> {
+impl<S: BosStr, St: car_state::State> CarBuilder<S, St> {
     /// Set the `carYear` field (optional)
     pub fn car_year(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.6 = value.into();
@@ -368,36 +368,36 @@ impl<'a, S: car_state::State> CarBuilder<'a, S> {
     }
 }
 
-impl<'a, S> CarBuilder<'a, S>
+impl<S: BosStr, St> CarBuilder<S, St>
 where
-    S: car_state::State,
-    S::CreatedAt: car_state::IsUnset,
+    St: car_state::State,
+    St::CreatedAt: car_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> CarBuilder<'a, car_state::SetCreatedAt<S>> {
+    ) -> CarBuilder<S, car_state::SetCreatedAt<St>> {
         self._fields.7 = Option::Some(value.into());
         CarBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CarBuilder<'a, S>
+impl<S: BosStr, St> CarBuilder<S, St>
 where
-    S: car_state::State,
-    S::AmountRemaining: car_state::IsSet,
-    S::CarPercentFuelRemaining: car_state::IsSet,
-    S::CarFuelRange: car_state::IsSet,
-    S::CarTraveledDistance: car_state::IsSet,
-    S::CreatedAt: car_state::IsSet,
+    St: car_state::State,
+    St::AmountRemaining: car_state::IsSet,
+    St::CarFuelRange: car_state::IsSet,
+    St::CarTraveledDistance: car_state::IsSet,
+    St::CarPercentFuelRemaining: car_state::IsSet,
+    St::CreatedAt: car_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Car<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Car<S> {
         Car {
             amount_remaining: self._fields.0.unwrap(),
             car_fuel_range: self._fields.1.unwrap(),
@@ -410,8 +410,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Car<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Car<S> {
         Car {
             amount_remaining: self._fields.0.unwrap(),
             car_fuel_range: self._fields.1.unwrap(),

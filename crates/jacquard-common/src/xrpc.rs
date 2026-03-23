@@ -29,7 +29,7 @@ pub mod subscription;
 
 #[cfg(feature = "streaming")]
 use crate::StreamError;
-use crate::bos::Bos;
+use crate::bos::BosStr;
 use crate::error::DecodeError;
 use crate::http_client::HttpClient;
 #[cfg(feature = "streaming")]
@@ -133,7 +133,7 @@ impl XrpcMethod {
 /// HTTP method, encoding, and associated output type.
 ///
 /// The trait is implemented on the request parameters/input type itself.
-pub trait XrpcRequest: Serialize {
+pub trait XrpcRequest {
     /// The NSID for this XRPC method
     const NSID: &'static str;
 
@@ -146,7 +146,10 @@ pub trait XrpcRequest: Serialize {
     /// Encode the request body for procedures.
     ///
     /// Default implementation serializes to JSON. Override for non-JSON encodings.
-    fn encode_body(&self, buffer: &mut [u8]) -> Result<(), EncodeError> {
+    fn encode_body(&self, buffer: &mut [u8]) -> Result<(), EncodeError>
+    where
+        Self: Serialize,
+    {
         Ok(serde_json::to_writer(buffer, self)?)
     }
 
@@ -181,7 +184,7 @@ pub trait XrpcResp {
     const ENCODING: &'static str;
 
     /// Response output type, parameterised on backing string type.
-    type Output<S: Bos<str> + AsRef<str>>;
+    type Output<S: BosStr>;
 
     /// Error type for this request. Always owned (`DeserializeOwned`).
     type Err: Error + Serialize + DeserializeOwned;
@@ -189,9 +192,7 @@ pub trait XrpcResp {
     /// Encode the response output body.
     ///
     /// Default implementation serializes to JSON. Override for non-JSON encodings.
-    fn encode_output<S: Bos<str> + AsRef<str>>(
-        output: &Self::Output<S>,
-    ) -> Result<Vec<u8>, EncodeError>
+    fn encode_output<S: BosStr>(output: &Self::Output<S>) -> Result<Vec<u8>, EncodeError>
     where
         Self::Output<S>: Serialize,
     {
@@ -203,7 +204,7 @@ pub trait XrpcResp {
     /// Default implementation deserializes from JSON. Override for non-JSON encodings.
     fn decode_output<'de, S>(body: &'de [u8]) -> core::result::Result<Self::Output<S>, DecodeError>
     where
-        S: Bos<str> + AsRef<str> + Deserialize<'de>,
+        S: BosStr + Deserialize<'de>,
         Self::Output<S>: Deserialize<'de>,
     {
         let body = serde_json::from_slice(body).map_err(DecodeError::Json)?;
@@ -224,7 +225,7 @@ pub trait XrpcEndpoint {
     /// XRPC method (query/GET or procedure/POST)
     const METHOD: XrpcMethod;
     /// XRPC Request data type
-    type Request<S: Bos<str> + AsRef<str>>: XrpcRequest;
+    type Request<S: BosStr>: XrpcRequest;
     /// XRPC Response data type
     type Response: XrpcResp;
 }
@@ -495,7 +496,7 @@ impl<'a, C: HttpClient> XrpcCall<'a, C> {
     #[cfg_attr(feature = "tracing", tracing::instrument(level = "debug", skip(self, request), fields(nsid = R::NSID)))]
     pub async fn send<R>(self, request: &R) -> XrpcResult<Response<<R as XrpcRequest>::Response>>
     where
-        R: XrpcRequest,
+        R: XrpcRequest + Serialize,
         <R as XrpcRequest>::Response: Send + Sync,
     {
         let http_request = build_http_request(&self.base, request, &self.opts)?;
@@ -620,7 +621,7 @@ pub fn build_http_request<'s, R>(
     opts: &CallOptions<'_>,
 ) -> XrpcResult<Request<Vec<u8>>>
 where
-    R: XrpcRequest,
+    R: XrpcRequest + Serialize,
 {
     use crate::error::ClientError;
 
@@ -742,7 +743,7 @@ where
     /// `response.parse::<SmolStr>()` for owned.
     pub fn parse<'s, S>(&'s self) -> Result<R::Output<S>, XrpcError<R::Err>>
     where
-        S: Bos<str> + AsRef<str> + Deserialize<'s>,
+        S: BosStr + Deserialize<'s>,
         R::Output<S>: Deserialize<'s>,
     {
         if self.status.is_success() {
@@ -1023,7 +1024,7 @@ impl<'a, C: HttpClient + HttpClientExt> XrpcCall<'a, C> {
     /// Useful for downloading blobs and entire repository archives
     pub async fn download<R>(self, request: &R) -> Result<StreamingResponse, StreamError>
     where
-        R: XrpcRequest,
+        R: XrpcRequest + Serialize,
         <R as XrpcRequest>::Response: Send + Sync,
     {
         let http_request =
@@ -1130,7 +1131,7 @@ mod tests {
     impl XrpcResp for DummyResp {
         const NSID: &'static str = "test.dummy";
         const ENCODING: &'static str = "application/json";
-        type Output<S: Bos<str> + AsRef<str>> = ();
+        type Output<S: BosStr> = ();
         type Err = DummyErr;
     }
 
@@ -1189,7 +1190,7 @@ mod tests {
         impl XrpcResp for Resp {
             const NSID: &'static str = "com.example.test";
             const ENCODING: &'static str = "application/json";
-            type Output<S: Bos<str> + AsRef<str>> = ();
+            type Output<S: BosStr> = ();
             type Err = Err;
         }
         impl XrpcRequest for Req {
@@ -1263,7 +1264,7 @@ mod tests {
         impl XrpcResp for Resp {
             const NSID: &'static str = "com.example.test";
             const ENCODING: &'static str = "application/json";
-            type Output<S: Bos<str> + AsRef<str>> = ();
+            type Output<S: BosStr> = ();
             type Err = Err;
         }
         impl XrpcRequest for QueryReq {
@@ -1335,7 +1336,7 @@ mod tests {
         impl XrpcResp for Resp {
             const NSID: &'static str = "com.example.test";
             const ENCODING: &'static str = "application/json";
-            type Output<S: Bos<str> + AsRef<str>> = ();
+            type Output<S: BosStr> = ();
             type Err = Err;
         }
         impl XrpcRequest for QueryReq {
@@ -1419,7 +1420,7 @@ mod tests {
         impl XrpcResp for Resp {
             const NSID: &'static str = "com.example.test";
             const ENCODING: &'static str = "application/json";
-            type Output<S: Bos<str> + AsRef<str>> = ();
+            type Output<S: BosStr> = ();
             type Err = Err;
         }
         impl XrpcRequest for Req {

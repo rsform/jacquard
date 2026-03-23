@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -38,11 +38,11 @@ use crate::org_okazu_diary::material::Tag;
     rename = "org.okazu-diary.feed.entry",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Entry<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Entry<S: BosStr = DefaultStr> {
     ///User-defined date and time associated with the activity, typically the datetime of the climax of the activity or simply of the record creation. The string format must satisfy all the requirements of the `datetime` format from the Lexicon language, except the requirement of whole seconds precision, but the datetime must at least specify up to the day (e.g. valid: `4545-07-21Z`, `1919-04-05T04:05+09:00`, invalid: `1919Z`). This is a subset of ISO 8601-1:2019 datetime format, but not RFC 3339 (whose time format requires whole seconds precision).
     pub datetime: S,
     ///If `true`, indicates that there may have been unrecorded activities since the last entry, so that the data in the meantime are not reliable for statistical purposes.  Defaults to `false`.
@@ -74,13 +74,13 @@ pub struct Entry<S: Bos<str> + AsRef<str> = DefaultStr> {
 /// Indicates the intended audience of the entry. A `public` entry (default) is fully public. An `unlisted` entry should not be listed in public profile feeds.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum EntryVisibility<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum EntryVisibility<S: BosStr = DefaultStr> {
     Public,
     Unlisted,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> EntryVisibility<S> {
+impl<S: BosStr> EntryVisibility<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Public => "public",
@@ -98,19 +98,19 @@ impl<S: Bos<str> + AsRef<str>> EntryVisibility<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for EntryVisibility<S> {
+impl<S: BosStr> core::fmt::Display for EntryVisibility<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for EntryVisibility<S> {
+impl<S: BosStr> AsRef<str> for EntryVisibility<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for EntryVisibility<S> {
+impl<S: BosStr> Serialize for EntryVisibility<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -119,8 +119,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for EntryVisibility<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for EntryVisibility<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for EntryVisibility<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -130,14 +129,18 @@ for EntryVisibility<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for EntryVisibility<S> {
+impl<S: BosStr + Default> Default for EntryVisibility<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for EntryVisibility<S> {
-    type Output = EntryVisibility<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for EntryVisibility<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = EntryVisibility<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             EntryVisibility::Public => EntryVisibility::Public,
@@ -153,18 +156,18 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for EntryVisibility<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct EntryGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct EntryGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Entry<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Entry<S> {
+impl<S: BosStr> Entry<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, EntryRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -177,17 +180,17 @@ pub struct EntryRecord;
 impl XrpcResp for EntryRecord {
     const NSID: &'static str = "org.okazu-diary.feed.entry";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = EntryGetRecordOutput<S>;
+    type Output<S: BosStr> = EntryGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<EntryGetRecordOutput<S>> for Entry<S> {
+impl<S: BosStr> From<EntryGetRecordOutput<S>> for Entry<S> {
     fn from(output: EntryGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Entry<S> {
+impl<S: BosStr> Collection for Entry<S> {
     const NSID: &'static str = "org.okazu-diary.feed.entry";
     type Record = EntryRecord;
 }
@@ -197,7 +200,7 @@ impl Collection for EntryRecord {
     type Record = EntryRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Entry<S> {
+impl<S: BosStr> LexiconSchema for Entry<S> {
     fn nsid() -> &'static str {
         "org.okazu-diary.feed.entry"
     }
@@ -277,9 +280,9 @@ pub mod entry_state {
         type Datetime = Unset;
     }
     ///State transition - sets the `datetime` field to Set
-    pub struct SetDatetime<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDatetime<S> {}
-    impl<S: State> State for SetDatetime<S> {
+    pub struct SetDatetime<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDatetime<St> {}
+    impl<St: State> State for SetDatetime<St> {
         type Datetime = Set<members::datetime>;
     }
     /// Marker types for field names
@@ -290,9 +293,9 @@ pub mod entry_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct EntryBuilder<'a, S: entry_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct EntryBuilder<S: BosStr, St: entry_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
         Option<bool>,
@@ -303,47 +306,47 @@ pub struct EntryBuilder<'a, S: entry_state::State> {
         Option<StrongRef<S>>,
         Option<EntryVisibility<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Entry<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> EntryBuilder<'a, entry_state::Empty> {
+impl<S: BosStr> Entry<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> EntryBuilder<S, entry_state::Empty> {
         EntryBuilder::new()
     }
 }
 
-impl<'a> EntryBuilder<'a, entry_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> EntryBuilder<S, entry_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         EntryBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> EntryBuilder<'a, S>
+impl<S: BosStr, St> EntryBuilder<S, St>
 where
-    S: entry_state::State,
-    S::Datetime: entry_state::IsUnset,
+    St: entry_state::State,
+    St::Datetime: entry_state::IsUnset,
 {
     /// Set the `datetime` field (required)
     pub fn datetime(
         mut self,
         value: impl Into<S>,
-    ) -> EntryBuilder<'a, entry_state::SetDatetime<S>> {
+    ) -> EntryBuilder<S, entry_state::SetDatetime<St>> {
         self._fields.0 = Option::Some(value.into());
         EntryBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
+impl<S: BosStr, St: entry_state::State> EntryBuilder<S, St> {
     /// Set the `hadHiatus` field (optional)
     pub fn had_hiatus(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.1 = value.into();
@@ -356,7 +359,7 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     }
 }
 
-impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
+impl<S: BosStr, St: entry_state::State> EntryBuilder<S, St> {
     /// Set the `labels` field (optional)
     pub fn labels(mut self, value: impl Into<Option<SelfLabels<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -369,7 +372,7 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     }
 }
 
-impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
+impl<S: BosStr, St: entry_state::State> EntryBuilder<S, St> {
     /// Set the `note` field (optional)
     pub fn note(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -382,7 +385,7 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     }
 }
 
-impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
+impl<S: BosStr, St: entry_state::State> EntryBuilder<S, St> {
     /// Set the `subjects` field (optional)
     pub fn subjects(mut self, value: impl Into<Option<Vec<StrongRef<S>>>>) -> Self {
         self._fields.4 = value.into();
@@ -395,7 +398,7 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     }
 }
 
-impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
+impl<S: BosStr, St: entry_state::State> EntryBuilder<S, St> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<Tag<S>>>>) -> Self {
         self._fields.5 = value.into();
@@ -408,7 +411,7 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     }
 }
 
-impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
+impl<S: BosStr, St: entry_state::State> EntryBuilder<S, St> {
     /// Set the `via` field (optional)
     pub fn via(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -421,7 +424,7 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     }
 }
 
-impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
+impl<S: BosStr, St: entry_state::State> EntryBuilder<S, St> {
     /// Set the `visibility` field (optional)
     pub fn visibility(mut self, value: impl Into<Option<EntryVisibility<S>>>) -> Self {
         self._fields.7 = value.into();
@@ -434,13 +437,13 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     }
 }
 
-impl<'a, S> EntryBuilder<'a, S>
+impl<S: BosStr, St> EntryBuilder<S, St>
 where
-    S: entry_state::State,
-    S::Datetime: entry_state::IsSet,
+    St: entry_state::State,
+    St::Datetime: entry_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Entry<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Entry<S> {
         Entry {
             datetime: self._fields.0.unwrap(),
             had_hiatus: self._fields.1.or_else(|| Some(false)),
@@ -453,8 +456,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Entry<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Entry<S> {
         Entry {
             datetime: self._fields.0.unwrap(),
             had_hiatus: self._fields.1.or_else(|| Some(false)),

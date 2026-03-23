@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -30,11 +30,11 @@ use serde::{Serialize, Deserialize};
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Website<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Website<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -46,7 +46,7 @@ pub struct Website<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Website<S> {
+impl<S: BosStr> LexiconSchema for Website<S> {
     fn nsid() -> &'static str {
         "pub.leaflet.blocks.website"
     }
@@ -118,9 +118,9 @@ pub mod website_state {
         type Src = Unset;
     }
     ///State transition - sets the `src` field to Set
-    pub struct SetSrc<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSrc<S> {}
-    impl<S: State> State for SetSrc<S> {
+    pub struct SetSrc<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSrc<St> {}
+    impl<St: State> State for SetSrc<St> {
         type Src = Set<members::src>;
     }
     /// Marker types for field names
@@ -131,32 +131,32 @@ pub mod website_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct WebsiteBuilder<'a, S: website_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct WebsiteBuilder<S: BosStr, St: website_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<BlobRef<S>>, Option<UriValue<S>>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Website<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> WebsiteBuilder<'a, website_state::Empty> {
+impl<S: BosStr> Website<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> WebsiteBuilder<S, website_state::Empty> {
         WebsiteBuilder::new()
     }
 }
 
-impl<'a> WebsiteBuilder<'a, website_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> WebsiteBuilder<S, website_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         WebsiteBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: website_state::State> WebsiteBuilder<'a, S> {
+impl<S: BosStr, St: website_state::State> WebsiteBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -169,7 +169,7 @@ impl<'a, S: website_state::State> WebsiteBuilder<'a, S> {
     }
 }
 
-impl<'a, S: website_state::State> WebsiteBuilder<'a, S> {
+impl<S: BosStr, St: website_state::State> WebsiteBuilder<S, St> {
     /// Set the `previewImage` field (optional)
     pub fn preview_image(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -182,26 +182,26 @@ impl<'a, S: website_state::State> WebsiteBuilder<'a, S> {
     }
 }
 
-impl<'a, S> WebsiteBuilder<'a, S>
+impl<S: BosStr, St> WebsiteBuilder<S, St>
 where
-    S: website_state::State,
-    S::Src: website_state::IsUnset,
+    St: website_state::State,
+    St::Src: website_state::IsUnset,
 {
     /// Set the `src` field (required)
     pub fn src(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> WebsiteBuilder<'a, website_state::SetSrc<S>> {
+    ) -> WebsiteBuilder<S, website_state::SetSrc<St>> {
         self._fields.2 = Option::Some(value.into());
         WebsiteBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: website_state::State> WebsiteBuilder<'a, S> {
+impl<S: BosStr, St: website_state::State> WebsiteBuilder<S, St> {
     /// Set the `title` field (optional)
     pub fn title(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -214,13 +214,13 @@ impl<'a, S: website_state::State> WebsiteBuilder<'a, S> {
     }
 }
 
-impl<'a, S> WebsiteBuilder<'a, S>
+impl<S: BosStr, St> WebsiteBuilder<S, St>
 where
-    S: website_state::State,
-    S::Src: website_state::IsSet,
+    St: website_state::State,
+    St::Src: website_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Website<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Website<S> {
         Website {
             description: self._fields.0,
             preview_image: self._fields.1,
@@ -229,11 +229,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Website<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Website<S> {
         Website {
             description: self._fields.0,
             preview_image: self._fields.1,

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
@@ -18,37 +18,33 @@ use serde::{Serialize, Deserialize};
 use crate::chat_bsky::convo::MessageView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct RemoveReaction<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct RemoveReaction<S: BosStr = DefaultStr> {
     pub convo_id: S,
     pub message_id: S,
     pub value: S,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct RemoveReactionOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct RemoveReactionOutput<S: BosStr = DefaultStr> {
     pub message: MessageView<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -110,12 +106,11 @@ pub struct RemoveReactionResponse;
 impl jacquard_common::xrpc::XrpcResp for RemoveReactionResponse {
     const NSID: &'static str = "chat.bsky.convo.removeReaction";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = RemoveReactionOutput<S>;
+    type Output<S: BosStr> = RemoveReactionOutput<S>;
     type Err = RemoveReactionError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for RemoveReaction<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for RemoveReaction<S> {
     const NSID: &'static str = "chat.bsky.convo.removeReaction";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -130,6 +125,6 @@ impl jacquard_common::xrpc::XrpcEndpoint for RemoveReactionRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = RemoveReaction<S>;
+    type Request<S: BosStr> = RemoveReaction<S>;
     type Response = RemoveReactionResponse;
 }

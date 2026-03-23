@@ -166,7 +166,9 @@ pub enum ExternalImport {
     UriError,
     // jacquard_common BOS types
     Bos,
+    BosStr,
     DefaultStr,
+    FromStaticStr,
 }
 
 impl ExternalImport {
@@ -199,7 +201,9 @@ impl ExternalImport {
             Self::RecordUri => "RecordUri",
             Self::UriError => "UriError",
             Self::Bos => "Bos",
+            Self::BosStr => "BosStr",
             Self::DefaultStr => "DefaultStr",
+            Self::FromStaticStr => "FromStaticStr",
         }
     }
 
@@ -226,7 +230,7 @@ impl ExternalImport {
             | Self::EncodeError => "jacquard_common::xrpc",
             Self::DecodeError => "jacquard_common::error",
             Self::RecordUri | Self::UriError => "jacquard_common::types::uri",
-            Self::Bos | Self::DefaultStr => "jacquard_common",
+            Self::Bos | Self::BosStr | Self::DefaultStr | Self::FromStaticStr => "jacquard_common",
         }
     }
 }
@@ -650,7 +654,9 @@ impl ResolvedImports {
                 ExternalImport::PhantomData => "::core::marker::PhantomData",
                 ExternalImport::BTreeMap => "alloc::collections::BTreeMap",
                 ExternalImport::Bos => "jacquard_common::Bos",
+                ExternalImport::BosStr => "jacquard_common::BosStr",
                 ExternalImport::DefaultStr => "jacquard_common::DefaultStr",
+                ExternalImport::FromStaticStr => "jacquard_common::FromStaticStr",
             };
             let path: syn::Path = syn::parse_str(path_str).expect("valid path");
             quote! { #path }

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -27,41 +27,37 @@ use serde::{Serialize, Deserialize};
 use crate::games_gamesgamesgamesgames::get_reviews;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetReviews<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetReviews<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub cursor: Option<S>,
     ///Defaults to `20`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
-    #[serde(borrow)]
     pub uri: AtUri<S>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetReviewsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetReviewsOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
     pub reviews: Vec<get_reviews::PopfeedReview<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -70,11 +66,11 @@ pub struct GetReviewsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct PopfeedReview<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct PopfeedReview<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub contains_spoilers: Option<bool>,
     pub created_at: Datetime,
@@ -98,12 +94,11 @@ pub struct GetReviewsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetReviewsResponse {
     const NSID: &'static str = "games.gamesgamesgamesgames.getReviews";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetReviewsOutput<S>;
+    type Output<S: BosStr> = GetReviewsOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetReviews<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetReviews<S> {
     const NSID: &'static str = "games.gamesgamesgamesgames.getReviews";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetReviewsResponse;
@@ -114,11 +109,11 @@ pub struct GetReviewsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetReviewsRequest {
     const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.getReviews";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetReviews<S>;
+    type Request<S: BosStr> = GetReviews<S>;
     type Response = GetReviewsResponse;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for PopfeedReview<S> {
+impl<S: BosStr> LexiconSchema for PopfeedReview<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.getReviews"
     }
@@ -176,9 +171,9 @@ pub mod get_reviews_state {
         type Uri = Unset;
     }
     ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
         type Uri = Set<members::uri>;
     }
     /// Marker types for field names
@@ -189,32 +184,32 @@ pub mod get_reviews_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetReviewsBuilder<'a, S: get_reviews_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetReviewsBuilder<S: BosStr, St: get_reviews_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>, Option<AtUri<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetReviews<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetReviewsBuilder<'a, get_reviews_state::Empty> {
+impl<S: BosStr> GetReviews<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetReviewsBuilder<S, get_reviews_state::Empty> {
         GetReviewsBuilder::new()
     }
 }
 
-impl<'a> GetReviewsBuilder<'a, get_reviews_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetReviewsBuilder<S, get_reviews_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetReviewsBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: get_reviews_state::State> GetReviewsBuilder<'a, S> {
+impl<S: BosStr, St: get_reviews_state::State> GetReviewsBuilder<S, St> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -227,7 +222,7 @@ impl<'a, S: get_reviews_state::State> GetReviewsBuilder<'a, S> {
     }
 }
 
-impl<'a, S: get_reviews_state::State> GetReviewsBuilder<'a, S> {
+impl<S: BosStr, St: get_reviews_state::State> GetReviewsBuilder<S, St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -240,32 +235,32 @@ impl<'a, S: get_reviews_state::State> GetReviewsBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GetReviewsBuilder<'a, S>
+impl<S: BosStr, St> GetReviewsBuilder<S, St>
 where
-    S: get_reviews_state::State,
-    S::Uri: get_reviews_state::IsUnset,
+    St: get_reviews_state::State,
+    St::Uri: get_reviews_state::IsUnset,
 {
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> GetReviewsBuilder<'a, get_reviews_state::SetUri<S>> {
+    ) -> GetReviewsBuilder<S, get_reviews_state::SetUri<St>> {
         self._fields.2 = Option::Some(value.into());
         GetReviewsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetReviewsBuilder<'a, S>
+impl<S: BosStr, St> GetReviewsBuilder<S, St>
 where
-    S: get_reviews_state::State,
-    S::Uri: get_reviews_state::IsSet,
+    St: get_reviews_state::State,
+    St::Uri: get_reviews_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetReviews<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetReviews<S> {
         GetReviews {
             cursor: self._fields.0,
             limit: self._fields.1,
@@ -284,73 +279,73 @@ pub mod popfeed_review_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
-        type CreatedAt;
-        type Uri;
         type Rating;
+        type CreatedAt;
+        type Did;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
-        type CreatedAt = Unset;
-        type Uri = Unset;
         type Rating = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Did = Set<members::did>;
-        type CreatedAt = S::CreatedAt;
-        type Uri = S::Uri;
-        type Rating = S::Rating;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Did = S::Did;
-        type CreatedAt = Set<members::created_at>;
-        type Uri = S::Uri;
-        type Rating = S::Rating;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Did = S::Did;
-        type CreatedAt = S::CreatedAt;
-        type Uri = Set<members::uri>;
-        type Rating = S::Rating;
+        type CreatedAt = Unset;
+        type Did = Unset;
+        type Uri = Unset;
     }
     ///State transition - sets the `rating` field to Set
-    pub struct SetRating<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRating<S> {}
-    impl<S: State> State for SetRating<S> {
-        type Did = S::Did;
-        type CreatedAt = S::CreatedAt;
-        type Uri = S::Uri;
+    pub struct SetRating<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRating<St> {}
+    impl<St: State> State for SetRating<St> {
         type Rating = Set<members::rating>;
+        type CreatedAt = St::CreatedAt;
+        type Did = St::Did;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Rating = St::Rating;
+        type CreatedAt = Set<members::created_at>;
+        type Did = St::Did;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
+        type Rating = St::Rating;
+        type CreatedAt = St::CreatedAt;
+        type Did = Set<members::did>;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Rating = St::Rating;
+        type CreatedAt = St::CreatedAt;
+        type Did = St::Did;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `rating` field
         pub struct rating(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `did` field
+        pub struct did(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct PopfeedReviewBuilder<'a, S: popfeed_review_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct PopfeedReviewBuilder<S: BosStr, St: popfeed_review_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<bool>,
         Option<Datetime>,
@@ -362,28 +357,28 @@ pub struct PopfeedReviewBuilder<'a, S: popfeed_review_state::State> {
         Option<S>,
         Option<AtUri<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> PopfeedReview<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> PopfeedReviewBuilder<'a, popfeed_review_state::Empty> {
+impl<S: BosStr> PopfeedReview<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> PopfeedReviewBuilder<S, popfeed_review_state::Empty> {
         PopfeedReviewBuilder::new()
     }
 }
 
-impl<'a> PopfeedReviewBuilder<'a, popfeed_review_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> PopfeedReviewBuilder<S, popfeed_review_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         PopfeedReviewBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: popfeed_review_state::State> PopfeedReviewBuilder<'a, S> {
+impl<S: BosStr, St: popfeed_review_state::State> PopfeedReviewBuilder<S, St> {
     /// Set the `containsSpoilers` field (optional)
     pub fn contains_spoilers(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.0 = value.into();
@@ -396,45 +391,45 @@ impl<'a, S: popfeed_review_state::State> PopfeedReviewBuilder<'a, S> {
     }
 }
 
-impl<'a, S> PopfeedReviewBuilder<'a, S>
+impl<S: BosStr, St> PopfeedReviewBuilder<S, St>
 where
-    S: popfeed_review_state::State,
-    S::CreatedAt: popfeed_review_state::IsUnset,
+    St: popfeed_review_state::State,
+    St::CreatedAt: popfeed_review_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> PopfeedReviewBuilder<'a, popfeed_review_state::SetCreatedAt<S>> {
+    ) -> PopfeedReviewBuilder<S, popfeed_review_state::SetCreatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         PopfeedReviewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PopfeedReviewBuilder<'a, S>
+impl<S: BosStr, St> PopfeedReviewBuilder<S, St>
 where
-    S: popfeed_review_state::State,
-    S::Did: popfeed_review_state::IsUnset,
+    St: popfeed_review_state::State,
+    St::Did: popfeed_review_state::IsUnset,
 {
     /// Set the `did` field (required)
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> PopfeedReviewBuilder<'a, popfeed_review_state::SetDid<S>> {
+    ) -> PopfeedReviewBuilder<S, popfeed_review_state::SetDid<St>> {
         self._fields.2 = Option::Some(value.into());
         PopfeedReviewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: popfeed_review_state::State> PopfeedReviewBuilder<'a, S> {
+impl<S: BosStr, St: popfeed_review_state::State> PopfeedReviewBuilder<S, St> {
     /// Set the `facets` field (optional)
     pub fn facets(mut self, value: impl Into<Option<Vec<Data<S>>>>) -> Self {
         self._fields.3 = value.into();
@@ -447,26 +442,26 @@ impl<'a, S: popfeed_review_state::State> PopfeedReviewBuilder<'a, S> {
     }
 }
 
-impl<'a, S> PopfeedReviewBuilder<'a, S>
+impl<S: BosStr, St> PopfeedReviewBuilder<S, St>
 where
-    S: popfeed_review_state::State,
-    S::Rating: popfeed_review_state::IsUnset,
+    St: popfeed_review_state::State,
+    St::Rating: popfeed_review_state::IsUnset,
 {
     /// Set the `rating` field (required)
     pub fn rating(
         mut self,
         value: impl Into<i64>,
-    ) -> PopfeedReviewBuilder<'a, popfeed_review_state::SetRating<S>> {
+    ) -> PopfeedReviewBuilder<S, popfeed_review_state::SetRating<St>> {
         self._fields.4 = Option::Some(value.into());
         PopfeedReviewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: popfeed_review_state::State> PopfeedReviewBuilder<'a, S> {
+impl<S: BosStr, St: popfeed_review_state::State> PopfeedReviewBuilder<S, St> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -479,7 +474,7 @@ impl<'a, S: popfeed_review_state::State> PopfeedReviewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: popfeed_review_state::State> PopfeedReviewBuilder<'a, S> {
+impl<S: BosStr, St: popfeed_review_state::State> PopfeedReviewBuilder<S, St> {
     /// Set the `text` field (optional)
     pub fn text(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.6 = value.into();
@@ -492,7 +487,7 @@ impl<'a, S: popfeed_review_state::State> PopfeedReviewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: popfeed_review_state::State> PopfeedReviewBuilder<'a, S> {
+impl<S: BosStr, St: popfeed_review_state::State> PopfeedReviewBuilder<S, St> {
     /// Set the `title` field (optional)
     pub fn title(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.7 = value.into();
@@ -505,35 +500,35 @@ impl<'a, S: popfeed_review_state::State> PopfeedReviewBuilder<'a, S> {
     }
 }
 
-impl<'a, S> PopfeedReviewBuilder<'a, S>
+impl<S: BosStr, St> PopfeedReviewBuilder<S, St>
 where
-    S: popfeed_review_state::State,
-    S::Uri: popfeed_review_state::IsUnset,
+    St: popfeed_review_state::State,
+    St::Uri: popfeed_review_state::IsUnset,
 {
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> PopfeedReviewBuilder<'a, popfeed_review_state::SetUri<S>> {
+    ) -> PopfeedReviewBuilder<S, popfeed_review_state::SetUri<St>> {
         self._fields.8 = Option::Some(value.into());
         PopfeedReviewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PopfeedReviewBuilder<'a, S>
+impl<S: BosStr, St> PopfeedReviewBuilder<S, St>
 where
-    S: popfeed_review_state::State,
-    S::Did: popfeed_review_state::IsSet,
-    S::CreatedAt: popfeed_review_state::IsSet,
-    S::Uri: popfeed_review_state::IsSet,
-    S::Rating: popfeed_review_state::IsSet,
+    St: popfeed_review_state::State,
+    St::Rating: popfeed_review_state::IsSet,
+    St::CreatedAt: popfeed_review_state::IsSet,
+    St::Did: popfeed_review_state::IsSet,
+    St::Uri: popfeed_review_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> PopfeedReview<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> PopfeedReview<S> {
         PopfeedReview {
             contains_spoilers: self._fields.0,
             created_at: self._fields.1.unwrap(),
@@ -547,11 +542,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> PopfeedReview<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> PopfeedReview<S> {
         PopfeedReview {
             contains_spoilers: self._fields.0,
             created_at: self._fields.1.unwrap(),

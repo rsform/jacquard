@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -31,11 +31,11 @@ use crate::community_lexicon::calendar::get_event;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct EventView<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct EventView<S: BosStr = DefaultStr> {
     ///Number of users who have RSVP'd as going.
     pub count_going: i64,
     ///Number of users who have RSVP'd as interested.
@@ -50,36 +50,31 @@ pub struct EventView<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetEvent<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct GetEvent<S: BosStr = DefaultStr> {
     pub record_key: S,
-    #[serde(borrow)]
     pub repository: Did<S>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetEventOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetEventOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
-    #[serde(borrow)]
     pub value: Data<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -125,7 +120,7 @@ impl core::fmt::Display for GetEventError {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for EventView<S> {
+impl<S: BosStr> LexiconSchema for EventView<S> {
     fn nsid() -> &'static str {
         "community.lexicon.calendar.getEvent"
     }
@@ -145,12 +140,11 @@ pub struct GetEventResponse;
 impl jacquard_common::xrpc::XrpcResp for GetEventResponse {
     const NSID: &'static str = "community.lexicon.calendar.getEvent";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetEventOutput<S>;
+    type Output<S: BosStr> = GetEventOutput<S>;
     type Err = GetEventError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetEvent<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetEvent<S> {
     const NSID: &'static str = "community.lexicon.calendar.getEvent";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetEventResponse;
@@ -161,7 +155,7 @@ pub struct GetEventRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetEventRequest {
     const PATH: &'static str = "/xrpc/community.lexicon.calendar.getEvent";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetEvent<S>;
+    type Request<S: BosStr> = GetEvent<S>;
     type Response = GetEventResponse;
 }
 
@@ -177,8 +171,8 @@ pub mod event_view_state {
     pub trait State: sealed::Sealed {
         type CountGoing;
         type CountNotGoing;
-        type CountInterested;
         type Url;
+        type CountInterested;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -186,44 +180,44 @@ pub mod event_view_state {
     impl State for Empty {
         type CountGoing = Unset;
         type CountNotGoing = Unset;
-        type CountInterested = Unset;
         type Url = Unset;
+        type CountInterested = Unset;
     }
     ///State transition - sets the `count_going` field to Set
-    pub struct SetCountGoing<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCountGoing<S> {}
-    impl<S: State> State for SetCountGoing<S> {
+    pub struct SetCountGoing<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCountGoing<St> {}
+    impl<St: State> State for SetCountGoing<St> {
         type CountGoing = Set<members::count_going>;
-        type CountNotGoing = S::CountNotGoing;
-        type CountInterested = S::CountInterested;
-        type Url = S::Url;
+        type CountNotGoing = St::CountNotGoing;
+        type Url = St::Url;
+        type CountInterested = St::CountInterested;
     }
     ///State transition - sets the `count_not_going` field to Set
-    pub struct SetCountNotGoing<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCountNotGoing<S> {}
-    impl<S: State> State for SetCountNotGoing<S> {
-        type CountGoing = S::CountGoing;
+    pub struct SetCountNotGoing<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCountNotGoing<St> {}
+    impl<St: State> State for SetCountNotGoing<St> {
+        type CountGoing = St::CountGoing;
         type CountNotGoing = Set<members::count_not_going>;
-        type CountInterested = S::CountInterested;
-        type Url = S::Url;
-    }
-    ///State transition - sets the `count_interested` field to Set
-    pub struct SetCountInterested<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCountInterested<S> {}
-    impl<S: State> State for SetCountInterested<S> {
-        type CountGoing = S::CountGoing;
-        type CountNotGoing = S::CountNotGoing;
-        type CountInterested = Set<members::count_interested>;
-        type Url = S::Url;
+        type Url = St::Url;
+        type CountInterested = St::CountInterested;
     }
     ///State transition - sets the `url` field to Set
-    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrl<S> {}
-    impl<S: State> State for SetUrl<S> {
-        type CountGoing = S::CountGoing;
-        type CountNotGoing = S::CountNotGoing;
-        type CountInterested = S::CountInterested;
+    pub struct SetUrl<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUrl<St> {}
+    impl<St: State> State for SetUrl<St> {
+        type CountGoing = St::CountGoing;
+        type CountNotGoing = St::CountNotGoing;
         type Url = Set<members::url>;
+        type CountInterested = St::CountInterested;
+    }
+    ///State transition - sets the `count_interested` field to Set
+    pub struct SetCountInterested<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCountInterested<St> {}
+    impl<St: State> State for SetCountInterested<St> {
+        type CountGoing = St::CountGoing;
+        type CountNotGoing = St::CountNotGoing;
+        type Url = St::Url;
+        type CountInterested = Set<members::count_interested>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -232,124 +226,124 @@ pub mod event_view_state {
         pub struct count_going(());
         ///Marker type for the `count_not_going` field
         pub struct count_not_going(());
-        ///Marker type for the `count_interested` field
-        pub struct count_interested(());
         ///Marker type for the `url` field
         pub struct url(());
+        ///Marker type for the `count_interested` field
+        pub struct count_interested(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct EventViewBuilder<'a, S: event_view_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct EventViewBuilder<S: BosStr, St: event_view_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<i64>, Option<i64>, Option<UriValue<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> EventView<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> EventViewBuilder<'a, event_view_state::Empty> {
+impl<S: BosStr> EventView<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> EventViewBuilder<S, event_view_state::Empty> {
         EventViewBuilder::new()
     }
 }
 
-impl<'a> EventViewBuilder<'a, event_view_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> EventViewBuilder<S, event_view_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         EventViewBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> EventViewBuilder<'a, S>
+impl<S: BosStr, St> EventViewBuilder<S, St>
 where
-    S: event_view_state::State,
-    S::CountGoing: event_view_state::IsUnset,
+    St: event_view_state::State,
+    St::CountGoing: event_view_state::IsUnset,
 {
     /// Set the `countGoing` field (required)
     pub fn count_going(
         mut self,
         value: impl Into<i64>,
-    ) -> EventViewBuilder<'a, event_view_state::SetCountGoing<S>> {
+    ) -> EventViewBuilder<S, event_view_state::SetCountGoing<St>> {
         self._fields.0 = Option::Some(value.into());
         EventViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> EventViewBuilder<'a, S>
+impl<S: BosStr, St> EventViewBuilder<S, St>
 where
-    S: event_view_state::State,
-    S::CountInterested: event_view_state::IsUnset,
+    St: event_view_state::State,
+    St::CountInterested: event_view_state::IsUnset,
 {
     /// Set the `countInterested` field (required)
     pub fn count_interested(
         mut self,
         value: impl Into<i64>,
-    ) -> EventViewBuilder<'a, event_view_state::SetCountInterested<S>> {
+    ) -> EventViewBuilder<S, event_view_state::SetCountInterested<St>> {
         self._fields.1 = Option::Some(value.into());
         EventViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> EventViewBuilder<'a, S>
+impl<S: BosStr, St> EventViewBuilder<S, St>
 where
-    S: event_view_state::State,
-    S::CountNotGoing: event_view_state::IsUnset,
+    St: event_view_state::State,
+    St::CountNotGoing: event_view_state::IsUnset,
 {
     /// Set the `countNotGoing` field (required)
     pub fn count_not_going(
         mut self,
         value: impl Into<i64>,
-    ) -> EventViewBuilder<'a, event_view_state::SetCountNotGoing<S>> {
+    ) -> EventViewBuilder<S, event_view_state::SetCountNotGoing<St>> {
         self._fields.2 = Option::Some(value.into());
         EventViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> EventViewBuilder<'a, S>
+impl<S: BosStr, St> EventViewBuilder<S, St>
 where
-    S: event_view_state::State,
-    S::Url: event_view_state::IsUnset,
+    St: event_view_state::State,
+    St::Url: event_view_state::IsUnset,
 {
     /// Set the `url` field (required)
     pub fn url(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> EventViewBuilder<'a, event_view_state::SetUrl<S>> {
+    ) -> EventViewBuilder<S, event_view_state::SetUrl<St>> {
         self._fields.3 = Option::Some(value.into());
         EventViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> EventViewBuilder<'a, S>
+impl<S: BosStr, St> EventViewBuilder<S, St>
 where
-    S: event_view_state::State,
-    S::CountGoing: event_view_state::IsSet,
-    S::CountNotGoing: event_view_state::IsSet,
-    S::CountInterested: event_view_state::IsSet,
-    S::Url: event_view_state::IsSet,
+    St: event_view_state::State,
+    St::CountGoing: event_view_state::IsSet,
+    St::CountNotGoing: event_view_state::IsSet,
+    St::Url: event_view_state::IsSet,
+    St::CountInterested: event_view_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> EventView<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> EventView<S> {
         EventView {
             count_going: self._fields.0.unwrap(),
             count_interested: self._fields.1.unwrap(),
@@ -358,11 +352,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> EventView<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> EventView<S> {
         EventView {
             count_going: self._fields.0.unwrap(),
             count_interested: self._fields.1.unwrap(),
@@ -496,111 +490,111 @@ pub mod get_event_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Repository;
         type RecordKey;
+        type Repository;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Repository = Unset;
         type RecordKey = Unset;
-    }
-    ///State transition - sets the `repository` field to Set
-    pub struct SetRepository<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepository<S> {}
-    impl<S: State> State for SetRepository<S> {
-        type Repository = Set<members::repository>;
-        type RecordKey = S::RecordKey;
+        type Repository = Unset;
     }
     ///State transition - sets the `record_key` field to Set
-    pub struct SetRecordKey<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRecordKey<S> {}
-    impl<S: State> State for SetRecordKey<S> {
-        type Repository = S::Repository;
+    pub struct SetRecordKey<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRecordKey<St> {}
+    impl<St: State> State for SetRecordKey<St> {
         type RecordKey = Set<members::record_key>;
+        type Repository = St::Repository;
+    }
+    ///State transition - sets the `repository` field to Set
+    pub struct SetRepository<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRepository<St> {}
+    impl<St: State> State for SetRepository<St> {
+        type RecordKey = St::RecordKey;
+        type Repository = Set<members::repository>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `repository` field
-        pub struct repository(());
         ///Marker type for the `record_key` field
         pub struct record_key(());
+        ///Marker type for the `repository` field
+        pub struct repository(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetEventBuilder<'a, S: get_event_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetEventBuilder<S: BosStr, St: get_event_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<Did<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetEvent<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetEventBuilder<'a, get_event_state::Empty> {
+impl<S: BosStr> GetEvent<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetEventBuilder<S, get_event_state::Empty> {
         GetEventBuilder::new()
     }
 }
 
-impl<'a> GetEventBuilder<'a, get_event_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetEventBuilder<S, get_event_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetEventBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetEventBuilder<'a, S>
+impl<S: BosStr, St> GetEventBuilder<S, St>
 where
-    S: get_event_state::State,
-    S::RecordKey: get_event_state::IsUnset,
+    St: get_event_state::State,
+    St::RecordKey: get_event_state::IsUnset,
 {
     /// Set the `recordKey` field (required)
     pub fn record_key(
         mut self,
         value: impl Into<S>,
-    ) -> GetEventBuilder<'a, get_event_state::SetRecordKey<S>> {
+    ) -> GetEventBuilder<S, get_event_state::SetRecordKey<St>> {
         self._fields.0 = Option::Some(value.into());
         GetEventBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetEventBuilder<'a, S>
+impl<S: BosStr, St> GetEventBuilder<S, St>
 where
-    S: get_event_state::State,
-    S::Repository: get_event_state::IsUnset,
+    St: get_event_state::State,
+    St::Repository: get_event_state::IsUnset,
 {
     /// Set the `repository` field (required)
     pub fn repository(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> GetEventBuilder<'a, get_event_state::SetRepository<S>> {
+    ) -> GetEventBuilder<S, get_event_state::SetRepository<St>> {
         self._fields.1 = Option::Some(value.into());
         GetEventBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetEventBuilder<'a, S>
+impl<S: BosStr, St> GetEventBuilder<S, St>
 where
-    S: get_event_state::State,
-    S::Repository: get_event_state::IsSet,
-    S::RecordKey: get_event_state::IsSet,
+    St: get_event_state::State,
+    St::RecordKey: get_event_state::IsSet,
+    St::Repository: get_event_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetEvent<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetEvent<S> {
         GetEvent {
             record_key: self._fields.0.unwrap(),
             repository: self._fields.1.unwrap(),

@@ -23,7 +23,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -42,18 +42,18 @@ use serde::{Serialize, Deserialize};
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CommitMeta<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CommitMeta<S: BosStr = DefaultStr> {
     pub cid: Cid<S>,
     pub rev: Tid,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for CommitMeta<S> {
+impl<S: BosStr> LexiconSchema for CommitMeta<S> {
     fn nsid() -> &'static str {
         "com.atproto.repo.defs"
     }
@@ -89,17 +89,17 @@ pub mod commit_meta_state {
         type Cid = Unset;
     }
     ///State transition - sets the `rev` field to Set
-    pub struct SetRev<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRev<S> {}
-    impl<S: State> State for SetRev<S> {
+    pub struct SetRev<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRev<St> {}
+    impl<St: State> State for SetRev<St> {
         type Rev = Set<members::rev>;
-        type Cid = S::Cid;
+        type Cid = St::Cid;
     }
     ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Rev = S::Rev;
+    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCid<St> {}
+    impl<St: State> State for SetCid<St> {
+        type Rev = St::Rev;
         type Cid = Set<members::cid>;
     }
     /// Marker types for field names
@@ -112,88 +112,88 @@ pub mod commit_meta_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct CommitMetaBuilder<'a, S: commit_meta_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct CommitMetaBuilder<S: BosStr, St: commit_meta_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Cid<S>>, Option<Tid>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> CommitMeta<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> CommitMetaBuilder<'a, commit_meta_state::Empty> {
+impl<S: BosStr> CommitMeta<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> CommitMetaBuilder<S, commit_meta_state::Empty> {
         CommitMetaBuilder::new()
     }
 }
 
-impl<'a> CommitMetaBuilder<'a, commit_meta_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> CommitMetaBuilder<S, commit_meta_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         CommitMetaBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CommitMetaBuilder<'a, S>
+impl<S: BosStr, St> CommitMetaBuilder<S, St>
 where
-    S: commit_meta_state::State,
-    S::Cid: commit_meta_state::IsUnset,
+    St: commit_meta_state::State,
+    St::Cid: commit_meta_state::IsUnset,
 {
     /// Set the `cid` field (required)
     pub fn cid(
         mut self,
         value: impl Into<Cid<S>>,
-    ) -> CommitMetaBuilder<'a, commit_meta_state::SetCid<S>> {
+    ) -> CommitMetaBuilder<S, commit_meta_state::SetCid<St>> {
         self._fields.0 = Option::Some(value.into());
         CommitMetaBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CommitMetaBuilder<'a, S>
+impl<S: BosStr, St> CommitMetaBuilder<S, St>
 where
-    S: commit_meta_state::State,
-    S::Rev: commit_meta_state::IsUnset,
+    St: commit_meta_state::State,
+    St::Rev: commit_meta_state::IsUnset,
 {
     /// Set the `rev` field (required)
     pub fn rev(
         mut self,
         value: impl Into<Tid>,
-    ) -> CommitMetaBuilder<'a, commit_meta_state::SetRev<S>> {
+    ) -> CommitMetaBuilder<S, commit_meta_state::SetRev<St>> {
         self._fields.1 = Option::Some(value.into());
         CommitMetaBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CommitMetaBuilder<'a, S>
+impl<S: BosStr, St> CommitMetaBuilder<S, St>
 where
-    S: commit_meta_state::State,
-    S::Rev: commit_meta_state::IsSet,
-    S::Cid: commit_meta_state::IsSet,
+    St: commit_meta_state::State,
+    St::Rev: commit_meta_state::IsSet,
+    St::Cid: commit_meta_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> CommitMeta<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> CommitMeta<S> {
         CommitMeta {
             cid: self._fields.0.unwrap(),
             rev: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> CommitMeta<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> CommitMeta<S> {
         CommitMeta {
             cid: self._fields.0.unwrap(),
             rev: self._fields.1.unwrap(),

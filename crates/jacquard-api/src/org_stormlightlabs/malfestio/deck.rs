@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "org.stormlightlabs.malfestio.deck",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Deck<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Deck<S: BosStr = DefaultStr> {
     ///Ordered list of references to cards in this deck.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub card_refs: Option<Vec<AtUri<S>>>,
@@ -73,14 +73,14 @@ pub struct Deck<S: Bos<str> + AsRef<str> = DefaultStr> {
 /// Visibility setting for the deck.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum DeckVisibility<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum DeckVisibility<S: BosStr = DefaultStr> {
     Private,
     Unlisted,
     Public,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> DeckVisibility<S> {
+impl<S: BosStr> DeckVisibility<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Private => "private",
@@ -100,19 +100,19 @@ impl<S: Bos<str> + AsRef<str>> DeckVisibility<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for DeckVisibility<S> {
+impl<S: BosStr> core::fmt::Display for DeckVisibility<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for DeckVisibility<S> {
+impl<S: BosStr> AsRef<str> for DeckVisibility<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for DeckVisibility<S> {
+impl<S: BosStr> Serialize for DeckVisibility<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -121,8 +121,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for DeckVisibility<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for DeckVisibility<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for DeckVisibility<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -132,14 +131,18 @@ for DeckVisibility<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for DeckVisibility<S> {
+impl<S: BosStr + Default> Default for DeckVisibility<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for DeckVisibility<S> {
-    type Output = DeckVisibility<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for DeckVisibility<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = DeckVisibility<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             DeckVisibility::Private => DeckVisibility::Private,
@@ -156,18 +159,18 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for DeckVisibility<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DeckGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DeckGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Deck<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Deck<S> {
+impl<S: BosStr> Deck<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, DeckRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -180,17 +183,17 @@ pub struct DeckRecord;
 impl XrpcResp for DeckRecord {
     const NSID: &'static str = "org.stormlightlabs.malfestio.deck";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = DeckGetRecordOutput<S>;
+    type Output<S: BosStr> = DeckGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<DeckGetRecordOutput<S>> for Deck<S> {
+impl<S: BosStr> From<DeckGetRecordOutput<S>> for Deck<S> {
     fn from(output: DeckGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Deck<S> {
+impl<S: BosStr> Collection for Deck<S> {
     const NSID: &'static str = "org.stormlightlabs.malfestio.deck";
     type Record = DeckRecord;
 }
@@ -200,7 +203,7 @@ impl Collection for DeckRecord {
     type Record = DeckRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Deck<S> {
+impl<S: BosStr> LexiconSchema for Deck<S> {
     fn nsid() -> &'static str {
         "org.stormlightlabs.malfestio.deck"
     }
@@ -286,43 +289,43 @@ pub mod deck_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
         type CreatedAt;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type CreatedAt = S::CreatedAt;
+        type Title = Unset;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Title = S::Title;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
+        type Title = St::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
+        type CreatedAt = St::CreatedAt;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct DeckBuilder<'a, S: deck_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct DeckBuilder<S: BosStr, St: deck_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<AtUri<S>>>,
         Option<Datetime>,
@@ -335,28 +338,28 @@ pub struct DeckBuilder<'a, S: deck_state::State> {
         Option<Datetime>,
         Option<DeckVisibility<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Deck<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> DeckBuilder<'a, deck_state::Empty> {
+impl<S: BosStr> Deck<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> DeckBuilder<S, deck_state::Empty> {
         DeckBuilder::new()
     }
 }
 
-impl<'a> DeckBuilder<'a, deck_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> DeckBuilder<S, deck_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         DeckBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: deck_state::State> DeckBuilder<'a, S> {
+impl<S: BosStr, St: deck_state::State> DeckBuilder<S, St> {
     /// Set the `cardRefs` field (optional)
     pub fn card_refs(mut self, value: impl Into<Option<Vec<AtUri<S>>>>) -> Self {
         self._fields.0 = value.into();
@@ -369,26 +372,26 @@ impl<'a, S: deck_state::State> DeckBuilder<'a, S> {
     }
 }
 
-impl<'a, S> DeckBuilder<'a, S>
+impl<S: BosStr, St> DeckBuilder<S, St>
 where
-    S: deck_state::State,
-    S::CreatedAt: deck_state::IsUnset,
+    St: deck_state::State,
+    St::CreatedAt: deck_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> DeckBuilder<'a, deck_state::SetCreatedAt<S>> {
+    ) -> DeckBuilder<S, deck_state::SetCreatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         DeckBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: deck_state::State> DeckBuilder<'a, S> {
+impl<S: BosStr, St: deck_state::State> DeckBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -401,7 +404,7 @@ impl<'a, S: deck_state::State> DeckBuilder<'a, S> {
     }
 }
 
-impl<'a, S: deck_state::State> DeckBuilder<'a, S> {
+impl<S: BosStr, St: deck_state::State> DeckBuilder<S, St> {
     /// Set the `language` field (optional)
     pub fn language(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -414,7 +417,7 @@ impl<'a, S: deck_state::State> DeckBuilder<'a, S> {
     }
 }
 
-impl<'a, S: deck_state::State> DeckBuilder<'a, S> {
+impl<S: BosStr, St: deck_state::State> DeckBuilder<S, St> {
     /// Set the `license` field (optional)
     pub fn license(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
@@ -427,7 +430,7 @@ impl<'a, S: deck_state::State> DeckBuilder<'a, S> {
     }
 }
 
-impl<'a, S: deck_state::State> DeckBuilder<'a, S> {
+impl<S: BosStr, St: deck_state::State> DeckBuilder<S, St> {
     /// Set the `sourceRefs` field (optional)
     pub fn source_refs(mut self, value: impl Into<Option<Vec<AtUri<S>>>>) -> Self {
         self._fields.5 = value.into();
@@ -440,7 +443,7 @@ impl<'a, S: deck_state::State> DeckBuilder<'a, S> {
     }
 }
 
-impl<'a, S: deck_state::State> DeckBuilder<'a, S> {
+impl<S: BosStr, St: deck_state::State> DeckBuilder<S, St> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -453,26 +456,26 @@ impl<'a, S: deck_state::State> DeckBuilder<'a, S> {
     }
 }
 
-impl<'a, S> DeckBuilder<'a, S>
+impl<S: BosStr, St> DeckBuilder<S, St>
 where
-    S: deck_state::State,
-    S::Title: deck_state::IsUnset,
+    St: deck_state::State,
+    St::Title: deck_state::IsUnset,
 {
     /// Set the `title` field (required)
     pub fn title(
         mut self,
         value: impl Into<S>,
-    ) -> DeckBuilder<'a, deck_state::SetTitle<S>> {
+    ) -> DeckBuilder<S, deck_state::SetTitle<St>> {
         self._fields.7 = Option::Some(value.into());
         DeckBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: deck_state::State> DeckBuilder<'a, S> {
+impl<S: BosStr, St: deck_state::State> DeckBuilder<S, St> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.8 = value.into();
@@ -485,7 +488,7 @@ impl<'a, S: deck_state::State> DeckBuilder<'a, S> {
     }
 }
 
-impl<'a, S: deck_state::State> DeckBuilder<'a, S> {
+impl<S: BosStr, St: deck_state::State> DeckBuilder<S, St> {
     /// Set the `visibility` field (optional)
     pub fn visibility(mut self, value: impl Into<Option<DeckVisibility<S>>>) -> Self {
         self._fields.9 = value.into();
@@ -498,14 +501,14 @@ impl<'a, S: deck_state::State> DeckBuilder<'a, S> {
     }
 }
 
-impl<'a, S> DeckBuilder<'a, S>
+impl<S: BosStr, St> DeckBuilder<S, St>
 where
-    S: deck_state::State,
-    S::Title: deck_state::IsSet,
-    S::CreatedAt: deck_state::IsSet,
+    St: deck_state::State,
+    St::CreatedAt: deck_state::IsSet,
+    St::Title: deck_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Deck<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Deck<S> {
         Deck {
             card_refs: self._fields.0,
             created_at: self._fields.1.unwrap(),
@@ -520,8 +523,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Deck<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Deck<S> {
         Deck {
             card_refs: self._fields.0,
             created_at: self._fields.1.unwrap(),

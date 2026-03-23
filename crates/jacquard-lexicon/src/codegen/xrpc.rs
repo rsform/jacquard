@@ -402,16 +402,26 @@ impl<'c> CodeGenerator<'c> {
                 })
             }
             LexXrpcSubscriptionMessageSchema::Ref(ref_type) => {
-                // Just a type alias to the referenced type.
-                // Refs generally have lifetimes, so always add <'a>.
+                // Type alias to the referenced type, parameterised on S if the ref needs it.
                 let type_name = format!("{}Message", type_base);
                 let ident = syn::Ident::new(&type_name, proc_macro2::Span::call_site());
                 let rust_type = self.ref_to_rust_type(&ref_type.r#ref, resolved)?;
                 let doc = self.generate_doc_comment(ref_type.description.as_ref());
 
-                let type_alias = quote! {
-                    #doc
-                    pub type #ident<'a> = #rust_type;
+                let bosstr_path =
+                    resolved.external_type_tokens(&super::prettify::ExternalImport::BosStr);
+                let default_str_path =
+                    resolved.external_type_tokens(&super::prettify::ExternalImport::DefaultStr);
+                let type_alias = if self.ref_needs_type_param(&ref_type.r#ref) {
+                    quote! {
+                        #doc
+                        pub type #ident<S: #bosstr_path = #default_str_path> = #rust_type;
+                    }
+                } else {
+                    quote! {
+                        #doc
+                        pub type #ident = #rust_type;
+                    }
                 };
                 Ok(GeneratedCode::type_only(type_alias))
             }
@@ -496,13 +506,18 @@ impl<'c> CodeGenerator<'c> {
         let needs_type_param = self.params_need_type_param(p);
 
         let derives = resolved.derive_standard();
-        let bos_path = resolved.external_type_tokens(&super::prettify::ExternalImport::Bos);
-                let default_str_path = resolved.external_type_tokens(&super::prettify::ExternalImport::DefaultStr);
-                let bos_serde = resolved.serde_external_path(&super::prettify::ExternalImport::Bos);
-                let ser_serde = resolved.serde_external_path(&super::prettify::ExternalImport::Serialize);
-                let de_serde = resolved.serde_external_path(&super::prettify::ExternalImport::Deserialize);
-                let serde_ser_bound = format!("S: {} + {}<str> + AsRef<str>", ser_serde, bos_serde);
-                let serde_de_bound = format!("S: {}<'de> + {}<str> + AsRef<str>", de_serde, bos_serde);
+        let bosstr_path =
+            resolved.external_type_tokens(&super::prettify::ExternalImport::BosStr);
+        let default_str_path =
+            resolved.external_type_tokens(&super::prettify::ExternalImport::DefaultStr);
+        let bosstr_serde =
+            resolved.serde_external_path(&super::prettify::ExternalImport::BosStr);
+        let ser_serde = resolved.serde_external_path(&super::prettify::ExternalImport::Serialize);
+        let de_serde = resolved.serde_external_path(&super::prettify::ExternalImport::Deserialize);
+        let serde_ser_bound = format!("S: {} + {}", ser_serde, bosstr_serde);
+        // Since BosStr includes FromStaticStr, the serde bound is the same whether
+        // or not there are string defaults with static values.
+        let serde_de_bound = format!("S: {}<'de> + {}", de_serde, bosstr_serde);
 
         let struct_body = if fields.is_empty() {
             quote! {
@@ -510,7 +525,7 @@ impl<'c> CodeGenerator<'c> {
             }
         } else if needs_type_param {
             quote! {
-                pub struct #ident<S: #bos_path<str> + AsRef<str> = #default_str_path> {
+                pub struct #ident<S: #bosstr_path = #default_str_path> {
                     #(#fields)*
                 }
             }
@@ -526,8 +541,7 @@ impl<'c> CodeGenerator<'c> {
             quote! {
                 #doc
                 #derives
-                #[serde(rename_all = "camelCase")]
-                #[serde(bound(
+                #[serde(rename_all = "camelCase", bound(
                     serialize = #serde_ser_bound,
                     deserialize = #serde_de_bound
                 ))]
@@ -541,6 +555,7 @@ impl<'c> CodeGenerator<'c> {
                 #struct_body
             }
         };
+
 
         let type_name = ident.to_string();
         let ctx = super::builder_gen::BuilderGenContext::from_parameters(
@@ -616,31 +631,34 @@ impl<'c> CodeGenerator<'c> {
             } else {
                 resolved.derive_standard()
             };
-            let bos_path = resolved.external_type_tokens(&super::prettify::ExternalImport::Bos);
-                let default_str_path = resolved.external_type_tokens(&super::prettify::ExternalImport::DefaultStr);
-                let bos_serde = resolved.serde_external_path(&super::prettify::ExternalImport::Bos);
-                let ser_serde = resolved.serde_external_path(&super::prettify::ExternalImport::Serialize);
-                let de_serde = resolved.serde_external_path(&super::prettify::ExternalImport::Deserialize);
-                let serde_ser_bound = format!("S: {} + {}<str> + AsRef<str>", ser_serde, bos_serde);
-                let serde_de_bound = format!("S: {}<'de> + {}<str> + AsRef<str>", de_serde, bos_serde);
+            let bosstr_path =
+                resolved.external_type_tokens(&super::prettify::ExternalImport::BosStr);
+            let default_str_path =
+                resolved.external_type_tokens(&super::prettify::ExternalImport::DefaultStr);
+            let bosstr_serde =
+                resolved.serde_external_path(&super::prettify::ExternalImport::BosStr);
+            let ser_serde =
+                resolved.serde_external_path(&super::prettify::ExternalImport::Serialize);
+            let de_serde =
+                resolved.serde_external_path(&super::prettify::ExternalImport::Deserialize);
+            let serde_ser_bound = format!("S: {} + {}", ser_serde, bosstr_serde);
+            let serde_de_bound = format!("S: {}<'de> + {}", de_serde, bosstr_serde);
             let data_type = resolved.type_tokens(&super::prettify::CommonType::Data);
             let smol_str_type = resolved.type_tokens(&super::prettify::CommonType::SmolStr);
             let btree_map = resolved.btree_map_path();
             let is_none_path = resolved.option_is_none_path();
-            let extra_data_type = resolved.option_type(quote! { #btree_map<#smol_str_type, #data_type> });
+            let extra_data_type =
+                resolved.option_type(quote! { #btree_map<#smol_str_type, #data_type> });
             quote! {
                 #doc
                 #derive_attr
-                #[serde(rename_all = "camelCase")]
-                #[serde(bound(
+                #[serde(rename_all = "camelCase", bound(
                     serialize = #serde_ser_bound,
                     deserialize = #serde_de_bound
                 ))]
-                pub struct #ident<S: #bos_path<str> + AsRef<str> = #default_str_path> {
+                pub struct #ident<S: #bosstr_path = #default_str_path> {
                     #fields
-                    #[serde(flatten)]
-                    #[serde(skip_serializing_if = #is_none_path)]
-                    #[serde(default)]
+                    #[serde(flatten, default, skip_serializing_if = #is_none_path)]
                     pub extra_data: #extra_data_type,
                 }
             }
@@ -745,31 +763,34 @@ impl<'c> CodeGenerator<'c> {
             } else {
                 resolved.derive_standard()
             };
-            let bos_path = resolved.external_type_tokens(&super::prettify::ExternalImport::Bos);
-                let default_str_path = resolved.external_type_tokens(&super::prettify::ExternalImport::DefaultStr);
-                let bos_serde = resolved.serde_external_path(&super::prettify::ExternalImport::Bos);
-                let ser_serde = resolved.serde_external_path(&super::prettify::ExternalImport::Serialize);
-                let de_serde = resolved.serde_external_path(&super::prettify::ExternalImport::Deserialize);
-                let serde_ser_bound = format!("S: {} + {}<str> + AsRef<str>", ser_serde, bos_serde);
-                let serde_de_bound = format!("S: {}<'de> + {}<str> + AsRef<str>", de_serde, bos_serde);
+            let bosstr_path =
+                resolved.external_type_tokens(&super::prettify::ExternalImport::BosStr);
+            let default_str_path =
+                resolved.external_type_tokens(&super::prettify::ExternalImport::DefaultStr);
+            let bosstr_serde =
+                resolved.serde_external_path(&super::prettify::ExternalImport::BosStr);
+            let ser_serde =
+                resolved.serde_external_path(&super::prettify::ExternalImport::Serialize);
+            let de_serde =
+                resolved.serde_external_path(&super::prettify::ExternalImport::Deserialize);
+            let serde_ser_bound = format!("S: {} + {}", ser_serde, bosstr_serde);
+            let serde_de_bound = format!("S: {}<'de> + {}", de_serde, bosstr_serde);
             let data_type = resolved.type_tokens(&super::prettify::CommonType::Data);
             let smol_str_type = resolved.type_tokens(&super::prettify::CommonType::SmolStr);
             let btree_map = resolved.btree_map_path();
             let is_none_path = resolved.option_is_none_path();
-            let extra_data_type = resolved.option_type(quote! { #btree_map<#smol_str_type, #data_type> });
+            let extra_data_type =
+                resolved.option_type(quote! { #btree_map<#smol_str_type, #data_type> });
             quote! {
                 #doc
                 #derive_attr
-                #[serde(rename_all = "camelCase")]
-                #[serde(bound(
+                #[serde(rename_all = "camelCase", bound(
                     serialize = #serde_ser_bound,
                     deserialize = #serde_de_bound
                 ))]
-                pub struct #ident<S: #bos_path<str> + AsRef<str> = #default_str_path> {
+                pub struct #ident<S: #bosstr_path = #default_str_path> {
                     #fields
-                    #[serde(flatten)]
-                    #[serde(skip_serializing_if = #is_none_path)]
-                    #[serde(default)]
+                    #[serde(flatten, default, skip_serializing_if = #is_none_path)]
                     pub extra_data: #extra_data_type,
                 }
             }
@@ -824,7 +845,6 @@ impl<'c> CodeGenerator<'c> {
                 Ok((
                     quote! {
                         #[serde(flatten)]
-                        #[serde(borrow)]
                         pub value: #rust_type,
                     },
                     Vec::new(),
@@ -835,7 +855,6 @@ impl<'c> CodeGenerator<'c> {
                 Ok((
                     quote! {
                         #[serde(flatten)]
-                        #[serde(borrow)]
                         pub value: #data_type,
                     },
                     Vec::new(),
@@ -858,7 +877,7 @@ impl<'c> CodeGenerator<'c> {
         let field_ident = make_ident(&field_name.to_snake_case());
 
         let data_type = resolved.type_tokens(&super::prettify::CommonType::Data);
-        let (rust_type, needs_lifetime) = match field_type {
+        let (rust_type, _needs_type_param) = match field_type {
             LexXrpcParametersProperty::Boolean(_) => (quote! { bool }, false),
             LexXrpcParametersProperty::Integer(_) => (quote! { i64 }, false),
             LexXrpcParametersProperty::String(s) => (
@@ -867,7 +886,7 @@ impl<'c> CodeGenerator<'c> {
             ),
             LexXrpcParametersProperty::Unknown(_) => (data_type.clone(), true),
             LexXrpcParametersProperty::Array(arr) => {
-                let needs_lifetime = match &arr.items {
+                let needs_type_param = match &arr.items {
                     crate::lexicon::LexPrimitiveArrayItem::Boolean(_)
                     | crate::lexicon::LexPrimitiveArrayItem::Integer(_) => false,
                     crate::lexicon::LexPrimitiveArrayItem::String(s) => {
@@ -883,7 +902,7 @@ impl<'c> CodeGenerator<'c> {
                     }
                     crate::lexicon::LexPrimitiveArrayItem::Unknown(_) => data_type.clone(),
                 };
-                (quote! { Vec<#item_type> }, needs_lifetime)
+                (quote! { Vec<#item_type> }, needs_type_param)
             }
         };
 
@@ -898,11 +917,6 @@ impl<'c> CodeGenerator<'c> {
         if !is_required {
             let is_none_path = resolved.option_is_none_path();
             attrs.push(quote! { #[serde(skip_serializing_if = #is_none_path)] });
-        }
-
-        // Add serde(borrow) to all fields with lifetimes.
-        if needs_lifetime {
-            attrs.push(quote! { #[serde(borrow)] });
         }
 
         Ok(quote! {
@@ -960,13 +974,12 @@ impl<'c> CodeGenerator<'c> {
                     let v = s.default.as_ref().unwrap().as_ref();
                     let fn_name = format!("_default_{}", field_name.to_snake_case());
                     let fn_ident = syn::Ident::new(&fn_name, proc_macro2::Span::call_site());
-                    let cowstr_path = resolved.type_path(&super::prettify::CommonType::CowStr);
                     (
-                        Some(format!(" Defaults to `\"{}\"`", v)),
+                        Some(format!("Defaults to `\"{}\"`.", v)),
                         Some(quote! { #[serde(default = #fn_name)] }),
                         Some(quote! {
-                            fn #fn_ident() -> #cowstr_path<'static> {
-                                #cowstr_path::from(#v)
+                            fn #fn_ident<S: jacquard_common::FromStaticStr>() -> S {
+                                S::from_static(#v)
                             }
                         }),
                     )
@@ -1026,18 +1039,14 @@ impl<'c> CodeGenerator<'c> {
                     }
                     let fn_name = format!("_default_{}", field_name.to_snake_case());
                     let fn_ident = syn::Ident::new(&fn_name, proc_macro2::Span::call_site());
-                    let cowstr_path = resolved.type_path(&super::prettify::CommonType::CowStr);
                     (
                         Some(parts.join(" ")),
                         Some(quote! { #[serde(default = #fn_name)] }),
-                        {
-                            let opt_cowstr = resolved.option_type(quote! { #cowstr_path<'static> });
-                            Some(quote! {
-                                fn #fn_ident() -> #opt_cowstr {
-                                    Some(#cowstr_path::from(#v))
-                                }
-                            })
-                        },
+                        Some(quote! {
+                            fn #fn_ident<S: jacquard_common::FromStaticStr>() -> Option<S> {
+                                Some(S::from_static(#v))
+                            }
+                        }),
                     )
                 }
                 // Optional fields without defaults: doc comments only.
@@ -1219,17 +1228,14 @@ impl<'c> CodeGenerator<'c> {
             proc_macro2::Span::call_site(),
         );
 
-        let bos_path = resolved.external_type_tokens(&super::prettify::ExternalImport::Bos);
-        let _default_str_path = resolved.external_type_tokens(&super::prettify::ExternalImport::DefaultStr);
-        let bos_serde = resolved.serde_external_path(&super::prettify::ExternalImport::Bos);
-        let ser_serde = resolved.serde_external_path(&super::prettify::ExternalImport::Serialize);
-        let de_serde = resolved.serde_external_path(&super::prettify::ExternalImport::Deserialize);
-        let _serde_ser_bound = format!("S: {} + {}<str> + AsRef<str>", ser_serde, bos_serde);
-        let _serde_de_bound = format!("S: {}<'de> + {}<str> + AsRef<str>", de_serde, bos_serde);
+        let bosstr_path =
+            resolved.external_type_tokens(&super::prettify::ExternalImport::BosStr);
         let ser_path = resolved.external_type_tokens(&super::prettify::ExternalImport::Serialize);
         let de_path = resolved.external_type_tokens(&super::prettify::ExternalImport::Deserialize);
-        let decode_error_path = resolved.external_type_tokens(&super::prettify::ExternalImport::DecodeError);
-        let encode_error_path = resolved.external_type_tokens(&super::prettify::ExternalImport::EncodeError);
+        let decode_error_path =
+            resolved.external_type_tokens(&super::prettify::ExternalImport::DecodeError);
+        let encode_error_path =
+            resolved.external_type_tokens(&super::prettify::ExternalImport::EncodeError);
 
         let decode_output_method = if output_encoding == "application/json" {
             quote! {}
@@ -1241,7 +1247,7 @@ impl<'c> CodeGenerator<'c> {
             quote! {
                 fn decode_output<'de, S>(body: &'de [u8]) -> Result<Self::Output<S>, #decode_error_path>
                 where
-                    S: #bos_path<str> + AsRef<str> + #de_path<'de>,
+                    S: #bosstr_path + #de_path<'de>,
                     Self::Output<S>: #de_path<'de>,
                 {
                     Ok(#output_ident {
@@ -1255,7 +1261,7 @@ impl<'c> CodeGenerator<'c> {
             quote! {}
         } else {
             quote! {
-                fn encode_output<S: #bos_path<str> + AsRef<str>>(
+                fn encode_output<S: #bosstr_path>(
                     output: &Self::Output<S>,
                 ) -> Result<Vec<u8>, #encode_error_path>
                 where Self::Output<S>: #ser_path
@@ -1273,7 +1279,7 @@ impl<'c> CodeGenerator<'c> {
             impl jacquard_common::xrpc::XrpcResp for #response_ident {
                 const NSID: &'static str = #nsid;
                 const ENCODING: &'static str = #output_encoding;
-                type Output<S: #bos_path<str> + AsRef<str>> = #output_type;
+                type Output<S: #bosstr_path> = #output_type;
                 type Err = #error_type;
 
                 #encode_output_method
@@ -1284,8 +1290,13 @@ impl<'c> CodeGenerator<'c> {
         // Generate encode_body() method for binary inputs
         let encode_body_method = if is_binary_input {
             quote! {
-                fn encode_body(&self) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError> {
-                    Ok(self.body.to_vec())
+                fn encode_body(&self, buffer: &mut [u8]) -> Result<(), jacquard_common::xrpc::EncodeError>
+                where
+                    Self: #ser_path,
+                {
+                    Ok(
+                        buffer.copy_from_slice(self.body.as_ref())
+                    )
                 }
             }
         } else {
@@ -1297,13 +1308,13 @@ impl<'c> CodeGenerator<'c> {
             quote! {
                 fn decode_body<'de>(
                     body: &'de [u8],
-                ) -> Result<Box<Self>, jacquard_common::error::DecodeError>
+                ) -> Result<Self, jacquard_common::error::DecodeError>
                 where
                     Self: #de_path<'de>,
                 {
-                    Ok(Box::new(Self {
+                    Ok(Self {
                         body: jacquard_common::deps::bytes::Bytes::copy_from_slice(body),
-                    }))
+                    })
                 }
             }
         } else {
@@ -1319,7 +1330,8 @@ impl<'c> CodeGenerator<'c> {
 
             let (impl_generics, impl_target, endpoint_request_type) = if params_has_lifetime {
                 (
-                    quote! { <S: #bos_path<str> + AsRef<str> + #ser_path> },
+                    quote! { <S: #bosstr_path> },
+                    //quote! { <S: #bosstr_path + #ser_path> },
                     quote! { #request_ident<S> },
                     quote! { #request_ident<S> },
                 )
@@ -1353,7 +1365,7 @@ impl<'c> CodeGenerator<'c> {
                     const PATH: &'static str = #endpoint_path;
                     const METHOD: jacquard_common::xrpc::XrpcMethod = #method;
 
-                    type Request<S: #bos_path<str> + AsRef<str>> = #endpoint_request_type;
+                    type Request<S: #bosstr_path> = #endpoint_request_type;
                     type Response = #response_ident;
                 }
             })
@@ -1383,7 +1395,7 @@ impl<'c> CodeGenerator<'c> {
                     const PATH: &'static str = #endpoint_path;
                     const METHOD: jacquard_common::xrpc::XrpcMethod = #method;
 
-                    type Request<S: #bos_path<str> + AsRef<str>> = #request_ident;
+                    type Request<S: #bosstr_path> = #request_ident;
                     type Response = #response_ident;
                 }
             })

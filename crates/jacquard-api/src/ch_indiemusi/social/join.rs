@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "ch.indiemusi.social.join",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Join<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Join<S: BosStr = DefaultStr> {
     ///Link to the song that the user wants to listen to together with others
     pub song: AtUri<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -52,18 +52,18 @@ pub struct Join<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct JoinGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct JoinGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Join<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Join<S> {
+impl<S: BosStr> Join<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, JoinRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -76,17 +76,17 @@ pub struct JoinRecord;
 impl XrpcResp for JoinRecord {
     const NSID: &'static str = "ch.indiemusi.social.join";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = JoinGetRecordOutput<S>;
+    type Output<S: BosStr> = JoinGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<JoinGetRecordOutput<S>> for Join<S> {
+impl<S: BosStr> From<JoinGetRecordOutput<S>> for Join<S> {
     fn from(output: JoinGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Join<S> {
+impl<S: BosStr> Collection for Join<S> {
     const NSID: &'static str = "ch.indiemusi.social.join";
     type Record = JoinRecord;
 }
@@ -96,7 +96,7 @@ impl Collection for JoinRecord {
     type Record = JoinRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Join<S> {
+impl<S: BosStr> LexiconSchema for Join<S> {
     fn nsid() -> &'static str {
         "ch.indiemusi.social.join"
     }
@@ -130,9 +130,9 @@ pub mod join_state {
         type Song = Unset;
     }
     ///State transition - sets the `song` field to Set
-    pub struct SetSong<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSong<S> {}
-    impl<S: State> State for SetSong<S> {
+    pub struct SetSong<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSong<St> {}
+    impl<St: State> State for SetSong<St> {
         type Song = Set<members::song>;
     }
     /// Marker types for field names
@@ -143,64 +143,64 @@ pub mod join_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct JoinBuilder<'a, S: join_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct JoinBuilder<S: BosStr, St: join_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Join<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> JoinBuilder<'a, join_state::Empty> {
+impl<S: BosStr> Join<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> JoinBuilder<S, join_state::Empty> {
         JoinBuilder::new()
     }
 }
 
-impl<'a> JoinBuilder<'a, join_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> JoinBuilder<S, join_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         JoinBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> JoinBuilder<'a, S>
+impl<S: BosStr, St> JoinBuilder<S, St>
 where
-    S: join_state::State,
-    S::Song: join_state::IsUnset,
+    St: join_state::State,
+    St::Song: join_state::IsUnset,
 {
     /// Set the `song` field (required)
     pub fn song(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> JoinBuilder<'a, join_state::SetSong<S>> {
+    ) -> JoinBuilder<S, join_state::SetSong<St>> {
         self._fields.0 = Option::Some(value.into());
         JoinBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> JoinBuilder<'a, S>
+impl<S: BosStr, St> JoinBuilder<S, St>
 where
-    S: join_state::State,
-    S::Song: join_state::IsSet,
+    St: join_state::State,
+    St::Song: join_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Join<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Join<S> {
         Join {
             song: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Join<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Join<S> {
         Join {
             song: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

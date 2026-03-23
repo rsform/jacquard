@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "com.chrisvanderloo.project",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Project<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Project<S: BosStr = DefaultStr> {
     pub description: S,
     pub language: S,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -56,18 +56,18 @@ pub struct Project<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ProjectGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ProjectGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Project<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Project<S> {
+impl<S: BosStr> Project<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, ProjectRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -80,17 +80,17 @@ pub struct ProjectRecord;
 impl XrpcResp for ProjectRecord {
     const NSID: &'static str = "com.chrisvanderloo.project";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ProjectGetRecordOutput<S>;
+    type Output<S: BosStr> = ProjectGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<ProjectGetRecordOutput<S>> for Project<S> {
+impl<S: BosStr> From<ProjectGetRecordOutput<S>> for Project<S> {
     fn from(output: ProjectGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Project<S> {
+impl<S: BosStr> Collection for Project<S> {
     const NSID: &'static str = "com.chrisvanderloo.project";
     type Record = ProjectRecord;
 }
@@ -100,7 +100,7 @@ impl Collection for ProjectRecord {
     type Record = ProjectRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Project<S> {
+impl<S: BosStr> LexiconSchema for Project<S> {
     fn nsid() -> &'static str {
         "com.chrisvanderloo.project"
     }
@@ -179,134 +179,134 @@ pub mod project_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
+        type Repo;
         type Description;
         type Language;
-        type Repo;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
+        type Repo = Unset;
         type Description = Unset;
         type Language = Unset;
-        type Repo = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type Description = S::Description;
-        type Language = S::Language;
-        type Repo = S::Repo;
-    }
-    ///State transition - sets the `description` field to Set
-    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDescription<S> {}
-    impl<S: State> State for SetDescription<S> {
-        type Title = S::Title;
-        type Description = Set<members::description>;
-        type Language = S::Language;
-        type Repo = S::Repo;
-    }
-    ///State transition - sets the `language` field to Set
-    pub struct SetLanguage<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLanguage<S> {}
-    impl<S: State> State for SetLanguage<S> {
-        type Title = S::Title;
-        type Description = S::Description;
-        type Language = Set<members::language>;
-        type Repo = S::Repo;
+        type Title = Unset;
     }
     ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
-        type Title = S::Title;
-        type Description = S::Description;
-        type Language = S::Language;
+    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRepo<St> {}
+    impl<St: State> State for SetRepo<St> {
         type Repo = Set<members::repo>;
+        type Description = St::Description;
+        type Language = St::Language;
+        type Title = St::Title;
+    }
+    ///State transition - sets the `description` field to Set
+    pub struct SetDescription<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDescription<St> {}
+    impl<St: State> State for SetDescription<St> {
+        type Repo = St::Repo;
+        type Description = Set<members::description>;
+        type Language = St::Language;
+        type Title = St::Title;
+    }
+    ///State transition - sets the `language` field to Set
+    pub struct SetLanguage<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLanguage<St> {}
+    impl<St: State> State for SetLanguage<St> {
+        type Repo = St::Repo;
+        type Description = St::Description;
+        type Language = Set<members::language>;
+        type Title = St::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
+        type Repo = St::Repo;
+        type Description = St::Description;
+        type Language = St::Language;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
         ///Marker type for the `description` field
         pub struct description(());
         ///Marker type for the `language` field
         pub struct language(());
-        ///Marker type for the `repo` field
-        pub struct repo(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ProjectBuilder<'a, S: project_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ProjectBuilder<S: BosStr, St: project_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>, Option<UriValue<S>>, Option<UriValue<S>>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Project<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ProjectBuilder<'a, project_state::Empty> {
+impl<S: BosStr> Project<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ProjectBuilder<S, project_state::Empty> {
         ProjectBuilder::new()
     }
 }
 
-impl<'a> ProjectBuilder<'a, project_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ProjectBuilder<S, project_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ProjectBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ProjectBuilder<'a, S>
+impl<S: BosStr, St> ProjectBuilder<S, St>
 where
-    S: project_state::State,
-    S::Description: project_state::IsUnset,
+    St: project_state::State,
+    St::Description: project_state::IsUnset,
 {
     /// Set the `description` field (required)
     pub fn description(
         mut self,
         value: impl Into<S>,
-    ) -> ProjectBuilder<'a, project_state::SetDescription<S>> {
+    ) -> ProjectBuilder<S, project_state::SetDescription<St>> {
         self._fields.0 = Option::Some(value.into());
         ProjectBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ProjectBuilder<'a, S>
+impl<S: BosStr, St> ProjectBuilder<S, St>
 where
-    S: project_state::State,
-    S::Language: project_state::IsUnset,
+    St: project_state::State,
+    St::Language: project_state::IsUnset,
 {
     /// Set the `language` field (required)
     pub fn language(
         mut self,
         value: impl Into<S>,
-    ) -> ProjectBuilder<'a, project_state::SetLanguage<S>> {
+    ) -> ProjectBuilder<S, project_state::SetLanguage<St>> {
         self._fields.1 = Option::Some(value.into());
         ProjectBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: project_state::State> ProjectBuilder<'a, S> {
+impl<S: BosStr, St: project_state::State> ProjectBuilder<S, St> {
     /// Set the `link` field (optional)
     pub fn link(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -319,54 +319,54 @@ impl<'a, S: project_state::State> ProjectBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ProjectBuilder<'a, S>
+impl<S: BosStr, St> ProjectBuilder<S, St>
 where
-    S: project_state::State,
-    S::Repo: project_state::IsUnset,
+    St: project_state::State,
+    St::Repo: project_state::IsUnset,
 {
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> ProjectBuilder<'a, project_state::SetRepo<S>> {
+    ) -> ProjectBuilder<S, project_state::SetRepo<St>> {
         self._fields.3 = Option::Some(value.into());
         ProjectBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ProjectBuilder<'a, S>
+impl<S: BosStr, St> ProjectBuilder<S, St>
 where
-    S: project_state::State,
-    S::Title: project_state::IsUnset,
+    St: project_state::State,
+    St::Title: project_state::IsUnset,
 {
     /// Set the `title` field (required)
     pub fn title(
         mut self,
         value: impl Into<S>,
-    ) -> ProjectBuilder<'a, project_state::SetTitle<S>> {
+    ) -> ProjectBuilder<S, project_state::SetTitle<St>> {
         self._fields.4 = Option::Some(value.into());
         ProjectBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ProjectBuilder<'a, S>
+impl<S: BosStr, St> ProjectBuilder<S, St>
 where
-    S: project_state::State,
-    S::Title: project_state::IsSet,
-    S::Description: project_state::IsSet,
-    S::Language: project_state::IsSet,
-    S::Repo: project_state::IsSet,
+    St: project_state::State,
+    St::Repo: project_state::IsSet,
+    St::Description: project_state::IsSet,
+    St::Language: project_state::IsSet,
+    St::Title: project_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Project<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Project<S> {
         Project {
             description: self._fields.0.unwrap(),
             language: self._fields.1.unwrap(),
@@ -376,11 +376,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Project<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Project<S> {
         Project {
             description: self._fields.0.unwrap(),
             language: self._fields.1.unwrap(),

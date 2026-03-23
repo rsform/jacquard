@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -39,11 +39,11 @@ use crate::social_flockfeeds::lexical::r#type::product;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Embedded<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Embedded<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub additional_property: Option<EmbeddedAdditionalProperty<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -196,99 +196,99 @@ pub struct Embedded<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedAdditionalProperty<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedAdditionalProperty<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedAdditionalType<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedAdditionalType<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedAggregateRating<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedAggregateRating<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedAlternateName<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedAlternateName<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedAsin<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedAsin<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedAudience<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedAudience<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedAward<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedAward<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedAwards<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedAwards<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedBrand<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum EmbeddedBrand<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Brand#embedded")]
     BrandEmbedded(Box<brand::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
@@ -301,33 +301,33 @@ pub enum EmbeddedBrand<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedCategory<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedCategory<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedColor<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedColor<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedColorSwatch<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum EmbeddedColorSwatch<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
@@ -338,242 +338,242 @@ pub enum EmbeddedColorSwatch<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedCountryOfAssembly<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedCountryOfAssembly<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedCountryOfLastProcessing<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedCountryOfLastProcessing<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedCountryOfOrigin<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedCountryOfOrigin<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedDepth<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedDepth<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedDescription<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedDescription<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedDisambiguatingDescription<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedDisambiguatingDescription<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedFunding<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedFunding<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedGtin<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedGtin<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedGtin12<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedGtin12<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedGtin13<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedGtin13<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedGtin14<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedGtin14<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedGtin8<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedGtin8<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedHasAdultConsideration<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedHasAdultConsideration<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedHasCertification<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedHasCertification<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedHasEnergyConsumptionDetails<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedHasEnergyConsumptionDetails<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedHasGs1DigitalLink<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedHasGs1DigitalLink<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedHasMeasurement<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedHasMeasurement<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedHasMerchantReturnPolicy<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedHasMerchantReturnPolicy<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedHasProductReturnPolicy<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedHasProductReturnPolicy<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedHeight<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedHeight<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedIdentifier<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedIdentifier<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedImage<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum EmbeddedImage<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
@@ -584,22 +584,22 @@ pub enum EmbeddedImage<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedInProductGroupWithId<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedInProductGroupWithId<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedIsAccessoryOrSparePartFor<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum EmbeddedIsAccessoryOrSparePartFor<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
     Embedded(Box<product::Embedded<S>>),
 }
@@ -610,11 +610,11 @@ pub enum EmbeddedIsAccessoryOrSparePartFor<S: Bos<str> + AsRef<str> = DefaultStr
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedIsConsumableFor<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum EmbeddedIsConsumableFor<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
     Embedded(Box<product::Embedded<S>>),
 }
@@ -625,22 +625,22 @@ pub enum EmbeddedIsConsumableFor<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedIsFamilyFriendly<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedIsFamilyFriendly<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedIsRelatedTo<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum EmbeddedIsRelatedTo<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
     Embedded(Box<product::Embedded<S>>),
 }
@@ -651,11 +651,11 @@ pub enum EmbeddedIsRelatedTo<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedIsSimilarTo<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum EmbeddedIsSimilarTo<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
     Embedded(Box<product::Embedded<S>>),
 }
@@ -666,44 +666,44 @@ pub enum EmbeddedIsSimilarTo<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedIsVariantOf<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedIsVariantOf<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedItemCondition<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedItemCondition<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedKeywords<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedKeywords<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedLogo<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum EmbeddedLogo<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
@@ -714,22 +714,22 @@ pub enum EmbeddedLogo<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedMainEntityOfPage<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedMainEntityOfPage<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedManufacturer<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum EmbeddedManufacturer<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
@@ -740,11 +740,11 @@ pub enum EmbeddedManufacturer<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedMaterial<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum EmbeddedMaterial<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
     Embedded(Box<product::Embedded<S>>),
 }
@@ -755,77 +755,77 @@ pub enum EmbeddedMaterial<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedMobileUrl<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedMobileUrl<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedModel<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedModel<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedMpn<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedMpn<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedName<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedName<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedNegativeNotes<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedNegativeNotes<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedNsn<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedNsn<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedOffers<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum EmbeddedOffers<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Offer#embedded")]
     OfferEmbedded(Box<offer::Embedded<S>>),
 }
@@ -836,154 +836,154 @@ pub enum EmbeddedOffers<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedPattern<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedPattern<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedPositiveNotes<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedPositiveNotes<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedPotentialAction<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedPotentialAction<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedProductId<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedProductId<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedProductionDate<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedProductionDate<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedPurchaseDate<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedPurchaseDate<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedReleaseDate<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedReleaseDate<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedReview<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedReview<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedReviews<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedReviews<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedSameAs<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedSameAs<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedSize<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedSize<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedSku<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedSku<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedSlogan<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedSlogan<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedSubjectOf<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum EmbeddedSubjectOf<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
@@ -994,33 +994,33 @@ pub enum EmbeddedSubjectOf<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedUrl<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedUrl<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedWeight<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedWeight<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EmbeddedWidth<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum EmbeddedWidth<S: BosStr = DefaultStr> {}
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
@@ -1028,11 +1028,11 @@ pub enum EmbeddedWidth<S: Bos<str> + AsRef<str> = DefaultStr> {}
     rename = "social.flockfeeds.lexical.type.Product",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Product<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Product<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub additional_property: Option<ProductAdditionalProperty<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1185,99 +1185,99 @@ pub struct Product<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductAdditionalProperty<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum ProductAdditionalProperty<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductAdditionalType<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum ProductAdditionalType<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductAggregateRating<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum ProductAggregateRating<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductAlternateName<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum ProductAlternateName<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductAsin<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum ProductAsin<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductAudience<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum ProductAudience<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductAward<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum ProductAward<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductAwards<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum ProductAwards<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductBrand<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ProductBrand<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Brand#embedded")]
     BrandEmbedded(Box<brand::Embedded<S>>),
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
@@ -1290,33 +1290,33 @@ pub enum ProductBrand<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductCategory<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum ProductCategory<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductColor<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum ProductColor<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductColorSwatch<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ProductColorSwatch<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
@@ -1327,242 +1327,242 @@ pub enum ProductColorSwatch<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductCountryOfAssembly<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum ProductCountryOfAssembly<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductCountryOfLastProcessing<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum ProductCountryOfLastProcessing<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductCountryOfOrigin<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum ProductCountryOfOrigin<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductDepth<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum ProductDepth<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductDescription<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum ProductDescription<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductDisambiguatingDescription<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum ProductDisambiguatingDescription<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductFunding<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum ProductFunding<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductGtin<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum ProductGtin<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductGtin12<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum ProductGtin12<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductGtin13<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum ProductGtin13<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductGtin14<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum ProductGtin14<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductGtin8<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum ProductGtin8<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductHasAdultConsideration<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum ProductHasAdultConsideration<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductHasCertification<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum ProductHasCertification<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductHasEnergyConsumptionDetails<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum ProductHasEnergyConsumptionDetails<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductHasGs1DigitalLink<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum ProductHasGs1DigitalLink<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductHasMeasurement<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum ProductHasMeasurement<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductHasMerchantReturnPolicy<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum ProductHasMerchantReturnPolicy<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductHasProductReturnPolicy<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum ProductHasProductReturnPolicy<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductHeight<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum ProductHeight<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductIdentifier<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum ProductIdentifier<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductImage<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ProductImage<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
@@ -1573,22 +1573,22 @@ pub enum ProductImage<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductInProductGroupWithId<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum ProductInProductGroupWithId<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductIsAccessoryOrSparePartFor<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ProductIsAccessoryOrSparePartFor<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
     Embedded(Box<product::Embedded<S>>),
 }
@@ -1599,11 +1599,11 @@ pub enum ProductIsAccessoryOrSparePartFor<S: Bos<str> + AsRef<str> = DefaultStr>
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductIsConsumableFor<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ProductIsConsumableFor<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
     Embedded(Box<product::Embedded<S>>),
 }
@@ -1614,22 +1614,22 @@ pub enum ProductIsConsumableFor<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductIsFamilyFriendly<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum ProductIsFamilyFriendly<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductIsRelatedTo<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ProductIsRelatedTo<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
     Embedded(Box<product::Embedded<S>>),
 }
@@ -1640,11 +1640,11 @@ pub enum ProductIsRelatedTo<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductIsSimilarTo<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ProductIsSimilarTo<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
     Embedded(Box<product::Embedded<S>>),
 }
@@ -1655,44 +1655,44 @@ pub enum ProductIsSimilarTo<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductIsVariantOf<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum ProductIsVariantOf<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductItemCondition<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum ProductItemCondition<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductKeywords<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum ProductKeywords<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductLogo<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ProductLogo<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.ImageObject#embedded")]
     ImageObjectEmbedded(Box<image_object::Embedded<S>>),
 }
@@ -1703,22 +1703,22 @@ pub enum ProductLogo<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductMainEntityOfPage<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum ProductMainEntityOfPage<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductManufacturer<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ProductManufacturer<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Organization#embedded")]
     OrganizationEmbedded(Box<organization::Embedded<S>>),
 }
@@ -1729,11 +1729,11 @@ pub enum ProductManufacturer<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductMaterial<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ProductMaterial<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Product#embedded")]
     Embedded(Box<product::Embedded<S>>),
 }
@@ -1744,77 +1744,77 @@ pub enum ProductMaterial<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductMobileUrl<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum ProductMobileUrl<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductModel<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum ProductModel<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductMpn<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum ProductMpn<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductName<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum ProductName<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductNegativeNotes<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum ProductNegativeNotes<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductNsn<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum ProductNsn<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductOffers<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ProductOffers<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Offer#embedded")]
     OfferEmbedded(Box<offer::Embedded<S>>),
 }
@@ -1825,154 +1825,154 @@ pub enum ProductOffers<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductPattern<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum ProductPattern<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductPositiveNotes<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum ProductPositiveNotes<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductPotentialAction<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum ProductPotentialAction<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductProductId<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum ProductProductId<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductProductionDate<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum ProductProductionDate<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductPurchaseDate<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum ProductPurchaseDate<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductReleaseDate<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum ProductReleaseDate<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductReview<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum ProductReview<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductReviews<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum ProductReviews<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductSameAs<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum ProductSameAs<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductSize<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum ProductSize<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductSku<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum ProductSku<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductSlogan<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum ProductSlogan<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductSubjectOf<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ProductSubjectOf<S: BosStr = DefaultStr> {
     #[serde(rename = "social.flockfeeds.lexical.type.Event#embedded")]
     EventEmbedded(Box<event::Embedded<S>>),
 }
@@ -1983,57 +1983,57 @@ pub enum ProductSubjectOf<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductUrl<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum ProductUrl<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductWeight<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum ProductWeight<S: BosStr = DefaultStr> {}
 
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ProductWidth<S: Bos<str> + AsRef<str> = DefaultStr> {}
+pub enum ProductWidth<S: BosStr = DefaultStr> {}
 /// Typed wrapper for GetRecord response with this collection's record type.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ProductGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ProductGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Product<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Product<S> {
+impl<S: BosStr> Product<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, ProductRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Embedded<S> {
+impl<S: BosStr> LexiconSchema for Embedded<S> {
     fn nsid() -> &'static str {
         "social.flockfeeds.lexical.type.Product"
     }
@@ -2055,17 +2055,17 @@ pub struct ProductRecord;
 impl XrpcResp for ProductRecord {
     const NSID: &'static str = "social.flockfeeds.lexical.type.Product";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ProductGetRecordOutput<S>;
+    type Output<S: BosStr> = ProductGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<ProductGetRecordOutput<S>> for Product<S> {
+impl<S: BosStr> From<ProductGetRecordOutput<S>> for Product<S> {
     fn from(output: ProductGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Product<S> {
+impl<S: BosStr> Collection for Product<S> {
     const NSID: &'static str = "social.flockfeeds.lexical.type.Product";
     type Record = ProductRecord;
 }
@@ -2075,7 +2075,7 @@ impl Collection for ProductRecord {
     type Record = ProductRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Product<S> {
+impl<S: BosStr> LexiconSchema for Product<S> {
     fn nsid() -> &'static str {
         "social.flockfeeds.lexical.type.Product"
     }
@@ -3657,9 +3657,9 @@ pub mod product_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct ProductBuilder<'a, S: product_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ProductBuilder<S: BosStr, St: product_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<ProductAdditionalProperty<S>>,
         Option<ProductAdditionalType<S>>,
@@ -3733,18 +3733,18 @@ pub struct ProductBuilder<'a, S: product_state::State> {
         Option<ProductWeight<S>>,
         Option<ProductWidth<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Product<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ProductBuilder<'a, product_state::Empty> {
+impl<S: BosStr> Product<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ProductBuilder<S, product_state::Empty> {
         ProductBuilder::new()
     }
 }
 
-impl<'a> ProductBuilder<'a, product_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ProductBuilder<S, product_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ProductBuilder {
             _state: PhantomData,
@@ -3821,12 +3821,12 @@ impl<'a> ProductBuilder<'a, product_state::Empty> {
                 None,
                 None,
             ),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `additionalProperty` field (optional)
     pub fn additional_property(
         mut self,
@@ -3845,7 +3845,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `additionalType` field (optional)
     pub fn additional_type(
         mut self,
@@ -3864,7 +3864,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `aggregateRating` field (optional)
     pub fn aggregate_rating(
         mut self,
@@ -3883,7 +3883,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `alternateName` field (optional)
     pub fn alternate_name(
         mut self,
@@ -3902,7 +3902,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `asin` field (optional)
     pub fn asin(mut self, value: impl Into<Option<ProductAsin<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -3915,7 +3915,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `audience` field (optional)
     pub fn audience(mut self, value: impl Into<Option<ProductAudience<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -3928,7 +3928,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `award` field (optional)
     pub fn award(mut self, value: impl Into<Option<ProductAward<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -3941,7 +3941,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `awards` field (optional)
     pub fn awards(mut self, value: impl Into<Option<ProductAwards<S>>>) -> Self {
         self._fields.7 = value.into();
@@ -3954,7 +3954,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `brand` field (optional)
     pub fn brand(mut self, value: impl Into<Option<ProductBrand<S>>>) -> Self {
         self._fields.8 = value.into();
@@ -3967,7 +3967,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `category` field (optional)
     pub fn category(mut self, value: impl Into<Option<ProductCategory<S>>>) -> Self {
         self._fields.9 = value.into();
@@ -3980,7 +3980,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `color` field (optional)
     pub fn color(mut self, value: impl Into<Option<ProductColor<S>>>) -> Self {
         self._fields.10 = value.into();
@@ -3993,7 +3993,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `colorSwatch` field (optional)
     pub fn color_swatch(
         mut self,
@@ -4009,7 +4009,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `countryOfAssembly` field (optional)
     pub fn country_of_assembly(
         mut self,
@@ -4028,7 +4028,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `countryOfLastProcessing` field (optional)
     pub fn country_of_last_processing(
         mut self,
@@ -4047,7 +4047,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `countryOfOrigin` field (optional)
     pub fn country_of_origin(
         mut self,
@@ -4066,7 +4066,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `depth` field (optional)
     pub fn depth(mut self, value: impl Into<Option<ProductDepth<S>>>) -> Self {
         self._fields.15 = value.into();
@@ -4079,7 +4079,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(
         mut self,
@@ -4095,7 +4095,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `disambiguatingDescription` field (optional)
     pub fn disambiguating_description(
         mut self,
@@ -4114,7 +4114,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `funding` field (optional)
     pub fn funding(mut self, value: impl Into<Option<ProductFunding<S>>>) -> Self {
         self._fields.18 = value.into();
@@ -4127,7 +4127,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `gtin` field (optional)
     pub fn gtin(mut self, value: impl Into<Option<ProductGtin<S>>>) -> Self {
         self._fields.19 = value.into();
@@ -4140,7 +4140,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `gtin12` field (optional)
     pub fn gtin12(mut self, value: impl Into<Option<ProductGtin12<S>>>) -> Self {
         self._fields.20 = value.into();
@@ -4153,7 +4153,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `gtin13` field (optional)
     pub fn gtin13(mut self, value: impl Into<Option<ProductGtin13<S>>>) -> Self {
         self._fields.21 = value.into();
@@ -4166,7 +4166,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `gtin14` field (optional)
     pub fn gtin14(mut self, value: impl Into<Option<ProductGtin14<S>>>) -> Self {
         self._fields.22 = value.into();
@@ -4179,7 +4179,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `gtin8` field (optional)
     pub fn gtin8(mut self, value: impl Into<Option<ProductGtin8<S>>>) -> Self {
         self._fields.23 = value.into();
@@ -4192,7 +4192,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `hasAdultConsideration` field (optional)
     pub fn has_adult_consideration(
         mut self,
@@ -4211,7 +4211,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `hasCertification` field (optional)
     pub fn has_certification(
         mut self,
@@ -4230,7 +4230,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `hasEnergyConsumptionDetails` field (optional)
     pub fn has_energy_consumption_details(
         mut self,
@@ -4249,7 +4249,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `hasGS1DigitalLink` field (optional)
     pub fn has_gs1_digital_link(
         mut self,
@@ -4268,7 +4268,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `hasMeasurement` field (optional)
     pub fn has_measurement(
         mut self,
@@ -4287,7 +4287,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `hasMerchantReturnPolicy` field (optional)
     pub fn has_merchant_return_policy(
         mut self,
@@ -4306,7 +4306,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `hasProductReturnPolicy` field (optional)
     pub fn has_product_return_policy(
         mut self,
@@ -4325,7 +4325,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `height` field (optional)
     pub fn height(mut self, value: impl Into<Option<ProductHeight<S>>>) -> Self {
         self._fields.31 = value.into();
@@ -4338,7 +4338,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `identifier` field (optional)
     pub fn identifier(mut self, value: impl Into<Option<ProductIdentifier<S>>>) -> Self {
         self._fields.32 = value.into();
@@ -4351,7 +4351,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `image` field (optional)
     pub fn image(mut self, value: impl Into<Option<ProductImage<S>>>) -> Self {
         self._fields.33 = value.into();
@@ -4364,7 +4364,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `inProductGroupWithID` field (optional)
     pub fn in_product_group_with_id(
         mut self,
@@ -4383,7 +4383,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `isAccessoryOrSparePartFor` field (optional)
     pub fn is_accessory_or_spare_part_for(
         mut self,
@@ -4402,7 +4402,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `isConsumableFor` field (optional)
     pub fn is_consumable_for(
         mut self,
@@ -4421,7 +4421,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `isFamilyFriendly` field (optional)
     pub fn is_family_friendly(
         mut self,
@@ -4440,7 +4440,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `isRelatedTo` field (optional)
     pub fn is_related_to(
         mut self,
@@ -4456,7 +4456,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `isSimilarTo` field (optional)
     pub fn is_similar_to(
         mut self,
@@ -4472,7 +4472,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `isVariantOf` field (optional)
     pub fn is_variant_of(
         mut self,
@@ -4488,7 +4488,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `itemCondition` field (optional)
     pub fn item_condition(
         mut self,
@@ -4507,7 +4507,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `keywords` field (optional)
     pub fn keywords(mut self, value: impl Into<Option<ProductKeywords<S>>>) -> Self {
         self._fields.42 = value.into();
@@ -4520,7 +4520,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `logo` field (optional)
     pub fn logo(mut self, value: impl Into<Option<ProductLogo<S>>>) -> Self {
         self._fields.43 = value.into();
@@ -4533,7 +4533,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `mainEntityOfPage` field (optional)
     pub fn main_entity_of_page(
         mut self,
@@ -4552,7 +4552,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `manufacturer` field (optional)
     pub fn manufacturer(
         mut self,
@@ -4568,7 +4568,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `material` field (optional)
     pub fn material(mut self, value: impl Into<Option<ProductMaterial<S>>>) -> Self {
         self._fields.46 = value.into();
@@ -4581,7 +4581,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `mobileUrl` field (optional)
     pub fn mobile_url(mut self, value: impl Into<Option<ProductMobileUrl<S>>>) -> Self {
         self._fields.47 = value.into();
@@ -4594,7 +4594,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `model` field (optional)
     pub fn model(mut self, value: impl Into<Option<ProductModel<S>>>) -> Self {
         self._fields.48 = value.into();
@@ -4607,7 +4607,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `mpn` field (optional)
     pub fn mpn(mut self, value: impl Into<Option<ProductMpn<S>>>) -> Self {
         self._fields.49 = value.into();
@@ -4620,7 +4620,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `name` field (optional)
     pub fn name(mut self, value: impl Into<Option<ProductName<S>>>) -> Self {
         self._fields.50 = value.into();
@@ -4633,7 +4633,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `negativeNotes` field (optional)
     pub fn negative_notes(
         mut self,
@@ -4652,7 +4652,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `nsn` field (optional)
     pub fn nsn(mut self, value: impl Into<Option<ProductNsn<S>>>) -> Self {
         self._fields.52 = value.into();
@@ -4665,7 +4665,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `offers` field (optional)
     pub fn offers(mut self, value: impl Into<Option<ProductOffers<S>>>) -> Self {
         self._fields.53 = value.into();
@@ -4678,7 +4678,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `pattern` field (optional)
     pub fn pattern(mut self, value: impl Into<Option<ProductPattern<S>>>) -> Self {
         self._fields.54 = value.into();
@@ -4691,7 +4691,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `positiveNotes` field (optional)
     pub fn positive_notes(
         mut self,
@@ -4710,7 +4710,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `potentialAction` field (optional)
     pub fn potential_action(
         mut self,
@@ -4729,7 +4729,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `productID` field (optional)
     pub fn product_id(mut self, value: impl Into<Option<ProductProductId<S>>>) -> Self {
         self._fields.57 = value.into();
@@ -4742,7 +4742,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `productionDate` field (optional)
     pub fn production_date(
         mut self,
@@ -4761,7 +4761,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `purchaseDate` field (optional)
     pub fn purchase_date(
         mut self,
@@ -4777,7 +4777,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `releaseDate` field (optional)
     pub fn release_date(
         mut self,
@@ -4793,7 +4793,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `review` field (optional)
     pub fn review(mut self, value: impl Into<Option<ProductReview<S>>>) -> Self {
         self._fields.61 = value.into();
@@ -4806,7 +4806,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `reviews` field (optional)
     pub fn reviews(mut self, value: impl Into<Option<ProductReviews<S>>>) -> Self {
         self._fields.62 = value.into();
@@ -4819,7 +4819,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `sameAs` field (optional)
     pub fn same_as(mut self, value: impl Into<Option<ProductSameAs<S>>>) -> Self {
         self._fields.63 = value.into();
@@ -4832,7 +4832,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `size` field (optional)
     pub fn size(mut self, value: impl Into<Option<ProductSize<S>>>) -> Self {
         self._fields.64 = value.into();
@@ -4845,7 +4845,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `sku` field (optional)
     pub fn sku(mut self, value: impl Into<Option<ProductSku<S>>>) -> Self {
         self._fields.65 = value.into();
@@ -4858,7 +4858,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `slogan` field (optional)
     pub fn slogan(mut self, value: impl Into<Option<ProductSlogan<S>>>) -> Self {
         self._fields.66 = value.into();
@@ -4871,7 +4871,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `subjectOf` field (optional)
     pub fn subject_of(mut self, value: impl Into<Option<ProductSubjectOf<S>>>) -> Self {
         self._fields.67 = value.into();
@@ -4884,7 +4884,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `url` field (optional)
     pub fn url(mut self, value: impl Into<Option<ProductUrl<S>>>) -> Self {
         self._fields.68 = value.into();
@@ -4897,7 +4897,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `weight` field (optional)
     pub fn weight(mut self, value: impl Into<Option<ProductWeight<S>>>) -> Self {
         self._fields.69 = value.into();
@@ -4910,7 +4910,7 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S: product_state::State> ProductBuilder<'a, S> {
+impl<S: BosStr, St: product_state::State> ProductBuilder<S, St> {
     /// Set the `width` field (optional)
     pub fn width(mut self, value: impl Into<Option<ProductWidth<S>>>) -> Self {
         self._fields.70 = value.into();
@@ -4923,12 +4923,12 @@ impl<'a, S: product_state::State> ProductBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ProductBuilder<'a, S>
+impl<S: BosStr, St> ProductBuilder<S, St>
 where
-    S: product_state::State,
+    St: product_state::State,
 {
-    /// Build the final struct
-    pub fn build(self) -> Product<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Product<S> {
         Product {
             additional_property: self._fields.0,
             additional_type: self._fields.1,
@@ -5004,11 +5004,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Product<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Product<S> {
         Product {
             additional_property: self._fields.0,
             additional_type: self._fields.1,

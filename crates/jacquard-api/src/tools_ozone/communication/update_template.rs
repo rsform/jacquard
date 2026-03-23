@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, Language};
 use jacquard_common::types::value::Data;
@@ -19,14 +19,14 @@ use serde::{Serialize, Deserialize};
 use crate::tools_ozone::communication::TemplateView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct UpdateTemplate<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct UpdateTemplate<S: BosStr = DefaultStr> {
     ///Content of the template, markdown supported, can contain variable placeholders.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub content_markdown: Option<S>,
@@ -46,28 +46,23 @@ pub struct UpdateTemplate<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///DID of the user who is updating the template.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_by: Option<Did<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct UpdateTemplateOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct UpdateTemplateOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
-    #[serde(borrow)]
     pub value: TemplateView<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -118,12 +113,11 @@ pub struct UpdateTemplateResponse;
 impl jacquard_common::xrpc::XrpcResp for UpdateTemplateResponse {
     const NSID: &'static str = "tools.ozone.communication.updateTemplate";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = UpdateTemplateOutput<S>;
+    type Output<S: BosStr> = UpdateTemplateOutput<S>;
     type Err = UpdateTemplateError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for UpdateTemplate<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UpdateTemplate<S> {
     const NSID: &'static str = "tools.ozone.communication.updateTemplate";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -138,6 +132,6 @@ impl jacquard_common::xrpc::XrpcEndpoint for UpdateTemplateRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = UpdateTemplate<S>;
+    type Request<S: BosStr> = UpdateTemplate<S>;
     type Response = UpdateTemplateResponse;
 }

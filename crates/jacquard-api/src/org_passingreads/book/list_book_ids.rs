@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
@@ -19,19 +19,17 @@ use crate::org_passingreads::BookIdEntry;
 use crate::org_passingreads::LocationEntry;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ListBookIdsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ListBookIdsOutput<S: BosStr = DefaultStr> {
     pub books: Vec<BookIdEntry<S>>,
     pub locations: Vec<LocationEntry<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -44,7 +42,7 @@ pub struct ListBookIdsResponse;
 impl jacquard_common::xrpc::XrpcResp for ListBookIdsResponse {
     const NSID: &'static str = "org.passingreads.book.listBookIds";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ListBookIdsOutput<S>;
+    type Output<S: BosStr> = ListBookIdsOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
@@ -59,6 +57,6 @@ pub struct ListBookIdsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListBookIdsRequest {
     const PATH: &'static str = "/xrpc/org.passingreads.book.listBookIds";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = ListBookIds;
+    type Request<S: BosStr> = ListBookIds;
     type Response = ListBookIdsResponse;
 }

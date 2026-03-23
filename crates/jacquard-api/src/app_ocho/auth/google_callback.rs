@@ -6,23 +6,26 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[allow(unused_imports)]
+use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GoogleCallback<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct GoogleCallback<S: BosStr = DefaultStr> {
     pub code: S,
-    #[serde(borrow)]
     pub state: S,
 }
 
@@ -31,12 +34,11 @@ pub struct GoogleCallbackResponse;
 impl jacquard_common::xrpc::XrpcResp for GoogleCallbackResponse {
     const NSID: &'static str = "app.ocho.auth.googleCallback";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ();
+    type Output<S: BosStr> = ();
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GoogleCallback<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GoogleCallback<S> {
     const NSID: &'static str = "app.ocho.auth.googleCallback";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GoogleCallbackResponse;
@@ -47,7 +49,7 @@ pub struct GoogleCallbackRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GoogleCallbackRequest {
     const PATH: &'static str = "/xrpc/app.ocho.auth.googleCallback";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GoogleCallback<S>;
+    type Request<S: BosStr> = GoogleCallback<S>;
     type Response = GoogleCallbackResponse;
 }
 
@@ -61,111 +63,111 @@ pub mod google_callback_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type State;
         type Code;
+        type State;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type State = Unset;
         type Code = Unset;
-    }
-    ///State transition - sets the `state` field to Set
-    pub struct SetState<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetState<S> {}
-    impl<S: State> State for SetState<S> {
-        type State = Set<members::state>;
-        type Code = S::Code;
+        type State = Unset;
     }
     ///State transition - sets the `code` field to Set
-    pub struct SetCode<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCode<S> {}
-    impl<S: State> State for SetCode<S> {
-        type State = S::State;
+    pub struct SetCode<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCode<St> {}
+    impl<St: State> State for SetCode<St> {
         type Code = Set<members::code>;
+        type State = St::State;
+    }
+    ///State transition - sets the `state` field to Set
+    pub struct SetState<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetState<St> {}
+    impl<St: State> State for SetState<St> {
+        type Code = St::Code;
+        type State = Set<members::state>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `state` field
-        pub struct state(());
         ///Marker type for the `code` field
         pub struct code(());
+        ///Marker type for the `state` field
+        pub struct state(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GoogleCallbackBuilder<'a, S: google_callback_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GoogleCallbackBuilder<S: BosStr, St: google_callback_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GoogleCallback<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GoogleCallbackBuilder<'a, google_callback_state::Empty> {
+impl<S: BosStr> GoogleCallback<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GoogleCallbackBuilder<S, google_callback_state::Empty> {
         GoogleCallbackBuilder::new()
     }
 }
 
-impl<'a> GoogleCallbackBuilder<'a, google_callback_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GoogleCallbackBuilder<S, google_callback_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GoogleCallbackBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GoogleCallbackBuilder<'a, S>
+impl<S: BosStr, St> GoogleCallbackBuilder<S, St>
 where
-    S: google_callback_state::State,
-    S::Code: google_callback_state::IsUnset,
+    St: google_callback_state::State,
+    St::Code: google_callback_state::IsUnset,
 {
     /// Set the `code` field (required)
     pub fn code(
         mut self,
         value: impl Into<S>,
-    ) -> GoogleCallbackBuilder<'a, google_callback_state::SetCode<S>> {
+    ) -> GoogleCallbackBuilder<S, google_callback_state::SetCode<St>> {
         self._fields.0 = Option::Some(value.into());
         GoogleCallbackBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GoogleCallbackBuilder<'a, S>
+impl<S: BosStr, St> GoogleCallbackBuilder<S, St>
 where
-    S: google_callback_state::State,
-    S::State: google_callback_state::IsUnset,
+    St: google_callback_state::State,
+    St::State: google_callback_state::IsUnset,
 {
     /// Set the `state` field (required)
     pub fn state(
         mut self,
         value: impl Into<S>,
-    ) -> GoogleCallbackBuilder<'a, google_callback_state::SetState<S>> {
+    ) -> GoogleCallbackBuilder<S, google_callback_state::SetState<St>> {
         self._fields.1 = Option::Some(value.into());
         GoogleCallbackBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GoogleCallbackBuilder<'a, S>
+impl<S: BosStr, St> GoogleCallbackBuilder<S, St>
 where
-    S: google_callback_state::State,
-    S::State: google_callback_state::IsSet,
-    S::Code: google_callback_state::IsSet,
+    St: google_callback_state::State,
+    St::Code: google_callback_state::IsSet,
+    St::State: google_callback_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GoogleCallback<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GoogleCallback<S> {
         GoogleCallback {
             code: self._fields.0.unwrap(),
             state: self._fields.1.unwrap(),

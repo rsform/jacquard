@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -30,11 +30,11 @@ use crate::org_atsui::clip;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct AspectRatio<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct AspectRatio<S: BosStr = DefaultStr> {
     pub height: i64,
     pub width: i64,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -43,14 +43,14 @@ pub struct AspectRatio<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Clip<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Clip<S: BosStr = DefaultStr> {
     pub children: Data<S>,
     ///Maximum box proportions (tallest allowed shape). E.g. {width:1, height:2} means at most twice as tall as wide.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -58,32 +58,27 @@ pub struct Clip<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Minimum box proportions (shortest allowed shape). E.g. {width:1, height:1} means at least as tall as wide.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub min: Option<clip::AspectRatio<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ClipOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ClipOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
-    #[serde(borrow)]
     pub value: Response<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for AspectRatio<S> {
+impl<S: BosStr> LexiconSchema for AspectRatio<S> {
     fn nsid() -> &'static str {
         "org.atsui.Clip"
     }
@@ -123,12 +118,11 @@ pub struct ClipResponse;
 impl jacquard_common::xrpc::XrpcResp for ClipResponse {
     const NSID: &'static str = "org.atsui.Clip";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ClipOutput<S>;
+    type Output<S: BosStr> = ClipOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for Clip<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Clip<S> {
     const NSID: &'static str = "org.atsui.Clip";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -143,7 +137,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for ClipRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = Clip<S>;
+    type Request<S: BosStr> = Clip<S>;
     type Response = ClipResponse;
 }
 
@@ -168,17 +162,17 @@ pub mod aspect_ratio_state {
         type Width = Unset;
     }
     ///State transition - sets the `height` field to Set
-    pub struct SetHeight<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHeight<S> {}
-    impl<S: State> State for SetHeight<S> {
+    pub struct SetHeight<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHeight<St> {}
+    impl<St: State> State for SetHeight<St> {
         type Height = Set<members::height>;
-        type Width = S::Width;
+        type Width = St::Width;
     }
     ///State transition - sets the `width` field to Set
-    pub struct SetWidth<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWidth<S> {}
-    impl<S: State> State for SetWidth<S> {
-        type Height = S::Height;
+    pub struct SetWidth<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetWidth<St> {}
+    impl<St: State> State for SetWidth<St> {
+        type Height = St::Height;
         type Width = Set<members::width>;
     }
     /// Marker types for field names
@@ -191,88 +185,88 @@ pub mod aspect_ratio_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct AspectRatioBuilder<'a, S: aspect_ratio_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct AspectRatioBuilder<S: BosStr, St: aspect_ratio_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<i64>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> AspectRatio<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> AspectRatioBuilder<'a, aspect_ratio_state::Empty> {
+impl<S: BosStr> AspectRatio<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> AspectRatioBuilder<S, aspect_ratio_state::Empty> {
         AspectRatioBuilder::new()
     }
 }
 
-impl<'a> AspectRatioBuilder<'a, aspect_ratio_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> AspectRatioBuilder<S, aspect_ratio_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         AspectRatioBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AspectRatioBuilder<'a, S>
+impl<S: BosStr, St> AspectRatioBuilder<S, St>
 where
-    S: aspect_ratio_state::State,
-    S::Height: aspect_ratio_state::IsUnset,
+    St: aspect_ratio_state::State,
+    St::Height: aspect_ratio_state::IsUnset,
 {
     /// Set the `height` field (required)
     pub fn height(
         mut self,
         value: impl Into<i64>,
-    ) -> AspectRatioBuilder<'a, aspect_ratio_state::SetHeight<S>> {
+    ) -> AspectRatioBuilder<S, aspect_ratio_state::SetHeight<St>> {
         self._fields.0 = Option::Some(value.into());
         AspectRatioBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AspectRatioBuilder<'a, S>
+impl<S: BosStr, St> AspectRatioBuilder<S, St>
 where
-    S: aspect_ratio_state::State,
-    S::Width: aspect_ratio_state::IsUnset,
+    St: aspect_ratio_state::State,
+    St::Width: aspect_ratio_state::IsUnset,
 {
     /// Set the `width` field (required)
     pub fn width(
         mut self,
         value: impl Into<i64>,
-    ) -> AspectRatioBuilder<'a, aspect_ratio_state::SetWidth<S>> {
+    ) -> AspectRatioBuilder<S, aspect_ratio_state::SetWidth<St>> {
         self._fields.1 = Option::Some(value.into());
         AspectRatioBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AspectRatioBuilder<'a, S>
+impl<S: BosStr, St> AspectRatioBuilder<S, St>
 where
-    S: aspect_ratio_state::State,
-    S::Height: aspect_ratio_state::IsSet,
-    S::Width: aspect_ratio_state::IsSet,
+    St: aspect_ratio_state::State,
+    St::Height: aspect_ratio_state::IsSet,
+    St::Width: aspect_ratio_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> AspectRatio<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> AspectRatio<S> {
         AspectRatio {
             height: self._fields.0.unwrap(),
             width: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> AspectRatio<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> AspectRatio<S> {
         AspectRatio {
             height: self._fields.0.unwrap(),
             width: self._fields.1.unwrap(),
@@ -385,9 +379,9 @@ pub mod clip_state {
         type Children = Unset;
     }
     ///State transition - sets the `children` field to Set
-    pub struct SetChildren<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetChildren<S> {}
-    impl<S: State> State for SetChildren<S> {
+    pub struct SetChildren<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetChildren<St> {}
+    impl<St: State> State for SetChildren<St> {
         type Children = Set<members::children>;
     }
     /// Marker types for field names
@@ -398,55 +392,55 @@ pub mod clip_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ClipBuilder<'a, S: clip_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ClipBuilder<S: BosStr, St: clip_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Data<S>>,
         Option<clip::AspectRatio<S>>,
         Option<clip::AspectRatio<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Clip<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ClipBuilder<'a, clip_state::Empty> {
+impl<S: BosStr> Clip<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ClipBuilder<S, clip_state::Empty> {
         ClipBuilder::new()
     }
 }
 
-impl<'a> ClipBuilder<'a, clip_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ClipBuilder<S, clip_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ClipBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ClipBuilder<'a, S>
+impl<S: BosStr, St> ClipBuilder<S, St>
 where
-    S: clip_state::State,
-    S::Children: clip_state::IsUnset,
+    St: clip_state::State,
+    St::Children: clip_state::IsUnset,
 {
     /// Set the `children` field (required)
     pub fn children(
         mut self,
         value: impl Into<Data<S>>,
-    ) -> ClipBuilder<'a, clip_state::SetChildren<S>> {
+    ) -> ClipBuilder<S, clip_state::SetChildren<St>> {
         self._fields.0 = Option::Some(value.into());
         ClipBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+impl<S: BosStr, St: clip_state::State> ClipBuilder<S, St> {
     /// Set the `max` field (optional)
     pub fn max(mut self, value: impl Into<Option<clip::AspectRatio<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -459,7 +453,7 @@ impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
     }
 }
 
-impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
+impl<S: BosStr, St: clip_state::State> ClipBuilder<S, St> {
     /// Set the `min` field (optional)
     pub fn min(mut self, value: impl Into<Option<clip::AspectRatio<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -472,13 +466,13 @@ impl<'a, S: clip_state::State> ClipBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ClipBuilder<'a, S>
+impl<S: BosStr, St> ClipBuilder<S, St>
 where
-    S: clip_state::State,
-    S::Children: clip_state::IsSet,
+    St: clip_state::State,
+    St::Children: clip_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Clip<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Clip<S> {
         Clip {
             children: self._fields.0.unwrap(),
             max: self._fields.1,
@@ -486,8 +480,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Clip<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Clip<S> {
         Clip {
             children: self._fields.0.unwrap(),
             max: self._fields.1,

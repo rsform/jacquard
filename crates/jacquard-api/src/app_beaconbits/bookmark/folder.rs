@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "app.beaconbits.bookmark.folder",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Folder<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Folder<S: BosStr = DefaultStr> {
     ///Hex color code for the folder (e.g., #ff0000)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub color: Option<S>,
@@ -63,14 +63,14 @@ pub struct Folder<S: Bos<str> + AsRef<str> = DefaultStr> {
 /// Visibility setting for the folder
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum FolderVisibility<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum FolderVisibility<S: BosStr = DefaultStr> {
     Public,
     Unlisted,
     Hidden,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> FolderVisibility<S> {
+impl<S: BosStr> FolderVisibility<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Public => "public",
@@ -90,19 +90,19 @@ impl<S: Bos<str> + AsRef<str>> FolderVisibility<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for FolderVisibility<S> {
+impl<S: BosStr> core::fmt::Display for FolderVisibility<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for FolderVisibility<S> {
+impl<S: BosStr> AsRef<str> for FolderVisibility<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for FolderVisibility<S> {
+impl<S: BosStr> Serialize for FolderVisibility<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -111,8 +111,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for FolderVisibility<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for FolderVisibility<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for FolderVisibility<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -122,14 +121,18 @@ for FolderVisibility<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for FolderVisibility<S> {
+impl<S: BosStr + Default> Default for FolderVisibility<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for FolderVisibility<S> {
-    type Output = FolderVisibility<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for FolderVisibility<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = FolderVisibility<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             FolderVisibility::Public => FolderVisibility::Public,
@@ -146,18 +149,18 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for FolderVisibility<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct FolderGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct FolderGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Folder<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Folder<S> {
+impl<S: BosStr> Folder<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, FolderRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -170,17 +173,17 @@ pub struct FolderRecord;
 impl XrpcResp for FolderRecord {
     const NSID: &'static str = "app.beaconbits.bookmark.folder";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = FolderGetRecordOutput<S>;
+    type Output<S: BosStr> = FolderGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<FolderGetRecordOutput<S>> for Folder<S> {
+impl<S: BosStr> From<FolderGetRecordOutput<S>> for Folder<S> {
     fn from(output: FolderGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Folder<S> {
+impl<S: BosStr> Collection for Folder<S> {
     const NSID: &'static str = "app.beaconbits.bookmark.folder";
     type Record = FolderRecord;
 }
@@ -190,7 +193,7 @@ impl Collection for FolderRecord {
     type Record = FolderRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Folder<S> {
+impl<S: BosStr> LexiconSchema for Folder<S> {
     fn nsid() -> &'static str {
         "app.beaconbits.bookmark.folder"
     }
@@ -276,43 +279,43 @@ pub mod folder_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Name;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Name = S::Name;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type CreatedAt = S::CreatedAt;
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
         type Name = Set<members::name>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Name = St::Name;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct FolderBuilder<'a, S: folder_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct FolderBuilder<S: BosStr, St: folder_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
         Option<Datetime>,
@@ -321,28 +324,28 @@ pub struct FolderBuilder<'a, S: folder_state::State> {
         Option<S>,
         Option<FolderVisibility<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Folder<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> FolderBuilder<'a, folder_state::Empty> {
+impl<S: BosStr> Folder<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> FolderBuilder<S, folder_state::Empty> {
         FolderBuilder::new()
     }
 }
 
-impl<'a> FolderBuilder<'a, folder_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> FolderBuilder<S, folder_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         FolderBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: folder_state::State> FolderBuilder<'a, S> {
+impl<S: BosStr, St: folder_state::State> FolderBuilder<S, St> {
     /// Set the `color` field (optional)
     pub fn color(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -355,26 +358,26 @@ impl<'a, S: folder_state::State> FolderBuilder<'a, S> {
     }
 }
 
-impl<'a, S> FolderBuilder<'a, S>
+impl<S: BosStr, St> FolderBuilder<S, St>
 where
-    S: folder_state::State,
-    S::CreatedAt: folder_state::IsUnset,
+    St: folder_state::State,
+    St::CreatedAt: folder_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> FolderBuilder<'a, folder_state::SetCreatedAt<S>> {
+    ) -> FolderBuilder<S, folder_state::SetCreatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         FolderBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: folder_state::State> FolderBuilder<'a, S> {
+impl<S: BosStr, St: folder_state::State> FolderBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -387,7 +390,7 @@ impl<'a, S: folder_state::State> FolderBuilder<'a, S> {
     }
 }
 
-impl<'a, S: folder_state::State> FolderBuilder<'a, S> {
+impl<S: BosStr, St: folder_state::State> FolderBuilder<S, St> {
     /// Set the `icon` field (optional)
     pub fn icon(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -400,26 +403,26 @@ impl<'a, S: folder_state::State> FolderBuilder<'a, S> {
     }
 }
 
-impl<'a, S> FolderBuilder<'a, S>
+impl<S: BosStr, St> FolderBuilder<S, St>
 where
-    S: folder_state::State,
-    S::Name: folder_state::IsUnset,
+    St: folder_state::State,
+    St::Name: folder_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> FolderBuilder<'a, folder_state::SetName<S>> {
+    ) -> FolderBuilder<S, folder_state::SetName<St>> {
         self._fields.4 = Option::Some(value.into());
         FolderBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: folder_state::State> FolderBuilder<'a, S> {
+impl<S: BosStr, St: folder_state::State> FolderBuilder<S, St> {
     /// Set the `visibility` field (optional)
     pub fn visibility(mut self, value: impl Into<Option<FolderVisibility<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -432,14 +435,14 @@ impl<'a, S: folder_state::State> FolderBuilder<'a, S> {
     }
 }
 
-impl<'a, S> FolderBuilder<'a, S>
+impl<S: BosStr, St> FolderBuilder<S, St>
 where
-    S: folder_state::State,
-    S::CreatedAt: folder_state::IsSet,
-    S::Name: folder_state::IsSet,
+    St: folder_state::State,
+    St::Name: folder_state::IsSet,
+    St::CreatedAt: folder_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Folder<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Folder<S> {
         Folder {
             color: self._fields.0,
             created_at: self._fields.1.unwrap(),
@@ -450,8 +453,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Folder<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Folder<S> {
         Folder {
             color: self._fields.0,
             created_at: self._fields.1.unwrap(),

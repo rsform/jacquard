@@ -6,8 +6,14 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[allow(unused_imports)]
+use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
@@ -22,7 +28,7 @@ pub struct ImportRepoResponse;
 impl jacquard_common::xrpc::XrpcResp for ImportRepoResponse {
     const NSID: &'static str = "com.atproto.repo.importRepo";
     const ENCODING: &'static str = "application/json";
-    type Output<S: jacquard_common::Bos<str> + AsRef<str>> = ();
+    type Output<S: BosStr> = ();
     type Err = jacquard_common::xrpc::GenericError;
 }
 
@@ -32,20 +38,24 @@ impl jacquard_common::xrpc::XrpcRequest for ImportRepo {
         "application/vnd.ipld.car",
     );
     type Response = ImportRepoResponse;
-    fn encode_body(&self) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError> {
-        Ok(self.body.to_vec())
+    fn encode_body(
+        &self,
+        buffer: &mut [u8],
+    ) -> Result<(), jacquard_common::xrpc::EncodeError>
+    where
+        Self: Serialize,
+    {
+        Ok(buffer.copy_from_slice(self.body.as_ref()))
     }
     fn decode_body<'de>(
         body: &'de [u8],
-    ) -> Result<Box<Self>, jacquard_common::error::DecodeError>
+    ) -> Result<Self, jacquard_common::error::DecodeError>
     where
         Self: Deserialize<'de>,
     {
-        Ok(
-            Box::new(Self {
-                body: jacquard_common::deps::bytes::Bytes::copy_from_slice(body),
-            }),
-        )
+        Ok(Self {
+            body: jacquard_common::deps::bytes::Bytes::copy_from_slice(body),
+        })
     }
 }
 
@@ -56,6 +66,6 @@ impl jacquard_common::xrpc::XrpcEndpoint for ImportRepoRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/vnd.ipld.car",
     );
-    type Request<S: jacquard_common::Bos<str> + AsRef<str>> = ImportRepo;
+    type Request<S: BosStr> = ImportRepo;
     type Response = ImportRepoResponse;
 }

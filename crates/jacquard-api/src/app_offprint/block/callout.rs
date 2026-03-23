@@ -7,7 +7,7 @@
 
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -25,11 +25,11 @@ use serde::{Serialize, Deserialize};
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Callout<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Callout<S: BosStr = DefaultStr> {
     ///Background color (CSS color value)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub color: Option<S>,
@@ -46,7 +46,7 @@ pub struct Callout<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Callout<S> {
+impl<S: BosStr> LexiconSchema for Callout<S> {
     fn nsid() -> &'static str {
         "app.offprint.block.callout"
     }
@@ -61,8 +61,8 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Callout<S> {
     }
 }
 
-fn _default_callout_emoji<S: From<&'static str>>() -> ::core::option::Option<S> {
-    Some(S::from("💡"))
+fn _default_callout_emoji<S: FromStaticStr>() -> ::core::option::Option<S> {
+    Some(S::from_static("💡"))
 }
 
 fn lexicon_doc_app_offprint_block_callout() -> LexiconDoc<'static> {

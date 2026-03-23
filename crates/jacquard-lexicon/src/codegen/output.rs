@@ -3,9 +3,9 @@ use quote::quote;
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 
 use super::CodeGenerator;
-use super::nsid_utils::NsidPath;
 use super::prettify::{FileOutput, ResolvedImports};
 use super::utils::{make_ident, sanitize_name};
+use crate::ref_utils::NsidPath;
 
 impl<'c> CodeGenerator<'c> {
     /// Generate all code for the corpus, organized by file
@@ -57,7 +57,8 @@ impl<'c> CodeGenerator<'c> {
         // Multiple NSIDs can map to the same file (e.g. `app.rocksky.album` and
         // `app.rocksky.album.defs` both output to `album.rs`), so we accumulate
         // imports per file path before resolving.
-        let mut file_imports_map: BTreeMap<std::path::PathBuf, super::prettify::ImportSet> = BTreeMap::new();
+        let mut file_imports_map: BTreeMap<std::path::PathBuf, super::prettify::ImportSet> =
+            BTreeMap::new();
         for (nsid, doc) in self.corpus.iter() {
             let file_path = self.nsid_to_file_path(nsid.as_ref());
             let file_imports = file_imports_map.entry(file_path).or_default();
@@ -68,10 +69,7 @@ impl<'c> CodeGenerator<'c> {
 
         let mut file_resolved: BTreeMap<std::path::PathBuf, ResolvedImports> = BTreeMap::new();
         for (file_path, file_imports) in &file_imports_map {
-            let local_names = file_local_names
-                .get(file_path)
-                .cloned()
-                .unwrap_or_default();
+            let local_names = file_local_names.get(file_path).cloned().unwrap_or_default();
 
             let lexicon_paths: BTreeMap<String, String> = file_imports
                 .lexicon_refs
@@ -302,7 +300,10 @@ impl<'c> CodeGenerator<'c> {
             // Format code
             let file: syn::File = syn::parse2(file_output.tokens.clone()).map_err(|e| {
                 let tokens = file_output.tokens.to_string();
-                eprintln!("Failed to parse generated tokens for {:?}:\n{}", path, tokens);
+                eprintln!(
+                    "Failed to parse generated tokens for {:?}:\n{}",
+                    path, tokens
+                );
                 CodegenError::TokenParseError {
                     path: path.clone(),
                     source: e,

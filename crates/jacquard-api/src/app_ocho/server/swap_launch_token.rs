@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
@@ -18,28 +18,27 @@ use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SwapLaunchToken<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct SwapLaunchToken<S: BosStr = DefaultStr> {
     pub launch_token: S,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SwapLaunchTokenOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SwapLaunchTokenOutput<S: BosStr = DefaultStr> {
     ///The did of the user
     #[serde(skip_serializing_if = "Option::is_none")]
     pub did: Option<Did<S>>,
@@ -48,9 +47,7 @@ pub struct SwapLaunchTokenOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<S>,
     pub token: S,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -59,12 +56,11 @@ pub struct SwapLaunchTokenResponse;
 impl jacquard_common::xrpc::XrpcResp for SwapLaunchTokenResponse {
     const NSID: &'static str = "app.ocho.server.swapLaunchToken";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = SwapLaunchTokenOutput<S>;
+    type Output<S: BosStr> = SwapLaunchTokenOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for SwapLaunchToken<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for SwapLaunchToken<S> {
     const NSID: &'static str = "app.ocho.server.swapLaunchToken";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = SwapLaunchTokenResponse;
@@ -75,7 +71,7 @@ pub struct SwapLaunchTokenRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SwapLaunchTokenRequest {
     const PATH: &'static str = "/xrpc/app.ocho.server.swapLaunchToken";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = SwapLaunchToken<S>;
+    type Request<S: BosStr> = SwapLaunchToken<S>;
     type Response = SwapLaunchTokenResponse;
 }
 
@@ -98,9 +94,9 @@ pub mod swap_launch_token_state {
         type LaunchToken = Unset;
     }
     ///State transition - sets the `launch_token` field to Set
-    pub struct SetLaunchToken<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLaunchToken<S> {}
-    impl<S: State> State for SetLaunchToken<S> {
+    pub struct SetLaunchToken<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLaunchToken<St> {}
+    impl<St: State> State for SetLaunchToken<St> {
         type LaunchToken = Set<members::launch_token>;
     }
     /// Marker types for field names
@@ -111,57 +107,57 @@ pub mod swap_launch_token_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct SwapLaunchTokenBuilder<'a, S: swap_launch_token_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct SwapLaunchTokenBuilder<S: BosStr, St: swap_launch_token_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> SwapLaunchToken<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> SwapLaunchTokenBuilder<'a, swap_launch_token_state::Empty> {
+impl<S: BosStr> SwapLaunchToken<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> SwapLaunchTokenBuilder<S, swap_launch_token_state::Empty> {
         SwapLaunchTokenBuilder::new()
     }
 }
 
-impl<'a> SwapLaunchTokenBuilder<'a, swap_launch_token_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> SwapLaunchTokenBuilder<S, swap_launch_token_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SwapLaunchTokenBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SwapLaunchTokenBuilder<'a, S>
+impl<S: BosStr, St> SwapLaunchTokenBuilder<S, St>
 where
-    S: swap_launch_token_state::State,
-    S::LaunchToken: swap_launch_token_state::IsUnset,
+    St: swap_launch_token_state::State,
+    St::LaunchToken: swap_launch_token_state::IsUnset,
 {
     /// Set the `launchToken` field (required)
     pub fn launch_token(
         mut self,
         value: impl Into<S>,
-    ) -> SwapLaunchTokenBuilder<'a, swap_launch_token_state::SetLaunchToken<S>> {
+    ) -> SwapLaunchTokenBuilder<S, swap_launch_token_state::SetLaunchToken<St>> {
         self._fields.0 = Option::Some(value.into());
         SwapLaunchTokenBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SwapLaunchTokenBuilder<'a, S>
+impl<S: BosStr, St> SwapLaunchTokenBuilder<S, St>
 where
-    S: swap_launch_token_state::State,
-    S::LaunchToken: swap_launch_token_state::IsSet,
+    St: swap_launch_token_state::State,
+    St::LaunchToken: swap_launch_token_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> SwapLaunchToken<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> SwapLaunchToken<S> {
         SwapLaunchToken {
             launch_token: self._fields.0.unwrap(),
         }

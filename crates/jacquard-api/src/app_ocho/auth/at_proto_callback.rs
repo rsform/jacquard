@@ -6,25 +6,27 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[allow(unused_imports)]
+use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct AtProtoCallback<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct AtProtoCallback<S: BosStr = DefaultStr> {
     pub code: S,
-    #[serde(borrow)]
     pub iss: S,
-    #[serde(borrow)]
     pub state: S,
 }
 
@@ -33,12 +35,11 @@ pub struct AtProtoCallbackResponse;
 impl jacquard_common::xrpc::XrpcResp for AtProtoCallbackResponse {
     const NSID: &'static str = "app.ocho.auth.atProtoCallback";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ();
+    type Output<S: BosStr> = ();
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for AtProtoCallback<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for AtProtoCallback<S> {
     const NSID: &'static str = "app.ocho.auth.atProtoCallback";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = AtProtoCallbackResponse;
@@ -49,7 +50,7 @@ pub struct AtProtoCallbackRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for AtProtoCallbackRequest {
     const PATH: &'static str = "/xrpc/app.ocho.auth.atProtoCallback";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = AtProtoCallback<S>;
+    type Request<S: BosStr> = AtProtoCallback<S>;
     type Response = AtProtoCallbackResponse;
 }
 
@@ -63,145 +64,145 @@ pub mod at_proto_callback_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Code;
-        type State;
         type Iss;
+        type State;
+        type Code;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Code = Unset;
-        type State = Unset;
         type Iss = Unset;
-    }
-    ///State transition - sets the `code` field to Set
-    pub struct SetCode<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCode<S> {}
-    impl<S: State> State for SetCode<S> {
-        type Code = Set<members::code>;
-        type State = S::State;
-        type Iss = S::Iss;
-    }
-    ///State transition - sets the `state` field to Set
-    pub struct SetState<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetState<S> {}
-    impl<S: State> State for SetState<S> {
-        type Code = S::Code;
-        type State = Set<members::state>;
-        type Iss = S::Iss;
+        type State = Unset;
+        type Code = Unset;
     }
     ///State transition - sets the `iss` field to Set
-    pub struct SetIss<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIss<S> {}
-    impl<S: State> State for SetIss<S> {
-        type Code = S::Code;
-        type State = S::State;
+    pub struct SetIss<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIss<St> {}
+    impl<St: State> State for SetIss<St> {
         type Iss = Set<members::iss>;
+        type State = St::State;
+        type Code = St::Code;
+    }
+    ///State transition - sets the `state` field to Set
+    pub struct SetState<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetState<St> {}
+    impl<St: State> State for SetState<St> {
+        type Iss = St::Iss;
+        type State = Set<members::state>;
+        type Code = St::Code;
+    }
+    ///State transition - sets the `code` field to Set
+    pub struct SetCode<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCode<St> {}
+    impl<St: State> State for SetCode<St> {
+        type Iss = St::Iss;
+        type State = St::State;
+        type Code = Set<members::code>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `code` field
-        pub struct code(());
-        ///Marker type for the `state` field
-        pub struct state(());
         ///Marker type for the `iss` field
         pub struct iss(());
+        ///Marker type for the `state` field
+        pub struct state(());
+        ///Marker type for the `code` field
+        pub struct code(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct AtProtoCallbackBuilder<'a, S: at_proto_callback_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct AtProtoCallbackBuilder<S: BosStr, St: at_proto_callback_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> AtProtoCallback<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> AtProtoCallbackBuilder<'a, at_proto_callback_state::Empty> {
+impl<S: BosStr> AtProtoCallback<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> AtProtoCallbackBuilder<S, at_proto_callback_state::Empty> {
         AtProtoCallbackBuilder::new()
     }
 }
 
-impl<'a> AtProtoCallbackBuilder<'a, at_proto_callback_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> AtProtoCallbackBuilder<S, at_proto_callback_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         AtProtoCallbackBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AtProtoCallbackBuilder<'a, S>
+impl<S: BosStr, St> AtProtoCallbackBuilder<S, St>
 where
-    S: at_proto_callback_state::State,
-    S::Code: at_proto_callback_state::IsUnset,
+    St: at_proto_callback_state::State,
+    St::Code: at_proto_callback_state::IsUnset,
 {
     /// Set the `code` field (required)
     pub fn code(
         mut self,
         value: impl Into<S>,
-    ) -> AtProtoCallbackBuilder<'a, at_proto_callback_state::SetCode<S>> {
+    ) -> AtProtoCallbackBuilder<S, at_proto_callback_state::SetCode<St>> {
         self._fields.0 = Option::Some(value.into());
         AtProtoCallbackBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AtProtoCallbackBuilder<'a, S>
+impl<S: BosStr, St> AtProtoCallbackBuilder<S, St>
 where
-    S: at_proto_callback_state::State,
-    S::Iss: at_proto_callback_state::IsUnset,
+    St: at_proto_callback_state::State,
+    St::Iss: at_proto_callback_state::IsUnset,
 {
     /// Set the `iss` field (required)
     pub fn iss(
         mut self,
         value: impl Into<S>,
-    ) -> AtProtoCallbackBuilder<'a, at_proto_callback_state::SetIss<S>> {
+    ) -> AtProtoCallbackBuilder<S, at_proto_callback_state::SetIss<St>> {
         self._fields.1 = Option::Some(value.into());
         AtProtoCallbackBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AtProtoCallbackBuilder<'a, S>
+impl<S: BosStr, St> AtProtoCallbackBuilder<S, St>
 where
-    S: at_proto_callback_state::State,
-    S::State: at_proto_callback_state::IsUnset,
+    St: at_proto_callback_state::State,
+    St::State: at_proto_callback_state::IsUnset,
 {
     /// Set the `state` field (required)
     pub fn state(
         mut self,
         value: impl Into<S>,
-    ) -> AtProtoCallbackBuilder<'a, at_proto_callback_state::SetState<S>> {
+    ) -> AtProtoCallbackBuilder<S, at_proto_callback_state::SetState<St>> {
         self._fields.2 = Option::Some(value.into());
         AtProtoCallbackBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AtProtoCallbackBuilder<'a, S>
+impl<S: BosStr, St> AtProtoCallbackBuilder<S, St>
 where
-    S: at_proto_callback_state::State,
-    S::Code: at_proto_callback_state::IsSet,
-    S::State: at_proto_callback_state::IsSet,
-    S::Iss: at_proto_callback_state::IsSet,
+    St: at_proto_callback_state::State,
+    St::Iss: at_proto_callback_state::IsSet,
+    St::State: at_proto_callback_state::IsSet,
+    St::Code: at_proto_callback_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> AtProtoCallback<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> AtProtoCallback<S> {
         AtProtoCallback {
             code: self._fields.0.unwrap(),
             iss: self._fields.1.unwrap(),

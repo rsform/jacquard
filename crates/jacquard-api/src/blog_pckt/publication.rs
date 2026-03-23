@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
     rename = "blog.pckt.publication",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Publication<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Publication<S: BosStr = DefaultStr> {
     pub publication: StrongRef<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -51,18 +51,18 @@ pub struct Publication<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct PublicationGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct PublicationGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Publication<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Publication<S> {
+impl<S: BosStr> Publication<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, PublicationRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -75,17 +75,17 @@ pub struct PublicationRecord;
 impl XrpcResp for PublicationRecord {
     const NSID: &'static str = "blog.pckt.publication";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = PublicationGetRecordOutput<S>;
+    type Output<S: BosStr> = PublicationGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<PublicationGetRecordOutput<S>> for Publication<S> {
+impl<S: BosStr> From<PublicationGetRecordOutput<S>> for Publication<S> {
     fn from(output: PublicationGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Publication<S> {
+impl<S: BosStr> Collection for Publication<S> {
     const NSID: &'static str = "blog.pckt.publication";
     type Record = PublicationRecord;
 }
@@ -95,7 +95,7 @@ impl Collection for PublicationRecord {
     type Record = PublicationRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Publication<S> {
+impl<S: BosStr> LexiconSchema for Publication<S> {
     fn nsid() -> &'static str {
         "blog.pckt.publication"
     }
@@ -129,9 +129,9 @@ pub mod publication_state {
         type Publication = Unset;
     }
     ///State transition - sets the `publication` field to Set
-    pub struct SetPublication<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPublication<S> {}
-    impl<S: State> State for SetPublication<S> {
+    pub struct SetPublication<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPublication<St> {}
+    impl<St: State> State for SetPublication<St> {
         type Publication = Set<members::publication>;
     }
     /// Marker types for field names
@@ -142,67 +142,67 @@ pub mod publication_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct PublicationBuilder<'a, S: publication_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct PublicationBuilder<S: BosStr, St: publication_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<StrongRef<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Publication<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> PublicationBuilder<'a, publication_state::Empty> {
+impl<S: BosStr> Publication<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> PublicationBuilder<S, publication_state::Empty> {
         PublicationBuilder::new()
     }
 }
 
-impl<'a> PublicationBuilder<'a, publication_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> PublicationBuilder<S, publication_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         PublicationBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PublicationBuilder<'a, S>
+impl<S: BosStr, St> PublicationBuilder<S, St>
 where
-    S: publication_state::State,
-    S::Publication: publication_state::IsUnset,
+    St: publication_state::State,
+    St::Publication: publication_state::IsUnset,
 {
     /// Set the `publication` field (required)
     pub fn publication(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> PublicationBuilder<'a, publication_state::SetPublication<S>> {
+    ) -> PublicationBuilder<S, publication_state::SetPublication<St>> {
         self._fields.0 = Option::Some(value.into());
         PublicationBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PublicationBuilder<'a, S>
+impl<S: BosStr, St> PublicationBuilder<S, St>
 where
-    S: publication_state::State,
-    S::Publication: publication_state::IsSet,
+    St: publication_state::State,
+    St::Publication: publication_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Publication<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Publication<S> {
         Publication {
             publication: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Publication<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Publication<S> {
         Publication {
             publication: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

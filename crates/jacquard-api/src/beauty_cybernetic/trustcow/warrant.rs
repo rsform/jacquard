@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "beauty.cybernetic.trustcow.warrant",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Warrant<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Warrant<S: BosStr = DefaultStr> {
     ///When the warrant was created
     pub created_at: Datetime,
     ///Optional description explaining the basis for this warrant
@@ -63,7 +63,7 @@ pub struct Warrant<S: Bos<str> + AsRef<str> = DefaultStr> {
 /// Level of trust being warranted
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum WarrantTrustLevel<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum WarrantTrustLevel<S: BosStr = DefaultStr> {
     Basic,
     Verified,
     Trusted,
@@ -71,7 +71,7 @@ pub enum WarrantTrustLevel<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> WarrantTrustLevel<S> {
+impl<S: BosStr> WarrantTrustLevel<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Basic => "basic",
@@ -93,19 +93,19 @@ impl<S: Bos<str> + AsRef<str>> WarrantTrustLevel<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for WarrantTrustLevel<S> {
+impl<S: BosStr> core::fmt::Display for WarrantTrustLevel<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for WarrantTrustLevel<S> {
+impl<S: BosStr> AsRef<str> for WarrantTrustLevel<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for WarrantTrustLevel<S> {
+impl<S: BosStr> Serialize for WarrantTrustLevel<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -114,8 +114,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for WarrantTrustLevel<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for WarrantTrustLevel<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for WarrantTrustLevel<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -125,14 +124,18 @@ for WarrantTrustLevel<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for WarrantTrustLevel<S> {
+impl<S: BosStr + Default> Default for WarrantTrustLevel<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for WarrantTrustLevel<S> {
-    type Output = WarrantTrustLevel<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for WarrantTrustLevel<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = WarrantTrustLevel<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             WarrantTrustLevel::Basic => WarrantTrustLevel::Basic,
@@ -147,7 +150,7 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for WarrantTrustLevel<S> {
 /// Type of warrant being provided
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum WarrantWarrantType<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum WarrantWarrantType<S: BosStr = DefaultStr> {
     General,
     Business,
     Individual,
@@ -156,7 +159,7 @@ pub enum WarrantWarrantType<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> WarrantWarrantType<S> {
+impl<S: BosStr> WarrantWarrantType<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::General => "general",
@@ -180,19 +183,19 @@ impl<S: Bos<str> + AsRef<str>> WarrantWarrantType<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for WarrantWarrantType<S> {
+impl<S: BosStr> core::fmt::Display for WarrantWarrantType<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for WarrantWarrantType<S> {
+impl<S: BosStr> AsRef<str> for WarrantWarrantType<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for WarrantWarrantType<S> {
+impl<S: BosStr> Serialize for WarrantWarrantType<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -201,8 +204,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for WarrantWarrantType<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for WarrantWarrantType<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for WarrantWarrantType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -212,14 +214,18 @@ for WarrantWarrantType<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for WarrantWarrantType<S> {
+impl<S: BosStr + Default> Default for WarrantWarrantType<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for WarrantWarrantType<S> {
-    type Output = WarrantWarrantType<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for WarrantWarrantType<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = WarrantWarrantType<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             WarrantWarrantType::General => WarrantWarrantType::General,
@@ -238,18 +244,18 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for WarrantWarrantType<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct WarrantGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct WarrantGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Warrant<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Warrant<S> {
+impl<S: BosStr> Warrant<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, WarrantRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -262,17 +268,17 @@ pub struct WarrantRecord;
 impl XrpcResp for WarrantRecord {
     const NSID: &'static str = "beauty.cybernetic.trustcow.warrant";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = WarrantGetRecordOutput<S>;
+    type Output<S: BosStr> = WarrantGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<WarrantGetRecordOutput<S>> for Warrant<S> {
+impl<S: BosStr> From<WarrantGetRecordOutput<S>> for Warrant<S> {
     fn from(output: WarrantGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Warrant<S> {
+impl<S: BosStr> Collection for Warrant<S> {
     const NSID: &'static str = "beauty.cybernetic.trustcow.warrant";
     type Record = WarrantRecord;
 }
@@ -282,7 +288,7 @@ impl Collection for WarrantRecord {
     type Record = WarrantRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Warrant<S> {
+impl<S: BosStr> LexiconSchema for Warrant<S> {
     fn nsid() -> &'static str {
         "beauty.cybernetic.trustcow.warrant"
     }
@@ -328,17 +334,17 @@ pub mod warrant_state {
         type CreatedAt = Unset;
     }
     ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
+    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubject<St> {}
+    impl<St: State> State for SetSubject<St> {
         type Subject = Set<members::subject>;
-        type CreatedAt = S::CreatedAt;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Subject = S::Subject;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Subject = St::Subject;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
@@ -351,9 +357,9 @@ pub mod warrant_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct WarrantBuilder<'a, S: warrant_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct WarrantBuilder<S: BosStr, St: warrant_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
         Option<S>,
@@ -362,47 +368,47 @@ pub struct WarrantBuilder<'a, S: warrant_state::State> {
         Option<WarrantTrustLevel<S>>,
         Option<WarrantWarrantType<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Warrant<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> WarrantBuilder<'a, warrant_state::Empty> {
+impl<S: BosStr> Warrant<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> WarrantBuilder<S, warrant_state::Empty> {
         WarrantBuilder::new()
     }
 }
 
-impl<'a> WarrantBuilder<'a, warrant_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> WarrantBuilder<S, warrant_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         WarrantBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> WarrantBuilder<'a, S>
+impl<S: BosStr, St> WarrantBuilder<S, St>
 where
-    S: warrant_state::State,
-    S::CreatedAt: warrant_state::IsUnset,
+    St: warrant_state::State,
+    St::CreatedAt: warrant_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> WarrantBuilder<'a, warrant_state::SetCreatedAt<S>> {
+    ) -> WarrantBuilder<S, warrant_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         WarrantBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: warrant_state::State> WarrantBuilder<'a, S> {
+impl<S: BosStr, St: warrant_state::State> WarrantBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -415,7 +421,7 @@ impl<'a, S: warrant_state::State> WarrantBuilder<'a, S> {
     }
 }
 
-impl<'a, S: warrant_state::State> WarrantBuilder<'a, S> {
+impl<S: BosStr, St: warrant_state::State> WarrantBuilder<S, St> {
     /// Set the `expiresAt` field (optional)
     pub fn expires_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.2 = value.into();
@@ -428,26 +434,26 @@ impl<'a, S: warrant_state::State> WarrantBuilder<'a, S> {
     }
 }
 
-impl<'a, S> WarrantBuilder<'a, S>
+impl<S: BosStr, St> WarrantBuilder<S, St>
 where
-    S: warrant_state::State,
-    S::Subject: warrant_state::IsUnset,
+    St: warrant_state::State,
+    St::Subject: warrant_state::IsUnset,
 {
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
         value: impl Into<S>,
-    ) -> WarrantBuilder<'a, warrant_state::SetSubject<S>> {
+    ) -> WarrantBuilder<S, warrant_state::SetSubject<St>> {
         self._fields.3 = Option::Some(value.into());
         WarrantBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: warrant_state::State> WarrantBuilder<'a, S> {
+impl<S: BosStr, St: warrant_state::State> WarrantBuilder<S, St> {
     /// Set the `trustLevel` field (optional)
     pub fn trust_level(
         mut self,
@@ -463,7 +469,7 @@ impl<'a, S: warrant_state::State> WarrantBuilder<'a, S> {
     }
 }
 
-impl<'a, S: warrant_state::State> WarrantBuilder<'a, S> {
+impl<S: BosStr, St: warrant_state::State> WarrantBuilder<S, St> {
     /// Set the `warrantType` field (optional)
     pub fn warrant_type(
         mut self,
@@ -479,14 +485,14 @@ impl<'a, S: warrant_state::State> WarrantBuilder<'a, S> {
     }
 }
 
-impl<'a, S> WarrantBuilder<'a, S>
+impl<S: BosStr, St> WarrantBuilder<S, St>
 where
-    S: warrant_state::State,
-    S::Subject: warrant_state::IsSet,
-    S::CreatedAt: warrant_state::IsSet,
+    St: warrant_state::State,
+    St::Subject: warrant_state::IsSet,
+    St::CreatedAt: warrant_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Warrant<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Warrant<S> {
         Warrant {
             created_at: self._fields.0.unwrap(),
             description: self._fields.1,
@@ -497,11 +503,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Warrant<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Warrant<S> {
         Warrant {
             created_at: self._fields.0.unwrap(),
             description: self._fields.1,

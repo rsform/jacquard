@@ -5,7 +5,7 @@
 //! implementations sufficient for bootstrap code generation without builders or
 //! validation helpers.
 //!
-use crate::Bos;
+use crate::BosStr;
 use crate::CowStr;
 use crate::DefaultStr;
 use crate::IntoStatic;
@@ -30,7 +30,7 @@ use smol_str::SmolStr;
 #[allow(missing_docs)]
 pub struct ListRecords<S = DefaultStr>
 where
-    S: Bos<str> + AsRef<str>,
+    S: BosStr,
 {
     pub collection: Nsid<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -44,8 +44,8 @@ where
 
 impl<S> IntoStatic for ListRecords<S>
 where
-    S: Bos<str> + AsRef<str> + IntoStatic,
-    S::Output: Bos<str> + AsRef<str>,
+    S: BosStr + IntoStatic,
+    S::Output: BosStr,
 {
     type Output = ListRecords<S::Output>;
 
@@ -66,7 +66,7 @@ where
 #[allow(missing_docs)]
 pub struct ListRecordsOutput<S = DefaultStr>
 where
-    S: Bos<str> + AsRef<str>,
+    S: BosStr,
 {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -75,8 +75,8 @@ where
 
 impl<S> IntoStatic for ListRecordsOutput<S>
 where
-    S: Bos<str> + AsRef<str> + IntoStatic,
-    S::Output: Bos<str> + AsRef<str>,
+    S: BosStr + IntoStatic,
+    S::Output: BosStr,
 {
     type Output = ListRecordsOutput<S::Output>;
 
@@ -94,7 +94,7 @@ where
 #[allow(missing_docs)]
 pub struct ListRecordsRecord<S = DefaultStr>
 where
-    S: Bos<str> + AsRef<str>,
+    S: BosStr,
 {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -104,8 +104,8 @@ where
 
 impl<S> IntoStatic for ListRecordsRecord<S>
 where
-    S: Bos<str> + AsRef<str> + IntoStatic,
-    S::Output: Bos<str> + AsRef<str>,
+    S: BosStr + IntoStatic,
+    S::Output: BosStr,
 {
     type Output = ListRecordsRecord<<S as IntoStatic>::Output>;
 
@@ -124,13 +124,13 @@ pub struct ListRecordsResponse;
 impl XrpcResp for ListRecordsResponse {
     const NSID: &'static str = "com.atproto.repo.listRecords";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ListRecordsOutput<S>;
+    type Output<S: BosStr> = ListRecordsOutput<S>;
     type Err = GenericError;
 }
 
 impl<S> XrpcRequest for ListRecords<S>
 where
-    S: Bos<str> + AsRef<str> + Serialize,
+    S: BosStr + Serialize,
 {
     const NSID: &'static str = "com.atproto.repo.listRecords";
     const METHOD: XrpcMethod = XrpcMethod::Query;
@@ -176,7 +176,7 @@ impl IntoStatic for GetRecord<'_> {
 #[serde(rename_all = "camelCase")]
 pub struct GetRecordOutput<S = DefaultStr>
 where
-    S: Bos<str> + AsRef<str>,
+    S: BosStr,
 {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -186,8 +186,8 @@ where
 
 impl<S> IntoStatic for GetRecordOutput<S>
 where
-    S: Bos<str> + AsRef<str> + IntoStatic,
-    S::Output: Bos<str> + AsRef<str>,
+    S: BosStr + IntoStatic,
+    S::Output: BosStr,
 {
     type Output = GetRecordOutput<S::Output>;
 
@@ -235,7 +235,7 @@ pub struct GetRecordResponse;
 impl XrpcResp for GetRecordResponse {
     const NSID: &'static str = "com.atproto.repo.getRecord";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetRecordOutput<S>;
+    type Output<S: BosStr> = GetRecordOutput<S>;
     type Err = GetRecordError;
 }
 
@@ -253,14 +253,14 @@ impl<'a> XrpcRequest for GetRecord<'a> {
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 #[allow(missing_docs)]
-pub struct ResolveHandle<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ResolveHandle<S: BosStr = DefaultStr> {
     pub handle: Handle<S>,
 }
 
 impl<S> IntoStatic for ResolveHandle<S>
 where
-    S: Bos<str> + AsRef<str> + IntoStatic,
-    S::Output: Bos<str> + AsRef<str>,
+    S: BosStr + IntoStatic,
+    S::Output: BosStr,
 {
     type Output = ResolveHandle<<S as IntoStatic>::Output>;
 
@@ -275,14 +275,14 @@ where
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 #[allow(missing_docs)]
-pub struct ResolveHandleOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ResolveHandleOutput<S: BosStr = DefaultStr> {
     pub did: Did<S>,
 }
 
 impl<S> IntoStatic for ResolveHandleOutput<S>
 where
-    S: Bos<str> + AsRef<str> + IntoStatic,
-    S::Output: Bos<str> + AsRef<str>,
+    S: BosStr + IntoStatic,
+    S::Output: BosStr,
 {
     type Output = ResolveHandleOutput<<S as IntoStatic>::Output>;
 
@@ -328,11 +328,11 @@ pub struct ResolveHandleResponse;
 impl XrpcResp for ResolveHandleResponse {
     const NSID: &'static str = "com.atproto.identity.resolveHandle";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ResolveHandleOutput<S>;
+    type Output<S: BosStr> = ResolveHandleOutput<S>;
     type Err = ResolveHandleError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> XrpcRequest for ResolveHandle<S> {
+impl<S: BosStr + Serialize> XrpcRequest for ResolveHandle<S> {
     const NSID: &'static str = "com.atproto.identity.resolveHandle";
     const METHOD: XrpcMethod = XrpcMethod::Query;
     type Response = ResolveHandleResponse;
@@ -346,15 +346,14 @@ impl<S: Bos<str> + AsRef<str> + Serialize> XrpcRequest for ResolveHandle<S> {
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 #[allow(missing_docs)]
-pub struct ResolveDid<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ResolveDid<S: BosStr = DefaultStr> {
     pub did: Did<S>,
 }
 
 impl<S> IntoStatic for ResolveDid<S>
 where
-    S: Bos<str> + AsRef<str> + IntoStatic,
-    <S as IntoStatic>::Output: Bos<str>,
-    <S as IntoStatic>::Output: AsRef<str>,
+    S: BosStr + IntoStatic,
+    <S as IntoStatic>::Output: BosStr,
 {
     type Output = ResolveDid<<S as IntoStatic>::Output>;
 
@@ -371,15 +370,15 @@ where
 #[allow(missing_docs)]
 pub struct ResolveDidOutput<S = DefaultStr>
 where
-    S: Bos<str> + AsRef<str>,
+    S: BosStr,
 {
     pub did_doc: Data<S>,
 }
 
 impl<S> IntoStatic for ResolveDidOutput<S>
 where
-    S: Bos<str> + AsRef<str> + IntoStatic,
-    S::Output: Bos<str> + AsRef<str>,
+    S: BosStr + IntoStatic,
+    S::Output: BosStr,
 {
     type Output = ResolveDidOutput<S::Output>;
 
@@ -434,13 +433,13 @@ pub struct ResolveDidResponse;
 impl XrpcResp for ResolveDidResponse {
     const NSID: &'static str = "com.atproto.identity.resolveDid";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ResolveDidOutput<S>;
+    type Output<S: BosStr> = ResolveDidOutput<S>;
     type Err = ResolveDidError;
 }
 
 impl<S> XrpcRequest for ResolveDid<S>
 where
-    S: Bos<str> + AsRef<str> + Serialize,
+    S: BosStr + Serialize,
 {
     const NSID: &'static str = "com.atproto.identity.resolveDid";
     const METHOD: XrpcMethod = XrpcMethod::Query;

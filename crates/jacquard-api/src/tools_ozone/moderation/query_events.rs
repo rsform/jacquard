@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, Nsid, Datetime, UriValue};
 use jacquard_common::types::value::Data;
@@ -19,41 +19,33 @@ use serde::{Serialize, Deserialize};
 use crate::tools_ozone::moderation::ModEventView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct QueryEvents<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct QueryEvents<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub added_labels: Option<Vec<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub added_tags: Option<Vec<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub age_assurance_state: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub batch_id: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub collections: Option<Vec<Nsid<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub comment: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_after: Option<Datetime>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_before: Option<Datetime>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub created_by: Option<Did<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub cursor: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub has_comment: Option<bool>,
@@ -66,33 +58,24 @@ pub struct QueryEvents<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub mod_tool: Option<Vec<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub policies: Option<Vec<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub removed_labels: Option<Vec<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub removed_tags: Option<Vec<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub report_types: Option<Vec<S>>,
     ///Defaults to `"desc"`.
     #[serde(default = "_default_sort_direction")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub sort_direction: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub subject: Option<UriValue<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub subject_type: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub types: Option<Vec<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub with_strike: Option<bool>,
@@ -100,20 +83,18 @@ pub struct QueryEvents<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct QueryEventsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct QueryEventsOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
     pub events: Vec<ModEventView<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -122,12 +103,11 @@ pub struct QueryEventsResponse;
 impl jacquard_common::xrpc::XrpcResp for QueryEventsResponse {
     const NSID: &'static str = "tools.ozone.moderation.queryEvents";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = QueryEventsOutput<S>;
+    type Output<S: BosStr> = QueryEventsOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for QueryEvents<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for QueryEvents<S> {
     const NSID: &'static str = "tools.ozone.moderation.queryEvents";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = QueryEventsResponse;
@@ -138,7 +118,7 @@ pub struct QueryEventsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for QueryEventsRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.moderation.queryEvents";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = QueryEvents<S>;
+    type Request<S: BosStr> = QueryEvents<S>;
     type Response = QueryEventsResponse;
 }
 
@@ -150,8 +130,8 @@ fn _default_limit() -> Option<i64> {
     Some(50i64)
 }
 
-fn _default_sort_direction() -> Option<CowStr<'static>> {
-    Some(CowStr::from("desc"))
+fn _default_sort_direction<S: jacquard_common::FromStaticStr>() -> Option<S> {
+    Some(S::from_static("desc"))
 }
 
 pub mod query_events_state {
@@ -173,9 +153,9 @@ pub mod query_events_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct QueryEventsBuilder<'a, S: query_events_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct QueryEventsBuilder<S: BosStr, St: query_events_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<S>>,
         Option<Vec<S>>,
@@ -201,18 +181,18 @@ pub struct QueryEventsBuilder<'a, S: query_events_state::State> {
         Option<Vec<S>>,
         Option<bool>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> QueryEvents<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> QueryEventsBuilder<'a, query_events_state::Empty> {
+impl<S: BosStr> QueryEvents<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> QueryEventsBuilder<S, query_events_state::Empty> {
         QueryEventsBuilder::new()
     }
 }
 
-impl<'a> QueryEventsBuilder<'a, query_events_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> QueryEventsBuilder<S, query_events_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         QueryEventsBuilder {
             _state: PhantomData,
@@ -241,12 +221,12 @@ impl<'a> QueryEventsBuilder<'a, query_events_state::Empty> {
                 None,
                 None,
             ),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
+impl<S: BosStr, St: query_events_state::State> QueryEventsBuilder<S, St> {
     /// Set the `addedLabels` field (optional)
     pub fn added_labels(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -259,7 +239,7 @@ impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     }
 }
 
-impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
+impl<S: BosStr, St: query_events_state::State> QueryEventsBuilder<S, St> {
     /// Set the `addedTags` field (optional)
     pub fn added_tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -272,7 +252,7 @@ impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     }
 }
 
-impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
+impl<S: BosStr, St: query_events_state::State> QueryEventsBuilder<S, St> {
     /// Set the `ageAssuranceState` field (optional)
     pub fn age_assurance_state(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -285,7 +265,7 @@ impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     }
 }
 
-impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
+impl<S: BosStr, St: query_events_state::State> QueryEventsBuilder<S, St> {
     /// Set the `batchId` field (optional)
     pub fn batch_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -298,7 +278,7 @@ impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     }
 }
 
-impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
+impl<S: BosStr, St: query_events_state::State> QueryEventsBuilder<S, St> {
     /// Set the `collections` field (optional)
     pub fn collections(mut self, value: impl Into<Option<Vec<Nsid<S>>>>) -> Self {
         self._fields.4 = value.into();
@@ -311,7 +291,7 @@ impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     }
 }
 
-impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
+impl<S: BosStr, St: query_events_state::State> QueryEventsBuilder<S, St> {
     /// Set the `comment` field (optional)
     pub fn comment(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
@@ -324,7 +304,7 @@ impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     }
 }
 
-impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
+impl<S: BosStr, St: query_events_state::State> QueryEventsBuilder<S, St> {
     /// Set the `createdAfter` field (optional)
     pub fn created_after(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.6 = value.into();
@@ -337,7 +317,7 @@ impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     }
 }
 
-impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
+impl<S: BosStr, St: query_events_state::State> QueryEventsBuilder<S, St> {
     /// Set the `createdBefore` field (optional)
     pub fn created_before(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.7 = value.into();
@@ -350,7 +330,7 @@ impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     }
 }
 
-impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
+impl<S: BosStr, St: query_events_state::State> QueryEventsBuilder<S, St> {
     /// Set the `createdBy` field (optional)
     pub fn created_by(mut self, value: impl Into<Option<Did<S>>>) -> Self {
         self._fields.8 = value.into();
@@ -363,7 +343,7 @@ impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     }
 }
 
-impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
+impl<S: BosStr, St: query_events_state::State> QueryEventsBuilder<S, St> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.9 = value.into();
@@ -376,7 +356,7 @@ impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     }
 }
 
-impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
+impl<S: BosStr, St: query_events_state::State> QueryEventsBuilder<S, St> {
     /// Set the `hasComment` field (optional)
     pub fn has_comment(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.10 = value.into();
@@ -389,7 +369,7 @@ impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     }
 }
 
-impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
+impl<S: BosStr, St: query_events_state::State> QueryEventsBuilder<S, St> {
     /// Set the `includeAllUserRecords` field (optional)
     pub fn include_all_user_records(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.11 = value.into();
@@ -402,7 +382,7 @@ impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     }
 }
 
-impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
+impl<S: BosStr, St: query_events_state::State> QueryEventsBuilder<S, St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.12 = value.into();
@@ -415,7 +395,7 @@ impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     }
 }
 
-impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
+impl<S: BosStr, St: query_events_state::State> QueryEventsBuilder<S, St> {
     /// Set the `modTool` field (optional)
     pub fn mod_tool(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.13 = value.into();
@@ -428,7 +408,7 @@ impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     }
 }
 
-impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
+impl<S: BosStr, St: query_events_state::State> QueryEventsBuilder<S, St> {
     /// Set the `policies` field (optional)
     pub fn policies(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.14 = value.into();
@@ -441,7 +421,7 @@ impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     }
 }
 
-impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
+impl<S: BosStr, St: query_events_state::State> QueryEventsBuilder<S, St> {
     /// Set the `removedLabels` field (optional)
     pub fn removed_labels(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.15 = value.into();
@@ -454,7 +434,7 @@ impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     }
 }
 
-impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
+impl<S: BosStr, St: query_events_state::State> QueryEventsBuilder<S, St> {
     /// Set the `removedTags` field (optional)
     pub fn removed_tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.16 = value.into();
@@ -467,7 +447,7 @@ impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     }
 }
 
-impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
+impl<S: BosStr, St: query_events_state::State> QueryEventsBuilder<S, St> {
     /// Set the `reportTypes` field (optional)
     pub fn report_types(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.17 = value.into();
@@ -480,7 +460,7 @@ impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     }
 }
 
-impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
+impl<S: BosStr, St: query_events_state::State> QueryEventsBuilder<S, St> {
     /// Set the `sortDirection` field (optional)
     pub fn sort_direction(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.18 = value.into();
@@ -493,7 +473,7 @@ impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     }
 }
 
-impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
+impl<S: BosStr, St: query_events_state::State> QueryEventsBuilder<S, St> {
     /// Set the `subject` field (optional)
     pub fn subject(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.19 = value.into();
@@ -506,7 +486,7 @@ impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     }
 }
 
-impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
+impl<S: BosStr, St: query_events_state::State> QueryEventsBuilder<S, St> {
     /// Set the `subjectType` field (optional)
     pub fn subject_type(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.20 = value.into();
@@ -519,7 +499,7 @@ impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     }
 }
 
-impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
+impl<S: BosStr, St: query_events_state::State> QueryEventsBuilder<S, St> {
     /// Set the `types` field (optional)
     pub fn types(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.21 = value.into();
@@ -532,7 +512,7 @@ impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     }
 }
 
-impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
+impl<S: BosStr, St: query_events_state::State> QueryEventsBuilder<S, St> {
     /// Set the `withStrike` field (optional)
     pub fn with_strike(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.22 = value.into();
@@ -545,12 +525,12 @@ impl<'a, S: query_events_state::State> QueryEventsBuilder<'a, S> {
     }
 }
 
-impl<'a, S> QueryEventsBuilder<'a, S>
+impl<S: BosStr, St> QueryEventsBuilder<S, St>
 where
-    S: query_events_state::State,
+    St: query_events_state::State,
 {
-    /// Build the final struct
-    pub fn build(self) -> QueryEvents<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> QueryEvents<S> {
         QueryEvents {
             added_labels: self._fields.0,
             added_tags: self._fields.1,

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -30,11 +30,11 @@ use crate::blue_rito::service::get_schema;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Langs<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Langs<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub comment: Option<S>,
     pub lang: S,
@@ -46,32 +46,30 @@ pub struct Langs<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetSchema<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetSchema<S: BosStr = DefaultStr> {
     pub nsid: S,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Returns the Bookmark data for the given NSID.
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetSchemaOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetSchemaOutput<S: BosStr = DefaultStr> {
     ///Comments with titles, content, and moderation in multiple languages.
     pub comments: Vec<get_schema::Langs<S>>,
     ///Moderation result for OGP title and description
@@ -94,13 +92,11 @@ pub struct GetSchemaOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub tags: Option<Vec<S>>,
     ///If this comment registed by owner, this field should be true.
     pub verified: bool,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Langs<S> {
+impl<S: BosStr> LexiconSchema for Langs<S> {
     fn nsid() -> &'static str {
         "blue.rito.service.getSchema"
     }
@@ -120,12 +116,11 @@ pub struct GetSchemaResponse;
 impl jacquard_common::xrpc::XrpcResp for GetSchemaResponse {
     const NSID: &'static str = "blue.rito.service.getSchema";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetSchemaOutput<S>;
+    type Output<S: BosStr> = GetSchemaOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetSchema<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetSchema<S> {
     const NSID: &'static str = "blue.rito.service.getSchema";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -140,7 +135,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetSchemaRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = GetSchema<S>;
+    type Request<S: BosStr> = GetSchema<S>;
     type Response = GetSchemaResponse;
 }
 
@@ -154,80 +149,80 @@ pub mod langs_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Title;
         type Moderation;
         type Lang;
-        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Title = Unset;
         type Moderation = Unset;
         type Lang = Unset;
-        type Title = Unset;
-    }
-    ///State transition - sets the `moderation` field to Set
-    pub struct SetModeration<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetModeration<S> {}
-    impl<S: State> State for SetModeration<S> {
-        type Moderation = Set<members::moderation>;
-        type Lang = S::Lang;
-        type Title = S::Title;
-    }
-    ///State transition - sets the `lang` field to Set
-    pub struct SetLang<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLang<S> {}
-    impl<S: State> State for SetLang<S> {
-        type Moderation = S::Moderation;
-        type Lang = Set<members::lang>;
-        type Title = S::Title;
     }
     ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Moderation = S::Moderation;
-        type Lang = S::Lang;
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
         type Title = Set<members::title>;
+        type Moderation = St::Moderation;
+        type Lang = St::Lang;
+    }
+    ///State transition - sets the `moderation` field to Set
+    pub struct SetModeration<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetModeration<St> {}
+    impl<St: State> State for SetModeration<St> {
+        type Title = St::Title;
+        type Moderation = Set<members::moderation>;
+        type Lang = St::Lang;
+    }
+    ///State transition - sets the `lang` field to Set
+    pub struct SetLang<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLang<St> {}
+    impl<St: State> State for SetLang<St> {
+        type Title = St::Title;
+        type Moderation = St::Moderation;
+        type Lang = Set<members::lang>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `title` field
+        pub struct title(());
         ///Marker type for the `moderation` field
         pub struct moderation(());
         ///Marker type for the `lang` field
         pub struct lang(());
-        ///Marker type for the `title` field
-        pub struct title(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct LangsBuilder<'a, S: langs_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct LangsBuilder<S: BosStr, St: langs_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>, Option<Vec<S>>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Langs<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> LangsBuilder<'a, langs_state::Empty> {
+impl<S: BosStr> Langs<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> LangsBuilder<S, langs_state::Empty> {
         LangsBuilder::new()
     }
 }
 
-impl<'a> LangsBuilder<'a, langs_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> LangsBuilder<S, langs_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         LangsBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: langs_state::State> LangsBuilder<'a, S> {
+impl<S: BosStr, St: langs_state::State> LangsBuilder<S, St> {
     /// Set the `comment` field (optional)
     pub fn comment(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -240,72 +235,72 @@ impl<'a, S: langs_state::State> LangsBuilder<'a, S> {
     }
 }
 
-impl<'a, S> LangsBuilder<'a, S>
+impl<S: BosStr, St> LangsBuilder<S, St>
 where
-    S: langs_state::State,
-    S::Lang: langs_state::IsUnset,
+    St: langs_state::State,
+    St::Lang: langs_state::IsUnset,
 {
     /// Set the `lang` field (required)
     pub fn lang(
         mut self,
         value: impl Into<S>,
-    ) -> LangsBuilder<'a, langs_state::SetLang<S>> {
+    ) -> LangsBuilder<S, langs_state::SetLang<St>> {
         self._fields.1 = Option::Some(value.into());
         LangsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LangsBuilder<'a, S>
+impl<S: BosStr, St> LangsBuilder<S, St>
 where
-    S: langs_state::State,
-    S::Moderation: langs_state::IsUnset,
+    St: langs_state::State,
+    St::Moderation: langs_state::IsUnset,
 {
     /// Set the `moderation` field (required)
     pub fn moderation(
         mut self,
         value: impl Into<Vec<S>>,
-    ) -> LangsBuilder<'a, langs_state::SetModeration<S>> {
+    ) -> LangsBuilder<S, langs_state::SetModeration<St>> {
         self._fields.2 = Option::Some(value.into());
         LangsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LangsBuilder<'a, S>
+impl<S: BosStr, St> LangsBuilder<S, St>
 where
-    S: langs_state::State,
-    S::Title: langs_state::IsUnset,
+    St: langs_state::State,
+    St::Title: langs_state::IsUnset,
 {
     /// Set the `title` field (required)
     pub fn title(
         mut self,
         value: impl Into<S>,
-    ) -> LangsBuilder<'a, langs_state::SetTitle<S>> {
+    ) -> LangsBuilder<S, langs_state::SetTitle<St>> {
         self._fields.3 = Option::Some(value.into());
         LangsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LangsBuilder<'a, S>
+impl<S: BosStr, St> LangsBuilder<S, St>
 where
-    S: langs_state::State,
-    S::Moderation: langs_state::IsSet,
-    S::Lang: langs_state::IsSet,
-    S::Title: langs_state::IsSet,
+    St: langs_state::State,
+    St::Title: langs_state::IsSet,
+    St::Moderation: langs_state::IsSet,
+    St::Lang: langs_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Langs<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Langs<S> {
         Langs {
             comment: self._fields.0,
             lang: self._fields.1.unwrap(),
@@ -314,8 +309,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Langs<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Langs<S> {
         Langs {
             comment: self._fields.0,
             lang: self._fields.1.unwrap(),

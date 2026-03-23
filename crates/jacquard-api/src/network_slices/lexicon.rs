@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,11 +34,11 @@ use serde::{Serialize, Deserialize};
     rename = "network.slices.lexicon",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Lexicon<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Lexicon<S: BosStr = DefaultStr> {
     ///When the lexicon was created
     pub created_at: Datetime,
     ///The lexicon schema definitions as JSON
@@ -67,18 +67,18 @@ pub struct Lexicon<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct LexiconGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct LexiconGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Lexicon<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Lexicon<S> {
+impl<S: BosStr> Lexicon<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, LexiconRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -91,17 +91,17 @@ pub struct LexiconRecord;
 impl XrpcResp for LexiconRecord {
     const NSID: &'static str = "network.slices.lexicon";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = LexiconGetRecordOutput<S>;
+    type Output<S: BosStr> = LexiconGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<LexiconGetRecordOutput<S>> for Lexicon<S> {
+impl<S: BosStr> From<LexiconGetRecordOutput<S>> for Lexicon<S> {
     fn from(output: LexiconGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Lexicon<S> {
+impl<S: BosStr> Collection for Lexicon<S> {
     const NSID: &'static str = "network.slices.lexicon";
     type Record = LexiconRecord;
 }
@@ -111,7 +111,7 @@ impl Collection for LexiconRecord {
     type Record = LexiconRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Lexicon<S> {
+impl<S: BosStr> LexiconSchema for Lexicon<S> {
     fn nsid() -> &'static str {
         "network.slices.lexicon"
     }
@@ -161,73 +161,73 @@ pub mod lexicon_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Nsid;
+        type Definitions;
         type CreatedAt;
         type Slice;
-        type Definitions;
+        type Nsid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Nsid = Unset;
+        type Definitions = Unset;
         type CreatedAt = Unset;
         type Slice = Unset;
-        type Definitions = Unset;
-    }
-    ///State transition - sets the `nsid` field to Set
-    pub struct SetNsid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNsid<S> {}
-    impl<S: State> State for SetNsid<S> {
-        type Nsid = Set<members::nsid>;
-        type CreatedAt = S::CreatedAt;
-        type Slice = S::Slice;
-        type Definitions = S::Definitions;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Nsid = S::Nsid;
-        type CreatedAt = Set<members::created_at>;
-        type Slice = S::Slice;
-        type Definitions = S::Definitions;
-    }
-    ///State transition - sets the `slice` field to Set
-    pub struct SetSlice<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSlice<S> {}
-    impl<S: State> State for SetSlice<S> {
-        type Nsid = S::Nsid;
-        type CreatedAt = S::CreatedAt;
-        type Slice = Set<members::slice>;
-        type Definitions = S::Definitions;
+        type Nsid = Unset;
     }
     ///State transition - sets the `definitions` field to Set
-    pub struct SetDefinitions<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDefinitions<S> {}
-    impl<S: State> State for SetDefinitions<S> {
-        type Nsid = S::Nsid;
-        type CreatedAt = S::CreatedAt;
-        type Slice = S::Slice;
+    pub struct SetDefinitions<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDefinitions<St> {}
+    impl<St: State> State for SetDefinitions<St> {
         type Definitions = Set<members::definitions>;
+        type CreatedAt = St::CreatedAt;
+        type Slice = St::Slice;
+        type Nsid = St::Nsid;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Definitions = St::Definitions;
+        type CreatedAt = Set<members::created_at>;
+        type Slice = St::Slice;
+        type Nsid = St::Nsid;
+    }
+    ///State transition - sets the `slice` field to Set
+    pub struct SetSlice<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSlice<St> {}
+    impl<St: State> State for SetSlice<St> {
+        type Definitions = St::Definitions;
+        type CreatedAt = St::CreatedAt;
+        type Slice = Set<members::slice>;
+        type Nsid = St::Nsid;
+    }
+    ///State transition - sets the `nsid` field to Set
+    pub struct SetNsid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetNsid<St> {}
+    impl<St: State> State for SetNsid<St> {
+        type Definitions = St::Definitions;
+        type CreatedAt = St::CreatedAt;
+        type Slice = St::Slice;
+        type Nsid = Set<members::nsid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `nsid` field
-        pub struct nsid(());
+        ///Marker type for the `definitions` field
+        pub struct definitions(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `slice` field
         pub struct slice(());
-        ///Marker type for the `definitions` field
-        pub struct definitions(());
+        ///Marker type for the `nsid` field
+        pub struct nsid(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct LexiconBuilder<'a, S: lexicon_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct LexiconBuilder<S: BosStr, St: lexicon_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
         Option<S>,
@@ -237,66 +237,66 @@ pub struct LexiconBuilder<'a, S: lexicon_state::State> {
         Option<AtUri<S>>,
         Option<Datetime>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Lexicon<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> LexiconBuilder<'a, lexicon_state::Empty> {
+impl<S: BosStr> Lexicon<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> LexiconBuilder<S, lexicon_state::Empty> {
         LexiconBuilder::new()
     }
 }
 
-impl<'a> LexiconBuilder<'a, lexicon_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> LexiconBuilder<S, lexicon_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         LexiconBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LexiconBuilder<'a, S>
+impl<S: BosStr, St> LexiconBuilder<S, St>
 where
-    S: lexicon_state::State,
-    S::CreatedAt: lexicon_state::IsUnset,
+    St: lexicon_state::State,
+    St::CreatedAt: lexicon_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> LexiconBuilder<'a, lexicon_state::SetCreatedAt<S>> {
+    ) -> LexiconBuilder<S, lexicon_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         LexiconBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LexiconBuilder<'a, S>
+impl<S: BosStr, St> LexiconBuilder<S, St>
 where
-    S: lexicon_state::State,
-    S::Definitions: lexicon_state::IsUnset,
+    St: lexicon_state::State,
+    St::Definitions: lexicon_state::IsUnset,
 {
     /// Set the `definitions` field (required)
     pub fn definitions(
         mut self,
         value: impl Into<S>,
-    ) -> LexiconBuilder<'a, lexicon_state::SetDefinitions<S>> {
+    ) -> LexiconBuilder<S, lexicon_state::SetDefinitions<St>> {
         self._fields.1 = Option::Some(value.into());
         LexiconBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: lexicon_state::State> LexiconBuilder<'a, S> {
+impl<S: BosStr, St: lexicon_state::State> LexiconBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -309,7 +309,7 @@ impl<'a, S: lexicon_state::State> LexiconBuilder<'a, S> {
     }
 }
 
-impl<'a, S: lexicon_state::State> LexiconBuilder<'a, S> {
+impl<S: BosStr, St: lexicon_state::State> LexiconBuilder<S, St> {
     /// Set the `excludedFromSync` field (optional)
     pub fn excluded_from_sync(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.3 = value.into();
@@ -322,45 +322,45 @@ impl<'a, S: lexicon_state::State> LexiconBuilder<'a, S> {
     }
 }
 
-impl<'a, S> LexiconBuilder<'a, S>
+impl<S: BosStr, St> LexiconBuilder<S, St>
 where
-    S: lexicon_state::State,
-    S::Nsid: lexicon_state::IsUnset,
+    St: lexicon_state::State,
+    St::Nsid: lexicon_state::IsUnset,
 {
     /// Set the `nsid` field (required)
     pub fn nsid(
         mut self,
         value: impl Into<S>,
-    ) -> LexiconBuilder<'a, lexicon_state::SetNsid<S>> {
+    ) -> LexiconBuilder<S, lexicon_state::SetNsid<St>> {
         self._fields.4 = Option::Some(value.into());
         LexiconBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LexiconBuilder<'a, S>
+impl<S: BosStr, St> LexiconBuilder<S, St>
 where
-    S: lexicon_state::State,
-    S::Slice: lexicon_state::IsUnset,
+    St: lexicon_state::State,
+    St::Slice: lexicon_state::IsUnset,
 {
     /// Set the `slice` field (required)
     pub fn slice(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> LexiconBuilder<'a, lexicon_state::SetSlice<S>> {
+    ) -> LexiconBuilder<S, lexicon_state::SetSlice<St>> {
         self._fields.5 = Option::Some(value.into());
         LexiconBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: lexicon_state::State> LexiconBuilder<'a, S> {
+impl<S: BosStr, St: lexicon_state::State> LexiconBuilder<S, St> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.6 = value.into();
@@ -373,16 +373,16 @@ impl<'a, S: lexicon_state::State> LexiconBuilder<'a, S> {
     }
 }
 
-impl<'a, S> LexiconBuilder<'a, S>
+impl<S: BosStr, St> LexiconBuilder<S, St>
 where
-    S: lexicon_state::State,
-    S::Nsid: lexicon_state::IsSet,
-    S::CreatedAt: lexicon_state::IsSet,
-    S::Slice: lexicon_state::IsSet,
-    S::Definitions: lexicon_state::IsSet,
+    St: lexicon_state::State,
+    St::Definitions: lexicon_state::IsSet,
+    St::CreatedAt: lexicon_state::IsSet,
+    St::Slice: lexicon_state::IsSet,
+    St::Nsid: lexicon_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Lexicon<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Lexicon<S> {
         Lexicon {
             created_at: self._fields.0.unwrap(),
             definitions: self._fields.1.unwrap(),
@@ -394,11 +394,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Lexicon<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Lexicon<S> {
         Lexicon {
             created_at: self._fields.0.unwrap(),
             definitions: self._fields.1.unwrap(),

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, Tid, Cid};
 use jacquard_common::types::value::Data;
@@ -18,33 +18,30 @@ use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetLatestCommit<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct GetLatestCommit<S: BosStr = DefaultStr> {
     pub did: Did<S>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetLatestCommitOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetLatestCommitOutput<S: BosStr = DefaultStr> {
     pub cid: Cid<S>,
     pub rev: Tid,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -122,12 +119,11 @@ pub struct GetLatestCommitResponse;
 impl jacquard_common::xrpc::XrpcResp for GetLatestCommitResponse {
     const NSID: &'static str = "com.atproto.sync.getLatestCommit";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetLatestCommitOutput<S>;
+    type Output<S: BosStr> = GetLatestCommitOutput<S>;
     type Err = GetLatestCommitError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetLatestCommit<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetLatestCommit<S> {
     const NSID: &'static str = "com.atproto.sync.getLatestCommit";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetLatestCommitResponse;
@@ -138,7 +134,7 @@ pub struct GetLatestCommitRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetLatestCommitRequest {
     const PATH: &'static str = "/xrpc/com.atproto.sync.getLatestCommit";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetLatestCommit<S>;
+    type Request<S: BosStr> = GetLatestCommit<S>;
     type Response = GetLatestCommitResponse;
 }
 
@@ -161,9 +157,9 @@ pub mod get_latest_commit_state {
         type Did = Unset;
     }
     ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
         type Did = Set<members::did>;
     }
     /// Marker types for field names
@@ -174,57 +170,57 @@ pub mod get_latest_commit_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetLatestCommitBuilder<'a, S: get_latest_commit_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetLatestCommitBuilder<S: BosStr, St: get_latest_commit_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetLatestCommit<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetLatestCommitBuilder<'a, get_latest_commit_state::Empty> {
+impl<S: BosStr> GetLatestCommit<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetLatestCommitBuilder<S, get_latest_commit_state::Empty> {
         GetLatestCommitBuilder::new()
     }
 }
 
-impl<'a> GetLatestCommitBuilder<'a, get_latest_commit_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetLatestCommitBuilder<S, get_latest_commit_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetLatestCommitBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetLatestCommitBuilder<'a, S>
+impl<S: BosStr, St> GetLatestCommitBuilder<S, St>
 where
-    S: get_latest_commit_state::State,
-    S::Did: get_latest_commit_state::IsUnset,
+    St: get_latest_commit_state::State,
+    St::Did: get_latest_commit_state::IsUnset,
 {
     /// Set the `did` field (required)
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> GetLatestCommitBuilder<'a, get_latest_commit_state::SetDid<S>> {
+    ) -> GetLatestCommitBuilder<S, get_latest_commit_state::SetDid<St>> {
         self._fields.0 = Option::Some(value.into());
         GetLatestCommitBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetLatestCommitBuilder<'a, S>
+impl<S: BosStr, St> GetLatestCommitBuilder<S, St>
 where
-    S: get_latest_commit_state::State,
-    S::Did: get_latest_commit_state::IsSet,
+    St: get_latest_commit_state::State,
+    St::Did: get_latest_commit_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetLatestCommit<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetLatestCommit<S> {
         GetLatestCommit {
             did: self._fields.0.unwrap(),
         }

@@ -15,7 +15,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,18 +34,18 @@ use serde::{Serialize, Deserialize};
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Did<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Did<S: BosStr = DefaultStr> {
     ///The DID string value.
     pub did: jacquard_common::types::string::Did<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Did<S> {
+impl<S: BosStr> LexiconSchema for Did<S> {
     fn nsid() -> &'static str {
         "app.certified.defs"
     }
@@ -90,9 +90,9 @@ pub mod did_state {
         type Did = Unset;
     }
     ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
         type Did = Set<members::did>;
     }
     /// Marker types for field names
@@ -103,64 +103,64 @@ pub mod did_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct DidBuilder<'a, S: did_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct DidBuilder<S: BosStr, St: did_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<jacquard_common::types::string::Did<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Did<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> DidBuilder<'a, did_state::Empty> {
+impl<S: BosStr> Did<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> DidBuilder<S, did_state::Empty> {
         DidBuilder::new()
     }
 }
 
-impl<'a> DidBuilder<'a, did_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> DidBuilder<S, did_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         DidBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DidBuilder<'a, S>
+impl<S: BosStr, St> DidBuilder<S, St>
 where
-    S: did_state::State,
-    S::Did: did_state::IsUnset,
+    St: did_state::State,
+    St::Did: did_state::IsUnset,
 {
     /// Set the `did` field (required)
     pub fn did(
         mut self,
         value: impl Into<jacquard_common::types::string::Did<S>>,
-    ) -> DidBuilder<'a, did_state::SetDid<S>> {
+    ) -> DidBuilder<S, did_state::SetDid<St>> {
         self._fields.0 = Option::Some(value.into());
         DidBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DidBuilder<'a, S>
+impl<S: BosStr, St> DidBuilder<S, St>
 where
-    S: did_state::State,
-    S::Did: did_state::IsSet,
+    St: did_state::State,
+    St::Did: did_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Did<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Did<S> {
         Did {
             did: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Did<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Did<S> {
         Did {
             did: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

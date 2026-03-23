@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Datetime;
 use jacquard_common::types::value::Data;
@@ -31,19 +31,17 @@ pub struct GetLiveUsers {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetLiveUsersOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetLiveUsersOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub streams: Option<Vec<LivestreamView<S>>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -52,7 +50,7 @@ pub struct GetLiveUsersResponse;
 impl jacquard_common::xrpc::XrpcResp for GetLiveUsersResponse {
     const NSID: &'static str = "place.stream.live.getLiveUsers";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetLiveUsersOutput<S>;
+    type Output<S: BosStr> = GetLiveUsersOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
@@ -67,7 +65,7 @@ pub struct GetLiveUsersRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetLiveUsersRequest {
     const PATH: &'static str = "/xrpc/place.stream.live.getLiveUsers";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetLiveUsers;
+    type Request<S: BosStr> = GetLiveUsers;
     type Response = GetLiveUsersResponse;
 }
 
@@ -94,21 +92,21 @@ pub mod get_live_users_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetLiveUsersBuilder<S: get_live_users_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetLiveUsersBuilder<St: get_live_users_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<i64>),
 }
 
 impl GetLiveUsers {
-    /// Create a new builder for this type
+    /// Create a new builder for this type.
     pub fn new() -> GetLiveUsersBuilder<get_live_users_state::Empty> {
         GetLiveUsersBuilder::new()
     }
 }
 
 impl GetLiveUsersBuilder<get_live_users_state::Empty> {
-    /// Create a new builder with all fields unset
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetLiveUsersBuilder {
             _state: PhantomData,
@@ -117,7 +115,7 @@ impl GetLiveUsersBuilder<get_live_users_state::Empty> {
     }
 }
 
-impl<S: get_live_users_state::State> GetLiveUsersBuilder<S> {
+impl<St: get_live_users_state::State> GetLiveUsersBuilder<St> {
     /// Set the `before` field (optional)
     pub fn before(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.0 = value.into();
@@ -130,7 +128,7 @@ impl<S: get_live_users_state::State> GetLiveUsersBuilder<S> {
     }
 }
 
-impl<S: get_live_users_state::State> GetLiveUsersBuilder<S> {
+impl<St: get_live_users_state::State> GetLiveUsersBuilder<St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -143,11 +141,11 @@ impl<S: get_live_users_state::State> GetLiveUsersBuilder<S> {
     }
 }
 
-impl<S> GetLiveUsersBuilder<S>
+impl<St> GetLiveUsersBuilder<St>
 where
-    S: get_live_users_state::State,
+    St: get_live_users_state::State,
 {
-    /// Build the final struct
+    /// Build the final struct.
     pub fn build(self) -> GetLiveUsers {
         GetLiveUsers {
             before: self._fields.0,

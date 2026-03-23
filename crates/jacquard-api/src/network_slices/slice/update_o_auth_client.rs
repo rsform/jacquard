@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::UriValue;
 use jacquard_common::types::value::Data;
@@ -19,14 +19,14 @@ use serde::{Serialize, Deserialize};
 use crate::network_slices::slice::get_o_auth_clients::OauthClientDetails;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct UpdateOAuthClient<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct UpdateOAuthClient<S: BosStr = DefaultStr> {
     ///OAuth client ID to update
     pub client_id: S,
     ///New human-readable name of the OAuth client
@@ -50,28 +50,23 @@ pub struct UpdateOAuthClient<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///New URI of the terms of service
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tos_uri: Option<UriValue<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct UpdateOAuthClientOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct UpdateOAuthClientOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
-    #[serde(borrow)]
     pub value: OauthClientDetails<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -80,12 +75,11 @@ pub struct UpdateOAuthClientResponse;
 impl jacquard_common::xrpc::XrpcResp for UpdateOAuthClientResponse {
     const NSID: &'static str = "network.slices.slice.updateOAuthClient";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = UpdateOAuthClientOutput<S>;
+    type Output<S: BosStr> = UpdateOAuthClientOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for UpdateOAuthClient<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UpdateOAuthClient<S> {
     const NSID: &'static str = "network.slices.slice.updateOAuthClient";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -100,6 +94,6 @@ impl jacquard_common::xrpc::XrpcEndpoint for UpdateOAuthClientRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = UpdateOAuthClient<S>;
+    type Request<S: BosStr> = UpdateOAuthClient<S>;
     type Response = UpdateOAuthClientResponse;
 }

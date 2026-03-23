@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
     rename = "art.cllctv.feed.pin",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Pin<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Pin<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     pub subject: StrongRef<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -52,18 +52,18 @@ pub struct Pin<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct PinGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct PinGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Pin<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Pin<S> {
+impl<S: BosStr> Pin<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, PinRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -76,17 +76,17 @@ pub struct PinRecord;
 impl XrpcResp for PinRecord {
     const NSID: &'static str = "art.cllctv.feed.pin";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = PinGetRecordOutput<S>;
+    type Output<S: BosStr> = PinGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<PinGetRecordOutput<S>> for Pin<S> {
+impl<S: BosStr> From<PinGetRecordOutput<S>> for Pin<S> {
     fn from(output: PinGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Pin<S> {
+impl<S: BosStr> Collection for Pin<S> {
     const NSID: &'static str = "art.cllctv.feed.pin";
     type Record = PinRecord;
 }
@@ -96,7 +96,7 @@ impl Collection for PinRecord {
     type Record = PinRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Pin<S> {
+impl<S: BosStr> LexiconSchema for Pin<S> {
     fn nsid() -> &'static str {
         "art.cllctv.feed.pin"
     }
@@ -132,17 +132,17 @@ pub mod pin_state {
         type Subject = Unset;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
-        type Subject = S::Subject;
+        type Subject = St::Subject;
     }
     ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type CreatedAt = S::CreatedAt;
+    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubject<St> {}
+    impl<St: State> State for SetSubject<St> {
+        type CreatedAt = St::CreatedAt;
         type Subject = Set<members::subject>;
     }
     /// Marker types for field names
@@ -155,85 +155,85 @@ pub mod pin_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct PinBuilder<'a, S: pin_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct PinBuilder<S: BosStr, St: pin_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<StrongRef<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Pin<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> PinBuilder<'a, pin_state::Empty> {
+impl<S: BosStr> Pin<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> PinBuilder<S, pin_state::Empty> {
         PinBuilder::new()
     }
 }
 
-impl<'a> PinBuilder<'a, pin_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> PinBuilder<S, pin_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         PinBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PinBuilder<'a, S>
+impl<S: BosStr, St> PinBuilder<S, St>
 where
-    S: pin_state::State,
-    S::CreatedAt: pin_state::IsUnset,
+    St: pin_state::State,
+    St::CreatedAt: pin_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> PinBuilder<'a, pin_state::SetCreatedAt<S>> {
+    ) -> PinBuilder<S, pin_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         PinBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PinBuilder<'a, S>
+impl<S: BosStr, St> PinBuilder<S, St>
 where
-    S: pin_state::State,
-    S::Subject: pin_state::IsUnset,
+    St: pin_state::State,
+    St::Subject: pin_state::IsUnset,
 {
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> PinBuilder<'a, pin_state::SetSubject<S>> {
+    ) -> PinBuilder<S, pin_state::SetSubject<St>> {
         self._fields.1 = Option::Some(value.into());
         PinBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PinBuilder<'a, S>
+impl<S: BosStr, St> PinBuilder<S, St>
 where
-    S: pin_state::State,
-    S::CreatedAt: pin_state::IsSet,
-    S::Subject: pin_state::IsSet,
+    St: pin_state::State,
+    St::CreatedAt: pin_state::IsSet,
+    St::Subject: pin_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Pin<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Pin<S> {
         Pin {
             created_at: self._fields.0.unwrap(),
             subject: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Pin<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Pin<S> {
         Pin {
             created_at: self._fields.0.unwrap(),
             subject: self._fields.1.unwrap(),

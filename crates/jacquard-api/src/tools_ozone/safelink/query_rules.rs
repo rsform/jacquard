@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
@@ -19,14 +19,14 @@ use serde::{Serialize, Deserialize};
 use crate::tools_ozone::safelink::UrlRule;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct QueryRules<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct QueryRules<S: BosStr = DefaultStr> {
     ///Filter by action types
     #[serde(skip_serializing_if = "Option::is_none")]
     pub actions: Option<Vec<S>>,
@@ -52,22 +52,20 @@ pub struct QueryRules<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Filter by specific URLs or domains
     #[serde(skip_serializing_if = "Option::is_none")]
     pub urls: Option<Vec<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Sort direction
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum QueryRulesSortDirection<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum QueryRulesSortDirection<S: BosStr = DefaultStr> {
     Asc,
     Desc,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> QueryRulesSortDirection<S> {
+impl<S: BosStr> QueryRulesSortDirection<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Asc => "asc",
@@ -85,19 +83,19 @@ impl<S: Bos<str> + AsRef<str>> QueryRulesSortDirection<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for QueryRulesSortDirection<S> {
+impl<S: BosStr> core::fmt::Display for QueryRulesSortDirection<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for QueryRulesSortDirection<S> {
+impl<S: BosStr> AsRef<str> for QueryRulesSortDirection<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for QueryRulesSortDirection<S> {
+impl<S: BosStr> Serialize for QueryRulesSortDirection<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -106,8 +104,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for QueryRulesSortDirection<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for QueryRulesSortDirection<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for QueryRulesSortDirection<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -117,14 +114,18 @@ for QueryRulesSortDirection<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for QueryRulesSortDirection<S> {
+impl<S: BosStr + Default> Default for QueryRulesSortDirection<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for QueryRulesSortDirection<S> {
-    type Output = QueryRulesSortDirection<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for QueryRulesSortDirection<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = QueryRulesSortDirection<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             QueryRulesSortDirection::Asc => QueryRulesSortDirection::Asc,
@@ -138,21 +139,19 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for QueryRulesSortDirection<S> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct QueryRulesOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct QueryRulesOutput<S: BosStr = DefaultStr> {
     ///Next cursor for pagination. Only present if there are more results.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
     pub rules: Vec<UrlRule<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -161,12 +160,11 @@ pub struct QueryRulesResponse;
 impl jacquard_common::xrpc::XrpcResp for QueryRulesResponse {
     const NSID: &'static str = "tools.ozone.safelink.queryRules";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = QueryRulesOutput<S>;
+    type Output<S: BosStr> = QueryRulesOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for QueryRules<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for QueryRules<S> {
     const NSID: &'static str = "tools.ozone.safelink.queryRules";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -181,7 +179,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for QueryRulesRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = QueryRules<S>;
+    type Request<S: BosStr> = QueryRules<S>;
     type Response = QueryRulesResponse;
 }
 

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "moe.karashiiro.kpaste.paste",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Paste<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Paste<S: BosStr = DefaultStr> {
     ///Blob reference to the paste content
     pub content: BlobRef<S>,
     ///When the paste was created
@@ -64,18 +64,18 @@ pub struct Paste<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct PasteGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct PasteGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Paste<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Paste<S> {
+impl<S: BosStr> Paste<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, PasteRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -88,17 +88,17 @@ pub struct PasteRecord;
 impl XrpcResp for PasteRecord {
     const NSID: &'static str = "moe.karashiiro.kpaste.paste";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = PasteGetRecordOutput<S>;
+    type Output<S: BosStr> = PasteGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<PasteGetRecordOutput<S>> for Paste<S> {
+impl<S: BosStr> From<PasteGetRecordOutput<S>> for Paste<S> {
     fn from(output: PasteGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Paste<S> {
+impl<S: BosStr> Collection for Paste<S> {
     const NSID: &'static str = "moe.karashiiro.kpaste.paste";
     type Record = PasteRecord;
 }
@@ -108,7 +108,7 @@ impl Collection for PasteRecord {
     type Record = PasteRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Paste<S> {
+impl<S: BosStr> LexiconSchema for Paste<S> {
     fn nsid() -> &'static str {
         "moe.karashiiro.kpaste.paste"
     }
@@ -183,8 +183,8 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Paste<S> {
     }
 }
 
-fn _default_paste_language<S: From<&'static str>>() -> ::core::option::Option<S> {
-    Some(S::from("text"))
+fn _default_paste_language<S: FromStaticStr>() -> ::core::option::Option<S> {
+    Some(S::from_static("text"))
 }
 
 pub mod paste_state {
@@ -208,17 +208,17 @@ pub mod paste_state {
         type CreatedAt = Unset;
     }
     ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
+    pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetContent<St> {}
+    impl<St: State> State for SetContent<St> {
         type Content = Set<members::content>;
-        type CreatedAt = S::CreatedAt;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Content = S::Content;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Content = St::Content;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
@@ -231,9 +231,9 @@ pub mod paste_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct PasteBuilder<'a, S: paste_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct PasteBuilder<S: BosStr, St: paste_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<BlobRef<S>>,
         Option<Datetime>,
@@ -241,66 +241,66 @@ pub struct PasteBuilder<'a, S: paste_state::State> {
         Option<S>,
         Option<Datetime>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Paste<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> PasteBuilder<'a, paste_state::Empty> {
+impl<S: BosStr> Paste<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> PasteBuilder<S, paste_state::Empty> {
         PasteBuilder::new()
     }
 }
 
-impl<'a> PasteBuilder<'a, paste_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> PasteBuilder<S, paste_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         PasteBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PasteBuilder<'a, S>
+impl<S: BosStr, St> PasteBuilder<S, St>
 where
-    S: paste_state::State,
-    S::Content: paste_state::IsUnset,
+    St: paste_state::State,
+    St::Content: paste_state::IsUnset,
 {
     /// Set the `content` field (required)
     pub fn content(
         mut self,
         value: impl Into<BlobRef<S>>,
-    ) -> PasteBuilder<'a, paste_state::SetContent<S>> {
+    ) -> PasteBuilder<S, paste_state::SetContent<St>> {
         self._fields.0 = Option::Some(value.into());
         PasteBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PasteBuilder<'a, S>
+impl<S: BosStr, St> PasteBuilder<S, St>
 where
-    S: paste_state::State,
-    S::CreatedAt: paste_state::IsUnset,
+    St: paste_state::State,
+    St::CreatedAt: paste_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> PasteBuilder<'a, paste_state::SetCreatedAt<S>> {
+    ) -> PasteBuilder<S, paste_state::SetCreatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         PasteBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: paste_state::State> PasteBuilder<'a, S> {
+impl<S: BosStr, St: paste_state::State> PasteBuilder<S, St> {
     /// Set the `language` field (optional)
     pub fn language(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -313,7 +313,7 @@ impl<'a, S: paste_state::State> PasteBuilder<'a, S> {
     }
 }
 
-impl<'a, S: paste_state::State> PasteBuilder<'a, S> {
+impl<S: BosStr, St: paste_state::State> PasteBuilder<S, St> {
     /// Set the `title` field (optional)
     pub fn title(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -326,7 +326,7 @@ impl<'a, S: paste_state::State> PasteBuilder<'a, S> {
     }
 }
 
-impl<'a, S: paste_state::State> PasteBuilder<'a, S> {
+impl<S: BosStr, St: paste_state::State> PasteBuilder<S, St> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.4 = value.into();
@@ -339,29 +339,29 @@ impl<'a, S: paste_state::State> PasteBuilder<'a, S> {
     }
 }
 
-impl<'a, S> PasteBuilder<'a, S>
+impl<S: BosStr, St> PasteBuilder<S, St>
 where
-    S: paste_state::State,
-    S::Content: paste_state::IsSet,
-    S::CreatedAt: paste_state::IsSet,
+    St: paste_state::State,
+    St::Content: paste_state::IsSet,
+    St::CreatedAt: paste_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Paste<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Paste<S> {
         Paste {
             content: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
-            language: self._fields.2.or_else(|| Some(CowStr::from("text"))),
+            language: self._fields.2.or_else(|| Some(SmolStr::from("text"))),
             title: self._fields.3,
             updated_at: self._fields.4,
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Paste<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Paste<S> {
         Paste {
             content: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
-            language: self._fields.2.or_else(|| Some(CowStr::from("text"))),
+            language: self._fields.2.or_else(|| Some(SmolStr::from("text"))),
             title: self._fields.3,
             updated_at: self._fields.4,
             extra_data: Some(extra_data),

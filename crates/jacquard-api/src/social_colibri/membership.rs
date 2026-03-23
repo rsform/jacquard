@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,11 +34,11 @@ use serde::{Serialize, Deserialize};
     rename = "social.colibri.membership",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Membership<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Membership<S: BosStr = DefaultStr> {
     ///AT-URI of the social.colibri.community record being joined
     pub community: AtUri<S>,
     pub created_at: Datetime,
@@ -52,18 +52,18 @@ pub struct Membership<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct MembershipGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct MembershipGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Membership<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Membership<S> {
+impl<S: BosStr> Membership<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, MembershipRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -76,17 +76,17 @@ pub struct MembershipRecord;
 impl XrpcResp for MembershipRecord {
     const NSID: &'static str = "social.colibri.membership";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = MembershipGetRecordOutput<S>;
+    type Output<S: BosStr> = MembershipGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<MembershipGetRecordOutput<S>> for Membership<S> {
+impl<S: BosStr> From<MembershipGetRecordOutput<S>> for Membership<S> {
     fn from(output: MembershipGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Membership<S> {
+impl<S: BosStr> Collection for Membership<S> {
     const NSID: &'static str = "social.colibri.membership";
     type Record = MembershipRecord;
 }
@@ -96,7 +96,7 @@ impl Collection for MembershipRecord {
     type Record = MembershipRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Membership<S> {
+impl<S: BosStr> LexiconSchema for Membership<S> {
     fn nsid() -> &'static str {
         "social.colibri.membership"
     }
@@ -132,17 +132,17 @@ pub mod membership_state {
         type CreatedAt = Unset;
     }
     ///State transition - sets the `community` field to Set
-    pub struct SetCommunity<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCommunity<S> {}
-    impl<S: State> State for SetCommunity<S> {
+    pub struct SetCommunity<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCommunity<St> {}
+    impl<St: State> State for SetCommunity<St> {
         type Community = Set<members::community>;
-        type CreatedAt = S::CreatedAt;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Community = S::Community;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Community = St::Community;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
@@ -155,88 +155,88 @@ pub mod membership_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct MembershipBuilder<'a, S: membership_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct MembershipBuilder<S: BosStr, St: membership_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>, Option<Datetime>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Membership<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> MembershipBuilder<'a, membership_state::Empty> {
+impl<S: BosStr> Membership<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> MembershipBuilder<S, membership_state::Empty> {
         MembershipBuilder::new()
     }
 }
 
-impl<'a> MembershipBuilder<'a, membership_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> MembershipBuilder<S, membership_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         MembershipBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> MembershipBuilder<'a, S>
+impl<S: BosStr, St> MembershipBuilder<S, St>
 where
-    S: membership_state::State,
-    S::Community: membership_state::IsUnset,
+    St: membership_state::State,
+    St::Community: membership_state::IsUnset,
 {
     /// Set the `community` field (required)
     pub fn community(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> MembershipBuilder<'a, membership_state::SetCommunity<S>> {
+    ) -> MembershipBuilder<S, membership_state::SetCommunity<St>> {
         self._fields.0 = Option::Some(value.into());
         MembershipBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> MembershipBuilder<'a, S>
+impl<S: BosStr, St> MembershipBuilder<S, St>
 where
-    S: membership_state::State,
-    S::CreatedAt: membership_state::IsUnset,
+    St: membership_state::State,
+    St::CreatedAt: membership_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> MembershipBuilder<'a, membership_state::SetCreatedAt<S>> {
+    ) -> MembershipBuilder<S, membership_state::SetCreatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         MembershipBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> MembershipBuilder<'a, S>
+impl<S: BosStr, St> MembershipBuilder<S, St>
 where
-    S: membership_state::State,
-    S::Community: membership_state::IsSet,
-    S::CreatedAt: membership_state::IsSet,
+    St: membership_state::State,
+    St::Community: membership_state::IsSet,
+    St::CreatedAt: membership_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Membership<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Membership<S> {
         Membership {
             community: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Membership<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Membership<S> {
         Membership {
             community: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),

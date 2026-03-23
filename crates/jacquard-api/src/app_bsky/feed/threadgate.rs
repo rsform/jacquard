@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,11 +34,11 @@ use crate::app_bsky::feed::threadgate;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct FollowerRule<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct FollowerRule<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
@@ -49,11 +49,11 @@ pub struct FollowerRule<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct FollowingRule<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct FollowingRule<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
@@ -64,11 +64,11 @@ pub struct FollowingRule<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ListRule<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ListRule<S: BosStr = DefaultStr> {
     pub list: AtUri<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -82,11 +82,11 @@ pub struct ListRule<S: Bos<str> + AsRef<str> = DefaultStr> {
     rename = "app.bsky.feed.threadgate",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Threadgate<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Threadgate<S: BosStr = DefaultStr> {
     ///List of rules defining who can reply to this post. If value is an empty array, no one can reply. If value is undefined, anyone can reply.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub allow: Option<Vec<ThreadgateAllowItem<S>>>,
@@ -106,11 +106,11 @@ pub struct Threadgate<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ThreadgateAllowItem<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ThreadgateAllowItem<S: BosStr = DefaultStr> {
     #[serde(rename = "app.bsky.feed.threadgate#mentionRule")]
     MentionRule(Box<threadgate::MentionRule<S>>),
     #[serde(rename = "app.bsky.feed.threadgate#followerRule")]
@@ -127,11 +127,11 @@ pub enum ThreadgateAllowItem<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ThreadgateGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ThreadgateGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
@@ -144,22 +144,22 @@ pub struct ThreadgateGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct MentionRule<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct MentionRule<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Threadgate<S> {
+impl<S: BosStr> Threadgate<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, ThreadgateRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for FollowerRule<S> {
+impl<S: BosStr> LexiconSchema for FollowerRule<S> {
     fn nsid() -> &'static str {
         "app.bsky.feed.threadgate"
     }
@@ -174,7 +174,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for FollowerRule<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for FollowingRule<S> {
+impl<S: BosStr> LexiconSchema for FollowingRule<S> {
     fn nsid() -> &'static str {
         "app.bsky.feed.threadgate"
     }
@@ -189,7 +189,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for FollowingRule<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ListRule<S> {
+impl<S: BosStr> LexiconSchema for ListRule<S> {
     fn nsid() -> &'static str {
         "app.bsky.feed.threadgate"
     }
@@ -211,17 +211,17 @@ pub struct ThreadgateRecord;
 impl XrpcResp for ThreadgateRecord {
     const NSID: &'static str = "app.bsky.feed.threadgate";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ThreadgateGetRecordOutput<S>;
+    type Output<S: BosStr> = ThreadgateGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<ThreadgateGetRecordOutput<S>> for Threadgate<S> {
+impl<S: BosStr> From<ThreadgateGetRecordOutput<S>> for Threadgate<S> {
     fn from(output: ThreadgateGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Threadgate<S> {
+impl<S: BosStr> Collection for Threadgate<S> {
     const NSID: &'static str = "app.bsky.feed.threadgate";
     type Record = ThreadgateRecord;
 }
@@ -231,7 +231,7 @@ impl Collection for ThreadgateRecord {
     type Record = ThreadgateRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Threadgate<S> {
+impl<S: BosStr> LexiconSchema for Threadgate<S> {
     fn nsid() -> &'static str {
         "app.bsky.feed.threadgate"
     }
@@ -266,7 +266,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Threadgate<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for MentionRule<S> {
+impl<S: BosStr> LexiconSchema for MentionRule<S> {
     fn nsid() -> &'static str {
         "app.bsky.feed.threadgate"
     }
@@ -460,9 +460,9 @@ pub mod list_rule_state {
         type List = Unset;
     }
     ///State transition - sets the `list` field to Set
-    pub struct SetList<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetList<S> {}
-    impl<S: State> State for SetList<S> {
+    pub struct SetList<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetList<St> {}
+    impl<St: State> State for SetList<St> {
         type List = Set<members::list>;
     }
     /// Marker types for field names
@@ -473,67 +473,64 @@ pub mod list_rule_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ListRuleBuilder<'a, S: list_rule_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ListRuleBuilder<S: BosStr, St: list_rule_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ListRule<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ListRuleBuilder<'a, list_rule_state::Empty> {
+impl<S: BosStr> ListRule<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ListRuleBuilder<S, list_rule_state::Empty> {
         ListRuleBuilder::new()
     }
 }
 
-impl<'a> ListRuleBuilder<'a, list_rule_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ListRuleBuilder<S, list_rule_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ListRuleBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ListRuleBuilder<'a, S>
+impl<S: BosStr, St> ListRuleBuilder<S, St>
 where
-    S: list_rule_state::State,
-    S::List: list_rule_state::IsUnset,
+    St: list_rule_state::State,
+    St::List: list_rule_state::IsUnset,
 {
     /// Set the `list` field (required)
     pub fn list(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> ListRuleBuilder<'a, list_rule_state::SetList<S>> {
+    ) -> ListRuleBuilder<S, list_rule_state::SetList<St>> {
         self._fields.0 = Option::Some(value.into());
         ListRuleBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ListRuleBuilder<'a, S>
+impl<S: BosStr, St> ListRuleBuilder<S, St>
 where
-    S: list_rule_state::State,
-    S::List: list_rule_state::IsSet,
+    St: list_rule_state::State,
+    St::List: list_rule_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ListRule<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ListRule<S> {
         ListRule {
             list: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> ListRule<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ListRule<S> {
         ListRule {
             list: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -551,71 +548,71 @@ pub mod threadgate_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Post;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Post = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Post = S::Post;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `post` field to Set
-    pub struct SetPost<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPost<S> {}
-    impl<S: State> State for SetPost<S> {
-        type CreatedAt = S::CreatedAt;
+    pub struct SetPost<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPost<St> {}
+    impl<St: State> State for SetPost<St> {
         type Post = Set<members::post>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Post = St::Post;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `post` field
         pub struct post(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ThreadgateBuilder<'a, S: threadgate_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ThreadgateBuilder<S: BosStr, St: threadgate_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<ThreadgateAllowItem<S>>>,
         Option<Datetime>,
         Option<Vec<AtUri<S>>>,
         Option<AtUri<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Threadgate<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ThreadgateBuilder<'a, threadgate_state::Empty> {
+impl<S: BosStr> Threadgate<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ThreadgateBuilder<S, threadgate_state::Empty> {
         ThreadgateBuilder::new()
     }
 }
 
-impl<'a> ThreadgateBuilder<'a, threadgate_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ThreadgateBuilder<S, threadgate_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ThreadgateBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: threadgate_state::State> ThreadgateBuilder<'a, S> {
+impl<S: BosStr, St: threadgate_state::State> ThreadgateBuilder<S, St> {
     /// Set the `allow` field (optional)
     pub fn allow(
         mut self,
@@ -631,26 +628,26 @@ impl<'a, S: threadgate_state::State> ThreadgateBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ThreadgateBuilder<'a, S>
+impl<S: BosStr, St> ThreadgateBuilder<S, St>
 where
-    S: threadgate_state::State,
-    S::CreatedAt: threadgate_state::IsUnset,
+    St: threadgate_state::State,
+    St::CreatedAt: threadgate_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ThreadgateBuilder<'a, threadgate_state::SetCreatedAt<S>> {
+    ) -> ThreadgateBuilder<S, threadgate_state::SetCreatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         ThreadgateBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: threadgate_state::State> ThreadgateBuilder<'a, S> {
+impl<S: BosStr, St: threadgate_state::State> ThreadgateBuilder<S, St> {
     /// Set the `hiddenReplies` field (optional)
     pub fn hidden_replies(mut self, value: impl Into<Option<Vec<AtUri<S>>>>) -> Self {
         self._fields.2 = value.into();
@@ -663,33 +660,33 @@ impl<'a, S: threadgate_state::State> ThreadgateBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ThreadgateBuilder<'a, S>
+impl<S: BosStr, St> ThreadgateBuilder<S, St>
 where
-    S: threadgate_state::State,
-    S::Post: threadgate_state::IsUnset,
+    St: threadgate_state::State,
+    St::Post: threadgate_state::IsUnset,
 {
     /// Set the `post` field (required)
     pub fn post(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> ThreadgateBuilder<'a, threadgate_state::SetPost<S>> {
+    ) -> ThreadgateBuilder<S, threadgate_state::SetPost<St>> {
         self._fields.3 = Option::Some(value.into());
         ThreadgateBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ThreadgateBuilder<'a, S>
+impl<S: BosStr, St> ThreadgateBuilder<S, St>
 where
-    S: threadgate_state::State,
-    S::CreatedAt: threadgate_state::IsSet,
-    S::Post: threadgate_state::IsSet,
+    St: threadgate_state::State,
+    St::Post: threadgate_state::IsSet,
+    St::CreatedAt: threadgate_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Threadgate<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Threadgate<S> {
         Threadgate {
             allow: self._fields.0,
             created_at: self._fields.1.unwrap(),
@@ -698,11 +695,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Threadgate<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Threadgate<S> {
         Threadgate {
             allow: self._fields.0,
             created_at: self._fields.1.unwrap(),

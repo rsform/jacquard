@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -30,11 +30,11 @@ use serde::{Serialize, Deserialize};
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CodeType<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CodeType<S: BosStr = DefaultStr> {
     pub code: RecordKey<Rkey<S>>,
     ///Identifier of the standard code list that contains the allowed codes.
     pub list_id: Nsid<S>,
@@ -42,7 +42,7 @@ pub struct CodeType<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for CodeType<S> {
+impl<S: BosStr> LexiconSchema for CodeType<S> {
     fn nsid() -> &'static str {
         "org.farmapps.temp.ecrop.defs"
     }
@@ -67,122 +67,119 @@ pub mod code_type_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Code;
         type ListId;
+        type Code;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Code = Unset;
         type ListId = Unset;
-    }
-    ///State transition - sets the `code` field to Set
-    pub struct SetCode<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCode<S> {}
-    impl<S: State> State for SetCode<S> {
-        type Code = Set<members::code>;
-        type ListId = S::ListId;
+        type Code = Unset;
     }
     ///State transition - sets the `list_id` field to Set
-    pub struct SetListId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetListId<S> {}
-    impl<S: State> State for SetListId<S> {
-        type Code = S::Code;
+    pub struct SetListId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetListId<St> {}
+    impl<St: State> State for SetListId<St> {
         type ListId = Set<members::list_id>;
+        type Code = St::Code;
+    }
+    ///State transition - sets the `code` field to Set
+    pub struct SetCode<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCode<St> {}
+    impl<St: State> State for SetCode<St> {
+        type ListId = St::ListId;
+        type Code = Set<members::code>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `code` field
-        pub struct code(());
         ///Marker type for the `list_id` field
         pub struct list_id(());
+        ///Marker type for the `code` field
+        pub struct code(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct CodeTypeBuilder<'a, S: code_type_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct CodeTypeBuilder<S: BosStr, St: code_type_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<RecordKey<Rkey<S>>>, Option<Nsid<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> CodeType<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> CodeTypeBuilder<'a, code_type_state::Empty> {
+impl<S: BosStr> CodeType<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> CodeTypeBuilder<S, code_type_state::Empty> {
         CodeTypeBuilder::new()
     }
 }
 
-impl<'a> CodeTypeBuilder<'a, code_type_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> CodeTypeBuilder<S, code_type_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         CodeTypeBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CodeTypeBuilder<'a, S>
+impl<S: BosStr, St> CodeTypeBuilder<S, St>
 where
-    S: code_type_state::State,
-    S::Code: code_type_state::IsUnset,
+    St: code_type_state::State,
+    St::Code: code_type_state::IsUnset,
 {
     /// Set the `code` field (required)
     pub fn code(
         mut self,
         value: impl Into<RecordKey<Rkey<S>>>,
-    ) -> CodeTypeBuilder<'a, code_type_state::SetCode<S>> {
+    ) -> CodeTypeBuilder<S, code_type_state::SetCode<St>> {
         self._fields.0 = Option::Some(value.into());
         CodeTypeBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CodeTypeBuilder<'a, S>
+impl<S: BosStr, St> CodeTypeBuilder<S, St>
 where
-    S: code_type_state::State,
-    S::ListId: code_type_state::IsUnset,
+    St: code_type_state::State,
+    St::ListId: code_type_state::IsUnset,
 {
     /// Set the `listId` field (required)
     pub fn list_id(
         mut self,
         value: impl Into<Nsid<S>>,
-    ) -> CodeTypeBuilder<'a, code_type_state::SetListId<S>> {
+    ) -> CodeTypeBuilder<S, code_type_state::SetListId<St>> {
         self._fields.1 = Option::Some(value.into());
         CodeTypeBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CodeTypeBuilder<'a, S>
+impl<S: BosStr, St> CodeTypeBuilder<S, St>
 where
-    S: code_type_state::State,
-    S::Code: code_type_state::IsSet,
-    S::ListId: code_type_state::IsSet,
+    St: code_type_state::State,
+    St::ListId: code_type_state::IsSet,
+    St::Code: code_type_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> CodeType<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> CodeType<S> {
         CodeType {
             code: self._fields.0.unwrap(),
             list_id: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> CodeType<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> CodeType<S> {
         CodeType {
             code: self._fields.0.unwrap(),
             list_id: self._fields.1.unwrap(),

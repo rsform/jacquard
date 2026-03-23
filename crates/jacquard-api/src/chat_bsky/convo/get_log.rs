@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
@@ -27,35 +27,32 @@ use crate::chat_bsky::convo::LogRemoveReaction;
 use crate::chat_bsky::convo::LogUnmuteConvo;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetLog<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetLog<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub cursor: Option<S>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetLogOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetLogOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
     pub logs: Vec<GetLogOutputLogsItem<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -65,11 +62,11 @@ pub struct GetLogOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum GetLogOutputLogsItem<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum GetLogOutputLogsItem<S: BosStr = DefaultStr> {
     #[serde(rename = "chat.bsky.convo.defs#logBeginConvo")]
     LogBeginConvo(Box<LogBeginConvo<S>>),
     #[serde(rename = "chat.bsky.convo.defs#logAcceptConvo")]
@@ -97,12 +94,11 @@ pub struct GetLogResponse;
 impl jacquard_common::xrpc::XrpcResp for GetLogResponse {
     const NSID: &'static str = "chat.bsky.convo.getLog";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetLogOutput<S>;
+    type Output<S: BosStr> = GetLogOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetLog<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetLog<S> {
     const NSID: &'static str = "chat.bsky.convo.getLog";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetLogResponse;
@@ -113,7 +109,7 @@ pub struct GetLogRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetLogRequest {
     const PATH: &'static str = "/xrpc/chat.bsky.convo.getLog";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetLog<S>;
+    type Request<S: BosStr> = GetLog<S>;
     type Response = GetLogResponse;
 }
 
@@ -136,32 +132,32 @@ pub mod get_log_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetLogBuilder<'a, S: get_log_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetLogBuilder<S: BosStr, St: get_log_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetLog<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetLogBuilder<'a, get_log_state::Empty> {
+impl<S: BosStr> GetLog<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetLogBuilder<S, get_log_state::Empty> {
         GetLogBuilder::new()
     }
 }
 
-impl<'a> GetLogBuilder<'a, get_log_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetLogBuilder<S, get_log_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetLogBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: get_log_state::State> GetLogBuilder<'a, S> {
+impl<S: BosStr, St: get_log_state::State> GetLogBuilder<S, St> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -174,12 +170,12 @@ impl<'a, S: get_log_state::State> GetLogBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GetLogBuilder<'a, S>
+impl<S: BosStr, St> GetLogBuilder<S, St>
 where
-    S: get_log_state::State,
+    St: get_log_state::State,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetLog<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetLog<S> {
         GetLog { cursor: self._fields.0 }
     }
 }

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
     rename = "io.kich.cookinglog",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Cookinglog<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Cookinglog<S: BosStr = DefaultStr> {
     ///When this cooking log was created.
     pub created_at: Datetime,
     ///Optional user notes captured at completion.
@@ -60,18 +60,18 @@ pub struct Cookinglog<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CookinglogGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CookinglogGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Cookinglog<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Cookinglog<S> {
+impl<S: BosStr> Cookinglog<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, CookinglogRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -84,17 +84,17 @@ pub struct CookinglogRecord;
 impl XrpcResp for CookinglogRecord {
     const NSID: &'static str = "io.kich.cookinglog";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = CookinglogGetRecordOutput<S>;
+    type Output<S: BosStr> = CookinglogGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<CookinglogGetRecordOutput<S>> for Cookinglog<S> {
+impl<S: BosStr> From<CookinglogGetRecordOutput<S>> for Cookinglog<S> {
     fn from(output: CookinglogGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Cookinglog<S> {
+impl<S: BosStr> Collection for Cookinglog<S> {
     const NSID: &'static str = "io.kich.cookinglog";
     type Record = CookinglogRecord;
 }
@@ -104,7 +104,7 @@ impl Collection for CookinglogRecord {
     type Record = CookinglogRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Cookinglog<S> {
+impl<S: BosStr> LexiconSchema for Cookinglog<S> {
     fn nsid() -> &'static str {
         "io.kich.cookinglog"
     }
@@ -150,17 +150,17 @@ pub mod cookinglog_state {
         type CreatedAt = Unset;
     }
     ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
+    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubject<St> {}
+    impl<St: State> State for SetSubject<St> {
         type Subject = Set<members::subject>;
-        type CreatedAt = S::CreatedAt;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Subject = S::Subject;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Subject = St::Subject;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
@@ -173,51 +173,51 @@ pub mod cookinglog_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct CookinglogBuilder<'a, S: cookinglog_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct CookinglogBuilder<S: BosStr, St: cookinglog_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<S>, Option<Data<S>>, Option<StrongRef<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Cookinglog<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> CookinglogBuilder<'a, cookinglog_state::Empty> {
+impl<S: BosStr> Cookinglog<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> CookinglogBuilder<S, cookinglog_state::Empty> {
         CookinglogBuilder::new()
     }
 }
 
-impl<'a> CookinglogBuilder<'a, cookinglog_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> CookinglogBuilder<S, cookinglog_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         CookinglogBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CookinglogBuilder<'a, S>
+impl<S: BosStr, St> CookinglogBuilder<S, St>
 where
-    S: cookinglog_state::State,
-    S::CreatedAt: cookinglog_state::IsUnset,
+    St: cookinglog_state::State,
+    St::CreatedAt: cookinglog_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> CookinglogBuilder<'a, cookinglog_state::SetCreatedAt<S>> {
+    ) -> CookinglogBuilder<S, cookinglog_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         CookinglogBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: cookinglog_state::State> CookinglogBuilder<'a, S> {
+impl<S: BosStr, St: cookinglog_state::State> CookinglogBuilder<S, St> {
     /// Set the `notes` field (optional)
     pub fn notes(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -230,7 +230,7 @@ impl<'a, S: cookinglog_state::State> CookinglogBuilder<'a, S> {
     }
 }
 
-impl<'a, S: cookinglog_state::State> CookinglogBuilder<'a, S> {
+impl<S: BosStr, St: cookinglog_state::State> CookinglogBuilder<S, St> {
     /// Set the `scaledServings` field (optional)
     pub fn scaled_servings(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -243,33 +243,33 @@ impl<'a, S: cookinglog_state::State> CookinglogBuilder<'a, S> {
     }
 }
 
-impl<'a, S> CookinglogBuilder<'a, S>
+impl<S: BosStr, St> CookinglogBuilder<S, St>
 where
-    S: cookinglog_state::State,
-    S::Subject: cookinglog_state::IsUnset,
+    St: cookinglog_state::State,
+    St::Subject: cookinglog_state::IsUnset,
 {
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> CookinglogBuilder<'a, cookinglog_state::SetSubject<S>> {
+    ) -> CookinglogBuilder<S, cookinglog_state::SetSubject<St>> {
         self._fields.3 = Option::Some(value.into());
         CookinglogBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CookinglogBuilder<'a, S>
+impl<S: BosStr, St> CookinglogBuilder<S, St>
 where
-    S: cookinglog_state::State,
-    S::Subject: cookinglog_state::IsSet,
-    S::CreatedAt: cookinglog_state::IsSet,
+    St: cookinglog_state::State,
+    St::Subject: cookinglog_state::IsSet,
+    St::CreatedAt: cookinglog_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Cookinglog<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Cookinglog<S> {
         Cookinglog {
             created_at: self._fields.0.unwrap(),
             notes: self._fields.1,
@@ -278,11 +278,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Cookinglog<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Cookinglog<S> {
         Cookinglog {
             created_at: self._fields.0.unwrap(),
             notes: self._fields.1,

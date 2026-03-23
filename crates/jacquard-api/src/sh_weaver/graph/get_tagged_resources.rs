@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
@@ -20,16 +20,15 @@ use crate::sh_weaver::notebook::EntryView;
 use crate::sh_weaver::notebook::NotebookView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetTaggedResources<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetTaggedResources<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub cursor: Option<S>,
     /// Defaults to `true`.
     #[serde(default = "_default_include_author_tags")]
@@ -46,35 +45,30 @@ pub struct GetTaggedResources<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Defaults to `"all"`.
     #[serde(default = "_default_resource_type")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub resource_type: Option<S>,
     ///Defaults to `"recent"`.
     #[serde(default = "_default_sort")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub sort: Option<S>,
-    #[serde(borrow)]
     pub tag: S,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetTaggedResourcesOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetTaggedResourcesOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
     pub resources: Vec<GetTaggedResourcesOutputResourcesItem<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tag: Option<TagView<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -84,11 +78,11 @@ pub struct GetTaggedResourcesOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum GetTaggedResourcesOutputResourcesItem<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum GetTaggedResourcesOutputResourcesItem<S: BosStr = DefaultStr> {
     #[serde(rename = "sh.weaver.notebook.defs#notebookView")]
     NotebookView(Box<NotebookView<S>>),
     #[serde(rename = "sh.weaver.notebook.defs#entryView")]
@@ -100,12 +94,11 @@ pub struct GetTaggedResourcesResponse;
 impl jacquard_common::xrpc::XrpcResp for GetTaggedResourcesResponse {
     const NSID: &'static str = "sh.weaver.graph.getTaggedResources";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetTaggedResourcesOutput<S>;
+    type Output<S: BosStr> = GetTaggedResourcesOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetTaggedResources<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetTaggedResources<S> {
     const NSID: &'static str = "sh.weaver.graph.getTaggedResources";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetTaggedResourcesResponse;
@@ -116,7 +109,7 @@ pub struct GetTaggedResourcesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetTaggedResourcesRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.graph.getTaggedResources";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetTaggedResources<S>;
+    type Request<S: BosStr> = GetTaggedResources<S>;
     type Response = GetTaggedResourcesResponse;
 }
 
@@ -132,12 +125,12 @@ fn _default_limit() -> Option<i64> {
     Some(50i64)
 }
 
-fn _default_resource_type() -> Option<CowStr<'static>> {
-    Some(CowStr::from("all"))
+fn _default_resource_type<S: jacquard_common::FromStaticStr>() -> Option<S> {
+    Some(S::from_static("all"))
 }
 
-fn _default_sort() -> Option<CowStr<'static>> {
-    Some(CowStr::from("recent"))
+fn _default_sort<S: jacquard_common::FromStaticStr>() -> Option<S> {
+    Some(S::from_static("recent"))
 }
 
 pub mod get_tagged_resources_state {
@@ -159,9 +152,9 @@ pub mod get_tagged_resources_state {
         type Tag = Unset;
     }
     ///State transition - sets the `tag` field to Set
-    pub struct SetTag<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTag<S> {}
-    impl<S: State> State for SetTag<S> {
+    pub struct SetTag<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTag<St> {}
+    impl<St: State> State for SetTag<St> {
         type Tag = Set<members::tag>;
     }
     /// Marker types for field names
@@ -172,9 +165,9 @@ pub mod get_tagged_resources_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetTaggedResourcesBuilder<'a, S: get_tagged_resources_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetTaggedResourcesBuilder<S: BosStr, St: get_tagged_resources_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
         Option<bool>,
@@ -184,28 +177,28 @@ pub struct GetTaggedResourcesBuilder<'a, S: get_tagged_resources_state::State> {
         Option<S>,
         Option<S>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetTaggedResources<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetTaggedResourcesBuilder<'a, get_tagged_resources_state::Empty> {
+impl<S: BosStr> GetTaggedResources<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetTaggedResourcesBuilder<S, get_tagged_resources_state::Empty> {
         GetTaggedResourcesBuilder::new()
     }
 }
 
-impl<'a> GetTaggedResourcesBuilder<'a, get_tagged_resources_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetTaggedResourcesBuilder<S, get_tagged_resources_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetTaggedResourcesBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: get_tagged_resources_state::State> GetTaggedResourcesBuilder<'a, S> {
+impl<S: BosStr, St: get_tagged_resources_state::State> GetTaggedResourcesBuilder<S, St> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -218,7 +211,7 @@ impl<'a, S: get_tagged_resources_state::State> GetTaggedResourcesBuilder<'a, S> 
     }
 }
 
-impl<'a, S: get_tagged_resources_state::State> GetTaggedResourcesBuilder<'a, S> {
+impl<S: BosStr, St: get_tagged_resources_state::State> GetTaggedResourcesBuilder<S, St> {
     /// Set the `includeAuthorTags` field (optional)
     pub fn include_author_tags(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.1 = value.into();
@@ -231,7 +224,7 @@ impl<'a, S: get_tagged_resources_state::State> GetTaggedResourcesBuilder<'a, S> 
     }
 }
 
-impl<'a, S: get_tagged_resources_state::State> GetTaggedResourcesBuilder<'a, S> {
+impl<S: BosStr, St: get_tagged_resources_state::State> GetTaggedResourcesBuilder<S, St> {
     /// Set the `includeCommunityTags` field (optional)
     pub fn include_community_tags(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.2 = value.into();
@@ -244,7 +237,7 @@ impl<'a, S: get_tagged_resources_state::State> GetTaggedResourcesBuilder<'a, S> 
     }
 }
 
-impl<'a, S: get_tagged_resources_state::State> GetTaggedResourcesBuilder<'a, S> {
+impl<S: BosStr, St: get_tagged_resources_state::State> GetTaggedResourcesBuilder<S, St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.3 = value.into();
@@ -257,7 +250,7 @@ impl<'a, S: get_tagged_resources_state::State> GetTaggedResourcesBuilder<'a, S> 
     }
 }
 
-impl<'a, S: get_tagged_resources_state::State> GetTaggedResourcesBuilder<'a, S> {
+impl<S: BosStr, St: get_tagged_resources_state::State> GetTaggedResourcesBuilder<S, St> {
     /// Set the `resourceType` field (optional)
     pub fn resource_type(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
@@ -270,7 +263,7 @@ impl<'a, S: get_tagged_resources_state::State> GetTaggedResourcesBuilder<'a, S> 
     }
 }
 
-impl<'a, S: get_tagged_resources_state::State> GetTaggedResourcesBuilder<'a, S> {
+impl<S: BosStr, St: get_tagged_resources_state::State> GetTaggedResourcesBuilder<S, St> {
     /// Set the `sort` field (optional)
     pub fn sort(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
@@ -283,32 +276,32 @@ impl<'a, S: get_tagged_resources_state::State> GetTaggedResourcesBuilder<'a, S> 
     }
 }
 
-impl<'a, S> GetTaggedResourcesBuilder<'a, S>
+impl<S: BosStr, St> GetTaggedResourcesBuilder<S, St>
 where
-    S: get_tagged_resources_state::State,
-    S::Tag: get_tagged_resources_state::IsUnset,
+    St: get_tagged_resources_state::State,
+    St::Tag: get_tagged_resources_state::IsUnset,
 {
     /// Set the `tag` field (required)
     pub fn tag(
         mut self,
         value: impl Into<S>,
-    ) -> GetTaggedResourcesBuilder<'a, get_tagged_resources_state::SetTag<S>> {
+    ) -> GetTaggedResourcesBuilder<S, get_tagged_resources_state::SetTag<St>> {
         self._fields.6 = Option::Some(value.into());
         GetTaggedResourcesBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetTaggedResourcesBuilder<'a, S>
+impl<S: BosStr, St> GetTaggedResourcesBuilder<S, St>
 where
-    S: get_tagged_resources_state::State,
-    S::Tag: get_tagged_resources_state::IsSet,
+    St: get_tagged_resources_state::State,
+    St::Tag: get_tagged_resources_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetTaggedResources<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetTaggedResources<S> {
         GetTaggedResources {
             cursor: self._fields.0,
             include_author_tags: self._fields.1,

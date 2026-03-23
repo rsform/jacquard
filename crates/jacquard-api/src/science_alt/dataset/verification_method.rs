@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 /// Automated test suite verification
@@ -41,9 +41,7 @@ impl core::fmt::Display for FormalProof {
 /// Verification method identifier for lens verification records. Known values correspond to token definitions in this Lexicon. New verification methods can be added as tokens without breaking changes.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum VerificationMethod<
-    S: jacquard_common::Bos<str> + AsRef<str> = jacquard_common::DefaultStr,
-> {
+pub enum VerificationMethod<S: BosStr = DefaultStr> {
     CodeReview,
     FormalProof,
     SignedHash,
@@ -51,7 +49,7 @@ pub enum VerificationMethod<
     Other(S),
 }
 
-impl<S: jacquard_common::Bos<str> + AsRef<str>> VerificationMethod<S> {
+impl<S: BosStr> VerificationMethod<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::CodeReview => "codeReview",
@@ -73,20 +71,19 @@ impl<S: jacquard_common::Bos<str> + AsRef<str>> VerificationMethod<S> {
     }
 }
 
-impl<S: jacquard_common::Bos<str> + AsRef<str>> AsRef<str> for VerificationMethod<S> {
+impl<S: BosStr> AsRef<str> for VerificationMethod<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: jacquard_common::Bos<str> + AsRef<str>> core::fmt::Display
-for VerificationMethod<S> {
+impl<S: BosStr> core::fmt::Display for VerificationMethod<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: jacquard_common::Bos<str> + AsRef<str>> Serialize for VerificationMethod<S> {
+impl<S: BosStr> Serialize for VerificationMethod<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -95,8 +92,7 @@ impl<S: jacquard_common::Bos<str> + AsRef<str>> Serialize for VerificationMethod
     }
 }
 
-impl<'de, S: Deserialize<'de> + jacquard_common::Bos<str> + AsRef<str>> Deserialize<'de>
-for VerificationMethod<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for VerificationMethod<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -106,8 +102,12 @@ for VerificationMethod<S> {
     }
 }
 
-impl<S: jacquard_common::Bos<str> + AsRef<str>> IntoStatic for VerificationMethod<S> {
-    type Output = VerificationMethod<jacquard_common::DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for VerificationMethod<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = VerificationMethod<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             VerificationMethod::CodeReview => VerificationMethod::CodeReview,

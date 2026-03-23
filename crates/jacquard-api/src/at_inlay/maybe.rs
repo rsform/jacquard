@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
@@ -19,39 +19,34 @@ use crate::at_inlay::Element;
 use crate::at_inlay::Response;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Maybe<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Maybe<S: BosStr = DefaultStr> {
     pub children: Data<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub fallback: Option<Element<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct MaybeOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct MaybeOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
-    #[serde(borrow)]
     pub value: Response<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -60,12 +55,11 @@ pub struct MaybeResponse;
 impl jacquard_common::xrpc::XrpcResp for MaybeResponse {
     const NSID: &'static str = "at.inlay.Maybe";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = MaybeOutput<S>;
+    type Output<S: BosStr> = MaybeOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for Maybe<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Maybe<S> {
     const NSID: &'static str = "at.inlay.Maybe";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -80,7 +74,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for MaybeRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = Maybe<S>;
+    type Request<S: BosStr> = Maybe<S>;
     type Response = MaybeResponse;
 }
 
@@ -103,9 +97,9 @@ pub mod maybe_state {
         type Children = Unset;
     }
     ///State transition - sets the `children` field to Set
-    pub struct SetChildren<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetChildren<S> {}
-    impl<S: State> State for SetChildren<S> {
+    pub struct SetChildren<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetChildren<St> {}
+    impl<St: State> State for SetChildren<St> {
         type Children = Set<members::children>;
     }
     /// Marker types for field names
@@ -116,51 +110,51 @@ pub mod maybe_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct MaybeBuilder<'a, S: maybe_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct MaybeBuilder<S: BosStr, St: maybe_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Data<S>>, Option<Element<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Maybe<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> MaybeBuilder<'a, maybe_state::Empty> {
+impl<S: BosStr> Maybe<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> MaybeBuilder<S, maybe_state::Empty> {
         MaybeBuilder::new()
     }
 }
 
-impl<'a> MaybeBuilder<'a, maybe_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> MaybeBuilder<S, maybe_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         MaybeBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> MaybeBuilder<'a, S>
+impl<S: BosStr, St> MaybeBuilder<S, St>
 where
-    S: maybe_state::State,
-    S::Children: maybe_state::IsUnset,
+    St: maybe_state::State,
+    St::Children: maybe_state::IsUnset,
 {
     /// Set the `children` field (required)
     pub fn children(
         mut self,
         value: impl Into<Data<S>>,
-    ) -> MaybeBuilder<'a, maybe_state::SetChildren<S>> {
+    ) -> MaybeBuilder<S, maybe_state::SetChildren<St>> {
         self._fields.0 = Option::Some(value.into());
         MaybeBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: maybe_state::State> MaybeBuilder<'a, S> {
+impl<S: BosStr, St: maybe_state::State> MaybeBuilder<S, St> {
     /// Set the `fallback` field (optional)
     pub fn fallback(mut self, value: impl Into<Option<Element<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -173,21 +167,21 @@ impl<'a, S: maybe_state::State> MaybeBuilder<'a, S> {
     }
 }
 
-impl<'a, S> MaybeBuilder<'a, S>
+impl<S: BosStr, St> MaybeBuilder<S, St>
 where
-    S: maybe_state::State,
-    S::Children: maybe_state::IsSet,
+    St: maybe_state::State,
+    St::Children: maybe_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Maybe<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Maybe<S> {
         Maybe {
             children: self._fields.0.unwrap(),
             fallback: self._fields.1,
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Maybe<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Maybe<S> {
         Maybe {
             children: self._fields.0.unwrap(),
             fallback: self._fields.1,

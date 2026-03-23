@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
@@ -28,18 +28,16 @@ pub struct GetLatest {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetLatestOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetLatestOutput<S: BosStr = DefaultStr> {
     pub plays: Vec<PlayView<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -48,7 +46,7 @@ pub struct GetLatestResponse;
 impl jacquard_common::xrpc::XrpcResp for GetLatestResponse {
     const NSID: &'static str = "fm.teal.alpha.stats.getLatest";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetLatestOutput<S>;
+    type Output<S: BosStr> = GetLatestOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
@@ -63,7 +61,7 @@ pub struct GetLatestRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetLatestRequest {
     const PATH: &'static str = "/xrpc/fm.teal.alpha.stats.getLatest";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetLatest;
+    type Request<S: BosStr> = GetLatest;
     type Response = GetLatestResponse;
 }
 
@@ -90,21 +88,21 @@ pub mod get_latest_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetLatestBuilder<S: get_latest_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetLatestBuilder<St: get_latest_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>,),
 }
 
 impl GetLatest {
-    /// Create a new builder for this type
+    /// Create a new builder for this type.
     pub fn new() -> GetLatestBuilder<get_latest_state::Empty> {
         GetLatestBuilder::new()
     }
 }
 
 impl GetLatestBuilder<get_latest_state::Empty> {
-    /// Create a new builder with all fields unset
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetLatestBuilder {
             _state: PhantomData,
@@ -113,7 +111,7 @@ impl GetLatestBuilder<get_latest_state::Empty> {
     }
 }
 
-impl<S: get_latest_state::State> GetLatestBuilder<S> {
+impl<St: get_latest_state::State> GetLatestBuilder<St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
@@ -126,11 +124,11 @@ impl<S: get_latest_state::State> GetLatestBuilder<S> {
     }
 }
 
-impl<S> GetLatestBuilder<S>
+impl<St> GetLatestBuilder<St>
 where
-    S: get_latest_state::State,
+    St: get_latest_state::State,
 {
-    /// Build the final struct
+    /// Build the final struct.
     pub fn build(self) -> GetLatest {
         GetLatest { limit: self._fields.0 }
     }

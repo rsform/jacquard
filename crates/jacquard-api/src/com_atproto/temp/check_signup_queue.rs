@@ -10,29 +10,27 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CheckSignupQueueOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CheckSignupQueueOutput<S: BosStr = DefaultStr> {
     pub activated: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub estimated_time_ms: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub place_in_queue: Option<i64>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -45,7 +43,7 @@ pub struct CheckSignupQueueResponse;
 impl jacquard_common::xrpc::XrpcResp for CheckSignupQueueResponse {
     const NSID: &'static str = "com.atproto.temp.checkSignupQueue";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = CheckSignupQueueOutput<S>;
+    type Output<S: BosStr> = CheckSignupQueueOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
@@ -60,6 +58,6 @@ pub struct CheckSignupQueueRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for CheckSignupQueueRequest {
     const PATH: &'static str = "/xrpc/com.atproto.temp.checkSignupQueue";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = CheckSignupQueue;
+    type Request<S: BosStr> = CheckSignupQueue;
     type Response = CheckSignupQueueResponse;
 }

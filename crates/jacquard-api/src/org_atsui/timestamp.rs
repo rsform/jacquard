@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Datetime;
 use jacquard_common::types::value::Data;
@@ -19,37 +19,32 @@ use serde::{Serialize, Deserialize};
 use crate::at_inlay::Response;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Timestamp<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Timestamp<S: BosStr = DefaultStr> {
     pub value: Datetime,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct TimestampOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct TimestampOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
-    #[serde(borrow)]
     pub value: Response<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -58,12 +53,11 @@ pub struct TimestampResponse;
 impl jacquard_common::xrpc::XrpcResp for TimestampResponse {
     const NSID: &'static str = "org.atsui.Timestamp";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = TimestampOutput<S>;
+    type Output<S: BosStr> = TimestampOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for Timestamp<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Timestamp<S> {
     const NSID: &'static str = "org.atsui.Timestamp";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -78,7 +72,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for TimestampRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = Timestamp<S>;
+    type Request<S: BosStr> = Timestamp<S>;
     type Response = TimestampResponse;
 }
 
@@ -101,9 +95,9 @@ pub mod timestamp_state {
         type Value = Unset;
     }
     ///State transition - sets the `value` field to Set
-    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValue<S> {}
-    impl<S: State> State for SetValue<S> {
+    pub struct SetValue<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetValue<St> {}
+    impl<St: State> State for SetValue<St> {
         type Value = Set<members::value>;
     }
     /// Marker types for field names
@@ -114,67 +108,67 @@ pub mod timestamp_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct TimestampBuilder<'a, S: timestamp_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct TimestampBuilder<S: BosStr, St: timestamp_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Timestamp<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> TimestampBuilder<'a, timestamp_state::Empty> {
+impl<S: BosStr> Timestamp<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> TimestampBuilder<S, timestamp_state::Empty> {
         TimestampBuilder::new()
     }
 }
 
-impl<'a> TimestampBuilder<'a, timestamp_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> TimestampBuilder<S, timestamp_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         TimestampBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> TimestampBuilder<'a, S>
+impl<S: BosStr, St> TimestampBuilder<S, St>
 where
-    S: timestamp_state::State,
-    S::Value: timestamp_state::IsUnset,
+    St: timestamp_state::State,
+    St::Value: timestamp_state::IsUnset,
 {
     /// Set the `value` field (required)
     pub fn value(
         mut self,
         value: impl Into<Datetime>,
-    ) -> TimestampBuilder<'a, timestamp_state::SetValue<S>> {
+    ) -> TimestampBuilder<S, timestamp_state::SetValue<St>> {
         self._fields.0 = Option::Some(value.into());
         TimestampBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> TimestampBuilder<'a, S>
+impl<S: BosStr, St> TimestampBuilder<S, St>
 where
-    S: timestamp_state::State,
-    S::Value: timestamp_state::IsSet,
+    St: timestamp_state::State,
+    St::Value: timestamp_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Timestamp<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Timestamp<S> {
         Timestamp {
             value: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Timestamp<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Timestamp<S> {
         Timestamp {
             value: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

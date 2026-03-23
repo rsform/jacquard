@@ -21,7 +21,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -43,11 +43,11 @@ use crate::sh_weaver::edit;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DocRef<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DocRef<S: BosStr = DefaultStr> {
     pub value: DocRefValue<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -59,11 +59,11 @@ pub struct DocRef<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum DocRefValue<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum DocRefValue<S: BosStr = DefaultStr> {
     #[serde(rename = "sh.weaver.edit.defs#notebookRef")]
     NotebookRef(Box<edit::NotebookRef<S>>),
     #[serde(rename = "sh.weaver.edit.defs#entryRef")]
@@ -77,11 +77,11 @@ pub enum DocRefValue<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DraftRef<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DraftRef<S: BosStr = DefaultStr> {
     pub draft_key: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -93,11 +93,11 @@ pub struct DraftRef<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct EditBranchView<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct EditBranchView<S: BosStr = DefaultStr> {
     pub author: ProfileViewBasic<S>,
     ///Common ancestor if this is a fork
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -120,11 +120,11 @@ pub struct EditBranchView<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct EditHistoryEntry<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct EditHistoryEntry<S: BosStr = DefaultStr> {
     pub author: ProfileViewBasic<S>,
     pub cid: Cid<S>,
     pub created_at: Datetime,
@@ -144,13 +144,13 @@ pub struct EditHistoryEntry<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum EditHistoryEntryType<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum EditHistoryEntryType<S: BosStr = DefaultStr> {
     Root,
     Diff,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> EditHistoryEntryType<S> {
+impl<S: BosStr> EditHistoryEntryType<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Root => "root",
@@ -168,19 +168,19 @@ impl<S: Bos<str> + AsRef<str>> EditHistoryEntryType<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for EditHistoryEntryType<S> {
+impl<S: BosStr> core::fmt::Display for EditHistoryEntryType<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for EditHistoryEntryType<S> {
+impl<S: BosStr> AsRef<str> for EditHistoryEntryType<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for EditHistoryEntryType<S> {
+impl<S: BosStr> Serialize for EditHistoryEntryType<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -189,8 +189,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for EditHistoryEntryType<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for EditHistoryEntryType<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for EditHistoryEntryType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -200,14 +199,18 @@ for EditHistoryEntryType<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for EditHistoryEntryType<S> {
+impl<S: BosStr + Default> Default for EditHistoryEntryType<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for EditHistoryEntryType<S> {
-    type Output = EditHistoryEntryType<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for EditHistoryEntryType<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = EditHistoryEntryType<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             EditHistoryEntryType::Root => EditHistoryEntryType::Root,
@@ -225,11 +228,11 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for EditHistoryEntryType<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct EditTreeView<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct EditTreeView<S: BosStr = DefaultStr> {
     pub branches: Vec<edit::EditBranchView<S>>,
     ///Diffs where branches diverge
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -248,11 +251,11 @@ pub struct EditTreeView<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct EntryRef<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct EntryRef<S: BosStr = DefaultStr> {
     pub entry: StrongRef<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -263,17 +266,17 @@ pub struct EntryRef<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct NotebookRef<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct NotebookRef<S: BosStr = DefaultStr> {
     pub notebook: StrongRef<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for DocRef<S> {
+impl<S: BosStr> LexiconSchema for DocRef<S> {
     fn nsid() -> &'static str {
         "sh.weaver.edit.defs"
     }
@@ -288,7 +291,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for DocRef<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for DraftRef<S> {
+impl<S: BosStr> LexiconSchema for DraftRef<S> {
     fn nsid() -> &'static str {
         "sh.weaver.edit.defs"
     }
@@ -314,7 +317,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for DraftRef<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for EditBranchView<S> {
+impl<S: BosStr> LexiconSchema for EditBranchView<S> {
     fn nsid() -> &'static str {
         "sh.weaver.edit.defs"
     }
@@ -329,7 +332,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for EditBranchView<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for EditHistoryEntry<S> {
+impl<S: BosStr> LexiconSchema for EditHistoryEntry<S> {
     fn nsid() -> &'static str {
         "sh.weaver.edit.defs"
     }
@@ -344,7 +347,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for EditHistoryEntry<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for EditTreeView<S> {
+impl<S: BosStr> LexiconSchema for EditTreeView<S> {
     fn nsid() -> &'static str {
         "sh.weaver.edit.defs"
     }
@@ -359,7 +362,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for EditTreeView<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for EntryRef<S> {
+impl<S: BosStr> LexiconSchema for EntryRef<S> {
     fn nsid() -> &'static str {
         "sh.weaver.edit.defs"
     }
@@ -374,7 +377,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for EntryRef<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for NotebookRef<S> {
+impl<S: BosStr> LexiconSchema for NotebookRef<S> {
     fn nsid() -> &'static str {
         "sh.weaver.edit.defs"
     }
@@ -408,9 +411,9 @@ pub mod doc_ref_state {
         type Value = Unset;
     }
     ///State transition - sets the `value` field to Set
-    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValue<S> {}
-    impl<S: State> State for SetValue<S> {
+    pub struct SetValue<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetValue<St> {}
+    impl<St: State> State for SetValue<St> {
         type Value = Set<members::value>;
     }
     /// Marker types for field names
@@ -421,64 +424,64 @@ pub mod doc_ref_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct DocRefBuilder<'a, S: doc_ref_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct DocRefBuilder<S: BosStr, St: doc_ref_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<DocRefValue<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> DocRef<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> DocRefBuilder<'a, doc_ref_state::Empty> {
+impl<S: BosStr> DocRef<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> DocRefBuilder<S, doc_ref_state::Empty> {
         DocRefBuilder::new()
     }
 }
 
-impl<'a> DocRefBuilder<'a, doc_ref_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> DocRefBuilder<S, doc_ref_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         DocRefBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DocRefBuilder<'a, S>
+impl<S: BosStr, St> DocRefBuilder<S, St>
 where
-    S: doc_ref_state::State,
-    S::Value: doc_ref_state::IsUnset,
+    St: doc_ref_state::State,
+    St::Value: doc_ref_state::IsUnset,
 {
     /// Set the `value` field (required)
     pub fn value(
         mut self,
         value: impl Into<DocRefValue<S>>,
-    ) -> DocRefBuilder<'a, doc_ref_state::SetValue<S>> {
+    ) -> DocRefBuilder<S, doc_ref_state::SetValue<St>> {
         self._fields.0 = Option::Some(value.into());
         DocRefBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DocRefBuilder<'a, S>
+impl<S: BosStr, St> DocRefBuilder<S, St>
 where
-    S: doc_ref_state::State,
-    S::Value: doc_ref_state::IsSet,
+    St: doc_ref_state::State,
+    St::Value: doc_ref_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> DocRef<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> DocRef<S> {
         DocRef {
             value: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> DocRef<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> DocRef<S> {
         DocRef {
             value: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -813,73 +816,73 @@ pub mod edit_branch_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Length;
         type Author;
-        type LastUpdated;
+        type Length;
         type Head;
+        type LastUpdated;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Length = Unset;
         type Author = Unset;
-        type LastUpdated = Unset;
+        type Length = Unset;
         type Head = Unset;
-    }
-    ///State transition - sets the `length` field to Set
-    pub struct SetLength<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLength<S> {}
-    impl<S: State> State for SetLength<S> {
-        type Length = Set<members::length>;
-        type Author = S::Author;
-        type LastUpdated = S::LastUpdated;
-        type Head = S::Head;
+        type LastUpdated = Unset;
     }
     ///State transition - sets the `author` field to Set
-    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthor<S> {}
-    impl<S: State> State for SetAuthor<S> {
-        type Length = S::Length;
+    pub struct SetAuthor<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAuthor<St> {}
+    impl<St: State> State for SetAuthor<St> {
         type Author = Set<members::author>;
-        type LastUpdated = S::LastUpdated;
-        type Head = S::Head;
+        type Length = St::Length;
+        type Head = St::Head;
+        type LastUpdated = St::LastUpdated;
     }
-    ///State transition - sets the `last_updated` field to Set
-    pub struct SetLastUpdated<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLastUpdated<S> {}
-    impl<S: State> State for SetLastUpdated<S> {
-        type Length = S::Length;
-        type Author = S::Author;
-        type LastUpdated = Set<members::last_updated>;
-        type Head = S::Head;
+    ///State transition - sets the `length` field to Set
+    pub struct SetLength<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLength<St> {}
+    impl<St: State> State for SetLength<St> {
+        type Author = St::Author;
+        type Length = Set<members::length>;
+        type Head = St::Head;
+        type LastUpdated = St::LastUpdated;
     }
     ///State transition - sets the `head` field to Set
-    pub struct SetHead<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHead<S> {}
-    impl<S: State> State for SetHead<S> {
-        type Length = S::Length;
-        type Author = S::Author;
-        type LastUpdated = S::LastUpdated;
+    pub struct SetHead<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHead<St> {}
+    impl<St: State> State for SetHead<St> {
+        type Author = St::Author;
+        type Length = St::Length;
         type Head = Set<members::head>;
+        type LastUpdated = St::LastUpdated;
+    }
+    ///State transition - sets the `last_updated` field to Set
+    pub struct SetLastUpdated<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLastUpdated<St> {}
+    impl<St: State> State for SetLastUpdated<St> {
+        type Author = St::Author;
+        type Length = St::Length;
+        type Head = St::Head;
+        type LastUpdated = Set<members::last_updated>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `length` field
-        pub struct length(());
         ///Marker type for the `author` field
         pub struct author(());
-        ///Marker type for the `last_updated` field
-        pub struct last_updated(());
+        ///Marker type for the `length` field
+        pub struct length(());
         ///Marker type for the `head` field
         pub struct head(());
+        ///Marker type for the `last_updated` field
+        pub struct last_updated(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct EditBranchViewBuilder<'a, S: edit_branch_view_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct EditBranchViewBuilder<S: BosStr, St: edit_branch_view_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<ProfileViewBasic<S>>,
         Option<StrongRef<S>>,
@@ -889,47 +892,47 @@ pub struct EditBranchViewBuilder<'a, S: edit_branch_view_state::State> {
         Option<i64>,
         Option<StrongRef<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> EditBranchView<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> EditBranchViewBuilder<'a, edit_branch_view_state::Empty> {
+impl<S: BosStr> EditBranchView<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> EditBranchViewBuilder<S, edit_branch_view_state::Empty> {
         EditBranchViewBuilder::new()
     }
 }
 
-impl<'a> EditBranchViewBuilder<'a, edit_branch_view_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> EditBranchViewBuilder<S, edit_branch_view_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         EditBranchViewBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> EditBranchViewBuilder<'a, S>
+impl<S: BosStr, St> EditBranchViewBuilder<S, St>
 where
-    S: edit_branch_view_state::State,
-    S::Author: edit_branch_view_state::IsUnset,
+    St: edit_branch_view_state::State,
+    St::Author: edit_branch_view_state::IsUnset,
 {
     /// Set the `author` field (required)
     pub fn author(
         mut self,
         value: impl Into<ProfileViewBasic<S>>,
-    ) -> EditBranchViewBuilder<'a, edit_branch_view_state::SetAuthor<S>> {
+    ) -> EditBranchViewBuilder<S, edit_branch_view_state::SetAuthor<St>> {
         self._fields.0 = Option::Some(value.into());
         EditBranchViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: edit_branch_view_state::State> EditBranchViewBuilder<'a, S> {
+impl<S: BosStr, St: edit_branch_view_state::State> EditBranchViewBuilder<S, St> {
     /// Set the `divergesFrom` field (optional)
     pub fn diverges_from(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -942,26 +945,26 @@ impl<'a, S: edit_branch_view_state::State> EditBranchViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S> EditBranchViewBuilder<'a, S>
+impl<S: BosStr, St> EditBranchViewBuilder<S, St>
 where
-    S: edit_branch_view_state::State,
-    S::Head: edit_branch_view_state::IsUnset,
+    St: edit_branch_view_state::State,
+    St::Head: edit_branch_view_state::IsUnset,
 {
     /// Set the `head` field (required)
     pub fn head(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> EditBranchViewBuilder<'a, edit_branch_view_state::SetHead<S>> {
+    ) -> EditBranchViewBuilder<S, edit_branch_view_state::SetHead<St>> {
         self._fields.2 = Option::Some(value.into());
         EditBranchViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: edit_branch_view_state::State> EditBranchViewBuilder<'a, S> {
+impl<S: BosStr, St: edit_branch_view_state::State> EditBranchViewBuilder<S, St> {
     /// Set the `isMerged` field (optional)
     pub fn is_merged(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.3 = value.into();
@@ -974,45 +977,45 @@ impl<'a, S: edit_branch_view_state::State> EditBranchViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S> EditBranchViewBuilder<'a, S>
+impl<S: BosStr, St> EditBranchViewBuilder<S, St>
 where
-    S: edit_branch_view_state::State,
-    S::LastUpdated: edit_branch_view_state::IsUnset,
+    St: edit_branch_view_state::State,
+    St::LastUpdated: edit_branch_view_state::IsUnset,
 {
     /// Set the `lastUpdated` field (required)
     pub fn last_updated(
         mut self,
         value: impl Into<Datetime>,
-    ) -> EditBranchViewBuilder<'a, edit_branch_view_state::SetLastUpdated<S>> {
+    ) -> EditBranchViewBuilder<S, edit_branch_view_state::SetLastUpdated<St>> {
         self._fields.4 = Option::Some(value.into());
         EditBranchViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> EditBranchViewBuilder<'a, S>
+impl<S: BosStr, St> EditBranchViewBuilder<S, St>
 where
-    S: edit_branch_view_state::State,
-    S::Length: edit_branch_view_state::IsUnset,
+    St: edit_branch_view_state::State,
+    St::Length: edit_branch_view_state::IsUnset,
 {
     /// Set the `length` field (required)
     pub fn length(
         mut self,
         value: impl Into<i64>,
-    ) -> EditBranchViewBuilder<'a, edit_branch_view_state::SetLength<S>> {
+    ) -> EditBranchViewBuilder<S, edit_branch_view_state::SetLength<St>> {
         self._fields.5 = Option::Some(value.into());
         EditBranchViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: edit_branch_view_state::State> EditBranchViewBuilder<'a, S> {
+impl<S: BosStr, St: edit_branch_view_state::State> EditBranchViewBuilder<S, St> {
     /// Set the `root` field (optional)
     pub fn root(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -1025,16 +1028,16 @@ impl<'a, S: edit_branch_view_state::State> EditBranchViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S> EditBranchViewBuilder<'a, S>
+impl<S: BosStr, St> EditBranchViewBuilder<S, St>
 where
-    S: edit_branch_view_state::State,
-    S::Length: edit_branch_view_state::IsSet,
-    S::Author: edit_branch_view_state::IsSet,
-    S::LastUpdated: edit_branch_view_state::IsSet,
-    S::Head: edit_branch_view_state::IsSet,
+    St: edit_branch_view_state::State,
+    St::Author: edit_branch_view_state::IsSet,
+    St::Length: edit_branch_view_state::IsSet,
+    St::Head: edit_branch_view_state::IsSet,
+    St::LastUpdated: edit_branch_view_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> EditBranchView<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> EditBranchView<S> {
         EditBranchView {
             author: self._fields.0.unwrap(),
             diverges_from: self._fields.1,
@@ -1046,11 +1049,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> EditBranchView<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> EditBranchView<S> {
         EditBranchView {
             author: self._fields.0.unwrap(),
             diverges_from: self._fields.1,
@@ -1074,91 +1077,91 @@ pub mod edit_history_entry_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Cid;
-        type Uri;
-        type Author;
         type Type;
+        type Uri;
+        type Cid;
         type CreatedAt;
+        type Author;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Cid = Unset;
-        type Uri = Unset;
-        type Author = Unset;
         type Type = Unset;
+        type Uri = Unset;
+        type Cid = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Cid = Set<members::cid>;
-        type Uri = S::Uri;
-        type Author = S::Author;
-        type Type = S::Type;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Cid = S::Cid;
-        type Uri = Set<members::uri>;
-        type Author = S::Author;
-        type Type = S::Type;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `author` field to Set
-    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthor<S> {}
-    impl<S: State> State for SetAuthor<S> {
-        type Cid = S::Cid;
-        type Uri = S::Uri;
-        type Author = Set<members::author>;
-        type Type = S::Type;
-        type CreatedAt = S::CreatedAt;
+        type Author = Unset;
     }
     ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type Cid = S::Cid;
-        type Uri = S::Uri;
-        type Author = S::Author;
+    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetType<St> {}
+    impl<St: State> State for SetType<St> {
         type Type = Set<members::r#type>;
-        type CreatedAt = S::CreatedAt;
+        type Uri = St::Uri;
+        type Cid = St::Cid;
+        type CreatedAt = St::CreatedAt;
+        type Author = St::Author;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Type = St::Type;
+        type Uri = Set<members::uri>;
+        type Cid = St::Cid;
+        type CreatedAt = St::CreatedAt;
+        type Author = St::Author;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCid<St> {}
+    impl<St: State> State for SetCid<St> {
+        type Type = St::Type;
+        type Uri = St::Uri;
+        type Cid = Set<members::cid>;
+        type CreatedAt = St::CreatedAt;
+        type Author = St::Author;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Cid = S::Cid;
-        type Uri = S::Uri;
-        type Author = S::Author;
-        type Type = S::Type;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Type = St::Type;
+        type Uri = St::Uri;
+        type Cid = St::Cid;
         type CreatedAt = Set<members::created_at>;
+        type Author = St::Author;
+    }
+    ///State transition - sets the `author` field to Set
+    pub struct SetAuthor<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAuthor<St> {}
+    impl<St: State> State for SetAuthor<St> {
+        type Type = St::Type;
+        type Uri = St::Uri;
+        type Cid = St::Cid;
+        type CreatedAt = St::CreatedAt;
+        type Author = Set<members::author>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `cid` field
-        pub struct cid(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
-        ///Marker type for the `author` field
-        pub struct author(());
         ///Marker type for the `type` field
         pub struct r#type(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `author` field
+        pub struct author(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct EditHistoryEntryBuilder<'a, S: edit_history_entry_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct EditHistoryEntryBuilder<S: BosStr, St: edit_history_entry_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<ProfileViewBasic<S>>,
         Option<Cid<S>>,
@@ -1170,85 +1173,85 @@ pub struct EditHistoryEntryBuilder<'a, S: edit_history_entry_state::State> {
         Option<EditHistoryEntryType<S>>,
         Option<AtUri<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> EditHistoryEntry<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> EditHistoryEntryBuilder<'a, edit_history_entry_state::Empty> {
+impl<S: BosStr> EditHistoryEntry<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> EditHistoryEntryBuilder<S, edit_history_entry_state::Empty> {
         EditHistoryEntryBuilder::new()
     }
 }
 
-impl<'a> EditHistoryEntryBuilder<'a, edit_history_entry_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> EditHistoryEntryBuilder<S, edit_history_entry_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         EditHistoryEntryBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> EditHistoryEntryBuilder<'a, S>
+impl<S: BosStr, St> EditHistoryEntryBuilder<S, St>
 where
-    S: edit_history_entry_state::State,
-    S::Author: edit_history_entry_state::IsUnset,
+    St: edit_history_entry_state::State,
+    St::Author: edit_history_entry_state::IsUnset,
 {
     /// Set the `author` field (required)
     pub fn author(
         mut self,
         value: impl Into<ProfileViewBasic<S>>,
-    ) -> EditHistoryEntryBuilder<'a, edit_history_entry_state::SetAuthor<S>> {
+    ) -> EditHistoryEntryBuilder<S, edit_history_entry_state::SetAuthor<St>> {
         self._fields.0 = Option::Some(value.into());
         EditHistoryEntryBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> EditHistoryEntryBuilder<'a, S>
+impl<S: BosStr, St> EditHistoryEntryBuilder<S, St>
 where
-    S: edit_history_entry_state::State,
-    S::Cid: edit_history_entry_state::IsUnset,
+    St: edit_history_entry_state::State,
+    St::Cid: edit_history_entry_state::IsUnset,
 {
     /// Set the `cid` field (required)
     pub fn cid(
         mut self,
         value: impl Into<Cid<S>>,
-    ) -> EditHistoryEntryBuilder<'a, edit_history_entry_state::SetCid<S>> {
+    ) -> EditHistoryEntryBuilder<S, edit_history_entry_state::SetCid<St>> {
         self._fields.1 = Option::Some(value.into());
         EditHistoryEntryBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> EditHistoryEntryBuilder<'a, S>
+impl<S: BosStr, St> EditHistoryEntryBuilder<S, St>
 where
-    S: edit_history_entry_state::State,
-    S::CreatedAt: edit_history_entry_state::IsUnset,
+    St: edit_history_entry_state::State,
+    St::CreatedAt: edit_history_entry_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> EditHistoryEntryBuilder<'a, edit_history_entry_state::SetCreatedAt<S>> {
+    ) -> EditHistoryEntryBuilder<S, edit_history_entry_state::SetCreatedAt<St>> {
         self._fields.2 = Option::Some(value.into());
         EditHistoryEntryBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: edit_history_entry_state::State> EditHistoryEntryBuilder<'a, S> {
+impl<S: BosStr, St: edit_history_entry_state::State> EditHistoryEntryBuilder<S, St> {
     /// Set the `hasInlineDiff` field (optional)
     pub fn has_inline_diff(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.3 = value.into();
@@ -1261,7 +1264,7 @@ impl<'a, S: edit_history_entry_state::State> EditHistoryEntryBuilder<'a, S> {
     }
 }
 
-impl<'a, S: edit_history_entry_state::State> EditHistoryEntryBuilder<'a, S> {
+impl<S: BosStr, St: edit_history_entry_state::State> EditHistoryEntryBuilder<S, St> {
     /// Set the `prevRef` field (optional)
     pub fn prev_ref(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -1274,7 +1277,7 @@ impl<'a, S: edit_history_entry_state::State> EditHistoryEntryBuilder<'a, S> {
     }
 }
 
-impl<'a, S: edit_history_entry_state::State> EditHistoryEntryBuilder<'a, S> {
+impl<S: BosStr, St: edit_history_entry_state::State> EditHistoryEntryBuilder<S, St> {
     /// Set the `rootRef` field (optional)
     pub fn root_ref(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -1287,7 +1290,7 @@ impl<'a, S: edit_history_entry_state::State> EditHistoryEntryBuilder<'a, S> {
     }
 }
 
-impl<'a, S: edit_history_entry_state::State> EditHistoryEntryBuilder<'a, S> {
+impl<S: BosStr, St: edit_history_entry_state::State> EditHistoryEntryBuilder<S, St> {
     /// Set the `snapshotCid` field (optional)
     pub fn snapshot_cid(mut self, value: impl Into<Option<Cid<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -1300,55 +1303,55 @@ impl<'a, S: edit_history_entry_state::State> EditHistoryEntryBuilder<'a, S> {
     }
 }
 
-impl<'a, S> EditHistoryEntryBuilder<'a, S>
+impl<S: BosStr, St> EditHistoryEntryBuilder<S, St>
 where
-    S: edit_history_entry_state::State,
-    S::Type: edit_history_entry_state::IsUnset,
+    St: edit_history_entry_state::State,
+    St::Type: edit_history_entry_state::IsUnset,
 {
     /// Set the `type` field (required)
     pub fn r#type(
         mut self,
         value: impl Into<EditHistoryEntryType<S>>,
-    ) -> EditHistoryEntryBuilder<'a, edit_history_entry_state::SetType<S>> {
+    ) -> EditHistoryEntryBuilder<S, edit_history_entry_state::SetType<St>> {
         self._fields.7 = Option::Some(value.into());
         EditHistoryEntryBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> EditHistoryEntryBuilder<'a, S>
+impl<S: BosStr, St> EditHistoryEntryBuilder<S, St>
 where
-    S: edit_history_entry_state::State,
-    S::Uri: edit_history_entry_state::IsUnset,
+    St: edit_history_entry_state::State,
+    St::Uri: edit_history_entry_state::IsUnset,
 {
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> EditHistoryEntryBuilder<'a, edit_history_entry_state::SetUri<S>> {
+    ) -> EditHistoryEntryBuilder<S, edit_history_entry_state::SetUri<St>> {
         self._fields.8 = Option::Some(value.into());
         EditHistoryEntryBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> EditHistoryEntryBuilder<'a, S>
+impl<S: BosStr, St> EditHistoryEntryBuilder<S, St>
 where
-    S: edit_history_entry_state::State,
-    S::Cid: edit_history_entry_state::IsSet,
-    S::Uri: edit_history_entry_state::IsSet,
-    S::Author: edit_history_entry_state::IsSet,
-    S::Type: edit_history_entry_state::IsSet,
-    S::CreatedAt: edit_history_entry_state::IsSet,
+    St: edit_history_entry_state::State,
+    St::Type: edit_history_entry_state::IsSet,
+    St::Uri: edit_history_entry_state::IsSet,
+    St::Cid: edit_history_entry_state::IsSet,
+    St::CreatedAt: edit_history_entry_state::IsSet,
+    St::Author: edit_history_entry_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> EditHistoryEntry<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> EditHistoryEntry<S> {
         EditHistoryEntry {
             author: self._fields.0.unwrap(),
             cid: self._fields.1.unwrap(),
@@ -1362,11 +1365,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> EditHistoryEntry<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> EditHistoryEntry<S> {
         EditHistoryEntry {
             author: self._fields.0.unwrap(),
             cid: self._fields.1.unwrap(),
@@ -1392,43 +1395,43 @@ pub mod edit_tree_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Branches;
         type Resource;
+        type Branches;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Branches = Unset;
         type Resource = Unset;
-    }
-    ///State transition - sets the `branches` field to Set
-    pub struct SetBranches<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBranches<S> {}
-    impl<S: State> State for SetBranches<S> {
-        type Branches = Set<members::branches>;
-        type Resource = S::Resource;
+        type Branches = Unset;
     }
     ///State transition - sets the `resource` field to Set
-    pub struct SetResource<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetResource<S> {}
-    impl<S: State> State for SetResource<S> {
-        type Branches = S::Branches;
+    pub struct SetResource<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetResource<St> {}
+    impl<St: State> State for SetResource<St> {
         type Resource = Set<members::resource>;
+        type Branches = St::Branches;
+    }
+    ///State transition - sets the `branches` field to Set
+    pub struct SetBranches<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBranches<St> {}
+    impl<St: State> State for SetBranches<St> {
+        type Resource = St::Resource;
+        type Branches = Set<members::branches>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `branches` field
-        pub struct branches(());
         ///Marker type for the `resource` field
         pub struct resource(());
+        ///Marker type for the `branches` field
+        pub struct branches(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct EditTreeViewBuilder<'a, S: edit_tree_view_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct EditTreeViewBuilder<S: BosStr, St: edit_tree_view_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<edit::EditBranchView<S>>>,
         Option<Vec<StrongRef<S>>>,
@@ -1436,47 +1439,47 @@ pub struct EditTreeViewBuilder<'a, S: edit_tree_view_state::State> {
         Option<edit::EditBranchView<S>>,
         Option<StrongRef<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> EditTreeView<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> EditTreeViewBuilder<'a, edit_tree_view_state::Empty> {
+impl<S: BosStr> EditTreeView<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> EditTreeViewBuilder<S, edit_tree_view_state::Empty> {
         EditTreeViewBuilder::new()
     }
 }
 
-impl<'a> EditTreeViewBuilder<'a, edit_tree_view_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> EditTreeViewBuilder<S, edit_tree_view_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         EditTreeViewBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> EditTreeViewBuilder<'a, S>
+impl<S: BosStr, St> EditTreeViewBuilder<S, St>
 where
-    S: edit_tree_view_state::State,
-    S::Branches: edit_tree_view_state::IsUnset,
+    St: edit_tree_view_state::State,
+    St::Branches: edit_tree_view_state::IsUnset,
 {
     /// Set the `branches` field (required)
     pub fn branches(
         mut self,
         value: impl Into<Vec<edit::EditBranchView<S>>>,
-    ) -> EditTreeViewBuilder<'a, edit_tree_view_state::SetBranches<S>> {
+    ) -> EditTreeViewBuilder<S, edit_tree_view_state::SetBranches<St>> {
         self._fields.0 = Option::Some(value.into());
         EditTreeViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: edit_tree_view_state::State> EditTreeViewBuilder<'a, S> {
+impl<S: BosStr, St: edit_tree_view_state::State> EditTreeViewBuilder<S, St> {
     /// Set the `conflictPoints` field (optional)
     pub fn conflict_points(
         mut self,
@@ -1492,7 +1495,7 @@ impl<'a, S: edit_tree_view_state::State> EditTreeViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: edit_tree_view_state::State> EditTreeViewBuilder<'a, S> {
+impl<S: BosStr, St: edit_tree_view_state::State> EditTreeViewBuilder<S, St> {
     /// Set the `hasConflicts` field (optional)
     pub fn has_conflicts(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.2 = value.into();
@@ -1505,7 +1508,7 @@ impl<'a, S: edit_tree_view_state::State> EditTreeViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: edit_tree_view_state::State> EditTreeViewBuilder<'a, S> {
+impl<S: BosStr, St: edit_tree_view_state::State> EditTreeViewBuilder<S, St> {
     /// Set the `mainBranch` field (optional)
     pub fn main_branch(
         mut self,
@@ -1521,33 +1524,33 @@ impl<'a, S: edit_tree_view_state::State> EditTreeViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S> EditTreeViewBuilder<'a, S>
+impl<S: BosStr, St> EditTreeViewBuilder<S, St>
 where
-    S: edit_tree_view_state::State,
-    S::Resource: edit_tree_view_state::IsUnset,
+    St: edit_tree_view_state::State,
+    St::Resource: edit_tree_view_state::IsUnset,
 {
     /// Set the `resource` field (required)
     pub fn resource(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> EditTreeViewBuilder<'a, edit_tree_view_state::SetResource<S>> {
+    ) -> EditTreeViewBuilder<S, edit_tree_view_state::SetResource<St>> {
         self._fields.4 = Option::Some(value.into());
         EditTreeViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> EditTreeViewBuilder<'a, S>
+impl<S: BosStr, St> EditTreeViewBuilder<S, St>
 where
-    S: edit_tree_view_state::State,
-    S::Branches: edit_tree_view_state::IsSet,
-    S::Resource: edit_tree_view_state::IsSet,
+    St: edit_tree_view_state::State,
+    St::Resource: edit_tree_view_state::IsSet,
+    St::Branches: edit_tree_view_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> EditTreeView<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> EditTreeView<S> {
         EditTreeView {
             branches: self._fields.0.unwrap(),
             conflict_points: self._fields.1,
@@ -1557,11 +1560,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> EditTreeView<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> EditTreeView<S> {
         EditTreeView {
             branches: self._fields.0.unwrap(),
             conflict_points: self._fields.1,
@@ -1592,9 +1595,9 @@ pub mod entry_ref_state {
         type Entry = Unset;
     }
     ///State transition - sets the `entry` field to Set
-    pub struct SetEntry<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEntry<S> {}
-    impl<S: State> State for SetEntry<S> {
+    pub struct SetEntry<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetEntry<St> {}
+    impl<St: State> State for SetEntry<St> {
         type Entry = Set<members::entry>;
     }
     /// Marker types for field names
@@ -1605,67 +1608,64 @@ pub mod entry_ref_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct EntryRefBuilder<'a, S: entry_ref_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct EntryRefBuilder<S: BosStr, St: entry_ref_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<StrongRef<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> EntryRef<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> EntryRefBuilder<'a, entry_ref_state::Empty> {
+impl<S: BosStr> EntryRef<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> EntryRefBuilder<S, entry_ref_state::Empty> {
         EntryRefBuilder::new()
     }
 }
 
-impl<'a> EntryRefBuilder<'a, entry_ref_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> EntryRefBuilder<S, entry_ref_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         EntryRefBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> EntryRefBuilder<'a, S>
+impl<S: BosStr, St> EntryRefBuilder<S, St>
 where
-    S: entry_ref_state::State,
-    S::Entry: entry_ref_state::IsUnset,
+    St: entry_ref_state::State,
+    St::Entry: entry_ref_state::IsUnset,
 {
     /// Set the `entry` field (required)
     pub fn entry(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> EntryRefBuilder<'a, entry_ref_state::SetEntry<S>> {
+    ) -> EntryRefBuilder<S, entry_ref_state::SetEntry<St>> {
         self._fields.0 = Option::Some(value.into());
         EntryRefBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> EntryRefBuilder<'a, S>
+impl<S: BosStr, St> EntryRefBuilder<S, St>
 where
-    S: entry_ref_state::State,
-    S::Entry: entry_ref_state::IsSet,
+    St: entry_ref_state::State,
+    St::Entry: entry_ref_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> EntryRef<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> EntryRef<S> {
         EntryRef {
             entry: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> EntryRef<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> EntryRef<S> {
         EntryRef {
             entry: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -1692,9 +1692,9 @@ pub mod notebook_ref_state {
         type Notebook = Unset;
     }
     ///State transition - sets the `notebook` field to Set
-    pub struct SetNotebook<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNotebook<S> {}
-    impl<S: State> State for SetNotebook<S> {
+    pub struct SetNotebook<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetNotebook<St> {}
+    impl<St: State> State for SetNotebook<St> {
         type Notebook = Set<members::notebook>;
     }
     /// Marker types for field names
@@ -1705,67 +1705,67 @@ pub mod notebook_ref_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct NotebookRefBuilder<'a, S: notebook_ref_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct NotebookRefBuilder<S: BosStr, St: notebook_ref_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<StrongRef<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> NotebookRef<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> NotebookRefBuilder<'a, notebook_ref_state::Empty> {
+impl<S: BosStr> NotebookRef<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> NotebookRefBuilder<S, notebook_ref_state::Empty> {
         NotebookRefBuilder::new()
     }
 }
 
-impl<'a> NotebookRefBuilder<'a, notebook_ref_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> NotebookRefBuilder<S, notebook_ref_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         NotebookRefBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> NotebookRefBuilder<'a, S>
+impl<S: BosStr, St> NotebookRefBuilder<S, St>
 where
-    S: notebook_ref_state::State,
-    S::Notebook: notebook_ref_state::IsUnset,
+    St: notebook_ref_state::State,
+    St::Notebook: notebook_ref_state::IsUnset,
 {
     /// Set the `notebook` field (required)
     pub fn notebook(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> NotebookRefBuilder<'a, notebook_ref_state::SetNotebook<S>> {
+    ) -> NotebookRefBuilder<S, notebook_ref_state::SetNotebook<St>> {
         self._fields.0 = Option::Some(value.into());
         NotebookRefBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> NotebookRefBuilder<'a, S>
+impl<S: BosStr, St> NotebookRefBuilder<S, St>
 where
-    S: notebook_ref_state::State,
-    S::Notebook: notebook_ref_state::IsSet,
+    St: notebook_ref_state::State,
+    St::Notebook: notebook_ref_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> NotebookRef<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> NotebookRef<S> {
         NotebookRef {
             notebook: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> NotebookRef<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> NotebookRef<S> {
         NotebookRef {
             notebook: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

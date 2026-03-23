@@ -72,6 +72,8 @@ pub(crate) struct BuilderGenContext<'a, 'c> {
     pub schema: BuilderSchema<'a>,
     /// Whether the struct has a lifetime parameter
     pub has_lifetime: bool,
+    /// Whether the struct has a type parameter S (BOS pattern)
+    pub has_type_param: bool,
     /// Resolved imports for the current file.
     pub resolved: &'a crate::codegen::prettify::ResolvedImports,
 }
@@ -83,7 +85,7 @@ impl<'a, 'c> BuilderGenContext<'a, 'c> {
         nsid: &'a str,
         type_name: &'a str,
         object: &'a LexObject<'static>,
-        has_lifetime: bool,
+        has_type_param: bool,
         resolved: &'a crate::codegen::prettify::ResolvedImports,
     ) -> Self {
         Self {
@@ -91,7 +93,8 @@ impl<'a, 'c> BuilderGenContext<'a, 'c> {
             nsid,
             type_name,
             schema: BuilderSchema::Object(object),
-            has_lifetime,
+            has_lifetime: false, // BOS types use S, not 'a
+            has_type_param,
             resolved,
         }
     }
@@ -102,7 +105,7 @@ impl<'a, 'c> BuilderGenContext<'a, 'c> {
         nsid: &'a str,
         type_name: &'a str,
         parameters: &'a LexXrpcParameters<'static>,
-        has_lifetime: bool,
+        has_type_param: bool,
         resolved: &'a crate::codegen::prettify::ResolvedImports,
     ) -> Self {
         Self {
@@ -110,7 +113,8 @@ impl<'a, 'c> BuilderGenContext<'a, 'c> {
             nsid,
             type_name,
             schema: BuilderSchema::Parameters(parameters),
-            has_lifetime,
+            has_lifetime: false, // BOS types use S, not 'a
+            has_type_param,
             resolved,
         }
     }
@@ -134,6 +138,7 @@ impl<'a, 'c> BuilderGenContext<'a, 'c> {
             self.type_name,
             &self.schema,
             self.has_lifetime,
+            self.has_type_param,
             self.resolved,
         );
 
@@ -145,6 +150,7 @@ impl<'a, 'c> BuilderGenContext<'a, 'c> {
             &self.schema,
             &required_fields,
             self.has_lifetime,
+            self.has_type_param,
             self.resolved,
         );
 
@@ -154,6 +160,7 @@ impl<'a, 'c> BuilderGenContext<'a, 'c> {
             &self.schema,
             &required_fields,
             self.has_lifetime,
+            self.has_type_param,
             self.resolved,
         );
 

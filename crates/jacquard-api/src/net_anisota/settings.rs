@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,11 +34,11 @@ use crate::net_anisota::settings;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct AnimationTiming<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct AnimationTiming<S: BosStr = DefaultStr> {
     ///Card advance exit to right and entrance back in from right (stored as string)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub card_advance: Option<S>,
@@ -78,11 +78,11 @@ pub struct AnimationTiming<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct BatchNotificationTypes<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct BatchNotificationTypes<S: BosStr = DefaultStr> {
     ///Batch follow notifications
     #[serde(skip_serializing_if = "Option::is_none")]
     pub follows: Option<bool>,
@@ -111,11 +111,11 @@ pub struct BatchNotificationTypes<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct BehaviorSettings<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct BehaviorSettings<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub animation_timing: Option<settings::AnimationTiming<S>>,
     ///Show only Anisota posts in profiles instead of regular Bluesky posts
@@ -264,11 +264,11 @@ pub struct BehaviorSettings<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ControlSettings<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ControlSettings<S: BosStr = DefaultStr> {
     ///Show account list button
     #[serde(skip_serializing_if = "Option::is_none")]
     pub account_list: Option<bool>,
@@ -363,11 +363,11 @@ pub struct ControlSettings<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CornerElements<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CornerElements<S: BosStr = DefaultStr> {
     ///Element to show in bottom left corner
     #[serde(skip_serializing_if = "Option::is_none")]
     pub bottom_left: Option<S>,
@@ -389,11 +389,11 @@ pub struct CornerElements<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct FilterNotificationTypes<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct FilterNotificationTypes<S: BosStr = DefaultStr> {
     ///Show follow notifications
     #[serde(skip_serializing_if = "Option::is_none")]
     pub follows: Option<bool>,
@@ -421,11 +421,11 @@ pub struct FilterNotificationTypes<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct FilterRelationshipTypes<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct FilterRelationshipTypes<S: BosStr = DefaultStr> {
     ///Show notifications from followers
     #[serde(skip_serializing_if = "Option::is_none")]
     pub followers: Option<bool>,
@@ -447,11 +447,11 @@ pub struct FilterRelationshipTypes<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct HideReposts<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct HideReposts<S: BosStr = DefaultStr> {
     ///Hide reposts in feed
     #[serde(skip_serializing_if = "Option::is_none")]
     pub feed: Option<bool>,
@@ -467,11 +467,11 @@ pub struct HideReposts<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct HighlightNotificationTypes<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct HighlightNotificationTypes<S: BosStr = DefaultStr> {
     ///Highlight follow notifications
     #[serde(skip_serializing_if = "Option::is_none")]
     pub follows: Option<bool>,
@@ -500,11 +500,11 @@ pub struct HighlightNotificationTypes<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct KeyboardShortcuts<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct KeyboardShortcuts<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub composer: Option<settings::KeyboardShortcutsComposer<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -525,11 +525,11 @@ pub struct KeyboardShortcuts<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct KeyboardShortcutsComposer<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct KeyboardShortcutsComposer<S: BosStr = DefaultStr> {
     ///Publish post (e.g., ctrl+enter)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub publish: Option<S>,
@@ -543,11 +543,11 @@ pub struct KeyboardShortcutsComposer<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct KeyboardShortcutsGlobal<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct KeyboardShortcutsGlobal<S: BosStr = DefaultStr> {
     ///Navigate to collection
     #[serde(skip_serializing_if = "Option::is_none")]
     pub collection: Option<S>,
@@ -570,11 +570,11 @@ pub struct KeyboardShortcutsGlobal<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct KeyboardShortcutsModals<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct KeyboardShortcutsModals<S: BosStr = DefaultStr> {
     ///Show keyboard shortcuts help
     #[serde(skip_serializing_if = "Option::is_none")]
     pub keyboard_help: Option<S>,
@@ -600,11 +600,11 @@ pub struct KeyboardShortcutsModals<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct KeyboardShortcutsNavigation<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct KeyboardShortcutsNavigation<S: BosStr = DefaultStr> {
     ///Scroll down or next item
     #[serde(skip_serializing_if = "Option::is_none")]
     pub arrow_down: Option<S>,
@@ -630,11 +630,11 @@ pub struct KeyboardShortcutsNavigation<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct KeyboardShortcutsPostInteractions<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct KeyboardShortcutsPostInteractions<S: BosStr = DefaultStr> {
     ///Like current post
     #[serde(skip_serializing_if = "Option::is_none")]
     pub like: Option<S>,
@@ -659,11 +659,11 @@ pub struct KeyboardShortcutsPostInteractions<S: Bos<str> + AsRef<str> = DefaultS
     rename = "net.anisota.settings",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Settings<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Settings<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub behavior_settings: Option<settings::BehaviorSettings<S>>,
     ///Order of control buttons
@@ -692,11 +692,11 @@ pub struct Settings<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SettingsGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SettingsGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
@@ -709,11 +709,11 @@ pub struct SettingsGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ModerationSettings<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ModerationSettings<S: BosStr = DefaultStr> {
     ///How to handle posts from muted accounts
     #[serde(skip_serializing_if = "Option::is_none")]
     pub muted_accounts_handling: Option<S>,
@@ -729,11 +729,11 @@ pub struct ModerationSettings<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct StatsVisibleSections<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct StatsVisibleSections<S: BosStr = DefaultStr> {
     ///Show activity section in stats overview
     #[serde(skip_serializing_if = "Option::is_none")]
     pub activity: Option<bool>,
@@ -753,11 +753,11 @@ pub struct StatsVisibleSections<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct UiSettings<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct UiSettings<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub corner_elements: Option<settings::CornerElements<S>>,
     ///Font size scale (0.8 = 80%, 1.0 = 100% default, 1.2 = 120%)
@@ -878,13 +878,13 @@ pub struct UiSettings<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Settings<S> {
+impl<S: BosStr> Settings<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, SettingsRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for AnimationTiming<S> {
+impl<S: BosStr> LexiconSchema for AnimationTiming<S> {
     fn nsid() -> &'static str {
         "net.anisota.settings"
     }
@@ -999,7 +999,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for AnimationTiming<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for BatchNotificationTypes<S> {
+impl<S: BosStr> LexiconSchema for BatchNotificationTypes<S> {
     fn nsid() -> &'static str {
         "net.anisota.settings"
     }
@@ -1014,7 +1014,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for BatchNotificationTypes<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for BehaviorSettings<S> {
+impl<S: BosStr> LexiconSchema for BehaviorSettings<S> {
     fn nsid() -> &'static str {
         "net.anisota.settings"
     }
@@ -1078,7 +1078,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for BehaviorSettings<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ControlSettings<S> {
+impl<S: BosStr> LexiconSchema for ControlSettings<S> {
     fn nsid() -> &'static str {
         "net.anisota.settings"
     }
@@ -1093,7 +1093,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for ControlSettings<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for CornerElements<S> {
+impl<S: BosStr> LexiconSchema for CornerElements<S> {
     fn nsid() -> &'static str {
         "net.anisota.settings"
     }
@@ -1108,7 +1108,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for CornerElements<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for FilterNotificationTypes<S> {
+impl<S: BosStr> LexiconSchema for FilterNotificationTypes<S> {
     fn nsid() -> &'static str {
         "net.anisota.settings"
     }
@@ -1123,7 +1123,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for FilterNotificationTypes<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for FilterRelationshipTypes<S> {
+impl<S: BosStr> LexiconSchema for FilterRelationshipTypes<S> {
     fn nsid() -> &'static str {
         "net.anisota.settings"
     }
@@ -1138,7 +1138,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for FilterRelationshipTypes<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for HideReposts<S> {
+impl<S: BosStr> LexiconSchema for HideReposts<S> {
     fn nsid() -> &'static str {
         "net.anisota.settings"
     }
@@ -1153,7 +1153,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for HideReposts<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for HighlightNotificationTypes<S> {
+impl<S: BosStr> LexiconSchema for HighlightNotificationTypes<S> {
     fn nsid() -> &'static str {
         "net.anisota.settings"
     }
@@ -1168,7 +1168,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for HighlightNotificationTypes<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for KeyboardShortcuts<S> {
+impl<S: BosStr> LexiconSchema for KeyboardShortcuts<S> {
     fn nsid() -> &'static str {
         "net.anisota.settings"
     }
@@ -1183,7 +1183,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for KeyboardShortcuts<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for KeyboardShortcutsComposer<S> {
+impl<S: BosStr> LexiconSchema for KeyboardShortcutsComposer<S> {
     fn nsid() -> &'static str {
         "net.anisota.settings"
     }
@@ -1208,7 +1208,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for KeyboardShortcutsComposer<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for KeyboardShortcutsGlobal<S> {
+impl<S: BosStr> LexiconSchema for KeyboardShortcutsGlobal<S> {
     fn nsid() -> &'static str {
         "net.anisota.settings"
     }
@@ -1263,7 +1263,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for KeyboardShortcutsGlobal<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for KeyboardShortcutsModals<S> {
+impl<S: BosStr> LexiconSchema for KeyboardShortcutsModals<S> {
     fn nsid() -> &'static str {
         "net.anisota.settings"
     }
@@ -1328,7 +1328,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for KeyboardShortcutsModals<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for KeyboardShortcutsNavigation<S> {
+impl<S: BosStr> LexiconSchema for KeyboardShortcutsNavigation<S> {
     fn nsid() -> &'static str {
         "net.anisota.settings"
     }
@@ -1393,7 +1393,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for KeyboardShortcutsNavigation<S> 
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for KeyboardShortcutsPostInteractions<S> {
+impl<S: BosStr> LexiconSchema for KeyboardShortcutsPostInteractions<S> {
     fn nsid() -> &'static str {
         "net.anisota.settings"
     }
@@ -1455,17 +1455,17 @@ pub struct SettingsRecord;
 impl XrpcResp for SettingsRecord {
     const NSID: &'static str = "net.anisota.settings";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = SettingsGetRecordOutput<S>;
+    type Output<S: BosStr> = SettingsGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<SettingsGetRecordOutput<S>> for Settings<S> {
+impl<S: BosStr> From<SettingsGetRecordOutput<S>> for Settings<S> {
     fn from(output: SettingsGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Settings<S> {
+impl<S: BosStr> Collection for Settings<S> {
     const NSID: &'static str = "net.anisota.settings";
     type Record = SettingsRecord;
 }
@@ -1475,7 +1475,7 @@ impl Collection for SettingsRecord {
     type Record = SettingsRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Settings<S> {
+impl<S: BosStr> LexiconSchema for Settings<S> {
     fn nsid() -> &'static str {
         "net.anisota.settings"
     }
@@ -1500,7 +1500,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Settings<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ModerationSettings<S> {
+impl<S: BosStr> LexiconSchema for ModerationSettings<S> {
     fn nsid() -> &'static str {
         "net.anisota.settings"
     }
@@ -1515,7 +1515,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for ModerationSettings<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for StatsVisibleSections<S> {
+impl<S: BosStr> LexiconSchema for StatsVisibleSections<S> {
     fn nsid() -> &'static str {
         "net.anisota.settings"
     }
@@ -1530,7 +1530,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for StatsVisibleSections<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for UiSettings<S> {
+impl<S: BosStr> LexiconSchema for UiSettings<S> {
     fn nsid() -> &'static str {
         "net.anisota.settings"
     }
@@ -3244,27 +3244,27 @@ pub mod settings_state {
         type CreatedAt = Unset;
     }
     ///State transition - sets the `updated_at` field to Set
-    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
-    impl<S: State> State for SetUpdatedAt<S> {
+    pub struct SetUpdatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUpdatedAt<St> {}
+    impl<St: State> State for SetUpdatedAt<St> {
         type UpdatedAt = Set<members::updated_at>;
-        type Version = S::Version;
-        type CreatedAt = S::CreatedAt;
+        type Version = St::Version;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `version` field to Set
-    pub struct SetVersion<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVersion<S> {}
-    impl<S: State> State for SetVersion<S> {
-        type UpdatedAt = S::UpdatedAt;
+    pub struct SetVersion<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetVersion<St> {}
+    impl<St: State> State for SetVersion<St> {
+        type UpdatedAt = St::UpdatedAt;
         type Version = Set<members::version>;
-        type CreatedAt = S::CreatedAt;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type UpdatedAt = S::UpdatedAt;
-        type Version = S::Version;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type UpdatedAt = St::UpdatedAt;
+        type Version = St::Version;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
@@ -3279,9 +3279,9 @@ pub mod settings_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct SettingsBuilder<'a, S: settings_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct SettingsBuilder<S: BosStr, St: settings_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<settings::BehaviorSettings<S>>,
         Option<Vec<S>>,
@@ -3292,28 +3292,28 @@ pub struct SettingsBuilder<'a, S: settings_state::State> {
         Option<Datetime>,
         Option<i64>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Settings<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> SettingsBuilder<'a, settings_state::Empty> {
+impl<S: BosStr> Settings<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> SettingsBuilder<S, settings_state::Empty> {
         SettingsBuilder::new()
     }
 }
 
-impl<'a> SettingsBuilder<'a, settings_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> SettingsBuilder<S, settings_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SettingsBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
+impl<S: BosStr, St: settings_state::State> SettingsBuilder<S, St> {
     /// Set the `behaviorSettings` field (optional)
     pub fn behavior_settings(
         mut self,
@@ -3332,7 +3332,7 @@ impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
     }
 }
 
-impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
+impl<S: BosStr, St: settings_state::State> SettingsBuilder<S, St> {
     /// Set the `controlOrder` field (optional)
     pub fn control_order(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -3345,7 +3345,7 @@ impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
     }
 }
 
-impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
+impl<S: BosStr, St: settings_state::State> SettingsBuilder<S, St> {
     /// Set the `controlSettings` field (optional)
     pub fn control_settings(
         mut self,
@@ -3364,26 +3364,26 @@ impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
     }
 }
 
-impl<'a, S> SettingsBuilder<'a, S>
+impl<S: BosStr, St> SettingsBuilder<S, St>
 where
-    S: settings_state::State,
-    S::CreatedAt: settings_state::IsUnset,
+    St: settings_state::State,
+    St::CreatedAt: settings_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> SettingsBuilder<'a, settings_state::SetCreatedAt<S>> {
+    ) -> SettingsBuilder<S, settings_state::SetCreatedAt<St>> {
         self._fields.3 = Option::Some(value.into());
         SettingsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
+impl<S: BosStr, St: settings_state::State> SettingsBuilder<S, St> {
     /// Set the `theme` field (optional)
     pub fn theme(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
@@ -3396,7 +3396,7 @@ impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
     }
 }
 
-impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
+impl<S: BosStr, St: settings_state::State> SettingsBuilder<S, St> {
     /// Set the `uiSettings` field (optional)
     pub fn ui_settings(
         mut self,
@@ -3412,53 +3412,53 @@ impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
     }
 }
 
-impl<'a, S> SettingsBuilder<'a, S>
+impl<S: BosStr, St> SettingsBuilder<S, St>
 where
-    S: settings_state::State,
-    S::UpdatedAt: settings_state::IsUnset,
+    St: settings_state::State,
+    St::UpdatedAt: settings_state::IsUnset,
 {
     /// Set the `updatedAt` field (required)
     pub fn updated_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> SettingsBuilder<'a, settings_state::SetUpdatedAt<S>> {
+    ) -> SettingsBuilder<S, settings_state::SetUpdatedAt<St>> {
         self._fields.6 = Option::Some(value.into());
         SettingsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SettingsBuilder<'a, S>
+impl<S: BosStr, St> SettingsBuilder<S, St>
 where
-    S: settings_state::State,
-    S::Version: settings_state::IsUnset,
+    St: settings_state::State,
+    St::Version: settings_state::IsUnset,
 {
     /// Set the `version` field (required)
     pub fn version(
         mut self,
         value: impl Into<i64>,
-    ) -> SettingsBuilder<'a, settings_state::SetVersion<S>> {
+    ) -> SettingsBuilder<S, settings_state::SetVersion<St>> {
         self._fields.7 = Option::Some(value.into());
         SettingsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SettingsBuilder<'a, S>
+impl<S: BosStr, St> SettingsBuilder<S, St>
 where
-    S: settings_state::State,
-    S::UpdatedAt: settings_state::IsSet,
-    S::Version: settings_state::IsSet,
-    S::CreatedAt: settings_state::IsSet,
+    St: settings_state::State,
+    St::UpdatedAt: settings_state::IsSet,
+    St::Version: settings_state::IsSet,
+    St::CreatedAt: settings_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Settings<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Settings<S> {
         Settings {
             behavior_settings: self._fields.0,
             control_order: self._fields.1,
@@ -3471,11 +3471,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Settings<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Settings<S> {
         Settings {
             behavior_settings: self._fields.0,
             control_order: self._fields.1,

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -30,11 +30,11 @@ use serde::{Serialize, Deserialize};
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Indexable<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Indexable<S: BosStr = DefaultStr> {
     ///The internal ID for the value, limited to the RecordKey character set.
     pub id: RecordKey<Rkey<S>>,
     ///The numeric index used for sorting.
@@ -51,11 +51,11 @@ pub struct Indexable<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct TypedRef<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct TypedRef<S: BosStr = DefaultStr> {
     ///The AT URI of the record this object references.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub r#ref: Option<AtUri<S>>,
@@ -66,7 +66,7 @@ pub struct TypedRef<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Indexable<S> {
+impl<S: BosStr> LexiconSchema for Indexable<S> {
     fn nsid() -> &'static str {
         "dev.tsunagite.types"
     }
@@ -103,7 +103,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Indexable<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for TypedRef<S> {
+impl<S: BosStr> LexiconSchema for TypedRef<S> {
     fn nsid() -> &'static str {
         "dev.tsunagite.types"
     }
@@ -141,27 +141,27 @@ pub mod indexable_state {
         type Id = Unset;
     }
     ///State transition - sets the `index` field to Set
-    pub struct SetIndex<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIndex<S> {}
-    impl<S: State> State for SetIndex<S> {
+    pub struct SetIndex<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIndex<St> {}
+    impl<St: State> State for SetIndex<St> {
         type Index = Set<members::index>;
-        type Name = S::Name;
-        type Id = S::Id;
+        type Name = St::Name;
+        type Id = St::Id;
     }
     ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Index = S::Index;
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Index = St::Index;
         type Name = Set<members::name>;
-        type Id = S::Id;
+        type Id = St::Id;
     }
     ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type Index = S::Index;
-        type Name = S::Name;
+    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetId<St> {}
+    impl<St: State> State for SetId<St> {
+        type Index = St::Index;
+        type Name = St::Name;
         type Id = Set<members::id>;
     }
     /// Marker types for field names
@@ -176,97 +176,97 @@ pub mod indexable_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct IndexableBuilder<'a, S: indexable_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct IndexableBuilder<S: BosStr, St: indexable_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<RecordKey<Rkey<S>>>, Option<i64>, Option<Data<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Indexable<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> IndexableBuilder<'a, indexable_state::Empty> {
+impl<S: BosStr> Indexable<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> IndexableBuilder<S, indexable_state::Empty> {
         IndexableBuilder::new()
     }
 }
 
-impl<'a> IndexableBuilder<'a, indexable_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> IndexableBuilder<S, indexable_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         IndexableBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> IndexableBuilder<'a, S>
+impl<S: BosStr, St> IndexableBuilder<S, St>
 where
-    S: indexable_state::State,
-    S::Id: indexable_state::IsUnset,
+    St: indexable_state::State,
+    St::Id: indexable_state::IsUnset,
 {
     /// Set the `id` field (required)
     pub fn id(
         mut self,
         value: impl Into<RecordKey<Rkey<S>>>,
-    ) -> IndexableBuilder<'a, indexable_state::SetId<S>> {
+    ) -> IndexableBuilder<S, indexable_state::SetId<St>> {
         self._fields.0 = Option::Some(value.into());
         IndexableBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> IndexableBuilder<'a, S>
+impl<S: BosStr, St> IndexableBuilder<S, St>
 where
-    S: indexable_state::State,
-    S::Index: indexable_state::IsUnset,
+    St: indexable_state::State,
+    St::Index: indexable_state::IsUnset,
 {
     /// Set the `index` field (required)
     pub fn index(
         mut self,
         value: impl Into<i64>,
-    ) -> IndexableBuilder<'a, indexable_state::SetIndex<S>> {
+    ) -> IndexableBuilder<S, indexable_state::SetIndex<St>> {
         self._fields.1 = Option::Some(value.into());
         IndexableBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> IndexableBuilder<'a, S>
+impl<S: BosStr, St> IndexableBuilder<S, St>
 where
-    S: indexable_state::State,
-    S::Name: indexable_state::IsUnset,
+    St: indexable_state::State,
+    St::Name: indexable_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<Data<S>>,
-    ) -> IndexableBuilder<'a, indexable_state::SetName<S>> {
+    ) -> IndexableBuilder<S, indexable_state::SetName<St>> {
         self._fields.2 = Option::Some(value.into());
         IndexableBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> IndexableBuilder<'a, S>
+impl<S: BosStr, St> IndexableBuilder<S, St>
 where
-    S: indexable_state::State,
-    S::Index: indexable_state::IsSet,
-    S::Name: indexable_state::IsSet,
-    S::Id: indexable_state::IsSet,
+    St: indexable_state::State,
+    St::Index: indexable_state::IsSet,
+    St::Name: indexable_state::IsSet,
+    St::Id: indexable_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Indexable<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Indexable<S> {
         Indexable {
             id: self._fields.0.unwrap(),
             index: self._fields.1.unwrap(),
@@ -274,11 +274,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Indexable<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Indexable<S> {
         Indexable {
             id: self._fields.0.unwrap(),
             index: self._fields.1.unwrap(),

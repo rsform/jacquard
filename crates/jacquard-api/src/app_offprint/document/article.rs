@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
     rename = "app.offprint.document.article",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Article<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Article<S: BosStr = DefaultStr> {
     ///Strong reference to a `site.standard.document` compatible record.
     pub document: StrongRef<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -52,18 +52,18 @@ pub struct Article<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ArticleGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ArticleGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Article<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Article<S> {
+impl<S: BosStr> Article<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, ArticleRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -76,17 +76,17 @@ pub struct ArticleRecord;
 impl XrpcResp for ArticleRecord {
     const NSID: &'static str = "app.offprint.document.article";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ArticleGetRecordOutput<S>;
+    type Output<S: BosStr> = ArticleGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<ArticleGetRecordOutput<S>> for Article<S> {
+impl<S: BosStr> From<ArticleGetRecordOutput<S>> for Article<S> {
     fn from(output: ArticleGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Article<S> {
+impl<S: BosStr> Collection for Article<S> {
     const NSID: &'static str = "app.offprint.document.article";
     type Record = ArticleRecord;
 }
@@ -96,7 +96,7 @@ impl Collection for ArticleRecord {
     type Record = ArticleRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Article<S> {
+impl<S: BosStr> LexiconSchema for Article<S> {
     fn nsid() -> &'static str {
         "app.offprint.document.article"
     }
@@ -130,9 +130,9 @@ pub mod article_state {
         type Document = Unset;
     }
     ///State transition - sets the `document` field to Set
-    pub struct SetDocument<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDocument<S> {}
-    impl<S: State> State for SetDocument<S> {
+    pub struct SetDocument<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDocument<St> {}
+    impl<St: State> State for SetDocument<St> {
         type Document = Set<members::document>;
     }
     /// Marker types for field names
@@ -143,67 +143,64 @@ pub mod article_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ArticleBuilder<'a, S: article_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ArticleBuilder<S: BosStr, St: article_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<StrongRef<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Article<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ArticleBuilder<'a, article_state::Empty> {
+impl<S: BosStr> Article<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ArticleBuilder<S, article_state::Empty> {
         ArticleBuilder::new()
     }
 }
 
-impl<'a> ArticleBuilder<'a, article_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ArticleBuilder<S, article_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ArticleBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ArticleBuilder<'a, S>
+impl<S: BosStr, St> ArticleBuilder<S, St>
 where
-    S: article_state::State,
-    S::Document: article_state::IsUnset,
+    St: article_state::State,
+    St::Document: article_state::IsUnset,
 {
     /// Set the `document` field (required)
     pub fn document(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> ArticleBuilder<'a, article_state::SetDocument<S>> {
+    ) -> ArticleBuilder<S, article_state::SetDocument<St>> {
         self._fields.0 = Option::Some(value.into());
         ArticleBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ArticleBuilder<'a, S>
+impl<S: BosStr, St> ArticleBuilder<S, St>
 where
-    S: article_state::State,
-    S::Document: article_state::IsSet,
+    St: article_state::State,
+    St::Document: article_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Article<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Article<S> {
         Article {
             document: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Article<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Article<S> {
         Article {
             document: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

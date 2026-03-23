@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -29,17 +29,17 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Poll<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Poll<S: BosStr = DefaultStr> {
     pub poll_ref: StrongRef<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Poll<S> {
+impl<S: BosStr> LexiconSchema for Poll<S> {
     fn nsid() -> &'static str {
         "pub.leaflet.blocks.poll"
     }
@@ -73,9 +73,9 @@ pub mod poll_state {
         type PollRef = Unset;
     }
     ///State transition - sets the `poll_ref` field to Set
-    pub struct SetPollRef<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPollRef<S> {}
-    impl<S: State> State for SetPollRef<S> {
+    pub struct SetPollRef<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPollRef<St> {}
+    impl<St: State> State for SetPollRef<St> {
         type PollRef = Set<members::poll_ref>;
     }
     /// Marker types for field names
@@ -86,64 +86,64 @@ pub mod poll_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct PollBuilder<'a, S: poll_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct PollBuilder<S: BosStr, St: poll_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<StrongRef<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Poll<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> PollBuilder<'a, poll_state::Empty> {
+impl<S: BosStr> Poll<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> PollBuilder<S, poll_state::Empty> {
         PollBuilder::new()
     }
 }
 
-impl<'a> PollBuilder<'a, poll_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> PollBuilder<S, poll_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         PollBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PollBuilder<'a, S>
+impl<S: BosStr, St> PollBuilder<S, St>
 where
-    S: poll_state::State,
-    S::PollRef: poll_state::IsUnset,
+    St: poll_state::State,
+    St::PollRef: poll_state::IsUnset,
 {
     /// Set the `pollRef` field (required)
     pub fn poll_ref(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> PollBuilder<'a, poll_state::SetPollRef<S>> {
+    ) -> PollBuilder<S, poll_state::SetPollRef<St>> {
         self._fields.0 = Option::Some(value.into());
         PollBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PollBuilder<'a, S>
+impl<S: BosStr, St> PollBuilder<S, St>
 where
-    S: poll_state::State,
-    S::PollRef: poll_state::IsSet,
+    St: poll_state::State,
+    St::PollRef: poll_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Poll<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Poll<S> {
         Poll {
             poll_ref: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Poll<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Poll<S> {
         Poll {
             poll_ref: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

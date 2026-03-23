@@ -15,7 +15,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -39,11 +39,11 @@ use serde::{Serialize, Deserialize};
     rename = "sh.tangled.knot",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Knot<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Knot<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -55,18 +55,18 @@ pub struct Knot<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct KnotGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct KnotGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Knot<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Knot<S> {
+impl<S: BosStr> Knot<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, KnotRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -79,17 +79,17 @@ pub struct KnotRecord;
 impl XrpcResp for KnotRecord {
     const NSID: &'static str = "sh.tangled.knot";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = KnotGetRecordOutput<S>;
+    type Output<S: BosStr> = KnotGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<KnotGetRecordOutput<S>> for Knot<S> {
+impl<S: BosStr> From<KnotGetRecordOutput<S>> for Knot<S> {
     fn from(output: KnotGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Knot<S> {
+impl<S: BosStr> Collection for Knot<S> {
     const NSID: &'static str = "sh.tangled.knot";
     type Record = KnotRecord;
 }
@@ -99,7 +99,7 @@ impl Collection for KnotRecord {
     type Record = KnotRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Knot<S> {
+impl<S: BosStr> LexiconSchema for Knot<S> {
     fn nsid() -> &'static str {
         "sh.tangled.knot"
     }
@@ -133,9 +133,9 @@ pub mod knot_state {
         type CreatedAt = Unset;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
@@ -146,64 +146,64 @@ pub mod knot_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct KnotBuilder<'a, S: knot_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct KnotBuilder<S: BosStr, St: knot_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Knot<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> KnotBuilder<'a, knot_state::Empty> {
+impl<S: BosStr> Knot<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> KnotBuilder<S, knot_state::Empty> {
         KnotBuilder::new()
     }
 }
 
-impl<'a> KnotBuilder<'a, knot_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> KnotBuilder<S, knot_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         KnotBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> KnotBuilder<'a, S>
+impl<S: BosStr, St> KnotBuilder<S, St>
 where
-    S: knot_state::State,
-    S::CreatedAt: knot_state::IsUnset,
+    St: knot_state::State,
+    St::CreatedAt: knot_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> KnotBuilder<'a, knot_state::SetCreatedAt<S>> {
+    ) -> KnotBuilder<S, knot_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         KnotBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> KnotBuilder<'a, S>
+impl<S: BosStr, St> KnotBuilder<S, St>
 where
-    S: knot_state::State,
-    S::CreatedAt: knot_state::IsSet,
+    St: knot_state::State,
+    St::CreatedAt: knot_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Knot<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Knot<S> {
         Knot {
             created_at: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Knot<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Knot<S> {
         Knot {
             created_at: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

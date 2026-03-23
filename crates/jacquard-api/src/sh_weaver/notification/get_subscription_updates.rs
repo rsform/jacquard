@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Datetime;
 use jacquard_common::types::value::Data;
@@ -19,16 +19,15 @@ use serde::{Serialize, Deserialize};
 use crate::sh_weaver::notification::SubscriptionUpdateView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetSubscriptionUpdates<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetSubscriptionUpdates<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub cursor: Option<S>,
     ///Defaults to `20`. Min: 1. Max: 50.
     #[serde(default = "_default_limit")]
@@ -40,20 +39,18 @@ pub struct GetSubscriptionUpdates<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetSubscriptionUpdatesOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetSubscriptionUpdatesOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
     pub updates: Vec<SubscriptionUpdateView<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -62,12 +59,11 @@ pub struct GetSubscriptionUpdatesResponse;
 impl jacquard_common::xrpc::XrpcResp for GetSubscriptionUpdatesResponse {
     const NSID: &'static str = "sh.weaver.notification.getSubscriptionUpdates";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetSubscriptionUpdatesOutput<S>;
+    type Output<S: BosStr> = GetSubscriptionUpdatesOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetSubscriptionUpdates<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetSubscriptionUpdates<S> {
     const NSID: &'static str = "sh.weaver.notification.getSubscriptionUpdates";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetSubscriptionUpdatesResponse;
@@ -78,7 +74,7 @@ pub struct GetSubscriptionUpdatesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetSubscriptionUpdatesRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.notification.getSubscriptionUpdates";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetSubscriptionUpdates<S>;
+    type Request<S: BosStr> = GetSubscriptionUpdates<S>;
     type Response = GetSubscriptionUpdatesResponse;
 }
 
@@ -105,35 +101,41 @@ pub mod get_subscription_updates_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetSubscriptionUpdatesBuilder<'a, S: get_subscription_updates_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetSubscriptionUpdatesBuilder<
+    S: BosStr,
+    St: get_subscription_updates_state::State,
+> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>, Option<Datetime>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetSubscriptionUpdates<'a> {
-    /// Create a new builder for this type
+impl<S: BosStr> GetSubscriptionUpdates<S> {
+    /// Create a new builder for this type.
     pub fn new() -> GetSubscriptionUpdatesBuilder<
-        'a,
+        S,
         get_subscription_updates_state::Empty,
     > {
         GetSubscriptionUpdatesBuilder::new()
     }
 }
 
-impl<'a> GetSubscriptionUpdatesBuilder<'a, get_subscription_updates_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetSubscriptionUpdatesBuilder<S, get_subscription_updates_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetSubscriptionUpdatesBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: get_subscription_updates_state::State> GetSubscriptionUpdatesBuilder<'a, S> {
+impl<
+    S: BosStr,
+    St: get_subscription_updates_state::State,
+> GetSubscriptionUpdatesBuilder<S, St> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -146,7 +148,10 @@ impl<'a, S: get_subscription_updates_state::State> GetSubscriptionUpdatesBuilder
     }
 }
 
-impl<'a, S: get_subscription_updates_state::State> GetSubscriptionUpdatesBuilder<'a, S> {
+impl<
+    S: BosStr,
+    St: get_subscription_updates_state::State,
+> GetSubscriptionUpdatesBuilder<S, St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -159,7 +164,10 @@ impl<'a, S: get_subscription_updates_state::State> GetSubscriptionUpdatesBuilder
     }
 }
 
-impl<'a, S: get_subscription_updates_state::State> GetSubscriptionUpdatesBuilder<'a, S> {
+impl<
+    S: BosStr,
+    St: get_subscription_updates_state::State,
+> GetSubscriptionUpdatesBuilder<S, St> {
     /// Set the `since` field (optional)
     pub fn since(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.2 = value.into();
@@ -172,12 +180,12 @@ impl<'a, S: get_subscription_updates_state::State> GetSubscriptionUpdatesBuilder
     }
 }
 
-impl<'a, S> GetSubscriptionUpdatesBuilder<'a, S>
+impl<S: BosStr, St> GetSubscriptionUpdatesBuilder<S, St>
 where
-    S: get_subscription_updates_state::State,
+    St: get_subscription_updates_state::State,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetSubscriptionUpdates<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetSubscriptionUpdates<S> {
         GetSubscriptionUpdates {
             cursor: self._fields.0,
             limit: self._fields.1,

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "io.livewire.p3k.podping00",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Podping00<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Podping00<S: BosStr = DefaultStr> {
     ///The timestamp of when the podping was created.
     pub created_at: Datetime,
     ///The feed URL that updated.
@@ -54,18 +54,18 @@ pub struct Podping00<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Podping00GetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Podping00GetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Podping00<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Podping00<S> {
+impl<S: BosStr> Podping00<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, Podping00Record>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -78,17 +78,17 @@ pub struct Podping00Record;
 impl XrpcResp for Podping00Record {
     const NSID: &'static str = "io.livewire.p3k.podping00";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = Podping00GetRecordOutput<S>;
+    type Output<S: BosStr> = Podping00GetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<Podping00GetRecordOutput<S>> for Podping00<S> {
+impl<S: BosStr> From<Podping00GetRecordOutput<S>> for Podping00<S> {
     fn from(output: Podping00GetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Podping00<S> {
+impl<S: BosStr> Collection for Podping00<S> {
     const NSID: &'static str = "io.livewire.p3k.podping00";
     type Record = Podping00Record;
 }
@@ -98,7 +98,7 @@ impl Collection for Podping00Record {
     type Record = Podping00Record;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Podping00<S> {
+impl<S: BosStr> LexiconSchema for Podping00<S> {
     fn nsid() -> &'static str {
         "io.livewire.p3k.podping00"
     }
@@ -134,17 +134,17 @@ pub mod podping00_state {
         type CreatedAt = Unset;
     }
     ///State transition - sets the `url` field to Set
-    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrl<S> {}
-    impl<S: State> State for SetUrl<S> {
+    pub struct SetUrl<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUrl<St> {}
+    impl<St: State> State for SetUrl<St> {
         type Url = Set<members::url>;
-        type CreatedAt = S::CreatedAt;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Url = S::Url;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Url = St::Url;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
@@ -157,88 +157,88 @@ pub mod podping00_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct Podping00Builder<'a, S: podping00_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct Podping00Builder<S: BosStr, St: podping00_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<UriValue<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Podping00<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> Podping00Builder<'a, podping00_state::Empty> {
+impl<S: BosStr> Podping00<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> Podping00Builder<S, podping00_state::Empty> {
         Podping00Builder::new()
     }
 }
 
-impl<'a> Podping00Builder<'a, podping00_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> Podping00Builder<S, podping00_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         Podping00Builder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> Podping00Builder<'a, S>
+impl<S: BosStr, St> Podping00Builder<S, St>
 where
-    S: podping00_state::State,
-    S::CreatedAt: podping00_state::IsUnset,
+    St: podping00_state::State,
+    St::CreatedAt: podping00_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> Podping00Builder<'a, podping00_state::SetCreatedAt<S>> {
+    ) -> Podping00Builder<S, podping00_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         Podping00Builder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> Podping00Builder<'a, S>
+impl<S: BosStr, St> Podping00Builder<S, St>
 where
-    S: podping00_state::State,
-    S::Url: podping00_state::IsUnset,
+    St: podping00_state::State,
+    St::Url: podping00_state::IsUnset,
 {
     /// Set the `url` field (required)
     pub fn url(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> Podping00Builder<'a, podping00_state::SetUrl<S>> {
+    ) -> Podping00Builder<S, podping00_state::SetUrl<St>> {
         self._fields.1 = Option::Some(value.into());
         Podping00Builder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> Podping00Builder<'a, S>
+impl<S: BosStr, St> Podping00Builder<S, St>
 where
-    S: podping00_state::State,
-    S::Url: podping00_state::IsSet,
-    S::CreatedAt: podping00_state::IsSet,
+    St: podping00_state::State,
+    St::Url: podping00_state::IsSet,
+    St::CreatedAt: podping00_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Podping00<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Podping00<S> {
         Podping00 {
             created_at: self._fields.0.unwrap(),
             url: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Podping00<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Podping00<S> {
         Podping00 {
             created_at: self._fields.0.unwrap(),
             url: self._fields.1.unwrap(),

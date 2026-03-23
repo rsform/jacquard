@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
@@ -19,70 +19,56 @@ use serde::{Serialize, Deserialize};
 use crate::games_gamesgamesgamesgames::GameDetailView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetGame<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetGame<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub apple_app_store_id: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub epic_games_id: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub gog_id: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub google_play_id: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub humble_bundle_id: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub igdb_id: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub include_actor_credits: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub include_org_credits: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub nintendo_eshop_id: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub play_station_id: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub slug: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub steam_id: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub uri: Option<AtUri<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub xbox_id: Option<S>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetGameOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetGameOutput<S: BosStr = DefaultStr> {
     pub game: GameDetailView<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -91,12 +77,11 @@ pub struct GetGameResponse;
 impl jacquard_common::xrpc::XrpcResp for GetGameResponse {
     const NSID: &'static str = "games.gamesgamesgamesgames.getGame";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetGameOutput<S>;
+    type Output<S: BosStr> = GetGameOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetGame<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetGame<S> {
     const NSID: &'static str = "games.gamesgamesgamesgames.getGame";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetGameResponse;
@@ -107,7 +92,7 @@ pub struct GetGameRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetGameRequest {
     const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.getGame";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetGame<S>;
+    type Request<S: BosStr> = GetGame<S>;
     type Response = GetGameResponse;
 }
 
@@ -130,9 +115,9 @@ pub mod get_game_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetGameBuilder<'a, S: get_game_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetGameBuilder<S: BosStr, St: get_game_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
         Option<S>,
@@ -149,18 +134,18 @@ pub struct GetGameBuilder<'a, S: get_game_state::State> {
         Option<AtUri<S>>,
         Option<S>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetGame<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetGameBuilder<'a, get_game_state::Empty> {
+impl<S: BosStr> GetGame<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetGameBuilder<S, get_game_state::Empty> {
         GetGameBuilder::new()
     }
 }
 
-impl<'a> GetGameBuilder<'a, get_game_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetGameBuilder<S, get_game_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetGameBuilder {
             _state: PhantomData,
@@ -180,12 +165,12 @@ impl<'a> GetGameBuilder<'a, get_game_state::Empty> {
                 None,
                 None,
             ),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
+impl<S: BosStr, St: get_game_state::State> GetGameBuilder<S, St> {
     /// Set the `appleAppStoreId` field (optional)
     pub fn apple_app_store_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -198,7 +183,7 @@ impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
     }
 }
 
-impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
+impl<S: BosStr, St: get_game_state::State> GetGameBuilder<S, St> {
     /// Set the `epicGamesId` field (optional)
     pub fn epic_games_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -211,7 +196,7 @@ impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
     }
 }
 
-impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
+impl<S: BosStr, St: get_game_state::State> GetGameBuilder<S, St> {
     /// Set the `gogId` field (optional)
     pub fn gog_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -224,7 +209,7 @@ impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
     }
 }
 
-impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
+impl<S: BosStr, St: get_game_state::State> GetGameBuilder<S, St> {
     /// Set the `googlePlayId` field (optional)
     pub fn google_play_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -237,7 +222,7 @@ impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
     }
 }
 
-impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
+impl<S: BosStr, St: get_game_state::State> GetGameBuilder<S, St> {
     /// Set the `humbleBundleId` field (optional)
     pub fn humble_bundle_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
@@ -250,7 +235,7 @@ impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
     }
 }
 
-impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
+impl<S: BosStr, St: get_game_state::State> GetGameBuilder<S, St> {
     /// Set the `igdbId` field (optional)
     pub fn igdb_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
@@ -263,7 +248,7 @@ impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
     }
 }
 
-impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
+impl<S: BosStr, St: get_game_state::State> GetGameBuilder<S, St> {
     /// Set the `includeActorCredits` field (optional)
     pub fn include_actor_credits(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.6 = value.into();
@@ -276,7 +261,7 @@ impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
     }
 }
 
-impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
+impl<S: BosStr, St: get_game_state::State> GetGameBuilder<S, St> {
     /// Set the `includeOrgCredits` field (optional)
     pub fn include_org_credits(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.7 = value.into();
@@ -289,7 +274,7 @@ impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
     }
 }
 
-impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
+impl<S: BosStr, St: get_game_state::State> GetGameBuilder<S, St> {
     /// Set the `nintendoEshopId` field (optional)
     pub fn nintendo_eshop_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.8 = value.into();
@@ -302,7 +287,7 @@ impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
     }
 }
 
-impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
+impl<S: BosStr, St: get_game_state::State> GetGameBuilder<S, St> {
     /// Set the `playStationId` field (optional)
     pub fn play_station_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.9 = value.into();
@@ -315,7 +300,7 @@ impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
     }
 }
 
-impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
+impl<S: BosStr, St: get_game_state::State> GetGameBuilder<S, St> {
     /// Set the `slug` field (optional)
     pub fn slug(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.10 = value.into();
@@ -328,7 +313,7 @@ impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
     }
 }
 
-impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
+impl<S: BosStr, St: get_game_state::State> GetGameBuilder<S, St> {
     /// Set the `steamId` field (optional)
     pub fn steam_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.11 = value.into();
@@ -341,7 +326,7 @@ impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
     }
 }
 
-impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
+impl<S: BosStr, St: get_game_state::State> GetGameBuilder<S, St> {
     /// Set the `uri` field (optional)
     pub fn uri(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.12 = value.into();
@@ -354,7 +339,7 @@ impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
     }
 }
 
-impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
+impl<S: BosStr, St: get_game_state::State> GetGameBuilder<S, St> {
     /// Set the `xboxId` field (optional)
     pub fn xbox_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.13 = value.into();
@@ -367,12 +352,12 @@ impl<'a, S: get_game_state::State> GetGameBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GetGameBuilder<'a, S>
+impl<S: BosStr, St> GetGameBuilder<S, St>
 where
-    S: get_game_state::State,
+    St: get_game_state::State,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetGame<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetGame<S> {
         GetGame {
             apple_app_store_id: self._fields.0,
             epic_games_id: self._fields.1,

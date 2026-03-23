@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use serde::{Serialize, Deserialize};
     rename = "haus.opn.mic.artist",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Artist<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Artist<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub artist_pic: Option<BlobRef<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -61,18 +61,18 @@ pub struct Artist<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ArtistGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ArtistGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Artist<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Artist<S> {
+impl<S: BosStr> Artist<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, ArtistRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -85,17 +85,17 @@ pub struct ArtistRecord;
 impl XrpcResp for ArtistRecord {
     const NSID: &'static str = "haus.opn.mic.artist";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ArtistGetRecordOutput<S>;
+    type Output<S: BosStr> = ArtistGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<ArtistGetRecordOutput<S>> for Artist<S> {
+impl<S: BosStr> From<ArtistGetRecordOutput<S>> for Artist<S> {
     fn from(output: ArtistGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Artist<S> {
+impl<S: BosStr> Collection for Artist<S> {
     const NSID: &'static str = "haus.opn.mic.artist";
     type Record = ArtistRecord;
 }
@@ -105,7 +105,7 @@ impl Collection for ArtistRecord {
     type Record = ArtistRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Artist<S> {
+impl<S: BosStr> LexiconSchema for Artist<S> {
     fn nsid() -> &'static str {
         "haus.opn.mic.artist"
     }
@@ -189,43 +189,43 @@ pub mod artist_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type CreatedAt;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type CreatedAt = S::CreatedAt;
+        type Name = Unset;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Name = S::Name;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type CreatedAt = St::CreatedAt;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ArtistBuilder<'a, S: artist_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ArtistBuilder<S: BosStr, St: artist_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<BlobRef<S>>,
         Option<S>,
@@ -234,28 +234,28 @@ pub struct ArtistBuilder<'a, S: artist_state::State> {
         Option<Vec<S>>,
         Option<S>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Artist<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ArtistBuilder<'a, artist_state::Empty> {
+impl<S: BosStr> Artist<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ArtistBuilder<S, artist_state::Empty> {
         ArtistBuilder::new()
     }
 }
 
-impl<'a> ArtistBuilder<'a, artist_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ArtistBuilder<S, artist_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ArtistBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: artist_state::State> ArtistBuilder<'a, S> {
+impl<S: BosStr, St: artist_state::State> ArtistBuilder<S, St> {
     /// Set the `artistPic` field (optional)
     pub fn artist_pic(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -268,7 +268,7 @@ impl<'a, S: artist_state::State> ArtistBuilder<'a, S> {
     }
 }
 
-impl<'a, S: artist_state::State> ArtistBuilder<'a, S> {
+impl<S: BosStr, St: artist_state::State> ArtistBuilder<S, St> {
     /// Set the `bio` field (optional)
     pub fn bio(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -281,26 +281,26 @@ impl<'a, S: artist_state::State> ArtistBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ArtistBuilder<'a, S>
+impl<S: BosStr, St> ArtistBuilder<S, St>
 where
-    S: artist_state::State,
-    S::CreatedAt: artist_state::IsUnset,
+    St: artist_state::State,
+    St::CreatedAt: artist_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ArtistBuilder<'a, artist_state::SetCreatedAt<S>> {
+    ) -> ArtistBuilder<S, artist_state::SetCreatedAt<St>> {
         self._fields.2 = Option::Some(value.into());
         ArtistBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: artist_state::State> ArtistBuilder<'a, S> {
+impl<S: BosStr, St: artist_state::State> ArtistBuilder<S, St> {
     /// Set the `externalLinks` field (optional)
     pub fn external_links(mut self, value: impl Into<Option<Vec<UriValue<S>>>>) -> Self {
         self._fields.3 = value.into();
@@ -313,7 +313,7 @@ impl<'a, S: artist_state::State> ArtistBuilder<'a, S> {
     }
 }
 
-impl<'a, S: artist_state::State> ArtistBuilder<'a, S> {
+impl<S: BosStr, St: artist_state::State> ArtistBuilder<S, St> {
     /// Set the `genre` field (optional)
     pub fn genre(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -326,33 +326,33 @@ impl<'a, S: artist_state::State> ArtistBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ArtistBuilder<'a, S>
+impl<S: BosStr, St> ArtistBuilder<S, St>
 where
-    S: artist_state::State,
-    S::Name: artist_state::IsUnset,
+    St: artist_state::State,
+    St::Name: artist_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> ArtistBuilder<'a, artist_state::SetName<S>> {
+    ) -> ArtistBuilder<S, artist_state::SetName<St>> {
         self._fields.5 = Option::Some(value.into());
         ArtistBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ArtistBuilder<'a, S>
+impl<S: BosStr, St> ArtistBuilder<S, St>
 where
-    S: artist_state::State,
-    S::Name: artist_state::IsSet,
-    S::CreatedAt: artist_state::IsSet,
+    St: artist_state::State,
+    St::CreatedAt: artist_state::IsSet,
+    St::Name: artist_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Artist<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Artist<S> {
         Artist {
             artist_pic: self._fields.0,
             bio: self._fields.1,
@@ -363,8 +363,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Artist<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Artist<S> {
         Artist {
             artist_pic: self._fields.0,
             bio: self._fields.1,

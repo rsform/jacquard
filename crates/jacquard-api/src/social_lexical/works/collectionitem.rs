@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "social.lexical.works.collectionitem",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Collectionitem<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Collectionitem<S: BosStr = DefaultStr> {
     ///
     pub created_at: Datetime,
     ///
@@ -56,18 +56,18 @@ pub struct Collectionitem<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CollectionitemGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CollectionitemGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Collectionitem<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Collectionitem<S> {
+impl<S: BosStr> Collectionitem<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, CollectionitemRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -80,18 +80,17 @@ pub struct CollectionitemRecord;
 impl XrpcResp for CollectionitemRecord {
     const NSID: &'static str = "social.lexical.works.collectionitem";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = CollectionitemGetRecordOutput<S>;
+    type Output<S: BosStr> = CollectionitemGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<CollectionitemGetRecordOutput<S>>
-for Collectionitem<S> {
+impl<S: BosStr> From<CollectionitemGetRecordOutput<S>> for Collectionitem<S> {
     fn from(output: CollectionitemGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Collectionitem<S> {
+impl<S: BosStr> Collection for Collectionitem<S> {
     const NSID: &'static str = "social.lexical.works.collectionitem";
     type Record = CollectionitemRecord;
 }
@@ -101,7 +100,7 @@ impl Collection for CollectionitemRecord {
     type Record = CollectionitemRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Collectionitem<S> {
+impl<S: BosStr> LexiconSchema for Collectionitem<S> {
     fn nsid() -> &'static str {
         "social.lexical.works.collectionitem"
     }
@@ -126,145 +125,145 @@ pub mod collectionitem_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type List;
         type Work;
+        type List;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type List = Unset;
         type Work = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type List = S::List;
-        type Work = S::Work;
-    }
-    ///State transition - sets the `list` field to Set
-    pub struct SetList<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetList<S> {}
-    impl<S: State> State for SetList<S> {
-        type CreatedAt = S::CreatedAt;
-        type List = Set<members::list>;
-        type Work = S::Work;
+        type List = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `work` field to Set
-    pub struct SetWork<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWork<S> {}
-    impl<S: State> State for SetWork<S> {
-        type CreatedAt = S::CreatedAt;
-        type List = S::List;
+    pub struct SetWork<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetWork<St> {}
+    impl<St: State> State for SetWork<St> {
         type Work = Set<members::work>;
+        type List = St::List;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `list` field to Set
+    pub struct SetList<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetList<St> {}
+    impl<St: State> State for SetList<St> {
+        type Work = St::Work;
+        type List = Set<members::list>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Work = St::Work;
+        type List = St::List;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `list` field
-        pub struct list(());
         ///Marker type for the `work` field
         pub struct work(());
+        ///Marker type for the `list` field
+        pub struct list(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct CollectionitemBuilder<'a, S: collectionitem_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct CollectionitemBuilder<S: BosStr, St: collectionitem_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<AtUri<S>>, Option<AtUri<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Collectionitem<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> CollectionitemBuilder<'a, collectionitem_state::Empty> {
+impl<S: BosStr> Collectionitem<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> CollectionitemBuilder<S, collectionitem_state::Empty> {
         CollectionitemBuilder::new()
     }
 }
 
-impl<'a> CollectionitemBuilder<'a, collectionitem_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> CollectionitemBuilder<S, collectionitem_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         CollectionitemBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CollectionitemBuilder<'a, S>
+impl<S: BosStr, St> CollectionitemBuilder<S, St>
 where
-    S: collectionitem_state::State,
-    S::CreatedAt: collectionitem_state::IsUnset,
+    St: collectionitem_state::State,
+    St::CreatedAt: collectionitem_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> CollectionitemBuilder<'a, collectionitem_state::SetCreatedAt<S>> {
+    ) -> CollectionitemBuilder<S, collectionitem_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         CollectionitemBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CollectionitemBuilder<'a, S>
+impl<S: BosStr, St> CollectionitemBuilder<S, St>
 where
-    S: collectionitem_state::State,
-    S::List: collectionitem_state::IsUnset,
+    St: collectionitem_state::State,
+    St::List: collectionitem_state::IsUnset,
 {
     /// Set the `list` field (required)
     pub fn list(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> CollectionitemBuilder<'a, collectionitem_state::SetList<S>> {
+    ) -> CollectionitemBuilder<S, collectionitem_state::SetList<St>> {
         self._fields.1 = Option::Some(value.into());
         CollectionitemBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CollectionitemBuilder<'a, S>
+impl<S: BosStr, St> CollectionitemBuilder<S, St>
 where
-    S: collectionitem_state::State,
-    S::Work: collectionitem_state::IsUnset,
+    St: collectionitem_state::State,
+    St::Work: collectionitem_state::IsUnset,
 {
     /// Set the `work` field (required)
     pub fn work(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> CollectionitemBuilder<'a, collectionitem_state::SetWork<S>> {
+    ) -> CollectionitemBuilder<S, collectionitem_state::SetWork<St>> {
         self._fields.2 = Option::Some(value.into());
         CollectionitemBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CollectionitemBuilder<'a, S>
+impl<S: BosStr, St> CollectionitemBuilder<S, St>
 where
-    S: collectionitem_state::State,
-    S::CreatedAt: collectionitem_state::IsSet,
-    S::List: collectionitem_state::IsSet,
-    S::Work: collectionitem_state::IsSet,
+    St: collectionitem_state::State,
+    St::Work: collectionitem_state::IsSet,
+    St::List: collectionitem_state::IsSet,
+    St::CreatedAt: collectionitem_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Collectionitem<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Collectionitem<S> {
         Collectionitem {
             created_at: self._fields.0.unwrap(),
             list: self._fields.1.unwrap(),
@@ -272,11 +271,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Collectionitem<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Collectionitem<S> {
         Collectionitem {
             created_at: self._fields.0.unwrap(),
             list: self._fields.1.unwrap(),

@@ -15,7 +15,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -43,11 +43,11 @@ use crate::app_rocksky::artist::ArtistViewBasic;
     rename = "app.rocksky.scrobble",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Scrobble<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Scrobble<S: BosStr = DefaultStr> {
     ///The album of the song.
     pub album: S,
     ///The album art of the song.
@@ -127,11 +127,11 @@ pub struct Scrobble<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ScrobbleGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ScrobbleGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
@@ -143,11 +143,11 @@ pub struct ScrobbleGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ScrobbleViewBasic<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ScrobbleViewBasic<S: BosStr = DefaultStr> {
     ///The album of the song.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub album: Option<S>,
@@ -200,11 +200,11 @@ pub struct ScrobbleViewBasic<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ScrobbleViewDetailed<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ScrobbleViewDetailed<S: BosStr = DefaultStr> {
     ///The album of the song.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub album: Option<S>,
@@ -250,7 +250,7 @@ pub struct ScrobbleViewDetailed<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Scrobble<S> {
+impl<S: BosStr> Scrobble<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, ScrobbleRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -263,17 +263,17 @@ pub struct ScrobbleRecord;
 impl XrpcResp for ScrobbleRecord {
     const NSID: &'static str = "app.rocksky.scrobble";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ScrobbleGetRecordOutput<S>;
+    type Output<S: BosStr> = ScrobbleGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<ScrobbleGetRecordOutput<S>> for Scrobble<S> {
+impl<S: BosStr> From<ScrobbleGetRecordOutput<S>> for Scrobble<S> {
     fn from(output: ScrobbleGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Scrobble<S> {
+impl<S: BosStr> Collection for Scrobble<S> {
     const NSID: &'static str = "app.rocksky.scrobble";
     type Record = ScrobbleRecord;
 }
@@ -283,7 +283,7 @@ impl Collection for ScrobbleRecord {
     type Record = ScrobbleRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Scrobble<S> {
+impl<S: BosStr> LexiconSchema for Scrobble<S> {
     fn nsid() -> &'static str {
         "app.rocksky.scrobble"
     }
@@ -514,7 +514,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Scrobble<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ScrobbleViewBasic<S> {
+impl<S: BosStr> LexiconSchema for ScrobbleViewBasic<S> {
     fn nsid() -> &'static str {
         "app.rocksky.scrobble.defs"
     }
@@ -529,7 +529,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for ScrobbleViewBasic<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ScrobbleViewDetailed<S> {
+impl<S: BosStr> LexiconSchema for ScrobbleViewDetailed<S> {
     fn nsid() -> &'static str {
         "app.rocksky.scrobble.defs"
     }
@@ -554,111 +554,111 @@ pub mod scrobble_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Artist;
-        type CreatedAt;
         type Duration;
         type AlbumArtist;
-        type Title;
+        type Artist;
         type Album;
+        type Title;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Artist = Unset;
-        type CreatedAt = Unset;
         type Duration = Unset;
         type AlbumArtist = Unset;
-        type Title = Unset;
+        type Artist = Unset;
         type Album = Unset;
-    }
-    ///State transition - sets the `artist` field to Set
-    pub struct SetArtist<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetArtist<S> {}
-    impl<S: State> State for SetArtist<S> {
-        type Artist = Set<members::artist>;
-        type CreatedAt = S::CreatedAt;
-        type Duration = S::Duration;
-        type AlbumArtist = S::AlbumArtist;
-        type Title = S::Title;
-        type Album = S::Album;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Artist = S::Artist;
-        type CreatedAt = Set<members::created_at>;
-        type Duration = S::Duration;
-        type AlbumArtist = S::AlbumArtist;
-        type Title = S::Title;
-        type Album = S::Album;
+        type Title = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `duration` field to Set
-    pub struct SetDuration<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDuration<S> {}
-    impl<S: State> State for SetDuration<S> {
-        type Artist = S::Artist;
-        type CreatedAt = S::CreatedAt;
+    pub struct SetDuration<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDuration<St> {}
+    impl<St: State> State for SetDuration<St> {
         type Duration = Set<members::duration>;
-        type AlbumArtist = S::AlbumArtist;
-        type Title = S::Title;
-        type Album = S::Album;
+        type AlbumArtist = St::AlbumArtist;
+        type Artist = St::Artist;
+        type Album = St::Album;
+        type Title = St::Title;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `album_artist` field to Set
-    pub struct SetAlbumArtist<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAlbumArtist<S> {}
-    impl<S: State> State for SetAlbumArtist<S> {
-        type Artist = S::Artist;
-        type CreatedAt = S::CreatedAt;
-        type Duration = S::Duration;
+    pub struct SetAlbumArtist<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAlbumArtist<St> {}
+    impl<St: State> State for SetAlbumArtist<St> {
+        type Duration = St::Duration;
         type AlbumArtist = Set<members::album_artist>;
-        type Title = S::Title;
-        type Album = S::Album;
+        type Artist = St::Artist;
+        type Album = St::Album;
+        type Title = St::Title;
+        type CreatedAt = St::CreatedAt;
     }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Artist = S::Artist;
-        type CreatedAt = S::CreatedAt;
-        type Duration = S::Duration;
-        type AlbumArtist = S::AlbumArtist;
-        type Title = Set<members::title>;
-        type Album = S::Album;
+    ///State transition - sets the `artist` field to Set
+    pub struct SetArtist<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetArtist<St> {}
+    impl<St: State> State for SetArtist<St> {
+        type Duration = St::Duration;
+        type AlbumArtist = St::AlbumArtist;
+        type Artist = Set<members::artist>;
+        type Album = St::Album;
+        type Title = St::Title;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `album` field to Set
-    pub struct SetAlbum<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAlbum<S> {}
-    impl<S: State> State for SetAlbum<S> {
-        type Artist = S::Artist;
-        type CreatedAt = S::CreatedAt;
-        type Duration = S::Duration;
-        type AlbumArtist = S::AlbumArtist;
-        type Title = S::Title;
+    pub struct SetAlbum<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAlbum<St> {}
+    impl<St: State> State for SetAlbum<St> {
+        type Duration = St::Duration;
+        type AlbumArtist = St::AlbumArtist;
+        type Artist = St::Artist;
         type Album = Set<members::album>;
+        type Title = St::Title;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
+        type Duration = St::Duration;
+        type AlbumArtist = St::AlbumArtist;
+        type Artist = St::Artist;
+        type Album = St::Album;
+        type Title = Set<members::title>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Duration = St::Duration;
+        type AlbumArtist = St::AlbumArtist;
+        type Artist = St::Artist;
+        type Album = St::Album;
+        type Title = St::Title;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `artist` field
-        pub struct artist(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `duration` field
         pub struct duration(());
         ///Marker type for the `album_artist` field
         pub struct album_artist(());
-        ///Marker type for the `title` field
-        pub struct title(());
+        ///Marker type for the `artist` field
+        pub struct artist(());
         ///Marker type for the `album` field
         pub struct album(());
+        ///Marker type for the `title` field
+        pub struct title(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ScrobbleBuilder<'a, S: scrobble_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ScrobbleBuilder<S: BosStr, St: scrobble_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
         Option<BlobRef<S>>,
@@ -686,18 +686,18 @@ pub struct ScrobbleBuilder<'a, S: scrobble_state::State> {
         Option<i64>,
         Option<UriValue<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Scrobble<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ScrobbleBuilder<'a, scrobble_state::Empty> {
+impl<S: BosStr> Scrobble<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ScrobbleBuilder<S, scrobble_state::Empty> {
         ScrobbleBuilder::new()
     }
 }
 
-impl<'a> ScrobbleBuilder<'a, scrobble_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ScrobbleBuilder<S, scrobble_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ScrobbleBuilder {
             _state: PhantomData,
@@ -728,31 +728,31 @@ impl<'a> ScrobbleBuilder<'a, scrobble_state::Empty> {
                 None,
                 None,
             ),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ScrobbleBuilder<'a, S>
+impl<S: BosStr, St> ScrobbleBuilder<S, St>
 where
-    S: scrobble_state::State,
-    S::Album: scrobble_state::IsUnset,
+    St: scrobble_state::State,
+    St::Album: scrobble_state::IsUnset,
 {
     /// Set the `album` field (required)
     pub fn album(
         mut self,
         value: impl Into<S>,
-    ) -> ScrobbleBuilder<'a, scrobble_state::SetAlbum<S>> {
+    ) -> ScrobbleBuilder<S, scrobble_state::SetAlbum<St>> {
         self._fields.0 = Option::Some(value.into());
         ScrobbleBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: scrobble_state::State> ScrobbleBuilder<'a, S> {
+impl<S: BosStr, St: scrobble_state::State> ScrobbleBuilder<S, St> {
     /// Set the `albumArt` field (optional)
     pub fn album_art(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -765,7 +765,7 @@ impl<'a, S: scrobble_state::State> ScrobbleBuilder<'a, S> {
     }
 }
 
-impl<'a, S: scrobble_state::State> ScrobbleBuilder<'a, S> {
+impl<S: BosStr, St: scrobble_state::State> ScrobbleBuilder<S, St> {
     /// Set the `albumArtUrl` field (optional)
     pub fn album_art_url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -778,26 +778,26 @@ impl<'a, S: scrobble_state::State> ScrobbleBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ScrobbleBuilder<'a, S>
+impl<S: BosStr, St> ScrobbleBuilder<S, St>
 where
-    S: scrobble_state::State,
-    S::AlbumArtist: scrobble_state::IsUnset,
+    St: scrobble_state::State,
+    St::AlbumArtist: scrobble_state::IsUnset,
 {
     /// Set the `albumArtist` field (required)
     pub fn album_artist(
         mut self,
         value: impl Into<S>,
-    ) -> ScrobbleBuilder<'a, scrobble_state::SetAlbumArtist<S>> {
+    ) -> ScrobbleBuilder<S, scrobble_state::SetAlbumArtist<St>> {
         self._fields.3 = Option::Some(value.into());
         ScrobbleBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: scrobble_state::State> ScrobbleBuilder<'a, S> {
+impl<S: BosStr, St: scrobble_state::State> ScrobbleBuilder<S, St> {
     /// Set the `appleMusicLink` field (optional)
     pub fn apple_music_link(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -810,26 +810,26 @@ impl<'a, S: scrobble_state::State> ScrobbleBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ScrobbleBuilder<'a, S>
+impl<S: BosStr, St> ScrobbleBuilder<S, St>
 where
-    S: scrobble_state::State,
-    S::Artist: scrobble_state::IsUnset,
+    St: scrobble_state::State,
+    St::Artist: scrobble_state::IsUnset,
 {
     /// Set the `artist` field (required)
     pub fn artist(
         mut self,
         value: impl Into<S>,
-    ) -> ScrobbleBuilder<'a, scrobble_state::SetArtist<S>> {
+    ) -> ScrobbleBuilder<S, scrobble_state::SetArtist<St>> {
         self._fields.5 = Option::Some(value.into());
         ScrobbleBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: scrobble_state::State> ScrobbleBuilder<'a, S> {
+impl<S: BosStr, St: scrobble_state::State> ScrobbleBuilder<S, St> {
     /// Set the `artists` field (optional)
     pub fn artists(mut self, value: impl Into<Option<Vec<ArtistMbid<S>>>>) -> Self {
         self._fields.6 = value.into();
@@ -842,7 +842,7 @@ impl<'a, S: scrobble_state::State> ScrobbleBuilder<'a, S> {
     }
 }
 
-impl<'a, S: scrobble_state::State> ScrobbleBuilder<'a, S> {
+impl<S: BosStr, St: scrobble_state::State> ScrobbleBuilder<S, St> {
     /// Set the `composer` field (optional)
     pub fn composer(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.7 = value.into();
@@ -855,7 +855,7 @@ impl<'a, S: scrobble_state::State> ScrobbleBuilder<'a, S> {
     }
 }
 
-impl<'a, S: scrobble_state::State> ScrobbleBuilder<'a, S> {
+impl<S: BosStr, St: scrobble_state::State> ScrobbleBuilder<S, St> {
     /// Set the `copyrightMessage` field (optional)
     pub fn copyright_message(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.8 = value.into();
@@ -868,26 +868,26 @@ impl<'a, S: scrobble_state::State> ScrobbleBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ScrobbleBuilder<'a, S>
+impl<S: BosStr, St> ScrobbleBuilder<S, St>
 where
-    S: scrobble_state::State,
-    S::CreatedAt: scrobble_state::IsUnset,
+    St: scrobble_state::State,
+    St::CreatedAt: scrobble_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ScrobbleBuilder<'a, scrobble_state::SetCreatedAt<S>> {
+    ) -> ScrobbleBuilder<S, scrobble_state::SetCreatedAt<St>> {
         self._fields.9 = Option::Some(value.into());
         ScrobbleBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: scrobble_state::State> ScrobbleBuilder<'a, S> {
+impl<S: BosStr, St: scrobble_state::State> ScrobbleBuilder<S, St> {
     /// Set the `discNumber` field (optional)
     pub fn disc_number(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.10 = value.into();
@@ -900,26 +900,26 @@ impl<'a, S: scrobble_state::State> ScrobbleBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ScrobbleBuilder<'a, S>
+impl<S: BosStr, St> ScrobbleBuilder<S, St>
 where
-    S: scrobble_state::State,
-    S::Duration: scrobble_state::IsUnset,
+    St: scrobble_state::State,
+    St::Duration: scrobble_state::IsUnset,
 {
     /// Set the `duration` field (required)
     pub fn duration(
         mut self,
         value: impl Into<i64>,
-    ) -> ScrobbleBuilder<'a, scrobble_state::SetDuration<S>> {
+    ) -> ScrobbleBuilder<S, scrobble_state::SetDuration<St>> {
         self._fields.11 = Option::Some(value.into());
         ScrobbleBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: scrobble_state::State> ScrobbleBuilder<'a, S> {
+impl<S: BosStr, St: scrobble_state::State> ScrobbleBuilder<S, St> {
     /// Set the `genre` field (optional)
     pub fn genre(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.12 = value.into();
@@ -932,7 +932,7 @@ impl<'a, S: scrobble_state::State> ScrobbleBuilder<'a, S> {
     }
 }
 
-impl<'a, S: scrobble_state::State> ScrobbleBuilder<'a, S> {
+impl<S: BosStr, St: scrobble_state::State> ScrobbleBuilder<S, St> {
     /// Set the `label` field (optional)
     pub fn label(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.13 = value.into();
@@ -945,7 +945,7 @@ impl<'a, S: scrobble_state::State> ScrobbleBuilder<'a, S> {
     }
 }
 
-impl<'a, S: scrobble_state::State> ScrobbleBuilder<'a, S> {
+impl<S: BosStr, St: scrobble_state::State> ScrobbleBuilder<S, St> {
     /// Set the `lyrics` field (optional)
     pub fn lyrics(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.14 = value.into();
@@ -958,7 +958,7 @@ impl<'a, S: scrobble_state::State> ScrobbleBuilder<'a, S> {
     }
 }
 
-impl<'a, S: scrobble_state::State> ScrobbleBuilder<'a, S> {
+impl<S: BosStr, St: scrobble_state::State> ScrobbleBuilder<S, St> {
     /// Set the `mbid` field (optional)
     pub fn mbid(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.15 = value.into();
@@ -971,7 +971,7 @@ impl<'a, S: scrobble_state::State> ScrobbleBuilder<'a, S> {
     }
 }
 
-impl<'a, S: scrobble_state::State> ScrobbleBuilder<'a, S> {
+impl<S: BosStr, St: scrobble_state::State> ScrobbleBuilder<S, St> {
     /// Set the `releaseDate` field (optional)
     pub fn release_date(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.16 = value.into();
@@ -984,7 +984,7 @@ impl<'a, S: scrobble_state::State> ScrobbleBuilder<'a, S> {
     }
 }
 
-impl<'a, S: scrobble_state::State> ScrobbleBuilder<'a, S> {
+impl<S: BosStr, St: scrobble_state::State> ScrobbleBuilder<S, St> {
     /// Set the `spotifyLink` field (optional)
     pub fn spotify_link(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.17 = value.into();
@@ -997,7 +997,7 @@ impl<'a, S: scrobble_state::State> ScrobbleBuilder<'a, S> {
     }
 }
 
-impl<'a, S: scrobble_state::State> ScrobbleBuilder<'a, S> {
+impl<S: BosStr, St: scrobble_state::State> ScrobbleBuilder<S, St> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.18 = value.into();
@@ -1010,7 +1010,7 @@ impl<'a, S: scrobble_state::State> ScrobbleBuilder<'a, S> {
     }
 }
 
-impl<'a, S: scrobble_state::State> ScrobbleBuilder<'a, S> {
+impl<S: BosStr, St: scrobble_state::State> ScrobbleBuilder<S, St> {
     /// Set the `tidalLink` field (optional)
     pub fn tidal_link(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.19 = value.into();
@@ -1023,26 +1023,26 @@ impl<'a, S: scrobble_state::State> ScrobbleBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ScrobbleBuilder<'a, S>
+impl<S: BosStr, St> ScrobbleBuilder<S, St>
 where
-    S: scrobble_state::State,
-    S::Title: scrobble_state::IsUnset,
+    St: scrobble_state::State,
+    St::Title: scrobble_state::IsUnset,
 {
     /// Set the `title` field (required)
     pub fn title(
         mut self,
         value: impl Into<S>,
-    ) -> ScrobbleBuilder<'a, scrobble_state::SetTitle<S>> {
+    ) -> ScrobbleBuilder<S, scrobble_state::SetTitle<St>> {
         self._fields.20 = Option::Some(value.into());
         ScrobbleBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: scrobble_state::State> ScrobbleBuilder<'a, S> {
+impl<S: BosStr, St: scrobble_state::State> ScrobbleBuilder<S, St> {
     /// Set the `trackNumber` field (optional)
     pub fn track_number(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.21 = value.into();
@@ -1055,7 +1055,7 @@ impl<'a, S: scrobble_state::State> ScrobbleBuilder<'a, S> {
     }
 }
 
-impl<'a, S: scrobble_state::State> ScrobbleBuilder<'a, S> {
+impl<S: BosStr, St: scrobble_state::State> ScrobbleBuilder<S, St> {
     /// Set the `wiki` field (optional)
     pub fn wiki(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.22 = value.into();
@@ -1068,7 +1068,7 @@ impl<'a, S: scrobble_state::State> ScrobbleBuilder<'a, S> {
     }
 }
 
-impl<'a, S: scrobble_state::State> ScrobbleBuilder<'a, S> {
+impl<S: BosStr, St: scrobble_state::State> ScrobbleBuilder<S, St> {
     /// Set the `year` field (optional)
     pub fn year(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.23 = value.into();
@@ -1081,7 +1081,7 @@ impl<'a, S: scrobble_state::State> ScrobbleBuilder<'a, S> {
     }
 }
 
-impl<'a, S: scrobble_state::State> ScrobbleBuilder<'a, S> {
+impl<S: BosStr, St: scrobble_state::State> ScrobbleBuilder<S, St> {
     /// Set the `youtubeLink` field (optional)
     pub fn youtube_link(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.24 = value.into();
@@ -1094,18 +1094,18 @@ impl<'a, S: scrobble_state::State> ScrobbleBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ScrobbleBuilder<'a, S>
+impl<S: BosStr, St> ScrobbleBuilder<S, St>
 where
-    S: scrobble_state::State,
-    S::Artist: scrobble_state::IsSet,
-    S::CreatedAt: scrobble_state::IsSet,
-    S::Duration: scrobble_state::IsSet,
-    S::AlbumArtist: scrobble_state::IsSet,
-    S::Title: scrobble_state::IsSet,
-    S::Album: scrobble_state::IsSet,
+    St: scrobble_state::State,
+    St::Duration: scrobble_state::IsSet,
+    St::AlbumArtist: scrobble_state::IsSet,
+    St::Artist: scrobble_state::IsSet,
+    St::Album: scrobble_state::IsSet,
+    St::Title: scrobble_state::IsSet,
+    St::CreatedAt: scrobble_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Scrobble<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Scrobble<S> {
         Scrobble {
             album: self._fields.0.unwrap(),
             album_art: self._fields.1,
@@ -1135,11 +1135,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Scrobble<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Scrobble<S> {
         Scrobble {
             album: self._fields.0.unwrap(),
             album_art: self._fields.1,

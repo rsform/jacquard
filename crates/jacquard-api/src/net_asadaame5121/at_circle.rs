@@ -17,7 +17,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use serde::{Serialize, Deserialize};
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct RingRef<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct RingRef<S: BosStr = DefaultStr> {
     ///Optional CID for strong reference
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
@@ -50,7 +50,7 @@ pub struct RingRef<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for RingRef<S> {
+impl<S: BosStr> LexiconSchema for RingRef<S> {
     fn nsid() -> &'static str {
         "net.asadaame5121.at-circle.defs"
     }
@@ -105,9 +105,9 @@ pub mod ring_ref_state {
         type Uri = Unset;
     }
     ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
         type Uri = Set<members::uri>;
     }
     /// Marker types for field names
@@ -118,32 +118,32 @@ pub mod ring_ref_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct RingRefBuilder<'a, S: ring_ref_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct RingRefBuilder<S: BosStr, St: ring_ref_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Cid<S>>, Option<AtUri<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> RingRef<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> RingRefBuilder<'a, ring_ref_state::Empty> {
+impl<S: BosStr> RingRef<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> RingRefBuilder<S, ring_ref_state::Empty> {
         RingRefBuilder::new()
     }
 }
 
-impl<'a> RingRefBuilder<'a, ring_ref_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> RingRefBuilder<S, ring_ref_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         RingRefBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: ring_ref_state::State> RingRefBuilder<'a, S> {
+impl<S: BosStr, St: ring_ref_state::State> RingRefBuilder<S, St> {
     /// Set the `cid` field (optional)
     pub fn cid(mut self, value: impl Into<Option<Cid<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -156,43 +156,40 @@ impl<'a, S: ring_ref_state::State> RingRefBuilder<'a, S> {
     }
 }
 
-impl<'a, S> RingRefBuilder<'a, S>
+impl<S: BosStr, St> RingRefBuilder<S, St>
 where
-    S: ring_ref_state::State,
-    S::Uri: ring_ref_state::IsUnset,
+    St: ring_ref_state::State,
+    St::Uri: ring_ref_state::IsUnset,
 {
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> RingRefBuilder<'a, ring_ref_state::SetUri<S>> {
+    ) -> RingRefBuilder<S, ring_ref_state::SetUri<St>> {
         self._fields.1 = Option::Some(value.into());
         RingRefBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RingRefBuilder<'a, S>
+impl<S: BosStr, St> RingRefBuilder<S, St>
 where
-    S: ring_ref_state::State,
-    S::Uri: ring_ref_state::IsSet,
+    St: ring_ref_state::State,
+    St::Uri: ring_ref_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> RingRef<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> RingRef<S> {
         RingRef {
             cid: self._fields.0,
             uri: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> RingRef<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> RingRef<S> {
         RingRef {
             cid: self._fields.0,
             uri: self._fields.1.unwrap(),

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use crate::blue__2048::SyncStatus;
     rename = "blue.2048.player.profile",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Profile<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Profile<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     ///Does not want to show up anywhere. Keep stats to your PDS.  Defaults to `false`.
     #[serde(default = "_default_profile_solo_play")]
@@ -57,18 +57,18 @@ pub struct Profile<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ProfileGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ProfileGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Profile<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Profile<S> {
+impl<S: BosStr> Profile<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, ProfileRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -81,17 +81,17 @@ pub struct ProfileRecord;
 impl XrpcResp for ProfileRecord {
     const NSID: &'static str = "blue.2048.player.profile";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ProfileGetRecordOutput<S>;
+    type Output<S: BosStr> = ProfileGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<ProfileGetRecordOutput<S>> for Profile<S> {
+impl<S: BosStr> From<ProfileGetRecordOutput<S>> for Profile<S> {
     fn from(output: ProfileGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Profile<S> {
+impl<S: BosStr> Collection for Profile<S> {
     const NSID: &'static str = "blue.2048.player.profile";
     type Record = ProfileRecord;
 }
@@ -101,7 +101,7 @@ impl Collection for ProfileRecord {
     type Record = ProfileRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Profile<S> {
+impl<S: BosStr> LexiconSchema for Profile<S> {
     fn nsid() -> &'static str {
         "blue.2048.player.profile"
     }
@@ -131,144 +131,144 @@ pub mod profile_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type SyncStatus;
-        type CreatedAt;
         type SoloPlay;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type SyncStatus = Unset;
-        type CreatedAt = Unset;
         type SoloPlay = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `sync_status` field to Set
-    pub struct SetSyncStatus<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSyncStatus<S> {}
-    impl<S: State> State for SetSyncStatus<S> {
+    pub struct SetSyncStatus<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSyncStatus<St> {}
+    impl<St: State> State for SetSyncStatus<St> {
         type SyncStatus = Set<members::sync_status>;
-        type CreatedAt = S::CreatedAt;
-        type SoloPlay = S::SoloPlay;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type SyncStatus = S::SyncStatus;
-        type CreatedAt = Set<members::created_at>;
-        type SoloPlay = S::SoloPlay;
+        type SoloPlay = St::SoloPlay;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `solo_play` field to Set
-    pub struct SetSoloPlay<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSoloPlay<S> {}
-    impl<S: State> State for SetSoloPlay<S> {
-        type SyncStatus = S::SyncStatus;
-        type CreatedAt = S::CreatedAt;
+    pub struct SetSoloPlay<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSoloPlay<St> {}
+    impl<St: State> State for SetSoloPlay<St> {
+        type SyncStatus = St::SyncStatus;
         type SoloPlay = Set<members::solo_play>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type SyncStatus = St::SyncStatus;
+        type SoloPlay = St::SoloPlay;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `sync_status` field
         pub struct sync_status(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `solo_play` field
         pub struct solo_play(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ProfileBuilder<'a, S: profile_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ProfileBuilder<S: BosStr, St: profile_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<bool>, Option<SyncStatus<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Profile<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ProfileBuilder<'a, profile_state::Empty> {
+impl<S: BosStr> Profile<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ProfileBuilder<S, profile_state::Empty> {
         ProfileBuilder::new()
     }
 }
 
-impl<'a> ProfileBuilder<'a, profile_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ProfileBuilder<S, profile_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ProfileBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ProfileBuilder<'a, S>
+impl<S: BosStr, St> ProfileBuilder<S, St>
 where
-    S: profile_state::State,
-    S::CreatedAt: profile_state::IsUnset,
+    St: profile_state::State,
+    St::CreatedAt: profile_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ProfileBuilder<'a, profile_state::SetCreatedAt<S>> {
+    ) -> ProfileBuilder<S, profile_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         ProfileBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ProfileBuilder<'a, S>
+impl<S: BosStr, St> ProfileBuilder<S, St>
 where
-    S: profile_state::State,
-    S::SoloPlay: profile_state::IsUnset,
+    St: profile_state::State,
+    St::SoloPlay: profile_state::IsUnset,
 {
     /// Set the `soloPlay` field (required)
     pub fn solo_play(
         mut self,
         value: impl Into<bool>,
-    ) -> ProfileBuilder<'a, profile_state::SetSoloPlay<S>> {
+    ) -> ProfileBuilder<S, profile_state::SetSoloPlay<St>> {
         self._fields.1 = Option::Some(value.into());
         ProfileBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ProfileBuilder<'a, S>
+impl<S: BosStr, St> ProfileBuilder<S, St>
 where
-    S: profile_state::State,
-    S::SyncStatus: profile_state::IsUnset,
+    St: profile_state::State,
+    St::SyncStatus: profile_state::IsUnset,
 {
     /// Set the `syncStatus` field (required)
     pub fn sync_status(
         mut self,
         value: impl Into<SyncStatus<S>>,
-    ) -> ProfileBuilder<'a, profile_state::SetSyncStatus<S>> {
+    ) -> ProfileBuilder<S, profile_state::SetSyncStatus<St>> {
         self._fields.2 = Option::Some(value.into());
         ProfileBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ProfileBuilder<'a, S>
+impl<S: BosStr, St> ProfileBuilder<S, St>
 where
-    S: profile_state::State,
-    S::SyncStatus: profile_state::IsSet,
-    S::CreatedAt: profile_state::IsSet,
-    S::SoloPlay: profile_state::IsSet,
+    St: profile_state::State,
+    St::SyncStatus: profile_state::IsSet,
+    St::SoloPlay: profile_state::IsSet,
+    St::CreatedAt: profile_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Profile<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Profile<S> {
         Profile {
             created_at: self._fields.0.unwrap(),
             solo_play: self._fields.1.unwrap(),
@@ -276,11 +276,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Profile<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Profile<S> {
         Profile {
             created_at: self._fields.0.unwrap(),
             solo_play: self._fields.1.unwrap(),

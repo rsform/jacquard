@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use crate::dev_vielle::dnd::astral;
     rename = "dev.vielle.dnd.astral",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Astral<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Astral<S: BosStr = DefaultStr> {
     /// Defaults to `0`.
     #[serde(default = "_default_astral_points")]
     pub points: i64,
@@ -54,11 +54,11 @@ pub struct Astral<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct AstralGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct AstralGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
@@ -67,7 +67,7 @@ pub struct AstralGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum Power<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum Power<S: BosStr = DefaultStr> {
     DevVielleDndPowerEldritchAdaptability,
     DevVielleDndPowerEldritchAssault,
     DevVielleDndPowerRuneSeeker,
@@ -88,7 +88,7 @@ pub enum Power<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> Power<S> {
+impl<S: BosStr> Power<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::DevVielleDndPowerEldritchAdaptability => {
@@ -152,19 +152,19 @@ impl<S: Bos<str> + AsRef<str>> Power<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for Power<S> {
+impl<S: BosStr> AsRef<str> for Power<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for Power<S> {
+impl<S: BosStr> core::fmt::Display for Power<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for Power<S> {
+impl<S: BosStr> Serialize for Power<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -173,7 +173,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for Power<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de> for Power<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for Power<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -183,8 +183,12 @@ impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de> for Powe
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for Power<S> {
-    type Output = Power<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for Power<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = Power<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             Power::DevVielleDndPowerEldritchAdaptability => {
@@ -217,7 +221,7 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for Power<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Astral<S> {
+impl<S: BosStr> Astral<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, AstralRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -230,17 +234,17 @@ pub struct AstralRecord;
 impl XrpcResp for AstralRecord {
     const NSID: &'static str = "dev.vielle.dnd.astral";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = AstralGetRecordOutput<S>;
+    type Output<S: BosStr> = AstralGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<AstralGetRecordOutput<S>> for Astral<S> {
+impl<S: BosStr> From<AstralGetRecordOutput<S>> for Astral<S> {
     fn from(output: AstralGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Astral<S> {
+impl<S: BosStr> Collection for Astral<S> {
     const NSID: &'static str = "dev.vielle.dnd.astral";
     type Record = AstralRecord;
 }
@@ -250,7 +254,7 @@ impl Collection for AstralRecord {
     type Record = AstralRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Astral<S> {
+impl<S: BosStr> LexiconSchema for Astral<S> {
     fn nsid() -> &'static str {
         "dev.vielle.dnd.astral"
     }
@@ -290,17 +294,17 @@ pub mod astral_state {
         type Powers = Unset;
     }
     ///State transition - sets the `points` field to Set
-    pub struct SetPoints<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPoints<S> {}
-    impl<S: State> State for SetPoints<S> {
+    pub struct SetPoints<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPoints<St> {}
+    impl<St: State> State for SetPoints<St> {
         type Points = Set<members::points>;
-        type Powers = S::Powers;
+        type Powers = St::Powers;
     }
     ///State transition - sets the `powers` field to Set
-    pub struct SetPowers<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPowers<S> {}
-    impl<S: State> State for SetPowers<S> {
-        type Points = S::Points;
+    pub struct SetPowers<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPowers<St> {}
+    impl<St: State> State for SetPowers<St> {
+        type Points = St::Points;
         type Powers = Set<members::powers>;
     }
     /// Marker types for field names
@@ -313,85 +317,85 @@ pub mod astral_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct AstralBuilder<'a, S: astral_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct AstralBuilder<S: BosStr, St: astral_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<Vec<astral::Power<S>>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Astral<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> AstralBuilder<'a, astral_state::Empty> {
+impl<S: BosStr> Astral<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> AstralBuilder<S, astral_state::Empty> {
         AstralBuilder::new()
     }
 }
 
-impl<'a> AstralBuilder<'a, astral_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> AstralBuilder<S, astral_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         AstralBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AstralBuilder<'a, S>
+impl<S: BosStr, St> AstralBuilder<S, St>
 where
-    S: astral_state::State,
-    S::Points: astral_state::IsUnset,
+    St: astral_state::State,
+    St::Points: astral_state::IsUnset,
 {
     /// Set the `points` field (required)
     pub fn points(
         mut self,
         value: impl Into<i64>,
-    ) -> AstralBuilder<'a, astral_state::SetPoints<S>> {
+    ) -> AstralBuilder<S, astral_state::SetPoints<St>> {
         self._fields.0 = Option::Some(value.into());
         AstralBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AstralBuilder<'a, S>
+impl<S: BosStr, St> AstralBuilder<S, St>
 where
-    S: astral_state::State,
-    S::Powers: astral_state::IsUnset,
+    St: astral_state::State,
+    St::Powers: astral_state::IsUnset,
 {
     /// Set the `powers` field (required)
     pub fn powers(
         mut self,
         value: impl Into<Vec<astral::Power<S>>>,
-    ) -> AstralBuilder<'a, astral_state::SetPowers<S>> {
+    ) -> AstralBuilder<S, astral_state::SetPowers<St>> {
         self._fields.1 = Option::Some(value.into());
         AstralBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AstralBuilder<'a, S>
+impl<S: BosStr, St> AstralBuilder<S, St>
 where
-    S: astral_state::State,
-    S::Points: astral_state::IsSet,
-    S::Powers: astral_state::IsSet,
+    St: astral_state::State,
+    St::Points: astral_state::IsSet,
+    St::Powers: astral_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Astral<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Astral<S> {
         Astral {
             points: self._fields.0.unwrap(),
             powers: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Astral<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Astral<S> {
         Astral {
             points: self._fields.0.unwrap(),
             powers: self._fields.1.unwrap(),

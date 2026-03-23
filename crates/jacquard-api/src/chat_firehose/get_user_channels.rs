@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -29,11 +29,11 @@ use crate::chat_firehose::get_user_channels;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Channel<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Channel<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -44,23 +44,21 @@ pub struct Channel<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetUserChannelsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetUserChannelsOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub channels: Option<Vec<get_user_channels::Channel<S>>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Channel<S> {
+impl<S: BosStr> LexiconSchema for Channel<S> {
     fn nsid() -> &'static str {
         "chat.firehose.getUserChannels"
     }
@@ -84,7 +82,7 @@ pub struct GetUserChannelsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetUserChannelsResponse {
     const NSID: &'static str = "chat.firehose.getUserChannels";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetUserChannelsOutput<S>;
+    type Output<S: BosStr> = GetUserChannelsOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
@@ -99,7 +97,7 @@ pub struct GetUserChannelsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetUserChannelsRequest {
     const PATH: &'static str = "/xrpc/chat.firehose.getUserChannels";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetUserChannels;
+    type Request<S: BosStr> = GetUserChannels;
     type Response = GetUserChannelsResponse;
 }
 

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "app.bsky.notification.declaration",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Declaration<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Declaration<S: BosStr = DefaultStr> {
     ///A declaration of the user's preference for allowing activity subscriptions from other users. Absence of a record implies 'followers'.
     pub allow_subscriptions: DeclarationAllowSubscriptions<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -49,14 +49,14 @@ pub struct Declaration<S: Bos<str> + AsRef<str> = DefaultStr> {
 /// A declaration of the user's preference for allowing activity subscriptions from other users. Absence of a record implies 'followers'.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum DeclarationAllowSubscriptions<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum DeclarationAllowSubscriptions<S: BosStr = DefaultStr> {
     Followers,
     Mutuals,
     None,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> DeclarationAllowSubscriptions<S> {
+impl<S: BosStr> DeclarationAllowSubscriptions<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Followers => "followers",
@@ -76,19 +76,19 @@ impl<S: Bos<str> + AsRef<str>> DeclarationAllowSubscriptions<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for DeclarationAllowSubscriptions<S> {
+impl<S: BosStr> core::fmt::Display for DeclarationAllowSubscriptions<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for DeclarationAllowSubscriptions<S> {
+impl<S: BosStr> AsRef<str> for DeclarationAllowSubscriptions<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for DeclarationAllowSubscriptions<S> {
+impl<S: BosStr> Serialize for DeclarationAllowSubscriptions<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -97,7 +97,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for DeclarationAllowSubscriptions<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
 for DeclarationAllowSubscriptions<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
@@ -108,14 +108,18 @@ for DeclarationAllowSubscriptions<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for DeclarationAllowSubscriptions<S> {
+impl<S: BosStr + Default> Default for DeclarationAllowSubscriptions<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for DeclarationAllowSubscriptions<S> {
-    type Output = DeclarationAllowSubscriptions<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for DeclarationAllowSubscriptions<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = DeclarationAllowSubscriptions<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             DeclarationAllowSubscriptions::Followers => {
@@ -138,18 +142,18 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for DeclarationAllowSubscriptions<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DeclarationGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DeclarationGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Declaration<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Declaration<S> {
+impl<S: BosStr> Declaration<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, DeclarationRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -162,17 +166,17 @@ pub struct DeclarationRecord;
 impl XrpcResp for DeclarationRecord {
     const NSID: &'static str = "app.bsky.notification.declaration";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = DeclarationGetRecordOutput<S>;
+    type Output<S: BosStr> = DeclarationGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<DeclarationGetRecordOutput<S>> for Declaration<S> {
+impl<S: BosStr> From<DeclarationGetRecordOutput<S>> for Declaration<S> {
     fn from(output: DeclarationGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Declaration<S> {
+impl<S: BosStr> Collection for Declaration<S> {
     const NSID: &'static str = "app.bsky.notification.declaration";
     type Record = DeclarationRecord;
 }
@@ -182,7 +186,7 @@ impl Collection for DeclarationRecord {
     type Record = DeclarationRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Declaration<S> {
+impl<S: BosStr> LexiconSchema for Declaration<S> {
     fn nsid() -> &'static str {
         "app.bsky.notification.declaration"
     }
@@ -216,9 +220,9 @@ pub mod declaration_state {
         type AllowSubscriptions = Unset;
     }
     ///State transition - sets the `allow_subscriptions` field to Set
-    pub struct SetAllowSubscriptions<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAllowSubscriptions<S> {}
-    impl<S: State> State for SetAllowSubscriptions<S> {
+    pub struct SetAllowSubscriptions<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAllowSubscriptions<St> {}
+    impl<St: State> State for SetAllowSubscriptions<St> {
         type AllowSubscriptions = Set<members::allow_subscriptions>;
     }
     /// Marker types for field names
@@ -229,67 +233,67 @@ pub mod declaration_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct DeclarationBuilder<'a, S: declaration_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct DeclarationBuilder<S: BosStr, St: declaration_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<DeclarationAllowSubscriptions<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Declaration<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> DeclarationBuilder<'a, declaration_state::Empty> {
+impl<S: BosStr> Declaration<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> DeclarationBuilder<S, declaration_state::Empty> {
         DeclarationBuilder::new()
     }
 }
 
-impl<'a> DeclarationBuilder<'a, declaration_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> DeclarationBuilder<S, declaration_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         DeclarationBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DeclarationBuilder<'a, S>
+impl<S: BosStr, St> DeclarationBuilder<S, St>
 where
-    S: declaration_state::State,
-    S::AllowSubscriptions: declaration_state::IsUnset,
+    St: declaration_state::State,
+    St::AllowSubscriptions: declaration_state::IsUnset,
 {
     /// Set the `allowSubscriptions` field (required)
     pub fn allow_subscriptions(
         mut self,
         value: impl Into<DeclarationAllowSubscriptions<S>>,
-    ) -> DeclarationBuilder<'a, declaration_state::SetAllowSubscriptions<S>> {
+    ) -> DeclarationBuilder<S, declaration_state::SetAllowSubscriptions<St>> {
         self._fields.0 = Option::Some(value.into());
         DeclarationBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DeclarationBuilder<'a, S>
+impl<S: BosStr, St> DeclarationBuilder<S, St>
 where
-    S: declaration_state::State,
-    S::AllowSubscriptions: declaration_state::IsSet,
+    St: declaration_state::State,
+    St::AllowSubscriptions: declaration_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Declaration<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Declaration<S> {
         Declaration {
             allow_subscriptions: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Declaration<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Declaration<S> {
         Declaration {
             allow_subscriptions: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

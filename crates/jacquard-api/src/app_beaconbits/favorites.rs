@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "app.beaconbits.favorites",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Favorites<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Favorites<S: BosStr = DefaultStr> {
     ///List of favorited user DIDs
     pub dids: Vec<Did<S>>,
     ///Timestamp when the favorites list was last updated
@@ -54,18 +54,18 @@ pub struct Favorites<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct FavoritesGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct FavoritesGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Favorites<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Favorites<S> {
+impl<S: BosStr> Favorites<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, FavoritesRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -78,17 +78,17 @@ pub struct FavoritesRecord;
 impl XrpcResp for FavoritesRecord {
     const NSID: &'static str = "app.beaconbits.favorites";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = FavoritesGetRecordOutput<S>;
+    type Output<S: BosStr> = FavoritesGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<FavoritesGetRecordOutput<S>> for Favorites<S> {
+impl<S: BosStr> From<FavoritesGetRecordOutput<S>> for Favorites<S> {
     fn from(output: FavoritesGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Favorites<S> {
+impl<S: BosStr> Collection for Favorites<S> {
     const NSID: &'static str = "app.beaconbits.favorites";
     type Record = FavoritesRecord;
 }
@@ -98,7 +98,7 @@ impl Collection for FavoritesRecord {
     type Record = FavoritesRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Favorites<S> {
+impl<S: BosStr> LexiconSchema for Favorites<S> {
     fn nsid() -> &'static str {
         "app.beaconbits.favorites"
     }
@@ -134,122 +134,122 @@ pub mod favorites_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type UpdatedAt;
         type Dids;
+        type UpdatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type UpdatedAt = Unset;
         type Dids = Unset;
-    }
-    ///State transition - sets the `updated_at` field to Set
-    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
-    impl<S: State> State for SetUpdatedAt<S> {
-        type UpdatedAt = Set<members::updated_at>;
-        type Dids = S::Dids;
+        type UpdatedAt = Unset;
     }
     ///State transition - sets the `dids` field to Set
-    pub struct SetDids<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDids<S> {}
-    impl<S: State> State for SetDids<S> {
-        type UpdatedAt = S::UpdatedAt;
+    pub struct SetDids<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDids<St> {}
+    impl<St: State> State for SetDids<St> {
         type Dids = Set<members::dids>;
+        type UpdatedAt = St::UpdatedAt;
+    }
+    ///State transition - sets the `updated_at` field to Set
+    pub struct SetUpdatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUpdatedAt<St> {}
+    impl<St: State> State for SetUpdatedAt<St> {
+        type Dids = St::Dids;
+        type UpdatedAt = Set<members::updated_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `updated_at` field
-        pub struct updated_at(());
         ///Marker type for the `dids` field
         pub struct dids(());
+        ///Marker type for the `updated_at` field
+        pub struct updated_at(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct FavoritesBuilder<'a, S: favorites_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct FavoritesBuilder<S: BosStr, St: favorites_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<Did<S>>>, Option<Datetime>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Favorites<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> FavoritesBuilder<'a, favorites_state::Empty> {
+impl<S: BosStr> Favorites<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> FavoritesBuilder<S, favorites_state::Empty> {
         FavoritesBuilder::new()
     }
 }
 
-impl<'a> FavoritesBuilder<'a, favorites_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> FavoritesBuilder<S, favorites_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         FavoritesBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> FavoritesBuilder<'a, S>
+impl<S: BosStr, St> FavoritesBuilder<S, St>
 where
-    S: favorites_state::State,
-    S::Dids: favorites_state::IsUnset,
+    St: favorites_state::State,
+    St::Dids: favorites_state::IsUnset,
 {
     /// Set the `dids` field (required)
     pub fn dids(
         mut self,
         value: impl Into<Vec<Did<S>>>,
-    ) -> FavoritesBuilder<'a, favorites_state::SetDids<S>> {
+    ) -> FavoritesBuilder<S, favorites_state::SetDids<St>> {
         self._fields.0 = Option::Some(value.into());
         FavoritesBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> FavoritesBuilder<'a, S>
+impl<S: BosStr, St> FavoritesBuilder<S, St>
 where
-    S: favorites_state::State,
-    S::UpdatedAt: favorites_state::IsUnset,
+    St: favorites_state::State,
+    St::UpdatedAt: favorites_state::IsUnset,
 {
     /// Set the `updatedAt` field (required)
     pub fn updated_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> FavoritesBuilder<'a, favorites_state::SetUpdatedAt<S>> {
+    ) -> FavoritesBuilder<S, favorites_state::SetUpdatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         FavoritesBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> FavoritesBuilder<'a, S>
+impl<S: BosStr, St> FavoritesBuilder<S, St>
 where
-    S: favorites_state::State,
-    S::UpdatedAt: favorites_state::IsSet,
-    S::Dids: favorites_state::IsSet,
+    St: favorites_state::State,
+    St::Dids: favorites_state::IsSet,
+    St::UpdatedAt: favorites_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Favorites<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Favorites<S> {
         Favorites {
             dids: self._fields.0.unwrap(),
             updated_at: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Favorites<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Favorites<S> {
         Favorites {
             dids: self._fields.0.unwrap(),
             updated_at: self._fields.1.unwrap(),

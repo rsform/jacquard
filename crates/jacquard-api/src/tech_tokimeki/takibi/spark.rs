@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "tech.tokimeki.takibi.spark",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Spark<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Spark<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     ///Short text (up to 30 graphemes)
     pub text: S,
@@ -53,18 +53,18 @@ pub struct Spark<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SparkGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SparkGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Spark<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Spark<S> {
+impl<S: BosStr> Spark<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, SparkRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -77,17 +77,17 @@ pub struct SparkRecord;
 impl XrpcResp for SparkRecord {
     const NSID: &'static str = "tech.tokimeki.takibi.spark";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = SparkGetRecordOutput<S>;
+    type Output<S: BosStr> = SparkGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<SparkGetRecordOutput<S>> for Spark<S> {
+impl<S: BosStr> From<SparkGetRecordOutput<S>> for Spark<S> {
     fn from(output: SparkGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Spark<S> {
+impl<S: BosStr> Collection for Spark<S> {
     const NSID: &'static str = "tech.tokimeki.takibi.spark";
     type Record = SparkRecord;
 }
@@ -97,7 +97,7 @@ impl Collection for SparkRecord {
     type Record = SparkRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Spark<S> {
+impl<S: BosStr> LexiconSchema for Spark<S> {
     fn nsid() -> &'static str {
         "tech.tokimeki.takibi.spark"
     }
@@ -157,17 +157,17 @@ pub mod spark_state {
         type Text = Unset;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
-        type Text = S::Text;
+        type Text = St::Text;
     }
     ///State transition - sets the `text` field to Set
-    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetText<S> {}
-    impl<S: State> State for SetText<S> {
-        type CreatedAt = S::CreatedAt;
+    pub struct SetText<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetText<St> {}
+    impl<St: State> State for SetText<St> {
+        type CreatedAt = St::CreatedAt;
         type Text = Set<members::text>;
     }
     /// Marker types for field names
@@ -180,85 +180,85 @@ pub mod spark_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct SparkBuilder<'a, S: spark_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct SparkBuilder<S: BosStr, St: spark_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Spark<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> SparkBuilder<'a, spark_state::Empty> {
+impl<S: BosStr> Spark<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> SparkBuilder<S, spark_state::Empty> {
         SparkBuilder::new()
     }
 }
 
-impl<'a> SparkBuilder<'a, spark_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> SparkBuilder<S, spark_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SparkBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SparkBuilder<'a, S>
+impl<S: BosStr, St> SparkBuilder<S, St>
 where
-    S: spark_state::State,
-    S::CreatedAt: spark_state::IsUnset,
+    St: spark_state::State,
+    St::CreatedAt: spark_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> SparkBuilder<'a, spark_state::SetCreatedAt<S>> {
+    ) -> SparkBuilder<S, spark_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         SparkBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SparkBuilder<'a, S>
+impl<S: BosStr, St> SparkBuilder<S, St>
 where
-    S: spark_state::State,
-    S::Text: spark_state::IsUnset,
+    St: spark_state::State,
+    St::Text: spark_state::IsUnset,
 {
     /// Set the `text` field (required)
     pub fn text(
         mut self,
         value: impl Into<S>,
-    ) -> SparkBuilder<'a, spark_state::SetText<S>> {
+    ) -> SparkBuilder<S, spark_state::SetText<St>> {
         self._fields.1 = Option::Some(value.into());
         SparkBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SparkBuilder<'a, S>
+impl<S: BosStr, St> SparkBuilder<S, St>
 where
-    S: spark_state::State,
-    S::CreatedAt: spark_state::IsSet,
-    S::Text: spark_state::IsSet,
+    St: spark_state::State,
+    St::CreatedAt: spark_state::IsSet,
+    St::Text: spark_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Spark<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Spark<S> {
         Spark {
             created_at: self._fields.0.unwrap(),
             text: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Spark<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Spark<S> {
         Spark {
             created_at: self._fields.0.unwrap(),
             text: self._fields.1.unwrap(),

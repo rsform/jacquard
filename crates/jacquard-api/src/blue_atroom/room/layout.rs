@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use crate::blue_atroom::room::layout;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Color<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Color<S: BosStr = DefaultStr> {
     pub blue: i64,
     pub green: i64,
     pub red: i64,
@@ -52,11 +52,11 @@ pub struct Color<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Floor<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Floor<S: BosStr = DefaultStr> {
     pub surface: layout::Surface<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -68,11 +68,11 @@ pub struct Floor<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Furnishing<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Furnishing<S: BosStr = DefaultStr> {
     ///Strong reference to a blue.atroom.room.object record.
     pub object: StrongRef<S>,
     ///Position [x, y, z] in millimeters.
@@ -91,11 +91,11 @@ pub struct Furnishing<S: Bos<str> + AsRef<str> = DefaultStr> {
     rename = "blue.atroom.room.layout",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Layout<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Layout<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     pub floor: layout::Floor<S>,
     pub furnishings: Vec<layout::Furnishing<S>>,
@@ -112,11 +112,11 @@ pub struct Layout<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct LayoutGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct LayoutGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
@@ -128,11 +128,11 @@ pub struct LayoutGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Surface<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Surface<S: BosStr = DefaultStr> {
     pub color: layout::Color<S>,
     ///Texture identifier.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -150,11 +150,11 @@ pub struct Surface<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Wall<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Wall<S: BosStr = DefaultStr> {
     ///Wall height in millimeters.
     pub height: i64,
     pub surface: layout::Surface<S>,
@@ -164,13 +164,13 @@ pub struct Wall<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Layout<S> {
+impl<S: BosStr> Layout<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, LayoutRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Color<S> {
+impl<S: BosStr> LexiconSchema for Color<S> {
     fn nsid() -> &'static str {
         "blue.atroom.room.layout"
     }
@@ -245,7 +245,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Color<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Floor<S> {
+impl<S: BosStr> LexiconSchema for Floor<S> {
     fn nsid() -> &'static str {
         "blue.atroom.room.layout"
     }
@@ -260,7 +260,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Floor<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Furnishing<S> {
+impl<S: BosStr> LexiconSchema for Furnishing<S> {
     fn nsid() -> &'static str {
         "blue.atroom.room.layout"
     }
@@ -326,17 +326,17 @@ pub struct LayoutRecord;
 impl XrpcResp for LayoutRecord {
     const NSID: &'static str = "blue.atroom.room.layout";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = LayoutGetRecordOutput<S>;
+    type Output<S: BosStr> = LayoutGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<LayoutGetRecordOutput<S>> for Layout<S> {
+impl<S: BosStr> From<LayoutGetRecordOutput<S>> for Layout<S> {
     fn from(output: LayoutGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Layout<S> {
+impl<S: BosStr> Collection for Layout<S> {
     const NSID: &'static str = "blue.atroom.room.layout";
     type Record = LayoutRecord;
 }
@@ -346,7 +346,7 @@ impl Collection for LayoutRecord {
     type Record = LayoutRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Layout<S> {
+impl<S: BosStr> LexiconSchema for Layout<S> {
     fn nsid() -> &'static str {
         "blue.atroom.room.layout"
     }
@@ -392,7 +392,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Layout<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Surface<S> {
+impl<S: BosStr> LexiconSchema for Surface<S> {
     fn nsid() -> &'static str {
         "blue.atroom.room.layout"
     }
@@ -427,7 +427,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Surface<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Wall<S> {
+impl<S: BosStr> LexiconSchema for Wall<S> {
     fn nsid() -> &'static str {
         "blue.atroom.room.layout"
     }
@@ -452,145 +452,145 @@ pub mod color_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Green;
         type Blue;
         type Red;
-        type Green;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Green = Unset;
         type Blue = Unset;
         type Red = Unset;
-        type Green = Unset;
-    }
-    ///State transition - sets the `blue` field to Set
-    pub struct SetBlue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBlue<S> {}
-    impl<S: State> State for SetBlue<S> {
-        type Blue = Set<members::blue>;
-        type Red = S::Red;
-        type Green = S::Green;
-    }
-    ///State transition - sets the `red` field to Set
-    pub struct SetRed<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRed<S> {}
-    impl<S: State> State for SetRed<S> {
-        type Blue = S::Blue;
-        type Red = Set<members::red>;
-        type Green = S::Green;
     }
     ///State transition - sets the `green` field to Set
-    pub struct SetGreen<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGreen<S> {}
-    impl<S: State> State for SetGreen<S> {
-        type Blue = S::Blue;
-        type Red = S::Red;
+    pub struct SetGreen<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetGreen<St> {}
+    impl<St: State> State for SetGreen<St> {
         type Green = Set<members::green>;
+        type Blue = St::Blue;
+        type Red = St::Red;
+    }
+    ///State transition - sets the `blue` field to Set
+    pub struct SetBlue<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBlue<St> {}
+    impl<St: State> State for SetBlue<St> {
+        type Green = St::Green;
+        type Blue = Set<members::blue>;
+        type Red = St::Red;
+    }
+    ///State transition - sets the `red` field to Set
+    pub struct SetRed<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRed<St> {}
+    impl<St: State> State for SetRed<St> {
+        type Green = St::Green;
+        type Blue = St::Blue;
+        type Red = Set<members::red>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `green` field
+        pub struct green(());
         ///Marker type for the `blue` field
         pub struct blue(());
         ///Marker type for the `red` field
         pub struct red(());
-        ///Marker type for the `green` field
-        pub struct green(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ColorBuilder<'a, S: color_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ColorBuilder<S: BosStr, St: color_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<i64>, Option<i64>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Color<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ColorBuilder<'a, color_state::Empty> {
+impl<S: BosStr> Color<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ColorBuilder<S, color_state::Empty> {
         ColorBuilder::new()
     }
 }
 
-impl<'a> ColorBuilder<'a, color_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ColorBuilder<S, color_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ColorBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ColorBuilder<'a, S>
+impl<S: BosStr, St> ColorBuilder<S, St>
 where
-    S: color_state::State,
-    S::Blue: color_state::IsUnset,
+    St: color_state::State,
+    St::Blue: color_state::IsUnset,
 {
     /// Set the `blue` field (required)
     pub fn blue(
         mut self,
         value: impl Into<i64>,
-    ) -> ColorBuilder<'a, color_state::SetBlue<S>> {
+    ) -> ColorBuilder<S, color_state::SetBlue<St>> {
         self._fields.0 = Option::Some(value.into());
         ColorBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ColorBuilder<'a, S>
+impl<S: BosStr, St> ColorBuilder<S, St>
 where
-    S: color_state::State,
-    S::Green: color_state::IsUnset,
+    St: color_state::State,
+    St::Green: color_state::IsUnset,
 {
     /// Set the `green` field (required)
     pub fn green(
         mut self,
         value: impl Into<i64>,
-    ) -> ColorBuilder<'a, color_state::SetGreen<S>> {
+    ) -> ColorBuilder<S, color_state::SetGreen<St>> {
         self._fields.1 = Option::Some(value.into());
         ColorBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ColorBuilder<'a, S>
+impl<S: BosStr, St> ColorBuilder<S, St>
 where
-    S: color_state::State,
-    S::Red: color_state::IsUnset,
+    St: color_state::State,
+    St::Red: color_state::IsUnset,
 {
     /// Set the `red` field (required)
     pub fn red(
         mut self,
         value: impl Into<i64>,
-    ) -> ColorBuilder<'a, color_state::SetRed<S>> {
+    ) -> ColorBuilder<S, color_state::SetRed<St>> {
         self._fields.2 = Option::Some(value.into());
         ColorBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ColorBuilder<'a, S>
+impl<S: BosStr, St> ColorBuilder<S, St>
 where
-    S: color_state::State,
-    S::Blue: color_state::IsSet,
-    S::Red: color_state::IsSet,
-    S::Green: color_state::IsSet,
+    St: color_state::State,
+    St::Green: color_state::IsSet,
+    St::Blue: color_state::IsSet,
+    St::Red: color_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Color<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Color<S> {
         Color {
             blue: self._fields.0.unwrap(),
             green: self._fields.1.unwrap(),
@@ -598,8 +598,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Color<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Color<S> {
         Color {
             blue: self._fields.0.unwrap(),
             green: self._fields.1.unwrap(),
@@ -909,9 +909,9 @@ pub mod floor_state {
         type Surface = Unset;
     }
     ///State transition - sets the `surface` field to Set
-    pub struct SetSurface<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSurface<S> {}
-    impl<S: State> State for SetSurface<S> {
+    pub struct SetSurface<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSurface<St> {}
+    impl<St: State> State for SetSurface<St> {
         type Surface = Set<members::surface>;
     }
     /// Marker types for field names
@@ -922,64 +922,64 @@ pub mod floor_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct FloorBuilder<'a, S: floor_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct FloorBuilder<S: BosStr, St: floor_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<layout::Surface<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Floor<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> FloorBuilder<'a, floor_state::Empty> {
+impl<S: BosStr> Floor<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> FloorBuilder<S, floor_state::Empty> {
         FloorBuilder::new()
     }
 }
 
-impl<'a> FloorBuilder<'a, floor_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> FloorBuilder<S, floor_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         FloorBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> FloorBuilder<'a, S>
+impl<S: BosStr, St> FloorBuilder<S, St>
 where
-    S: floor_state::State,
-    S::Surface: floor_state::IsUnset,
+    St: floor_state::State,
+    St::Surface: floor_state::IsUnset,
 {
     /// Set the `surface` field (required)
     pub fn surface(
         mut self,
         value: impl Into<layout::Surface<S>>,
-    ) -> FloorBuilder<'a, floor_state::SetSurface<S>> {
+    ) -> FloorBuilder<S, floor_state::SetSurface<St>> {
         self._fields.0 = Option::Some(value.into());
         FloorBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> FloorBuilder<'a, S>
+impl<S: BosStr, St> FloorBuilder<S, St>
 where
-    S: floor_state::State,
-    S::Surface: floor_state::IsSet,
+    St: floor_state::State,
+    St::Surface: floor_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Floor<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Floor<S> {
         Floor {
             surface: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Floor<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Floor<S> {
         Floor {
             surface: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -997,145 +997,145 @@ pub mod furnishing_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Object;
         type Rotation;
+        type Object;
         type Position;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Object = Unset;
         type Rotation = Unset;
+        type Object = Unset;
         type Position = Unset;
     }
-    ///State transition - sets the `object` field to Set
-    pub struct SetObject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetObject<S> {}
-    impl<S: State> State for SetObject<S> {
-        type Object = Set<members::object>;
-        type Rotation = S::Rotation;
-        type Position = S::Position;
-    }
     ///State transition - sets the `rotation` field to Set
-    pub struct SetRotation<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRotation<S> {}
-    impl<S: State> State for SetRotation<S> {
-        type Object = S::Object;
+    pub struct SetRotation<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRotation<St> {}
+    impl<St: State> State for SetRotation<St> {
         type Rotation = Set<members::rotation>;
-        type Position = S::Position;
+        type Object = St::Object;
+        type Position = St::Position;
+    }
+    ///State transition - sets the `object` field to Set
+    pub struct SetObject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetObject<St> {}
+    impl<St: State> State for SetObject<St> {
+        type Rotation = St::Rotation;
+        type Object = Set<members::object>;
+        type Position = St::Position;
     }
     ///State transition - sets the `position` field to Set
-    pub struct SetPosition<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPosition<S> {}
-    impl<S: State> State for SetPosition<S> {
-        type Object = S::Object;
-        type Rotation = S::Rotation;
+    pub struct SetPosition<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPosition<St> {}
+    impl<St: State> State for SetPosition<St> {
+        type Rotation = St::Rotation;
+        type Object = St::Object;
         type Position = Set<members::position>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `object` field
-        pub struct object(());
         ///Marker type for the `rotation` field
         pub struct rotation(());
+        ///Marker type for the `object` field
+        pub struct object(());
         ///Marker type for the `position` field
         pub struct position(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct FurnishingBuilder<'a, S: furnishing_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct FurnishingBuilder<S: BosStr, St: furnishing_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<StrongRef<S>>, Option<Vec<i64>>, Option<Vec<i64>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Furnishing<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> FurnishingBuilder<'a, furnishing_state::Empty> {
+impl<S: BosStr> Furnishing<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> FurnishingBuilder<S, furnishing_state::Empty> {
         FurnishingBuilder::new()
     }
 }
 
-impl<'a> FurnishingBuilder<'a, furnishing_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> FurnishingBuilder<S, furnishing_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         FurnishingBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> FurnishingBuilder<'a, S>
+impl<S: BosStr, St> FurnishingBuilder<S, St>
 where
-    S: furnishing_state::State,
-    S::Object: furnishing_state::IsUnset,
+    St: furnishing_state::State,
+    St::Object: furnishing_state::IsUnset,
 {
     /// Set the `object` field (required)
     pub fn object(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> FurnishingBuilder<'a, furnishing_state::SetObject<S>> {
+    ) -> FurnishingBuilder<S, furnishing_state::SetObject<St>> {
         self._fields.0 = Option::Some(value.into());
         FurnishingBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> FurnishingBuilder<'a, S>
+impl<S: BosStr, St> FurnishingBuilder<S, St>
 where
-    S: furnishing_state::State,
-    S::Position: furnishing_state::IsUnset,
+    St: furnishing_state::State,
+    St::Position: furnishing_state::IsUnset,
 {
     /// Set the `position` field (required)
     pub fn position(
         mut self,
         value: impl Into<Vec<i64>>,
-    ) -> FurnishingBuilder<'a, furnishing_state::SetPosition<S>> {
+    ) -> FurnishingBuilder<S, furnishing_state::SetPosition<St>> {
         self._fields.1 = Option::Some(value.into());
         FurnishingBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> FurnishingBuilder<'a, S>
+impl<S: BosStr, St> FurnishingBuilder<S, St>
 where
-    S: furnishing_state::State,
-    S::Rotation: furnishing_state::IsUnset,
+    St: furnishing_state::State,
+    St::Rotation: furnishing_state::IsUnset,
 {
     /// Set the `rotation` field (required)
     pub fn rotation(
         mut self,
         value: impl Into<Vec<i64>>,
-    ) -> FurnishingBuilder<'a, furnishing_state::SetRotation<S>> {
+    ) -> FurnishingBuilder<S, furnishing_state::SetRotation<St>> {
         self._fields.2 = Option::Some(value.into());
         FurnishingBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> FurnishingBuilder<'a, S>
+impl<S: BosStr, St> FurnishingBuilder<S, St>
 where
-    S: furnishing_state::State,
-    S::Object: furnishing_state::IsSet,
-    S::Rotation: furnishing_state::IsSet,
-    S::Position: furnishing_state::IsSet,
+    St: furnishing_state::State,
+    St::Rotation: furnishing_state::IsSet,
+    St::Object: furnishing_state::IsSet,
+    St::Position: furnishing_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Furnishing<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Furnishing<S> {
         Furnishing {
             object: self._fields.0.unwrap(),
             position: self._fields.1.unwrap(),
@@ -1143,11 +1143,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Furnishing<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Furnishing<S> {
         Furnishing {
             object: self._fields.0.unwrap(),
             position: self._fields.1.unwrap(),
@@ -1168,9 +1168,9 @@ pub mod layout_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Size;
-        type Floor;
-        type Furnishings;
         type Wall;
+        type Furnishings;
+        type Floor;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
@@ -1178,59 +1178,59 @@ pub mod layout_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Size = Unset;
-        type Floor = Unset;
-        type Furnishings = Unset;
         type Wall = Unset;
+        type Furnishings = Unset;
+        type Floor = Unset;
         type CreatedAt = Unset;
     }
     ///State transition - sets the `size` field to Set
-    pub struct SetSize<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSize<S> {}
-    impl<S: State> State for SetSize<S> {
+    pub struct SetSize<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSize<St> {}
+    impl<St: State> State for SetSize<St> {
         type Size = Set<members::size>;
-        type Floor = S::Floor;
-        type Furnishings = S::Furnishings;
-        type Wall = S::Wall;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `floor` field to Set
-    pub struct SetFloor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFloor<S> {}
-    impl<S: State> State for SetFloor<S> {
-        type Size = S::Size;
-        type Floor = Set<members::floor>;
-        type Furnishings = S::Furnishings;
-        type Wall = S::Wall;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `furnishings` field to Set
-    pub struct SetFurnishings<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFurnishings<S> {}
-    impl<S: State> State for SetFurnishings<S> {
-        type Size = S::Size;
-        type Floor = S::Floor;
-        type Furnishings = Set<members::furnishings>;
-        type Wall = S::Wall;
-        type CreatedAt = S::CreatedAt;
+        type Wall = St::Wall;
+        type Furnishings = St::Furnishings;
+        type Floor = St::Floor;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `wall` field to Set
-    pub struct SetWall<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWall<S> {}
-    impl<S: State> State for SetWall<S> {
-        type Size = S::Size;
-        type Floor = S::Floor;
-        type Furnishings = S::Furnishings;
+    pub struct SetWall<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetWall<St> {}
+    impl<St: State> State for SetWall<St> {
+        type Size = St::Size;
         type Wall = Set<members::wall>;
-        type CreatedAt = S::CreatedAt;
+        type Furnishings = St::Furnishings;
+        type Floor = St::Floor;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `furnishings` field to Set
+    pub struct SetFurnishings<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetFurnishings<St> {}
+    impl<St: State> State for SetFurnishings<St> {
+        type Size = St::Size;
+        type Wall = St::Wall;
+        type Furnishings = Set<members::furnishings>;
+        type Floor = St::Floor;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `floor` field to Set
+    pub struct SetFloor<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetFloor<St> {}
+    impl<St: State> State for SetFloor<St> {
+        type Size = St::Size;
+        type Wall = St::Wall;
+        type Furnishings = St::Furnishings;
+        type Floor = Set<members::floor>;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Size = S::Size;
-        type Floor = S::Floor;
-        type Furnishings = S::Furnishings;
-        type Wall = S::Wall;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Size = St::Size;
+        type Wall = St::Wall;
+        type Furnishings = St::Furnishings;
+        type Floor = St::Floor;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
@@ -1238,20 +1238,20 @@ pub mod layout_state {
     pub mod members {
         ///Marker type for the `size` field
         pub struct size(());
-        ///Marker type for the `floor` field
-        pub struct floor(());
-        ///Marker type for the `furnishings` field
-        pub struct furnishings(());
         ///Marker type for the `wall` field
         pub struct wall(());
+        ///Marker type for the `furnishings` field
+        pub struct furnishings(());
+        ///Marker type for the `floor` field
+        pub struct floor(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct LayoutBuilder<'a, S: layout_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct LayoutBuilder<S: BosStr, St: layout_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
         Option<layout::Floor<S>>,
@@ -1259,133 +1259,133 @@ pub struct LayoutBuilder<'a, S: layout_state::State> {
         Option<i64>,
         Option<layout::Wall<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Layout<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> LayoutBuilder<'a, layout_state::Empty> {
+impl<S: BosStr> Layout<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> LayoutBuilder<S, layout_state::Empty> {
         LayoutBuilder::new()
     }
 }
 
-impl<'a> LayoutBuilder<'a, layout_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> LayoutBuilder<S, layout_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         LayoutBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LayoutBuilder<'a, S>
+impl<S: BosStr, St> LayoutBuilder<S, St>
 where
-    S: layout_state::State,
-    S::CreatedAt: layout_state::IsUnset,
+    St: layout_state::State,
+    St::CreatedAt: layout_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> LayoutBuilder<'a, layout_state::SetCreatedAt<S>> {
+    ) -> LayoutBuilder<S, layout_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         LayoutBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LayoutBuilder<'a, S>
+impl<S: BosStr, St> LayoutBuilder<S, St>
 where
-    S: layout_state::State,
-    S::Floor: layout_state::IsUnset,
+    St: layout_state::State,
+    St::Floor: layout_state::IsUnset,
 {
     /// Set the `floor` field (required)
     pub fn floor(
         mut self,
         value: impl Into<layout::Floor<S>>,
-    ) -> LayoutBuilder<'a, layout_state::SetFloor<S>> {
+    ) -> LayoutBuilder<S, layout_state::SetFloor<St>> {
         self._fields.1 = Option::Some(value.into());
         LayoutBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LayoutBuilder<'a, S>
+impl<S: BosStr, St> LayoutBuilder<S, St>
 where
-    S: layout_state::State,
-    S::Furnishings: layout_state::IsUnset,
+    St: layout_state::State,
+    St::Furnishings: layout_state::IsUnset,
 {
     /// Set the `furnishings` field (required)
     pub fn furnishings(
         mut self,
         value: impl Into<Vec<layout::Furnishing<S>>>,
-    ) -> LayoutBuilder<'a, layout_state::SetFurnishings<S>> {
+    ) -> LayoutBuilder<S, layout_state::SetFurnishings<St>> {
         self._fields.2 = Option::Some(value.into());
         LayoutBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LayoutBuilder<'a, S>
+impl<S: BosStr, St> LayoutBuilder<S, St>
 where
-    S: layout_state::State,
-    S::Size: layout_state::IsUnset,
+    St: layout_state::State,
+    St::Size: layout_state::IsUnset,
 {
     /// Set the `size` field (required)
     pub fn size(
         mut self,
         value: impl Into<i64>,
-    ) -> LayoutBuilder<'a, layout_state::SetSize<S>> {
+    ) -> LayoutBuilder<S, layout_state::SetSize<St>> {
         self._fields.3 = Option::Some(value.into());
         LayoutBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LayoutBuilder<'a, S>
+impl<S: BosStr, St> LayoutBuilder<S, St>
 where
-    S: layout_state::State,
-    S::Wall: layout_state::IsUnset,
+    St: layout_state::State,
+    St::Wall: layout_state::IsUnset,
 {
     /// Set the `wall` field (required)
     pub fn wall(
         mut self,
         value: impl Into<layout::Wall<S>>,
-    ) -> LayoutBuilder<'a, layout_state::SetWall<S>> {
+    ) -> LayoutBuilder<S, layout_state::SetWall<St>> {
         self._fields.4 = Option::Some(value.into());
         LayoutBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LayoutBuilder<'a, S>
+impl<S: BosStr, St> LayoutBuilder<S, St>
 where
-    S: layout_state::State,
-    S::Size: layout_state::IsSet,
-    S::Floor: layout_state::IsSet,
-    S::Furnishings: layout_state::IsSet,
-    S::Wall: layout_state::IsSet,
-    S::CreatedAt: layout_state::IsSet,
+    St: layout_state::State,
+    St::Size: layout_state::IsSet,
+    St::Wall: layout_state::IsSet,
+    St::Furnishings: layout_state::IsSet,
+    St::Floor: layout_state::IsSet,
+    St::CreatedAt: layout_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Layout<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Layout<S> {
         Layout {
             created_at: self._fields.0.unwrap(),
             floor: self._fields.1.unwrap(),
@@ -1395,8 +1395,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Layout<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Layout<S> {
         Layout {
             created_at: self._fields.0.unwrap(),
             floor: self._fields.1.unwrap(),
@@ -1427,9 +1427,9 @@ pub mod surface_state {
         type Color = Unset;
     }
     ///State transition - sets the `color` field to Set
-    pub struct SetColor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetColor<S> {}
-    impl<S: State> State for SetColor<S> {
+    pub struct SetColor<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetColor<St> {}
+    impl<St: State> State for SetColor<St> {
         type Color = Set<members::color>;
     }
     /// Marker types for field names
@@ -1440,51 +1440,51 @@ pub mod surface_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct SurfaceBuilder<'a, S: surface_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct SurfaceBuilder<S: BosStr, St: surface_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<layout::Color<S>>, Option<S>, Option<Vec<i64>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Surface<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> SurfaceBuilder<'a, surface_state::Empty> {
+impl<S: BosStr> Surface<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> SurfaceBuilder<S, surface_state::Empty> {
         SurfaceBuilder::new()
     }
 }
 
-impl<'a> SurfaceBuilder<'a, surface_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> SurfaceBuilder<S, surface_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SurfaceBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SurfaceBuilder<'a, S>
+impl<S: BosStr, St> SurfaceBuilder<S, St>
 where
-    S: surface_state::State,
-    S::Color: surface_state::IsUnset,
+    St: surface_state::State,
+    St::Color: surface_state::IsUnset,
 {
     /// Set the `color` field (required)
     pub fn color(
         mut self,
         value: impl Into<layout::Color<S>>,
-    ) -> SurfaceBuilder<'a, surface_state::SetColor<S>> {
+    ) -> SurfaceBuilder<S, surface_state::SetColor<St>> {
         self._fields.0 = Option::Some(value.into());
         SurfaceBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: surface_state::State> SurfaceBuilder<'a, S> {
+impl<S: BosStr, St: surface_state::State> SurfaceBuilder<S, St> {
     /// Set the `texture` field (optional)
     pub fn texture(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -1497,7 +1497,7 @@ impl<'a, S: surface_state::State> SurfaceBuilder<'a, S> {
     }
 }
 
-impl<'a, S: surface_state::State> SurfaceBuilder<'a, S> {
+impl<S: BosStr, St: surface_state::State> SurfaceBuilder<S, St> {
     /// Set the `textureTiling` field (optional)
     pub fn texture_tiling(mut self, value: impl Into<Option<Vec<i64>>>) -> Self {
         self._fields.2 = value.into();
@@ -1510,13 +1510,13 @@ impl<'a, S: surface_state::State> SurfaceBuilder<'a, S> {
     }
 }
 
-impl<'a, S> SurfaceBuilder<'a, S>
+impl<S: BosStr, St> SurfaceBuilder<S, St>
 where
-    S: surface_state::State,
-    S::Color: surface_state::IsSet,
+    St: surface_state::State,
+    St::Color: surface_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Surface<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Surface<S> {
         Surface {
             color: self._fields.0.unwrap(),
             texture: self._fields.1,
@@ -1524,11 +1524,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Surface<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Surface<S> {
         Surface {
             color: self._fields.0.unwrap(),
             texture: self._fields.1,
@@ -1548,145 +1545,145 @@ pub mod wall_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Height;
         type Thickness;
+        type Height;
         type Surface;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Height = Unset;
         type Thickness = Unset;
+        type Height = Unset;
         type Surface = Unset;
     }
-    ///State transition - sets the `height` field to Set
-    pub struct SetHeight<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHeight<S> {}
-    impl<S: State> State for SetHeight<S> {
-        type Height = Set<members::height>;
-        type Thickness = S::Thickness;
-        type Surface = S::Surface;
-    }
     ///State transition - sets the `thickness` field to Set
-    pub struct SetThickness<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetThickness<S> {}
-    impl<S: State> State for SetThickness<S> {
-        type Height = S::Height;
+    pub struct SetThickness<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetThickness<St> {}
+    impl<St: State> State for SetThickness<St> {
         type Thickness = Set<members::thickness>;
-        type Surface = S::Surface;
+        type Height = St::Height;
+        type Surface = St::Surface;
+    }
+    ///State transition - sets the `height` field to Set
+    pub struct SetHeight<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHeight<St> {}
+    impl<St: State> State for SetHeight<St> {
+        type Thickness = St::Thickness;
+        type Height = Set<members::height>;
+        type Surface = St::Surface;
     }
     ///State transition - sets the `surface` field to Set
-    pub struct SetSurface<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSurface<S> {}
-    impl<S: State> State for SetSurface<S> {
-        type Height = S::Height;
-        type Thickness = S::Thickness;
+    pub struct SetSurface<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSurface<St> {}
+    impl<St: State> State for SetSurface<St> {
+        type Thickness = St::Thickness;
+        type Height = St::Height;
         type Surface = Set<members::surface>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `height` field
-        pub struct height(());
         ///Marker type for the `thickness` field
         pub struct thickness(());
+        ///Marker type for the `height` field
+        pub struct height(());
         ///Marker type for the `surface` field
         pub struct surface(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct WallBuilder<'a, S: wall_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct WallBuilder<S: BosStr, St: wall_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<layout::Surface<S>>, Option<i64>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Wall<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> WallBuilder<'a, wall_state::Empty> {
+impl<S: BosStr> Wall<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> WallBuilder<S, wall_state::Empty> {
         WallBuilder::new()
     }
 }
 
-impl<'a> WallBuilder<'a, wall_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> WallBuilder<S, wall_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         WallBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> WallBuilder<'a, S>
+impl<S: BosStr, St> WallBuilder<S, St>
 where
-    S: wall_state::State,
-    S::Height: wall_state::IsUnset,
+    St: wall_state::State,
+    St::Height: wall_state::IsUnset,
 {
     /// Set the `height` field (required)
     pub fn height(
         mut self,
         value: impl Into<i64>,
-    ) -> WallBuilder<'a, wall_state::SetHeight<S>> {
+    ) -> WallBuilder<S, wall_state::SetHeight<St>> {
         self._fields.0 = Option::Some(value.into());
         WallBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> WallBuilder<'a, S>
+impl<S: BosStr, St> WallBuilder<S, St>
 where
-    S: wall_state::State,
-    S::Surface: wall_state::IsUnset,
+    St: wall_state::State,
+    St::Surface: wall_state::IsUnset,
 {
     /// Set the `surface` field (required)
     pub fn surface(
         mut self,
         value: impl Into<layout::Surface<S>>,
-    ) -> WallBuilder<'a, wall_state::SetSurface<S>> {
+    ) -> WallBuilder<S, wall_state::SetSurface<St>> {
         self._fields.1 = Option::Some(value.into());
         WallBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> WallBuilder<'a, S>
+impl<S: BosStr, St> WallBuilder<S, St>
 where
-    S: wall_state::State,
-    S::Thickness: wall_state::IsUnset,
+    St: wall_state::State,
+    St::Thickness: wall_state::IsUnset,
 {
     /// Set the `thickness` field (required)
     pub fn thickness(
         mut self,
         value: impl Into<i64>,
-    ) -> WallBuilder<'a, wall_state::SetThickness<S>> {
+    ) -> WallBuilder<S, wall_state::SetThickness<St>> {
         self._fields.2 = Option::Some(value.into());
         WallBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> WallBuilder<'a, S>
+impl<S: BosStr, St> WallBuilder<S, St>
 where
-    S: wall_state::State,
-    S::Height: wall_state::IsSet,
-    S::Thickness: wall_state::IsSet,
-    S::Surface: wall_state::IsSet,
+    St: wall_state::State,
+    St::Thickness: wall_state::IsSet,
+    St::Height: wall_state::IsSet,
+    St::Surface: wall_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Wall<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Wall<S> {
         Wall {
             height: self._fields.0.unwrap(),
             surface: self._fields.1.unwrap(),
@@ -1694,8 +1691,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Wall<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Wall<S> {
         Wall {
             height: self._fields.0.unwrap(),
             surface: self._fields.1.unwrap(),

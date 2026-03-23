@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, Datetime};
 use jacquard_common::types::value::Data;
@@ -18,14 +18,14 @@ use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SetStats<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SetStats<S: BosStr = DefaultStr> {
     ///RFC3339 timestamp of last pull
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_pull: Option<Datetime>,
@@ -42,27 +42,23 @@ pub struct SetStats<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub push_count: Option<i64>,
     ///Repository name
     pub repository: S,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SetStatsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SetStatsOutput<S: BosStr = DefaultStr> {
     ///Whether the stats were successfully updated
     pub success: bool,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -122,12 +118,11 @@ pub struct SetStatsResponse;
 impl jacquard_common::xrpc::XrpcResp for SetStatsResponse {
     const NSID: &'static str = "io.atcr.hold.setStats";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = SetStatsOutput<S>;
+    type Output<S: BosStr> = SetStatsOutput<S>;
     type Err = SetStatsError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for SetStats<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for SetStats<S> {
     const NSID: &'static str = "io.atcr.hold.setStats";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -142,7 +137,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for SetStatsRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = SetStats<S>;
+    type Request<S: BosStr> = SetStats<S>;
     type Response = SetStatsResponse;
 }
 
@@ -167,17 +162,17 @@ pub mod set_stats_state {
         type OwnerDid = Unset;
     }
     ///State transition - sets the `repository` field to Set
-    pub struct SetRepository<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepository<S> {}
-    impl<S: State> State for SetRepository<S> {
+    pub struct SetRepository<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRepository<St> {}
+    impl<St: State> State for SetRepository<St> {
         type Repository = Set<members::repository>;
-        type OwnerDid = S::OwnerDid;
+        type OwnerDid = St::OwnerDid;
     }
     ///State transition - sets the `owner_did` field to Set
-    pub struct SetOwnerDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetOwnerDid<S> {}
-    impl<S: State> State for SetOwnerDid<S> {
-        type Repository = S::Repository;
+    pub struct SetOwnerDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetOwnerDid<St> {}
+    impl<St: State> State for SetOwnerDid<St> {
+        type Repository = St::Repository;
         type OwnerDid = Set<members::owner_did>;
     }
     /// Marker types for field names
@@ -190,9 +185,9 @@ pub mod set_stats_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct SetStatsBuilder<'a, S: set_stats_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct SetStatsBuilder<S: BosStr, St: set_stats_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
         Option<Datetime>,
@@ -201,28 +196,28 @@ pub struct SetStatsBuilder<'a, S: set_stats_state::State> {
         Option<i64>,
         Option<S>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> SetStats<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> SetStatsBuilder<'a, set_stats_state::Empty> {
+impl<S: BosStr> SetStats<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> SetStatsBuilder<S, set_stats_state::Empty> {
         SetStatsBuilder::new()
     }
 }
 
-impl<'a> SetStatsBuilder<'a, set_stats_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> SetStatsBuilder<S, set_stats_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SetStatsBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: set_stats_state::State> SetStatsBuilder<'a, S> {
+impl<S: BosStr, St: set_stats_state::State> SetStatsBuilder<S, St> {
     /// Set the `lastPull` field (optional)
     pub fn last_pull(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.0 = value.into();
@@ -235,7 +230,7 @@ impl<'a, S: set_stats_state::State> SetStatsBuilder<'a, S> {
     }
 }
 
-impl<'a, S: set_stats_state::State> SetStatsBuilder<'a, S> {
+impl<S: BosStr, St: set_stats_state::State> SetStatsBuilder<S, St> {
     /// Set the `lastPush` field (optional)
     pub fn last_push(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.1 = value.into();
@@ -248,26 +243,26 @@ impl<'a, S: set_stats_state::State> SetStatsBuilder<'a, S> {
     }
 }
 
-impl<'a, S> SetStatsBuilder<'a, S>
+impl<S: BosStr, St> SetStatsBuilder<S, St>
 where
-    S: set_stats_state::State,
-    S::OwnerDid: set_stats_state::IsUnset,
+    St: set_stats_state::State,
+    St::OwnerDid: set_stats_state::IsUnset,
 {
     /// Set the `ownerDid` field (required)
     pub fn owner_did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> SetStatsBuilder<'a, set_stats_state::SetOwnerDid<S>> {
+    ) -> SetStatsBuilder<S, set_stats_state::SetOwnerDid<St>> {
         self._fields.2 = Option::Some(value.into());
         SetStatsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: set_stats_state::State> SetStatsBuilder<'a, S> {
+impl<S: BosStr, St: set_stats_state::State> SetStatsBuilder<S, St> {
     /// Set the `pullCount` field (optional)
     pub fn pull_count(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.3 = value.into();
@@ -280,7 +275,7 @@ impl<'a, S: set_stats_state::State> SetStatsBuilder<'a, S> {
     }
 }
 
-impl<'a, S: set_stats_state::State> SetStatsBuilder<'a, S> {
+impl<S: BosStr, St: set_stats_state::State> SetStatsBuilder<S, St> {
     /// Set the `pushCount` field (optional)
     pub fn push_count(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.4 = value.into();
@@ -293,33 +288,33 @@ impl<'a, S: set_stats_state::State> SetStatsBuilder<'a, S> {
     }
 }
 
-impl<'a, S> SetStatsBuilder<'a, S>
+impl<S: BosStr, St> SetStatsBuilder<S, St>
 where
-    S: set_stats_state::State,
-    S::Repository: set_stats_state::IsUnset,
+    St: set_stats_state::State,
+    St::Repository: set_stats_state::IsUnset,
 {
     /// Set the `repository` field (required)
     pub fn repository(
         mut self,
         value: impl Into<S>,
-    ) -> SetStatsBuilder<'a, set_stats_state::SetRepository<S>> {
+    ) -> SetStatsBuilder<S, set_stats_state::SetRepository<St>> {
         self._fields.5 = Option::Some(value.into());
         SetStatsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SetStatsBuilder<'a, S>
+impl<S: BosStr, St> SetStatsBuilder<S, St>
 where
-    S: set_stats_state::State,
-    S::Repository: set_stats_state::IsSet,
-    S::OwnerDid: set_stats_state::IsSet,
+    St: set_stats_state::State,
+    St::Repository: set_stats_state::IsSet,
+    St::OwnerDid: set_stats_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> SetStats<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> SetStats<S> {
         SetStats {
             last_pull: self._fields.0,
             last_push: self._fields.1,
@@ -330,11 +325,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> SetStats<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> SetStats<S> {
         SetStats {
             last_pull: self._fields.0,
             last_push: self._fields.1,

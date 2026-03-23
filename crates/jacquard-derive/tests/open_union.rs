@@ -1,3 +1,4 @@
+use jacquard_common::Bos;
 use jacquard_derive::open_union;
 use serde::{Deserialize, Serialize};
 extern crate alloc;
@@ -5,9 +6,13 @@ extern crate alloc;
 #[open_union]
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 #[serde(tag = "$type")]
-enum TestUnion<'s> {
+#[serde(bound(
+    serialize = "S: Serialize + Bos<str> + AsRef<str>",
+    deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+))]
+enum TestUnion<S: Bos<str> + AsRef<str> = jacquard_common::DefaultStr> {
     #[serde(rename = "com.example.typeA")]
-    TypeA { value: &'s str },
+    TypeA { value: S },
     #[serde(rename = "com.example.typeB")]
     TypeB { count: i64 },
 }
@@ -18,7 +23,7 @@ fn test_open_union_known_variant() {
     let union: TestUnion = serde_json::from_str(json).unwrap();
 
     match union {
-        TestUnion::TypeA { value } => assert_eq!(value, "hello"),
+        TestUnion::TypeA { value } => assert_eq!(AsRef::<str>::as_ref(&value), "hello"),
         _ => panic!("expected TypeA"),
     }
 }
@@ -32,11 +37,9 @@ fn test_open_union_unknown_variant() {
 
     match union {
         TestUnion::Unknown(Data::Object(obj)) => {
-            // Verify the captured data contains the expected fields
             assert!(obj.0.contains_key("$type"));
             assert!(obj.0.contains_key("data"));
 
-            // Check the actual values
             if let Some(Data::String(type_str)) = obj.0.get("$type") {
                 assert_eq!(type_str.as_str(), "com.example.unknown");
             } else {
@@ -55,38 +58,36 @@ fn test_open_union_unknown_variant() {
 
 #[test]
 fn test_open_union_roundtrip() {
-    let union = TestUnion::TypeB { count: 42 };
+    let union = TestUnion::<jacquard_common::DefaultStr>::TypeB { count: 42 };
     let json = serde_json::to_string(&union).unwrap();
     let parsed: TestUnion = serde_json::from_str(&json).unwrap();
 
     assert_eq!(union, parsed);
-
-    // Verify the $type field is present
     assert!(json.contains(r#""$type":"com.example.typeB""#));
 }
 
 #[test]
 fn test_open_union_unknown_roundtrip() {
+    use jacquard_common::DefaultStr;
     use jacquard_common::types::value::{Data, Object};
     use std::collections::BTreeMap;
 
-    // Create an Unknown variant with complex data
-    let mut map = BTreeMap::new();
+    let mut map: BTreeMap<jacquard_common::deps::smol_str::SmolStr, Data<DefaultStr>> =
+        BTreeMap::new();
     map.insert(
         "$type".into(),
         Data::String(jacquard_common::types::string::AtprotoStr::String(
-            "com.example.custom".into(),
+            jacquard_common::deps::smol_str::SmolStr::from("com.example.custom"),
         )),
     );
     map.insert("field1".into(), Data::Integer(123));
     map.insert("field2".into(), Data::Boolean(false));
 
-    let union = TestUnion::Unknown(Data::Object(Object(map)));
+    let union: TestUnion = TestUnion::Unknown(Data::Object(Object(map)));
 
     let json = serde_json::to_string(&union).unwrap();
     let parsed: TestUnion = serde_json::from_str(&json).unwrap();
 
-    // Should deserialize back as Unknown since the type is not recognized
     match parsed {
         TestUnion::Unknown(Data::Object(obj)) => {
             assert_eq!(obj.0.len(), 3);
@@ -94,7 +95,6 @@ fn test_open_union_unknown_roundtrip() {
             assert!(obj.0.contains_key("field1"));
             assert!(obj.0.contains_key("field2"));
 
-            // Verify values
             if let Some(Data::String(s)) = obj.0.get("$type") {
                 assert_eq!(s.as_str(), "com.example.custom");
             } else {

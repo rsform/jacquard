@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -30,11 +30,11 @@ use crate::network_slices::slice::get_actors;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Actor<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Actor<S: BosStr = DefaultStr> {
     ///Decentralized identifier of the actor
     pub did: Did<S>,
     ///Human-readable handle of the actor
@@ -50,14 +50,14 @@ pub struct Actor<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetActors<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetActors<S: BosStr = DefaultStr> {
     ///Pagination cursor from previous response
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -70,33 +70,29 @@ pub struct GetActors<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Flexible filtering conditions for querying actors
     #[serde(skip_serializing_if = "Option::is_none")]
     pub r#where: Option<Data<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetActorsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetActorsOutput<S: BosStr = DefaultStr> {
     pub actors: Vec<get_actors::Actor<S>>,
     ///Pagination cursor for next page
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Actor<S> {
+impl<S: BosStr> LexiconSchema for Actor<S> {
     fn nsid() -> &'static str {
         "network.slices.slice.getActors"
     }
@@ -116,12 +112,11 @@ pub struct GetActorsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetActorsResponse {
     const NSID: &'static str = "network.slices.slice.getActors";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetActorsOutput<S>;
+    type Output<S: BosStr> = GetActorsOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetActors<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetActors<S> {
     const NSID: &'static str = "network.slices.slice.getActors";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -136,7 +131,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for GetActorsRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = GetActors<S>;
+    type Request<S: BosStr> = GetActors<S>;
     type Response = GetActorsResponse;
 }
 
@@ -150,99 +145,99 @@ pub mod actor_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type IndexedAt;
         type Did;
         type SliceUri;
-        type IndexedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type IndexedAt = Unset;
         type Did = Unset;
         type SliceUri = Unset;
-        type IndexedAt = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Did = Set<members::did>;
-        type SliceUri = S::SliceUri;
-        type IndexedAt = S::IndexedAt;
-    }
-    ///State transition - sets the `slice_uri` field to Set
-    pub struct SetSliceUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSliceUri<S> {}
-    impl<S: State> State for SetSliceUri<S> {
-        type Did = S::Did;
-        type SliceUri = Set<members::slice_uri>;
-        type IndexedAt = S::IndexedAt;
     }
     ///State transition - sets the `indexed_at` field to Set
-    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
-    impl<S: State> State for SetIndexedAt<S> {
-        type Did = S::Did;
-        type SliceUri = S::SliceUri;
+    pub struct SetIndexedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIndexedAt<St> {}
+    impl<St: State> State for SetIndexedAt<St> {
         type IndexedAt = Set<members::indexed_at>;
+        type Did = St::Did;
+        type SliceUri = St::SliceUri;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
+        type IndexedAt = St::IndexedAt;
+        type Did = Set<members::did>;
+        type SliceUri = St::SliceUri;
+    }
+    ///State transition - sets the `slice_uri` field to Set
+    pub struct SetSliceUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSliceUri<St> {}
+    impl<St: State> State for SetSliceUri<St> {
+        type IndexedAt = St::IndexedAt;
+        type Did = St::Did;
+        type SliceUri = Set<members::slice_uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `indexed_at` field
+        pub struct indexed_at(());
         ///Marker type for the `did` field
         pub struct did(());
         ///Marker type for the `slice_uri` field
         pub struct slice_uri(());
-        ///Marker type for the `indexed_at` field
-        pub struct indexed_at(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ActorBuilder<'a, S: actor_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ActorBuilder<S: BosStr, St: actor_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>, Option<Handle<S>>, Option<Datetime>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Actor<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ActorBuilder<'a, actor_state::Empty> {
+impl<S: BosStr> Actor<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ActorBuilder<S, actor_state::Empty> {
         ActorBuilder::new()
     }
 }
 
-impl<'a> ActorBuilder<'a, actor_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ActorBuilder<S, actor_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ActorBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ActorBuilder<'a, S>
+impl<S: BosStr, St> ActorBuilder<S, St>
 where
-    S: actor_state::State,
-    S::Did: actor_state::IsUnset,
+    St: actor_state::State,
+    St::Did: actor_state::IsUnset,
 {
     /// Set the `did` field (required)
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> ActorBuilder<'a, actor_state::SetDid<S>> {
+    ) -> ActorBuilder<S, actor_state::SetDid<St>> {
         self._fields.0 = Option::Some(value.into());
         ActorBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: actor_state::State> ActorBuilder<'a, S> {
+impl<S: BosStr, St: actor_state::State> ActorBuilder<S, St> {
     /// Set the `handle` field (optional)
     pub fn handle(mut self, value: impl Into<Option<Handle<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -255,53 +250,53 @@ impl<'a, S: actor_state::State> ActorBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ActorBuilder<'a, S>
+impl<S: BosStr, St> ActorBuilder<S, St>
 where
-    S: actor_state::State,
-    S::IndexedAt: actor_state::IsUnset,
+    St: actor_state::State,
+    St::IndexedAt: actor_state::IsUnset,
 {
     /// Set the `indexedAt` field (required)
     pub fn indexed_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ActorBuilder<'a, actor_state::SetIndexedAt<S>> {
+    ) -> ActorBuilder<S, actor_state::SetIndexedAt<St>> {
         self._fields.2 = Option::Some(value.into());
         ActorBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ActorBuilder<'a, S>
+impl<S: BosStr, St> ActorBuilder<S, St>
 where
-    S: actor_state::State,
-    S::SliceUri: actor_state::IsUnset,
+    St: actor_state::State,
+    St::SliceUri: actor_state::IsUnset,
 {
     /// Set the `sliceUri` field (required)
     pub fn slice_uri(
         mut self,
         value: impl Into<S>,
-    ) -> ActorBuilder<'a, actor_state::SetSliceUri<S>> {
+    ) -> ActorBuilder<S, actor_state::SetSliceUri<St>> {
         self._fields.3 = Option::Some(value.into());
         ActorBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ActorBuilder<'a, S>
+impl<S: BosStr, St> ActorBuilder<S, St>
 where
-    S: actor_state::State,
-    S::Did: actor_state::IsSet,
-    S::SliceUri: actor_state::IsSet,
-    S::IndexedAt: actor_state::IsSet,
+    St: actor_state::State,
+    St::IndexedAt: actor_state::IsSet,
+    St::Did: actor_state::IsSet,
+    St::SliceUri: actor_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Actor<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Actor<S> {
         Actor {
             did: self._fields.0.unwrap(),
             handle: self._fields.1,
@@ -310,8 +305,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Actor<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Actor<S> {
         Actor {
             did: self._fields.0.unwrap(),
             handle: self._fields.1,

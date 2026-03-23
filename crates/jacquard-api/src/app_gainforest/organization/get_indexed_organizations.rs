@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
@@ -21,18 +21,16 @@ use serde::{Serialize, Deserialize};
 pub struct GetIndexedOrganizations;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetIndexedOrganizationsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetIndexedOrganizationsOutput<S: BosStr = DefaultStr> {
     pub organizations: Vec<Data<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -41,7 +39,7 @@ pub struct GetIndexedOrganizationsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetIndexedOrganizationsResponse {
     const NSID: &'static str = "app.gainforest.organization.getIndexedOrganizations";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetIndexedOrganizationsOutput<S>;
+    type Output<S: BosStr> = GetIndexedOrganizationsOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
@@ -56,6 +54,6 @@ pub struct GetIndexedOrganizationsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetIndexedOrganizationsRequest {
     const PATH: &'static str = "/xrpc/app.gainforest.organization.getIndexedOrganizations";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetIndexedOrganizations;
+    type Request<S: BosStr> = GetIndexedOrganizations;
     type Response = GetIndexedOrganizationsResponse;
 }

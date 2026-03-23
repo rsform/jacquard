@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -29,41 +29,37 @@ use crate::systems_timker::hawlt::note::Note;
 use crate::systems_timker::hawlt::list_notes;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ListNotes<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ListNotes<S: BosStr = DefaultStr> {
     ///(max length: 100)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub cursor: Option<S>,
     ///(min: 1, max: 100)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
-    #[serde(borrow)]
     pub repo: AtIdentifier<S>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ListNotesOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ListNotesOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
     pub notes: Vec<list_notes::NoteView<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -73,11 +69,11 @@ pub struct ListNotesOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct NoteView<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct NoteView<S: BosStr = DefaultStr> {
     pub cid: Cid<S>,
     pub indexed_at: Datetime,
     pub uri: AtUri<S>,
@@ -91,12 +87,11 @@ pub struct ListNotesResponse;
 impl jacquard_common::xrpc::XrpcResp for ListNotesResponse {
     const NSID: &'static str = "systems.timker.hawlt.listNotes";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ListNotesOutput<S>;
+    type Output<S: BosStr> = ListNotesOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for ListNotes<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ListNotes<S> {
     const NSID: &'static str = "systems.timker.hawlt.listNotes";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ListNotesResponse;
@@ -107,11 +102,11 @@ pub struct ListNotesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListNotesRequest {
     const PATH: &'static str = "/xrpc/systems.timker.hawlt.listNotes";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = ListNotes<S>;
+    type Request<S: BosStr> = ListNotes<S>;
     type Response = ListNotesResponse;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for NoteView<S> {
+impl<S: BosStr> LexiconSchema for NoteView<S> {
     fn nsid() -> &'static str {
         "systems.timker.hawlt.listNotes"
     }
@@ -145,9 +140,9 @@ pub mod list_notes_state {
         type Repo = Unset;
     }
     ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
+    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRepo<St> {}
+    impl<St: State> State for SetRepo<St> {
         type Repo = Set<members::repo>;
     }
     /// Marker types for field names
@@ -158,32 +153,32 @@ pub mod list_notes_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ListNotesBuilder<'a, S: list_notes_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ListNotesBuilder<S: BosStr, St: list_notes_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>, Option<AtIdentifier<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ListNotes<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ListNotesBuilder<'a, list_notes_state::Empty> {
+impl<S: BosStr> ListNotes<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ListNotesBuilder<S, list_notes_state::Empty> {
         ListNotesBuilder::new()
     }
 }
 
-impl<'a> ListNotesBuilder<'a, list_notes_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ListNotesBuilder<S, list_notes_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ListNotesBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: list_notes_state::State> ListNotesBuilder<'a, S> {
+impl<S: BosStr, St: list_notes_state::State> ListNotesBuilder<S, St> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -196,7 +191,7 @@ impl<'a, S: list_notes_state::State> ListNotesBuilder<'a, S> {
     }
 }
 
-impl<'a, S: list_notes_state::State> ListNotesBuilder<'a, S> {
+impl<S: BosStr, St: list_notes_state::State> ListNotesBuilder<S, St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -209,32 +204,32 @@ impl<'a, S: list_notes_state::State> ListNotesBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ListNotesBuilder<'a, S>
+impl<S: BosStr, St> ListNotesBuilder<S, St>
 where
-    S: list_notes_state::State,
-    S::Repo: list_notes_state::IsUnset,
+    St: list_notes_state::State,
+    St::Repo: list_notes_state::IsUnset,
 {
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
         value: impl Into<AtIdentifier<S>>,
-    ) -> ListNotesBuilder<'a, list_notes_state::SetRepo<S>> {
+    ) -> ListNotesBuilder<S, list_notes_state::SetRepo<St>> {
         self._fields.2 = Option::Some(value.into());
         ListNotesBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ListNotesBuilder<'a, S>
+impl<S: BosStr, St> ListNotesBuilder<S, St>
 where
-    S: list_notes_state::State,
-    S::Repo: list_notes_state::IsSet,
+    St: list_notes_state::State,
+    St::Repo: list_notes_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ListNotes<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ListNotes<S> {
         ListNotes {
             cursor: self._fields.0,
             limit: self._fields.1,
@@ -253,181 +248,181 @@ pub mod note_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
         type Cid;
-        type Value;
         type IndexedAt;
+        type Value;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
         type Cid = Unset;
-        type Value = Unset;
         type IndexedAt = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Uri = Set<members::uri>;
-        type Cid = S::Cid;
-        type Value = S::Value;
-        type IndexedAt = S::IndexedAt;
+        type Value = Unset;
+        type Uri = Unset;
     }
     ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Uri = S::Uri;
+    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCid<St> {}
+    impl<St: State> State for SetCid<St> {
         type Cid = Set<members::cid>;
-        type Value = S::Value;
-        type IndexedAt = S::IndexedAt;
-    }
-    ///State transition - sets the `value` field to Set
-    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValue<S> {}
-    impl<S: State> State for SetValue<S> {
-        type Uri = S::Uri;
-        type Cid = S::Cid;
-        type Value = Set<members::value>;
-        type IndexedAt = S::IndexedAt;
+        type IndexedAt = St::IndexedAt;
+        type Value = St::Value;
+        type Uri = St::Uri;
     }
     ///State transition - sets the `indexed_at` field to Set
-    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
-    impl<S: State> State for SetIndexedAt<S> {
-        type Uri = S::Uri;
-        type Cid = S::Cid;
-        type Value = S::Value;
+    pub struct SetIndexedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIndexedAt<St> {}
+    impl<St: State> State for SetIndexedAt<St> {
+        type Cid = St::Cid;
         type IndexedAt = Set<members::indexed_at>;
+        type Value = St::Value;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetValue<St> {}
+    impl<St: State> State for SetValue<St> {
+        type Cid = St::Cid;
+        type IndexedAt = St::IndexedAt;
+        type Value = Set<members::value>;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Cid = St::Cid;
+        type IndexedAt = St::IndexedAt;
+        type Value = St::Value;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `cid` field
         pub struct cid(());
-        ///Marker type for the `value` field
-        pub struct value(());
         ///Marker type for the `indexed_at` field
         pub struct indexed_at(());
+        ///Marker type for the `value` field
+        pub struct value(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct NoteViewBuilder<'a, S: note_view_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct NoteViewBuilder<S: BosStr, St: note_view_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Cid<S>>, Option<Datetime>, Option<AtUri<S>>, Option<Note<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> NoteView<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> NoteViewBuilder<'a, note_view_state::Empty> {
+impl<S: BosStr> NoteView<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> NoteViewBuilder<S, note_view_state::Empty> {
         NoteViewBuilder::new()
     }
 }
 
-impl<'a> NoteViewBuilder<'a, note_view_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> NoteViewBuilder<S, note_view_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         NoteViewBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> NoteViewBuilder<'a, S>
+impl<S: BosStr, St> NoteViewBuilder<S, St>
 where
-    S: note_view_state::State,
-    S::Cid: note_view_state::IsUnset,
+    St: note_view_state::State,
+    St::Cid: note_view_state::IsUnset,
 {
     /// Set the `cid` field (required)
     pub fn cid(
         mut self,
         value: impl Into<Cid<S>>,
-    ) -> NoteViewBuilder<'a, note_view_state::SetCid<S>> {
+    ) -> NoteViewBuilder<S, note_view_state::SetCid<St>> {
         self._fields.0 = Option::Some(value.into());
         NoteViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> NoteViewBuilder<'a, S>
+impl<S: BosStr, St> NoteViewBuilder<S, St>
 where
-    S: note_view_state::State,
-    S::IndexedAt: note_view_state::IsUnset,
+    St: note_view_state::State,
+    St::IndexedAt: note_view_state::IsUnset,
 {
     /// Set the `indexedAt` field (required)
     pub fn indexed_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> NoteViewBuilder<'a, note_view_state::SetIndexedAt<S>> {
+    ) -> NoteViewBuilder<S, note_view_state::SetIndexedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         NoteViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> NoteViewBuilder<'a, S>
+impl<S: BosStr, St> NoteViewBuilder<S, St>
 where
-    S: note_view_state::State,
-    S::Uri: note_view_state::IsUnset,
+    St: note_view_state::State,
+    St::Uri: note_view_state::IsUnset,
 {
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> NoteViewBuilder<'a, note_view_state::SetUri<S>> {
+    ) -> NoteViewBuilder<S, note_view_state::SetUri<St>> {
         self._fields.2 = Option::Some(value.into());
         NoteViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> NoteViewBuilder<'a, S>
+impl<S: BosStr, St> NoteViewBuilder<S, St>
 where
-    S: note_view_state::State,
-    S::Value: note_view_state::IsUnset,
+    St: note_view_state::State,
+    St::Value: note_view_state::IsUnset,
 {
     /// Set the `value` field (required)
     pub fn value(
         mut self,
         value: impl Into<Note<S>>,
-    ) -> NoteViewBuilder<'a, note_view_state::SetValue<S>> {
+    ) -> NoteViewBuilder<S, note_view_state::SetValue<St>> {
         self._fields.3 = Option::Some(value.into());
         NoteViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> NoteViewBuilder<'a, S>
+impl<S: BosStr, St> NoteViewBuilder<S, St>
 where
-    S: note_view_state::State,
-    S::Uri: note_view_state::IsSet,
-    S::Cid: note_view_state::IsSet,
-    S::Value: note_view_state::IsSet,
-    S::IndexedAt: note_view_state::IsSet,
+    St: note_view_state::State,
+    St::Cid: note_view_state::IsSet,
+    St::IndexedAt: note_view_state::IsSet,
+    St::Value: note_view_state::IsSet,
+    St::Uri: note_view_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> NoteView<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> NoteView<S> {
         NoteView {
             cid: self._fields.0.unwrap(),
             indexed_at: self._fields.1.unwrap(),
@@ -436,11 +431,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> NoteView<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> NoteView<S> {
         NoteView {
             cid: self._fields.0.unwrap(),
             indexed_at: self._fields.1.unwrap(),

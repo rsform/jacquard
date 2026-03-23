@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
@@ -18,19 +18,17 @@ use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DeleteRecords<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DeleteRecords<S: BosStr = DefaultStr> {
     ///The AT URIs of the records to delete.
     pub uris: Vec<AtUri<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -39,12 +37,11 @@ pub struct DeleteRecordsResponse;
 impl jacquard_common::xrpc::XrpcResp for DeleteRecordsResponse {
     const NSID: &'static str = "ooo.bsky.authfetch.deleteRecords";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ();
+    type Output<S: BosStr> = ();
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for DeleteRecords<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for DeleteRecords<S> {
     const NSID: &'static str = "ooo.bsky.authfetch.deleteRecords";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -59,7 +56,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for DeleteRecordsRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = DeleteRecords<S>;
+    type Request<S: BosStr> = DeleteRecords<S>;
     type Response = DeleteRecordsResponse;
 }
 
@@ -82,9 +79,9 @@ pub mod delete_records_state {
         type Uris = Unset;
     }
     ///State transition - sets the `uris` field to Set
-    pub struct SetUris<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUris<S> {}
-    impl<S: State> State for SetUris<S> {
+    pub struct SetUris<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUris<St> {}
+    impl<St: State> State for SetUris<St> {
         type Uris = Set<members::uris>;
     }
     /// Marker types for field names
@@ -95,67 +92,67 @@ pub mod delete_records_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct DeleteRecordsBuilder<'a, S: delete_records_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct DeleteRecordsBuilder<S: BosStr, St: delete_records_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<AtUri<S>>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> DeleteRecords<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> DeleteRecordsBuilder<'a, delete_records_state::Empty> {
+impl<S: BosStr> DeleteRecords<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> DeleteRecordsBuilder<S, delete_records_state::Empty> {
         DeleteRecordsBuilder::new()
     }
 }
 
-impl<'a> DeleteRecordsBuilder<'a, delete_records_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> DeleteRecordsBuilder<S, delete_records_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         DeleteRecordsBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DeleteRecordsBuilder<'a, S>
+impl<S: BosStr, St> DeleteRecordsBuilder<S, St>
 where
-    S: delete_records_state::State,
-    S::Uris: delete_records_state::IsUnset,
+    St: delete_records_state::State,
+    St::Uris: delete_records_state::IsUnset,
 {
     /// Set the `uris` field (required)
     pub fn uris(
         mut self,
         value: impl Into<Vec<AtUri<S>>>,
-    ) -> DeleteRecordsBuilder<'a, delete_records_state::SetUris<S>> {
+    ) -> DeleteRecordsBuilder<S, delete_records_state::SetUris<St>> {
         self._fields.0 = Option::Some(value.into());
         DeleteRecordsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DeleteRecordsBuilder<'a, S>
+impl<S: BosStr, St> DeleteRecordsBuilder<S, St>
 where
-    S: delete_records_state::State,
-    S::Uris: delete_records_state::IsSet,
+    St: delete_records_state::State,
+    St::Uris: delete_records_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> DeleteRecords<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> DeleteRecords<S> {
         DeleteRecords {
             uris: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> DeleteRecords<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> DeleteRecords<S> {
         DeleteRecords {
             uris: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

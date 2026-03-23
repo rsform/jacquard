@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
@@ -18,19 +18,17 @@ use serde::{Serialize, Deserialize};
 use crate::app_chronosky::plan::get_assignment::PlanAssignment;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ListAssignmentsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ListAssignmentsOutput<S: BosStr = DefaultStr> {
     ///List of plan assignments
     pub assignments: Vec<PlanAssignment<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -43,7 +41,7 @@ pub struct ListAssignmentsResponse;
 impl jacquard_common::xrpc::XrpcResp for ListAssignmentsResponse {
     const NSID: &'static str = "app.chronosky.plan.listAssignments";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ListAssignmentsOutput<S>;
+    type Output<S: BosStr> = ListAssignmentsOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
@@ -58,6 +56,6 @@ pub struct ListAssignmentsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListAssignmentsRequest {
     const PATH: &'static str = "/xrpc/app.chronosky.plan.listAssignments";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = ListAssignments;
+    type Request<S: BosStr> = ListAssignments;
     type Response = ListAssignmentsResponse;
 }

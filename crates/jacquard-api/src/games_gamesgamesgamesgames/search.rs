@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
@@ -22,25 +22,21 @@ use crate::games_gamesgamesgamesgames::PlatformSummaryView;
 use crate::games_gamesgamesgamesgames::ProfileSummaryView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Search<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Search<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub age_ratings: Option<Vec<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub application_types: Option<Vec<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub cursor: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub genres: Option<Vec<S>>,
     /// Defaults to `false`.
     #[serde(default = "_default_include_cancelled")]
@@ -55,43 +51,35 @@ pub struct Search<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub modes: Option<Vec<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub player_perspectives: Option<Vec<S>>,
-    #[serde(borrow)]
     pub q: S,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub sort: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub themes: Option<Vec<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub types: Option<Vec<S>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SearchOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SearchOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
     pub results: Vec<SearchOutputResultsItem<S>>,
     ///Total number of results matching the query above the relevance threshold.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub total_results: Option<i64>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -101,11 +89,11 @@ pub struct SearchOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum SearchOutputResultsItem<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum SearchOutputResultsItem<S: BosStr = DefaultStr> {
     #[serde(rename = "games.gamesgamesgamesgames.defs#gameSummaryView")]
     GameSummaryView(Box<GameSummaryView<S>>),
     #[serde(rename = "games.gamesgamesgamesgames.defs#profileSummaryView")]
@@ -123,12 +111,11 @@ pub struct SearchResponse;
 impl jacquard_common::xrpc::XrpcResp for SearchResponse {
     const NSID: &'static str = "games.gamesgamesgamesgames.search";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = SearchOutput<S>;
+    type Output<S: BosStr> = SearchOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for Search<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Search<S> {
     const NSID: &'static str = "games.gamesgamesgamesgames.search";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = SearchResponse;
@@ -139,7 +126,7 @@ pub struct SearchRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SearchRequest {
     const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.search";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = Search<S>;
+    type Request<S: BosStr> = Search<S>;
     type Response = SearchResponse;
 }
 
@@ -174,9 +161,9 @@ pub mod search_state {
         type Q = Unset;
     }
     ///State transition - sets the `q` field to Set
-    pub struct SetQ<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetQ<S> {}
-    impl<S: State> State for SetQ<S> {
+    pub struct SetQ<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetQ<St> {}
+    impl<St: State> State for SetQ<St> {
         type Q = Set<members::q>;
     }
     /// Marker types for field names
@@ -187,9 +174,9 @@ pub mod search_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct SearchBuilder<'a, S: search_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct SearchBuilder<S: BosStr, St: search_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<S>>,
         Option<Vec<S>>,
@@ -205,18 +192,18 @@ pub struct SearchBuilder<'a, S: search_state::State> {
         Option<Vec<S>>,
         Option<Vec<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Search<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> SearchBuilder<'a, search_state::Empty> {
+impl<S: BosStr> Search<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> SearchBuilder<S, search_state::Empty> {
         SearchBuilder::new()
     }
 }
 
-impl<'a> SearchBuilder<'a, search_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> SearchBuilder<S, search_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SearchBuilder {
             _state: PhantomData,
@@ -235,12 +222,12 @@ impl<'a> SearchBuilder<'a, search_state::Empty> {
                 None,
                 None,
             ),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: search_state::State> SearchBuilder<'a, S> {
+impl<S: BosStr, St: search_state::State> SearchBuilder<S, St> {
     /// Set the `ageRatings` field (optional)
     pub fn age_ratings(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -253,7 +240,7 @@ impl<'a, S: search_state::State> SearchBuilder<'a, S> {
     }
 }
 
-impl<'a, S: search_state::State> SearchBuilder<'a, S> {
+impl<S: BosStr, St: search_state::State> SearchBuilder<S, St> {
     /// Set the `applicationTypes` field (optional)
     pub fn application_types(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -266,7 +253,7 @@ impl<'a, S: search_state::State> SearchBuilder<'a, S> {
     }
 }
 
-impl<'a, S: search_state::State> SearchBuilder<'a, S> {
+impl<S: BosStr, St: search_state::State> SearchBuilder<S, St> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -279,7 +266,7 @@ impl<'a, S: search_state::State> SearchBuilder<'a, S> {
     }
 }
 
-impl<'a, S: search_state::State> SearchBuilder<'a, S> {
+impl<S: BosStr, St: search_state::State> SearchBuilder<S, St> {
     /// Set the `genres` field (optional)
     pub fn genres(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -292,7 +279,7 @@ impl<'a, S: search_state::State> SearchBuilder<'a, S> {
     }
 }
 
-impl<'a, S: search_state::State> SearchBuilder<'a, S> {
+impl<S: BosStr, St: search_state::State> SearchBuilder<S, St> {
     /// Set the `includeCancelled` field (optional)
     pub fn include_cancelled(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.4 = value.into();
@@ -305,7 +292,7 @@ impl<'a, S: search_state::State> SearchBuilder<'a, S> {
     }
 }
 
-impl<'a, S: search_state::State> SearchBuilder<'a, S> {
+impl<S: BosStr, St: search_state::State> SearchBuilder<S, St> {
     /// Set the `includeUnrated` field (optional)
     pub fn include_unrated(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.5 = value.into();
@@ -318,7 +305,7 @@ impl<'a, S: search_state::State> SearchBuilder<'a, S> {
     }
 }
 
-impl<'a, S: search_state::State> SearchBuilder<'a, S> {
+impl<S: BosStr, St: search_state::State> SearchBuilder<S, St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.6 = value.into();
@@ -331,7 +318,7 @@ impl<'a, S: search_state::State> SearchBuilder<'a, S> {
     }
 }
 
-impl<'a, S: search_state::State> SearchBuilder<'a, S> {
+impl<S: BosStr, St: search_state::State> SearchBuilder<S, St> {
     /// Set the `modes` field (optional)
     pub fn modes(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.7 = value.into();
@@ -344,7 +331,7 @@ impl<'a, S: search_state::State> SearchBuilder<'a, S> {
     }
 }
 
-impl<'a, S: search_state::State> SearchBuilder<'a, S> {
+impl<S: BosStr, St: search_state::State> SearchBuilder<S, St> {
     /// Set the `playerPerspectives` field (optional)
     pub fn player_perspectives(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.8 = value.into();
@@ -357,23 +344,23 @@ impl<'a, S: search_state::State> SearchBuilder<'a, S> {
     }
 }
 
-impl<'a, S> SearchBuilder<'a, S>
+impl<S: BosStr, St> SearchBuilder<S, St>
 where
-    S: search_state::State,
-    S::Q: search_state::IsUnset,
+    St: search_state::State,
+    St::Q: search_state::IsUnset,
 {
     /// Set the `q` field (required)
-    pub fn q(mut self, value: impl Into<S>) -> SearchBuilder<'a, search_state::SetQ<S>> {
+    pub fn q(mut self, value: impl Into<S>) -> SearchBuilder<S, search_state::SetQ<St>> {
         self._fields.9 = Option::Some(value.into());
         SearchBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: search_state::State> SearchBuilder<'a, S> {
+impl<S: BosStr, St: search_state::State> SearchBuilder<S, St> {
     /// Set the `sort` field (optional)
     pub fn sort(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.10 = value.into();
@@ -386,7 +373,7 @@ impl<'a, S: search_state::State> SearchBuilder<'a, S> {
     }
 }
 
-impl<'a, S: search_state::State> SearchBuilder<'a, S> {
+impl<S: BosStr, St: search_state::State> SearchBuilder<S, St> {
     /// Set the `themes` field (optional)
     pub fn themes(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.11 = value.into();
@@ -399,7 +386,7 @@ impl<'a, S: search_state::State> SearchBuilder<'a, S> {
     }
 }
 
-impl<'a, S: search_state::State> SearchBuilder<'a, S> {
+impl<S: BosStr, St: search_state::State> SearchBuilder<S, St> {
     /// Set the `types` field (optional)
     pub fn types(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.12 = value.into();
@@ -412,13 +399,13 @@ impl<'a, S: search_state::State> SearchBuilder<'a, S> {
     }
 }
 
-impl<'a, S> SearchBuilder<'a, S>
+impl<S: BosStr, St> SearchBuilder<S, St>
 where
-    S: search_state::State,
-    S::Q: search_state::IsSet,
+    St: search_state::State,
+    St::Q: search_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Search<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Search<S> {
         Search {
             age_ratings: self._fields.0,
             application_types: self._fields.1,

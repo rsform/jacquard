@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -30,11 +30,11 @@ use crate::com_atproto::server::describe_server;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Contact<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Contact<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub email: Option<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -46,11 +46,11 @@ pub struct Contact<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Links<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Links<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub privacy_policy: Option<UriValue<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -61,14 +61,14 @@ pub struct Links<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DescribeServerOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DescribeServerOutput<S: BosStr = DefaultStr> {
     ///List of domain suffixes that can be used in account handles.
     pub available_user_domains: Vec<S>,
     ///Contact information
@@ -84,13 +84,11 @@ pub struct DescribeServerOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///If true, a phone verification token must be supplied to create an account on this instance.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub phone_verification_required: Option<bool>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Contact<S> {
+impl<S: BosStr> LexiconSchema for Contact<S> {
     fn nsid() -> &'static str {
         "com.atproto.server.describeServer"
     }
@@ -105,7 +103,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Contact<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Links<S> {
+impl<S: BosStr> LexiconSchema for Links<S> {
     fn nsid() -> &'static str {
         "com.atproto.server.describeServer"
     }
@@ -129,7 +127,7 @@ pub struct DescribeServerResponse;
 impl jacquard_common::xrpc::XrpcResp for DescribeServerResponse {
     const NSID: &'static str = "com.atproto.server.describeServer";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = DescribeServerOutput<S>;
+    type Output<S: BosStr> = DescribeServerOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
@@ -144,7 +142,7 @@ pub struct DescribeServerRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DescribeServerRequest {
     const PATH: &'static str = "/xrpc/com.atproto.server.describeServer";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = DescribeServer;
+    type Request<S: BosStr> = DescribeServer;
     type Response = DescribeServerResponse;
 }
 

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,11 +34,11 @@ use serde::{Serialize, Deserialize};
     rename = "sh.tangled.string",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct TangledString<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct TangledString<S: BosStr = DefaultStr> {
     pub contents: S,
     pub created_at: Datetime,
     pub description: S,
@@ -53,18 +53,18 @@ pub struct TangledString<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct TangledStringGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct TangledStringGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: TangledString<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> TangledString<S> {
+impl<S: BosStr> TangledString<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, TangledStringRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -77,18 +77,17 @@ pub struct TangledStringRecord;
 impl XrpcResp for TangledStringRecord {
     const NSID: &'static str = "sh.tangled.string";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = TangledStringGetRecordOutput<S>;
+    type Output<S: BosStr> = TangledStringGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<TangledStringGetRecordOutput<S>>
-for TangledString<S> {
+impl<S: BosStr> From<TangledStringGetRecordOutput<S>> for TangledString<S> {
     fn from(output: TangledStringGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for TangledString<S> {
+impl<S: BosStr> Collection for TangledString<S> {
     const NSID: &'static str = "sh.tangled.string";
     type Record = TangledStringRecord;
 }
@@ -98,7 +97,7 @@ impl Collection for TangledStringRecord {
     type Record = TangledStringRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for TangledString<S> {
+impl<S: BosStr> LexiconSchema for TangledString<S> {
     fn nsid() -> &'static str {
         "sh.tangled.string"
     }
@@ -176,180 +175,180 @@ pub mod tangled_string_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Filename;
-        type Contents;
         type CreatedAt;
         type Description;
+        type Contents;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Filename = Unset;
-        type Contents = Unset;
         type CreatedAt = Unset;
         type Description = Unset;
+        type Contents = Unset;
     }
     ///State transition - sets the `filename` field to Set
-    pub struct SetFilename<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFilename<S> {}
-    impl<S: State> State for SetFilename<S> {
+    pub struct SetFilename<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetFilename<St> {}
+    impl<St: State> State for SetFilename<St> {
         type Filename = Set<members::filename>;
-        type Contents = S::Contents;
-        type CreatedAt = S::CreatedAt;
-        type Description = S::Description;
-    }
-    ///State transition - sets the `contents` field to Set
-    pub struct SetContents<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContents<S> {}
-    impl<S: State> State for SetContents<S> {
-        type Filename = S::Filename;
-        type Contents = Set<members::contents>;
-        type CreatedAt = S::CreatedAt;
-        type Description = S::Description;
+        type CreatedAt = St::CreatedAt;
+        type Description = St::Description;
+        type Contents = St::Contents;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Filename = S::Filename;
-        type Contents = S::Contents;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Filename = St::Filename;
         type CreatedAt = Set<members::created_at>;
-        type Description = S::Description;
+        type Description = St::Description;
+        type Contents = St::Contents;
     }
     ///State transition - sets the `description` field to Set
-    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDescription<S> {}
-    impl<S: State> State for SetDescription<S> {
-        type Filename = S::Filename;
-        type Contents = S::Contents;
-        type CreatedAt = S::CreatedAt;
+    pub struct SetDescription<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDescription<St> {}
+    impl<St: State> State for SetDescription<St> {
+        type Filename = St::Filename;
+        type CreatedAt = St::CreatedAt;
         type Description = Set<members::description>;
+        type Contents = St::Contents;
+    }
+    ///State transition - sets the `contents` field to Set
+    pub struct SetContents<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetContents<St> {}
+    impl<St: State> State for SetContents<St> {
+        type Filename = St::Filename;
+        type CreatedAt = St::CreatedAt;
+        type Description = St::Description;
+        type Contents = Set<members::contents>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `filename` field
         pub struct filename(());
-        ///Marker type for the `contents` field
-        pub struct contents(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `description` field
         pub struct description(());
+        ///Marker type for the `contents` field
+        pub struct contents(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct TangledStringBuilder<'a, S: tangled_string_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct TangledStringBuilder<S: BosStr, St: tangled_string_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<Datetime>, Option<S>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> TangledString<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> TangledStringBuilder<'a, tangled_string_state::Empty> {
+impl<S: BosStr> TangledString<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> TangledStringBuilder<S, tangled_string_state::Empty> {
         TangledStringBuilder::new()
     }
 }
 
-impl<'a> TangledStringBuilder<'a, tangled_string_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> TangledStringBuilder<S, tangled_string_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         TangledStringBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> TangledStringBuilder<'a, S>
+impl<S: BosStr, St> TangledStringBuilder<S, St>
 where
-    S: tangled_string_state::State,
-    S::Contents: tangled_string_state::IsUnset,
+    St: tangled_string_state::State,
+    St::Contents: tangled_string_state::IsUnset,
 {
     /// Set the `contents` field (required)
     pub fn contents(
         mut self,
         value: impl Into<S>,
-    ) -> TangledStringBuilder<'a, tangled_string_state::SetContents<S>> {
+    ) -> TangledStringBuilder<S, tangled_string_state::SetContents<St>> {
         self._fields.0 = Option::Some(value.into());
         TangledStringBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> TangledStringBuilder<'a, S>
+impl<S: BosStr, St> TangledStringBuilder<S, St>
 where
-    S: tangled_string_state::State,
-    S::CreatedAt: tangled_string_state::IsUnset,
+    St: tangled_string_state::State,
+    St::CreatedAt: tangled_string_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> TangledStringBuilder<'a, tangled_string_state::SetCreatedAt<S>> {
+    ) -> TangledStringBuilder<S, tangled_string_state::SetCreatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         TangledStringBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> TangledStringBuilder<'a, S>
+impl<S: BosStr, St> TangledStringBuilder<S, St>
 where
-    S: tangled_string_state::State,
-    S::Description: tangled_string_state::IsUnset,
+    St: tangled_string_state::State,
+    St::Description: tangled_string_state::IsUnset,
 {
     /// Set the `description` field (required)
     pub fn description(
         mut self,
         value: impl Into<S>,
-    ) -> TangledStringBuilder<'a, tangled_string_state::SetDescription<S>> {
+    ) -> TangledStringBuilder<S, tangled_string_state::SetDescription<St>> {
         self._fields.2 = Option::Some(value.into());
         TangledStringBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> TangledStringBuilder<'a, S>
+impl<S: BosStr, St> TangledStringBuilder<S, St>
 where
-    S: tangled_string_state::State,
-    S::Filename: tangled_string_state::IsUnset,
+    St: tangled_string_state::State,
+    St::Filename: tangled_string_state::IsUnset,
 {
     /// Set the `filename` field (required)
     pub fn filename(
         mut self,
         value: impl Into<S>,
-    ) -> TangledStringBuilder<'a, tangled_string_state::SetFilename<S>> {
+    ) -> TangledStringBuilder<S, tangled_string_state::SetFilename<St>> {
         self._fields.3 = Option::Some(value.into());
         TangledStringBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> TangledStringBuilder<'a, S>
+impl<S: BosStr, St> TangledStringBuilder<S, St>
 where
-    S: tangled_string_state::State,
-    S::Filename: tangled_string_state::IsSet,
-    S::Contents: tangled_string_state::IsSet,
-    S::CreatedAt: tangled_string_state::IsSet,
-    S::Description: tangled_string_state::IsSet,
+    St: tangled_string_state::State,
+    St::Filename: tangled_string_state::IsSet,
+    St::CreatedAt: tangled_string_state::IsSet,
+    St::Description: tangled_string_state::IsSet,
+    St::Contents: tangled_string_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> TangledString<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> TangledString<S> {
         TangledString {
             contents: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
@@ -358,11 +357,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> TangledString<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> TangledString<S> {
         TangledString {
             contents: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),

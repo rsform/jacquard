@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
@@ -18,16 +18,15 @@ use serde::{Serialize, Deserialize};
 use crate::at_unthread::document::put_draft::DraftView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ListDrafts<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ListDrafts<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub cursor: Option<S>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
@@ -37,21 +36,19 @@ pub struct ListDrafts<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ListDraftsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ListDraftsOutput<S: BosStr = DefaultStr> {
     ///Pagination cursor for the next page.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
     pub drafts: Vec<DraftView<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -60,12 +57,11 @@ pub struct ListDraftsResponse;
 impl jacquard_common::xrpc::XrpcResp for ListDraftsResponse {
     const NSID: &'static str = "at.unthread.document.listDrafts";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ListDraftsOutput<S>;
+    type Output<S: BosStr> = ListDraftsOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for ListDrafts<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ListDrafts<S> {
     const NSID: &'static str = "at.unthread.document.listDrafts";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ListDraftsResponse;
@@ -76,7 +72,7 @@ pub struct ListDraftsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListDraftsRequest {
     const PATH: &'static str = "/xrpc/at.unthread.document.listDrafts";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = ListDrafts<S>;
+    type Request<S: BosStr> = ListDrafts<S>;
     type Response = ListDraftsResponse;
 }
 
@@ -103,32 +99,32 @@ pub mod list_drafts_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct ListDraftsBuilder<'a, S: list_drafts_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ListDraftsBuilder<S: BosStr, St: list_drafts_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ListDrafts<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ListDraftsBuilder<'a, list_drafts_state::Empty> {
+impl<S: BosStr> ListDrafts<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ListDraftsBuilder<S, list_drafts_state::Empty> {
         ListDraftsBuilder::new()
     }
 }
 
-impl<'a> ListDraftsBuilder<'a, list_drafts_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ListDraftsBuilder<S, list_drafts_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ListDraftsBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: list_drafts_state::State> ListDraftsBuilder<'a, S> {
+impl<S: BosStr, St: list_drafts_state::State> ListDraftsBuilder<S, St> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -141,7 +137,7 @@ impl<'a, S: list_drafts_state::State> ListDraftsBuilder<'a, S> {
     }
 }
 
-impl<'a, S: list_drafts_state::State> ListDraftsBuilder<'a, S> {
+impl<S: BosStr, St: list_drafts_state::State> ListDraftsBuilder<S, St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -154,12 +150,12 @@ impl<'a, S: list_drafts_state::State> ListDraftsBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ListDraftsBuilder<'a, S>
+impl<S: BosStr, St> ListDraftsBuilder<S, St>
 where
-    S: list_drafts_state::State,
+    St: list_drafts_state::State,
 {
-    /// Build the final struct
-    pub fn build(self) -> ListDrafts<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ListDrafts<S> {
         ListDrafts {
             cursor: self._fields.0,
             limit: self._fields.1,

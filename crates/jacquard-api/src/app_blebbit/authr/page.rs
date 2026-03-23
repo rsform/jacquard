@@ -18,7 +18,7 @@ pub mod update_page_relationship;
 
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use serde::{Serialize, Deserialize};
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct PageForm<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct PageForm<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -54,11 +54,11 @@ pub struct PageForm<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct PageView<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct PageView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub content: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -71,7 +71,7 @@ pub struct PageView<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for PageForm<S> {
+impl<S: BosStr> LexiconSchema for PageForm<S> {
     fn nsid() -> &'static str {
         "app.blebbit.authr.page.defs"
     }
@@ -86,7 +86,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for PageForm<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for PageView<S> {
+impl<S: BosStr> LexiconSchema for PageView<S> {
     fn nsid() -> &'static str {
         "app.blebbit.authr.page.defs"
     }

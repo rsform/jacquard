@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "app.fitsky.goal",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Goal<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Goal<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub end_date: Option<Datetime>,
@@ -54,7 +54,7 @@ pub struct Goal<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum GoalMetric<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum GoalMetric<S: BosStr = DefaultStr> {
     Distance,
     Workouts,
     Duration,
@@ -62,7 +62,7 @@ pub enum GoalMetric<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> GoalMetric<S> {
+impl<S: BosStr> GoalMetric<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Distance => "distance",
@@ -84,19 +84,19 @@ impl<S: Bos<str> + AsRef<str>> GoalMetric<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for GoalMetric<S> {
+impl<S: BosStr> core::fmt::Display for GoalMetric<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for GoalMetric<S> {
+impl<S: BosStr> AsRef<str> for GoalMetric<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for GoalMetric<S> {
+impl<S: BosStr> Serialize for GoalMetric<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -105,8 +105,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for GoalMetric<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for GoalMetric<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for GoalMetric<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -116,14 +115,18 @@ for GoalMetric<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for GoalMetric<S> {
+impl<S: BosStr + Default> Default for GoalMetric<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for GoalMetric<S> {
-    type Output = GoalMetric<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for GoalMetric<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = GoalMetric<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             GoalMetric::Distance => GoalMetric::Distance,
@@ -137,14 +140,14 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for GoalMetric<S> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum GoalPeriod<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum GoalPeriod<S: BosStr = DefaultStr> {
     Weekly,
     Monthly,
     Yearly,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> GoalPeriod<S> {
+impl<S: BosStr> GoalPeriod<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Weekly => "weekly",
@@ -164,19 +167,19 @@ impl<S: Bos<str> + AsRef<str>> GoalPeriod<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for GoalPeriod<S> {
+impl<S: BosStr> core::fmt::Display for GoalPeriod<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for GoalPeriod<S> {
+impl<S: BosStr> AsRef<str> for GoalPeriod<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for GoalPeriod<S> {
+impl<S: BosStr> Serialize for GoalPeriod<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -185,8 +188,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for GoalPeriod<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for GoalPeriod<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for GoalPeriod<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -196,14 +198,18 @@ for GoalPeriod<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for GoalPeriod<S> {
+impl<S: BosStr + Default> Default for GoalPeriod<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for GoalPeriod<S> {
-    type Output = GoalPeriod<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for GoalPeriod<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = GoalPeriod<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             GoalPeriod::Weekly => GoalPeriod::Weekly,
@@ -220,18 +226,18 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for GoalPeriod<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GoalGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GoalGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Goal<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Goal<S> {
+impl<S: BosStr> Goal<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, GoalRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -244,17 +250,17 @@ pub struct GoalRecord;
 impl XrpcResp for GoalRecord {
     const NSID: &'static str = "app.fitsky.goal";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GoalGetRecordOutput<S>;
+    type Output<S: BosStr> = GoalGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<GoalGetRecordOutput<S>> for Goal<S> {
+impl<S: BosStr> From<GoalGetRecordOutput<S>> for Goal<S> {
     fn from(output: GoalGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Goal<S> {
+impl<S: BosStr> Collection for Goal<S> {
     const NSID: &'static str = "app.fitsky.goal";
     type Record = GoalRecord;
 }
@@ -264,7 +270,7 @@ impl Collection for GoalRecord {
     type Record = GoalRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Goal<S> {
+impl<S: BosStr> LexiconSchema for Goal<S> {
     fn nsid() -> &'static str {
         "app.fitsky.goal"
     }
@@ -324,8 +330,8 @@ pub mod goal_state {
         type Period;
         type StartDate;
         type CreatedAt;
-        type TargetValue;
         type Metric;
+        type TargetValue;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -334,58 +340,58 @@ pub mod goal_state {
         type Period = Unset;
         type StartDate = Unset;
         type CreatedAt = Unset;
-        type TargetValue = Unset;
         type Metric = Unset;
+        type TargetValue = Unset;
     }
     ///State transition - sets the `period` field to Set
-    pub struct SetPeriod<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPeriod<S> {}
-    impl<S: State> State for SetPeriod<S> {
+    pub struct SetPeriod<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPeriod<St> {}
+    impl<St: State> State for SetPeriod<St> {
         type Period = Set<members::period>;
-        type StartDate = S::StartDate;
-        type CreatedAt = S::CreatedAt;
-        type TargetValue = S::TargetValue;
-        type Metric = S::Metric;
+        type StartDate = St::StartDate;
+        type CreatedAt = St::CreatedAt;
+        type Metric = St::Metric;
+        type TargetValue = St::TargetValue;
     }
     ///State transition - sets the `start_date` field to Set
-    pub struct SetStartDate<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStartDate<S> {}
-    impl<S: State> State for SetStartDate<S> {
-        type Period = S::Period;
+    pub struct SetStartDate<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStartDate<St> {}
+    impl<St: State> State for SetStartDate<St> {
+        type Period = St::Period;
         type StartDate = Set<members::start_date>;
-        type CreatedAt = S::CreatedAt;
-        type TargetValue = S::TargetValue;
-        type Metric = S::Metric;
+        type CreatedAt = St::CreatedAt;
+        type Metric = St::Metric;
+        type TargetValue = St::TargetValue;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Period = S::Period;
-        type StartDate = S::StartDate;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Period = St::Period;
+        type StartDate = St::StartDate;
         type CreatedAt = Set<members::created_at>;
-        type TargetValue = S::TargetValue;
-        type Metric = S::Metric;
-    }
-    ///State transition - sets the `target_value` field to Set
-    pub struct SetTargetValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTargetValue<S> {}
-    impl<S: State> State for SetTargetValue<S> {
-        type Period = S::Period;
-        type StartDate = S::StartDate;
-        type CreatedAt = S::CreatedAt;
-        type TargetValue = Set<members::target_value>;
-        type Metric = S::Metric;
+        type Metric = St::Metric;
+        type TargetValue = St::TargetValue;
     }
     ///State transition - sets the `metric` field to Set
-    pub struct SetMetric<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMetric<S> {}
-    impl<S: State> State for SetMetric<S> {
-        type Period = S::Period;
-        type StartDate = S::StartDate;
-        type CreatedAt = S::CreatedAt;
-        type TargetValue = S::TargetValue;
+    pub struct SetMetric<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMetric<St> {}
+    impl<St: State> State for SetMetric<St> {
+        type Period = St::Period;
+        type StartDate = St::StartDate;
+        type CreatedAt = St::CreatedAt;
         type Metric = Set<members::metric>;
+        type TargetValue = St::TargetValue;
+    }
+    ///State transition - sets the `target_value` field to Set
+    pub struct SetTargetValue<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTargetValue<St> {}
+    impl<St: State> State for SetTargetValue<St> {
+        type Period = St::Period;
+        type StartDate = St::StartDate;
+        type CreatedAt = St::CreatedAt;
+        type Metric = St::Metric;
+        type TargetValue = Set<members::target_value>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -396,16 +402,16 @@ pub mod goal_state {
         pub struct start_date(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `target_value` field
-        pub struct target_value(());
         ///Marker type for the `metric` field
         pub struct metric(());
+        ///Marker type for the `target_value` field
+        pub struct target_value(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GoalBuilder<'a, S: goal_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GoalBuilder<S: BosStr, St: goal_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
         Option<Datetime>,
@@ -414,47 +420,47 @@ pub struct GoalBuilder<'a, S: goal_state::State> {
         Option<Datetime>,
         Option<i64>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Goal<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GoalBuilder<'a, goal_state::Empty> {
+impl<S: BosStr> Goal<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GoalBuilder<S, goal_state::Empty> {
         GoalBuilder::new()
     }
 }
 
-impl<'a> GoalBuilder<'a, goal_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GoalBuilder<S, goal_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GoalBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GoalBuilder<'a, S>
+impl<S: BosStr, St> GoalBuilder<S, St>
 where
-    S: goal_state::State,
-    S::CreatedAt: goal_state::IsUnset,
+    St: goal_state::State,
+    St::CreatedAt: goal_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> GoalBuilder<'a, goal_state::SetCreatedAt<S>> {
+    ) -> GoalBuilder<S, goal_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         GoalBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
+impl<S: BosStr, St: goal_state::State> GoalBuilder<S, St> {
     /// Set the `endDate` field (optional)
     pub fn end_date(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.1 = value.into();
@@ -467,93 +473,93 @@ impl<'a, S: goal_state::State> GoalBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GoalBuilder<'a, S>
+impl<S: BosStr, St> GoalBuilder<S, St>
 where
-    S: goal_state::State,
-    S::Metric: goal_state::IsUnset,
+    St: goal_state::State,
+    St::Metric: goal_state::IsUnset,
 {
     /// Set the `metric` field (required)
     pub fn metric(
         mut self,
         value: impl Into<GoalMetric<S>>,
-    ) -> GoalBuilder<'a, goal_state::SetMetric<S>> {
+    ) -> GoalBuilder<S, goal_state::SetMetric<St>> {
         self._fields.2 = Option::Some(value.into());
         GoalBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GoalBuilder<'a, S>
+impl<S: BosStr, St> GoalBuilder<S, St>
 where
-    S: goal_state::State,
-    S::Period: goal_state::IsUnset,
+    St: goal_state::State,
+    St::Period: goal_state::IsUnset,
 {
     /// Set the `period` field (required)
     pub fn period(
         mut self,
         value: impl Into<GoalPeriod<S>>,
-    ) -> GoalBuilder<'a, goal_state::SetPeriod<S>> {
+    ) -> GoalBuilder<S, goal_state::SetPeriod<St>> {
         self._fields.3 = Option::Some(value.into());
         GoalBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GoalBuilder<'a, S>
+impl<S: BosStr, St> GoalBuilder<S, St>
 where
-    S: goal_state::State,
-    S::StartDate: goal_state::IsUnset,
+    St: goal_state::State,
+    St::StartDate: goal_state::IsUnset,
 {
     /// Set the `startDate` field (required)
     pub fn start_date(
         mut self,
         value: impl Into<Datetime>,
-    ) -> GoalBuilder<'a, goal_state::SetStartDate<S>> {
+    ) -> GoalBuilder<S, goal_state::SetStartDate<St>> {
         self._fields.4 = Option::Some(value.into());
         GoalBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GoalBuilder<'a, S>
+impl<S: BosStr, St> GoalBuilder<S, St>
 where
-    S: goal_state::State,
-    S::TargetValue: goal_state::IsUnset,
+    St: goal_state::State,
+    St::TargetValue: goal_state::IsUnset,
 {
     /// Set the `targetValue` field (required)
     pub fn target_value(
         mut self,
         value: impl Into<i64>,
-    ) -> GoalBuilder<'a, goal_state::SetTargetValue<S>> {
+    ) -> GoalBuilder<S, goal_state::SetTargetValue<St>> {
         self._fields.5 = Option::Some(value.into());
         GoalBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GoalBuilder<'a, S>
+impl<S: BosStr, St> GoalBuilder<S, St>
 where
-    S: goal_state::State,
-    S::Period: goal_state::IsSet,
-    S::StartDate: goal_state::IsSet,
-    S::CreatedAt: goal_state::IsSet,
-    S::TargetValue: goal_state::IsSet,
-    S::Metric: goal_state::IsSet,
+    St: goal_state::State,
+    St::Period: goal_state::IsSet,
+    St::StartDate: goal_state::IsSet,
+    St::CreatedAt: goal_state::IsSet,
+    St::Metric: goal_state::IsSet,
+    St::TargetValue: goal_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Goal<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Goal<S> {
         Goal {
             created_at: self._fields.0.unwrap(),
             end_date: self._fields.1,
@@ -564,8 +570,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Goal<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Goal<S> {
         Goal {
             created_at: self._fields.0.unwrap(),
             end_date: self._fields.1,

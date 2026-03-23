@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -31,11 +31,11 @@ use crate::app_chronosky::plan::get_usage;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CurrentPlan<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CurrentPlan<S: BosStr = DefaultStr> {
     ///Localized plan display names
     pub display_name: Data<S>,
     ///Plan ID
@@ -55,20 +55,18 @@ pub struct CurrentPlan<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetUsageOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetUsageOutput<S: BosStr = DefaultStr> {
     pub current_plan: get_usage::CurrentPlan<S>,
     pub limits: get_usage::PlanLimits<S>,
     pub usage: get_usage::UsageStats<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -78,11 +76,11 @@ pub struct GetUsageOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct PlanLimits<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct PlanLimits<S: BosStr = DefaultStr> {
     ///Whether markdown formatting is supported
     #[serde(skip_serializing_if = "Option::is_none")]
     pub markdown_support: Option<bool>,
@@ -123,11 +121,11 @@ pub struct PlanLimits<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct UsageStats<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct UsageStats<S: BosStr = DefaultStr> {
     ///API requests in current hour
     #[serde(skip_serializing_if = "Option::is_none")]
     pub api_requests_this_hour: Option<i64>,
@@ -148,7 +146,7 @@ pub struct UsageStats<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for CurrentPlan<S> {
+impl<S: BosStr> LexiconSchema for CurrentPlan<S> {
     fn nsid() -> &'static str {
         "app.chronosky.plan.getUsage"
     }
@@ -205,7 +203,7 @@ pub struct GetUsageResponse;
 impl jacquard_common::xrpc::XrpcResp for GetUsageResponse {
     const NSID: &'static str = "app.chronosky.plan.getUsage";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetUsageOutput<S>;
+    type Output<S: BosStr> = GetUsageOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
@@ -220,11 +218,11 @@ pub struct GetUsageRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetUsageRequest {
     const PATH: &'static str = "/xrpc/app.chronosky.plan.getUsage";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetUsage;
+    type Request<S: BosStr> = GetUsage;
     type Response = GetUsageResponse;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for PlanLimits<S> {
+impl<S: BosStr> LexiconSchema for PlanLimits<S> {
     fn nsid() -> &'static str {
         "app.chronosky.plan.getUsage"
     }
@@ -239,7 +237,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for PlanLimits<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for UsageStats<S> {
+impl<S: BosStr> LexiconSchema for UsageStats<S> {
     fn nsid() -> &'static str {
         "app.chronosky.plan.getUsage"
     }
@@ -264,91 +262,91 @@ pub mod current_plan_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type IsActive;
-        type DisplayName;
         type Id;
-        type Tier;
+        type DisplayName;
         type Name;
+        type IsActive;
+        type Tier;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type IsActive = Unset;
-        type DisplayName = Unset;
         type Id = Unset;
-        type Tier = Unset;
+        type DisplayName = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `is_active` field to Set
-    pub struct SetIsActive<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIsActive<S> {}
-    impl<S: State> State for SetIsActive<S> {
-        type IsActive = Set<members::is_active>;
-        type DisplayName = S::DisplayName;
-        type Id = S::Id;
-        type Tier = S::Tier;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `display_name` field to Set
-    pub struct SetDisplayName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDisplayName<S> {}
-    impl<S: State> State for SetDisplayName<S> {
-        type IsActive = S::IsActive;
-        type DisplayName = Set<members::display_name>;
-        type Id = S::Id;
-        type Tier = S::Tier;
-        type Name = S::Name;
+        type IsActive = Unset;
+        type Tier = Unset;
     }
     ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type IsActive = S::IsActive;
-        type DisplayName = S::DisplayName;
+    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetId<St> {}
+    impl<St: State> State for SetId<St> {
         type Id = Set<members::id>;
-        type Tier = S::Tier;
-        type Name = S::Name;
+        type DisplayName = St::DisplayName;
+        type Name = St::Name;
+        type IsActive = St::IsActive;
+        type Tier = St::Tier;
     }
-    ///State transition - sets the `tier` field to Set
-    pub struct SetTier<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTier<S> {}
-    impl<S: State> State for SetTier<S> {
-        type IsActive = S::IsActive;
-        type DisplayName = S::DisplayName;
-        type Id = S::Id;
-        type Tier = Set<members::tier>;
-        type Name = S::Name;
+    ///State transition - sets the `display_name` field to Set
+    pub struct SetDisplayName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDisplayName<St> {}
+    impl<St: State> State for SetDisplayName<St> {
+        type Id = St::Id;
+        type DisplayName = Set<members::display_name>;
+        type Name = St::Name;
+        type IsActive = St::IsActive;
+        type Tier = St::Tier;
     }
     ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type IsActive = S::IsActive;
-        type DisplayName = S::DisplayName;
-        type Id = S::Id;
-        type Tier = S::Tier;
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Id = St::Id;
+        type DisplayName = St::DisplayName;
         type Name = Set<members::name>;
+        type IsActive = St::IsActive;
+        type Tier = St::Tier;
+    }
+    ///State transition - sets the `is_active` field to Set
+    pub struct SetIsActive<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIsActive<St> {}
+    impl<St: State> State for SetIsActive<St> {
+        type Id = St::Id;
+        type DisplayName = St::DisplayName;
+        type Name = St::Name;
+        type IsActive = Set<members::is_active>;
+        type Tier = St::Tier;
+    }
+    ///State transition - sets the `tier` field to Set
+    pub struct SetTier<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTier<St> {}
+    impl<St: State> State for SetTier<St> {
+        type Id = St::Id;
+        type DisplayName = St::DisplayName;
+        type Name = St::Name;
+        type IsActive = St::IsActive;
+        type Tier = Set<members::tier>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `is_active` field
-        pub struct is_active(());
-        ///Marker type for the `display_name` field
-        pub struct display_name(());
         ///Marker type for the `id` field
         pub struct id(());
-        ///Marker type for the `tier` field
-        pub struct tier(());
+        ///Marker type for the `display_name` field
+        pub struct display_name(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `is_active` field
+        pub struct is_active(());
+        ///Marker type for the `tier` field
+        pub struct tier(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct CurrentPlanBuilder<'a, S: current_plan_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct CurrentPlanBuilder<S: BosStr, St: current_plan_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Data<S>>,
         Option<S>,
@@ -357,123 +355,123 @@ pub struct CurrentPlanBuilder<'a, S: current_plan_state::State> {
         Option<S>,
         Option<Datetime>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> CurrentPlan<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> CurrentPlanBuilder<'a, current_plan_state::Empty> {
+impl<S: BosStr> CurrentPlan<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> CurrentPlanBuilder<S, current_plan_state::Empty> {
         CurrentPlanBuilder::new()
     }
 }
 
-impl<'a> CurrentPlanBuilder<'a, current_plan_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> CurrentPlanBuilder<S, current_plan_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         CurrentPlanBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CurrentPlanBuilder<'a, S>
+impl<S: BosStr, St> CurrentPlanBuilder<S, St>
 where
-    S: current_plan_state::State,
-    S::DisplayName: current_plan_state::IsUnset,
+    St: current_plan_state::State,
+    St::DisplayName: current_plan_state::IsUnset,
 {
     /// Set the `displayName` field (required)
     pub fn display_name(
         mut self,
         value: impl Into<Data<S>>,
-    ) -> CurrentPlanBuilder<'a, current_plan_state::SetDisplayName<S>> {
+    ) -> CurrentPlanBuilder<S, current_plan_state::SetDisplayName<St>> {
         self._fields.0 = Option::Some(value.into());
         CurrentPlanBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CurrentPlanBuilder<'a, S>
+impl<S: BosStr, St> CurrentPlanBuilder<S, St>
 where
-    S: current_plan_state::State,
-    S::Id: current_plan_state::IsUnset,
+    St: current_plan_state::State,
+    St::Id: current_plan_state::IsUnset,
 {
     /// Set the `id` field (required)
     pub fn id(
         mut self,
         value: impl Into<S>,
-    ) -> CurrentPlanBuilder<'a, current_plan_state::SetId<S>> {
+    ) -> CurrentPlanBuilder<S, current_plan_state::SetId<St>> {
         self._fields.1 = Option::Some(value.into());
         CurrentPlanBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CurrentPlanBuilder<'a, S>
+impl<S: BosStr, St> CurrentPlanBuilder<S, St>
 where
-    S: current_plan_state::State,
-    S::IsActive: current_plan_state::IsUnset,
+    St: current_plan_state::State,
+    St::IsActive: current_plan_state::IsUnset,
 {
     /// Set the `isActive` field (required)
     pub fn is_active(
         mut self,
         value: impl Into<bool>,
-    ) -> CurrentPlanBuilder<'a, current_plan_state::SetIsActive<S>> {
+    ) -> CurrentPlanBuilder<S, current_plan_state::SetIsActive<St>> {
         self._fields.2 = Option::Some(value.into());
         CurrentPlanBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CurrentPlanBuilder<'a, S>
+impl<S: BosStr, St> CurrentPlanBuilder<S, St>
 where
-    S: current_plan_state::State,
-    S::Name: current_plan_state::IsUnset,
+    St: current_plan_state::State,
+    St::Name: current_plan_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> CurrentPlanBuilder<'a, current_plan_state::SetName<S>> {
+    ) -> CurrentPlanBuilder<S, current_plan_state::SetName<St>> {
         self._fields.3 = Option::Some(value.into());
         CurrentPlanBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CurrentPlanBuilder<'a, S>
+impl<S: BosStr, St> CurrentPlanBuilder<S, St>
 where
-    S: current_plan_state::State,
-    S::Tier: current_plan_state::IsUnset,
+    St: current_plan_state::State,
+    St::Tier: current_plan_state::IsUnset,
 {
     /// Set the `tier` field (required)
     pub fn tier(
         mut self,
         value: impl Into<S>,
-    ) -> CurrentPlanBuilder<'a, current_plan_state::SetTier<S>> {
+    ) -> CurrentPlanBuilder<S, current_plan_state::SetTier<St>> {
         self._fields.4 = Option::Some(value.into());
         CurrentPlanBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: current_plan_state::State> CurrentPlanBuilder<'a, S> {
+impl<S: BosStr, St: current_plan_state::State> CurrentPlanBuilder<S, St> {
     /// Set the `validUntil` field (optional)
     pub fn valid_until(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.5 = value.into();
@@ -486,17 +484,17 @@ impl<'a, S: current_plan_state::State> CurrentPlanBuilder<'a, S> {
     }
 }
 
-impl<'a, S> CurrentPlanBuilder<'a, S>
+impl<S: BosStr, St> CurrentPlanBuilder<S, St>
 where
-    S: current_plan_state::State,
-    S::IsActive: current_plan_state::IsSet,
-    S::DisplayName: current_plan_state::IsSet,
-    S::Id: current_plan_state::IsSet,
-    S::Tier: current_plan_state::IsSet,
-    S::Name: current_plan_state::IsSet,
+    St: current_plan_state::State,
+    St::Id: current_plan_state::IsSet,
+    St::DisplayName: current_plan_state::IsSet,
+    St::Name: current_plan_state::IsSet,
+    St::IsActive: current_plan_state::IsSet,
+    St::Tier: current_plan_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> CurrentPlan<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> CurrentPlan<S> {
         CurrentPlan {
             display_name: self._fields.0.unwrap(),
             id: self._fields.1.unwrap(),
@@ -507,11 +505,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> CurrentPlan<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> CurrentPlan<S> {
         CurrentPlan {
             display_name: self._fields.0.unwrap(),
             id: self._fields.1.unwrap(),
@@ -804,111 +802,111 @@ pub mod plan_limits_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type ScheduleIntervalMinutes;
         type PendingPostsLimit;
         type MaxImagesPerPost;
-        type ScheduleIntervalMinutes;
         type MaxScheduleDays;
-        type ThreadPostsLimit;
         type MonthlyPostsLimit;
+        type ThreadPostsLimit;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type ScheduleIntervalMinutes = Unset;
         type PendingPostsLimit = Unset;
         type MaxImagesPerPost = Unset;
-        type ScheduleIntervalMinutes = Unset;
         type MaxScheduleDays = Unset;
-        type ThreadPostsLimit = Unset;
         type MonthlyPostsLimit = Unset;
-    }
-    ///State transition - sets the `pending_posts_limit` field to Set
-    pub struct SetPendingPostsLimit<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPendingPostsLimit<S> {}
-    impl<S: State> State for SetPendingPostsLimit<S> {
-        type PendingPostsLimit = Set<members::pending_posts_limit>;
-        type MaxImagesPerPost = S::MaxImagesPerPost;
-        type ScheduleIntervalMinutes = S::ScheduleIntervalMinutes;
-        type MaxScheduleDays = S::MaxScheduleDays;
-        type ThreadPostsLimit = S::ThreadPostsLimit;
-        type MonthlyPostsLimit = S::MonthlyPostsLimit;
-    }
-    ///State transition - sets the `max_images_per_post` field to Set
-    pub struct SetMaxImagesPerPost<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMaxImagesPerPost<S> {}
-    impl<S: State> State for SetMaxImagesPerPost<S> {
-        type PendingPostsLimit = S::PendingPostsLimit;
-        type MaxImagesPerPost = Set<members::max_images_per_post>;
-        type ScheduleIntervalMinutes = S::ScheduleIntervalMinutes;
-        type MaxScheduleDays = S::MaxScheduleDays;
-        type ThreadPostsLimit = S::ThreadPostsLimit;
-        type MonthlyPostsLimit = S::MonthlyPostsLimit;
+        type ThreadPostsLimit = Unset;
     }
     ///State transition - sets the `schedule_interval_minutes` field to Set
-    pub struct SetScheduleIntervalMinutes<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetScheduleIntervalMinutes<S> {}
-    impl<S: State> State for SetScheduleIntervalMinutes<S> {
-        type PendingPostsLimit = S::PendingPostsLimit;
-        type MaxImagesPerPost = S::MaxImagesPerPost;
+    pub struct SetScheduleIntervalMinutes<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetScheduleIntervalMinutes<St> {}
+    impl<St: State> State for SetScheduleIntervalMinutes<St> {
         type ScheduleIntervalMinutes = Set<members::schedule_interval_minutes>;
-        type MaxScheduleDays = S::MaxScheduleDays;
-        type ThreadPostsLimit = S::ThreadPostsLimit;
-        type MonthlyPostsLimit = S::MonthlyPostsLimit;
+        type PendingPostsLimit = St::PendingPostsLimit;
+        type MaxImagesPerPost = St::MaxImagesPerPost;
+        type MaxScheduleDays = St::MaxScheduleDays;
+        type MonthlyPostsLimit = St::MonthlyPostsLimit;
+        type ThreadPostsLimit = St::ThreadPostsLimit;
+    }
+    ///State transition - sets the `pending_posts_limit` field to Set
+    pub struct SetPendingPostsLimit<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPendingPostsLimit<St> {}
+    impl<St: State> State for SetPendingPostsLimit<St> {
+        type ScheduleIntervalMinutes = St::ScheduleIntervalMinutes;
+        type PendingPostsLimit = Set<members::pending_posts_limit>;
+        type MaxImagesPerPost = St::MaxImagesPerPost;
+        type MaxScheduleDays = St::MaxScheduleDays;
+        type MonthlyPostsLimit = St::MonthlyPostsLimit;
+        type ThreadPostsLimit = St::ThreadPostsLimit;
+    }
+    ///State transition - sets the `max_images_per_post` field to Set
+    pub struct SetMaxImagesPerPost<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMaxImagesPerPost<St> {}
+    impl<St: State> State for SetMaxImagesPerPost<St> {
+        type ScheduleIntervalMinutes = St::ScheduleIntervalMinutes;
+        type PendingPostsLimit = St::PendingPostsLimit;
+        type MaxImagesPerPost = Set<members::max_images_per_post>;
+        type MaxScheduleDays = St::MaxScheduleDays;
+        type MonthlyPostsLimit = St::MonthlyPostsLimit;
+        type ThreadPostsLimit = St::ThreadPostsLimit;
     }
     ///State transition - sets the `max_schedule_days` field to Set
-    pub struct SetMaxScheduleDays<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMaxScheduleDays<S> {}
-    impl<S: State> State for SetMaxScheduleDays<S> {
-        type PendingPostsLimit = S::PendingPostsLimit;
-        type MaxImagesPerPost = S::MaxImagesPerPost;
-        type ScheduleIntervalMinutes = S::ScheduleIntervalMinutes;
+    pub struct SetMaxScheduleDays<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMaxScheduleDays<St> {}
+    impl<St: State> State for SetMaxScheduleDays<St> {
+        type ScheduleIntervalMinutes = St::ScheduleIntervalMinutes;
+        type PendingPostsLimit = St::PendingPostsLimit;
+        type MaxImagesPerPost = St::MaxImagesPerPost;
         type MaxScheduleDays = Set<members::max_schedule_days>;
-        type ThreadPostsLimit = S::ThreadPostsLimit;
-        type MonthlyPostsLimit = S::MonthlyPostsLimit;
-    }
-    ///State transition - sets the `thread_posts_limit` field to Set
-    pub struct SetThreadPostsLimit<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetThreadPostsLimit<S> {}
-    impl<S: State> State for SetThreadPostsLimit<S> {
-        type PendingPostsLimit = S::PendingPostsLimit;
-        type MaxImagesPerPost = S::MaxImagesPerPost;
-        type ScheduleIntervalMinutes = S::ScheduleIntervalMinutes;
-        type MaxScheduleDays = S::MaxScheduleDays;
-        type ThreadPostsLimit = Set<members::thread_posts_limit>;
-        type MonthlyPostsLimit = S::MonthlyPostsLimit;
+        type MonthlyPostsLimit = St::MonthlyPostsLimit;
+        type ThreadPostsLimit = St::ThreadPostsLimit;
     }
     ///State transition - sets the `monthly_posts_limit` field to Set
-    pub struct SetMonthlyPostsLimit<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMonthlyPostsLimit<S> {}
-    impl<S: State> State for SetMonthlyPostsLimit<S> {
-        type PendingPostsLimit = S::PendingPostsLimit;
-        type MaxImagesPerPost = S::MaxImagesPerPost;
-        type ScheduleIntervalMinutes = S::ScheduleIntervalMinutes;
-        type MaxScheduleDays = S::MaxScheduleDays;
-        type ThreadPostsLimit = S::ThreadPostsLimit;
+    pub struct SetMonthlyPostsLimit<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMonthlyPostsLimit<St> {}
+    impl<St: State> State for SetMonthlyPostsLimit<St> {
+        type ScheduleIntervalMinutes = St::ScheduleIntervalMinutes;
+        type PendingPostsLimit = St::PendingPostsLimit;
+        type MaxImagesPerPost = St::MaxImagesPerPost;
+        type MaxScheduleDays = St::MaxScheduleDays;
         type MonthlyPostsLimit = Set<members::monthly_posts_limit>;
+        type ThreadPostsLimit = St::ThreadPostsLimit;
+    }
+    ///State transition - sets the `thread_posts_limit` field to Set
+    pub struct SetThreadPostsLimit<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetThreadPostsLimit<St> {}
+    impl<St: State> State for SetThreadPostsLimit<St> {
+        type ScheduleIntervalMinutes = St::ScheduleIntervalMinutes;
+        type PendingPostsLimit = St::PendingPostsLimit;
+        type MaxImagesPerPost = St::MaxImagesPerPost;
+        type MaxScheduleDays = St::MaxScheduleDays;
+        type MonthlyPostsLimit = St::MonthlyPostsLimit;
+        type ThreadPostsLimit = Set<members::thread_posts_limit>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `schedule_interval_minutes` field
+        pub struct schedule_interval_minutes(());
         ///Marker type for the `pending_posts_limit` field
         pub struct pending_posts_limit(());
         ///Marker type for the `max_images_per_post` field
         pub struct max_images_per_post(());
-        ///Marker type for the `schedule_interval_minutes` field
-        pub struct schedule_interval_minutes(());
         ///Marker type for the `max_schedule_days` field
         pub struct max_schedule_days(());
-        ///Marker type for the `thread_posts_limit` field
-        pub struct thread_posts_limit(());
         ///Marker type for the `monthly_posts_limit` field
         pub struct monthly_posts_limit(());
+        ///Marker type for the `thread_posts_limit` field
+        pub struct thread_posts_limit(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct PlanLimitsBuilder<'a, S: plan_limits_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct PlanLimitsBuilder<S: BosStr, St: plan_limits_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<bool>,
         Option<i64>,
@@ -923,18 +921,18 @@ pub struct PlanLimitsBuilder<'a, S: plan_limits_state::State> {
         Option<i64>,
         Option<bool>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> PlanLimits<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> PlanLimitsBuilder<'a, plan_limits_state::Empty> {
+impl<S: BosStr> PlanLimits<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> PlanLimitsBuilder<S, plan_limits_state::Empty> {
         PlanLimitsBuilder::new()
     }
 }
 
-impl<'a> PlanLimitsBuilder<'a, plan_limits_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> PlanLimitsBuilder<S, plan_limits_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         PlanLimitsBuilder {
             _state: PhantomData,
@@ -952,12 +950,12 @@ impl<'a> PlanLimitsBuilder<'a, plan_limits_state::Empty> {
                 None,
                 None,
             ),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: plan_limits_state::State> PlanLimitsBuilder<'a, S> {
+impl<S: BosStr, St: plan_limits_state::State> PlanLimitsBuilder<S, St> {
     /// Set the `markdownSupport` field (optional)
     pub fn markdown_support(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.0 = value.into();
@@ -970,7 +968,7 @@ impl<'a, S: plan_limits_state::State> PlanLimitsBuilder<'a, S> {
     }
 }
 
-impl<'a, S: plan_limits_state::State> PlanLimitsBuilder<'a, S> {
+impl<S: BosStr, St: plan_limits_state::State> PlanLimitsBuilder<S, St> {
     /// Set the `maxImageSizeMb` field (optional)
     pub fn max_image_size_mb(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -983,45 +981,45 @@ impl<'a, S: plan_limits_state::State> PlanLimitsBuilder<'a, S> {
     }
 }
 
-impl<'a, S> PlanLimitsBuilder<'a, S>
+impl<S: BosStr, St> PlanLimitsBuilder<S, St>
 where
-    S: plan_limits_state::State,
-    S::MaxImagesPerPost: plan_limits_state::IsUnset,
+    St: plan_limits_state::State,
+    St::MaxImagesPerPost: plan_limits_state::IsUnset,
 {
     /// Set the `maxImagesPerPost` field (required)
     pub fn max_images_per_post(
         mut self,
         value: impl Into<i64>,
-    ) -> PlanLimitsBuilder<'a, plan_limits_state::SetMaxImagesPerPost<S>> {
+    ) -> PlanLimitsBuilder<S, plan_limits_state::SetMaxImagesPerPost<St>> {
         self._fields.2 = Option::Some(value.into());
         PlanLimitsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PlanLimitsBuilder<'a, S>
+impl<S: BosStr, St> PlanLimitsBuilder<S, St>
 where
-    S: plan_limits_state::State,
-    S::MaxScheduleDays: plan_limits_state::IsUnset,
+    St: plan_limits_state::State,
+    St::MaxScheduleDays: plan_limits_state::IsUnset,
 {
     /// Set the `maxScheduleDays` field (required)
     pub fn max_schedule_days(
         mut self,
         value: impl Into<i64>,
-    ) -> PlanLimitsBuilder<'a, plan_limits_state::SetMaxScheduleDays<S>> {
+    ) -> PlanLimitsBuilder<S, plan_limits_state::SetMaxScheduleDays<St>> {
         self._fields.3 = Option::Some(value.into());
         PlanLimitsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: plan_limits_state::State> PlanLimitsBuilder<'a, S> {
+impl<S: BosStr, St: plan_limits_state::State> PlanLimitsBuilder<S, St> {
     /// Set the `maxVideoSizeMb` field (optional)
     pub fn max_video_size_mb(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.4 = value.into();
@@ -1034,64 +1032,64 @@ impl<'a, S: plan_limits_state::State> PlanLimitsBuilder<'a, S> {
     }
 }
 
-impl<'a, S> PlanLimitsBuilder<'a, S>
+impl<S: BosStr, St> PlanLimitsBuilder<S, St>
 where
-    S: plan_limits_state::State,
-    S::MonthlyPostsLimit: plan_limits_state::IsUnset,
+    St: plan_limits_state::State,
+    St::MonthlyPostsLimit: plan_limits_state::IsUnset,
 {
     /// Set the `monthlyPostsLimit` field (required)
     pub fn monthly_posts_limit(
         mut self,
         value: impl Into<i64>,
-    ) -> PlanLimitsBuilder<'a, plan_limits_state::SetMonthlyPostsLimit<S>> {
+    ) -> PlanLimitsBuilder<S, plan_limits_state::SetMonthlyPostsLimit<St>> {
         self._fields.5 = Option::Some(value.into());
         PlanLimitsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PlanLimitsBuilder<'a, S>
+impl<S: BosStr, St> PlanLimitsBuilder<S, St>
 where
-    S: plan_limits_state::State,
-    S::PendingPostsLimit: plan_limits_state::IsUnset,
+    St: plan_limits_state::State,
+    St::PendingPostsLimit: plan_limits_state::IsUnset,
 {
     /// Set the `pendingPostsLimit` field (required)
     pub fn pending_posts_limit(
         mut self,
         value: impl Into<i64>,
-    ) -> PlanLimitsBuilder<'a, plan_limits_state::SetPendingPostsLimit<S>> {
+    ) -> PlanLimitsBuilder<S, plan_limits_state::SetPendingPostsLimit<St>> {
         self._fields.6 = Option::Some(value.into());
         PlanLimitsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PlanLimitsBuilder<'a, S>
+impl<S: BosStr, St> PlanLimitsBuilder<S, St>
 where
-    S: plan_limits_state::State,
-    S::ScheduleIntervalMinutes: plan_limits_state::IsUnset,
+    St: plan_limits_state::State,
+    St::ScheduleIntervalMinutes: plan_limits_state::IsUnset,
 {
     /// Set the `scheduleIntervalMinutes` field (required)
     pub fn schedule_interval_minutes(
         mut self,
         value: impl Into<i64>,
-    ) -> PlanLimitsBuilder<'a, plan_limits_state::SetScheduleIntervalMinutes<S>> {
+    ) -> PlanLimitsBuilder<S, plan_limits_state::SetScheduleIntervalMinutes<St>> {
         self._fields.7 = Option::Some(value.into());
         PlanLimitsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: plan_limits_state::State> PlanLimitsBuilder<'a, S> {
+impl<S: BosStr, St: plan_limits_state::State> PlanLimitsBuilder<S, St> {
     /// Set the `threadPosts` field (optional)
     pub fn thread_posts(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.8 = value.into();
@@ -1104,26 +1102,26 @@ impl<'a, S: plan_limits_state::State> PlanLimitsBuilder<'a, S> {
     }
 }
 
-impl<'a, S> PlanLimitsBuilder<'a, S>
+impl<S: BosStr, St> PlanLimitsBuilder<S, St>
 where
-    S: plan_limits_state::State,
-    S::ThreadPostsLimit: plan_limits_state::IsUnset,
+    St: plan_limits_state::State,
+    St::ThreadPostsLimit: plan_limits_state::IsUnset,
 {
     /// Set the `threadPostsLimit` field (required)
     pub fn thread_posts_limit(
         mut self,
         value: impl Into<i64>,
-    ) -> PlanLimitsBuilder<'a, plan_limits_state::SetThreadPostsLimit<S>> {
+    ) -> PlanLimitsBuilder<S, plan_limits_state::SetThreadPostsLimit<St>> {
         self._fields.9 = Option::Some(value.into());
         PlanLimitsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: plan_limits_state::State> PlanLimitsBuilder<'a, S> {
+impl<S: BosStr, St: plan_limits_state::State> PlanLimitsBuilder<S, St> {
     /// Set the `videoProcessingMinutesMonthly` field (optional)
     pub fn video_processing_minutes_monthly(
         mut self,
@@ -1139,7 +1137,7 @@ impl<'a, S: plan_limits_state::State> PlanLimitsBuilder<'a, S> {
     }
 }
 
-impl<'a, S: plan_limits_state::State> PlanLimitsBuilder<'a, S> {
+impl<S: BosStr, St: plan_limits_state::State> PlanLimitsBuilder<S, St> {
     /// Set the `videoUpload` field (optional)
     pub fn video_upload(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.11 = value.into();
@@ -1152,18 +1150,18 @@ impl<'a, S: plan_limits_state::State> PlanLimitsBuilder<'a, S> {
     }
 }
 
-impl<'a, S> PlanLimitsBuilder<'a, S>
+impl<S: BosStr, St> PlanLimitsBuilder<S, St>
 where
-    S: plan_limits_state::State,
-    S::PendingPostsLimit: plan_limits_state::IsSet,
-    S::MaxImagesPerPost: plan_limits_state::IsSet,
-    S::ScheduleIntervalMinutes: plan_limits_state::IsSet,
-    S::MaxScheduleDays: plan_limits_state::IsSet,
-    S::ThreadPostsLimit: plan_limits_state::IsSet,
-    S::MonthlyPostsLimit: plan_limits_state::IsSet,
+    St: plan_limits_state::State,
+    St::ScheduleIntervalMinutes: plan_limits_state::IsSet,
+    St::PendingPostsLimit: plan_limits_state::IsSet,
+    St::MaxImagesPerPost: plan_limits_state::IsSet,
+    St::MaxScheduleDays: plan_limits_state::IsSet,
+    St::MonthlyPostsLimit: plan_limits_state::IsSet,
+    St::ThreadPostsLimit: plan_limits_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> PlanLimits<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> PlanLimits<S> {
         PlanLimits {
             markdown_support: self._fields.0,
             max_image_size_mb: self._fields.1,
@@ -1180,11 +1178,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> PlanLimits<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> PlanLimits<S> {
         PlanLimits {
             markdown_support: self._fields.0,
             max_image_size_mb: self._fields.1,
@@ -1213,91 +1211,91 @@ pub mod usage_stats_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type MonthlyPostsCount;
+        type PendingPostsCount;
+        type MonthlyPeriodStart;
         type MonthlyPeriodEnd;
         type LastUpdated;
-        type PendingPostsCount;
-        type MonthlyPostsCount;
-        type MonthlyPeriodStart;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type MonthlyPostsCount = Unset;
+        type PendingPostsCount = Unset;
+        type MonthlyPeriodStart = Unset;
         type MonthlyPeriodEnd = Unset;
         type LastUpdated = Unset;
-        type PendingPostsCount = Unset;
-        type MonthlyPostsCount = Unset;
-        type MonthlyPeriodStart = Unset;
-    }
-    ///State transition - sets the `monthly_period_end` field to Set
-    pub struct SetMonthlyPeriodEnd<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMonthlyPeriodEnd<S> {}
-    impl<S: State> State for SetMonthlyPeriodEnd<S> {
-        type MonthlyPeriodEnd = Set<members::monthly_period_end>;
-        type LastUpdated = S::LastUpdated;
-        type PendingPostsCount = S::PendingPostsCount;
-        type MonthlyPostsCount = S::MonthlyPostsCount;
-        type MonthlyPeriodStart = S::MonthlyPeriodStart;
-    }
-    ///State transition - sets the `last_updated` field to Set
-    pub struct SetLastUpdated<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLastUpdated<S> {}
-    impl<S: State> State for SetLastUpdated<S> {
-        type MonthlyPeriodEnd = S::MonthlyPeriodEnd;
-        type LastUpdated = Set<members::last_updated>;
-        type PendingPostsCount = S::PendingPostsCount;
-        type MonthlyPostsCount = S::MonthlyPostsCount;
-        type MonthlyPeriodStart = S::MonthlyPeriodStart;
-    }
-    ///State transition - sets the `pending_posts_count` field to Set
-    pub struct SetPendingPostsCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPendingPostsCount<S> {}
-    impl<S: State> State for SetPendingPostsCount<S> {
-        type MonthlyPeriodEnd = S::MonthlyPeriodEnd;
-        type LastUpdated = S::LastUpdated;
-        type PendingPostsCount = Set<members::pending_posts_count>;
-        type MonthlyPostsCount = S::MonthlyPostsCount;
-        type MonthlyPeriodStart = S::MonthlyPeriodStart;
     }
     ///State transition - sets the `monthly_posts_count` field to Set
-    pub struct SetMonthlyPostsCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMonthlyPostsCount<S> {}
-    impl<S: State> State for SetMonthlyPostsCount<S> {
-        type MonthlyPeriodEnd = S::MonthlyPeriodEnd;
-        type LastUpdated = S::LastUpdated;
-        type PendingPostsCount = S::PendingPostsCount;
+    pub struct SetMonthlyPostsCount<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMonthlyPostsCount<St> {}
+    impl<St: State> State for SetMonthlyPostsCount<St> {
         type MonthlyPostsCount = Set<members::monthly_posts_count>;
-        type MonthlyPeriodStart = S::MonthlyPeriodStart;
+        type PendingPostsCount = St::PendingPostsCount;
+        type MonthlyPeriodStart = St::MonthlyPeriodStart;
+        type MonthlyPeriodEnd = St::MonthlyPeriodEnd;
+        type LastUpdated = St::LastUpdated;
+    }
+    ///State transition - sets the `pending_posts_count` field to Set
+    pub struct SetPendingPostsCount<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPendingPostsCount<St> {}
+    impl<St: State> State for SetPendingPostsCount<St> {
+        type MonthlyPostsCount = St::MonthlyPostsCount;
+        type PendingPostsCount = Set<members::pending_posts_count>;
+        type MonthlyPeriodStart = St::MonthlyPeriodStart;
+        type MonthlyPeriodEnd = St::MonthlyPeriodEnd;
+        type LastUpdated = St::LastUpdated;
     }
     ///State transition - sets the `monthly_period_start` field to Set
-    pub struct SetMonthlyPeriodStart<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMonthlyPeriodStart<S> {}
-    impl<S: State> State for SetMonthlyPeriodStart<S> {
-        type MonthlyPeriodEnd = S::MonthlyPeriodEnd;
-        type LastUpdated = S::LastUpdated;
-        type PendingPostsCount = S::PendingPostsCount;
-        type MonthlyPostsCount = S::MonthlyPostsCount;
+    pub struct SetMonthlyPeriodStart<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMonthlyPeriodStart<St> {}
+    impl<St: State> State for SetMonthlyPeriodStart<St> {
+        type MonthlyPostsCount = St::MonthlyPostsCount;
+        type PendingPostsCount = St::PendingPostsCount;
         type MonthlyPeriodStart = Set<members::monthly_period_start>;
+        type MonthlyPeriodEnd = St::MonthlyPeriodEnd;
+        type LastUpdated = St::LastUpdated;
+    }
+    ///State transition - sets the `monthly_period_end` field to Set
+    pub struct SetMonthlyPeriodEnd<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMonthlyPeriodEnd<St> {}
+    impl<St: State> State for SetMonthlyPeriodEnd<St> {
+        type MonthlyPostsCount = St::MonthlyPostsCount;
+        type PendingPostsCount = St::PendingPostsCount;
+        type MonthlyPeriodStart = St::MonthlyPeriodStart;
+        type MonthlyPeriodEnd = Set<members::monthly_period_end>;
+        type LastUpdated = St::LastUpdated;
+    }
+    ///State transition - sets the `last_updated` field to Set
+    pub struct SetLastUpdated<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLastUpdated<St> {}
+    impl<St: State> State for SetLastUpdated<St> {
+        type MonthlyPostsCount = St::MonthlyPostsCount;
+        type PendingPostsCount = St::PendingPostsCount;
+        type MonthlyPeriodStart = St::MonthlyPeriodStart;
+        type MonthlyPeriodEnd = St::MonthlyPeriodEnd;
+        type LastUpdated = Set<members::last_updated>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `monthly_posts_count` field
+        pub struct monthly_posts_count(());
+        ///Marker type for the `pending_posts_count` field
+        pub struct pending_posts_count(());
+        ///Marker type for the `monthly_period_start` field
+        pub struct monthly_period_start(());
         ///Marker type for the `monthly_period_end` field
         pub struct monthly_period_end(());
         ///Marker type for the `last_updated` field
         pub struct last_updated(());
-        ///Marker type for the `pending_posts_count` field
-        pub struct pending_posts_count(());
-        ///Marker type for the `monthly_posts_count` field
-        pub struct monthly_posts_count(());
-        ///Marker type for the `monthly_period_start` field
-        pub struct monthly_period_start(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct UsageStatsBuilder<'a, S: usage_stats_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct UsageStatsBuilder<S: BosStr, St: usage_stats_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<i64>,
         Option<Datetime>,
@@ -1307,28 +1305,28 @@ pub struct UsageStatsBuilder<'a, S: usage_stats_state::State> {
         Option<i64>,
         Option<i64>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> UsageStats<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> UsageStatsBuilder<'a, usage_stats_state::Empty> {
+impl<S: BosStr> UsageStats<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> UsageStatsBuilder<S, usage_stats_state::Empty> {
         UsageStatsBuilder::new()
     }
 }
 
-impl<'a> UsageStatsBuilder<'a, usage_stats_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> UsageStatsBuilder<S, usage_stats_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         UsageStatsBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: usage_stats_state::State> UsageStatsBuilder<'a, S> {
+impl<S: BosStr, St: usage_stats_state::State> UsageStatsBuilder<S, St> {
     /// Set the `apiRequestsThisHour` field (optional)
     pub fn api_requests_this_hour(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
@@ -1341,102 +1339,102 @@ impl<'a, S: usage_stats_state::State> UsageStatsBuilder<'a, S> {
     }
 }
 
-impl<'a, S> UsageStatsBuilder<'a, S>
+impl<S: BosStr, St> UsageStatsBuilder<S, St>
 where
-    S: usage_stats_state::State,
-    S::LastUpdated: usage_stats_state::IsUnset,
+    St: usage_stats_state::State,
+    St::LastUpdated: usage_stats_state::IsUnset,
 {
     /// Set the `lastUpdated` field (required)
     pub fn last_updated(
         mut self,
         value: impl Into<Datetime>,
-    ) -> UsageStatsBuilder<'a, usage_stats_state::SetLastUpdated<S>> {
+    ) -> UsageStatsBuilder<S, usage_stats_state::SetLastUpdated<St>> {
         self._fields.1 = Option::Some(value.into());
         UsageStatsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> UsageStatsBuilder<'a, S>
+impl<S: BosStr, St> UsageStatsBuilder<S, St>
 where
-    S: usage_stats_state::State,
-    S::MonthlyPeriodEnd: usage_stats_state::IsUnset,
+    St: usage_stats_state::State,
+    St::MonthlyPeriodEnd: usage_stats_state::IsUnset,
 {
     /// Set the `monthlyPeriodEnd` field (required)
     pub fn monthly_period_end(
         mut self,
         value: impl Into<Datetime>,
-    ) -> UsageStatsBuilder<'a, usage_stats_state::SetMonthlyPeriodEnd<S>> {
+    ) -> UsageStatsBuilder<S, usage_stats_state::SetMonthlyPeriodEnd<St>> {
         self._fields.2 = Option::Some(value.into());
         UsageStatsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> UsageStatsBuilder<'a, S>
+impl<S: BosStr, St> UsageStatsBuilder<S, St>
 where
-    S: usage_stats_state::State,
-    S::MonthlyPeriodStart: usage_stats_state::IsUnset,
+    St: usage_stats_state::State,
+    St::MonthlyPeriodStart: usage_stats_state::IsUnset,
 {
     /// Set the `monthlyPeriodStart` field (required)
     pub fn monthly_period_start(
         mut self,
         value: impl Into<Datetime>,
-    ) -> UsageStatsBuilder<'a, usage_stats_state::SetMonthlyPeriodStart<S>> {
+    ) -> UsageStatsBuilder<S, usage_stats_state::SetMonthlyPeriodStart<St>> {
         self._fields.3 = Option::Some(value.into());
         UsageStatsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> UsageStatsBuilder<'a, S>
+impl<S: BosStr, St> UsageStatsBuilder<S, St>
 where
-    S: usage_stats_state::State,
-    S::MonthlyPostsCount: usage_stats_state::IsUnset,
+    St: usage_stats_state::State,
+    St::MonthlyPostsCount: usage_stats_state::IsUnset,
 {
     /// Set the `monthlyPostsCount` field (required)
     pub fn monthly_posts_count(
         mut self,
         value: impl Into<i64>,
-    ) -> UsageStatsBuilder<'a, usage_stats_state::SetMonthlyPostsCount<S>> {
+    ) -> UsageStatsBuilder<S, usage_stats_state::SetMonthlyPostsCount<St>> {
         self._fields.4 = Option::Some(value.into());
         UsageStatsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> UsageStatsBuilder<'a, S>
+impl<S: BosStr, St> UsageStatsBuilder<S, St>
 where
-    S: usage_stats_state::State,
-    S::PendingPostsCount: usage_stats_state::IsUnset,
+    St: usage_stats_state::State,
+    St::PendingPostsCount: usage_stats_state::IsUnset,
 {
     /// Set the `pendingPostsCount` field (required)
     pub fn pending_posts_count(
         mut self,
         value: impl Into<i64>,
-    ) -> UsageStatsBuilder<'a, usage_stats_state::SetPendingPostsCount<S>> {
+    ) -> UsageStatsBuilder<S, usage_stats_state::SetPendingPostsCount<St>> {
         self._fields.5 = Option::Some(value.into());
         UsageStatsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: usage_stats_state::State> UsageStatsBuilder<'a, S> {
+impl<S: BosStr, St: usage_stats_state::State> UsageStatsBuilder<S, St> {
     /// Set the `storageUsedMb` field (optional)
     pub fn storage_used_mb(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.6 = value.into();
@@ -1449,17 +1447,17 @@ impl<'a, S: usage_stats_state::State> UsageStatsBuilder<'a, S> {
     }
 }
 
-impl<'a, S> UsageStatsBuilder<'a, S>
+impl<S: BosStr, St> UsageStatsBuilder<S, St>
 where
-    S: usage_stats_state::State,
-    S::MonthlyPeriodEnd: usage_stats_state::IsSet,
-    S::LastUpdated: usage_stats_state::IsSet,
-    S::PendingPostsCount: usage_stats_state::IsSet,
-    S::MonthlyPostsCount: usage_stats_state::IsSet,
-    S::MonthlyPeriodStart: usage_stats_state::IsSet,
+    St: usage_stats_state::State,
+    St::MonthlyPostsCount: usage_stats_state::IsSet,
+    St::PendingPostsCount: usage_stats_state::IsSet,
+    St::MonthlyPeriodStart: usage_stats_state::IsSet,
+    St::MonthlyPeriodEnd: usage_stats_state::IsSet,
+    St::LastUpdated: usage_stats_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> UsageStats<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> UsageStats<S> {
         UsageStats {
             api_requests_this_hour: self._fields.0,
             last_updated: self._fields.1.unwrap(),
@@ -1471,11 +1469,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> UsageStats<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> UsageStats<S> {
         UsageStats {
             api_requests_this_hour: self._fields.0,
             last_updated: self._fields.1.unwrap(),

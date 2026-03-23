@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
@@ -19,18 +19,16 @@ use serde::{Serialize, Deserialize};
 use crate::games_gamesgamesgamesgames::SkeletonGameFeedItem;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetFeedSkeleton<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetFeedSkeleton<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub cursor: Option<S>,
-    #[serde(borrow)]
     pub feed: AtUri<S>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
@@ -40,20 +38,18 @@ pub struct GetFeedSkeleton<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetFeedSkeletonOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetFeedSkeletonOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
     pub feed: Vec<SkeletonGameFeedItem<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -104,12 +100,11 @@ pub struct GetFeedSkeletonResponse;
 impl jacquard_common::xrpc::XrpcResp for GetFeedSkeletonResponse {
     const NSID: &'static str = "games.gamesgamesgamesgames.feed.getFeedSkeleton";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetFeedSkeletonOutput<S>;
+    type Output<S: BosStr> = GetFeedSkeletonOutput<S>;
     type Err = GetFeedSkeletonError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetFeedSkeleton<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetFeedSkeleton<S> {
     const NSID: &'static str = "games.gamesgamesgamesgames.feed.getFeedSkeleton";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetFeedSkeletonResponse;
@@ -120,7 +115,7 @@ pub struct GetFeedSkeletonRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetFeedSkeletonRequest {
     const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.feed.getFeedSkeleton";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetFeedSkeleton<S>;
+    type Request<S: BosStr> = GetFeedSkeleton<S>;
     type Response = GetFeedSkeletonResponse;
 }
 
@@ -147,9 +142,9 @@ pub mod get_feed_skeleton_state {
         type Feed = Unset;
     }
     ///State transition - sets the `feed` field to Set
-    pub struct SetFeed<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFeed<S> {}
-    impl<S: State> State for SetFeed<S> {
+    pub struct SetFeed<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetFeed<St> {}
+    impl<St: State> State for SetFeed<St> {
         type Feed = Set<members::feed>;
     }
     /// Marker types for field names
@@ -160,32 +155,32 @@ pub mod get_feed_skeleton_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetFeedSkeletonBuilder<'a, S: get_feed_skeleton_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetFeedSkeletonBuilder<S: BosStr, St: get_feed_skeleton_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<AtUri<S>>, Option<i64>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetFeedSkeleton<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetFeedSkeletonBuilder<'a, get_feed_skeleton_state::Empty> {
+impl<S: BosStr> GetFeedSkeleton<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetFeedSkeletonBuilder<S, get_feed_skeleton_state::Empty> {
         GetFeedSkeletonBuilder::new()
     }
 }
 
-impl<'a> GetFeedSkeletonBuilder<'a, get_feed_skeleton_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetFeedSkeletonBuilder<S, get_feed_skeleton_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetFeedSkeletonBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: get_feed_skeleton_state::State> GetFeedSkeletonBuilder<'a, S> {
+impl<S: BosStr, St: get_feed_skeleton_state::State> GetFeedSkeletonBuilder<S, St> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -198,26 +193,26 @@ impl<'a, S: get_feed_skeleton_state::State> GetFeedSkeletonBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GetFeedSkeletonBuilder<'a, S>
+impl<S: BosStr, St> GetFeedSkeletonBuilder<S, St>
 where
-    S: get_feed_skeleton_state::State,
-    S::Feed: get_feed_skeleton_state::IsUnset,
+    St: get_feed_skeleton_state::State,
+    St::Feed: get_feed_skeleton_state::IsUnset,
 {
     /// Set the `feed` field (required)
     pub fn feed(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> GetFeedSkeletonBuilder<'a, get_feed_skeleton_state::SetFeed<S>> {
+    ) -> GetFeedSkeletonBuilder<S, get_feed_skeleton_state::SetFeed<St>> {
         self._fields.1 = Option::Some(value.into());
         GetFeedSkeletonBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: get_feed_skeleton_state::State> GetFeedSkeletonBuilder<'a, S> {
+impl<S: BosStr, St: get_feed_skeleton_state::State> GetFeedSkeletonBuilder<S, St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -230,13 +225,13 @@ impl<'a, S: get_feed_skeleton_state::State> GetFeedSkeletonBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GetFeedSkeletonBuilder<'a, S>
+impl<S: BosStr, St> GetFeedSkeletonBuilder<S, St>
 where
-    S: get_feed_skeleton_state::State,
-    S::Feed: get_feed_skeleton_state::IsSet,
+    St: get_feed_skeleton_state::State,
+    St::Feed: get_feed_skeleton_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetFeedSkeleton<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetFeedSkeleton<S> {
         GetFeedSkeleton {
             cursor: self._fields.0,
             feed: self._fields.1.unwrap(),

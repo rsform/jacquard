@@ -7,22 +7,21 @@
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
 use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 use crate::place_stream::live::subscribe_segments;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SubscribeSegments<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct SubscribeSegments<S: BosStr = DefaultStr> {
     pub streamer: S,
 }
 
@@ -104,9 +103,9 @@ pub mod subscribe_segments_state {
         type Streamer = Unset;
     }
     ///State transition - sets the `streamer` field to Set
-    pub struct SetStreamer<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStreamer<S> {}
-    impl<S: State> State for SetStreamer<S> {
+    pub struct SetStreamer<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStreamer<St> {}
+    impl<St: State> State for SetStreamer<St> {
         type Streamer = Set<members::streamer>;
     }
     /// Marker types for field names
@@ -117,57 +116,57 @@ pub mod subscribe_segments_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct SubscribeSegmentsBuilder<'a, S: subscribe_segments_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct SubscribeSegmentsBuilder<S: BosStr, St: subscribe_segments_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> SubscribeSegments<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> SubscribeSegmentsBuilder<'a, subscribe_segments_state::Empty> {
+impl<S: BosStr> SubscribeSegments<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> SubscribeSegmentsBuilder<S, subscribe_segments_state::Empty> {
         SubscribeSegmentsBuilder::new()
     }
 }
 
-impl<'a> SubscribeSegmentsBuilder<'a, subscribe_segments_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> SubscribeSegmentsBuilder<S, subscribe_segments_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SubscribeSegmentsBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SubscribeSegmentsBuilder<'a, S>
+impl<S: BosStr, St> SubscribeSegmentsBuilder<S, St>
 where
-    S: subscribe_segments_state::State,
-    S::Streamer: subscribe_segments_state::IsUnset,
+    St: subscribe_segments_state::State,
+    St::Streamer: subscribe_segments_state::IsUnset,
 {
     /// Set the `streamer` field (required)
     pub fn streamer(
         mut self,
         value: impl Into<S>,
-    ) -> SubscribeSegmentsBuilder<'a, subscribe_segments_state::SetStreamer<S>> {
+    ) -> SubscribeSegmentsBuilder<S, subscribe_segments_state::SetStreamer<St>> {
         self._fields.0 = Option::Some(value.into());
         SubscribeSegmentsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SubscribeSegmentsBuilder<'a, S>
+impl<S: BosStr, St> SubscribeSegmentsBuilder<S, St>
 where
-    S: subscribe_segments_state::State,
-    S::Streamer: subscribe_segments_state::IsSet,
+    St: subscribe_segments_state::State,
+    St::Streamer: subscribe_segments_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> SubscribeSegments<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> SubscribeSegments<S> {
         SubscribeSegments {
             streamer: self._fields.0.unwrap(),
         }

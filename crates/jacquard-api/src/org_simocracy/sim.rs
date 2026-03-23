@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -37,11 +37,11 @@ use crate::org_simocracy::SpriteSettings;
     rename = "org.simocracy.sim",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Sim<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Sim<S: BosStr = DefaultStr> {
     ///Timestamp when the sim was created
     pub created_at: Datetime,
     ///Rendered avatar PNG thumbnail for quick display
@@ -61,18 +61,18 @@ pub struct Sim<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SimGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SimGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Sim<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Sim<S> {
+impl<S: BosStr> Sim<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, SimRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -85,17 +85,17 @@ pub struct SimRecord;
 impl XrpcResp for SimRecord {
     const NSID: &'static str = "org.simocracy.sim";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = SimGetRecordOutput<S>;
+    type Output<S: BosStr> = SimGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<SimGetRecordOutput<S>> for Sim<S> {
+impl<S: BosStr> From<SimGetRecordOutput<S>> for Sim<S> {
     fn from(output: SimGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Sim<S> {
+impl<S: BosStr> Collection for Sim<S> {
     const NSID: &'static str = "org.simocracy.sim";
     type Record = SimRecord;
 }
@@ -105,7 +105,7 @@ impl Collection for SimRecord {
     type Record = SimRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Sim<S> {
+impl<S: BosStr> LexiconSchema for Sim<S> {
     fn nsid() -> &'static str {
         "org.simocracy.sim"
     }
@@ -170,104 +170,104 @@ pub mod sim_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Name;
         type Settings;
         type CreatedAt;
-        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Name = Unset;
         type Settings = Unset;
         type CreatedAt = Unset;
-        type Name = Unset;
-    }
-    ///State transition - sets the `settings` field to Set
-    pub struct SetSettings<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSettings<S> {}
-    impl<S: State> State for SetSettings<S> {
-        type Settings = Set<members::settings>;
-        type CreatedAt = S::CreatedAt;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Settings = S::Settings;
-        type CreatedAt = Set<members::created_at>;
-        type Name = S::Name;
     }
     ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Settings = S::Settings;
-        type CreatedAt = S::CreatedAt;
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
         type Name = Set<members::name>;
+        type Settings = St::Settings;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `settings` field to Set
+    pub struct SetSettings<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSettings<St> {}
+    impl<St: State> State for SetSettings<St> {
+        type Name = St::Name;
+        type Settings = Set<members::settings>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Name = St::Name;
+        type Settings = St::Settings;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `settings` field
         pub struct settings(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `name` field
-        pub struct name(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct SimBuilder<'a, S: sim_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct SimBuilder<S: BosStr, St: sim_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
         Option<BlobRef<S>>,
         Option<S>,
         Option<SpriteSettings<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Sim<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> SimBuilder<'a, sim_state::Empty> {
+impl<S: BosStr> Sim<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> SimBuilder<S, sim_state::Empty> {
         SimBuilder::new()
     }
 }
 
-impl<'a> SimBuilder<'a, sim_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> SimBuilder<S, sim_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SimBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SimBuilder<'a, S>
+impl<S: BosStr, St> SimBuilder<S, St>
 where
-    S: sim_state::State,
-    S::CreatedAt: sim_state::IsUnset,
+    St: sim_state::State,
+    St::CreatedAt: sim_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> SimBuilder<'a, sim_state::SetCreatedAt<S>> {
+    ) -> SimBuilder<S, sim_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         SimBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: sim_state::State> SimBuilder<'a, S> {
+impl<S: BosStr, St: sim_state::State> SimBuilder<S, St> {
     /// Set the `image` field (optional)
     pub fn image(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -280,50 +280,50 @@ impl<'a, S: sim_state::State> SimBuilder<'a, S> {
     }
 }
 
-impl<'a, S> SimBuilder<'a, S>
+impl<S: BosStr, St> SimBuilder<S, St>
 where
-    S: sim_state::State,
-    S::Name: sim_state::IsUnset,
+    St: sim_state::State,
+    St::Name: sim_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<S>) -> SimBuilder<'a, sim_state::SetName<S>> {
+    pub fn name(mut self, value: impl Into<S>) -> SimBuilder<S, sim_state::SetName<St>> {
         self._fields.2 = Option::Some(value.into());
         SimBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SimBuilder<'a, S>
+impl<S: BosStr, St> SimBuilder<S, St>
 where
-    S: sim_state::State,
-    S::Settings: sim_state::IsUnset,
+    St: sim_state::State,
+    St::Settings: sim_state::IsUnset,
 {
     /// Set the `settings` field (required)
     pub fn settings(
         mut self,
         value: impl Into<SpriteSettings<S>>,
-    ) -> SimBuilder<'a, sim_state::SetSettings<S>> {
+    ) -> SimBuilder<S, sim_state::SetSettings<St>> {
         self._fields.3 = Option::Some(value.into());
         SimBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SimBuilder<'a, S>
+impl<S: BosStr, St> SimBuilder<S, St>
 where
-    S: sim_state::State,
-    S::Settings: sim_state::IsSet,
-    S::CreatedAt: sim_state::IsSet,
-    S::Name: sim_state::IsSet,
+    St: sim_state::State,
+    St::Name: sim_state::IsSet,
+    St::Settings: sim_state::IsSet,
+    St::CreatedAt: sim_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Sim<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Sim<S> {
         Sim {
             created_at: self._fields.0.unwrap(),
             image: self._fields.1,
@@ -332,8 +332,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Sim<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Sim<S> {
         Sim {
             created_at: self._fields.0.unwrap(),
             image: self._fields.1,

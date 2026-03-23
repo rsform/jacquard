@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -29,18 +29,16 @@ use crate::app_bsky::graph::StarterPackView;
 use crate::app_bsky::graph::get_starter_packs_with_membership;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetStarterPacksWithMembership<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct GetStarterPacksWithMembership<S: BosStr = DefaultStr> {
     pub actor: AtIdentifier<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub cursor: Option<S>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
@@ -50,22 +48,20 @@ pub struct GetStarterPacksWithMembership<S: Bos<str> + AsRef<str> = DefaultStr> 
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetStarterPacksWithMembershipOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetStarterPacksWithMembershipOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
     pub starter_packs_with_membership: Vec<
         get_starter_packs_with_membership::StarterPackWithMembership<S>,
     >,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -75,11 +71,11 @@ pub struct GetStarterPacksWithMembershipOutput<S: Bos<str> + AsRef<str> = Defaul
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct StarterPackWithMembership<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct StarterPackWithMembership<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub list_item: Option<ListItemView<S>>,
     pub starter_pack: StarterPackView<S>,
@@ -92,12 +88,11 @@ pub struct GetStarterPacksWithMembershipResponse;
 impl jacquard_common::xrpc::XrpcResp for GetStarterPacksWithMembershipResponse {
     const NSID: &'static str = "app.bsky.graph.getStarterPacksWithMembership";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetStarterPacksWithMembershipOutput<S>;
+    type Output<S: BosStr> = GetStarterPacksWithMembershipOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetStarterPacksWithMembership<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetStarterPacksWithMembership<S> {
     const NSID: &'static str = "app.bsky.graph.getStarterPacksWithMembership";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetStarterPacksWithMembershipResponse;
@@ -108,11 +103,11 @@ pub struct GetStarterPacksWithMembershipRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetStarterPacksWithMembershipRequest {
     const PATH: &'static str = "/xrpc/app.bsky.graph.getStarterPacksWithMembership";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetStarterPacksWithMembership<S>;
+    type Request<S: BosStr> = GetStarterPacksWithMembership<S>;
     type Response = GetStarterPacksWithMembershipResponse;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for StarterPackWithMembership<S> {
+impl<S: BosStr> LexiconSchema for StarterPackWithMembership<S> {
     fn nsid() -> &'static str {
         "app.bsky.graph.getStarterPacksWithMembership"
     }
@@ -150,9 +145,9 @@ pub mod get_starter_packs_with_membership_state {
         type Actor = Unset;
     }
     ///State transition - sets the `actor` field to Set
-    pub struct SetActor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetActor<S> {}
-    impl<S: State> State for SetActor<S> {
+    pub struct SetActor<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetActor<St> {}
+    impl<St: State> State for SetActor<St> {
         type Actor = Set<members::actor>;
     }
     /// Marker types for field names
@@ -163,20 +158,20 @@ pub mod get_starter_packs_with_membership_state {
     }
 }
 
-/// Builder for constructing an instance of this type
+/// Builder for constructing an instance of this type.
 pub struct GetStarterPacksWithMembershipBuilder<
-    'a,
-    S: get_starter_packs_with_membership_state::State,
+    S: BosStr,
+    St: get_starter_packs_with_membership_state::State,
 > {
-    _state: PhantomData<fn() -> S>,
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtIdentifier<S>>, Option<S>, Option<i64>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetStarterPacksWithMembership<'a> {
-    /// Create a new builder for this type
+impl<S: BosStr> GetStarterPacksWithMembership<S> {
+    /// Create a new builder for this type.
     pub fn new() -> GetStarterPacksWithMembershipBuilder<
-        'a,
+        S,
         get_starter_packs_with_membership_state::Empty,
     > {
         GetStarterPacksWithMembershipBuilder::new()
@@ -184,47 +179,47 @@ impl<'a> GetStarterPacksWithMembership<'a> {
 }
 
 impl<
-    'a,
+    S: BosStr,
 > GetStarterPacksWithMembershipBuilder<
-    'a,
+    S,
     get_starter_packs_with_membership_state::Empty,
 > {
-    /// Create a new builder with all fields unset
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetStarterPacksWithMembershipBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetStarterPacksWithMembershipBuilder<'a, S>
+impl<S: BosStr, St> GetStarterPacksWithMembershipBuilder<S, St>
 where
-    S: get_starter_packs_with_membership_state::State,
-    S::Actor: get_starter_packs_with_membership_state::IsUnset,
+    St: get_starter_packs_with_membership_state::State,
+    St::Actor: get_starter_packs_with_membership_state::IsUnset,
 {
     /// Set the `actor` field (required)
     pub fn actor(
         mut self,
         value: impl Into<AtIdentifier<S>>,
     ) -> GetStarterPacksWithMembershipBuilder<
-        'a,
-        get_starter_packs_with_membership_state::SetActor<S>,
+        S,
+        get_starter_packs_with_membership_state::SetActor<St>,
     > {
         self._fields.0 = Option::Some(value.into());
         GetStarterPacksWithMembershipBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
 impl<
-    'a,
-    S: get_starter_packs_with_membership_state::State,
-> GetStarterPacksWithMembershipBuilder<'a, S> {
+    S: BosStr,
+    St: get_starter_packs_with_membership_state::State,
+> GetStarterPacksWithMembershipBuilder<S, St> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -238,9 +233,9 @@ impl<
 }
 
 impl<
-    'a,
-    S: get_starter_packs_with_membership_state::State,
-> GetStarterPacksWithMembershipBuilder<'a, S> {
+    S: BosStr,
+    St: get_starter_packs_with_membership_state::State,
+> GetStarterPacksWithMembershipBuilder<S, St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -253,13 +248,13 @@ impl<
     }
 }
 
-impl<'a, S> GetStarterPacksWithMembershipBuilder<'a, S>
+impl<S: BosStr, St> GetStarterPacksWithMembershipBuilder<S, St>
 where
-    S: get_starter_packs_with_membership_state::State,
-    S::Actor: get_starter_packs_with_membership_state::IsSet,
+    St: get_starter_packs_with_membership_state::State,
+    St::Actor: get_starter_packs_with_membership_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetStarterPacksWithMembership<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetStarterPacksWithMembership<S> {
         GetStarterPacksWithMembership {
             actor: self._fields.0.unwrap(),
             cursor: self._fields.1,
@@ -287,9 +282,9 @@ pub mod starter_pack_with_membership_state {
         type StarterPack = Unset;
     }
     ///State transition - sets the `starter_pack` field to Set
-    pub struct SetStarterPack<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStarterPack<S> {}
-    impl<S: State> State for SetStarterPack<S> {
+    pub struct SetStarterPack<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStarterPack<St> {}
+    impl<St: State> State for SetStarterPack<St> {
         type StarterPack = Set<members::starter_pack>;
     }
     /// Marker types for field names
@@ -300,20 +295,20 @@ pub mod starter_pack_with_membership_state {
     }
 }
 
-/// Builder for constructing an instance of this type
+/// Builder for constructing an instance of this type.
 pub struct StarterPackWithMembershipBuilder<
-    'a,
-    S: starter_pack_with_membership_state::State,
+    S: BosStr,
+    St: starter_pack_with_membership_state::State,
 > {
-    _state: PhantomData<fn() -> S>,
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<ListItemView<S>>, Option<StarterPackView<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> StarterPackWithMembership<'a> {
-    /// Create a new builder for this type
+impl<S: BosStr> StarterPackWithMembership<S> {
+    /// Create a new builder for this type.
     pub fn new() -> StarterPackWithMembershipBuilder<
-        'a,
+        S,
         starter_pack_with_membership_state::Empty,
     > {
         StarterPackWithMembershipBuilder::new()
@@ -321,22 +316,22 @@ impl<'a> StarterPackWithMembership<'a> {
 }
 
 impl<
-    'a,
-> StarterPackWithMembershipBuilder<'a, starter_pack_with_membership_state::Empty> {
-    /// Create a new builder with all fields unset
+    S: BosStr,
+> StarterPackWithMembershipBuilder<S, starter_pack_with_membership_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         StarterPackWithMembershipBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
 impl<
-    'a,
-    S: starter_pack_with_membership_state::State,
-> StarterPackWithMembershipBuilder<'a, S> {
+    S: BosStr,
+    St: starter_pack_with_membership_state::State,
+> StarterPackWithMembershipBuilder<S, St> {
     /// Set the `listItem` field (optional)
     pub fn list_item(mut self, value: impl Into<Option<ListItemView<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -349,46 +344,46 @@ impl<
     }
 }
 
-impl<'a, S> StarterPackWithMembershipBuilder<'a, S>
+impl<S: BosStr, St> StarterPackWithMembershipBuilder<S, St>
 where
-    S: starter_pack_with_membership_state::State,
-    S::StarterPack: starter_pack_with_membership_state::IsUnset,
+    St: starter_pack_with_membership_state::State,
+    St::StarterPack: starter_pack_with_membership_state::IsUnset,
 {
     /// Set the `starterPack` field (required)
     pub fn starter_pack(
         mut self,
         value: impl Into<StarterPackView<S>>,
     ) -> StarterPackWithMembershipBuilder<
-        'a,
-        starter_pack_with_membership_state::SetStarterPack<S>,
+        S,
+        starter_pack_with_membership_state::SetStarterPack<St>,
     > {
         self._fields.1 = Option::Some(value.into());
         StarterPackWithMembershipBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> StarterPackWithMembershipBuilder<'a, S>
+impl<S: BosStr, St> StarterPackWithMembershipBuilder<S, St>
 where
-    S: starter_pack_with_membership_state::State,
-    S::StarterPack: starter_pack_with_membership_state::IsSet,
+    St: starter_pack_with_membership_state::State,
+    St::StarterPack: starter_pack_with_membership_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> StarterPackWithMembership<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> StarterPackWithMembership<S> {
         StarterPackWithMembership {
             list_item: self._fields.0,
             starter_pack: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> StarterPackWithMembership<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> StarterPackWithMembership<S> {
         StarterPackWithMembership {
             list_item: self._fields.0,
             starter_pack: self._fields.1.unwrap(),

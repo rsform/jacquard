@@ -7,7 +7,7 @@
 
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -86,11 +86,11 @@ impl core::fmt::Display for Language {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ContentWarnings<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ContentWarnings<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub warnings: Option<Vec<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -137,7 +137,7 @@ impl core::fmt::Display for Violence {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ContentWarnings<S> {
+impl<S: BosStr> LexiconSchema for ContentWarnings<S> {
     fn nsid() -> &'static str {
         "place.stream.metadata.contentWarnings"
     }

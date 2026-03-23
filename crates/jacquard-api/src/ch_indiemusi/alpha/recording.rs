@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -38,11 +38,11 @@ use crate::ch_indiemusi::alpha::recording;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Artist<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Artist<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub artist: Option<artist::Artist<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -60,11 +60,11 @@ pub struct Artist<S: Bos<str> + AsRef<str> = DefaultStr> {
     rename = "ch.indiemusi.alpha.recording",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Recording<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Recording<S: BosStr = DefaultStr> {
     pub artists: Vec<recording::Artist<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub audio_file: Option<BlobRef<S>>,
@@ -89,11 +89,11 @@ pub struct Recording<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct RecordingGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct RecordingGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
@@ -106,11 +106,11 @@ pub struct RecordingGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct MasterOwnerInfo<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct MasterOwnerInfo<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub did: Option<Did<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -121,13 +121,13 @@ pub struct MasterOwnerInfo<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Recording<S> {
+impl<S: BosStr> Recording<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, RecordingRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Artist<S> {
+impl<S: BosStr> LexiconSchema for Artist<S> {
     fn nsid() -> &'static str {
         "ch.indiemusi.alpha.recording"
     }
@@ -160,17 +160,17 @@ pub struct RecordingRecord;
 impl XrpcResp for RecordingRecord {
     const NSID: &'static str = "ch.indiemusi.alpha.recording";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = RecordingGetRecordOutput<S>;
+    type Output<S: BosStr> = RecordingGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<RecordingGetRecordOutput<S>> for Recording<S> {
+impl<S: BosStr> From<RecordingGetRecordOutput<S>> for Recording<S> {
     fn from(output: RecordingGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Recording<S> {
+impl<S: BosStr> Collection for Recording<S> {
     const NSID: &'static str = "ch.indiemusi.alpha.recording";
     type Record = RecordingRecord;
 }
@@ -180,7 +180,7 @@ impl Collection for RecordingRecord {
     type Record = RecordingRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Recording<S> {
+impl<S: BosStr> LexiconSchema for Recording<S> {
     fn nsid() -> &'static str {
         "ch.indiemusi.alpha.recording"
     }
@@ -227,7 +227,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Recording<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for MasterOwnerInfo<S> {
+impl<S: BosStr> LexiconSchema for MasterOwnerInfo<S> {
     fn nsid() -> &'static str {
         "ch.indiemusi.alpha.recording"
     }
@@ -434,43 +434,43 @@ pub mod recording_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Artists;
         type Title;
+        type Artists;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Artists = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `artists` field to Set
-    pub struct SetArtists<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetArtists<S> {}
-    impl<S: State> State for SetArtists<S> {
-        type Artists = Set<members::artists>;
-        type Title = S::Title;
+        type Artists = Unset;
     }
     ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Artists = S::Artists;
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
         type Title = Set<members::title>;
+        type Artists = St::Artists;
+    }
+    ///State transition - sets the `artists` field to Set
+    pub struct SetArtists<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetArtists<St> {}
+    impl<St: State> State for SetArtists<St> {
+        type Title = St::Title;
+        type Artists = Set<members::artists>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `artists` field
-        pub struct artists(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `artists` field
+        pub struct artists(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct RecordingBuilder<'a, S: recording_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct RecordingBuilder<S: BosStr, St: recording_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<recording::Artist<S>>>,
         Option<BlobRef<S>>,
@@ -480,47 +480,47 @@ pub struct RecordingBuilder<'a, S: recording_state::State> {
         Option<Song<S>>,
         Option<S>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Recording<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> RecordingBuilder<'a, recording_state::Empty> {
+impl<S: BosStr> Recording<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> RecordingBuilder<S, recording_state::Empty> {
         RecordingBuilder::new()
     }
 }
 
-impl<'a> RecordingBuilder<'a, recording_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> RecordingBuilder<S, recording_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         RecordingBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RecordingBuilder<'a, S>
+impl<S: BosStr, St> RecordingBuilder<S, St>
 where
-    S: recording_state::State,
-    S::Artists: recording_state::IsUnset,
+    St: recording_state::State,
+    St::Artists: recording_state::IsUnset,
 {
     /// Set the `artists` field (required)
     pub fn artists(
         mut self,
         value: impl Into<Vec<recording::Artist<S>>>,
-    ) -> RecordingBuilder<'a, recording_state::SetArtists<S>> {
+    ) -> RecordingBuilder<S, recording_state::SetArtists<St>> {
         self._fields.0 = Option::Some(value.into());
         RecordingBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: recording_state::State> RecordingBuilder<'a, S> {
+impl<S: BosStr, St: recording_state::State> RecordingBuilder<S, St> {
     /// Set the `audioFile` field (optional)
     pub fn audio_file(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -533,7 +533,7 @@ impl<'a, S: recording_state::State> RecordingBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recording_state::State> RecordingBuilder<'a, S> {
+impl<S: BosStr, St: recording_state::State> RecordingBuilder<S, St> {
     /// Set the `duration` field (optional)
     pub fn duration(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -546,7 +546,7 @@ impl<'a, S: recording_state::State> RecordingBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recording_state::State> RecordingBuilder<'a, S> {
+impl<S: BosStr, St: recording_state::State> RecordingBuilder<S, St> {
     /// Set the `isrc` field (optional)
     pub fn isrc(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -559,7 +559,7 @@ impl<'a, S: recording_state::State> RecordingBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recording_state::State> RecordingBuilder<'a, S> {
+impl<S: BosStr, St: recording_state::State> RecordingBuilder<S, St> {
     /// Set the `masterOwner` field (optional)
     pub fn master_owner(
         mut self,
@@ -578,7 +578,7 @@ impl<'a, S: recording_state::State> RecordingBuilder<'a, S> {
     }
 }
 
-impl<'a, S: recording_state::State> RecordingBuilder<'a, S> {
+impl<S: BosStr, St: recording_state::State> RecordingBuilder<S, St> {
     /// Set the `song` field (optional)
     pub fn song(mut self, value: impl Into<Option<Song<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -591,33 +591,33 @@ impl<'a, S: recording_state::State> RecordingBuilder<'a, S> {
     }
 }
 
-impl<'a, S> RecordingBuilder<'a, S>
+impl<S: BosStr, St> RecordingBuilder<S, St>
 where
-    S: recording_state::State,
-    S::Title: recording_state::IsUnset,
+    St: recording_state::State,
+    St::Title: recording_state::IsUnset,
 {
     /// Set the `title` field (required)
     pub fn title(
         mut self,
         value: impl Into<S>,
-    ) -> RecordingBuilder<'a, recording_state::SetTitle<S>> {
+    ) -> RecordingBuilder<S, recording_state::SetTitle<St>> {
         self._fields.6 = Option::Some(value.into());
         RecordingBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RecordingBuilder<'a, S>
+impl<S: BosStr, St> RecordingBuilder<S, St>
 where
-    S: recording_state::State,
-    S::Artists: recording_state::IsSet,
-    S::Title: recording_state::IsSet,
+    St: recording_state::State,
+    St::Title: recording_state::IsSet,
+    St::Artists: recording_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Recording<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Recording<S> {
         Recording {
             artists: self._fields.0.unwrap(),
             audio_file: self._fields.1,
@@ -629,11 +629,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Recording<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Recording<S> {
         Recording {
             artists: self._fields.0.unwrap(),
             audio_file: self._fields.1,

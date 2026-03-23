@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "io.atcr.hold.crew",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Crew<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Crew<S: BosStr = DefaultStr> {
     ///RFC3339 timestamp of when the member was added
     pub added_at: Datetime,
     ///DID of the crew member
@@ -58,7 +58,7 @@ pub struct Crew<S: Bos<str> + AsRef<str> = DefaultStr> {
 /// Member's role in the hold
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum CrewRole<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum CrewRole<S: BosStr = DefaultStr> {
     Owner,
     Admin,
     Write,
@@ -66,7 +66,7 @@ pub enum CrewRole<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> CrewRole<S> {
+impl<S: BosStr> CrewRole<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Owner => "owner",
@@ -88,19 +88,19 @@ impl<S: Bos<str> + AsRef<str>> CrewRole<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for CrewRole<S> {
+impl<S: BosStr> core::fmt::Display for CrewRole<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for CrewRole<S> {
+impl<S: BosStr> AsRef<str> for CrewRole<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for CrewRole<S> {
+impl<S: BosStr> Serialize for CrewRole<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -109,7 +109,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for CrewRole<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de> for CrewRole<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for CrewRole<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -119,14 +119,18 @@ impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de> for Crew
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for CrewRole<S> {
+impl<S: BosStr + Default> Default for CrewRole<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for CrewRole<S> {
-    type Output = CrewRole<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for CrewRole<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = CrewRole<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             CrewRole::Owner => CrewRole::Owner,
@@ -144,18 +148,18 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for CrewRole<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CrewGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CrewGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Crew<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Crew<S> {
+impl<S: BosStr> Crew<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, CrewRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -168,17 +172,17 @@ pub struct CrewRecord;
 impl XrpcResp for CrewRecord {
     const NSID: &'static str = "io.atcr.hold.crew";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = CrewGetRecordOutput<S>;
+    type Output<S: BosStr> = CrewGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<CrewGetRecordOutput<S>> for Crew<S> {
+impl<S: BosStr> From<CrewGetRecordOutput<S>> for Crew<S> {
     fn from(output: CrewGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Crew<S> {
+impl<S: BosStr> Collection for Crew<S> {
     const NSID: &'static str = "io.atcr.hold.crew";
     type Record = CrewRecord;
 }
@@ -188,7 +192,7 @@ impl Collection for CrewRecord {
     type Record = CrewRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Crew<S> {
+impl<S: BosStr> LexiconSchema for Crew<S> {
     fn nsid() -> &'static str {
         "io.atcr.hold.crew"
     }
@@ -236,8 +240,8 @@ pub mod crew_state {
     pub trait State: sealed::Sealed {
         type Member;
         type AddedAt;
-        type Permissions;
         type Role;
+        type Permissions;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -245,44 +249,44 @@ pub mod crew_state {
     impl State for Empty {
         type Member = Unset;
         type AddedAt = Unset;
-        type Permissions = Unset;
         type Role = Unset;
+        type Permissions = Unset;
     }
     ///State transition - sets the `member` field to Set
-    pub struct SetMember<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMember<S> {}
-    impl<S: State> State for SetMember<S> {
+    pub struct SetMember<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMember<St> {}
+    impl<St: State> State for SetMember<St> {
         type Member = Set<members::member>;
-        type AddedAt = S::AddedAt;
-        type Permissions = S::Permissions;
-        type Role = S::Role;
+        type AddedAt = St::AddedAt;
+        type Role = St::Role;
+        type Permissions = St::Permissions;
     }
     ///State transition - sets the `added_at` field to Set
-    pub struct SetAddedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAddedAt<S> {}
-    impl<S: State> State for SetAddedAt<S> {
-        type Member = S::Member;
+    pub struct SetAddedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAddedAt<St> {}
+    impl<St: State> State for SetAddedAt<St> {
+        type Member = St::Member;
         type AddedAt = Set<members::added_at>;
-        type Permissions = S::Permissions;
-        type Role = S::Role;
-    }
-    ///State transition - sets the `permissions` field to Set
-    pub struct SetPermissions<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPermissions<S> {}
-    impl<S: State> State for SetPermissions<S> {
-        type Member = S::Member;
-        type AddedAt = S::AddedAt;
-        type Permissions = Set<members::permissions>;
-        type Role = S::Role;
+        type Role = St::Role;
+        type Permissions = St::Permissions;
     }
     ///State transition - sets the `role` field to Set
-    pub struct SetRole<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRole<S> {}
-    impl<S: State> State for SetRole<S> {
-        type Member = S::Member;
-        type AddedAt = S::AddedAt;
-        type Permissions = S::Permissions;
+    pub struct SetRole<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRole<St> {}
+    impl<St: State> State for SetRole<St> {
+        type Member = St::Member;
+        type AddedAt = St::AddedAt;
         type Role = Set<members::role>;
+        type Permissions = St::Permissions;
+    }
+    ///State transition - sets the `permissions` field to Set
+    pub struct SetPermissions<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPermissions<St> {}
+    impl<St: State> State for SetPermissions<St> {
+        type Member = St::Member;
+        type AddedAt = St::AddedAt;
+        type Role = St::Role;
+        type Permissions = Set<members::permissions>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -291,16 +295,16 @@ pub mod crew_state {
         pub struct member(());
         ///Marker type for the `added_at` field
         pub struct added_at(());
-        ///Marker type for the `permissions` field
-        pub struct permissions(());
         ///Marker type for the `role` field
         pub struct role(());
+        ///Marker type for the `permissions` field
+        pub struct permissions(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct CrewBuilder<'a, S: crew_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct CrewBuilder<S: BosStr, St: crew_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
         Option<Did<S>>,
@@ -308,104 +312,104 @@ pub struct CrewBuilder<'a, S: crew_state::State> {
         Option<CrewRole<S>>,
         Option<S>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Crew<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> CrewBuilder<'a, crew_state::Empty> {
+impl<S: BosStr> Crew<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> CrewBuilder<S, crew_state::Empty> {
         CrewBuilder::new()
     }
 }
 
-impl<'a> CrewBuilder<'a, crew_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> CrewBuilder<S, crew_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         CrewBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CrewBuilder<'a, S>
+impl<S: BosStr, St> CrewBuilder<S, St>
 where
-    S: crew_state::State,
-    S::AddedAt: crew_state::IsUnset,
+    St: crew_state::State,
+    St::AddedAt: crew_state::IsUnset,
 {
     /// Set the `addedAt` field (required)
     pub fn added_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> CrewBuilder<'a, crew_state::SetAddedAt<S>> {
+    ) -> CrewBuilder<S, crew_state::SetAddedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         CrewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CrewBuilder<'a, S>
+impl<S: BosStr, St> CrewBuilder<S, St>
 where
-    S: crew_state::State,
-    S::Member: crew_state::IsUnset,
+    St: crew_state::State,
+    St::Member: crew_state::IsUnset,
 {
     /// Set the `member` field (required)
     pub fn member(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> CrewBuilder<'a, crew_state::SetMember<S>> {
+    ) -> CrewBuilder<S, crew_state::SetMember<St>> {
         self._fields.1 = Option::Some(value.into());
         CrewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CrewBuilder<'a, S>
+impl<S: BosStr, St> CrewBuilder<S, St>
 where
-    S: crew_state::State,
-    S::Permissions: crew_state::IsUnset,
+    St: crew_state::State,
+    St::Permissions: crew_state::IsUnset,
 {
     /// Set the `permissions` field (required)
     pub fn permissions(
         mut self,
         value: impl Into<Vec<S>>,
-    ) -> CrewBuilder<'a, crew_state::SetPermissions<S>> {
+    ) -> CrewBuilder<S, crew_state::SetPermissions<St>> {
         self._fields.2 = Option::Some(value.into());
         CrewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CrewBuilder<'a, S>
+impl<S: BosStr, St> CrewBuilder<S, St>
 where
-    S: crew_state::State,
-    S::Role: crew_state::IsUnset,
+    St: crew_state::State,
+    St::Role: crew_state::IsUnset,
 {
     /// Set the `role` field (required)
     pub fn role(
         mut self,
         value: impl Into<CrewRole<S>>,
-    ) -> CrewBuilder<'a, crew_state::SetRole<S>> {
+    ) -> CrewBuilder<S, crew_state::SetRole<St>> {
         self._fields.3 = Option::Some(value.into());
         CrewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: crew_state::State> CrewBuilder<'a, S> {
+impl<S: BosStr, St: crew_state::State> CrewBuilder<S, St> {
     /// Set the `tier` field (optional)
     pub fn tier(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
@@ -418,16 +422,16 @@ impl<'a, S: crew_state::State> CrewBuilder<'a, S> {
     }
 }
 
-impl<'a, S> CrewBuilder<'a, S>
+impl<S: BosStr, St> CrewBuilder<S, St>
 where
-    S: crew_state::State,
-    S::Member: crew_state::IsSet,
-    S::AddedAt: crew_state::IsSet,
-    S::Permissions: crew_state::IsSet,
-    S::Role: crew_state::IsSet,
+    St: crew_state::State,
+    St::Member: crew_state::IsSet,
+    St::AddedAt: crew_state::IsSet,
+    St::Role: crew_state::IsSet,
+    St::Permissions: crew_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Crew<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Crew<S> {
         Crew {
             added_at: self._fields.0.unwrap(),
             member: self._fields.1.unwrap(),
@@ -437,8 +441,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Crew<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Crew<S> {
         Crew {
             added_at: self._fields.0.unwrap(),
             member: self._fields.1.unwrap(),

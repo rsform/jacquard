@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -37,11 +37,11 @@ use crate::com_shinolabs::pinksea::profile;
     rename = "com.shinolabs.pinksea.profile",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Profile<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Profile<S: BosStr = DefaultStr> {
     ///The oekaki image that's the avatar of this profile.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avatar: Option<StrongRef<S>>,
@@ -64,11 +64,11 @@ pub struct Profile<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ProfileGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ProfileGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
@@ -80,11 +80,11 @@ pub struct ProfileGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ProfileLink<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ProfileLink<S: BosStr = DefaultStr> {
     ///The URL of the link.
     pub link: UriValue<S>,
     ///The name of the link.
@@ -93,7 +93,7 @@ pub struct ProfileLink<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Profile<S> {
+impl<S: BosStr> Profile<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, ProfileRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -106,17 +106,17 @@ pub struct ProfileRecord;
 impl XrpcResp for ProfileRecord {
     const NSID: &'static str = "com.shinolabs.pinksea.profile";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ProfileGetRecordOutput<S>;
+    type Output<S: BosStr> = ProfileGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<ProfileGetRecordOutput<S>> for Profile<S> {
+impl<S: BosStr> From<ProfileGetRecordOutput<S>> for Profile<S> {
     fn from(output: ProfileGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Profile<S> {
+impl<S: BosStr> Collection for Profile<S> {
     const NSID: &'static str = "com.shinolabs.pinksea.profile";
     type Record = ProfileRecord;
 }
@@ -126,7 +126,7 @@ impl Collection for ProfileRecord {
     type Record = ProfileRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Profile<S> {
+impl<S: BosStr> LexiconSchema for Profile<S> {
     fn nsid() -> &'static str {
         "com.shinolabs.pinksea.profile"
     }
@@ -195,7 +195,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Profile<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ProfileLink<S> {
+impl<S: BosStr> LexiconSchema for ProfileLink<S> {
     fn nsid() -> &'static str {
         "com.shinolabs.pinksea.profile"
     }
@@ -253,37 +253,37 @@ pub mod profile_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct ProfileBuilder<'a, S: profile_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ProfileBuilder<S: BosStr, St: profile_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<StrongRef<S>>,
         Option<S>,
         Option<Vec<profile::ProfileLink<S>>>,
         Option<S>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Profile<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ProfileBuilder<'a, profile_state::Empty> {
+impl<S: BosStr> Profile<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ProfileBuilder<S, profile_state::Empty> {
         ProfileBuilder::new()
     }
 }
 
-impl<'a> ProfileBuilder<'a, profile_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ProfileBuilder<S, profile_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ProfileBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
+impl<S: BosStr, St: profile_state::State> ProfileBuilder<S, St> {
     /// Set the `avatar` field (optional)
     pub fn avatar(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -296,7 +296,7 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     }
 }
 
-impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
+impl<S: BosStr, St: profile_state::State> ProfileBuilder<S, St> {
     /// Set the `bio` field (optional)
     pub fn bio(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -309,7 +309,7 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     }
 }
 
-impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
+impl<S: BosStr, St: profile_state::State> ProfileBuilder<S, St> {
     /// Set the `links` field (optional)
     pub fn links(
         mut self,
@@ -325,7 +325,7 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     }
 }
 
-impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
+impl<S: BosStr, St: profile_state::State> ProfileBuilder<S, St> {
     /// Set the `nickname` field (optional)
     pub fn nickname(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -338,12 +338,12 @@ impl<'a, S: profile_state::State> ProfileBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ProfileBuilder<'a, S>
+impl<S: BosStr, St> ProfileBuilder<S, St>
 where
-    S: profile_state::State,
+    St: profile_state::State,
 {
-    /// Build the final struct
-    pub fn build(self) -> Profile<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Profile<S> {
         Profile {
             avatar: self._fields.0,
             bio: self._fields.1,
@@ -352,11 +352,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Profile<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Profile<S> {
         Profile {
             avatar: self._fields.0,
             bio: self._fields.1,
@@ -501,17 +498,17 @@ pub mod profile_link_state {
         type Name = Unset;
     }
     ///State transition - sets the `link` field to Set
-    pub struct SetLink<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLink<S> {}
-    impl<S: State> State for SetLink<S> {
+    pub struct SetLink<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLink<St> {}
+    impl<St: State> State for SetLink<St> {
         type Link = Set<members::link>;
-        type Name = S::Name;
+        type Name = St::Name;
     }
     ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Link = S::Link;
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Link = St::Link;
         type Name = Set<members::name>;
     }
     /// Marker types for field names
@@ -524,88 +521,88 @@ pub mod profile_link_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ProfileLinkBuilder<'a, S: profile_link_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ProfileLinkBuilder<S: BosStr, St: profile_link_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<UriValue<S>>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ProfileLink<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ProfileLinkBuilder<'a, profile_link_state::Empty> {
+impl<S: BosStr> ProfileLink<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ProfileLinkBuilder<S, profile_link_state::Empty> {
         ProfileLinkBuilder::new()
     }
 }
 
-impl<'a> ProfileLinkBuilder<'a, profile_link_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ProfileLinkBuilder<S, profile_link_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ProfileLinkBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ProfileLinkBuilder<'a, S>
+impl<S: BosStr, St> ProfileLinkBuilder<S, St>
 where
-    S: profile_link_state::State,
-    S::Link: profile_link_state::IsUnset,
+    St: profile_link_state::State,
+    St::Link: profile_link_state::IsUnset,
 {
     /// Set the `link` field (required)
     pub fn link(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> ProfileLinkBuilder<'a, profile_link_state::SetLink<S>> {
+    ) -> ProfileLinkBuilder<S, profile_link_state::SetLink<St>> {
         self._fields.0 = Option::Some(value.into());
         ProfileLinkBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ProfileLinkBuilder<'a, S>
+impl<S: BosStr, St> ProfileLinkBuilder<S, St>
 where
-    S: profile_link_state::State,
-    S::Name: profile_link_state::IsUnset,
+    St: profile_link_state::State,
+    St::Name: profile_link_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> ProfileLinkBuilder<'a, profile_link_state::SetName<S>> {
+    ) -> ProfileLinkBuilder<S, profile_link_state::SetName<St>> {
         self._fields.1 = Option::Some(value.into());
         ProfileLinkBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ProfileLinkBuilder<'a, S>
+impl<S: BosStr, St> ProfileLinkBuilder<S, St>
 where
-    S: profile_link_state::State,
-    S::Link: profile_link_state::IsSet,
-    S::Name: profile_link_state::IsSet,
+    St: profile_link_state::State,
+    St::Link: profile_link_state::IsSet,
+    St::Name: profile_link_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ProfileLink<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ProfileLink<S> {
         ProfileLink {
             link: self._fields.0.unwrap(),
             name: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> ProfileLink<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ProfileLink<S> {
         ProfileLink {
             link: self._fields.0.unwrap(),
             name: self._fields.1.unwrap(),

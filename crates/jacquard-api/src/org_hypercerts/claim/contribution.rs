@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "org.hypercerts.claim.contribution",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Contribution<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Contribution<S: BosStr = DefaultStr> {
     ///Description of what the contribution concretely involved.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub contribution_description: Option<S>,
@@ -64,18 +64,18 @@ pub struct Contribution<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ContributionGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ContributionGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Contribution<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Contribution<S> {
+impl<S: BosStr> Contribution<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, ContributionRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -88,17 +88,17 @@ pub struct ContributionRecord;
 impl XrpcResp for ContributionRecord {
     const NSID: &'static str = "org.hypercerts.claim.contribution";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ContributionGetRecordOutput<S>;
+    type Output<S: BosStr> = ContributionGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<ContributionGetRecordOutput<S>> for Contribution<S> {
+impl<S: BosStr> From<ContributionGetRecordOutput<S>> for Contribution<S> {
     fn from(output: ContributionGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Contribution<S> {
+impl<S: BosStr> Collection for Contribution<S> {
     const NSID: &'static str = "org.hypercerts.claim.contribution";
     type Record = ContributionRecord;
 }
@@ -108,7 +108,7 @@ impl Collection for ContributionRecord {
     type Record = ContributionRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Contribution<S> {
+impl<S: BosStr> LexiconSchema for Contribution<S> {
     fn nsid() -> &'static str {
         "org.hypercerts.claim.contribution"
     }
@@ -174,9 +174,9 @@ pub mod contribution_state {
         type CreatedAt = Unset;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
@@ -187,9 +187,9 @@ pub mod contribution_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ContributionBuilder<'a, S: contribution_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ContributionBuilder<S: BosStr, St: contribution_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
         Option<Datetime>,
@@ -197,28 +197,28 @@ pub struct ContributionBuilder<'a, S: contribution_state::State> {
         Option<S>,
         Option<Datetime>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Contribution<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ContributionBuilder<'a, contribution_state::Empty> {
+impl<S: BosStr> Contribution<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ContributionBuilder<S, contribution_state::Empty> {
         ContributionBuilder::new()
     }
 }
 
-impl<'a> ContributionBuilder<'a, contribution_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ContributionBuilder<S, contribution_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ContributionBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: contribution_state::State> ContributionBuilder<'a, S> {
+impl<S: BosStr, St: contribution_state::State> ContributionBuilder<S, St> {
     /// Set the `contributionDescription` field (optional)
     pub fn contribution_description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -231,26 +231,26 @@ impl<'a, S: contribution_state::State> ContributionBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ContributionBuilder<'a, S>
+impl<S: BosStr, St> ContributionBuilder<S, St>
 where
-    S: contribution_state::State,
-    S::CreatedAt: contribution_state::IsUnset,
+    St: contribution_state::State,
+    St::CreatedAt: contribution_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ContributionBuilder<'a, contribution_state::SetCreatedAt<S>> {
+    ) -> ContributionBuilder<S, contribution_state::SetCreatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         ContributionBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: contribution_state::State> ContributionBuilder<'a, S> {
+impl<S: BosStr, St: contribution_state::State> ContributionBuilder<S, St> {
     /// Set the `endDate` field (optional)
     pub fn end_date(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.2 = value.into();
@@ -263,7 +263,7 @@ impl<'a, S: contribution_state::State> ContributionBuilder<'a, S> {
     }
 }
 
-impl<'a, S: contribution_state::State> ContributionBuilder<'a, S> {
+impl<S: BosStr, St: contribution_state::State> ContributionBuilder<S, St> {
     /// Set the `role` field (optional)
     pub fn role(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -276,7 +276,7 @@ impl<'a, S: contribution_state::State> ContributionBuilder<'a, S> {
     }
 }
 
-impl<'a, S: contribution_state::State> ContributionBuilder<'a, S> {
+impl<S: BosStr, St: contribution_state::State> ContributionBuilder<S, St> {
     /// Set the `startDate` field (optional)
     pub fn start_date(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.4 = value.into();
@@ -289,13 +289,13 @@ impl<'a, S: contribution_state::State> ContributionBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ContributionBuilder<'a, S>
+impl<S: BosStr, St> ContributionBuilder<S, St>
 where
-    S: contribution_state::State,
-    S::CreatedAt: contribution_state::IsSet,
+    St: contribution_state::State,
+    St::CreatedAt: contribution_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Contribution<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Contribution<S> {
         Contribution {
             contribution_description: self._fields.0,
             created_at: self._fields.1.unwrap(),
@@ -305,11 +305,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Contribution<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Contribution<S> {
         Contribution {
             contribution_description: self._fields.0,
             created_at: self._fields.1.unwrap(),

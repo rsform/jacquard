@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -30,11 +30,11 @@ use serde::{Serialize, Deserialize};
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct WebEmbed<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct WebEmbed<S: BosStr = DefaultStr> {
     ///Horizontal alignment
     #[serde(skip_serializing_if = "Option::is_none")]
     pub alignment: Option<S>,
@@ -68,7 +68,7 @@ pub struct WebEmbed<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for WebEmbed<S> {
+impl<S: BosStr> LexiconSchema for WebEmbed<S> {
     fn nsid() -> &'static str {
         "app.offprint.block.webEmbed"
     }
@@ -194,9 +194,9 @@ pub mod web_embed_state {
         type Href = Unset;
     }
     ///State transition - sets the `href` field to Set
-    pub struct SetHref<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHref<S> {}
-    impl<S: State> State for SetHref<S> {
+    pub struct SetHref<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHref<St> {}
+    impl<St: State> State for SetHref<St> {
         type Href = Set<members::href>;
     }
     /// Marker types for field names
@@ -207,9 +207,9 @@ pub mod web_embed_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct WebEmbedBuilder<'a, S: web_embed_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct WebEmbedBuilder<S: BosStr, St: web_embed_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
         Option<S>,
@@ -222,28 +222,28 @@ pub struct WebEmbedBuilder<'a, S: web_embed_state::State> {
         Option<S>,
         Option<S>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> WebEmbed<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> WebEmbedBuilder<'a, web_embed_state::Empty> {
+impl<S: BosStr> WebEmbed<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> WebEmbedBuilder<S, web_embed_state::Empty> {
         WebEmbedBuilder::new()
     }
 }
 
-impl<'a> WebEmbedBuilder<'a, web_embed_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> WebEmbedBuilder<S, web_embed_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         WebEmbedBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
+impl<S: BosStr, St: web_embed_state::State> WebEmbedBuilder<S, St> {
     /// Set the `alignment` field (optional)
     pub fn alignment(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -256,7 +256,7 @@ impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
     }
 }
 
-impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
+impl<S: BosStr, St: web_embed_state::State> WebEmbedBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -269,7 +269,7 @@ impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
     }
 }
 
-impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
+impl<S: BosStr, St: web_embed_state::State> WebEmbedBuilder<S, St> {
     /// Set the `embedHeight` field (optional)
     pub fn embed_height(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -282,7 +282,7 @@ impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
     }
 }
 
-impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
+impl<S: BosStr, St: web_embed_state::State> WebEmbedBuilder<S, St> {
     /// Set the `embedUrl` field (optional)
     pub fn embed_url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -295,7 +295,7 @@ impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
     }
 }
 
-impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
+impl<S: BosStr, St: web_embed_state::State> WebEmbedBuilder<S, St> {
     /// Set the `embedWidth` field (optional)
     pub fn embed_width(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.4 = value.into();
@@ -308,26 +308,26 @@ impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
     }
 }
 
-impl<'a, S> WebEmbedBuilder<'a, S>
+impl<S: BosStr, St> WebEmbedBuilder<S, St>
 where
-    S: web_embed_state::State,
-    S::Href: web_embed_state::IsUnset,
+    St: web_embed_state::State,
+    St::Href: web_embed_state::IsUnset,
 {
     /// Set the `href` field (required)
     pub fn href(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> WebEmbedBuilder<'a, web_embed_state::SetHref<S>> {
+    ) -> WebEmbedBuilder<S, web_embed_state::SetHref<St>> {
         self._fields.5 = Option::Some(value.into());
         WebEmbedBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
+impl<S: BosStr, St: web_embed_state::State> WebEmbedBuilder<S, St> {
     /// Set the `preview` field (optional)
     pub fn preview(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -340,7 +340,7 @@ impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
     }
 }
 
-impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
+impl<S: BosStr, St: web_embed_state::State> WebEmbedBuilder<S, St> {
     /// Set the `siteName` field (optional)
     pub fn site_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.7 = value.into();
@@ -353,7 +353,7 @@ impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
     }
 }
 
-impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
+impl<S: BosStr, St: web_embed_state::State> WebEmbedBuilder<S, St> {
     /// Set the `title` field (optional)
     pub fn title(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.8 = value.into();
@@ -366,7 +366,7 @@ impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
     }
 }
 
-impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
+impl<S: BosStr, St: web_embed_state::State> WebEmbedBuilder<S, St> {
     /// Set the `width` field (optional)
     pub fn width(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.9 = value.into();
@@ -379,13 +379,13 @@ impl<'a, S: web_embed_state::State> WebEmbedBuilder<'a, S> {
     }
 }
 
-impl<'a, S> WebEmbedBuilder<'a, S>
+impl<S: BosStr, St> WebEmbedBuilder<S, St>
 where
-    S: web_embed_state::State,
-    S::Href: web_embed_state::IsSet,
+    St: web_embed_state::State,
+    St::Href: web_embed_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> WebEmbed<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> WebEmbed<S> {
         WebEmbed {
             alignment: self._fields.0,
             description: self._fields.1,
@@ -400,11 +400,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> WebEmbed<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> WebEmbed<S> {
         WebEmbed {
             alignment: self._fields.0,
             description: self._fields.1,

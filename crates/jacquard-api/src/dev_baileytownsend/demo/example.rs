@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "dev.baileytownsend.demo.example",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Example<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Example<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     ///A name of something
     pub name: S,
@@ -53,18 +53,18 @@ pub struct Example<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ExampleGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ExampleGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Example<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Example<S> {
+impl<S: BosStr> Example<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, ExampleRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -77,17 +77,17 @@ pub struct ExampleRecord;
 impl XrpcResp for ExampleRecord {
     const NSID: &'static str = "dev.baileytownsend.demo.example";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ExampleGetRecordOutput<S>;
+    type Output<S: BosStr> = ExampleGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<ExampleGetRecordOutput<S>> for Example<S> {
+impl<S: BosStr> From<ExampleGetRecordOutput<S>> for Example<S> {
     fn from(output: ExampleGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Example<S> {
+impl<S: BosStr> Collection for Example<S> {
     const NSID: &'static str = "dev.baileytownsend.demo.example";
     type Record = ExampleRecord;
 }
@@ -97,7 +97,7 @@ impl Collection for ExampleRecord {
     type Record = ExampleRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Example<S> {
+impl<S: BosStr> LexiconSchema for Example<S> {
     fn nsid() -> &'static str {
         "dev.baileytownsend.demo.example"
     }
@@ -168,17 +168,17 @@ pub mod example_state {
         type Name = Unset;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
-        type Name = S::Name;
+        type Name = St::Name;
     }
     ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type CreatedAt = S::CreatedAt;
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type CreatedAt = St::CreatedAt;
         type Name = Set<members::name>;
     }
     /// Marker types for field names
@@ -191,88 +191,85 @@ pub mod example_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ExampleBuilder<'a, S: example_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ExampleBuilder<S: BosStr, St: example_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Example<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ExampleBuilder<'a, example_state::Empty> {
+impl<S: BosStr> Example<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ExampleBuilder<S, example_state::Empty> {
         ExampleBuilder::new()
     }
 }
 
-impl<'a> ExampleBuilder<'a, example_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ExampleBuilder<S, example_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ExampleBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ExampleBuilder<'a, S>
+impl<S: BosStr, St> ExampleBuilder<S, St>
 where
-    S: example_state::State,
-    S::CreatedAt: example_state::IsUnset,
+    St: example_state::State,
+    St::CreatedAt: example_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ExampleBuilder<'a, example_state::SetCreatedAt<S>> {
+    ) -> ExampleBuilder<S, example_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         ExampleBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ExampleBuilder<'a, S>
+impl<S: BosStr, St> ExampleBuilder<S, St>
 where
-    S: example_state::State,
-    S::Name: example_state::IsUnset,
+    St: example_state::State,
+    St::Name: example_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> ExampleBuilder<'a, example_state::SetName<S>> {
+    ) -> ExampleBuilder<S, example_state::SetName<St>> {
         self._fields.1 = Option::Some(value.into());
         ExampleBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ExampleBuilder<'a, S>
+impl<S: BosStr, St> ExampleBuilder<S, St>
 where
-    S: example_state::State,
-    S::CreatedAt: example_state::IsSet,
-    S::Name: example_state::IsSet,
+    St: example_state::State,
+    St::CreatedAt: example_state::IsSet,
+    St::Name: example_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Example<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Example<S> {
         Example {
             created_at: self._fields.0.unwrap(),
             name: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Example<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Example<S> {
         Example {
             created_at: self._fields.0.unwrap(),
             name: self._fields.1.unwrap(),

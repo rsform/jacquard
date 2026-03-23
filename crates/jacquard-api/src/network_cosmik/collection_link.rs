@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -37,11 +37,11 @@ use crate::network_cosmik::Provenance;
     rename = "network.cosmik.collectionLink",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CollectionLink<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CollectionLink<S: BosStr = DefaultStr> {
     ///Timestamp when the card was added to the collection.
     pub added_at: Datetime,
     ///DID of the user who added the card to the collection
@@ -69,18 +69,18 @@ pub struct CollectionLink<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CollectionLinkGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CollectionLinkGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: CollectionLink<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> CollectionLink<S> {
+impl<S: BosStr> CollectionLink<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, CollectionLinkRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -93,18 +93,17 @@ pub struct CollectionLinkRecord;
 impl XrpcResp for CollectionLinkRecord {
     const NSID: &'static str = "network.cosmik.collectionLink";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = CollectionLinkGetRecordOutput<S>;
+    type Output<S: BosStr> = CollectionLinkGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<CollectionLinkGetRecordOutput<S>>
-for CollectionLink<S> {
+impl<S: BosStr> From<CollectionLinkGetRecordOutput<S>> for CollectionLink<S> {
     fn from(output: CollectionLinkGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for CollectionLink<S> {
+impl<S: BosStr> Collection for CollectionLink<S> {
     const NSID: &'static str = "network.cosmik.collectionLink";
     type Record = CollectionLinkRecord;
 }
@@ -114,7 +113,7 @@ impl Collection for CollectionLinkRecord {
     type Record = CollectionLinkRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for CollectionLink<S> {
+impl<S: BosStr> LexiconSchema for CollectionLink<S> {
     fn nsid() -> &'static str {
         "network.cosmik.collectionLink"
     }
@@ -139,8 +138,8 @@ pub mod collection_link_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type AddedAt;
         type Collection;
+        type AddedAt;
         type Card;
         type AddedBy;
     }
@@ -148,54 +147,54 @@ pub mod collection_link_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type AddedAt = Unset;
         type Collection = Unset;
+        type AddedAt = Unset;
         type Card = Unset;
         type AddedBy = Unset;
     }
-    ///State transition - sets the `added_at` field to Set
-    pub struct SetAddedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAddedAt<S> {}
-    impl<S: State> State for SetAddedAt<S> {
-        type AddedAt = Set<members::added_at>;
-        type Collection = S::Collection;
-        type Card = S::Card;
-        type AddedBy = S::AddedBy;
-    }
     ///State transition - sets the `collection` field to Set
-    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCollection<S> {}
-    impl<S: State> State for SetCollection<S> {
-        type AddedAt = S::AddedAt;
+    pub struct SetCollection<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCollection<St> {}
+    impl<St: State> State for SetCollection<St> {
         type Collection = Set<members::collection>;
-        type Card = S::Card;
-        type AddedBy = S::AddedBy;
+        type AddedAt = St::AddedAt;
+        type Card = St::Card;
+        type AddedBy = St::AddedBy;
+    }
+    ///State transition - sets the `added_at` field to Set
+    pub struct SetAddedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAddedAt<St> {}
+    impl<St: State> State for SetAddedAt<St> {
+        type Collection = St::Collection;
+        type AddedAt = Set<members::added_at>;
+        type Card = St::Card;
+        type AddedBy = St::AddedBy;
     }
     ///State transition - sets the `card` field to Set
-    pub struct SetCard<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCard<S> {}
-    impl<S: State> State for SetCard<S> {
-        type AddedAt = S::AddedAt;
-        type Collection = S::Collection;
+    pub struct SetCard<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCard<St> {}
+    impl<St: State> State for SetCard<St> {
+        type Collection = St::Collection;
+        type AddedAt = St::AddedAt;
         type Card = Set<members::card>;
-        type AddedBy = S::AddedBy;
+        type AddedBy = St::AddedBy;
     }
     ///State transition - sets the `added_by` field to Set
-    pub struct SetAddedBy<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAddedBy<S> {}
-    impl<S: State> State for SetAddedBy<S> {
-        type AddedAt = S::AddedAt;
-        type Collection = S::Collection;
-        type Card = S::Card;
+    pub struct SetAddedBy<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAddedBy<St> {}
+    impl<St: State> State for SetAddedBy<St> {
+        type Collection = St::Collection;
+        type AddedAt = St::AddedAt;
+        type Card = St::Card;
         type AddedBy = Set<members::added_by>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `added_at` field
-        pub struct added_at(());
         ///Marker type for the `collection` field
         pub struct collection(());
+        ///Marker type for the `added_at` field
+        pub struct added_at(());
         ///Marker type for the `card` field
         pub struct card(());
         ///Marker type for the `added_by` field
@@ -203,9 +202,9 @@ pub mod collection_link_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct CollectionLinkBuilder<'a, S: collection_link_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct CollectionLinkBuilder<S: BosStr, St: collection_link_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
         Option<S>,
@@ -215,104 +214,104 @@ pub struct CollectionLinkBuilder<'a, S: collection_link_state::State> {
         Option<StrongRef<S>>,
         Option<Provenance<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> CollectionLink<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> CollectionLinkBuilder<'a, collection_link_state::Empty> {
+impl<S: BosStr> CollectionLink<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> CollectionLinkBuilder<S, collection_link_state::Empty> {
         CollectionLinkBuilder::new()
     }
 }
 
-impl<'a> CollectionLinkBuilder<'a, collection_link_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> CollectionLinkBuilder<S, collection_link_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         CollectionLinkBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CollectionLinkBuilder<'a, S>
+impl<S: BosStr, St> CollectionLinkBuilder<S, St>
 where
-    S: collection_link_state::State,
-    S::AddedAt: collection_link_state::IsUnset,
+    St: collection_link_state::State,
+    St::AddedAt: collection_link_state::IsUnset,
 {
     /// Set the `addedAt` field (required)
     pub fn added_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> CollectionLinkBuilder<'a, collection_link_state::SetAddedAt<S>> {
+    ) -> CollectionLinkBuilder<S, collection_link_state::SetAddedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         CollectionLinkBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CollectionLinkBuilder<'a, S>
+impl<S: BosStr, St> CollectionLinkBuilder<S, St>
 where
-    S: collection_link_state::State,
-    S::AddedBy: collection_link_state::IsUnset,
+    St: collection_link_state::State,
+    St::AddedBy: collection_link_state::IsUnset,
 {
     /// Set the `addedBy` field (required)
     pub fn added_by(
         mut self,
         value: impl Into<S>,
-    ) -> CollectionLinkBuilder<'a, collection_link_state::SetAddedBy<S>> {
+    ) -> CollectionLinkBuilder<S, collection_link_state::SetAddedBy<St>> {
         self._fields.1 = Option::Some(value.into());
         CollectionLinkBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CollectionLinkBuilder<'a, S>
+impl<S: BosStr, St> CollectionLinkBuilder<S, St>
 where
-    S: collection_link_state::State,
-    S::Card: collection_link_state::IsUnset,
+    St: collection_link_state::State,
+    St::Card: collection_link_state::IsUnset,
 {
     /// Set the `card` field (required)
     pub fn card(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> CollectionLinkBuilder<'a, collection_link_state::SetCard<S>> {
+    ) -> CollectionLinkBuilder<S, collection_link_state::SetCard<St>> {
         self._fields.2 = Option::Some(value.into());
         CollectionLinkBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CollectionLinkBuilder<'a, S>
+impl<S: BosStr, St> CollectionLinkBuilder<S, St>
 where
-    S: collection_link_state::State,
-    S::Collection: collection_link_state::IsUnset,
+    St: collection_link_state::State,
+    St::Collection: collection_link_state::IsUnset,
 {
     /// Set the `collection` field (required)
     pub fn collection(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> CollectionLinkBuilder<'a, collection_link_state::SetCollection<S>> {
+    ) -> CollectionLinkBuilder<S, collection_link_state::SetCollection<St>> {
         self._fields.3 = Option::Some(value.into());
         CollectionLinkBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: collection_link_state::State> CollectionLinkBuilder<'a, S> {
+impl<S: BosStr, St: collection_link_state::State> CollectionLinkBuilder<S, St> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.4 = value.into();
@@ -325,7 +324,7 @@ impl<'a, S: collection_link_state::State> CollectionLinkBuilder<'a, S> {
     }
 }
 
-impl<'a, S: collection_link_state::State> CollectionLinkBuilder<'a, S> {
+impl<S: BosStr, St: collection_link_state::State> CollectionLinkBuilder<S, St> {
     /// Set the `originalCard` field (optional)
     pub fn original_card(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -338,7 +337,7 @@ impl<'a, S: collection_link_state::State> CollectionLinkBuilder<'a, S> {
     }
 }
 
-impl<'a, S: collection_link_state::State> CollectionLinkBuilder<'a, S> {
+impl<S: BosStr, St: collection_link_state::State> CollectionLinkBuilder<S, St> {
     /// Set the `provenance` field (optional)
     pub fn provenance(mut self, value: impl Into<Option<Provenance<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -351,16 +350,16 @@ impl<'a, S: collection_link_state::State> CollectionLinkBuilder<'a, S> {
     }
 }
 
-impl<'a, S> CollectionLinkBuilder<'a, S>
+impl<S: BosStr, St> CollectionLinkBuilder<S, St>
 where
-    S: collection_link_state::State,
-    S::AddedAt: collection_link_state::IsSet,
-    S::Collection: collection_link_state::IsSet,
-    S::Card: collection_link_state::IsSet,
-    S::AddedBy: collection_link_state::IsSet,
+    St: collection_link_state::State,
+    St::Collection: collection_link_state::IsSet,
+    St::AddedAt: collection_link_state::IsSet,
+    St::Card: collection_link_state::IsSet,
+    St::AddedBy: collection_link_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> CollectionLink<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> CollectionLink<S> {
         CollectionLink {
             added_at: self._fields.0.unwrap(),
             added_by: self._fields.1.unwrap(),
@@ -372,11 +371,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> CollectionLink<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> CollectionLink<S> {
         CollectionLink {
             added_at: self._fields.0.unwrap(),
             added_by: self._fields.1.unwrap(),

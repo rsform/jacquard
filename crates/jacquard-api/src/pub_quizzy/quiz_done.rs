@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
     rename = "pub.quizzy.quizDone",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct QuizDone<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct QuizDone<S: BosStr = DefaultStr> {
     ///Reference to the quizBegin record
     pub quiz_begin: StrongRef<S>,
     ///When this participant finished
@@ -55,18 +55,18 @@ pub struct QuizDone<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct QuizDoneGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct QuizDoneGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: QuizDone<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> QuizDone<S> {
+impl<S: BosStr> QuizDone<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, QuizDoneRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -79,17 +79,17 @@ pub struct QuizDoneRecord;
 impl XrpcResp for QuizDoneRecord {
     const NSID: &'static str = "pub.quizzy.quizDone";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = QuizDoneGetRecordOutput<S>;
+    type Output<S: BosStr> = QuizDoneGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<QuizDoneGetRecordOutput<S>> for QuizDone<S> {
+impl<S: BosStr> From<QuizDoneGetRecordOutput<S>> for QuizDone<S> {
     fn from(output: QuizDoneGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for QuizDone<S> {
+impl<S: BosStr> Collection for QuizDone<S> {
     const NSID: &'static str = "pub.quizzy.quizDone";
     type Record = QuizDoneRecord;
 }
@@ -99,7 +99,7 @@ impl Collection for QuizDoneRecord {
     type Record = QuizDoneRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for QuizDone<S> {
+impl<S: BosStr> LexiconSchema for QuizDone<S> {
     fn nsid() -> &'static str {
         "pub.quizzy.quizDone"
     }
@@ -124,122 +124,119 @@ pub mod quiz_done_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Timestamp;
         type QuizBegin;
+        type Timestamp;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Timestamp = Unset;
         type QuizBegin = Unset;
-    }
-    ///State transition - sets the `timestamp` field to Set
-    pub struct SetTimestamp<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTimestamp<S> {}
-    impl<S: State> State for SetTimestamp<S> {
-        type Timestamp = Set<members::timestamp>;
-        type QuizBegin = S::QuizBegin;
+        type Timestamp = Unset;
     }
     ///State transition - sets the `quiz_begin` field to Set
-    pub struct SetQuizBegin<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetQuizBegin<S> {}
-    impl<S: State> State for SetQuizBegin<S> {
-        type Timestamp = S::Timestamp;
+    pub struct SetQuizBegin<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetQuizBegin<St> {}
+    impl<St: State> State for SetQuizBegin<St> {
         type QuizBegin = Set<members::quiz_begin>;
+        type Timestamp = St::Timestamp;
+    }
+    ///State transition - sets the `timestamp` field to Set
+    pub struct SetTimestamp<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTimestamp<St> {}
+    impl<St: State> State for SetTimestamp<St> {
+        type QuizBegin = St::QuizBegin;
+        type Timestamp = Set<members::timestamp>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `timestamp` field
-        pub struct timestamp(());
         ///Marker type for the `quiz_begin` field
         pub struct quiz_begin(());
+        ///Marker type for the `timestamp` field
+        pub struct timestamp(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct QuizDoneBuilder<'a, S: quiz_done_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct QuizDoneBuilder<S: BosStr, St: quiz_done_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<StrongRef<S>>, Option<Datetime>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> QuizDone<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> QuizDoneBuilder<'a, quiz_done_state::Empty> {
+impl<S: BosStr> QuizDone<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> QuizDoneBuilder<S, quiz_done_state::Empty> {
         QuizDoneBuilder::new()
     }
 }
 
-impl<'a> QuizDoneBuilder<'a, quiz_done_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> QuizDoneBuilder<S, quiz_done_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         QuizDoneBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> QuizDoneBuilder<'a, S>
+impl<S: BosStr, St> QuizDoneBuilder<S, St>
 where
-    S: quiz_done_state::State,
-    S::QuizBegin: quiz_done_state::IsUnset,
+    St: quiz_done_state::State,
+    St::QuizBegin: quiz_done_state::IsUnset,
 {
     /// Set the `quizBegin` field (required)
     pub fn quiz_begin(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> QuizDoneBuilder<'a, quiz_done_state::SetQuizBegin<S>> {
+    ) -> QuizDoneBuilder<S, quiz_done_state::SetQuizBegin<St>> {
         self._fields.0 = Option::Some(value.into());
         QuizDoneBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> QuizDoneBuilder<'a, S>
+impl<S: BosStr, St> QuizDoneBuilder<S, St>
 where
-    S: quiz_done_state::State,
-    S::Timestamp: quiz_done_state::IsUnset,
+    St: quiz_done_state::State,
+    St::Timestamp: quiz_done_state::IsUnset,
 {
     /// Set the `timestamp` field (required)
     pub fn timestamp(
         mut self,
         value: impl Into<Datetime>,
-    ) -> QuizDoneBuilder<'a, quiz_done_state::SetTimestamp<S>> {
+    ) -> QuizDoneBuilder<S, quiz_done_state::SetTimestamp<St>> {
         self._fields.1 = Option::Some(value.into());
         QuizDoneBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> QuizDoneBuilder<'a, S>
+impl<S: BosStr, St> QuizDoneBuilder<S, St>
 where
-    S: quiz_done_state::State,
-    S::Timestamp: quiz_done_state::IsSet,
-    S::QuizBegin: quiz_done_state::IsSet,
+    St: quiz_done_state::State,
+    St::QuizBegin: quiz_done_state::IsSet,
+    St::Timestamp: quiz_done_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> QuizDone<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> QuizDone<S> {
         QuizDone {
             quiz_begin: self._fields.0.unwrap(),
             timestamp: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> QuizDone<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> QuizDone<S> {
         QuizDone {
             quiz_begin: self._fields.0.unwrap(),
             timestamp: self._fields.1.unwrap(),

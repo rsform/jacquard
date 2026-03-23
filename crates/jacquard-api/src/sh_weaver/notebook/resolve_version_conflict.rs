@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
@@ -20,35 +20,32 @@ use crate::sh_weaver::collab::CollaborationStateView;
 use crate::sh_weaver::notebook::PublishedVersionView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ResolveVersionConflict<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct ResolveVersionConflict<S: BosStr = DefaultStr> {
     pub uris: Vec<AtUri<S>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ResolveVersionConflictOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ResolveVersionConflictOutput<S: BosStr = DefaultStr> {
     pub canonical: PublishedVersionView<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub collaboration_state: Option<CollaborationStateView<S>>,
     pub related: Vec<PublishedVersionView<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -100,12 +97,11 @@ pub struct ResolveVersionConflictResponse;
 impl jacquard_common::xrpc::XrpcResp for ResolveVersionConflictResponse {
     const NSID: &'static str = "sh.weaver.notebook.resolveVersionConflict";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ResolveVersionConflictOutput<S>;
+    type Output<S: BosStr> = ResolveVersionConflictOutput<S>;
     type Err = ResolveVersionConflictError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for ResolveVersionConflict<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ResolveVersionConflict<S> {
     const NSID: &'static str = "sh.weaver.notebook.resolveVersionConflict";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ResolveVersionConflictResponse;
@@ -116,7 +112,7 @@ pub struct ResolveVersionConflictRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ResolveVersionConflictRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.notebook.resolveVersionConflict";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = ResolveVersionConflict<S>;
+    type Request<S: BosStr> = ResolveVersionConflict<S>;
     type Response = ResolveVersionConflictResponse;
 }
 
@@ -139,9 +135,9 @@ pub mod resolve_version_conflict_state {
         type Uris = Unset;
     }
     ///State transition - sets the `uris` field to Set
-    pub struct SetUris<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUris<S> {}
-    impl<S: State> State for SetUris<S> {
+    pub struct SetUris<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUris<St> {}
+    impl<St: State> State for SetUris<St> {
         type Uris = Set<members::uris>;
     }
     /// Marker types for field names
@@ -152,60 +148,63 @@ pub mod resolve_version_conflict_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ResolveVersionConflictBuilder<'a, S: resolve_version_conflict_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ResolveVersionConflictBuilder<
+    S: BosStr,
+    St: resolve_version_conflict_state::State,
+> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<AtUri<S>>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ResolveVersionConflict<'a> {
-    /// Create a new builder for this type
+impl<S: BosStr> ResolveVersionConflict<S> {
+    /// Create a new builder for this type.
     pub fn new() -> ResolveVersionConflictBuilder<
-        'a,
+        S,
         resolve_version_conflict_state::Empty,
     > {
         ResolveVersionConflictBuilder::new()
     }
 }
 
-impl<'a> ResolveVersionConflictBuilder<'a, resolve_version_conflict_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ResolveVersionConflictBuilder<S, resolve_version_conflict_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ResolveVersionConflictBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ResolveVersionConflictBuilder<'a, S>
+impl<S: BosStr, St> ResolveVersionConflictBuilder<S, St>
 where
-    S: resolve_version_conflict_state::State,
-    S::Uris: resolve_version_conflict_state::IsUnset,
+    St: resolve_version_conflict_state::State,
+    St::Uris: resolve_version_conflict_state::IsUnset,
 {
     /// Set the `uris` field (required)
     pub fn uris(
         mut self,
         value: impl Into<Vec<AtUri<S>>>,
-    ) -> ResolveVersionConflictBuilder<'a, resolve_version_conflict_state::SetUris<S>> {
+    ) -> ResolveVersionConflictBuilder<S, resolve_version_conflict_state::SetUris<St>> {
         self._fields.0 = Option::Some(value.into());
         ResolveVersionConflictBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ResolveVersionConflictBuilder<'a, S>
+impl<S: BosStr, St> ResolveVersionConflictBuilder<S, St>
 where
-    S: resolve_version_conflict_state::State,
-    S::Uris: resolve_version_conflict_state::IsSet,
+    St: resolve_version_conflict_state::State,
+    St::Uris: resolve_version_conflict_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ResolveVersionConflict<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ResolveVersionConflict<S> {
         ResolveVersionConflict {
             uris: self._fields.0.unwrap(),
         }

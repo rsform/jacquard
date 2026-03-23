@@ -15,7 +15,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -41,11 +41,11 @@ use crate::network_slices::tools::richtext::facet::Facet;
     rename = "network.slices.tools.bug",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Bug<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Bug<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub app_used: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -69,7 +69,7 @@ pub struct Bug<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum BugSeverity<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum BugSeverity<S: BosStr = DefaultStr> {
     Cosmetic,
     Annoying,
     Broken,
@@ -77,7 +77,7 @@ pub enum BugSeverity<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> BugSeverity<S> {
+impl<S: BosStr> BugSeverity<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Cosmetic => "cosmetic",
@@ -99,19 +99,19 @@ impl<S: Bos<str> + AsRef<str>> BugSeverity<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for BugSeverity<S> {
+impl<S: BosStr> core::fmt::Display for BugSeverity<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for BugSeverity<S> {
+impl<S: BosStr> AsRef<str> for BugSeverity<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for BugSeverity<S> {
+impl<S: BosStr> Serialize for BugSeverity<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -120,8 +120,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for BugSeverity<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for BugSeverity<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for BugSeverity<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -131,14 +130,18 @@ for BugSeverity<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for BugSeverity<S> {
+impl<S: BosStr + Default> Default for BugSeverity<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for BugSeverity<S> {
-    type Output = BugSeverity<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for BugSeverity<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = BugSeverity<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             BugSeverity::Cosmetic => BugSeverity::Cosmetic,
@@ -156,18 +159,18 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for BugSeverity<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct BugGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct BugGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Bug<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Bug<S> {
+impl<S: BosStr> Bug<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, BugRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -180,17 +183,17 @@ pub struct BugRecord;
 impl XrpcResp for BugRecord {
     const NSID: &'static str = "network.slices.tools.bug";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = BugGetRecordOutput<S>;
+    type Output<S: BosStr> = BugGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<BugGetRecordOutput<S>> for Bug<S> {
+impl<S: BosStr> From<BugGetRecordOutput<S>> for Bug<S> {
     fn from(output: BugGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Bug<S> {
+impl<S: BosStr> Collection for Bug<S> {
     const NSID: &'static str = "network.slices.tools.bug";
     type Record = BugRecord;
 }
@@ -200,7 +203,7 @@ impl Collection for BugRecord {
     type Record = BugRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Bug<S> {
+impl<S: BosStr> LexiconSchema for Bug<S> {
     fn nsid() -> &'static str {
         "network.slices.tools.bug"
     }
@@ -307,10 +310,10 @@ pub mod bug_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Namespace;
         type Severity;
         type StepsToReproduce;
         type Description;
+        type Namespace;
         type CreatedAt;
         type Title;
     }
@@ -318,90 +321,90 @@ pub mod bug_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Namespace = Unset;
         type Severity = Unset;
         type StepsToReproduce = Unset;
         type Description = Unset;
+        type Namespace = Unset;
         type CreatedAt = Unset;
         type Title = Unset;
     }
-    ///State transition - sets the `namespace` field to Set
-    pub struct SetNamespace<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNamespace<S> {}
-    impl<S: State> State for SetNamespace<S> {
-        type Namespace = Set<members::namespace>;
-        type Severity = S::Severity;
-        type StepsToReproduce = S::StepsToReproduce;
-        type Description = S::Description;
-        type CreatedAt = S::CreatedAt;
-        type Title = S::Title;
-    }
     ///State transition - sets the `severity` field to Set
-    pub struct SetSeverity<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSeverity<S> {}
-    impl<S: State> State for SetSeverity<S> {
-        type Namespace = S::Namespace;
+    pub struct SetSeverity<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSeverity<St> {}
+    impl<St: State> State for SetSeverity<St> {
         type Severity = Set<members::severity>;
-        type StepsToReproduce = S::StepsToReproduce;
-        type Description = S::Description;
-        type CreatedAt = S::CreatedAt;
-        type Title = S::Title;
+        type StepsToReproduce = St::StepsToReproduce;
+        type Description = St::Description;
+        type Namespace = St::Namespace;
+        type CreatedAt = St::CreatedAt;
+        type Title = St::Title;
     }
     ///State transition - sets the `steps_to_reproduce` field to Set
-    pub struct SetStepsToReproduce<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStepsToReproduce<S> {}
-    impl<S: State> State for SetStepsToReproduce<S> {
-        type Namespace = S::Namespace;
-        type Severity = S::Severity;
+    pub struct SetStepsToReproduce<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStepsToReproduce<St> {}
+    impl<St: State> State for SetStepsToReproduce<St> {
+        type Severity = St::Severity;
         type StepsToReproduce = Set<members::steps_to_reproduce>;
-        type Description = S::Description;
-        type CreatedAt = S::CreatedAt;
-        type Title = S::Title;
+        type Description = St::Description;
+        type Namespace = St::Namespace;
+        type CreatedAt = St::CreatedAt;
+        type Title = St::Title;
     }
     ///State transition - sets the `description` field to Set
-    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDescription<S> {}
-    impl<S: State> State for SetDescription<S> {
-        type Namespace = S::Namespace;
-        type Severity = S::Severity;
-        type StepsToReproduce = S::StepsToReproduce;
+    pub struct SetDescription<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDescription<St> {}
+    impl<St: State> State for SetDescription<St> {
+        type Severity = St::Severity;
+        type StepsToReproduce = St::StepsToReproduce;
         type Description = Set<members::description>;
-        type CreatedAt = S::CreatedAt;
-        type Title = S::Title;
+        type Namespace = St::Namespace;
+        type CreatedAt = St::CreatedAt;
+        type Title = St::Title;
+    }
+    ///State transition - sets the `namespace` field to Set
+    pub struct SetNamespace<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetNamespace<St> {}
+    impl<St: State> State for SetNamespace<St> {
+        type Severity = St::Severity;
+        type StepsToReproduce = St::StepsToReproduce;
+        type Description = St::Description;
+        type Namespace = Set<members::namespace>;
+        type CreatedAt = St::CreatedAt;
+        type Title = St::Title;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Namespace = S::Namespace;
-        type Severity = S::Severity;
-        type StepsToReproduce = S::StepsToReproduce;
-        type Description = S::Description;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Severity = St::Severity;
+        type StepsToReproduce = St::StepsToReproduce;
+        type Description = St::Description;
+        type Namespace = St::Namespace;
         type CreatedAt = Set<members::created_at>;
-        type Title = S::Title;
+        type Title = St::Title;
     }
     ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Namespace = S::Namespace;
-        type Severity = S::Severity;
-        type StepsToReproduce = S::StepsToReproduce;
-        type Description = S::Description;
-        type CreatedAt = S::CreatedAt;
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
+        type Severity = St::Severity;
+        type StepsToReproduce = St::StepsToReproduce;
+        type Description = St::Description;
+        type Namespace = St::Namespace;
+        type CreatedAt = St::CreatedAt;
         type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `namespace` field
-        pub struct namespace(());
         ///Marker type for the `severity` field
         pub struct severity(());
         ///Marker type for the `steps_to_reproduce` field
         pub struct steps_to_reproduce(());
         ///Marker type for the `description` field
         pub struct description(());
+        ///Marker type for the `namespace` field
+        pub struct namespace(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `title` field
@@ -409,9 +412,9 @@ pub mod bug_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct BugBuilder<'a, S: bug_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct BugBuilder<S: BosStr, St: bug_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
         Option<Images<S>>,
@@ -424,28 +427,28 @@ pub struct BugBuilder<'a, S: bug_state::State> {
         Option<Vec<Facet<S>>>,
         Option<S>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Bug<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> BugBuilder<'a, bug_state::Empty> {
+impl<S: BosStr> Bug<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> BugBuilder<S, bug_state::Empty> {
         BugBuilder::new()
     }
 }
 
-impl<'a> BugBuilder<'a, bug_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> BugBuilder<S, bug_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         BugBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: bug_state::State> BugBuilder<'a, S> {
+impl<S: BosStr, St: bug_state::State> BugBuilder<S, St> {
     /// Set the `appUsed` field (optional)
     pub fn app_used(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -458,7 +461,7 @@ impl<'a, S: bug_state::State> BugBuilder<'a, S> {
     }
 }
 
-impl<'a, S: bug_state::State> BugBuilder<'a, S> {
+impl<S: BosStr, St: bug_state::State> BugBuilder<S, St> {
     /// Set the `attachments` field (optional)
     pub fn attachments(mut self, value: impl Into<Option<Images<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -471,45 +474,45 @@ impl<'a, S: bug_state::State> BugBuilder<'a, S> {
     }
 }
 
-impl<'a, S> BugBuilder<'a, S>
+impl<S: BosStr, St> BugBuilder<S, St>
 where
-    S: bug_state::State,
-    S::CreatedAt: bug_state::IsUnset,
+    St: bug_state::State,
+    St::CreatedAt: bug_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> BugBuilder<'a, bug_state::SetCreatedAt<S>> {
+    ) -> BugBuilder<S, bug_state::SetCreatedAt<St>> {
         self._fields.2 = Option::Some(value.into());
         BugBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BugBuilder<'a, S>
+impl<S: BosStr, St> BugBuilder<S, St>
 where
-    S: bug_state::State,
-    S::Description: bug_state::IsUnset,
+    St: bug_state::State,
+    St::Description: bug_state::IsUnset,
 {
     /// Set the `description` field (required)
     pub fn description(
         mut self,
         value: impl Into<S>,
-    ) -> BugBuilder<'a, bug_state::SetDescription<S>> {
+    ) -> BugBuilder<S, bug_state::SetDescription<St>> {
         self._fields.3 = Option::Some(value.into());
         BugBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: bug_state::State> BugBuilder<'a, S> {
+impl<S: BosStr, St: bug_state::State> BugBuilder<S, St> {
     /// Set the `descriptionFacets` field (optional)
     pub fn description_facets(
         mut self,
@@ -525,64 +528,64 @@ impl<'a, S: bug_state::State> BugBuilder<'a, S> {
     }
 }
 
-impl<'a, S> BugBuilder<'a, S>
+impl<S: BosStr, St> BugBuilder<S, St>
 where
-    S: bug_state::State,
-    S::Namespace: bug_state::IsUnset,
+    St: bug_state::State,
+    St::Namespace: bug_state::IsUnset,
 {
     /// Set the `namespace` field (required)
     pub fn namespace(
         mut self,
         value: impl Into<S>,
-    ) -> BugBuilder<'a, bug_state::SetNamespace<S>> {
+    ) -> BugBuilder<S, bug_state::SetNamespace<St>> {
         self._fields.5 = Option::Some(value.into());
         BugBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BugBuilder<'a, S>
+impl<S: BosStr, St> BugBuilder<S, St>
 where
-    S: bug_state::State,
-    S::Severity: bug_state::IsUnset,
+    St: bug_state::State,
+    St::Severity: bug_state::IsUnset,
 {
     /// Set the `severity` field (required)
     pub fn severity(
         mut self,
         value: impl Into<BugSeverity<S>>,
-    ) -> BugBuilder<'a, bug_state::SetSeverity<S>> {
+    ) -> BugBuilder<S, bug_state::SetSeverity<St>> {
         self._fields.6 = Option::Some(value.into());
         BugBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BugBuilder<'a, S>
+impl<S: BosStr, St> BugBuilder<S, St>
 where
-    S: bug_state::State,
-    S::StepsToReproduce: bug_state::IsUnset,
+    St: bug_state::State,
+    St::StepsToReproduce: bug_state::IsUnset,
 {
     /// Set the `stepsToReproduce` field (required)
     pub fn steps_to_reproduce(
         mut self,
         value: impl Into<S>,
-    ) -> BugBuilder<'a, bug_state::SetStepsToReproduce<S>> {
+    ) -> BugBuilder<S, bug_state::SetStepsToReproduce<St>> {
         self._fields.7 = Option::Some(value.into());
         BugBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: bug_state::State> BugBuilder<'a, S> {
+impl<S: BosStr, St: bug_state::State> BugBuilder<S, St> {
     /// Set the `stepsToReproduceFacets` field (optional)
     pub fn steps_to_reproduce_facets(
         mut self,
@@ -601,37 +604,37 @@ impl<'a, S: bug_state::State> BugBuilder<'a, S> {
     }
 }
 
-impl<'a, S> BugBuilder<'a, S>
+impl<S: BosStr, St> BugBuilder<S, St>
 where
-    S: bug_state::State,
-    S::Title: bug_state::IsUnset,
+    St: bug_state::State,
+    St::Title: bug_state::IsUnset,
 {
     /// Set the `title` field (required)
     pub fn title(
         mut self,
         value: impl Into<S>,
-    ) -> BugBuilder<'a, bug_state::SetTitle<S>> {
+    ) -> BugBuilder<S, bug_state::SetTitle<St>> {
         self._fields.9 = Option::Some(value.into());
         BugBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BugBuilder<'a, S>
+impl<S: BosStr, St> BugBuilder<S, St>
 where
-    S: bug_state::State,
-    S::Namespace: bug_state::IsSet,
-    S::Severity: bug_state::IsSet,
-    S::StepsToReproduce: bug_state::IsSet,
-    S::Description: bug_state::IsSet,
-    S::CreatedAt: bug_state::IsSet,
-    S::Title: bug_state::IsSet,
+    St: bug_state::State,
+    St::Severity: bug_state::IsSet,
+    St::StepsToReproduce: bug_state::IsSet,
+    St::Description: bug_state::IsSet,
+    St::Namespace: bug_state::IsSet,
+    St::CreatedAt: bug_state::IsSet,
+    St::Title: bug_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Bug<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Bug<S> {
         Bug {
             app_used: self._fields.0,
             attachments: self._fields.1,
@@ -646,8 +649,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Bug<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Bug<S> {
         Bug {
             app_used: self._fields.0,
             attachments: self._fields.1,

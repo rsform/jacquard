@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -27,32 +27,29 @@ use serde::{Serialize, Deserialize};
 use crate::sh_tangled::repo::list_secrets;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ListSecrets<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct ListSecrets<S: BosStr = DefaultStr> {
     pub repo: AtUri<S>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ListSecretsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ListSecretsOutput<S: BosStr = DefaultStr> {
     pub secrets: Vec<list_secrets::Secret<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -61,11 +58,11 @@ pub struct ListSecretsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Secret<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Secret<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     pub created_by: Did<S>,
     pub key: S,
@@ -79,12 +76,11 @@ pub struct ListSecretsResponse;
 impl jacquard_common::xrpc::XrpcResp for ListSecretsResponse {
     const NSID: &'static str = "sh.tangled.repo.listSecrets";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ListSecretsOutput<S>;
+    type Output<S: BosStr> = ListSecretsOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for ListSecrets<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ListSecrets<S> {
     const NSID: &'static str = "sh.tangled.repo.listSecrets";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ListSecretsResponse;
@@ -95,11 +91,11 @@ pub struct ListSecretsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListSecretsRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.repo.listSecrets";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = ListSecrets<S>;
+    type Request<S: BosStr> = ListSecrets<S>;
     type Response = ListSecretsResponse;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Secret<S> {
+impl<S: BosStr> LexiconSchema for Secret<S> {
     fn nsid() -> &'static str {
         "sh.tangled.repo.listSecrets"
     }
@@ -155,9 +151,9 @@ pub mod list_secrets_state {
         type Repo = Unset;
     }
     ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
+    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRepo<St> {}
+    impl<St: State> State for SetRepo<St> {
         type Repo = Set<members::repo>;
     }
     /// Marker types for field names
@@ -168,57 +164,57 @@ pub mod list_secrets_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ListSecretsBuilder<'a, S: list_secrets_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ListSecretsBuilder<S: BosStr, St: list_secrets_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ListSecrets<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ListSecretsBuilder<'a, list_secrets_state::Empty> {
+impl<S: BosStr> ListSecrets<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ListSecretsBuilder<S, list_secrets_state::Empty> {
         ListSecretsBuilder::new()
     }
 }
 
-impl<'a> ListSecretsBuilder<'a, list_secrets_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ListSecretsBuilder<S, list_secrets_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ListSecretsBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ListSecretsBuilder<'a, S>
+impl<S: BosStr, St> ListSecretsBuilder<S, St>
 where
-    S: list_secrets_state::State,
-    S::Repo: list_secrets_state::IsUnset,
+    St: list_secrets_state::State,
+    St::Repo: list_secrets_state::IsUnset,
 {
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> ListSecretsBuilder<'a, list_secrets_state::SetRepo<S>> {
+    ) -> ListSecretsBuilder<S, list_secrets_state::SetRepo<St>> {
         self._fields.0 = Option::Some(value.into());
         ListSecretsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ListSecretsBuilder<'a, S>
+impl<S: BosStr, St> ListSecretsBuilder<S, St>
 where
-    S: list_secrets_state::State,
-    S::Repo: list_secrets_state::IsSet,
+    St: list_secrets_state::State,
+    St::Repo: list_secrets_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ListSecrets<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ListSecrets<S> {
         ListSecrets {
             repo: self._fields.0.unwrap(),
         }
@@ -235,181 +231,181 @@ pub mod secret_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Repo;
         type Key;
         type CreatedAt;
+        type Repo;
         type CreatedBy;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Repo = Unset;
         type Key = Unset;
         type CreatedAt = Unset;
+        type Repo = Unset;
         type CreatedBy = Unset;
     }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
-        type Repo = Set<members::repo>;
-        type Key = S::Key;
-        type CreatedAt = S::CreatedAt;
-        type CreatedBy = S::CreatedBy;
-    }
     ///State transition - sets the `key` field to Set
-    pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetKey<S> {}
-    impl<S: State> State for SetKey<S> {
-        type Repo = S::Repo;
+    pub struct SetKey<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetKey<St> {}
+    impl<St: State> State for SetKey<St> {
         type Key = Set<members::key>;
-        type CreatedAt = S::CreatedAt;
-        type CreatedBy = S::CreatedBy;
+        type CreatedAt = St::CreatedAt;
+        type Repo = St::Repo;
+        type CreatedBy = St::CreatedBy;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Repo = S::Repo;
-        type Key = S::Key;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Key = St::Key;
         type CreatedAt = Set<members::created_at>;
-        type CreatedBy = S::CreatedBy;
+        type Repo = St::Repo;
+        type CreatedBy = St::CreatedBy;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRepo<St> {}
+    impl<St: State> State for SetRepo<St> {
+        type Key = St::Key;
+        type CreatedAt = St::CreatedAt;
+        type Repo = Set<members::repo>;
+        type CreatedBy = St::CreatedBy;
     }
     ///State transition - sets the `created_by` field to Set
-    pub struct SetCreatedBy<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedBy<S> {}
-    impl<S: State> State for SetCreatedBy<S> {
-        type Repo = S::Repo;
-        type Key = S::Key;
-        type CreatedAt = S::CreatedAt;
+    pub struct SetCreatedBy<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedBy<St> {}
+    impl<St: State> State for SetCreatedBy<St> {
+        type Key = St::Key;
+        type CreatedAt = St::CreatedAt;
+        type Repo = St::Repo;
         type CreatedBy = Set<members::created_by>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `repo` field
-        pub struct repo(());
         ///Marker type for the `key` field
         pub struct key(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
         ///Marker type for the `created_by` field
         pub struct created_by(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct SecretBuilder<'a, S: secret_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct SecretBuilder<S: BosStr, St: secret_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<Did<S>>, Option<S>, Option<AtUri<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Secret<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> SecretBuilder<'a, secret_state::Empty> {
+impl<S: BosStr> Secret<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> SecretBuilder<S, secret_state::Empty> {
         SecretBuilder::new()
     }
 }
 
-impl<'a> SecretBuilder<'a, secret_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> SecretBuilder<S, secret_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SecretBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SecretBuilder<'a, S>
+impl<S: BosStr, St> SecretBuilder<S, St>
 where
-    S: secret_state::State,
-    S::CreatedAt: secret_state::IsUnset,
+    St: secret_state::State,
+    St::CreatedAt: secret_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> SecretBuilder<'a, secret_state::SetCreatedAt<S>> {
+    ) -> SecretBuilder<S, secret_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         SecretBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SecretBuilder<'a, S>
+impl<S: BosStr, St> SecretBuilder<S, St>
 where
-    S: secret_state::State,
-    S::CreatedBy: secret_state::IsUnset,
+    St: secret_state::State,
+    St::CreatedBy: secret_state::IsUnset,
 {
     /// Set the `createdBy` field (required)
     pub fn created_by(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> SecretBuilder<'a, secret_state::SetCreatedBy<S>> {
+    ) -> SecretBuilder<S, secret_state::SetCreatedBy<St>> {
         self._fields.1 = Option::Some(value.into());
         SecretBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SecretBuilder<'a, S>
+impl<S: BosStr, St> SecretBuilder<S, St>
 where
-    S: secret_state::State,
-    S::Key: secret_state::IsUnset,
+    St: secret_state::State,
+    St::Key: secret_state::IsUnset,
 {
     /// Set the `key` field (required)
     pub fn key(
         mut self,
         value: impl Into<S>,
-    ) -> SecretBuilder<'a, secret_state::SetKey<S>> {
+    ) -> SecretBuilder<S, secret_state::SetKey<St>> {
         self._fields.2 = Option::Some(value.into());
         SecretBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SecretBuilder<'a, S>
+impl<S: BosStr, St> SecretBuilder<S, St>
 where
-    S: secret_state::State,
-    S::Repo: secret_state::IsUnset,
+    St: secret_state::State,
+    St::Repo: secret_state::IsUnset,
 {
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> SecretBuilder<'a, secret_state::SetRepo<S>> {
+    ) -> SecretBuilder<S, secret_state::SetRepo<St>> {
         self._fields.3 = Option::Some(value.into());
         SecretBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SecretBuilder<'a, S>
+impl<S: BosStr, St> SecretBuilder<S, St>
 where
-    S: secret_state::State,
-    S::Repo: secret_state::IsSet,
-    S::Key: secret_state::IsSet,
-    S::CreatedAt: secret_state::IsSet,
-    S::CreatedBy: secret_state::IsSet,
+    St: secret_state::State,
+    St::Key: secret_state::IsSet,
+    St::CreatedAt: secret_state::IsSet,
+    St::Repo: secret_state::IsSet,
+    St::CreatedBy: secret_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Secret<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Secret<S> {
         Secret {
             created_at: self._fields.0.unwrap(),
             created_by: self._fields.1.unwrap(),
@@ -418,8 +414,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Secret<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Secret<S> {
         Secret {
             created_at: self._fields.0.unwrap(),
             created_by: self._fields.1.unwrap(),

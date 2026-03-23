@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{AtUri, Cid};
 use jacquard_common::types::value::Data;
@@ -18,44 +18,40 @@ use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetLikedBy<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetLikedBy<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub cursor: Option<S>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
-    #[serde(borrow)]
     pub subject: AtUri<S>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetLikedByOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetLikedByOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
     pub likes: Vec<Data<S>>,
     pub uri: AtUri<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -64,12 +60,11 @@ pub struct GetLikedByResponse;
 impl jacquard_common::xrpc::XrpcResp for GetLikedByResponse {
     const NSID: &'static str = "sh.weaver.graph.getLikedBy";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetLikedByOutput<S>;
+    type Output<S: BosStr> = GetLikedByOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetLikedBy<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetLikedBy<S> {
     const NSID: &'static str = "sh.weaver.graph.getLikedBy";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetLikedByResponse;
@@ -80,7 +75,7 @@ pub struct GetLikedByRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetLikedByRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.graph.getLikedBy";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetLikedBy<S>;
+    type Request<S: BosStr> = GetLikedBy<S>;
     type Response = GetLikedByResponse;
 }
 
@@ -107,9 +102,9 @@ pub mod get_liked_by_state {
         type Subject = Unset;
     }
     ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
+    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubject<St> {}
+    impl<St: State> State for SetSubject<St> {
         type Subject = Set<members::subject>;
     }
     /// Marker types for field names
@@ -120,32 +115,32 @@ pub mod get_liked_by_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetLikedByBuilder<'a, S: get_liked_by_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetLikedByBuilder<S: BosStr, St: get_liked_by_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>, Option<AtUri<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetLikedBy<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetLikedByBuilder<'a, get_liked_by_state::Empty> {
+impl<S: BosStr> GetLikedBy<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetLikedByBuilder<S, get_liked_by_state::Empty> {
         GetLikedByBuilder::new()
     }
 }
 
-impl<'a> GetLikedByBuilder<'a, get_liked_by_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetLikedByBuilder<S, get_liked_by_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetLikedByBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: get_liked_by_state::State> GetLikedByBuilder<'a, S> {
+impl<S: BosStr, St: get_liked_by_state::State> GetLikedByBuilder<S, St> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -158,7 +153,7 @@ impl<'a, S: get_liked_by_state::State> GetLikedByBuilder<'a, S> {
     }
 }
 
-impl<'a, S: get_liked_by_state::State> GetLikedByBuilder<'a, S> {
+impl<S: BosStr, St: get_liked_by_state::State> GetLikedByBuilder<S, St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -171,32 +166,32 @@ impl<'a, S: get_liked_by_state::State> GetLikedByBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GetLikedByBuilder<'a, S>
+impl<S: BosStr, St> GetLikedByBuilder<S, St>
 where
-    S: get_liked_by_state::State,
-    S::Subject: get_liked_by_state::IsUnset,
+    St: get_liked_by_state::State,
+    St::Subject: get_liked_by_state::IsUnset,
 {
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> GetLikedByBuilder<'a, get_liked_by_state::SetSubject<S>> {
+    ) -> GetLikedByBuilder<S, get_liked_by_state::SetSubject<St>> {
         self._fields.2 = Option::Some(value.into());
         GetLikedByBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetLikedByBuilder<'a, S>
+impl<S: BosStr, St> GetLikedByBuilder<S, St>
 where
-    S: get_liked_by_state::State,
-    S::Subject: get_liked_by_state::IsSet,
+    St: get_liked_by_state::State,
+    St::Subject: get_liked_by_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetLikedBy<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetLikedBy<S> {
         GetLikedBy {
             cursor: self._fields.0,
             limit: self._fields.1,

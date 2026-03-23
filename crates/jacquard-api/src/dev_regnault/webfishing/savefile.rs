@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "dev.regnault.webfishing.savefile",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Savefile<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Savefile<S: BosStr = DefaultStr> {
     pub name: S,
     pub uri: AtUri<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -52,18 +52,18 @@ pub struct Savefile<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SavefileGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SavefileGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Savefile<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Savefile<S> {
+impl<S: BosStr> Savefile<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, SavefileRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -76,17 +76,17 @@ pub struct SavefileRecord;
 impl XrpcResp for SavefileRecord {
     const NSID: &'static str = "dev.regnault.webfishing.savefile";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = SavefileGetRecordOutput<S>;
+    type Output<S: BosStr> = SavefileGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<SavefileGetRecordOutput<S>> for Savefile<S> {
+impl<S: BosStr> From<SavefileGetRecordOutput<S>> for Savefile<S> {
     fn from(output: SavefileGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Savefile<S> {
+impl<S: BosStr> Collection for Savefile<S> {
     const NSID: &'static str = "dev.regnault.webfishing.savefile";
     type Record = SavefileRecord;
 }
@@ -96,7 +96,7 @@ impl Collection for SavefileRecord {
     type Record = SavefileRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Savefile<S> {
+impl<S: BosStr> LexiconSchema for Savefile<S> {
     fn nsid() -> &'static str {
         "dev.regnault.webfishing.savefile"
     }
@@ -121,122 +121,119 @@ pub mod savefile_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Uri;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Uri = S::Uri;
+        type Name = Unset;
     }
     ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Name = S::Name;
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
         type Uri = Set<members::uri>;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Uri = St::Uri;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct SavefileBuilder<'a, S: savefile_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct SavefileBuilder<S: BosStr, St: savefile_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<AtUri<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Savefile<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> SavefileBuilder<'a, savefile_state::Empty> {
+impl<S: BosStr> Savefile<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> SavefileBuilder<S, savefile_state::Empty> {
         SavefileBuilder::new()
     }
 }
 
-impl<'a> SavefileBuilder<'a, savefile_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> SavefileBuilder<S, savefile_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SavefileBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SavefileBuilder<'a, S>
+impl<S: BosStr, St> SavefileBuilder<S, St>
 where
-    S: savefile_state::State,
-    S::Name: savefile_state::IsUnset,
+    St: savefile_state::State,
+    St::Name: savefile_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> SavefileBuilder<'a, savefile_state::SetName<S>> {
+    ) -> SavefileBuilder<S, savefile_state::SetName<St>> {
         self._fields.0 = Option::Some(value.into());
         SavefileBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SavefileBuilder<'a, S>
+impl<S: BosStr, St> SavefileBuilder<S, St>
 where
-    S: savefile_state::State,
-    S::Uri: savefile_state::IsUnset,
+    St: savefile_state::State,
+    St::Uri: savefile_state::IsUnset,
 {
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> SavefileBuilder<'a, savefile_state::SetUri<S>> {
+    ) -> SavefileBuilder<S, savefile_state::SetUri<St>> {
         self._fields.1 = Option::Some(value.into());
         SavefileBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SavefileBuilder<'a, S>
+impl<S: BosStr, St> SavefileBuilder<S, St>
 where
-    S: savefile_state::State,
-    S::Name: savefile_state::IsSet,
-    S::Uri: savefile_state::IsSet,
+    St: savefile_state::State,
+    St::Uri: savefile_state::IsSet,
+    St::Name: savefile_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Savefile<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Savefile<S> {
         Savefile {
             name: self._fields.0.unwrap(),
             uri: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Savefile<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Savefile<S> {
         Savefile {
             name: self._fields.0.unwrap(),
             uri: self._fields.1.unwrap(),

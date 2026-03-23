@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -28,11 +28,11 @@ use serde::{Serialize, Deserialize};
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Heading<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Heading<S: BosStr = DefaultStr> {
     ///Facets for text formatting
     #[serde(skip_serializing_if = "Option::is_none")]
     pub facets: Option<Vec<Data<S>>>,
@@ -47,7 +47,7 @@ pub struct Heading<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Heading<S> {
+impl<S: BosStr> LexiconSchema for Heading<S> {
     fn nsid() -> &'static str {
         "app.offprint.block.heading"
     }
@@ -92,66 +92,66 @@ pub mod heading_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Level;
         type Plaintext;
+        type Level;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Level = Unset;
         type Plaintext = Unset;
-    }
-    ///State transition - sets the `level` field to Set
-    pub struct SetLevel<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLevel<S> {}
-    impl<S: State> State for SetLevel<S> {
-        type Level = Set<members::level>;
-        type Plaintext = S::Plaintext;
+        type Level = Unset;
     }
     ///State transition - sets the `plaintext` field to Set
-    pub struct SetPlaintext<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPlaintext<S> {}
-    impl<S: State> State for SetPlaintext<S> {
-        type Level = S::Level;
+    pub struct SetPlaintext<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPlaintext<St> {}
+    impl<St: State> State for SetPlaintext<St> {
         type Plaintext = Set<members::plaintext>;
+        type Level = St::Level;
+    }
+    ///State transition - sets the `level` field to Set
+    pub struct SetLevel<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLevel<St> {}
+    impl<St: State> State for SetLevel<St> {
+        type Plaintext = St::Plaintext;
+        type Level = Set<members::level>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `level` field
-        pub struct level(());
         ///Marker type for the `plaintext` field
         pub struct plaintext(());
+        ///Marker type for the `level` field
+        pub struct level(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct HeadingBuilder<'a, S: heading_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct HeadingBuilder<S: BosStr, St: heading_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<Data<S>>>, Option<i64>, Option<S>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Heading<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> HeadingBuilder<'a, heading_state::Empty> {
+impl<S: BosStr> Heading<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> HeadingBuilder<S, heading_state::Empty> {
         HeadingBuilder::new()
     }
 }
 
-impl<'a> HeadingBuilder<'a, heading_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> HeadingBuilder<S, heading_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         HeadingBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: heading_state::State> HeadingBuilder<'a, S> {
+impl<S: BosStr, St: heading_state::State> HeadingBuilder<S, St> {
     /// Set the `facets` field (optional)
     pub fn facets(mut self, value: impl Into<Option<Vec<Data<S>>>>) -> Self {
         self._fields.0 = value.into();
@@ -164,45 +164,45 @@ impl<'a, S: heading_state::State> HeadingBuilder<'a, S> {
     }
 }
 
-impl<'a, S> HeadingBuilder<'a, S>
+impl<S: BosStr, St> HeadingBuilder<S, St>
 where
-    S: heading_state::State,
-    S::Level: heading_state::IsUnset,
+    St: heading_state::State,
+    St::Level: heading_state::IsUnset,
 {
     /// Set the `level` field (required)
     pub fn level(
         mut self,
         value: impl Into<i64>,
-    ) -> HeadingBuilder<'a, heading_state::SetLevel<S>> {
+    ) -> HeadingBuilder<S, heading_state::SetLevel<St>> {
         self._fields.1 = Option::Some(value.into());
         HeadingBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> HeadingBuilder<'a, S>
+impl<S: BosStr, St> HeadingBuilder<S, St>
 where
-    S: heading_state::State,
-    S::Plaintext: heading_state::IsUnset,
+    St: heading_state::State,
+    St::Plaintext: heading_state::IsUnset,
 {
     /// Set the `plaintext` field (required)
     pub fn plaintext(
         mut self,
         value: impl Into<S>,
-    ) -> HeadingBuilder<'a, heading_state::SetPlaintext<S>> {
+    ) -> HeadingBuilder<S, heading_state::SetPlaintext<St>> {
         self._fields.2 = Option::Some(value.into());
         HeadingBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: heading_state::State> HeadingBuilder<'a, S> {
+impl<S: BosStr, St: heading_state::State> HeadingBuilder<S, St> {
     /// Set the `textAlign` field (optional)
     pub fn text_align(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -215,14 +215,14 @@ impl<'a, S: heading_state::State> HeadingBuilder<'a, S> {
     }
 }
 
-impl<'a, S> HeadingBuilder<'a, S>
+impl<S: BosStr, St> HeadingBuilder<S, St>
 where
-    S: heading_state::State,
-    S::Level: heading_state::IsSet,
-    S::Plaintext: heading_state::IsSet,
+    St: heading_state::State,
+    St::Plaintext: heading_state::IsSet,
+    St::Level: heading_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Heading<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Heading<S> {
         Heading {
             facets: self._fields.0,
             level: self._fields.1.unwrap(),
@@ -231,11 +231,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Heading<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Heading<S> {
         Heading {
             facets: self._fields.0,
             level: self._fields.1.unwrap(),

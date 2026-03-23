@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,11 +34,11 @@ use crate::app_chavatar::settings;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct AvatarItem<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct AvatarItem<S: BosStr = DefaultStr> {
     pub id: S,
     pub image: StrongRef<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -53,11 +53,11 @@ pub struct AvatarItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     rename = "app.chavatar.settings",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Settings<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Settings<S: BosStr = DefaultStr> {
     pub avatars: Vec<settings::AvatarItem<S>>,
     pub enabled: bool,
     pub interval: SettingsInterval<S>,
@@ -68,7 +68,7 @@ pub struct Settings<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum SettingsInterval<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum SettingsInterval<S: BosStr = DefaultStr> {
     _1h,
     _3h,
     _6h,
@@ -79,7 +79,7 @@ pub enum SettingsInterval<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> SettingsInterval<S> {
+impl<S: BosStr> SettingsInterval<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::_1h => "1h",
@@ -107,19 +107,19 @@ impl<S: Bos<str> + AsRef<str>> SettingsInterval<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for SettingsInterval<S> {
+impl<S: BosStr> core::fmt::Display for SettingsInterval<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for SettingsInterval<S> {
+impl<S: BosStr> AsRef<str> for SettingsInterval<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for SettingsInterval<S> {
+impl<S: BosStr> Serialize for SettingsInterval<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -128,8 +128,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for SettingsInterval<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for SettingsInterval<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for SettingsInterval<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -139,14 +138,18 @@ for SettingsInterval<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for SettingsInterval<S> {
+impl<S: BosStr + Default> Default for SettingsInterval<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for SettingsInterval<S> {
-    type Output = SettingsInterval<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for SettingsInterval<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = SettingsInterval<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             SettingsInterval::_1h => SettingsInterval::_1h,
@@ -163,13 +166,13 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for SettingsInterval<S> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum SettingsMode<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum SettingsMode<S: BosStr = DefaultStr> {
     Sequential,
     Random,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> SettingsMode<S> {
+impl<S: BosStr> SettingsMode<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Sequential => "sequential",
@@ -187,19 +190,19 @@ impl<S: Bos<str> + AsRef<str>> SettingsMode<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for SettingsMode<S> {
+impl<S: BosStr> core::fmt::Display for SettingsMode<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for SettingsMode<S> {
+impl<S: BosStr> AsRef<str> for SettingsMode<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for SettingsMode<S> {
+impl<S: BosStr> Serialize for SettingsMode<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -208,8 +211,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for SettingsMode<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for SettingsMode<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for SettingsMode<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -219,14 +221,18 @@ for SettingsMode<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for SettingsMode<S> {
+impl<S: BosStr + Default> Default for SettingsMode<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for SettingsMode<S> {
-    type Output = SettingsMode<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for SettingsMode<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = SettingsMode<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             SettingsMode::Sequential => SettingsMode::Sequential,
@@ -242,24 +248,24 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for SettingsMode<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SettingsGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SettingsGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Settings<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Settings<S> {
+impl<S: BosStr> Settings<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, SettingsRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for AvatarItem<S> {
+impl<S: BosStr> LexiconSchema for AvatarItem<S> {
     fn nsid() -> &'static str {
         "app.chavatar.settings"
     }
@@ -292,17 +298,17 @@ pub struct SettingsRecord;
 impl XrpcResp for SettingsRecord {
     const NSID: &'static str = "app.chavatar.settings";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = SettingsGetRecordOutput<S>;
+    type Output<S: BosStr> = SettingsGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<SettingsGetRecordOutput<S>> for Settings<S> {
+impl<S: BosStr> From<SettingsGetRecordOutput<S>> for Settings<S> {
     fn from(output: SettingsGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Settings<S> {
+impl<S: BosStr> Collection for Settings<S> {
     const NSID: &'static str = "app.chavatar.settings";
     type Record = SettingsRecord;
 }
@@ -312,7 +318,7 @@ impl Collection for SettingsRecord {
     type Record = SettingsRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Settings<S> {
+impl<S: BosStr> LexiconSchema for Settings<S> {
     fn nsid() -> &'static str {
         "app.chavatar.settings"
     }
@@ -370,17 +376,17 @@ pub mod avatar_item_state {
         type Id = Unset;
     }
     ///State transition - sets the `image` field to Set
-    pub struct SetImage<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetImage<S> {}
-    impl<S: State> State for SetImage<S> {
+    pub struct SetImage<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetImage<St> {}
+    impl<St: State> State for SetImage<St> {
         type Image = Set<members::image>;
-        type Id = S::Id;
+        type Id = St::Id;
     }
     ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type Image = S::Image;
+    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetId<St> {}
+    impl<St: State> State for SetId<St> {
+        type Image = St::Image;
         type Id = Set<members::id>;
     }
     /// Marker types for field names
@@ -393,88 +399,88 @@ pub mod avatar_item_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct AvatarItemBuilder<'a, S: avatar_item_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct AvatarItemBuilder<S: BosStr, St: avatar_item_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<StrongRef<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> AvatarItem<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> AvatarItemBuilder<'a, avatar_item_state::Empty> {
+impl<S: BosStr> AvatarItem<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> AvatarItemBuilder<S, avatar_item_state::Empty> {
         AvatarItemBuilder::new()
     }
 }
 
-impl<'a> AvatarItemBuilder<'a, avatar_item_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> AvatarItemBuilder<S, avatar_item_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         AvatarItemBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AvatarItemBuilder<'a, S>
+impl<S: BosStr, St> AvatarItemBuilder<S, St>
 where
-    S: avatar_item_state::State,
-    S::Id: avatar_item_state::IsUnset,
+    St: avatar_item_state::State,
+    St::Id: avatar_item_state::IsUnset,
 {
     /// Set the `id` field (required)
     pub fn id(
         mut self,
         value: impl Into<S>,
-    ) -> AvatarItemBuilder<'a, avatar_item_state::SetId<S>> {
+    ) -> AvatarItemBuilder<S, avatar_item_state::SetId<St>> {
         self._fields.0 = Option::Some(value.into());
         AvatarItemBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AvatarItemBuilder<'a, S>
+impl<S: BosStr, St> AvatarItemBuilder<S, St>
 where
-    S: avatar_item_state::State,
-    S::Image: avatar_item_state::IsUnset,
+    St: avatar_item_state::State,
+    St::Image: avatar_item_state::IsUnset,
 {
     /// Set the `image` field (required)
     pub fn image(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> AvatarItemBuilder<'a, avatar_item_state::SetImage<S>> {
+    ) -> AvatarItemBuilder<S, avatar_item_state::SetImage<St>> {
         self._fields.1 = Option::Some(value.into());
         AvatarItemBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AvatarItemBuilder<'a, S>
+impl<S: BosStr, St> AvatarItemBuilder<S, St>
 where
-    S: avatar_item_state::State,
-    S::Image: avatar_item_state::IsSet,
-    S::Id: avatar_item_state::IsSet,
+    St: avatar_item_state::State,
+    St::Image: avatar_item_state::IsSet,
+    St::Id: avatar_item_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> AvatarItem<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> AvatarItem<S> {
         AvatarItem {
             id: self._fields.0.unwrap(),
             image: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> AvatarItem<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> AvatarItem<S> {
         AvatarItem {
             id: self._fields.0.unwrap(),
             image: self._fields.1.unwrap(),
@@ -592,186 +598,186 @@ pub mod settings_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Enabled;
-        type Mode;
         type Avatars;
+        type Mode;
+        type Enabled;
         type Interval;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Enabled = Unset;
-        type Mode = Unset;
         type Avatars = Unset;
+        type Mode = Unset;
+        type Enabled = Unset;
         type Interval = Unset;
     }
-    ///State transition - sets the `enabled` field to Set
-    pub struct SetEnabled<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEnabled<S> {}
-    impl<S: State> State for SetEnabled<S> {
-        type Enabled = Set<members::enabled>;
-        type Mode = S::Mode;
-        type Avatars = S::Avatars;
-        type Interval = S::Interval;
+    ///State transition - sets the `avatars` field to Set
+    pub struct SetAvatars<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAvatars<St> {}
+    impl<St: State> State for SetAvatars<St> {
+        type Avatars = Set<members::avatars>;
+        type Mode = St::Mode;
+        type Enabled = St::Enabled;
+        type Interval = St::Interval;
     }
     ///State transition - sets the `mode` field to Set
-    pub struct SetMode<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMode<S> {}
-    impl<S: State> State for SetMode<S> {
-        type Enabled = S::Enabled;
+    pub struct SetMode<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMode<St> {}
+    impl<St: State> State for SetMode<St> {
+        type Avatars = St::Avatars;
         type Mode = Set<members::mode>;
-        type Avatars = S::Avatars;
-        type Interval = S::Interval;
+        type Enabled = St::Enabled;
+        type Interval = St::Interval;
     }
-    ///State transition - sets the `avatars` field to Set
-    pub struct SetAvatars<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAvatars<S> {}
-    impl<S: State> State for SetAvatars<S> {
-        type Enabled = S::Enabled;
-        type Mode = S::Mode;
-        type Avatars = Set<members::avatars>;
-        type Interval = S::Interval;
+    ///State transition - sets the `enabled` field to Set
+    pub struct SetEnabled<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetEnabled<St> {}
+    impl<St: State> State for SetEnabled<St> {
+        type Avatars = St::Avatars;
+        type Mode = St::Mode;
+        type Enabled = Set<members::enabled>;
+        type Interval = St::Interval;
     }
     ///State transition - sets the `interval` field to Set
-    pub struct SetInterval<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetInterval<S> {}
-    impl<S: State> State for SetInterval<S> {
-        type Enabled = S::Enabled;
-        type Mode = S::Mode;
-        type Avatars = S::Avatars;
+    pub struct SetInterval<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetInterval<St> {}
+    impl<St: State> State for SetInterval<St> {
+        type Avatars = St::Avatars;
+        type Mode = St::Mode;
+        type Enabled = St::Enabled;
         type Interval = Set<members::interval>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `enabled` field
-        pub struct enabled(());
-        ///Marker type for the `mode` field
-        pub struct mode(());
         ///Marker type for the `avatars` field
         pub struct avatars(());
+        ///Marker type for the `mode` field
+        pub struct mode(());
+        ///Marker type for the `enabled` field
+        pub struct enabled(());
         ///Marker type for the `interval` field
         pub struct interval(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct SettingsBuilder<'a, S: settings_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct SettingsBuilder<S: BosStr, St: settings_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<settings::AvatarItem<S>>>,
         Option<bool>,
         Option<SettingsInterval<S>>,
         Option<SettingsMode<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Settings<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> SettingsBuilder<'a, settings_state::Empty> {
+impl<S: BosStr> Settings<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> SettingsBuilder<S, settings_state::Empty> {
         SettingsBuilder::new()
     }
 }
 
-impl<'a> SettingsBuilder<'a, settings_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> SettingsBuilder<S, settings_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SettingsBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SettingsBuilder<'a, S>
+impl<S: BosStr, St> SettingsBuilder<S, St>
 where
-    S: settings_state::State,
-    S::Avatars: settings_state::IsUnset,
+    St: settings_state::State,
+    St::Avatars: settings_state::IsUnset,
 {
     /// Set the `avatars` field (required)
     pub fn avatars(
         mut self,
         value: impl Into<Vec<settings::AvatarItem<S>>>,
-    ) -> SettingsBuilder<'a, settings_state::SetAvatars<S>> {
+    ) -> SettingsBuilder<S, settings_state::SetAvatars<St>> {
         self._fields.0 = Option::Some(value.into());
         SettingsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SettingsBuilder<'a, S>
+impl<S: BosStr, St> SettingsBuilder<S, St>
 where
-    S: settings_state::State,
-    S::Enabled: settings_state::IsUnset,
+    St: settings_state::State,
+    St::Enabled: settings_state::IsUnset,
 {
     /// Set the `enabled` field (required)
     pub fn enabled(
         mut self,
         value: impl Into<bool>,
-    ) -> SettingsBuilder<'a, settings_state::SetEnabled<S>> {
+    ) -> SettingsBuilder<S, settings_state::SetEnabled<St>> {
         self._fields.1 = Option::Some(value.into());
         SettingsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SettingsBuilder<'a, S>
+impl<S: BosStr, St> SettingsBuilder<S, St>
 where
-    S: settings_state::State,
-    S::Interval: settings_state::IsUnset,
+    St: settings_state::State,
+    St::Interval: settings_state::IsUnset,
 {
     /// Set the `interval` field (required)
     pub fn interval(
         mut self,
         value: impl Into<SettingsInterval<S>>,
-    ) -> SettingsBuilder<'a, settings_state::SetInterval<S>> {
+    ) -> SettingsBuilder<S, settings_state::SetInterval<St>> {
         self._fields.2 = Option::Some(value.into());
         SettingsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SettingsBuilder<'a, S>
+impl<S: BosStr, St> SettingsBuilder<S, St>
 where
-    S: settings_state::State,
-    S::Mode: settings_state::IsUnset,
+    St: settings_state::State,
+    St::Mode: settings_state::IsUnset,
 {
     /// Set the `mode` field (required)
     pub fn mode(
         mut self,
         value: impl Into<SettingsMode<S>>,
-    ) -> SettingsBuilder<'a, settings_state::SetMode<S>> {
+    ) -> SettingsBuilder<S, settings_state::SetMode<St>> {
         self._fields.3 = Option::Some(value.into());
         SettingsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SettingsBuilder<'a, S>
+impl<S: BosStr, St> SettingsBuilder<S, St>
 where
-    S: settings_state::State,
-    S::Enabled: settings_state::IsSet,
-    S::Mode: settings_state::IsSet,
-    S::Avatars: settings_state::IsSet,
-    S::Interval: settings_state::IsSet,
+    St: settings_state::State,
+    St::Avatars: settings_state::IsSet,
+    St::Mode: settings_state::IsSet,
+    St::Enabled: settings_state::IsSet,
+    St::Interval: settings_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Settings<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Settings<S> {
         Settings {
             avatars: self._fields.0.unwrap(),
             enabled: self._fields.1.unwrap(),
@@ -780,11 +786,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Settings<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Settings<S> {
         Settings {
             avatars: self._fields.0.unwrap(),
             enabled: self._fields.1.unwrap(),

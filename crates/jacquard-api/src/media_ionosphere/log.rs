@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use crate::media_ionosphere::Track;
     rename = "media.ionosphere.log",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Log<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Log<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     ///Version identifier
     pub ionosphere: S,
@@ -58,18 +58,18 @@ pub struct Log<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct LogGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct LogGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Log<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Log<S> {
+impl<S: BosStr> Log<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, LogRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -82,17 +82,17 @@ pub struct LogRecord;
 impl XrpcResp for LogRecord {
     const NSID: &'static str = "media.ionosphere.log";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = LogGetRecordOutput<S>;
+    type Output<S: BosStr> = LogGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<LogGetRecordOutput<S>> for Log<S> {
+impl<S: BosStr> From<LogGetRecordOutput<S>> for Log<S> {
     fn from(output: LogGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Log<S> {
+impl<S: BosStr> Collection for Log<S> {
     const NSID: &'static str = "media.ionosphere.log";
     type Record = LogRecord;
 }
@@ -102,7 +102,7 @@ impl Collection for LogRecord {
     type Record = LogRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Log<S> {
+impl<S: BosStr> LexiconSchema for Log<S> {
     fn nsid() -> &'static str {
         "media.ionosphere.log"
     }
@@ -151,27 +151,27 @@ pub mod log_state {
         type Item = Unset;
     }
     ///State transition - sets the `ionosphere` field to Set
-    pub struct SetIonosphere<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIonosphere<S> {}
-    impl<S: State> State for SetIonosphere<S> {
+    pub struct SetIonosphere<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIonosphere<St> {}
+    impl<St: State> State for SetIonosphere<St> {
         type Ionosphere = Set<members::ionosphere>;
-        type CreatedAt = S::CreatedAt;
-        type Item = S::Item;
+        type CreatedAt = St::CreatedAt;
+        type Item = St::Item;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Ionosphere = S::Ionosphere;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Ionosphere = St::Ionosphere;
         type CreatedAt = Set<members::created_at>;
-        type Item = S::Item;
+        type Item = St::Item;
     }
     ///State transition - sets the `item` field to Set
-    pub struct SetItem<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetItem<S> {}
-    impl<S: State> State for SetItem<S> {
-        type Ionosphere = S::Ionosphere;
-        type CreatedAt = S::CreatedAt;
+    pub struct SetItem<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetItem<St> {}
+    impl<St: State> State for SetItem<St> {
+        type Ionosphere = St::Ionosphere;
+        type CreatedAt = St::CreatedAt;
         type Item = Set<members::item>;
     }
     /// Marker types for field names
@@ -186,89 +186,89 @@ pub mod log_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct LogBuilder<'a, S: log_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct LogBuilder<S: BosStr, St: log_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<S>, Option<Track<S>>, Option<AtUri<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Log<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> LogBuilder<'a, log_state::Empty> {
+impl<S: BosStr> Log<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> LogBuilder<S, log_state::Empty> {
         LogBuilder::new()
     }
 }
 
-impl<'a> LogBuilder<'a, log_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> LogBuilder<S, log_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         LogBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LogBuilder<'a, S>
+impl<S: BosStr, St> LogBuilder<S, St>
 where
-    S: log_state::State,
-    S::CreatedAt: log_state::IsUnset,
+    St: log_state::State,
+    St::CreatedAt: log_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> LogBuilder<'a, log_state::SetCreatedAt<S>> {
+    ) -> LogBuilder<S, log_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         LogBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LogBuilder<'a, S>
+impl<S: BosStr, St> LogBuilder<S, St>
 where
-    S: log_state::State,
-    S::Ionosphere: log_state::IsUnset,
+    St: log_state::State,
+    St::Ionosphere: log_state::IsUnset,
 {
     /// Set the `ionosphere` field (required)
     pub fn ionosphere(
         mut self,
         value: impl Into<S>,
-    ) -> LogBuilder<'a, log_state::SetIonosphere<S>> {
+    ) -> LogBuilder<S, log_state::SetIonosphere<St>> {
         self._fields.1 = Option::Some(value.into());
         LogBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LogBuilder<'a, S>
+impl<S: BosStr, St> LogBuilder<S, St>
 where
-    S: log_state::State,
-    S::Item: log_state::IsUnset,
+    St: log_state::State,
+    St::Item: log_state::IsUnset,
 {
     /// Set the `item` field (required)
     pub fn item(
         mut self,
         value: impl Into<Track<S>>,
-    ) -> LogBuilder<'a, log_state::SetItem<S>> {
+    ) -> LogBuilder<S, log_state::SetItem<St>> {
         self._fields.2 = Option::Some(value.into());
         LogBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: log_state::State> LogBuilder<'a, S> {
+impl<S: BosStr, St: log_state::State> LogBuilder<S, St> {
     /// Set the `programme` field (optional)
     pub fn programme(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -281,15 +281,15 @@ impl<'a, S: log_state::State> LogBuilder<'a, S> {
     }
 }
 
-impl<'a, S> LogBuilder<'a, S>
+impl<S: BosStr, St> LogBuilder<S, St>
 where
-    S: log_state::State,
-    S::Ionosphere: log_state::IsSet,
-    S::CreatedAt: log_state::IsSet,
-    S::Item: log_state::IsSet,
+    St: log_state::State,
+    St::Ionosphere: log_state::IsSet,
+    St::CreatedAt: log_state::IsSet,
+    St::Item: log_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Log<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Log<S> {
         Log {
             created_at: self._fields.0.unwrap(),
             ionosphere: self._fields.1.unwrap(),
@@ -298,8 +298,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Log<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Log<S> {
         Log {
             created_at: self._fields.0.unwrap(),
             ionosphere: self._fields.1.unwrap(),

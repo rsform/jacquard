@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "ch.indiemusi.alpha.actor.masterOwner",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct MasterOwner<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct MasterOwner<S: BosStr = DefaultStr> {
     pub name: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -51,18 +51,18 @@ pub struct MasterOwner<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct MasterOwnerGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct MasterOwnerGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: MasterOwner<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> MasterOwner<S> {
+impl<S: BosStr> MasterOwner<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, MasterOwnerRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -75,17 +75,17 @@ pub struct MasterOwnerRecord;
 impl XrpcResp for MasterOwnerRecord {
     const NSID: &'static str = "ch.indiemusi.alpha.actor.masterOwner";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = MasterOwnerGetRecordOutput<S>;
+    type Output<S: BosStr> = MasterOwnerGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<MasterOwnerGetRecordOutput<S>> for MasterOwner<S> {
+impl<S: BosStr> From<MasterOwnerGetRecordOutput<S>> for MasterOwner<S> {
     fn from(output: MasterOwnerGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for MasterOwner<S> {
+impl<S: BosStr> Collection for MasterOwner<S> {
     const NSID: &'static str = "ch.indiemusi.alpha.actor.masterOwner";
     type Record = MasterOwnerRecord;
 }
@@ -95,7 +95,7 @@ impl Collection for MasterOwnerRecord {
     type Record = MasterOwnerRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for MasterOwner<S> {
+impl<S: BosStr> LexiconSchema for MasterOwner<S> {
     fn nsid() -> &'static str {
         "ch.indiemusi.alpha.actor.masterOwner"
     }
@@ -140,9 +140,9 @@ pub mod master_owner_state {
         type Name = Unset;
     }
     ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
         type Name = Set<members::name>;
     }
     /// Marker types for field names
@@ -153,67 +153,67 @@ pub mod master_owner_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct MasterOwnerBuilder<'a, S: master_owner_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct MasterOwnerBuilder<S: BosStr, St: master_owner_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> MasterOwner<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> MasterOwnerBuilder<'a, master_owner_state::Empty> {
+impl<S: BosStr> MasterOwner<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> MasterOwnerBuilder<S, master_owner_state::Empty> {
         MasterOwnerBuilder::new()
     }
 }
 
-impl<'a> MasterOwnerBuilder<'a, master_owner_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> MasterOwnerBuilder<S, master_owner_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         MasterOwnerBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> MasterOwnerBuilder<'a, S>
+impl<S: BosStr, St> MasterOwnerBuilder<S, St>
 where
-    S: master_owner_state::State,
-    S::Name: master_owner_state::IsUnset,
+    St: master_owner_state::State,
+    St::Name: master_owner_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> MasterOwnerBuilder<'a, master_owner_state::SetName<S>> {
+    ) -> MasterOwnerBuilder<S, master_owner_state::SetName<St>> {
         self._fields.0 = Option::Some(value.into());
         MasterOwnerBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> MasterOwnerBuilder<'a, S>
+impl<S: BosStr, St> MasterOwnerBuilder<S, St>
 where
-    S: master_owner_state::State,
-    S::Name: master_owner_state::IsSet,
+    St: master_owner_state::State,
+    St::Name: master_owner_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> MasterOwner<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> MasterOwner<S> {
         MasterOwner {
             name: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> MasterOwner<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> MasterOwner<S> {
         MasterOwner {
             name: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

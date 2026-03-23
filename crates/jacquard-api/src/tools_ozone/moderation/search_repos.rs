@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
@@ -18,45 +18,40 @@ use serde::{Serialize, Deserialize};
 use crate::tools_ozone::moderation::RepoView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SearchRepos<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SearchRepos<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub cursor: Option<S>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub q: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub term: Option<S>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SearchReposOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SearchReposOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
     pub repos: Vec<RepoView<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -65,12 +60,11 @@ pub struct SearchReposResponse;
 impl jacquard_common::xrpc::XrpcResp for SearchReposResponse {
     const NSID: &'static str = "tools.ozone.moderation.searchRepos";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = SearchReposOutput<S>;
+    type Output<S: BosStr> = SearchReposOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for SearchRepos<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for SearchRepos<S> {
     const NSID: &'static str = "tools.ozone.moderation.searchRepos";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = SearchReposResponse;
@@ -81,7 +75,7 @@ pub struct SearchReposRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SearchReposRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.moderation.searchRepos";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = SearchRepos<S>;
+    type Request<S: BosStr> = SearchRepos<S>;
     type Response = SearchReposResponse;
 }
 
@@ -108,32 +102,32 @@ pub mod search_repos_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct SearchReposBuilder<'a, S: search_repos_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct SearchReposBuilder<S: BosStr, St: search_repos_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>, Option<S>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> SearchRepos<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> SearchReposBuilder<'a, search_repos_state::Empty> {
+impl<S: BosStr> SearchRepos<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> SearchReposBuilder<S, search_repos_state::Empty> {
         SearchReposBuilder::new()
     }
 }
 
-impl<'a> SearchReposBuilder<'a, search_repos_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> SearchReposBuilder<S, search_repos_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SearchReposBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: search_repos_state::State> SearchReposBuilder<'a, S> {
+impl<S: BosStr, St: search_repos_state::State> SearchReposBuilder<S, St> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -146,7 +140,7 @@ impl<'a, S: search_repos_state::State> SearchReposBuilder<'a, S> {
     }
 }
 
-impl<'a, S: search_repos_state::State> SearchReposBuilder<'a, S> {
+impl<S: BosStr, St: search_repos_state::State> SearchReposBuilder<S, St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -159,7 +153,7 @@ impl<'a, S: search_repos_state::State> SearchReposBuilder<'a, S> {
     }
 }
 
-impl<'a, S: search_repos_state::State> SearchReposBuilder<'a, S> {
+impl<S: BosStr, St: search_repos_state::State> SearchReposBuilder<S, St> {
     /// Set the `q` field (optional)
     pub fn q(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -172,7 +166,7 @@ impl<'a, S: search_repos_state::State> SearchReposBuilder<'a, S> {
     }
 }
 
-impl<'a, S: search_repos_state::State> SearchReposBuilder<'a, S> {
+impl<S: BosStr, St: search_repos_state::State> SearchReposBuilder<S, St> {
     /// Set the `term` field (optional)
     pub fn term(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -185,12 +179,12 @@ impl<'a, S: search_repos_state::State> SearchReposBuilder<'a, S> {
     }
 }
 
-impl<'a, S> SearchReposBuilder<'a, S>
+impl<S: BosStr, St> SearchReposBuilder<S, St>
 where
-    S: search_repos_state::State,
+    St: search_repos_state::State,
 {
-    /// Build the final struct
-    pub fn build(self) -> SearchRepos<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> SearchRepos<S> {
         SearchRepos {
             cursor: self._fields.0,
             limit: self._fields.1,

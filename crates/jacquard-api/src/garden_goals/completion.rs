@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use serde::{Serialize, Deserialize};
     rename = "garden.goals.completion",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Completion<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Completion<S: BosStr = DefaultStr> {
     ///Timestamp when the completion was recorded
     pub completed_at: Datetime,
     ///Day of the completion (1-31)
@@ -73,18 +73,18 @@ pub struct Completion<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CompletionGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CompletionGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Completion<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Completion<S> {
+impl<S: BosStr> Completion<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, CompletionRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -97,17 +97,17 @@ pub struct CompletionRecord;
 impl XrpcResp for CompletionRecord {
     const NSID: &'static str = "garden.goals.completion";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = CompletionGetRecordOutput<S>;
+    type Output<S: BosStr> = CompletionGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<CompletionGetRecordOutput<S>> for Completion<S> {
+impl<S: BosStr> From<CompletionGetRecordOutput<S>> for Completion<S> {
     fn from(output: CompletionGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Completion<S> {
+impl<S: BosStr> Collection for Completion<S> {
     const NSID: &'static str = "garden.goals.completion";
     type Record = CompletionRecord;
 }
@@ -117,7 +117,7 @@ impl Collection for CompletionRecord {
     type Record = CompletionRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Completion<S> {
+impl<S: BosStr> LexiconSchema for Completion<S> {
     fn nsid() -> &'static str {
         "garden.goals.completion"
     }
@@ -260,91 +260,91 @@ pub mod completion_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Month;
-        type GoalId;
         type Day;
         type CompletedAt;
+        type GoalId;
         type Year;
+        type Month;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Month = Unset;
-        type GoalId = Unset;
         type Day = Unset;
         type CompletedAt = Unset;
+        type GoalId = Unset;
         type Year = Unset;
-    }
-    ///State transition - sets the `month` field to Set
-    pub struct SetMonth<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMonth<S> {}
-    impl<S: State> State for SetMonth<S> {
-        type Month = Set<members::month>;
-        type GoalId = S::GoalId;
-        type Day = S::Day;
-        type CompletedAt = S::CompletedAt;
-        type Year = S::Year;
-    }
-    ///State transition - sets the `goal_id` field to Set
-    pub struct SetGoalId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGoalId<S> {}
-    impl<S: State> State for SetGoalId<S> {
-        type Month = S::Month;
-        type GoalId = Set<members::goal_id>;
-        type Day = S::Day;
-        type CompletedAt = S::CompletedAt;
-        type Year = S::Year;
+        type Month = Unset;
     }
     ///State transition - sets the `day` field to Set
-    pub struct SetDay<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDay<S> {}
-    impl<S: State> State for SetDay<S> {
-        type Month = S::Month;
-        type GoalId = S::GoalId;
+    pub struct SetDay<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDay<St> {}
+    impl<St: State> State for SetDay<St> {
         type Day = Set<members::day>;
-        type CompletedAt = S::CompletedAt;
-        type Year = S::Year;
+        type CompletedAt = St::CompletedAt;
+        type GoalId = St::GoalId;
+        type Year = St::Year;
+        type Month = St::Month;
     }
     ///State transition - sets the `completed_at` field to Set
-    pub struct SetCompletedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCompletedAt<S> {}
-    impl<S: State> State for SetCompletedAt<S> {
-        type Month = S::Month;
-        type GoalId = S::GoalId;
-        type Day = S::Day;
+    pub struct SetCompletedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCompletedAt<St> {}
+    impl<St: State> State for SetCompletedAt<St> {
+        type Day = St::Day;
         type CompletedAt = Set<members::completed_at>;
-        type Year = S::Year;
+        type GoalId = St::GoalId;
+        type Year = St::Year;
+        type Month = St::Month;
+    }
+    ///State transition - sets the `goal_id` field to Set
+    pub struct SetGoalId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetGoalId<St> {}
+    impl<St: State> State for SetGoalId<St> {
+        type Day = St::Day;
+        type CompletedAt = St::CompletedAt;
+        type GoalId = Set<members::goal_id>;
+        type Year = St::Year;
+        type Month = St::Month;
     }
     ///State transition - sets the `year` field to Set
-    pub struct SetYear<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetYear<S> {}
-    impl<S: State> State for SetYear<S> {
-        type Month = S::Month;
-        type GoalId = S::GoalId;
-        type Day = S::Day;
-        type CompletedAt = S::CompletedAt;
+    pub struct SetYear<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetYear<St> {}
+    impl<St: State> State for SetYear<St> {
+        type Day = St::Day;
+        type CompletedAt = St::CompletedAt;
+        type GoalId = St::GoalId;
         type Year = Set<members::year>;
+        type Month = St::Month;
+    }
+    ///State transition - sets the `month` field to Set
+    pub struct SetMonth<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMonth<St> {}
+    impl<St: State> State for SetMonth<St> {
+        type Day = St::Day;
+        type CompletedAt = St::CompletedAt;
+        type GoalId = St::GoalId;
+        type Year = St::Year;
+        type Month = Set<members::month>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `month` field
-        pub struct month(());
-        ///Marker type for the `goal_id` field
-        pub struct goal_id(());
         ///Marker type for the `day` field
         pub struct day(());
         ///Marker type for the `completed_at` field
         pub struct completed_at(());
+        ///Marker type for the `goal_id` field
+        pub struct goal_id(());
         ///Marker type for the `year` field
         pub struct year(());
+        ///Marker type for the `month` field
+        pub struct month(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct CompletionBuilder<'a, S: completion_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct CompletionBuilder<S: BosStr, St: completion_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
         Option<i64>,
@@ -356,85 +356,85 @@ pub struct CompletionBuilder<'a, S: completion_state::State> {
         Option<i64>,
         Option<i64>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Completion<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> CompletionBuilder<'a, completion_state::Empty> {
+impl<S: BosStr> Completion<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> CompletionBuilder<S, completion_state::Empty> {
         CompletionBuilder::new()
     }
 }
 
-impl<'a> CompletionBuilder<'a, completion_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> CompletionBuilder<S, completion_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         CompletionBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CompletionBuilder<'a, S>
+impl<S: BosStr, St> CompletionBuilder<S, St>
 where
-    S: completion_state::State,
-    S::CompletedAt: completion_state::IsUnset,
+    St: completion_state::State,
+    St::CompletedAt: completion_state::IsUnset,
 {
     /// Set the `completedAt` field (required)
     pub fn completed_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> CompletionBuilder<'a, completion_state::SetCompletedAt<S>> {
+    ) -> CompletionBuilder<S, completion_state::SetCompletedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         CompletionBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CompletionBuilder<'a, S>
+impl<S: BosStr, St> CompletionBuilder<S, St>
 where
-    S: completion_state::State,
-    S::Day: completion_state::IsUnset,
+    St: completion_state::State,
+    St::Day: completion_state::IsUnset,
 {
     /// Set the `day` field (required)
     pub fn day(
         mut self,
         value: impl Into<i64>,
-    ) -> CompletionBuilder<'a, completion_state::SetDay<S>> {
+    ) -> CompletionBuilder<S, completion_state::SetDay<St>> {
         self._fields.1 = Option::Some(value.into());
         CompletionBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CompletionBuilder<'a, S>
+impl<S: BosStr, St> CompletionBuilder<S, St>
 where
-    S: completion_state::State,
-    S::GoalId: completion_state::IsUnset,
+    St: completion_state::State,
+    St::GoalId: completion_state::IsUnset,
 {
     /// Set the `goalId` field (required)
     pub fn goal_id(
         mut self,
         value: impl Into<S>,
-    ) -> CompletionBuilder<'a, completion_state::SetGoalId<S>> {
+    ) -> CompletionBuilder<S, completion_state::SetGoalId<St>> {
         self._fields.2 = Option::Some(value.into());
         CompletionBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: completion_state::State> CompletionBuilder<'a, S> {
+impl<S: BosStr, St: completion_state::State> CompletionBuilder<S, St> {
     /// Set the `goalUri` field (optional)
     pub fn goal_uri(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -447,26 +447,26 @@ impl<'a, S: completion_state::State> CompletionBuilder<'a, S> {
     }
 }
 
-impl<'a, S> CompletionBuilder<'a, S>
+impl<S: BosStr, St> CompletionBuilder<S, St>
 where
-    S: completion_state::State,
-    S::Month: completion_state::IsUnset,
+    St: completion_state::State,
+    St::Month: completion_state::IsUnset,
 {
     /// Set the `month` field (required)
     pub fn month(
         mut self,
         value: impl Into<i64>,
-    ) -> CompletionBuilder<'a, completion_state::SetMonth<S>> {
+    ) -> CompletionBuilder<S, completion_state::SetMonth<St>> {
         self._fields.4 = Option::Some(value.into());
         CompletionBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: completion_state::State> CompletionBuilder<'a, S> {
+impl<S: BosStr, St: completion_state::State> CompletionBuilder<S, St> {
     /// Set the `notes` field (optional)
     pub fn notes(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
@@ -479,7 +479,7 @@ impl<'a, S: completion_state::State> CompletionBuilder<'a, S> {
     }
 }
 
-impl<'a, S: completion_state::State> CompletionBuilder<'a, S> {
+impl<S: BosStr, St: completion_state::State> CompletionBuilder<S, St> {
     /// Set the `photoBlob` field (optional)
     pub fn photo_blob(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -492,7 +492,7 @@ impl<'a, S: completion_state::State> CompletionBuilder<'a, S> {
     }
 }
 
-impl<'a, S: completion_state::State> CompletionBuilder<'a, S> {
+impl<S: BosStr, St: completion_state::State> CompletionBuilder<S, St> {
     /// Set the `sequenceNum` field (optional)
     pub fn sequence_num(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.7 = value.into();
@@ -505,36 +505,36 @@ impl<'a, S: completion_state::State> CompletionBuilder<'a, S> {
     }
 }
 
-impl<'a, S> CompletionBuilder<'a, S>
+impl<S: BosStr, St> CompletionBuilder<S, St>
 where
-    S: completion_state::State,
-    S::Year: completion_state::IsUnset,
+    St: completion_state::State,
+    St::Year: completion_state::IsUnset,
 {
     /// Set the `year` field (required)
     pub fn year(
         mut self,
         value: impl Into<i64>,
-    ) -> CompletionBuilder<'a, completion_state::SetYear<S>> {
+    ) -> CompletionBuilder<S, completion_state::SetYear<St>> {
         self._fields.8 = Option::Some(value.into());
         CompletionBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CompletionBuilder<'a, S>
+impl<S: BosStr, St> CompletionBuilder<S, St>
 where
-    S: completion_state::State,
-    S::Month: completion_state::IsSet,
-    S::GoalId: completion_state::IsSet,
-    S::Day: completion_state::IsSet,
-    S::CompletedAt: completion_state::IsSet,
-    S::Year: completion_state::IsSet,
+    St: completion_state::State,
+    St::Day: completion_state::IsSet,
+    St::CompletedAt: completion_state::IsSet,
+    St::GoalId: completion_state::IsSet,
+    St::Year: completion_state::IsSet,
+    St::Month: completion_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Completion<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Completion<S> {
         Completion {
             completed_at: self._fields.0.unwrap(),
             day: self._fields.1.unwrap(),
@@ -548,11 +548,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Completion<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Completion<S> {
         Completion {
             completed_at: self._fields.0.unwrap(),
             day: self._fields.1.unwrap(),

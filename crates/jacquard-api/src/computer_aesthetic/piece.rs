@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "computer.aesthetic.piece",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Piece<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Piece<S: BosStr = DefaultStr> {
     ///MongoDB ObjectId reference for bidirectional sync
     pub r#ref: S,
     ///The piece identifier (e.g., 'wand')
@@ -56,18 +56,18 @@ pub struct Piece<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct PieceGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct PieceGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Piece<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Piece<S> {
+impl<S: BosStr> Piece<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, PieceRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -80,17 +80,17 @@ pub struct PieceRecord;
 impl XrpcResp for PieceRecord {
     const NSID: &'static str = "computer.aesthetic.piece";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = PieceGetRecordOutput<S>;
+    type Output<S: BosStr> = PieceGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<PieceGetRecordOutput<S>> for Piece<S> {
+impl<S: BosStr> From<PieceGetRecordOutput<S>> for Piece<S> {
     fn from(output: PieceGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Piece<S> {
+impl<S: BosStr> Collection for Piece<S> {
     const NSID: &'static str = "computer.aesthetic.piece";
     type Record = PieceRecord;
 }
@@ -100,7 +100,7 @@ impl Collection for PieceRecord {
     type Record = PieceRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Piece<S> {
+impl<S: BosStr> LexiconSchema for Piece<S> {
     fn nsid() -> &'static str {
         "computer.aesthetic.piece"
     }
@@ -147,145 +147,145 @@ pub mod piece_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type When;
         type Slug;
+        type When;
         type Ref;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type When = Unset;
         type Slug = Unset;
+        type When = Unset;
         type Ref = Unset;
     }
-    ///State transition - sets the `when` field to Set
-    pub struct SetWhen<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWhen<S> {}
-    impl<S: State> State for SetWhen<S> {
-        type When = Set<members::when>;
-        type Slug = S::Slug;
-        type Ref = S::Ref;
-    }
     ///State transition - sets the `slug` field to Set
-    pub struct SetSlug<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSlug<S> {}
-    impl<S: State> State for SetSlug<S> {
-        type When = S::When;
+    pub struct SetSlug<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSlug<St> {}
+    impl<St: State> State for SetSlug<St> {
         type Slug = Set<members::slug>;
-        type Ref = S::Ref;
+        type When = St::When;
+        type Ref = St::Ref;
+    }
+    ///State transition - sets the `when` field to Set
+    pub struct SetWhen<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetWhen<St> {}
+    impl<St: State> State for SetWhen<St> {
+        type Slug = St::Slug;
+        type When = Set<members::when>;
+        type Ref = St::Ref;
     }
     ///State transition - sets the `ref` field to Set
-    pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRef<S> {}
-    impl<S: State> State for SetRef<S> {
-        type When = S::When;
-        type Slug = S::Slug;
+    pub struct SetRef<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRef<St> {}
+    impl<St: State> State for SetRef<St> {
+        type Slug = St::Slug;
+        type When = St::When;
         type Ref = Set<members::r#ref>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `when` field
-        pub struct when(());
         ///Marker type for the `slug` field
         pub struct slug(());
+        ///Marker type for the `when` field
+        pub struct when(());
         ///Marker type for the `ref` field
         pub struct r#ref(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct PieceBuilder<'a, S: piece_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct PieceBuilder<S: BosStr, St: piece_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>, Option<Datetime>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Piece<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> PieceBuilder<'a, piece_state::Empty> {
+impl<S: BosStr> Piece<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> PieceBuilder<S, piece_state::Empty> {
         PieceBuilder::new()
     }
 }
 
-impl<'a> PieceBuilder<'a, piece_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> PieceBuilder<S, piece_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         PieceBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PieceBuilder<'a, S>
+impl<S: BosStr, St> PieceBuilder<S, St>
 where
-    S: piece_state::State,
-    S::Ref: piece_state::IsUnset,
+    St: piece_state::State,
+    St::Ref: piece_state::IsUnset,
 {
     /// Set the `ref` field (required)
     pub fn r#ref(
         mut self,
         value: impl Into<S>,
-    ) -> PieceBuilder<'a, piece_state::SetRef<S>> {
+    ) -> PieceBuilder<S, piece_state::SetRef<St>> {
         self._fields.0 = Option::Some(value.into());
         PieceBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PieceBuilder<'a, S>
+impl<S: BosStr, St> PieceBuilder<S, St>
 where
-    S: piece_state::State,
-    S::Slug: piece_state::IsUnset,
+    St: piece_state::State,
+    St::Slug: piece_state::IsUnset,
 {
     /// Set the `slug` field (required)
     pub fn slug(
         mut self,
         value: impl Into<S>,
-    ) -> PieceBuilder<'a, piece_state::SetSlug<S>> {
+    ) -> PieceBuilder<S, piece_state::SetSlug<St>> {
         self._fields.1 = Option::Some(value.into());
         PieceBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PieceBuilder<'a, S>
+impl<S: BosStr, St> PieceBuilder<S, St>
 where
-    S: piece_state::State,
-    S::When: piece_state::IsUnset,
+    St: piece_state::State,
+    St::When: piece_state::IsUnset,
 {
     /// Set the `when` field (required)
     pub fn when(
         mut self,
         value: impl Into<Datetime>,
-    ) -> PieceBuilder<'a, piece_state::SetWhen<S>> {
+    ) -> PieceBuilder<S, piece_state::SetWhen<St>> {
         self._fields.2 = Option::Some(value.into());
         PieceBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PieceBuilder<'a, S>
+impl<S: BosStr, St> PieceBuilder<S, St>
 where
-    S: piece_state::State,
-    S::When: piece_state::IsSet,
-    S::Slug: piece_state::IsSet,
-    S::Ref: piece_state::IsSet,
+    St: piece_state::State,
+    St::Slug: piece_state::IsSet,
+    St::When: piece_state::IsSet,
+    St::Ref: piece_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Piece<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Piece<S> {
         Piece {
             r#ref: self._fields.0.unwrap(),
             slug: self._fields.1.unwrap(),
@@ -293,8 +293,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Piece<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Piece<S> {
         Piece {
             r#ref: self._fields.0.unwrap(),
             slug: self._fields.1.unwrap(),

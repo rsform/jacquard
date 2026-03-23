@@ -1573,6 +1573,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8f42a60cbdf9a97f5d2305f08a87dc4e09308d1276d28c869c684d7777685682"
 
 [[package]]
+name = "jacquard-api"
+version = "0.11.1"
+dependencies = [
+ "jacquard-common",
+ "jacquard-derive",
+ "jacquard-lexicon",
+ "miette",
+ "serde",
+ "thiserror 2.0.18",
+]
+
+[[package]]
 name = "jacquard-common"
 version = "0.11.0"
 dependencies = [

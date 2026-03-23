@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -33,11 +33,11 @@ use crate::download_darkworld::deltarune;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct LocationElsewhere<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct LocationElsewhere<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
@@ -47,11 +47,11 @@ pub struct LocationElsewhere<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct LocationHome<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct LocationHome<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
@@ -61,11 +61,11 @@ pub struct LocationHome<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct LocationMathTextbook<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct LocationMathTextbook<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
@@ -75,11 +75,11 @@ pub struct LocationMathTextbook<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct LocationOnSkin<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct LocationOnSkin<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
@@ -89,11 +89,11 @@ pub struct LocationOnSkin<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct LocationSchool<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct LocationSchool<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
@@ -106,11 +106,11 @@ pub struct LocationSchool<S: Bos<str> + AsRef<str> = DefaultStr> {
     rename = "download.darkworld.deltarune",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Deltarune<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Deltarune<S: BosStr = DefaultStr> {
     pub time: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tool: Option<DeltaruneTool<S>>,
@@ -126,11 +126,11 @@ pub struct Deltarune<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum DeltaruneTool<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum DeltaruneTool<S: BosStr = DefaultStr> {
     #[serde(rename = "download.darkworld.deltarune#toolPen")]
     ToolPen(Box<deltarune::ToolPen<S>>),
     #[serde(rename = "download.darkworld.deltarune#toolPencil")]
@@ -149,11 +149,11 @@ pub enum DeltaruneTool<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum DeltaruneWhere<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum DeltaruneWhere<S: BosStr = DefaultStr> {
     #[serde(rename = "download.darkworld.deltarune#locationSchool")]
     LocationSchool(Box<deltarune::LocationSchool<S>>),
     #[serde(rename = "download.darkworld.deltarune#locationHome")]
@@ -172,11 +172,11 @@ pub enum DeltaruneWhere<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DeltaruneGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DeltaruneGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
@@ -188,11 +188,11 @@ pub struct DeltaruneGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ToolFinger<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ToolFinger<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
@@ -202,11 +202,11 @@ pub struct ToolFinger<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ToolMarker<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ToolMarker<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
@@ -216,11 +216,11 @@ pub struct ToolMarker<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ToolOther<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ToolOther<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
@@ -230,11 +230,11 @@ pub struct ToolOther<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ToolPen<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ToolPen<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
@@ -244,22 +244,22 @@ pub struct ToolPen<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ToolPencil<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ToolPencil<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Deltarune<S> {
+impl<S: BosStr> Deltarune<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, DeltaruneRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for LocationElsewhere<S> {
+impl<S: BosStr> LexiconSchema for LocationElsewhere<S> {
     fn nsid() -> &'static str {
         "download.darkworld.deltarune"
     }
@@ -274,7 +274,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for LocationElsewhere<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for LocationHome<S> {
+impl<S: BosStr> LexiconSchema for LocationHome<S> {
     fn nsid() -> &'static str {
         "download.darkworld.deltarune"
     }
@@ -289,7 +289,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for LocationHome<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for LocationMathTextbook<S> {
+impl<S: BosStr> LexiconSchema for LocationMathTextbook<S> {
     fn nsid() -> &'static str {
         "download.darkworld.deltarune"
     }
@@ -304,7 +304,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for LocationMathTextbook<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for LocationOnSkin<S> {
+impl<S: BosStr> LexiconSchema for LocationOnSkin<S> {
     fn nsid() -> &'static str {
         "download.darkworld.deltarune"
     }
@@ -319,7 +319,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for LocationOnSkin<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for LocationSchool<S> {
+impl<S: BosStr> LexiconSchema for LocationSchool<S> {
     fn nsid() -> &'static str {
         "download.darkworld.deltarune"
     }
@@ -341,17 +341,17 @@ pub struct DeltaruneRecord;
 impl XrpcResp for DeltaruneRecord {
     const NSID: &'static str = "download.darkworld.deltarune";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = DeltaruneGetRecordOutput<S>;
+    type Output<S: BosStr> = DeltaruneGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<DeltaruneGetRecordOutput<S>> for Deltarune<S> {
+impl<S: BosStr> From<DeltaruneGetRecordOutput<S>> for Deltarune<S> {
     fn from(output: DeltaruneGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Deltarune<S> {
+impl<S: BosStr> Collection for Deltarune<S> {
     const NSID: &'static str = "download.darkworld.deltarune";
     type Record = DeltaruneRecord;
 }
@@ -361,7 +361,7 @@ impl Collection for DeltaruneRecord {
     type Record = DeltaruneRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Deltarune<S> {
+impl<S: BosStr> LexiconSchema for Deltarune<S> {
     fn nsid() -> &'static str {
         "download.darkworld.deltarune"
     }
@@ -376,7 +376,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Deltarune<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ToolFinger<S> {
+impl<S: BosStr> LexiconSchema for ToolFinger<S> {
     fn nsid() -> &'static str {
         "download.darkworld.deltarune"
     }
@@ -391,7 +391,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for ToolFinger<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ToolMarker<S> {
+impl<S: BosStr> LexiconSchema for ToolMarker<S> {
     fn nsid() -> &'static str {
         "download.darkworld.deltarune"
     }
@@ -406,7 +406,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for ToolMarker<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ToolOther<S> {
+impl<S: BosStr> LexiconSchema for ToolOther<S> {
     fn nsid() -> &'static str {
         "download.darkworld.deltarune"
     }
@@ -421,7 +421,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for ToolOther<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ToolPen<S> {
+impl<S: BosStr> LexiconSchema for ToolPen<S> {
     fn nsid() -> &'static str {
         "download.darkworld.deltarune"
     }
@@ -436,7 +436,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for ToolPen<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ToolPencil<S> {
+impl<S: BosStr> LexiconSchema for ToolPencil<S> {
     fn nsid() -> &'static str {
         "download.darkworld.deltarune"
     }
@@ -650,9 +650,9 @@ pub mod deltarune_state {
         type Time = Unset;
     }
     ///State transition - sets the `time` field to Set
-    pub struct SetTime<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTime<S> {}
-    impl<S: State> State for SetTime<S> {
+    pub struct SetTime<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTime<St> {}
+    impl<St: State> State for SetTime<St> {
         type Time = Set<members::time>;
     }
     /// Marker types for field names
@@ -663,51 +663,51 @@ pub mod deltarune_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct DeltaruneBuilder<'a, S: deltarune_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct DeltaruneBuilder<S: BosStr, St: deltarune_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<DeltaruneTool<S>>, Option<DeltaruneWhere<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Deltarune<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> DeltaruneBuilder<'a, deltarune_state::Empty> {
+impl<S: BosStr> Deltarune<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> DeltaruneBuilder<S, deltarune_state::Empty> {
         DeltaruneBuilder::new()
     }
 }
 
-impl<'a> DeltaruneBuilder<'a, deltarune_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> DeltaruneBuilder<S, deltarune_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         DeltaruneBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DeltaruneBuilder<'a, S>
+impl<S: BosStr, St> DeltaruneBuilder<S, St>
 where
-    S: deltarune_state::State,
-    S::Time: deltarune_state::IsUnset,
+    St: deltarune_state::State,
+    St::Time: deltarune_state::IsUnset,
 {
     /// Set the `time` field (required)
     pub fn time(
         mut self,
         value: impl Into<Datetime>,
-    ) -> DeltaruneBuilder<'a, deltarune_state::SetTime<S>> {
+    ) -> DeltaruneBuilder<S, deltarune_state::SetTime<St>> {
         self._fields.0 = Option::Some(value.into());
         DeltaruneBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: deltarune_state::State> DeltaruneBuilder<'a, S> {
+impl<S: BosStr, St: deltarune_state::State> DeltaruneBuilder<S, St> {
     /// Set the `tool` field (optional)
     pub fn tool(mut self, value: impl Into<Option<DeltaruneTool<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -720,7 +720,7 @@ impl<'a, S: deltarune_state::State> DeltaruneBuilder<'a, S> {
     }
 }
 
-impl<'a, S: deltarune_state::State> DeltaruneBuilder<'a, S> {
+impl<S: BosStr, St: deltarune_state::State> DeltaruneBuilder<S, St> {
     /// Set the `where` field (optional)
     pub fn r#where(mut self, value: impl Into<Option<DeltaruneWhere<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -733,13 +733,13 @@ impl<'a, S: deltarune_state::State> DeltaruneBuilder<'a, S> {
     }
 }
 
-impl<'a, S> DeltaruneBuilder<'a, S>
+impl<S: BosStr, St> DeltaruneBuilder<S, St>
 where
-    S: deltarune_state::State,
-    S::Time: deltarune_state::IsSet,
+    St: deltarune_state::State,
+    St::Time: deltarune_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Deltarune<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Deltarune<S> {
         Deltarune {
             time: self._fields.0.unwrap(),
             tool: self._fields.1,
@@ -747,11 +747,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Deltarune<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Deltarune<S> {
         Deltarune {
             time: self._fields.0.unwrap(),
             tool: self._fields.1,

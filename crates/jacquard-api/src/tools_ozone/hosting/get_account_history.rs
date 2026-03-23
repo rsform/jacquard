@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -30,11 +30,11 @@ use crate::tools_ozone::hosting::get_account_history;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct AccountCreated<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct AccountCreated<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub email: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -48,11 +48,11 @@ pub struct AccountCreated<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct EmailConfirmed<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct EmailConfirmed<S: BosStr = DefaultStr> {
     pub email: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -63,11 +63,11 @@ pub struct EmailConfirmed<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct EmailUpdated<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct EmailUpdated<S: BosStr = DefaultStr> {
     pub email: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -78,11 +78,11 @@ pub struct EmailUpdated<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Event<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Event<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     pub created_by: S,
     pub details: EventDetails<S>,
@@ -96,11 +96,11 @@ pub struct Event<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EventDetails<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum EventDetails<S: BosStr = DefaultStr> {
     #[serde(rename = "tools.ozone.hosting.getAccountHistory#accountCreated")]
     AccountCreated(Box<get_account_history::AccountCreated<S>>),
     #[serde(rename = "tools.ozone.hosting.getAccountHistory#emailUpdated")]
@@ -118,11 +118,11 @@ pub enum EventDetails<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct HandleUpdated<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct HandleUpdated<S: BosStr = DefaultStr> {
     pub handle: Handle<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -130,21 +130,18 @@ pub struct HandleUpdated<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetAccountHistory<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetAccountHistory<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub cursor: Option<S>,
-    #[serde(borrow)]
     pub did: Did<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub events: Option<Vec<S>>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
@@ -154,20 +151,18 @@ pub struct GetAccountHistory<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetAccountHistoryOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetAccountHistoryOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
     pub events: Vec<get_account_history::Event<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -176,16 +171,16 @@ pub struct GetAccountHistoryOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct PasswordUpdated<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct PasswordUpdated<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for AccountCreated<S> {
+impl<S: BosStr> LexiconSchema for AccountCreated<S> {
     fn nsid() -> &'static str {
         "tools.ozone.hosting.getAccountHistory"
     }
@@ -200,7 +195,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for AccountCreated<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for EmailConfirmed<S> {
+impl<S: BosStr> LexiconSchema for EmailConfirmed<S> {
     fn nsid() -> &'static str {
         "tools.ozone.hosting.getAccountHistory"
     }
@@ -215,7 +210,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for EmailConfirmed<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for EmailUpdated<S> {
+impl<S: BosStr> LexiconSchema for EmailUpdated<S> {
     fn nsid() -> &'static str {
         "tools.ozone.hosting.getAccountHistory"
     }
@@ -230,7 +225,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for EmailUpdated<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Event<S> {
+impl<S: BosStr> LexiconSchema for Event<S> {
     fn nsid() -> &'static str {
         "tools.ozone.hosting.getAccountHistory"
     }
@@ -245,7 +240,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Event<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for HandleUpdated<S> {
+impl<S: BosStr> LexiconSchema for HandleUpdated<S> {
     fn nsid() -> &'static str {
         "tools.ozone.hosting.getAccountHistory"
     }
@@ -265,12 +260,11 @@ pub struct GetAccountHistoryResponse;
 impl jacquard_common::xrpc::XrpcResp for GetAccountHistoryResponse {
     const NSID: &'static str = "tools.ozone.hosting.getAccountHistory";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetAccountHistoryOutput<S>;
+    type Output<S: BosStr> = GetAccountHistoryOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetAccountHistory<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetAccountHistory<S> {
     const NSID: &'static str = "tools.ozone.hosting.getAccountHistory";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetAccountHistoryResponse;
@@ -281,11 +275,11 @@ pub struct GetAccountHistoryRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetAccountHistoryRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.hosting.getAccountHistory";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetAccountHistory<S>;
+    type Request<S: BosStr> = GetAccountHistory<S>;
     type Response = GetAccountHistoryResponse;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for PasswordUpdated<S> {
+impl<S: BosStr> LexiconSchema for PasswordUpdated<S> {
     fn nsid() -> &'static str {
         "tools.ozone.hosting.getAccountHistory"
     }
@@ -512,27 +506,27 @@ pub mod event_state {
         type CreatedBy = Unset;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
-        type Details = S::Details;
-        type CreatedBy = S::CreatedBy;
+        type Details = St::Details;
+        type CreatedBy = St::CreatedBy;
     }
     ///State transition - sets the `details` field to Set
-    pub struct SetDetails<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDetails<S> {}
-    impl<S: State> State for SetDetails<S> {
-        type CreatedAt = S::CreatedAt;
+    pub struct SetDetails<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDetails<St> {}
+    impl<St: State> State for SetDetails<St> {
+        type CreatedAt = St::CreatedAt;
         type Details = Set<members::details>;
-        type CreatedBy = S::CreatedBy;
+        type CreatedBy = St::CreatedBy;
     }
     ///State transition - sets the `created_by` field to Set
-    pub struct SetCreatedBy<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedBy<S> {}
-    impl<S: State> State for SetCreatedBy<S> {
-        type CreatedAt = S::CreatedAt;
-        type Details = S::Details;
+    pub struct SetCreatedBy<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedBy<St> {}
+    impl<St: State> State for SetCreatedBy<St> {
+        type CreatedAt = St::CreatedAt;
+        type Details = St::Details;
         type CreatedBy = Set<members::created_by>;
     }
     /// Marker types for field names
@@ -547,97 +541,97 @@ pub mod event_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct EventBuilder<'a, S: event_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct EventBuilder<S: BosStr, St: event_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<S>, Option<EventDetails<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Event<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> EventBuilder<'a, event_state::Empty> {
+impl<S: BosStr> Event<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> EventBuilder<S, event_state::Empty> {
         EventBuilder::new()
     }
 }
 
-impl<'a> EventBuilder<'a, event_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> EventBuilder<S, event_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         EventBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> EventBuilder<'a, S>
+impl<S: BosStr, St> EventBuilder<S, St>
 where
-    S: event_state::State,
-    S::CreatedAt: event_state::IsUnset,
+    St: event_state::State,
+    St::CreatedAt: event_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> EventBuilder<'a, event_state::SetCreatedAt<S>> {
+    ) -> EventBuilder<S, event_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         EventBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> EventBuilder<'a, S>
+impl<S: BosStr, St> EventBuilder<S, St>
 where
-    S: event_state::State,
-    S::CreatedBy: event_state::IsUnset,
+    St: event_state::State,
+    St::CreatedBy: event_state::IsUnset,
 {
     /// Set the `createdBy` field (required)
     pub fn created_by(
         mut self,
         value: impl Into<S>,
-    ) -> EventBuilder<'a, event_state::SetCreatedBy<S>> {
+    ) -> EventBuilder<S, event_state::SetCreatedBy<St>> {
         self._fields.1 = Option::Some(value.into());
         EventBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> EventBuilder<'a, S>
+impl<S: BosStr, St> EventBuilder<S, St>
 where
-    S: event_state::State,
-    S::Details: event_state::IsUnset,
+    St: event_state::State,
+    St::Details: event_state::IsUnset,
 {
     /// Set the `details` field (required)
     pub fn details(
         mut self,
         value: impl Into<EventDetails<S>>,
-    ) -> EventBuilder<'a, event_state::SetDetails<S>> {
+    ) -> EventBuilder<S, event_state::SetDetails<St>> {
         self._fields.2 = Option::Some(value.into());
         EventBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> EventBuilder<'a, S>
+impl<S: BosStr, St> EventBuilder<S, St>
 where
-    S: event_state::State,
-    S::CreatedAt: event_state::IsSet,
-    S::Details: event_state::IsSet,
-    S::CreatedBy: event_state::IsSet,
+    St: event_state::State,
+    St::CreatedAt: event_state::IsSet,
+    St::Details: event_state::IsSet,
+    St::CreatedBy: event_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Event<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Event<S> {
         Event {
             created_at: self._fields.0.unwrap(),
             created_by: self._fields.1.unwrap(),
@@ -645,8 +639,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Event<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Event<S> {
         Event {
             created_at: self._fields.0.unwrap(),
             created_by: self._fields.1.unwrap(),
@@ -675,9 +669,9 @@ pub mod handle_updated_state {
         type Handle = Unset;
     }
     ///State transition - sets the `handle` field to Set
-    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHandle<S> {}
-    impl<S: State> State for SetHandle<S> {
+    pub struct SetHandle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHandle<St> {}
+    impl<St: State> State for SetHandle<St> {
         type Handle = Set<members::handle>;
     }
     /// Marker types for field names
@@ -688,67 +682,67 @@ pub mod handle_updated_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct HandleUpdatedBuilder<'a, S: handle_updated_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct HandleUpdatedBuilder<S: BosStr, St: handle_updated_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Handle<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> HandleUpdated<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> HandleUpdatedBuilder<'a, handle_updated_state::Empty> {
+impl<S: BosStr> HandleUpdated<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> HandleUpdatedBuilder<S, handle_updated_state::Empty> {
         HandleUpdatedBuilder::new()
     }
 }
 
-impl<'a> HandleUpdatedBuilder<'a, handle_updated_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> HandleUpdatedBuilder<S, handle_updated_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         HandleUpdatedBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> HandleUpdatedBuilder<'a, S>
+impl<S: BosStr, St> HandleUpdatedBuilder<S, St>
 where
-    S: handle_updated_state::State,
-    S::Handle: handle_updated_state::IsUnset,
+    St: handle_updated_state::State,
+    St::Handle: handle_updated_state::IsUnset,
 {
     /// Set the `handle` field (required)
     pub fn handle(
         mut self,
         value: impl Into<Handle<S>>,
-    ) -> HandleUpdatedBuilder<'a, handle_updated_state::SetHandle<S>> {
+    ) -> HandleUpdatedBuilder<S, handle_updated_state::SetHandle<St>> {
         self._fields.0 = Option::Some(value.into());
         HandleUpdatedBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> HandleUpdatedBuilder<'a, S>
+impl<S: BosStr, St> HandleUpdatedBuilder<S, St>
 where
-    S: handle_updated_state::State,
-    S::Handle: handle_updated_state::IsSet,
+    St: handle_updated_state::State,
+    St::Handle: handle_updated_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> HandleUpdated<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> HandleUpdated<S> {
         HandleUpdated {
             handle: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> HandleUpdated<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> HandleUpdated<S> {
         HandleUpdated {
             handle: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -779,9 +773,9 @@ pub mod get_account_history_state {
         type Did = Unset;
     }
     ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
         type Did = Set<members::did>;
     }
     /// Marker types for field names
@@ -792,32 +786,32 @@ pub mod get_account_history_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetAccountHistoryBuilder<'a, S: get_account_history_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetAccountHistoryBuilder<S: BosStr, St: get_account_history_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<Did<S>>, Option<Vec<S>>, Option<i64>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetAccountHistory<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetAccountHistoryBuilder<'a, get_account_history_state::Empty> {
+impl<S: BosStr> GetAccountHistory<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetAccountHistoryBuilder<S, get_account_history_state::Empty> {
         GetAccountHistoryBuilder::new()
     }
 }
 
-impl<'a> GetAccountHistoryBuilder<'a, get_account_history_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetAccountHistoryBuilder<S, get_account_history_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetAccountHistoryBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: get_account_history_state::State> GetAccountHistoryBuilder<'a, S> {
+impl<S: BosStr, St: get_account_history_state::State> GetAccountHistoryBuilder<S, St> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -830,26 +824,26 @@ impl<'a, S: get_account_history_state::State> GetAccountHistoryBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GetAccountHistoryBuilder<'a, S>
+impl<S: BosStr, St> GetAccountHistoryBuilder<S, St>
 where
-    S: get_account_history_state::State,
-    S::Did: get_account_history_state::IsUnset,
+    St: get_account_history_state::State,
+    St::Did: get_account_history_state::IsUnset,
 {
     /// Set the `did` field (required)
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> GetAccountHistoryBuilder<'a, get_account_history_state::SetDid<S>> {
+    ) -> GetAccountHistoryBuilder<S, get_account_history_state::SetDid<St>> {
         self._fields.1 = Option::Some(value.into());
         GetAccountHistoryBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: get_account_history_state::State> GetAccountHistoryBuilder<'a, S> {
+impl<S: BosStr, St: get_account_history_state::State> GetAccountHistoryBuilder<S, St> {
     /// Set the `events` field (optional)
     pub fn events(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -862,7 +856,7 @@ impl<'a, S: get_account_history_state::State> GetAccountHistoryBuilder<'a, S> {
     }
 }
 
-impl<'a, S: get_account_history_state::State> GetAccountHistoryBuilder<'a, S> {
+impl<S: BosStr, St: get_account_history_state::State> GetAccountHistoryBuilder<S, St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.3 = value.into();
@@ -875,13 +869,13 @@ impl<'a, S: get_account_history_state::State> GetAccountHistoryBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GetAccountHistoryBuilder<'a, S>
+impl<S: BosStr, St> GetAccountHistoryBuilder<S, St>
 where
-    S: get_account_history_state::State,
-    S::Did: get_account_history_state::IsSet,
+    St: get_account_history_state::State,
+    St::Did: get_account_history_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetAccountHistory<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetAccountHistory<S> {
         GetAccountHistory {
             cursor: self._fields.0,
             did: self._fields.1.unwrap(),

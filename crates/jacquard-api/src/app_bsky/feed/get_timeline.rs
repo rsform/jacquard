@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
@@ -18,19 +18,17 @@ use serde::{Serialize, Deserialize};
 use crate::app_bsky::feed::FeedViewPost;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetTimeline<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetTimeline<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub algorithm: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub cursor: Option<S>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
@@ -40,20 +38,18 @@ pub struct GetTimeline<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetTimelineOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetTimelineOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
     pub feed: Vec<FeedViewPost<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -62,12 +58,11 @@ pub struct GetTimelineResponse;
 impl jacquard_common::xrpc::XrpcResp for GetTimelineResponse {
     const NSID: &'static str = "app.bsky.feed.getTimeline";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetTimelineOutput<S>;
+    type Output<S: BosStr> = GetTimelineOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetTimeline<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetTimeline<S> {
     const NSID: &'static str = "app.bsky.feed.getTimeline";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetTimelineResponse;
@@ -78,7 +73,7 @@ pub struct GetTimelineRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetTimelineRequest {
     const PATH: &'static str = "/xrpc/app.bsky.feed.getTimeline";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetTimeline<S>;
+    type Request<S: BosStr> = GetTimeline<S>;
     type Response = GetTimelineResponse;
 }
 
@@ -105,32 +100,32 @@ pub mod get_timeline_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetTimelineBuilder<'a, S: get_timeline_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetTimelineBuilder<S: BosStr, St: get_timeline_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>, Option<i64>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetTimeline<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetTimelineBuilder<'a, get_timeline_state::Empty> {
+impl<S: BosStr> GetTimeline<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetTimelineBuilder<S, get_timeline_state::Empty> {
         GetTimelineBuilder::new()
     }
 }
 
-impl<'a> GetTimelineBuilder<'a, get_timeline_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetTimelineBuilder<S, get_timeline_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetTimelineBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: get_timeline_state::State> GetTimelineBuilder<'a, S> {
+impl<S: BosStr, St: get_timeline_state::State> GetTimelineBuilder<S, St> {
     /// Set the `algorithm` field (optional)
     pub fn algorithm(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -143,7 +138,7 @@ impl<'a, S: get_timeline_state::State> GetTimelineBuilder<'a, S> {
     }
 }
 
-impl<'a, S: get_timeline_state::State> GetTimelineBuilder<'a, S> {
+impl<S: BosStr, St: get_timeline_state::State> GetTimelineBuilder<S, St> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -156,7 +151,7 @@ impl<'a, S: get_timeline_state::State> GetTimelineBuilder<'a, S> {
     }
 }
 
-impl<'a, S: get_timeline_state::State> GetTimelineBuilder<'a, S> {
+impl<S: BosStr, St: get_timeline_state::State> GetTimelineBuilder<S, St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -169,12 +164,12 @@ impl<'a, S: get_timeline_state::State> GetTimelineBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GetTimelineBuilder<'a, S>
+impl<S: BosStr, St> GetTimelineBuilder<S, St>
 where
-    S: get_timeline_state::State,
+    St: get_timeline_state::State,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetTimeline<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetTimeline<S> {
         GetTimeline {
             algorithm: self._fields.0,
             cursor: self._fields.1,

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use crate::net_anisota::harvest::minigame;
     rename = "net.anisota.harvest.minigame",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Minigame<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Minigame<S: BosStr = DefaultStr> {
     ///Version of the Anisota client
     #[serde(skip_serializing_if = "Option::is_none")]
     pub client_version: Option<S>,
@@ -96,11 +96,11 @@ pub struct Minigame<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct MinigameGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct MinigameGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
@@ -113,11 +113,11 @@ pub struct MinigameGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct RarityBreakdown<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct RarityBreakdown<S: BosStr = DefaultStr> {
     ///Number of common (triangle) shapes collected
     #[serde(skip_serializing_if = "Option::is_none")]
     pub common: Option<i64>,
@@ -137,7 +137,7 @@ pub struct RarityBreakdown<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Minigame<S> {
+impl<S: BosStr> Minigame<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, MinigameRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -150,17 +150,17 @@ pub struct MinigameRecord;
 impl XrpcResp for MinigameRecord {
     const NSID: &'static str = "net.anisota.harvest.minigame";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = MinigameGetRecordOutput<S>;
+    type Output<S: BosStr> = MinigameGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<MinigameGetRecordOutput<S>> for Minigame<S> {
+impl<S: BosStr> From<MinigameGetRecordOutput<S>> for Minigame<S> {
     fn from(output: MinigameGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Minigame<S> {
+impl<S: BosStr> Collection for Minigame<S> {
     const NSID: &'static str = "net.anisota.harvest.minigame";
     type Record = MinigameRecord;
 }
@@ -170,7 +170,7 @@ impl Collection for MinigameRecord {
     type Record = MinigameRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Minigame<S> {
+impl<S: BosStr> LexiconSchema for Minigame<S> {
     fn nsid() -> &'static str {
         "net.anisota.harvest.minigame"
     }
@@ -305,7 +305,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Minigame<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for RarityBreakdown<S> {
+impl<S: BosStr> LexiconSchema for RarityBreakdown<S> {
     fn nsid() -> &'static str {
         "net.anisota.harvest.minigame"
     }
@@ -375,91 +375,91 @@ pub mod minigame_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type GameContext;
-        type FinalScore;
         type RoundDuration;
+        type FinalScore;
         type ShapesCollected;
         type PlayedAt;
+        type GameContext;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type GameContext = Unset;
-        type FinalScore = Unset;
         type RoundDuration = Unset;
+        type FinalScore = Unset;
         type ShapesCollected = Unset;
         type PlayedAt = Unset;
-    }
-    ///State transition - sets the `game_context` field to Set
-    pub struct SetGameContext<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGameContext<S> {}
-    impl<S: State> State for SetGameContext<S> {
-        type GameContext = Set<members::game_context>;
-        type FinalScore = S::FinalScore;
-        type RoundDuration = S::RoundDuration;
-        type ShapesCollected = S::ShapesCollected;
-        type PlayedAt = S::PlayedAt;
-    }
-    ///State transition - sets the `final_score` field to Set
-    pub struct SetFinalScore<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFinalScore<S> {}
-    impl<S: State> State for SetFinalScore<S> {
-        type GameContext = S::GameContext;
-        type FinalScore = Set<members::final_score>;
-        type RoundDuration = S::RoundDuration;
-        type ShapesCollected = S::ShapesCollected;
-        type PlayedAt = S::PlayedAt;
+        type GameContext = Unset;
     }
     ///State transition - sets the `round_duration` field to Set
-    pub struct SetRoundDuration<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRoundDuration<S> {}
-    impl<S: State> State for SetRoundDuration<S> {
-        type GameContext = S::GameContext;
-        type FinalScore = S::FinalScore;
+    pub struct SetRoundDuration<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRoundDuration<St> {}
+    impl<St: State> State for SetRoundDuration<St> {
         type RoundDuration = Set<members::round_duration>;
-        type ShapesCollected = S::ShapesCollected;
-        type PlayedAt = S::PlayedAt;
+        type FinalScore = St::FinalScore;
+        type ShapesCollected = St::ShapesCollected;
+        type PlayedAt = St::PlayedAt;
+        type GameContext = St::GameContext;
+    }
+    ///State transition - sets the `final_score` field to Set
+    pub struct SetFinalScore<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetFinalScore<St> {}
+    impl<St: State> State for SetFinalScore<St> {
+        type RoundDuration = St::RoundDuration;
+        type FinalScore = Set<members::final_score>;
+        type ShapesCollected = St::ShapesCollected;
+        type PlayedAt = St::PlayedAt;
+        type GameContext = St::GameContext;
     }
     ///State transition - sets the `shapes_collected` field to Set
-    pub struct SetShapesCollected<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetShapesCollected<S> {}
-    impl<S: State> State for SetShapesCollected<S> {
-        type GameContext = S::GameContext;
-        type FinalScore = S::FinalScore;
-        type RoundDuration = S::RoundDuration;
+    pub struct SetShapesCollected<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetShapesCollected<St> {}
+    impl<St: State> State for SetShapesCollected<St> {
+        type RoundDuration = St::RoundDuration;
+        type FinalScore = St::FinalScore;
         type ShapesCollected = Set<members::shapes_collected>;
-        type PlayedAt = S::PlayedAt;
+        type PlayedAt = St::PlayedAt;
+        type GameContext = St::GameContext;
     }
     ///State transition - sets the `played_at` field to Set
-    pub struct SetPlayedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPlayedAt<S> {}
-    impl<S: State> State for SetPlayedAt<S> {
-        type GameContext = S::GameContext;
-        type FinalScore = S::FinalScore;
-        type RoundDuration = S::RoundDuration;
-        type ShapesCollected = S::ShapesCollected;
+    pub struct SetPlayedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPlayedAt<St> {}
+    impl<St: State> State for SetPlayedAt<St> {
+        type RoundDuration = St::RoundDuration;
+        type FinalScore = St::FinalScore;
+        type ShapesCollected = St::ShapesCollected;
         type PlayedAt = Set<members::played_at>;
+        type GameContext = St::GameContext;
+    }
+    ///State transition - sets the `game_context` field to Set
+    pub struct SetGameContext<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetGameContext<St> {}
+    impl<St: State> State for SetGameContext<St> {
+        type RoundDuration = St::RoundDuration;
+        type FinalScore = St::FinalScore;
+        type ShapesCollected = St::ShapesCollected;
+        type PlayedAt = St::PlayedAt;
+        type GameContext = Set<members::game_context>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `game_context` field
-        pub struct game_context(());
-        ///Marker type for the `final_score` field
-        pub struct final_score(());
         ///Marker type for the `round_duration` field
         pub struct round_duration(());
+        ///Marker type for the `final_score` field
+        pub struct final_score(());
         ///Marker type for the `shapes_collected` field
         pub struct shapes_collected(());
         ///Marker type for the `played_at` field
         pub struct played_at(());
+        ///Marker type for the `game_context` field
+        pub struct game_context(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct MinigameBuilder<'a, S: minigame_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct MinigameBuilder<S: BosStr, St: minigame_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
         Option<Datetime>,
@@ -479,18 +479,18 @@ pub struct MinigameBuilder<'a, S: minigame_state::State> {
         Option<i64>,
         Option<i64>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Minigame<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> MinigameBuilder<'a, minigame_state::Empty> {
+impl<S: BosStr> Minigame<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> MinigameBuilder<S, minigame_state::Empty> {
         MinigameBuilder::new()
     }
 }
 
-impl<'a> MinigameBuilder<'a, minigame_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> MinigameBuilder<S, minigame_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         MinigameBuilder {
             _state: PhantomData,
@@ -513,12 +513,12 @@ impl<'a> MinigameBuilder<'a, minigame_state::Empty> {
                 None,
                 None,
             ),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: minigame_state::State> MinigameBuilder<'a, S> {
+impl<S: BosStr, St: minigame_state::State> MinigameBuilder<S, St> {
     /// Set the `clientVersion` field (optional)
     pub fn client_version(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -531,7 +531,7 @@ impl<'a, S: minigame_state::State> MinigameBuilder<'a, S> {
     }
 }
 
-impl<'a, S: minigame_state::State> MinigameBuilder<'a, S> {
+impl<S: BosStr, St: minigame_state::State> MinigameBuilder<S, St> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.1 = value.into();
@@ -544,7 +544,7 @@ impl<'a, S: minigame_state::State> MinigameBuilder<'a, S> {
     }
 }
 
-impl<'a, S: minigame_state::State> MinigameBuilder<'a, S> {
+impl<S: BosStr, St: minigame_state::State> MinigameBuilder<S, St> {
     /// Set the `earlyHarvests` field (optional)
     pub fn early_harvests(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -557,7 +557,7 @@ impl<'a, S: minigame_state::State> MinigameBuilder<'a, S> {
     }
 }
 
-impl<'a, S: minigame_state::State> MinigameBuilder<'a, S> {
+impl<S: BosStr, St: minigame_state::State> MinigameBuilder<S, St> {
     /// Set the `efficiencyBonus` field (optional)
     pub fn efficiency_bonus(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.3 = value.into();
@@ -570,45 +570,45 @@ impl<'a, S: minigame_state::State> MinigameBuilder<'a, S> {
     }
 }
 
-impl<'a, S> MinigameBuilder<'a, S>
+impl<S: BosStr, St> MinigameBuilder<S, St>
 where
-    S: minigame_state::State,
-    S::FinalScore: minigame_state::IsUnset,
+    St: minigame_state::State,
+    St::FinalScore: minigame_state::IsUnset,
 {
     /// Set the `finalScore` field (required)
     pub fn final_score(
         mut self,
         value: impl Into<i64>,
-    ) -> MinigameBuilder<'a, minigame_state::SetFinalScore<S>> {
+    ) -> MinigameBuilder<S, minigame_state::SetFinalScore<St>> {
         self._fields.4 = Option::Some(value.into());
         MinigameBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> MinigameBuilder<'a, S>
+impl<S: BosStr, St> MinigameBuilder<S, St>
 where
-    S: minigame_state::State,
-    S::GameContext: minigame_state::IsUnset,
+    St: minigame_state::State,
+    St::GameContext: minigame_state::IsUnset,
 {
     /// Set the `gameContext` field (required)
     pub fn game_context(
         mut self,
         value: impl Into<S>,
-    ) -> MinigameBuilder<'a, minigame_state::SetGameContext<S>> {
+    ) -> MinigameBuilder<S, minigame_state::SetGameContext<St>> {
         self._fields.5 = Option::Some(value.into());
         MinigameBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: minigame_state::State> MinigameBuilder<'a, S> {
+impl<S: BosStr, St: minigame_state::State> MinigameBuilder<S, St> {
     /// Set the `lateHarvests` field (optional)
     pub fn late_harvests(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.6 = value.into();
@@ -621,7 +621,7 @@ impl<'a, S: minigame_state::State> MinigameBuilder<'a, S> {
     }
 }
 
-impl<'a, S: minigame_state::State> MinigameBuilder<'a, S> {
+impl<S: BosStr, St: minigame_state::State> MinigameBuilder<S, St> {
     /// Set the `peakHarvestRate` field (optional)
     pub fn peak_harvest_rate(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.7 = value.into();
@@ -634,7 +634,7 @@ impl<'a, S: minigame_state::State> MinigameBuilder<'a, S> {
     }
 }
 
-impl<'a, S: minigame_state::State> MinigameBuilder<'a, S> {
+impl<S: BosStr, St: minigame_state::State> MinigameBuilder<S, St> {
     /// Set the `peakRateBonus` field (optional)
     pub fn peak_rate_bonus(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.8 = value.into();
@@ -647,7 +647,7 @@ impl<'a, S: minigame_state::State> MinigameBuilder<'a, S> {
     }
 }
 
-impl<'a, S: minigame_state::State> MinigameBuilder<'a, S> {
+impl<S: BosStr, St: minigame_state::State> MinigameBuilder<S, St> {
     /// Set the `perfectHarvests` field (optional)
     pub fn perfect_harvests(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.9 = value.into();
@@ -660,26 +660,26 @@ impl<'a, S: minigame_state::State> MinigameBuilder<'a, S> {
     }
 }
 
-impl<'a, S> MinigameBuilder<'a, S>
+impl<S: BosStr, St> MinigameBuilder<S, St>
 where
-    S: minigame_state::State,
-    S::PlayedAt: minigame_state::IsUnset,
+    St: minigame_state::State,
+    St::PlayedAt: minigame_state::IsUnset,
 {
     /// Set the `playedAt` field (required)
     pub fn played_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> MinigameBuilder<'a, minigame_state::SetPlayedAt<S>> {
+    ) -> MinigameBuilder<S, minigame_state::SetPlayedAt<St>> {
         self._fields.10 = Option::Some(value.into());
         MinigameBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: minigame_state::State> MinigameBuilder<'a, S> {
+impl<S: BosStr, St: minigame_state::State> MinigameBuilder<S, St> {
     /// Set the `pointsPerSecond` field (optional)
     pub fn points_per_second(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.11 = value.into();
@@ -692,7 +692,7 @@ impl<'a, S: minigame_state::State> MinigameBuilder<'a, S> {
     }
 }
 
-impl<'a, S: minigame_state::State> MinigameBuilder<'a, S> {
+impl<S: BosStr, St: minigame_state::State> MinigameBuilder<S, St> {
     /// Set the `rarityBreakdown` field (optional)
     pub fn rarity_breakdown(
         mut self,
@@ -711,45 +711,45 @@ impl<'a, S: minigame_state::State> MinigameBuilder<'a, S> {
     }
 }
 
-impl<'a, S> MinigameBuilder<'a, S>
+impl<S: BosStr, St> MinigameBuilder<S, St>
 where
-    S: minigame_state::State,
-    S::RoundDuration: minigame_state::IsUnset,
+    St: minigame_state::State,
+    St::RoundDuration: minigame_state::IsUnset,
 {
     /// Set the `roundDuration` field (required)
     pub fn round_duration(
         mut self,
         value: impl Into<i64>,
-    ) -> MinigameBuilder<'a, minigame_state::SetRoundDuration<S>> {
+    ) -> MinigameBuilder<S, minigame_state::SetRoundDuration<St>> {
         self._fields.13 = Option::Some(value.into());
         MinigameBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> MinigameBuilder<'a, S>
+impl<S: BosStr, St> MinigameBuilder<S, St>
 where
-    S: minigame_state::State,
-    S::ShapesCollected: minigame_state::IsUnset,
+    St: minigame_state::State,
+    St::ShapesCollected: minigame_state::IsUnset,
 {
     /// Set the `shapesCollected` field (required)
     pub fn shapes_collected(
         mut self,
         value: impl Into<i64>,
-    ) -> MinigameBuilder<'a, minigame_state::SetShapesCollected<S>> {
+    ) -> MinigameBuilder<S, minigame_state::SetShapesCollected<St>> {
         self._fields.14 = Option::Some(value.into());
         MinigameBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: minigame_state::State> MinigameBuilder<'a, S> {
+impl<S: BosStr, St: minigame_state::State> MinigameBuilder<S, St> {
     /// Set the `shapesMissed` field (optional)
     pub fn shapes_missed(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.15 = value.into();
@@ -762,7 +762,7 @@ impl<'a, S: minigame_state::State> MinigameBuilder<'a, S> {
     }
 }
 
-impl<'a, S: minigame_state::State> MinigameBuilder<'a, S> {
+impl<S: BosStr, St: minigame_state::State> MinigameBuilder<S, St> {
     /// Set the `totalShapesSpawned` field (optional)
     pub fn total_shapes_spawned(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.16 = value.into();
@@ -775,17 +775,17 @@ impl<'a, S: minigame_state::State> MinigameBuilder<'a, S> {
     }
 }
 
-impl<'a, S> MinigameBuilder<'a, S>
+impl<S: BosStr, St> MinigameBuilder<S, St>
 where
-    S: minigame_state::State,
-    S::GameContext: minigame_state::IsSet,
-    S::FinalScore: minigame_state::IsSet,
-    S::RoundDuration: minigame_state::IsSet,
-    S::ShapesCollected: minigame_state::IsSet,
-    S::PlayedAt: minigame_state::IsSet,
+    St: minigame_state::State,
+    St::RoundDuration: minigame_state::IsSet,
+    St::FinalScore: minigame_state::IsSet,
+    St::ShapesCollected: minigame_state::IsSet,
+    St::PlayedAt: minigame_state::IsSet,
+    St::GameContext: minigame_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Minigame<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Minigame<S> {
         Minigame {
             client_version: self._fields.0,
             created_at: self._fields.1,
@@ -807,11 +807,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Minigame<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Minigame<S> {
         Minigame {
             client_version: self._fields.0,
             created_at: self._fields.1,

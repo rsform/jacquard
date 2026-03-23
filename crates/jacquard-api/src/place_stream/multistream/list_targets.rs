@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -27,16 +27,15 @@ use serde::{Serialize, Deserialize};
 use crate::place_stream::multistream::TargetView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ListTargets<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ListTargets<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub cursor: Option<S>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
@@ -46,20 +45,18 @@ pub struct ListTargets<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ListTargetsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ListTargetsOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
     pub targets: Vec<TargetView<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -68,11 +65,11 @@ pub struct ListTargetsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Record<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Record<S: BosStr = DefaultStr> {
     pub cid: Cid<S>,
     pub uri: AtUri<S>,
     pub value: Data<S>,
@@ -85,12 +82,11 @@ pub struct ListTargetsResponse;
 impl jacquard_common::xrpc::XrpcResp for ListTargetsResponse {
     const NSID: &'static str = "place.stream.multistream.listTargets";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ListTargetsOutput<S>;
+    type Output<S: BosStr> = ListTargetsOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for ListTargets<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ListTargets<S> {
     const NSID: &'static str = "place.stream.multistream.listTargets";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ListTargetsResponse;
@@ -101,11 +97,11 @@ pub struct ListTargetsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListTargetsRequest {
     const PATH: &'static str = "/xrpc/place.stream.multistream.listTargets";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = ListTargets<S>;
+    type Request<S: BosStr> = ListTargets<S>;
     type Response = ListTargetsResponse;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Record<S> {
+impl<S: BosStr> LexiconSchema for Record<S> {
     fn nsid() -> &'static str {
         "place.stream.multistream.listTargets"
     }
@@ -143,32 +139,32 @@ pub mod list_targets_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct ListTargetsBuilder<'a, S: list_targets_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ListTargetsBuilder<S: BosStr, St: list_targets_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ListTargets<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ListTargetsBuilder<'a, list_targets_state::Empty> {
+impl<S: BosStr> ListTargets<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ListTargetsBuilder<S, list_targets_state::Empty> {
         ListTargetsBuilder::new()
     }
 }
 
-impl<'a> ListTargetsBuilder<'a, list_targets_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ListTargetsBuilder<S, list_targets_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ListTargetsBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: list_targets_state::State> ListTargetsBuilder<'a, S> {
+impl<S: BosStr, St: list_targets_state::State> ListTargetsBuilder<S, St> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -181,7 +177,7 @@ impl<'a, S: list_targets_state::State> ListTargetsBuilder<'a, S> {
     }
 }
 
-impl<'a, S: list_targets_state::State> ListTargetsBuilder<'a, S> {
+impl<S: BosStr, St: list_targets_state::State> ListTargetsBuilder<S, St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -194,12 +190,12 @@ impl<'a, S: list_targets_state::State> ListTargetsBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ListTargetsBuilder<'a, S>
+impl<S: BosStr, St> ListTargetsBuilder<S, St>
 where
-    S: list_targets_state::State,
+    St: list_targets_state::State,
 {
-    /// Build the final struct
-    pub fn build(self) -> ListTargets<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ListTargets<S> {
         ListTargets {
             cursor: self._fields.0,
             limit: self._fields.1,
@@ -217,145 +213,145 @@ pub mod record_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
-        type Cid;
         type Value;
+        type Cid;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
-        type Cid = Unset;
         type Value = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Uri = Set<members::uri>;
-        type Cid = S::Cid;
-        type Value = S::Value;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Uri = S::Uri;
-        type Cid = Set<members::cid>;
-        type Value = S::Value;
+        type Cid = Unset;
+        type Uri = Unset;
     }
     ///State transition - sets the `value` field to Set
-    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValue<S> {}
-    impl<S: State> State for SetValue<S> {
-        type Uri = S::Uri;
-        type Cid = S::Cid;
+    pub struct SetValue<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetValue<St> {}
+    impl<St: State> State for SetValue<St> {
         type Value = Set<members::value>;
+        type Cid = St::Cid;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCid<St> {}
+    impl<St: State> State for SetCid<St> {
+        type Value = St::Value;
+        type Cid = Set<members::cid>;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Value = St::Value;
+        type Cid = St::Cid;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `value` field
         pub struct value(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct RecordBuilder<'a, S: record_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct RecordBuilder<S: BosStr, St: record_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Cid<S>>, Option<AtUri<S>>, Option<Data<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Record<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> RecordBuilder<'a, record_state::Empty> {
+impl<S: BosStr> Record<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> RecordBuilder<S, record_state::Empty> {
         RecordBuilder::new()
     }
 }
 
-impl<'a> RecordBuilder<'a, record_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> RecordBuilder<S, record_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         RecordBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RecordBuilder<'a, S>
+impl<S: BosStr, St> RecordBuilder<S, St>
 where
-    S: record_state::State,
-    S::Cid: record_state::IsUnset,
+    St: record_state::State,
+    St::Cid: record_state::IsUnset,
 {
     /// Set the `cid` field (required)
     pub fn cid(
         mut self,
         value: impl Into<Cid<S>>,
-    ) -> RecordBuilder<'a, record_state::SetCid<S>> {
+    ) -> RecordBuilder<S, record_state::SetCid<St>> {
         self._fields.0 = Option::Some(value.into());
         RecordBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RecordBuilder<'a, S>
+impl<S: BosStr, St> RecordBuilder<S, St>
 where
-    S: record_state::State,
-    S::Uri: record_state::IsUnset,
+    St: record_state::State,
+    St::Uri: record_state::IsUnset,
 {
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> RecordBuilder<'a, record_state::SetUri<S>> {
+    ) -> RecordBuilder<S, record_state::SetUri<St>> {
         self._fields.1 = Option::Some(value.into());
         RecordBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RecordBuilder<'a, S>
+impl<S: BosStr, St> RecordBuilder<S, St>
 where
-    S: record_state::State,
-    S::Value: record_state::IsUnset,
+    St: record_state::State,
+    St::Value: record_state::IsUnset,
 {
     /// Set the `value` field (required)
     pub fn value(
         mut self,
         value: impl Into<Data<S>>,
-    ) -> RecordBuilder<'a, record_state::SetValue<S>> {
+    ) -> RecordBuilder<S, record_state::SetValue<St>> {
         self._fields.2 = Option::Some(value.into());
         RecordBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RecordBuilder<'a, S>
+impl<S: BosStr, St> RecordBuilder<S, St>
 where
-    S: record_state::State,
-    S::Uri: record_state::IsSet,
-    S::Cid: record_state::IsSet,
-    S::Value: record_state::IsSet,
+    St: record_state::State,
+    St::Value: record_state::IsSet,
+    St::Cid: record_state::IsSet,
+    St::Uri: record_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Record<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Record<S> {
         Record {
             cid: self._fields.0.unwrap(),
             uri: self._fields.1.unwrap(),
@@ -363,8 +359,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Record<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Record<S> {
         Record {
             cid: self._fields.0.unwrap(),
             uri: self._fields.1.unwrap(),

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::value::Data;
@@ -18,20 +18,18 @@ use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct UpdateAccountEmail<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct UpdateAccountEmail<S: BosStr = DefaultStr> {
     ///The handle or DID of the repo.
     pub account: AtIdentifier<S>,
     pub email: S,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -40,12 +38,11 @@ pub struct UpdateAccountEmailResponse;
 impl jacquard_common::xrpc::XrpcResp for UpdateAccountEmailResponse {
     const NSID: &'static str = "com.atproto.admin.updateAccountEmail";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ();
+    type Output<S: BosStr> = ();
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for UpdateAccountEmail<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UpdateAccountEmail<S> {
     const NSID: &'static str = "com.atproto.admin.updateAccountEmail";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -60,7 +57,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for UpdateAccountEmailRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = UpdateAccountEmail<S>;
+    type Request<S: BosStr> = UpdateAccountEmail<S>;
     type Response = UpdateAccountEmailResponse;
 }
 
@@ -85,17 +82,17 @@ pub mod update_account_email_state {
         type Account = Unset;
     }
     ///State transition - sets the `email` field to Set
-    pub struct SetEmail<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEmail<S> {}
-    impl<S: State> State for SetEmail<S> {
+    pub struct SetEmail<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetEmail<St> {}
+    impl<St: State> State for SetEmail<St> {
         type Email = Set<members::email>;
-        type Account = S::Account;
+        type Account = St::Account;
     }
     ///State transition - sets the `account` field to Set
-    pub struct SetAccount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAccount<S> {}
-    impl<S: State> State for SetAccount<S> {
-        type Email = S::Email;
+    pub struct SetAccount<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAccount<St> {}
+    impl<St: State> State for SetAccount<St> {
+        type Email = St::Email;
         type Account = Set<members::account>;
     }
     /// Marker types for field names
@@ -108,88 +105,88 @@ pub mod update_account_email_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct UpdateAccountEmailBuilder<'a, S: update_account_email_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct UpdateAccountEmailBuilder<S: BosStr, St: update_account_email_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtIdentifier<S>>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> UpdateAccountEmail<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> UpdateAccountEmailBuilder<'a, update_account_email_state::Empty> {
+impl<S: BosStr> UpdateAccountEmail<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> UpdateAccountEmailBuilder<S, update_account_email_state::Empty> {
         UpdateAccountEmailBuilder::new()
     }
 }
 
-impl<'a> UpdateAccountEmailBuilder<'a, update_account_email_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> UpdateAccountEmailBuilder<S, update_account_email_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         UpdateAccountEmailBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> UpdateAccountEmailBuilder<'a, S>
+impl<S: BosStr, St> UpdateAccountEmailBuilder<S, St>
 where
-    S: update_account_email_state::State,
-    S::Account: update_account_email_state::IsUnset,
+    St: update_account_email_state::State,
+    St::Account: update_account_email_state::IsUnset,
 {
     /// Set the `account` field (required)
     pub fn account(
         mut self,
         value: impl Into<AtIdentifier<S>>,
-    ) -> UpdateAccountEmailBuilder<'a, update_account_email_state::SetAccount<S>> {
+    ) -> UpdateAccountEmailBuilder<S, update_account_email_state::SetAccount<St>> {
         self._fields.0 = Option::Some(value.into());
         UpdateAccountEmailBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> UpdateAccountEmailBuilder<'a, S>
+impl<S: BosStr, St> UpdateAccountEmailBuilder<S, St>
 where
-    S: update_account_email_state::State,
-    S::Email: update_account_email_state::IsUnset,
+    St: update_account_email_state::State,
+    St::Email: update_account_email_state::IsUnset,
 {
     /// Set the `email` field (required)
     pub fn email(
         mut self,
         value: impl Into<S>,
-    ) -> UpdateAccountEmailBuilder<'a, update_account_email_state::SetEmail<S>> {
+    ) -> UpdateAccountEmailBuilder<S, update_account_email_state::SetEmail<St>> {
         self._fields.1 = Option::Some(value.into());
         UpdateAccountEmailBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> UpdateAccountEmailBuilder<'a, S>
+impl<S: BosStr, St> UpdateAccountEmailBuilder<S, St>
 where
-    S: update_account_email_state::State,
-    S::Email: update_account_email_state::IsSet,
-    S::Account: update_account_email_state::IsSet,
+    St: update_account_email_state::State,
+    St::Email: update_account_email_state::IsSet,
+    St::Account: update_account_email_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> UpdateAccountEmail<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> UpdateAccountEmail<S> {
         UpdateAccountEmail {
             account: self._fields.0.unwrap(),
             email: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> UpdateAccountEmail<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> UpdateAccountEmail<S> {
         UpdateAccountEmail {
             account: self._fields.0.unwrap(),
             email: self._fields.1.unwrap(),

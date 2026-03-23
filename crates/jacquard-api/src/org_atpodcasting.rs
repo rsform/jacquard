@@ -13,7 +13,7 @@ pub mod podcast;
 
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -33,11 +33,11 @@ use serde::{Serialize, Deserialize};
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct AppleCategory<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct AppleCategory<S: BosStr = DefaultStr> {
     ///The category value. Subcategories use the format 'Category > Subcategory'.
     pub value: AppleCategoryValue<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -47,7 +47,7 @@ pub struct AppleCategory<S: Bos<str> + AsRef<str> = DefaultStr> {
 /// The category value. Subcategories use the format 'Category > Subcategory'.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum AppleCategoryValue<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum AppleCategoryValue<S: BosStr = DefaultStr> {
     Arts,
     ArtsBooks,
     ArtsDesign,
@@ -161,7 +161,7 @@ pub enum AppleCategoryValue<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> AppleCategoryValue<S> {
+impl<S: BosStr> AppleCategoryValue<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Arts => "Arts",
@@ -411,19 +411,19 @@ impl<S: Bos<str> + AsRef<str>> AppleCategoryValue<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for AppleCategoryValue<S> {
+impl<S: BosStr> core::fmt::Display for AppleCategoryValue<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for AppleCategoryValue<S> {
+impl<S: BosStr> AsRef<str> for AppleCategoryValue<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for AppleCategoryValue<S> {
+impl<S: BosStr> Serialize for AppleCategoryValue<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -432,8 +432,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for AppleCategoryValue<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for AppleCategoryValue<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for AppleCategoryValue<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -443,14 +442,18 @@ for AppleCategoryValue<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for AppleCategoryValue<S> {
+impl<S: BosStr + Default> Default for AppleCategoryValue<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for AppleCategoryValue<S> {
-    type Output = AppleCategoryValue<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for AppleCategoryValue<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = AppleCategoryValue<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             AppleCategoryValue::Arts => AppleCategoryValue::Arts,
@@ -680,11 +683,11 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for AppleCategoryValue<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct EpisodeRef<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct EpisodeRef<S: BosStr = DefaultStr> {
     ///The original feed item identifier. Must match the <guid> element of the corresponding RSS feed item.
     pub feed_item_guid: S,
     ///URL of the podcast's RSS feed.
@@ -702,11 +705,11 @@ pub struct EpisodeRef<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct PodcastRef<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct PodcastRef<S: BosStr = DefaultStr> {
     ///URL of the podcast's RSS feed.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub feed_url: Option<UriValue<S>>,
@@ -716,7 +719,7 @@ pub struct PodcastRef<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for AppleCategory<S> {
+impl<S: BosStr> LexiconSchema for AppleCategory<S> {
     fn nsid() -> &'static str {
         "org.atpodcasting.defs"
     }
@@ -731,7 +734,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for AppleCategory<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for EpisodeRef<S> {
+impl<S: BosStr> LexiconSchema for EpisodeRef<S> {
     fn nsid() -> &'static str {
         "org.atpodcasting.defs"
     }
@@ -768,7 +771,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for EpisodeRef<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for PodcastRef<S> {
+impl<S: BosStr> LexiconSchema for PodcastRef<S> {
     fn nsid() -> &'static str {
         "org.atpodcasting.defs"
     }

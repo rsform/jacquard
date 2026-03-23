@@ -13,7 +13,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,11 +34,11 @@ use crate::com_deckbelcher::richtext;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct BulletListBlock<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct BulletListBlock<S: BosStr = DefaultStr> {
     ///The list items.
     pub items: Vec<richtext::ListItem<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -51,11 +51,11 @@ pub struct BulletListBlock<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CodeBlock<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CodeBlock<S: BosStr = DefaultStr> {
     ///Optional language identifier for syntax highlighting.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub language: Option<S>,
@@ -72,11 +72,11 @@ Used for primers and other long-form content.*/
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Document<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Document<S: BosStr = DefaultStr> {
     ///Array of blocks (paragraphs, headings, etc).
     pub content: Vec<DocumentContentItem<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -89,11 +89,11 @@ pub struct Document<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum DocumentContentItem<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum DocumentContentItem<S: BosStr = DefaultStr> {
     #[serde(rename = "com.deckbelcher.richtext#paragraphBlock")]
     ParagraphBlock(Box<richtext::ParagraphBlock<S>>),
     #[serde(rename = "com.deckbelcher.richtext#headingBlock")]
@@ -114,11 +114,11 @@ pub enum DocumentContentItem<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct HeadingBlock<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct HeadingBlock<S: BosStr = DefaultStr> {
     ///Annotations of text (formatting, mentions, links, etc).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub facets: Option<Vec<Facet<S>>>,
@@ -137,11 +137,11 @@ pub struct HeadingBlock<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct HorizontalRuleBlock<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct HorizontalRuleBlock<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
@@ -152,11 +152,11 @@ pub struct HorizontalRuleBlock<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ListItem<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ListItem<S: BosStr = DefaultStr> {
     ///Annotations of text (formatting, mentions, links, etc).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub facets: Option<Vec<Facet<S>>>,
@@ -176,11 +176,11 @@ pub struct ListItem<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ListItemSublist<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ListItemSublist<S: BosStr = DefaultStr> {
     #[serde(rename = "com.deckbelcher.richtext#bulletListBlock")]
     BulletListBlock(Box<richtext::BulletListBlock<S>>),
     #[serde(rename = "com.deckbelcher.richtext#orderedListBlock")]
@@ -194,11 +194,11 @@ Used for descriptions and other short formatted text.*/
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Richtext<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Richtext<S: BosStr = DefaultStr> {
     ///Annotations of text (mentions, URLs, hashtags, formatting, etc).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub facets: Option<Vec<Facet<S>>>,
@@ -215,11 +215,11 @@ pub struct Richtext<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct OrderedListBlock<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct OrderedListBlock<S: BosStr = DefaultStr> {
     ///The list items.
     pub items: Vec<richtext::ListItem<S>>,
     ///Starting number (default 1).
@@ -235,11 +235,11 @@ pub struct OrderedListBlock<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ParagraphBlock<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ParagraphBlock<S: BosStr = DefaultStr> {
     ///Annotations of text (formatting, mentions, links, etc).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub facets: Option<Vec<Facet<S>>>,
@@ -250,7 +250,7 @@ pub struct ParagraphBlock<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for BulletListBlock<S> {
+impl<S: BosStr> LexiconSchema for BulletListBlock<S> {
     fn nsid() -> &'static str {
         "com.deckbelcher.richtext"
     }
@@ -265,7 +265,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for BulletListBlock<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for CodeBlock<S> {
+impl<S: BosStr> LexiconSchema for CodeBlock<S> {
     fn nsid() -> &'static str {
         "com.deckbelcher.richtext"
     }
@@ -301,7 +301,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for CodeBlock<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Document<S> {
+impl<S: BosStr> LexiconSchema for Document<S> {
     fn nsid() -> &'static str {
         "com.deckbelcher.richtext"
     }
@@ -316,7 +316,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Document<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for HeadingBlock<S> {
+impl<S: BosStr> LexiconSchema for HeadingBlock<S> {
     fn nsid() -> &'static str {
         "com.deckbelcher.richtext"
     }
@@ -373,7 +373,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for HeadingBlock<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for HorizontalRuleBlock<S> {
+impl<S: BosStr> LexiconSchema for HorizontalRuleBlock<S> {
     fn nsid() -> &'static str {
         "com.deckbelcher.richtext"
     }
@@ -388,7 +388,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for HorizontalRuleBlock<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ListItem<S> {
+impl<S: BosStr> LexiconSchema for ListItem<S> {
     fn nsid() -> &'static str {
         "com.deckbelcher.richtext"
     }
@@ -425,7 +425,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for ListItem<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Richtext<S> {
+impl<S: BosStr> LexiconSchema for Richtext<S> {
     fn nsid() -> &'static str {
         "com.deckbelcher.richtext"
     }
@@ -462,7 +462,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Richtext<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for OrderedListBlock<S> {
+impl<S: BosStr> LexiconSchema for OrderedListBlock<S> {
     fn nsid() -> &'static str {
         "com.deckbelcher.richtext"
     }
@@ -477,7 +477,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for OrderedListBlock<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ParagraphBlock<S> {
+impl<S: BosStr> LexiconSchema for ParagraphBlock<S> {
     fn nsid() -> &'static str {
         "com.deckbelcher.richtext"
     }
@@ -533,9 +533,9 @@ pub mod bullet_list_block_state {
         type Items = Unset;
     }
     ///State transition - sets the `items` field to Set
-    pub struct SetItems<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetItems<S> {}
-    impl<S: State> State for SetItems<S> {
+    pub struct SetItems<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetItems<St> {}
+    impl<St: State> State for SetItems<St> {
         type Items = Set<members::items>;
     }
     /// Marker types for field names
@@ -546,67 +546,67 @@ pub mod bullet_list_block_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct BulletListBlockBuilder<'a, S: bullet_list_block_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct BulletListBlockBuilder<S: BosStr, St: bullet_list_block_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<richtext::ListItem<S>>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> BulletListBlock<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> BulletListBlockBuilder<'a, bullet_list_block_state::Empty> {
+impl<S: BosStr> BulletListBlock<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> BulletListBlockBuilder<S, bullet_list_block_state::Empty> {
         BulletListBlockBuilder::new()
     }
 }
 
-impl<'a> BulletListBlockBuilder<'a, bullet_list_block_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> BulletListBlockBuilder<S, bullet_list_block_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         BulletListBlockBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BulletListBlockBuilder<'a, S>
+impl<S: BosStr, St> BulletListBlockBuilder<S, St>
 where
-    S: bullet_list_block_state::State,
-    S::Items: bullet_list_block_state::IsUnset,
+    St: bullet_list_block_state::State,
+    St::Items: bullet_list_block_state::IsUnset,
 {
     /// Set the `items` field (required)
     pub fn items(
         mut self,
         value: impl Into<Vec<richtext::ListItem<S>>>,
-    ) -> BulletListBlockBuilder<'a, bullet_list_block_state::SetItems<S>> {
+    ) -> BulletListBlockBuilder<S, bullet_list_block_state::SetItems<St>> {
         self._fields.0 = Option::Some(value.into());
         BulletListBlockBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BulletListBlockBuilder<'a, S>
+impl<S: BosStr, St> BulletListBlockBuilder<S, St>
 where
-    S: bullet_list_block_state::State,
-    S::Items: bullet_list_block_state::IsSet,
+    St: bullet_list_block_state::State,
+    St::Items: bullet_list_block_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> BulletListBlock<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> BulletListBlock<S> {
         BulletListBlock {
             items: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> BulletListBlock<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> BulletListBlock<S> {
         BulletListBlock {
             items: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -995,9 +995,9 @@ pub mod document_state {
         type Content = Unset;
     }
     ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
+    pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetContent<St> {}
+    impl<St: State> State for SetContent<St> {
         type Content = Set<members::content>;
     }
     /// Marker types for field names
@@ -1008,67 +1008,64 @@ pub mod document_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct DocumentBuilder<'a, S: document_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct DocumentBuilder<S: BosStr, St: document_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<DocumentContentItem<S>>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Document<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> DocumentBuilder<'a, document_state::Empty> {
+impl<S: BosStr> Document<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> DocumentBuilder<S, document_state::Empty> {
         DocumentBuilder::new()
     }
 }
 
-impl<'a> DocumentBuilder<'a, document_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> DocumentBuilder<S, document_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         DocumentBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DocumentBuilder<'a, S>
+impl<S: BosStr, St> DocumentBuilder<S, St>
 where
-    S: document_state::State,
-    S::Content: document_state::IsUnset,
+    St: document_state::State,
+    St::Content: document_state::IsUnset,
 {
     /// Set the `content` field (required)
     pub fn content(
         mut self,
         value: impl Into<Vec<DocumentContentItem<S>>>,
-    ) -> DocumentBuilder<'a, document_state::SetContent<S>> {
+    ) -> DocumentBuilder<S, document_state::SetContent<St>> {
         self._fields.0 = Option::Some(value.into());
         DocumentBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DocumentBuilder<'a, S>
+impl<S: BosStr, St> DocumentBuilder<S, St>
 where
-    S: document_state::State,
-    S::Content: document_state::IsSet,
+    St: document_state::State,
+    St::Content: document_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Document<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Document<S> {
         Document {
             content: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Document<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Document<S> {
         Document {
             content: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -1095,9 +1092,9 @@ pub mod heading_block_state {
         type Level = Unset;
     }
     ///State transition - sets the `level` field to Set
-    pub struct SetLevel<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLevel<S> {}
-    impl<S: State> State for SetLevel<S> {
+    pub struct SetLevel<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLevel<St> {}
+    impl<St: State> State for SetLevel<St> {
         type Level = Set<members::level>;
     }
     /// Marker types for field names
@@ -1108,32 +1105,32 @@ pub mod heading_block_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct HeadingBlockBuilder<'a, S: heading_block_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct HeadingBlockBuilder<S: BosStr, St: heading_block_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<Facet<S>>>, Option<i64>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> HeadingBlock<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> HeadingBlockBuilder<'a, heading_block_state::Empty> {
+impl<S: BosStr> HeadingBlock<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> HeadingBlockBuilder<S, heading_block_state::Empty> {
         HeadingBlockBuilder::new()
     }
 }
 
-impl<'a> HeadingBlockBuilder<'a, heading_block_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> HeadingBlockBuilder<S, heading_block_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         HeadingBlockBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: heading_block_state::State> HeadingBlockBuilder<'a, S> {
+impl<S: BosStr, St: heading_block_state::State> HeadingBlockBuilder<S, St> {
     /// Set the `facets` field (optional)
     pub fn facets(mut self, value: impl Into<Option<Vec<Facet<S>>>>) -> Self {
         self._fields.0 = value.into();
@@ -1146,26 +1143,26 @@ impl<'a, S: heading_block_state::State> HeadingBlockBuilder<'a, S> {
     }
 }
 
-impl<'a, S> HeadingBlockBuilder<'a, S>
+impl<S: BosStr, St> HeadingBlockBuilder<S, St>
 where
-    S: heading_block_state::State,
-    S::Level: heading_block_state::IsUnset,
+    St: heading_block_state::State,
+    St::Level: heading_block_state::IsUnset,
 {
     /// Set the `level` field (required)
     pub fn level(
         mut self,
         value: impl Into<i64>,
-    ) -> HeadingBlockBuilder<'a, heading_block_state::SetLevel<S>> {
+    ) -> HeadingBlockBuilder<S, heading_block_state::SetLevel<St>> {
         self._fields.1 = Option::Some(value.into());
         HeadingBlockBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: heading_block_state::State> HeadingBlockBuilder<'a, S> {
+impl<S: BosStr, St: heading_block_state::State> HeadingBlockBuilder<S, St> {
     /// Set the `text` field (optional)
     pub fn text(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -1178,13 +1175,13 @@ impl<'a, S: heading_block_state::State> HeadingBlockBuilder<'a, S> {
     }
 }
 
-impl<'a, S> HeadingBlockBuilder<'a, S>
+impl<S: BosStr, St> HeadingBlockBuilder<S, St>
 where
-    S: heading_block_state::State,
-    S::Level: heading_block_state::IsSet,
+    St: heading_block_state::State,
+    St::Level: heading_block_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> HeadingBlock<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> HeadingBlock<S> {
         HeadingBlock {
             facets: self._fields.0,
             level: self._fields.1.unwrap(),
@@ -1192,11 +1189,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> HeadingBlock<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> HeadingBlock<S> {
         HeadingBlock {
             facets: self._fields.0,
             level: self._fields.1.unwrap(),
@@ -1225,9 +1222,9 @@ pub mod ordered_list_block_state {
         type Items = Unset;
     }
     ///State transition - sets the `items` field to Set
-    pub struct SetItems<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetItems<S> {}
-    impl<S: State> State for SetItems<S> {
+    pub struct SetItems<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetItems<St> {}
+    impl<St: State> State for SetItems<St> {
         type Items = Set<members::items>;
     }
     /// Marker types for field names
@@ -1238,51 +1235,51 @@ pub mod ordered_list_block_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct OrderedListBlockBuilder<'a, S: ordered_list_block_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct OrderedListBlockBuilder<S: BosStr, St: ordered_list_block_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<richtext::ListItem<S>>>, Option<i64>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> OrderedListBlock<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> OrderedListBlockBuilder<'a, ordered_list_block_state::Empty> {
+impl<S: BosStr> OrderedListBlock<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> OrderedListBlockBuilder<S, ordered_list_block_state::Empty> {
         OrderedListBlockBuilder::new()
     }
 }
 
-impl<'a> OrderedListBlockBuilder<'a, ordered_list_block_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> OrderedListBlockBuilder<S, ordered_list_block_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         OrderedListBlockBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> OrderedListBlockBuilder<'a, S>
+impl<S: BosStr, St> OrderedListBlockBuilder<S, St>
 where
-    S: ordered_list_block_state::State,
-    S::Items: ordered_list_block_state::IsUnset,
+    St: ordered_list_block_state::State,
+    St::Items: ordered_list_block_state::IsUnset,
 {
     /// Set the `items` field (required)
     pub fn items(
         mut self,
         value: impl Into<Vec<richtext::ListItem<S>>>,
-    ) -> OrderedListBlockBuilder<'a, ordered_list_block_state::SetItems<S>> {
+    ) -> OrderedListBlockBuilder<S, ordered_list_block_state::SetItems<St>> {
         self._fields.0 = Option::Some(value.into());
         OrderedListBlockBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: ordered_list_block_state::State> OrderedListBlockBuilder<'a, S> {
+impl<S: BosStr, St: ordered_list_block_state::State> OrderedListBlockBuilder<S, St> {
     /// Set the `start` field (optional)
     pub fn start(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -1295,24 +1292,24 @@ impl<'a, S: ordered_list_block_state::State> OrderedListBlockBuilder<'a, S> {
     }
 }
 
-impl<'a, S> OrderedListBlockBuilder<'a, S>
+impl<S: BosStr, St> OrderedListBlockBuilder<S, St>
 where
-    S: ordered_list_block_state::State,
-    S::Items: ordered_list_block_state::IsSet,
+    St: ordered_list_block_state::State,
+    St::Items: ordered_list_block_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> OrderedListBlock<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> OrderedListBlock<S> {
         OrderedListBlock {
             items: self._fields.0.unwrap(),
             start: self._fields.1,
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> OrderedListBlock<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> OrderedListBlock<S> {
         OrderedListBlock {
             items: self._fields.0.unwrap(),
             start: self._fields.1,

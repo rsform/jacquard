@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::value::Data;
@@ -18,15 +18,14 @@ use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetProfileShouts<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct GetProfileShouts<S: BosStr = DefaultStr> {
     pub did: AtIdentifier<S>,
     ///(min: 1)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -38,19 +37,17 @@ pub struct GetProfileShouts<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetProfileShoutsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetProfileShoutsOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub shouts: Option<Vec<Data<S>>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -59,12 +56,11 @@ pub struct GetProfileShoutsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetProfileShoutsResponse {
     const NSID: &'static str = "app.rocksky.shout.getProfileShouts";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetProfileShoutsOutput<S>;
+    type Output<S: BosStr> = GetProfileShoutsOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetProfileShouts<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetProfileShouts<S> {
     const NSID: &'static str = "app.rocksky.shout.getProfileShouts";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetProfileShoutsResponse;
@@ -75,7 +71,7 @@ pub struct GetProfileShoutsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetProfileShoutsRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.shout.getProfileShouts";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetProfileShouts<S>;
+    type Request<S: BosStr> = GetProfileShouts<S>;
     type Response = GetProfileShoutsResponse;
 }
 
@@ -98,9 +94,9 @@ pub mod get_profile_shouts_state {
         type Did = Unset;
     }
     ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
         type Did = Set<members::did>;
     }
     /// Marker types for field names
@@ -111,51 +107,51 @@ pub mod get_profile_shouts_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetProfileShoutsBuilder<'a, S: get_profile_shouts_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetProfileShoutsBuilder<S: BosStr, St: get_profile_shouts_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtIdentifier<S>>, Option<i64>, Option<i64>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetProfileShouts<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetProfileShoutsBuilder<'a, get_profile_shouts_state::Empty> {
+impl<S: BosStr> GetProfileShouts<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetProfileShoutsBuilder<S, get_profile_shouts_state::Empty> {
         GetProfileShoutsBuilder::new()
     }
 }
 
-impl<'a> GetProfileShoutsBuilder<'a, get_profile_shouts_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetProfileShoutsBuilder<S, get_profile_shouts_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetProfileShoutsBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetProfileShoutsBuilder<'a, S>
+impl<S: BosStr, St> GetProfileShoutsBuilder<S, St>
 where
-    S: get_profile_shouts_state::State,
-    S::Did: get_profile_shouts_state::IsUnset,
+    St: get_profile_shouts_state::State,
+    St::Did: get_profile_shouts_state::IsUnset,
 {
     /// Set the `did` field (required)
     pub fn did(
         mut self,
         value: impl Into<AtIdentifier<S>>,
-    ) -> GetProfileShoutsBuilder<'a, get_profile_shouts_state::SetDid<S>> {
+    ) -> GetProfileShoutsBuilder<S, get_profile_shouts_state::SetDid<St>> {
         self._fields.0 = Option::Some(value.into());
         GetProfileShoutsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: get_profile_shouts_state::State> GetProfileShoutsBuilder<'a, S> {
+impl<S: BosStr, St: get_profile_shouts_state::State> GetProfileShoutsBuilder<S, St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -168,7 +164,7 @@ impl<'a, S: get_profile_shouts_state::State> GetProfileShoutsBuilder<'a, S> {
     }
 }
 
-impl<'a, S: get_profile_shouts_state::State> GetProfileShoutsBuilder<'a, S> {
+impl<S: BosStr, St: get_profile_shouts_state::State> GetProfileShoutsBuilder<S, St> {
     /// Set the `offset` field (optional)
     pub fn offset(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -181,13 +177,13 @@ impl<'a, S: get_profile_shouts_state::State> GetProfileShoutsBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GetProfileShoutsBuilder<'a, S>
+impl<S: BosStr, St> GetProfileShoutsBuilder<S, St>
 where
-    S: get_profile_shouts_state::State,
-    S::Did: get_profile_shouts_state::IsSet,
+    St: get_profile_shouts_state::State,
+    St::Did: get_profile_shouts_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetProfileShouts<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetProfileShouts<S> {
         GetProfileShouts {
             did: self._fields.0.unwrap(),
             limit: self._fields.1,

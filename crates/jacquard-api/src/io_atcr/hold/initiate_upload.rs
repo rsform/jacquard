@@ -10,44 +10,40 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct InitiateUpload<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct InitiateUpload<S: BosStr = DefaultStr> {
     ///The blob digest (e.g., sha256:abc123...)
     pub digest: S,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct InitiateUploadOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct InitiateUploadOutput<S: BosStr = DefaultStr> {
     ///Unique identifier for this upload session
     pub upload_id: S,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -98,12 +94,11 @@ pub struct InitiateUploadResponse;
 impl jacquard_common::xrpc::XrpcResp for InitiateUploadResponse {
     const NSID: &'static str = "io.atcr.hold.initiateUpload";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = InitiateUploadOutput<S>;
+    type Output<S: BosStr> = InitiateUploadOutput<S>;
     type Err = InitiateUploadError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for InitiateUpload<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for InitiateUpload<S> {
     const NSID: &'static str = "io.atcr.hold.initiateUpload";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -118,6 +113,6 @@ impl jacquard_common::xrpc::XrpcEndpoint for InitiateUploadRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = InitiateUpload<S>;
+    type Request<S: BosStr> = InitiateUpload<S>;
     type Response = InitiateUploadResponse;
 }

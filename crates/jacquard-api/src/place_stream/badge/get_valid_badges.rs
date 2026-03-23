@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
@@ -19,33 +19,30 @@ use serde::{Serialize, Deserialize};
 use crate::place_stream::badge::BadgeView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetValidBadges<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetValidBadges<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub streamer: Option<Did<S>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetValidBadgesOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetValidBadgesOutput<S: BosStr = DefaultStr> {
     pub badges: Vec<BadgeView<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -54,12 +51,11 @@ pub struct GetValidBadgesResponse;
 impl jacquard_common::xrpc::XrpcResp for GetValidBadgesResponse {
     const NSID: &'static str = "place.stream.badge.getValidBadges";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetValidBadgesOutput<S>;
+    type Output<S: BosStr> = GetValidBadgesOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetValidBadges<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetValidBadges<S> {
     const NSID: &'static str = "place.stream.badge.getValidBadges";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetValidBadgesResponse;
@@ -70,7 +66,7 @@ pub struct GetValidBadgesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetValidBadgesRequest {
     const PATH: &'static str = "/xrpc/place.stream.badge.getValidBadges";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetValidBadges<S>;
+    type Request<S: BosStr> = GetValidBadges<S>;
     type Response = GetValidBadgesResponse;
 }
 
@@ -93,32 +89,32 @@ pub mod get_valid_badges_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetValidBadgesBuilder<'a, S: get_valid_badges_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetValidBadgesBuilder<S: BosStr, St: get_valid_badges_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetValidBadges<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetValidBadgesBuilder<'a, get_valid_badges_state::Empty> {
+impl<S: BosStr> GetValidBadges<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetValidBadgesBuilder<S, get_valid_badges_state::Empty> {
         GetValidBadgesBuilder::new()
     }
 }
 
-impl<'a> GetValidBadgesBuilder<'a, get_valid_badges_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetValidBadgesBuilder<S, get_valid_badges_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetValidBadgesBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: get_valid_badges_state::State> GetValidBadgesBuilder<'a, S> {
+impl<S: BosStr, St: get_valid_badges_state::State> GetValidBadgesBuilder<S, St> {
     /// Set the `streamer` field (optional)
     pub fn streamer(mut self, value: impl Into<Option<Did<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -131,12 +127,12 @@ impl<'a, S: get_valid_badges_state::State> GetValidBadgesBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GetValidBadgesBuilder<'a, S>
+impl<S: BosStr, St> GetValidBadgesBuilder<S, St>
 where
-    S: get_valid_badges_state::State,
+    St: get_valid_badges_state::State,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetValidBadges<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetValidBadges<S> {
         GetValidBadges {
             streamer: self._fields.0,
         }

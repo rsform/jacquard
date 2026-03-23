@@ -6,30 +6,33 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[allow(unused_imports)]
+use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
+use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ListTags<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ListTags<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub cursor: Option<S>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
-    #[serde(borrow)]
     pub repo: AtUri<S>,
 }
 
@@ -56,16 +59,13 @@ pub struct ListTagsOutput {
 pub enum ListTagsError {
     /// Repository not found or access denied
     #[serde(rename = "RepoNotFound")]
-    RepoNotFound(Option<jacquard_common::deps::smol_str::SmolStr>),
+    RepoNotFound(Option<SmolStr>),
     /// Invalid request parameters
     #[serde(rename = "InvalidRequest")]
-    InvalidRequest(Option<jacquard_common::deps::smol_str::SmolStr>),
+    InvalidRequest(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: jacquard_common::deps::smol_str::SmolStr,
-        message: Option<jacquard_common::deps::smol_str::SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for ListTagsError {
@@ -101,9 +101,9 @@ pub struct ListTagsResponse;
 impl jacquard_common::xrpc::XrpcResp for ListTagsResponse {
     const NSID: &'static str = "sh.tangled.git.temp.listTags";
     const ENCODING: &'static str = "*/*";
-    type Output<S: Bos<str> + AsRef<str>> = ListTagsOutput;
+    type Output<S: BosStr> = ListTagsOutput;
     type Err = ListTagsError;
-    fn encode_output<S: Bos<str> + AsRef<str>>(
+    fn encode_output<S: BosStr>(
         output: &Self::Output<S>,
     ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError>
     where
@@ -115,7 +115,7 @@ impl jacquard_common::xrpc::XrpcResp for ListTagsResponse {
         body: &'de [u8],
     ) -> Result<Self::Output<S>, jacquard_common::error::DecodeError>
     where
-        S: Bos<str> + AsRef<str> + Deserialize<'de>,
+        S: BosStr + Deserialize<'de>,
         Self::Output<S>: Deserialize<'de>,
     {
         Ok(ListTagsOutput {
@@ -124,8 +124,7 @@ impl jacquard_common::xrpc::XrpcResp for ListTagsResponse {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for ListTags<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ListTags<S> {
     const NSID: &'static str = "sh.tangled.git.temp.listTags";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ListTagsResponse;
@@ -136,7 +135,7 @@ pub struct ListTagsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListTagsRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.git.temp.listTags";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = ListTags<S>;
+    type Request<S: BosStr> = ListTags<S>;
     type Response = ListTagsResponse;
 }
 
@@ -163,9 +162,9 @@ pub mod list_tags_state {
         type Repo = Unset;
     }
     ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
+    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRepo<St> {}
+    impl<St: State> State for SetRepo<St> {
         type Repo = Set<members::repo>;
     }
     /// Marker types for field names
@@ -176,32 +175,32 @@ pub mod list_tags_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ListTagsBuilder<'a, S: list_tags_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ListTagsBuilder<S: BosStr, St: list_tags_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>, Option<AtUri<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ListTags<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ListTagsBuilder<'a, list_tags_state::Empty> {
+impl<S: BosStr> ListTags<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ListTagsBuilder<S, list_tags_state::Empty> {
         ListTagsBuilder::new()
     }
 }
 
-impl<'a> ListTagsBuilder<'a, list_tags_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ListTagsBuilder<S, list_tags_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ListTagsBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: list_tags_state::State> ListTagsBuilder<'a, S> {
+impl<S: BosStr, St: list_tags_state::State> ListTagsBuilder<S, St> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -214,7 +213,7 @@ impl<'a, S: list_tags_state::State> ListTagsBuilder<'a, S> {
     }
 }
 
-impl<'a, S: list_tags_state::State> ListTagsBuilder<'a, S> {
+impl<S: BosStr, St: list_tags_state::State> ListTagsBuilder<S, St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -227,32 +226,32 @@ impl<'a, S: list_tags_state::State> ListTagsBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ListTagsBuilder<'a, S>
+impl<S: BosStr, St> ListTagsBuilder<S, St>
 where
-    S: list_tags_state::State,
-    S::Repo: list_tags_state::IsUnset,
+    St: list_tags_state::State,
+    St::Repo: list_tags_state::IsUnset,
 {
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> ListTagsBuilder<'a, list_tags_state::SetRepo<S>> {
+    ) -> ListTagsBuilder<S, list_tags_state::SetRepo<St>> {
         self._fields.2 = Option::Some(value.into());
         ListTagsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ListTagsBuilder<'a, S>
+impl<S: BosStr, St> ListTagsBuilder<S, St>
 where
-    S: list_tags_state::State,
-    S::Repo: list_tags_state::IsSet,
+    St: list_tags_state::State,
+    St::Repo: list_tags_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ListTags<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ListTags<S> {
         ListTags {
             cursor: self._fields.0,
             limit: self._fields.1,

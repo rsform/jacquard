@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Datetime;
 use jacquard_common::types::value::Data;
@@ -26,18 +26,16 @@ pub struct GetUnreadCount {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetUnreadCountOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetUnreadCountOutput<S: BosStr = DefaultStr> {
     pub count: i64,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -46,7 +44,7 @@ pub struct GetUnreadCountResponse;
 impl jacquard_common::xrpc::XrpcResp for GetUnreadCountResponse {
     const NSID: &'static str = "sh.weaver.notification.getUnreadCount";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetUnreadCountOutput<S>;
+    type Output<S: BosStr> = GetUnreadCountOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
@@ -61,7 +59,7 @@ pub struct GetUnreadCountRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetUnreadCountRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.notification.getUnreadCount";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetUnreadCount;
+    type Request<S: BosStr> = GetUnreadCount;
     type Response = GetUnreadCountResponse;
 }
 
@@ -84,21 +82,21 @@ pub mod get_unread_count_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetUnreadCountBuilder<S: get_unread_count_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetUnreadCountBuilder<St: get_unread_count_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>,),
 }
 
 impl GetUnreadCount {
-    /// Create a new builder for this type
+    /// Create a new builder for this type.
     pub fn new() -> GetUnreadCountBuilder<get_unread_count_state::Empty> {
         GetUnreadCountBuilder::new()
     }
 }
 
 impl GetUnreadCountBuilder<get_unread_count_state::Empty> {
-    /// Create a new builder with all fields unset
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetUnreadCountBuilder {
             _state: PhantomData,
@@ -107,7 +105,7 @@ impl GetUnreadCountBuilder<get_unread_count_state::Empty> {
     }
 }
 
-impl<S: get_unread_count_state::State> GetUnreadCountBuilder<S> {
+impl<St: get_unread_count_state::State> GetUnreadCountBuilder<St> {
     /// Set the `seenAt` field (optional)
     pub fn seen_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.0 = value.into();
@@ -120,11 +118,11 @@ impl<S: get_unread_count_state::State> GetUnreadCountBuilder<S> {
     }
 }
 
-impl<S> GetUnreadCountBuilder<S>
+impl<St> GetUnreadCountBuilder<St>
 where
-    S: get_unread_count_state::State,
+    St: get_unread_count_state::State,
 {
-    /// Build the final struct
+    /// Build the final struct.
     pub fn build(self) -> GetUnreadCount {
         GetUnreadCount {
             seen_at: self._fields.0,

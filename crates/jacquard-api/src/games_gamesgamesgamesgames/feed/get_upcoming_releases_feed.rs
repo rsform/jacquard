@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
@@ -18,16 +18,15 @@ use serde::{Serialize, Deserialize};
 use crate::games_gamesgamesgamesgames::GameFeedViewItem;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetUpcomingReleasesFeed<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetUpcomingReleasesFeed<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub cursor: Option<S>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
@@ -37,20 +36,18 @@ pub struct GetUpcomingReleasesFeed<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetUpcomingReleasesFeedOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetUpcomingReleasesFeedOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
     pub feed: Vec<GameFeedViewItem<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -59,12 +56,11 @@ pub struct GetUpcomingReleasesFeedResponse;
 impl jacquard_common::xrpc::XrpcResp for GetUpcomingReleasesFeedResponse {
     const NSID: &'static str = "games.gamesgamesgamesgames.feed.getUpcomingReleasesFeed";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetUpcomingReleasesFeedOutput<S>;
+    type Output<S: BosStr> = GetUpcomingReleasesFeedOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetUpcomingReleasesFeed<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetUpcomingReleasesFeed<S> {
     const NSID: &'static str = "games.gamesgamesgamesgames.feed.getUpcomingReleasesFeed";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetUpcomingReleasesFeedResponse;
@@ -75,7 +71,7 @@ pub struct GetUpcomingReleasesFeedRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetUpcomingReleasesFeedRequest {
     const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.feed.getUpcomingReleasesFeed";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetUpcomingReleasesFeed<S>;
+    type Request<S: BosStr> = GetUpcomingReleasesFeed<S>;
     type Response = GetUpcomingReleasesFeedResponse;
 }
 
@@ -102,41 +98,43 @@ pub mod get_upcoming_releases_feed_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
+/// Builder for constructing an instance of this type.
 pub struct GetUpcomingReleasesFeedBuilder<
-    'a,
-    S: get_upcoming_releases_feed_state::State,
+    S: BosStr,
+    St: get_upcoming_releases_feed_state::State,
 > {
-    _state: PhantomData<fn() -> S>,
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetUpcomingReleasesFeed<'a> {
-    /// Create a new builder for this type
+impl<S: BosStr> GetUpcomingReleasesFeed<S> {
+    /// Create a new builder for this type.
     pub fn new() -> GetUpcomingReleasesFeedBuilder<
-        'a,
+        S,
         get_upcoming_releases_feed_state::Empty,
     > {
         GetUpcomingReleasesFeedBuilder::new()
     }
 }
 
-impl<'a> GetUpcomingReleasesFeedBuilder<'a, get_upcoming_releases_feed_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<
+    S: BosStr,
+> GetUpcomingReleasesFeedBuilder<S, get_upcoming_releases_feed_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetUpcomingReleasesFeedBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
 impl<
-    'a,
-    S: get_upcoming_releases_feed_state::State,
-> GetUpcomingReleasesFeedBuilder<'a, S> {
+    S: BosStr,
+    St: get_upcoming_releases_feed_state::State,
+> GetUpcomingReleasesFeedBuilder<S, St> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -150,9 +148,9 @@ impl<
 }
 
 impl<
-    'a,
-    S: get_upcoming_releases_feed_state::State,
-> GetUpcomingReleasesFeedBuilder<'a, S> {
+    S: BosStr,
+    St: get_upcoming_releases_feed_state::State,
+> GetUpcomingReleasesFeedBuilder<S, St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -165,12 +163,12 @@ impl<
     }
 }
 
-impl<'a, S> GetUpcomingReleasesFeedBuilder<'a, S>
+impl<S: BosStr, St> GetUpcomingReleasesFeedBuilder<S, St>
 where
-    S: get_upcoming_releases_feed_state::State,
+    St: get_upcoming_releases_feed_state::State,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetUpcomingReleasesFeed<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetUpcomingReleasesFeed<S> {
         GetUpcomingReleasesFeed {
             cursor: self._fields.0,
             limit: self._fields.1,

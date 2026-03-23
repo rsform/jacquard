@@ -41,7 +41,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -63,11 +63,11 @@ use crate::games_gamesgamesgamesgames;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ActorCreditView<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ActorCreditView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub actor_uri: Option<AtUri<S>>,
     pub credits: Vec<games_gamesgamesgamesgames::CreditEntry<S>>,
@@ -83,11 +83,11 @@ pub struct ActorCreditView<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ActorProfileDetailView<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ActorProfileDetailView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avatar: Option<BlobRef<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -113,11 +113,11 @@ pub struct ActorProfileDetailView<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ActorProfileSummaryView<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ActorProfileSummaryView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avatar: Option<BlobRef<S>>,
     pub did: Did<S>,
@@ -133,11 +133,11 @@ pub struct ActorProfileSummaryView<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct AgeRating<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct AgeRating<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub content_descriptors: Option<Vec<S>>,
     pub organization: AgeRatingOrganization<S>,
@@ -148,7 +148,7 @@ pub struct AgeRating<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum AgeRatingOrganization<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum AgeRatingOrganization<S: BosStr = DefaultStr> {
     Esrb,
     Pegi,
     Cero,
@@ -159,7 +159,7 @@ pub enum AgeRatingOrganization<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> AgeRatingOrganization<S> {
+impl<S: BosStr> AgeRatingOrganization<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Esrb => "esrb",
@@ -187,19 +187,19 @@ impl<S: Bos<str> + AsRef<str>> AgeRatingOrganization<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for AgeRatingOrganization<S> {
+impl<S: BosStr> core::fmt::Display for AgeRatingOrganization<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for AgeRatingOrganization<S> {
+impl<S: BosStr> AsRef<str> for AgeRatingOrganization<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for AgeRatingOrganization<S> {
+impl<S: BosStr> Serialize for AgeRatingOrganization<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -208,8 +208,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for AgeRatingOrganization<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for AgeRatingOrganization<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for AgeRatingOrganization<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -219,14 +218,18 @@ for AgeRatingOrganization<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for AgeRatingOrganization<S> {
+impl<S: BosStr + Default> Default for AgeRatingOrganization<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for AgeRatingOrganization<S> {
-    type Output = AgeRatingOrganization<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for AgeRatingOrganization<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = AgeRatingOrganization<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             AgeRatingOrganization::Esrb => AgeRatingOrganization::Esrb,
@@ -248,11 +251,11 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for AgeRatingOrganization<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct AlternativeName<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct AlternativeName<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub comment: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -262,17 +265,17 @@ pub struct AlternativeName<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-pub type ApplicationType<'a> = S;
+pub type ApplicationType<S: BosStr = DefaultStr> = S;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CollectionSummaryView<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CollectionSummaryView<S: BosStr = DefaultStr> {
     pub name: S,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub slug: Option<S>,
@@ -285,14 +288,14 @@ pub struct CollectionSummaryView<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum CollectionSummaryViewType<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum CollectionSummaryViewType<S: BosStr = DefaultStr> {
     Franchise,
     Series,
     Curated,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> CollectionSummaryViewType<S> {
+impl<S: BosStr> CollectionSummaryViewType<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Franchise => "franchise",
@@ -312,19 +315,19 @@ impl<S: Bos<str> + AsRef<str>> CollectionSummaryViewType<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for CollectionSummaryViewType<S> {
+impl<S: BosStr> core::fmt::Display for CollectionSummaryViewType<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for CollectionSummaryViewType<S> {
+impl<S: BosStr> AsRef<str> for CollectionSummaryViewType<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for CollectionSummaryViewType<S> {
+impl<S: BosStr> Serialize for CollectionSummaryViewType<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -333,7 +336,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for CollectionSummaryViewType<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
 for CollectionSummaryViewType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
@@ -344,14 +347,18 @@ for CollectionSummaryViewType<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for CollectionSummaryViewType<S> {
+impl<S: BosStr + Default> Default for CollectionSummaryViewType<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for CollectionSummaryViewType<S> {
-    type Output = CollectionSummaryViewType<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for CollectionSummaryViewType<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = CollectionSummaryViewType<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             CollectionSummaryViewType::Franchise => CollectionSummaryViewType::Franchise,
@@ -366,7 +373,7 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for CollectionSummaryViewType<S> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum CompanyRole<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum CompanyRole<S: BosStr = DefaultStr> {
     Developer,
     Publisher,
     Porter,
@@ -374,7 +381,7 @@ pub enum CompanyRole<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> CompanyRole<S> {
+impl<S: BosStr> CompanyRole<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Developer => "developer",
@@ -396,19 +403,19 @@ impl<S: Bos<str> + AsRef<str>> CompanyRole<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for CompanyRole<S> {
+impl<S: BosStr> AsRef<str> for CompanyRole<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for CompanyRole<S> {
+impl<S: BosStr> core::fmt::Display for CompanyRole<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for CompanyRole<S> {
+impl<S: BosStr> Serialize for CompanyRole<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -417,8 +424,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for CompanyRole<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for CompanyRole<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for CompanyRole<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -428,8 +434,12 @@ for CompanyRole<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for CompanyRole<S> {
-    type Output = CompanyRole<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for CompanyRole<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = CompanyRole<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             CompanyRole::Developer => CompanyRole::Developer,
@@ -446,11 +456,11 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for CompanyRole<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CreditEntry<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CreditEntry<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub department: Option<S>,
     pub role: games_gamesgamesgamesgames::IndividualRole<S>,
@@ -463,11 +473,11 @@ pub struct CreditEntry<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct EngineSummaryView<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct EngineSummaryView<S: BosStr = DefaultStr> {
     pub name: S,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub slug: Option<S>,
@@ -481,11 +491,11 @@ pub struct EngineSummaryView<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ExternalIds<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ExternalIds<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub apple_app_store: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -519,11 +529,11 @@ pub struct ExternalIds<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ExternalVideo<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ExternalVideo<S: BosStr = DefaultStr> {
     pub platform: ExternalVideoPlatform<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub title: Option<S>,
@@ -534,14 +544,14 @@ pub struct ExternalVideo<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ExternalVideoPlatform<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ExternalVideoPlatform<S: BosStr = DefaultStr> {
     Youtube,
     Twitch,
     Vimeo,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> ExternalVideoPlatform<S> {
+impl<S: BosStr> ExternalVideoPlatform<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Youtube => "youtube",
@@ -561,19 +571,19 @@ impl<S: Bos<str> + AsRef<str>> ExternalVideoPlatform<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ExternalVideoPlatform<S> {
+impl<S: BosStr> core::fmt::Display for ExternalVideoPlatform<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for ExternalVideoPlatform<S> {
+impl<S: BosStr> AsRef<str> for ExternalVideoPlatform<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for ExternalVideoPlatform<S> {
+impl<S: BosStr> Serialize for ExternalVideoPlatform<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -582,8 +592,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for ExternalVideoPlatform<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for ExternalVideoPlatform<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ExternalVideoPlatform<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -593,14 +602,18 @@ for ExternalVideoPlatform<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for ExternalVideoPlatform<S> {
+impl<S: BosStr + Default> Default for ExternalVideoPlatform<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for ExternalVideoPlatform<S> {
-    type Output = ExternalVideoPlatform<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for ExternalVideoPlatform<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ExternalVideoPlatform<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             ExternalVideoPlatform::Youtube => ExternalVideoPlatform::Youtube,
@@ -618,11 +631,11 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for ExternalVideoPlatform<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GameDetailView<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GameDetailView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub actor_credits: Option<Vec<games_gamesgamesgamesgames::ActorCreditView<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -687,11 +700,11 @@ pub struct GameDetailView<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GameFeedViewItem<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GameFeedViewItem<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub feed_context: Option<S>,
     pub game: games_gamesgamesgamesgames::GameView<S>,
@@ -704,11 +717,11 @@ pub struct GameFeedViewItem<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GameSummaryView<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GameSummaryView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub application_type: Option<games_gamesgamesgamesgames::ApplicationType<S>>,
     ///Earliest release date as YYYYMMDD integer.
@@ -731,11 +744,11 @@ pub struct GameSummaryView<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GameView<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GameView<S: BosStr = DefaultStr> {
     pub application_type: games_gamesgamesgamesgames::ApplicationType<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub genres: Option<Vec<games_gamesgamesgamesgames::Genre<S>>>,
@@ -761,7 +774,7 @@ pub struct GameView<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum Genre<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum Genre<S: BosStr = DefaultStr> {
     Fighting,
     Music,
     Platform,
@@ -775,7 +788,7 @@ pub enum Genre<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> Genre<S> {
+impl<S: BosStr> Genre<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Fighting => "fighting",
@@ -809,19 +822,19 @@ impl<S: Bos<str> + AsRef<str>> Genre<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for Genre<S> {
+impl<S: BosStr> AsRef<str> for Genre<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for Genre<S> {
+impl<S: BosStr> core::fmt::Display for Genre<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for Genre<S> {
+impl<S: BosStr> Serialize for Genre<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -830,7 +843,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for Genre<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de> for Genre<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for Genre<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -840,8 +853,12 @@ impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de> for Genr
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for Genre<S> {
-    type Output = Genre<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for Genre<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = Genre<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             Genre::Fighting => Genre::Fighting,
@@ -861,7 +878,7 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for Genre<S> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum IndividualRole<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum IndividualRole<S: BosStr = DefaultStr> {
     Director,
     Producer,
     Designer,
@@ -879,7 +896,7 @@ pub enum IndividualRole<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> IndividualRole<S> {
+impl<S: BosStr> IndividualRole<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Director => "director",
@@ -921,19 +938,19 @@ impl<S: Bos<str> + AsRef<str>> IndividualRole<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for IndividualRole<S> {
+impl<S: BosStr> AsRef<str> for IndividualRole<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for IndividualRole<S> {
+impl<S: BosStr> core::fmt::Display for IndividualRole<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for IndividualRole<S> {
+impl<S: BosStr> Serialize for IndividualRole<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -942,8 +959,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for IndividualRole<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for IndividualRole<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for IndividualRole<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -953,8 +969,12 @@ for IndividualRole<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for IndividualRole<S> {
-    type Output = IndividualRole<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for IndividualRole<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = IndividualRole<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             IndividualRole::Director => IndividualRole::Director,
@@ -981,11 +1001,11 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for IndividualRole<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ItchIoId<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ItchIoId<S: BosStr = DefaultStr> {
     pub developer: S,
     pub game: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -997,11 +1017,11 @@ pub struct ItchIoId<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct LanguageSupport<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct LanguageSupport<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub audio: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1018,11 +1038,11 @@ pub struct LanguageSupport<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct MediaItem<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct MediaItem<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub blob: Option<BlobRef<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1043,7 +1063,7 @@ pub struct MediaItem<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum Mode<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum Mode<S: BosStr = DefaultStr> {
     BattleRoyale,
     Cooperative,
     Mmo,
@@ -1053,7 +1073,7 @@ pub enum Mode<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> Mode<S> {
+impl<S: BosStr> Mode<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::BattleRoyale => "battleRoyale",
@@ -1079,19 +1099,19 @@ impl<S: Bos<str> + AsRef<str>> Mode<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for Mode<S> {
+impl<S: BosStr> AsRef<str> for Mode<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for Mode<S> {
+impl<S: BosStr> core::fmt::Display for Mode<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for Mode<S> {
+impl<S: BosStr> Serialize for Mode<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -1100,7 +1120,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for Mode<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de> for Mode<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for Mode<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -1110,8 +1130,12 @@ impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de> for Mode
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for Mode<S> {
-    type Output = Mode<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for Mode<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = Mode<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             Mode::BattleRoyale => Mode::BattleRoyale,
@@ -1130,11 +1154,11 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for Mode<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct MultiplayerMode<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct MultiplayerMode<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub has_campaign_coop: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1164,11 +1188,11 @@ pub struct MultiplayerMode<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct OrgCreditView<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct OrgCreditView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub display_name: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1184,11 +1208,11 @@ pub struct OrgCreditView<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct OrgProfileDetailView<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct OrgProfileDetailView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avatar: Option<BlobRef<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1219,7 +1243,7 @@ pub struct OrgProfileDetailView<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum OrgProfileDetailViewStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum OrgProfileDetailViewStatus<S: BosStr = DefaultStr> {
     Active,
     Inactive,
     Merged,
@@ -1228,7 +1252,7 @@ pub enum OrgProfileDetailViewStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> OrgProfileDetailViewStatus<S> {
+impl<S: BosStr> OrgProfileDetailViewStatus<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Active => "active",
@@ -1252,19 +1276,19 @@ impl<S: Bos<str> + AsRef<str>> OrgProfileDetailViewStatus<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for OrgProfileDetailViewStatus<S> {
+impl<S: BosStr> core::fmt::Display for OrgProfileDetailViewStatus<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for OrgProfileDetailViewStatus<S> {
+impl<S: BosStr> AsRef<str> for OrgProfileDetailViewStatus<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for OrgProfileDetailViewStatus<S> {
+impl<S: BosStr> Serialize for OrgProfileDetailViewStatus<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -1273,7 +1297,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for OrgProfileDetailViewStatus<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
 for OrgProfileDetailViewStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
@@ -1284,14 +1308,18 @@ for OrgProfileDetailViewStatus<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for OrgProfileDetailViewStatus<S> {
+impl<S: BosStr + Default> Default for OrgProfileDetailViewStatus<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for OrgProfileDetailViewStatus<S> {
-    type Output = OrgProfileDetailViewStatus<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for OrgProfileDetailViewStatus<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = OrgProfileDetailViewStatus<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             OrgProfileDetailViewStatus::Active => OrgProfileDetailViewStatus::Active,
@@ -1311,11 +1339,11 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for OrgProfileDetailViewStatus<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct OrgProfileSummaryView<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct OrgProfileSummaryView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avatar: Option<BlobRef<S>>,
     pub did: Did<S>,
@@ -1328,7 +1356,7 @@ pub struct OrgProfileSummaryView<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum PlatformCategory<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum PlatformCategory<S: BosStr = DefaultStr> {
     Console,
     Portable,
     Computer,
@@ -1337,7 +1365,7 @@ pub enum PlatformCategory<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> PlatformCategory<S> {
+impl<S: BosStr> PlatformCategory<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Console => "console",
@@ -1361,19 +1389,19 @@ impl<S: Bos<str> + AsRef<str>> PlatformCategory<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for PlatformCategory<S> {
+impl<S: BosStr> AsRef<str> for PlatformCategory<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for PlatformCategory<S> {
+impl<S: BosStr> core::fmt::Display for PlatformCategory<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for PlatformCategory<S> {
+impl<S: BosStr> Serialize for PlatformCategory<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -1382,8 +1410,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for PlatformCategory<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for PlatformCategory<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for PlatformCategory<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -1393,8 +1420,12 @@ for PlatformCategory<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for PlatformCategory<S> {
-    type Output = PlatformCategory<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for PlatformCategory<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = PlatformCategory<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             PlatformCategory::Console => PlatformCategory::Console,
@@ -1413,11 +1444,11 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for PlatformCategory<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct PlatformFeatures<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct PlatformFeatures<S: BosStr = DefaultStr> {
     pub features: Vec<S>,
     pub platform: PlatformFeaturesPlatform<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -1426,7 +1457,7 @@ pub struct PlatformFeatures<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum PlatformFeaturesPlatform<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum PlatformFeaturesPlatform<S: BosStr = DefaultStr> {
     Steam,
     Gog,
     EpicGames,
@@ -1436,7 +1467,7 @@ pub enum PlatformFeaturesPlatform<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> PlatformFeaturesPlatform<S> {
+impl<S: BosStr> PlatformFeaturesPlatform<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Steam => "steam",
@@ -1462,19 +1493,19 @@ impl<S: Bos<str> + AsRef<str>> PlatformFeaturesPlatform<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for PlatformFeaturesPlatform<S> {
+impl<S: BosStr> core::fmt::Display for PlatformFeaturesPlatform<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for PlatformFeaturesPlatform<S> {
+impl<S: BosStr> AsRef<str> for PlatformFeaturesPlatform<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for PlatformFeaturesPlatform<S> {
+impl<S: BosStr> Serialize for PlatformFeaturesPlatform<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -1483,7 +1514,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for PlatformFeaturesPlatform<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
 for PlatformFeaturesPlatform<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
@@ -1494,14 +1525,18 @@ for PlatformFeaturesPlatform<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for PlatformFeaturesPlatform<S> {
+impl<S: BosStr + Default> Default for PlatformFeaturesPlatform<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for PlatformFeaturesPlatform<S> {
-    type Output = PlatformFeaturesPlatform<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for PlatformFeaturesPlatform<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = PlatformFeaturesPlatform<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             PlatformFeaturesPlatform::Steam => PlatformFeaturesPlatform::Steam,
@@ -1526,11 +1561,11 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for PlatformFeaturesPlatform<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct PlatformSummaryView<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct PlatformSummaryView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub abbreviation: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1548,11 +1583,11 @@ pub struct PlatformSummaryView<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct PlatformVersion<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct PlatformVersion<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub connectivity: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1580,7 +1615,7 @@ pub struct PlatformVersion<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum PlayerPerspective<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum PlayerPerspective<S: BosStr = DefaultStr> {
     Auditory,
     FirstPerson,
     Isometric,
@@ -1592,7 +1627,7 @@ pub enum PlayerPerspective<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> PlayerPerspective<S> {
+impl<S: BosStr> PlayerPerspective<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Auditory => "auditory",
@@ -1622,19 +1657,19 @@ impl<S: Bos<str> + AsRef<str>> PlayerPerspective<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for PlayerPerspective<S> {
+impl<S: BosStr> AsRef<str> for PlayerPerspective<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for PlayerPerspective<S> {
+impl<S: BosStr> core::fmt::Display for PlayerPerspective<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for PlayerPerspective<S> {
+impl<S: BosStr> Serialize for PlayerPerspective<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -1643,8 +1678,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for PlayerPerspective<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for PlayerPerspective<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for PlayerPerspective<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -1654,8 +1688,12 @@ for PlayerPerspective<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for PlayerPerspective<S> {
-    type Output = PlayerPerspective<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for PlayerPerspective<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = PlayerPerspective<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             PlayerPerspective::Auditory => PlayerPerspective::Auditory,
@@ -1676,11 +1714,11 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for PlayerPerspective<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ProfileSummaryView<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ProfileSummaryView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avatar: Option<BlobRef<S>>,
     pub did: Did<S>,
@@ -1694,13 +1732,13 @@ pub struct ProfileSummaryView<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ProfileSummaryViewProfileType<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ProfileSummaryViewProfileType<S: BosStr = DefaultStr> {
     Actor,
     Org,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> ProfileSummaryViewProfileType<S> {
+impl<S: BosStr> ProfileSummaryViewProfileType<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Actor => "actor",
@@ -1718,19 +1756,19 @@ impl<S: Bos<str> + AsRef<str>> ProfileSummaryViewProfileType<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ProfileSummaryViewProfileType<S> {
+impl<S: BosStr> core::fmt::Display for ProfileSummaryViewProfileType<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for ProfileSummaryViewProfileType<S> {
+impl<S: BosStr> AsRef<str> for ProfileSummaryViewProfileType<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for ProfileSummaryViewProfileType<S> {
+impl<S: BosStr> Serialize for ProfileSummaryViewProfileType<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -1739,7 +1777,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for ProfileSummaryViewProfileType<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
 for ProfileSummaryViewProfileType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
@@ -1750,14 +1788,18 @@ for ProfileSummaryViewProfileType<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for ProfileSummaryViewProfileType<S> {
+impl<S: BosStr + Default> Default for ProfileSummaryViewProfileType<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for ProfileSummaryViewProfileType<S> {
-    type Output = ProfileSummaryViewProfileType<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for ProfileSummaryViewProfileType<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ProfileSummaryViewProfileType<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             ProfileSummaryViewProfileType::Actor => ProfileSummaryViewProfileType::Actor,
@@ -1774,11 +1816,11 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for ProfileSummaryViewProfileType<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Release<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Release<S: BosStr = DefaultStr> {
     ///Free-text platform name, used when no platform record exists.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub platform: Option<S>,
@@ -1796,11 +1838,11 @@ pub struct Release<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ReleaseDate<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ReleaseDate<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub region: Option<ReleaseDateRegion<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1815,7 +1857,7 @@ pub struct ReleaseDate<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ReleaseDateRegion<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ReleaseDateRegion<S: BosStr = DefaultStr> {
     Worldwide,
     Europe,
     NorthAmerica,
@@ -1829,7 +1871,7 @@ pub enum ReleaseDateRegion<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> ReleaseDateRegion<S> {
+impl<S: BosStr> ReleaseDateRegion<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Worldwide => "worldwide",
@@ -1863,19 +1905,19 @@ impl<S: Bos<str> + AsRef<str>> ReleaseDateRegion<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ReleaseDateRegion<S> {
+impl<S: BosStr> core::fmt::Display for ReleaseDateRegion<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for ReleaseDateRegion<S> {
+impl<S: BosStr> AsRef<str> for ReleaseDateRegion<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for ReleaseDateRegion<S> {
+impl<S: BosStr> Serialize for ReleaseDateRegion<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -1884,8 +1926,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for ReleaseDateRegion<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for ReleaseDateRegion<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ReleaseDateRegion<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -1895,14 +1936,18 @@ for ReleaseDateRegion<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for ReleaseDateRegion<S> {
+impl<S: BosStr + Default> Default for ReleaseDateRegion<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for ReleaseDateRegion<S> {
-    type Output = ReleaseDateRegion<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for ReleaseDateRegion<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ReleaseDateRegion<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             ReleaseDateRegion::Worldwide => ReleaseDateRegion::Worldwide,
@@ -1922,7 +1967,7 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for ReleaseDateRegion<S> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ReleaseDateStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ReleaseDateStatus<S: BosStr = DefaultStr> {
     AdvancedAccess,
     Alpha,
     Beta,
@@ -1935,7 +1980,7 @@ pub enum ReleaseDateStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> ReleaseDateStatus<S> {
+impl<S: BosStr> ReleaseDateStatus<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::AdvancedAccess => "advancedAccess",
@@ -1967,19 +2012,19 @@ impl<S: Bos<str> + AsRef<str>> ReleaseDateStatus<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ReleaseDateStatus<S> {
+impl<S: BosStr> core::fmt::Display for ReleaseDateStatus<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for ReleaseDateStatus<S> {
+impl<S: BosStr> AsRef<str> for ReleaseDateStatus<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for ReleaseDateStatus<S> {
+impl<S: BosStr> Serialize for ReleaseDateStatus<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -1988,8 +2033,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for ReleaseDateStatus<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for ReleaseDateStatus<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ReleaseDateStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -1999,14 +2043,18 @@ for ReleaseDateStatus<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for ReleaseDateStatus<S> {
+impl<S: BosStr + Default> Default for ReleaseDateStatus<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for ReleaseDateStatus<S> {
-    type Output = ReleaseDateStatus<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for ReleaseDateStatus<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ReleaseDateStatus<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             ReleaseDateStatus::AdvancedAccess => ReleaseDateStatus::AdvancedAccess,
@@ -2032,11 +2080,11 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for ReleaseDateStatus<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SkeletonGameFeedItem<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SkeletonGameFeedItem<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub feed_context: Option<S>,
     pub game: AtUri<S>,
@@ -2050,11 +2098,11 @@ pub struct SkeletonGameFeedItem<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SystemRequirements<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SystemRequirements<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub minimum: Option<games_gamesgamesgamesgames::SystemSpec<S>>,
     pub platform: SystemRequirementsPlatform<S>,
@@ -2066,14 +2114,14 @@ pub struct SystemRequirements<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum SystemRequirementsPlatform<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum SystemRequirementsPlatform<S: BosStr = DefaultStr> {
     Windows,
     Mac,
     Linux,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> SystemRequirementsPlatform<S> {
+impl<S: BosStr> SystemRequirementsPlatform<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Windows => "windows",
@@ -2093,19 +2141,19 @@ impl<S: Bos<str> + AsRef<str>> SystemRequirementsPlatform<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for SystemRequirementsPlatform<S> {
+impl<S: BosStr> core::fmt::Display for SystemRequirementsPlatform<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for SystemRequirementsPlatform<S> {
+impl<S: BosStr> AsRef<str> for SystemRequirementsPlatform<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for SystemRequirementsPlatform<S> {
+impl<S: BosStr> Serialize for SystemRequirementsPlatform<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -2114,7 +2162,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for SystemRequirementsPlatform<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
 for SystemRequirementsPlatform<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
@@ -2125,14 +2173,18 @@ for SystemRequirementsPlatform<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for SystemRequirementsPlatform<S> {
+impl<S: BosStr + Default> Default for SystemRequirementsPlatform<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for SystemRequirementsPlatform<S> {
-    type Output = SystemRequirementsPlatform<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for SystemRequirementsPlatform<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = SystemRequirementsPlatform<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             SystemRequirementsPlatform::Windows => SystemRequirementsPlatform::Windows,
@@ -2151,11 +2203,11 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for SystemRequirementsPlatform<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SystemSpec<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SystemSpec<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub additional_notes: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -2178,7 +2230,7 @@ pub struct SystemSpec<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum Theme<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum Theme<S: BosStr = DefaultStr> {
     _4x,
     Action,
     Business,
@@ -2204,7 +2256,7 @@ pub enum Theme<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> Theme<S> {
+impl<S: BosStr> Theme<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::_4x => "4x",
@@ -2262,19 +2314,19 @@ impl<S: Bos<str> + AsRef<str>> Theme<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for Theme<S> {
+impl<S: BosStr> AsRef<str> for Theme<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for Theme<S> {
+impl<S: BosStr> core::fmt::Display for Theme<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for Theme<S> {
+impl<S: BosStr> Serialize for Theme<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -2283,7 +2335,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for Theme<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de> for Theme<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for Theme<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -2293,8 +2345,12 @@ impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de> for Them
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for Theme<S> {
-    type Output = Theme<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for Theme<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = Theme<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             Theme::_4x => Theme::_4x,
@@ -2329,11 +2385,11 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for Theme<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct TimeToBeat<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct TimeToBeat<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub completely: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -2349,11 +2405,11 @@ pub struct TimeToBeat<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ViewerState<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ViewerState<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub like: Option<AtUri<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -2365,11 +2421,11 @@ pub struct ViewerState<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Website<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Website<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub r#type: Option<WebsiteType<S>>,
     pub url: UriValue<S>,
@@ -2379,7 +2435,7 @@ pub struct Website<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum WebsiteType<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum WebsiteType<S: BosStr = DefaultStr> {
     Official,
     Wiki,
     Steam,
@@ -2403,7 +2459,7 @@ pub enum WebsiteType<S: Bos<str> + AsRef<str> = DefaultStr> {
     UnknownValue(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> WebsiteType<S> {
+impl<S: BosStr> WebsiteType<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Official => "official",
@@ -2457,19 +2513,19 @@ impl<S: Bos<str> + AsRef<str>> WebsiteType<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for WebsiteType<S> {
+impl<S: BosStr> core::fmt::Display for WebsiteType<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for WebsiteType<S> {
+impl<S: BosStr> AsRef<str> for WebsiteType<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for WebsiteType<S> {
+impl<S: BosStr> Serialize for WebsiteType<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -2478,8 +2534,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for WebsiteType<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for WebsiteType<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for WebsiteType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -2489,14 +2544,18 @@ for WebsiteType<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for WebsiteType<S> {
+impl<S: BosStr + Default> Default for WebsiteType<S> {
     fn default() -> Self {
         Self::UnknownValue(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for WebsiteType<S> {
-    type Output = WebsiteType<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for WebsiteType<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = WebsiteType<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             WebsiteType::Official => WebsiteType::Official,
@@ -2524,7 +2583,7 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for WebsiteType<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ActorCreditView<S> {
+impl<S: BosStr> LexiconSchema for ActorCreditView<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -2549,7 +2608,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for ActorCreditView<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ActorProfileDetailView<S> {
+impl<S: BosStr> LexiconSchema for ActorProfileDetailView<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -2634,7 +2693,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for ActorProfileDetailView<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ActorProfileSummaryView<S> {
+impl<S: BosStr> LexiconSchema for ActorProfileSummaryView<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -2699,7 +2758,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for ActorProfileSummaryView<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for AgeRating<S> {
+impl<S: BosStr> LexiconSchema for AgeRating<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -2714,7 +2773,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for AgeRating<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for AlternativeName<S> {
+impl<S: BosStr> LexiconSchema for AlternativeName<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -2729,7 +2788,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for AlternativeName<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for CollectionSummaryView<S> {
+impl<S: BosStr> LexiconSchema for CollectionSummaryView<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -2744,7 +2803,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for CollectionSummaryView<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for CreditEntry<S> {
+impl<S: BosStr> LexiconSchema for CreditEntry<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -2769,7 +2828,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for CreditEntry<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for EngineSummaryView<S> {
+impl<S: BosStr> LexiconSchema for EngineSummaryView<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -2784,7 +2843,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for EngineSummaryView<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ExternalIds<S> {
+impl<S: BosStr> LexiconSchema for ExternalIds<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -2799,7 +2858,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for ExternalIds<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ExternalVideo<S> {
+impl<S: BosStr> LexiconSchema for ExternalVideo<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -2814,7 +2873,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for ExternalVideo<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for GameDetailView<S> {
+impl<S: BosStr> LexiconSchema for GameDetailView<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -2829,7 +2888,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for GameDetailView<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for GameFeedViewItem<S> {
+impl<S: BosStr> LexiconSchema for GameFeedViewItem<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -2854,7 +2913,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for GameFeedViewItem<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for GameSummaryView<S> {
+impl<S: BosStr> LexiconSchema for GameSummaryView<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -2869,7 +2928,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for GameSummaryView<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for GameView<S> {
+impl<S: BosStr> LexiconSchema for GameView<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -2893,7 +2952,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for GameView<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ItchIoId<S> {
+impl<S: BosStr> LexiconSchema for ItchIoId<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -2908,7 +2967,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for ItchIoId<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for LanguageSupport<S> {
+impl<S: BosStr> LexiconSchema for LanguageSupport<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -2923,7 +2982,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for LanguageSupport<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for MediaItem<S> {
+impl<S: BosStr> LexiconSchema for MediaItem<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -2976,7 +3035,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for MediaItem<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for MultiplayerMode<S> {
+impl<S: BosStr> LexiconSchema for MultiplayerMode<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -2991,7 +3050,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for MultiplayerMode<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for OrgCreditView<S> {
+impl<S: BosStr> LexiconSchema for OrgCreditView<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -3016,7 +3075,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for OrgCreditView<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for OrgProfileDetailView<S> {
+impl<S: BosStr> LexiconSchema for OrgProfileDetailView<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -3091,7 +3150,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for OrgProfileDetailView<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for OrgProfileSummaryView<S> {
+impl<S: BosStr> LexiconSchema for OrgProfileSummaryView<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -3156,7 +3215,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for OrgProfileSummaryView<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for PlatformFeatures<S> {
+impl<S: BosStr> LexiconSchema for PlatformFeatures<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -3171,7 +3230,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for PlatformFeatures<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for PlatformSummaryView<S> {
+impl<S: BosStr> LexiconSchema for PlatformSummaryView<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -3186,7 +3245,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for PlatformSummaryView<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for PlatformVersion<S> {
+impl<S: BosStr> LexiconSchema for PlatformVersion<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -3201,7 +3260,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for PlatformVersion<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ProfileSummaryView<S> {
+impl<S: BosStr> LexiconSchema for ProfileSummaryView<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -3266,7 +3325,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for ProfileSummaryView<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Release<S> {
+impl<S: BosStr> LexiconSchema for Release<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -3281,7 +3340,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Release<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ReleaseDate<S> {
+impl<S: BosStr> LexiconSchema for ReleaseDate<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -3296,7 +3355,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for ReleaseDate<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for SkeletonGameFeedItem<S> {
+impl<S: BosStr> LexiconSchema for SkeletonGameFeedItem<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -3321,7 +3380,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for SkeletonGameFeedItem<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for SystemRequirements<S> {
+impl<S: BosStr> LexiconSchema for SystemRequirements<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -3336,7 +3395,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for SystemRequirements<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for SystemSpec<S> {
+impl<S: BosStr> LexiconSchema for SystemSpec<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -3351,7 +3410,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for SystemSpec<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for TimeToBeat<S> {
+impl<S: BosStr> LexiconSchema for TimeToBeat<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -3366,7 +3425,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for TimeToBeat<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ViewerState<S> {
+impl<S: BosStr> LexiconSchema for ViewerState<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -3381,7 +3440,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for ViewerState<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Website<S> {
+impl<S: BosStr> LexiconSchema for Website<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.defs"
     }
@@ -3417,17 +3476,17 @@ pub mod actor_credit_view_state {
         type Uri = Unset;
     }
     ///State transition - sets the `credits` field to Set
-    pub struct SetCredits<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCredits<S> {}
-    impl<S: State> State for SetCredits<S> {
+    pub struct SetCredits<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCredits<St> {}
+    impl<St: State> State for SetCredits<St> {
         type Credits = Set<members::credits>;
-        type Uri = S::Uri;
+        type Uri = St::Uri;
     }
     ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Credits = S::Credits;
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Credits = St::Credits;
         type Uri = Set<members::uri>;
     }
     /// Marker types for field names
@@ -3440,37 +3499,37 @@ pub mod actor_credit_view_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ActorCreditViewBuilder<'a, S: actor_credit_view_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ActorCreditViewBuilder<S: BosStr, St: actor_credit_view_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<AtUri<S>>,
         Option<Vec<games_gamesgamesgamesgames::CreditEntry<S>>>,
         Option<S>,
         Option<AtUri<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ActorCreditView<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ActorCreditViewBuilder<'a, actor_credit_view_state::Empty> {
+impl<S: BosStr> ActorCreditView<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ActorCreditViewBuilder<S, actor_credit_view_state::Empty> {
         ActorCreditViewBuilder::new()
     }
 }
 
-impl<'a> ActorCreditViewBuilder<'a, actor_credit_view_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ActorCreditViewBuilder<S, actor_credit_view_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ActorCreditViewBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: actor_credit_view_state::State> ActorCreditViewBuilder<'a, S> {
+impl<S: BosStr, St: actor_credit_view_state::State> ActorCreditViewBuilder<S, St> {
     /// Set the `actorUri` field (optional)
     pub fn actor_uri(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -3483,26 +3542,26 @@ impl<'a, S: actor_credit_view_state::State> ActorCreditViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ActorCreditViewBuilder<'a, S>
+impl<S: BosStr, St> ActorCreditViewBuilder<S, St>
 where
-    S: actor_credit_view_state::State,
-    S::Credits: actor_credit_view_state::IsUnset,
+    St: actor_credit_view_state::State,
+    St::Credits: actor_credit_view_state::IsUnset,
 {
     /// Set the `credits` field (required)
     pub fn credits(
         mut self,
         value: impl Into<Vec<games_gamesgamesgamesgames::CreditEntry<S>>>,
-    ) -> ActorCreditViewBuilder<'a, actor_credit_view_state::SetCredits<S>> {
+    ) -> ActorCreditViewBuilder<S, actor_credit_view_state::SetCredits<St>> {
         self._fields.1 = Option::Some(value.into());
         ActorCreditViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: actor_credit_view_state::State> ActorCreditViewBuilder<'a, S> {
+impl<S: BosStr, St: actor_credit_view_state::State> ActorCreditViewBuilder<S, St> {
     /// Set the `displayName` field (optional)
     pub fn display_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -3515,33 +3574,33 @@ impl<'a, S: actor_credit_view_state::State> ActorCreditViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ActorCreditViewBuilder<'a, S>
+impl<S: BosStr, St> ActorCreditViewBuilder<S, St>
 where
-    S: actor_credit_view_state::State,
-    S::Uri: actor_credit_view_state::IsUnset,
+    St: actor_credit_view_state::State,
+    St::Uri: actor_credit_view_state::IsUnset,
 {
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> ActorCreditViewBuilder<'a, actor_credit_view_state::SetUri<S>> {
+    ) -> ActorCreditViewBuilder<S, actor_credit_view_state::SetUri<St>> {
         self._fields.3 = Option::Some(value.into());
         ActorCreditViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ActorCreditViewBuilder<'a, S>
+impl<S: BosStr, St> ActorCreditViewBuilder<S, St>
 where
-    S: actor_credit_view_state::State,
-    S::Credits: actor_credit_view_state::IsSet,
-    S::Uri: actor_credit_view_state::IsSet,
+    St: actor_credit_view_state::State,
+    St::Credits: actor_credit_view_state::IsSet,
+    St::Uri: actor_credit_view_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ActorCreditView<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ActorCreditView<S> {
         ActorCreditView {
             actor_uri: self._fields.0,
             credits: self._fields.1.unwrap(),
@@ -3550,11 +3609,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> ActorCreditView<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ActorCreditView<S> {
         ActorCreditView {
             actor_uri: self._fields.0,
             credits: self._fields.1.unwrap(),
@@ -5316,43 +5375,46 @@ pub mod actor_profile_detail_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
         type Uri;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Did = Set<members::did>;
-        type Uri = S::Uri;
+        type Did = Unset;
     }
     ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Did = S::Did;
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
         type Uri = Set<members::uri>;
+        type Did = St::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
+        type Uri = St::Uri;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ActorProfileDetailViewBuilder<'a, S: actor_profile_detail_view_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ActorProfileDetailViewBuilder<
+    S: BosStr,
+    St: actor_profile_detail_view_state::State,
+> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<BlobRef<S>>,
         Option<Datetime>,
@@ -5364,34 +5426,36 @@ pub struct ActorProfileDetailViewBuilder<'a, S: actor_profile_detail_view_state:
         Option<AtUri<S>>,
         Option<Vec<games_gamesgamesgamesgames::Website<S>>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ActorProfileDetailView<'a> {
-    /// Create a new builder for this type
+impl<S: BosStr> ActorProfileDetailView<S> {
+    /// Create a new builder for this type.
     pub fn new() -> ActorProfileDetailViewBuilder<
-        'a,
+        S,
         actor_profile_detail_view_state::Empty,
     > {
         ActorProfileDetailViewBuilder::new()
     }
 }
 
-impl<'a> ActorProfileDetailViewBuilder<'a, actor_profile_detail_view_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<
+    S: BosStr,
+> ActorProfileDetailViewBuilder<S, actor_profile_detail_view_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ActorProfileDetailViewBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
 impl<
-    'a,
-    S: actor_profile_detail_view_state::State,
-> ActorProfileDetailViewBuilder<'a, S> {
+    S: BosStr,
+    St: actor_profile_detail_view_state::State,
+> ActorProfileDetailViewBuilder<S, St> {
     /// Set the `avatar` field (optional)
     pub fn avatar(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -5405,9 +5469,9 @@ impl<
 }
 
 impl<
-    'a,
-    S: actor_profile_detail_view_state::State,
-> ActorProfileDetailViewBuilder<'a, S> {
+    S: BosStr,
+    St: actor_profile_detail_view_state::State,
+> ActorProfileDetailViewBuilder<S, St> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.1 = value.into();
@@ -5421,9 +5485,9 @@ impl<
 }
 
 impl<
-    'a,
-    S: actor_profile_detail_view_state::State,
-> ActorProfileDetailViewBuilder<'a, S> {
+    S: BosStr,
+    St: actor_profile_detail_view_state::State,
+> ActorProfileDetailViewBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -5437,9 +5501,9 @@ impl<
 }
 
 impl<
-    'a,
-    S: actor_profile_detail_view_state::State,
-> ActorProfileDetailViewBuilder<'a, S> {
+    S: BosStr,
+    St: actor_profile_detail_view_state::State,
+> ActorProfileDetailViewBuilder<S, St> {
     /// Set the `descriptionFacets` field (optional)
     pub fn description_facets(
         mut self,
@@ -5455,29 +5519,29 @@ impl<
     }
 }
 
-impl<'a, S> ActorProfileDetailViewBuilder<'a, S>
+impl<S: BosStr, St> ActorProfileDetailViewBuilder<S, St>
 where
-    S: actor_profile_detail_view_state::State,
-    S::Did: actor_profile_detail_view_state::IsUnset,
+    St: actor_profile_detail_view_state::State,
+    St::Did: actor_profile_detail_view_state::IsUnset,
 {
     /// Set the `did` field (required)
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> ActorProfileDetailViewBuilder<'a, actor_profile_detail_view_state::SetDid<S>> {
+    ) -> ActorProfileDetailViewBuilder<S, actor_profile_detail_view_state::SetDid<St>> {
         self._fields.4 = Option::Some(value.into());
         ActorProfileDetailViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
 impl<
-    'a,
-    S: actor_profile_detail_view_state::State,
-> ActorProfileDetailViewBuilder<'a, S> {
+    S: BosStr,
+    St: actor_profile_detail_view_state::State,
+> ActorProfileDetailViewBuilder<S, St> {
     /// Set the `displayName` field (optional)
     pub fn display_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
@@ -5491,9 +5555,9 @@ impl<
 }
 
 impl<
-    'a,
-    S: actor_profile_detail_view_state::State,
-> ActorProfileDetailViewBuilder<'a, S> {
+    S: BosStr,
+    St: actor_profile_detail_view_state::State,
+> ActorProfileDetailViewBuilder<S, St> {
     /// Set the `pronouns` field (optional)
     pub fn pronouns(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.6 = value.into();
@@ -5506,29 +5570,29 @@ impl<
     }
 }
 
-impl<'a, S> ActorProfileDetailViewBuilder<'a, S>
+impl<S: BosStr, St> ActorProfileDetailViewBuilder<S, St>
 where
-    S: actor_profile_detail_view_state::State,
-    S::Uri: actor_profile_detail_view_state::IsUnset,
+    St: actor_profile_detail_view_state::State,
+    St::Uri: actor_profile_detail_view_state::IsUnset,
 {
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> ActorProfileDetailViewBuilder<'a, actor_profile_detail_view_state::SetUri<S>> {
+    ) -> ActorProfileDetailViewBuilder<S, actor_profile_detail_view_state::SetUri<St>> {
         self._fields.7 = Option::Some(value.into());
         ActorProfileDetailViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
 impl<
-    'a,
-    S: actor_profile_detail_view_state::State,
-> ActorProfileDetailViewBuilder<'a, S> {
+    S: BosStr,
+    St: actor_profile_detail_view_state::State,
+> ActorProfileDetailViewBuilder<S, St> {
     /// Set the `websites` field (optional)
     pub fn websites(
         mut self,
@@ -5547,14 +5611,14 @@ impl<
     }
 }
 
-impl<'a, S> ActorProfileDetailViewBuilder<'a, S>
+impl<S: BosStr, St> ActorProfileDetailViewBuilder<S, St>
 where
-    S: actor_profile_detail_view_state::State,
-    S::Did: actor_profile_detail_view_state::IsSet,
-    S::Uri: actor_profile_detail_view_state::IsSet,
+    St: actor_profile_detail_view_state::State,
+    St::Uri: actor_profile_detail_view_state::IsSet,
+    St::Did: actor_profile_detail_view_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ActorProfileDetailView<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ActorProfileDetailView<S> {
         ActorProfileDetailView {
             avatar: self._fields.0,
             created_at: self._fields.1,
@@ -5568,11 +5632,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> ActorProfileDetailView<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ActorProfileDetailView<S> {
         ActorProfileDetailView {
             avatar: self._fields.0,
             created_at: self._fields.1,
@@ -5609,17 +5673,17 @@ pub mod actor_profile_summary_view_state {
         type Uri = Unset;
     }
     ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
         type Did = Set<members::did>;
-        type Uri = S::Uri;
+        type Uri = St::Uri;
     }
     ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Did = S::Did;
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Did = St::Did;
         type Uri = Set<members::uri>;
     }
     /// Marker types for field names
@@ -5632,41 +5696,43 @@ pub mod actor_profile_summary_view_state {
     }
 }
 
-/// Builder for constructing an instance of this type
+/// Builder for constructing an instance of this type.
 pub struct ActorProfileSummaryViewBuilder<
-    'a,
-    S: actor_profile_summary_view_state::State,
+    S: BosStr,
+    St: actor_profile_summary_view_state::State,
 > {
-    _state: PhantomData<fn() -> S>,
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<BlobRef<S>>, Option<Did<S>>, Option<S>, Option<AtUri<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ActorProfileSummaryView<'a> {
-    /// Create a new builder for this type
+impl<S: BosStr> ActorProfileSummaryView<S> {
+    /// Create a new builder for this type.
     pub fn new() -> ActorProfileSummaryViewBuilder<
-        'a,
+        S,
         actor_profile_summary_view_state::Empty,
     > {
         ActorProfileSummaryViewBuilder::new()
     }
 }
 
-impl<'a> ActorProfileSummaryViewBuilder<'a, actor_profile_summary_view_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<
+    S: BosStr,
+> ActorProfileSummaryViewBuilder<S, actor_profile_summary_view_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ActorProfileSummaryViewBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
 impl<
-    'a,
-    S: actor_profile_summary_view_state::State,
-> ActorProfileSummaryViewBuilder<'a, S> {
+    S: BosStr,
+    St: actor_profile_summary_view_state::State,
+> ActorProfileSummaryViewBuilder<S, St> {
     /// Set the `avatar` field (optional)
     pub fn avatar(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -5679,32 +5745,32 @@ impl<
     }
 }
 
-impl<'a, S> ActorProfileSummaryViewBuilder<'a, S>
+impl<S: BosStr, St> ActorProfileSummaryViewBuilder<S, St>
 where
-    S: actor_profile_summary_view_state::State,
-    S::Did: actor_profile_summary_view_state::IsUnset,
+    St: actor_profile_summary_view_state::State,
+    St::Did: actor_profile_summary_view_state::IsUnset,
 {
     /// Set the `did` field (required)
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
     ) -> ActorProfileSummaryViewBuilder<
-        'a,
-        actor_profile_summary_view_state::SetDid<S>,
+        S,
+        actor_profile_summary_view_state::SetDid<St>,
     > {
         self._fields.1 = Option::Some(value.into());
         ActorProfileSummaryViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
 impl<
-    'a,
-    S: actor_profile_summary_view_state::State,
-> ActorProfileSummaryViewBuilder<'a, S> {
+    S: BosStr,
+    St: actor_profile_summary_view_state::State,
+> ActorProfileSummaryViewBuilder<S, St> {
     /// Set the `displayName` field (optional)
     pub fn display_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -5717,36 +5783,36 @@ impl<
     }
 }
 
-impl<'a, S> ActorProfileSummaryViewBuilder<'a, S>
+impl<S: BosStr, St> ActorProfileSummaryViewBuilder<S, St>
 where
-    S: actor_profile_summary_view_state::State,
-    S::Uri: actor_profile_summary_view_state::IsUnset,
+    St: actor_profile_summary_view_state::State,
+    St::Uri: actor_profile_summary_view_state::IsUnset,
 {
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
     ) -> ActorProfileSummaryViewBuilder<
-        'a,
-        actor_profile_summary_view_state::SetUri<S>,
+        S,
+        actor_profile_summary_view_state::SetUri<St>,
     > {
         self._fields.3 = Option::Some(value.into());
         ActorProfileSummaryViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ActorProfileSummaryViewBuilder<'a, S>
+impl<S: BosStr, St> ActorProfileSummaryViewBuilder<S, St>
 where
-    S: actor_profile_summary_view_state::State,
-    S::Did: actor_profile_summary_view_state::IsSet,
-    S::Uri: actor_profile_summary_view_state::IsSet,
+    St: actor_profile_summary_view_state::State,
+    St::Did: actor_profile_summary_view_state::IsSet,
+    St::Uri: actor_profile_summary_view_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ActorProfileSummaryView<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ActorProfileSummaryView<S> {
         ActorProfileSummaryView {
             avatar: self._fields.0,
             did: self._fields.1.unwrap(),
@@ -5755,11 +5821,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> ActorProfileSummaryView<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ActorProfileSummaryView<S> {
         ActorProfileSummaryView {
             avatar: self._fields.0,
             did: self._fields.1.unwrap(),
@@ -5791,17 +5857,17 @@ pub mod collection_summary_view_state {
         type Name = Unset;
     }
     ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
         type Uri = Set<members::uri>;
-        type Name = S::Name;
+        type Name = St::Name;
     }
     ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Uri = S::Uri;
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Uri = St::Uri;
         type Name = Set<members::name>;
     }
     /// Marker types for field names
@@ -5814,59 +5880,65 @@ pub mod collection_summary_view_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct CollectionSummaryViewBuilder<'a, S: collection_summary_view_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct CollectionSummaryViewBuilder<
+    S: BosStr,
+    St: collection_summary_view_state::State,
+> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
         Option<S>,
         Option<CollectionSummaryViewType<S>>,
         Option<AtUri<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> CollectionSummaryView<'a> {
-    /// Create a new builder for this type
+impl<S: BosStr> CollectionSummaryView<S> {
+    /// Create a new builder for this type.
     pub fn new() -> CollectionSummaryViewBuilder<
-        'a,
+        S,
         collection_summary_view_state::Empty,
     > {
         CollectionSummaryViewBuilder::new()
     }
 }
 
-impl<'a> CollectionSummaryViewBuilder<'a, collection_summary_view_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> CollectionSummaryViewBuilder<S, collection_summary_view_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         CollectionSummaryViewBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CollectionSummaryViewBuilder<'a, S>
+impl<S: BosStr, St> CollectionSummaryViewBuilder<S, St>
 where
-    S: collection_summary_view_state::State,
-    S::Name: collection_summary_view_state::IsUnset,
+    St: collection_summary_view_state::State,
+    St::Name: collection_summary_view_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> CollectionSummaryViewBuilder<'a, collection_summary_view_state::SetName<S>> {
+    ) -> CollectionSummaryViewBuilder<S, collection_summary_view_state::SetName<St>> {
         self._fields.0 = Option::Some(value.into());
         CollectionSummaryViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: collection_summary_view_state::State> CollectionSummaryViewBuilder<'a, S> {
+impl<
+    S: BosStr,
+    St: collection_summary_view_state::State,
+> CollectionSummaryViewBuilder<S, St> {
     /// Set the `slug` field (optional)
     pub fn slug(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -5879,7 +5951,10 @@ impl<'a, S: collection_summary_view_state::State> CollectionSummaryViewBuilder<'
     }
 }
 
-impl<'a, S: collection_summary_view_state::State> CollectionSummaryViewBuilder<'a, S> {
+impl<
+    S: BosStr,
+    St: collection_summary_view_state::State,
+> CollectionSummaryViewBuilder<S, St> {
     /// Set the `type` field (optional)
     pub fn r#type(
         mut self,
@@ -5895,33 +5970,33 @@ impl<'a, S: collection_summary_view_state::State> CollectionSummaryViewBuilder<'
     }
 }
 
-impl<'a, S> CollectionSummaryViewBuilder<'a, S>
+impl<S: BosStr, St> CollectionSummaryViewBuilder<S, St>
 where
-    S: collection_summary_view_state::State,
-    S::Uri: collection_summary_view_state::IsUnset,
+    St: collection_summary_view_state::State,
+    St::Uri: collection_summary_view_state::IsUnset,
 {
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> CollectionSummaryViewBuilder<'a, collection_summary_view_state::SetUri<S>> {
+    ) -> CollectionSummaryViewBuilder<S, collection_summary_view_state::SetUri<St>> {
         self._fields.3 = Option::Some(value.into());
         CollectionSummaryViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CollectionSummaryViewBuilder<'a, S>
+impl<S: BosStr, St> CollectionSummaryViewBuilder<S, St>
 where
-    S: collection_summary_view_state::State,
-    S::Uri: collection_summary_view_state::IsSet,
-    S::Name: collection_summary_view_state::IsSet,
+    St: collection_summary_view_state::State,
+    St::Uri: collection_summary_view_state::IsSet,
+    St::Name: collection_summary_view_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> CollectionSummaryView<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> CollectionSummaryView<S> {
         CollectionSummaryView {
             name: self._fields.0.unwrap(),
             slug: self._fields.1,
@@ -5930,11 +6005,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> CollectionSummaryView<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> CollectionSummaryView<S> {
         CollectionSummaryView {
             name: self._fields.0.unwrap(),
             slug: self._fields.1,
@@ -5964,9 +6039,9 @@ pub mod credit_entry_state {
         type Role = Unset;
     }
     ///State transition - sets the `role` field to Set
-    pub struct SetRole<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRole<S> {}
-    impl<S: State> State for SetRole<S> {
+    pub struct SetRole<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRole<St> {}
+    impl<St: State> State for SetRole<St> {
         type Role = Set<members::role>;
     }
     /// Marker types for field names
@@ -5977,32 +6052,32 @@ pub mod credit_entry_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct CreditEntryBuilder<'a, S: credit_entry_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct CreditEntryBuilder<S: BosStr, St: credit_entry_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<games_gamesgamesgamesgames::IndividualRole<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> CreditEntry<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> CreditEntryBuilder<'a, credit_entry_state::Empty> {
+impl<S: BosStr> CreditEntry<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> CreditEntryBuilder<S, credit_entry_state::Empty> {
         CreditEntryBuilder::new()
     }
 }
 
-impl<'a> CreditEntryBuilder<'a, credit_entry_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> CreditEntryBuilder<S, credit_entry_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         CreditEntryBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: credit_entry_state::State> CreditEntryBuilder<'a, S> {
+impl<S: BosStr, St: credit_entry_state::State> CreditEntryBuilder<S, St> {
     /// Set the `department` field (optional)
     pub fn department(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -6015,43 +6090,43 @@ impl<'a, S: credit_entry_state::State> CreditEntryBuilder<'a, S> {
     }
 }
 
-impl<'a, S> CreditEntryBuilder<'a, S>
+impl<S: BosStr, St> CreditEntryBuilder<S, St>
 where
-    S: credit_entry_state::State,
-    S::Role: credit_entry_state::IsUnset,
+    St: credit_entry_state::State,
+    St::Role: credit_entry_state::IsUnset,
 {
     /// Set the `role` field (required)
     pub fn role(
         mut self,
         value: impl Into<games_gamesgamesgamesgames::IndividualRole<S>>,
-    ) -> CreditEntryBuilder<'a, credit_entry_state::SetRole<S>> {
+    ) -> CreditEntryBuilder<S, credit_entry_state::SetRole<St>> {
         self._fields.1 = Option::Some(value.into());
         CreditEntryBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CreditEntryBuilder<'a, S>
+impl<S: BosStr, St> CreditEntryBuilder<S, St>
 where
-    S: credit_entry_state::State,
-    S::Role: credit_entry_state::IsSet,
+    St: credit_entry_state::State,
+    St::Role: credit_entry_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> CreditEntry<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> CreditEntry<S> {
         CreditEntry {
             department: self._fields.0,
             role: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> CreditEntry<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> CreditEntry<S> {
         CreditEntry {
             department: self._fields.0,
             role: self._fields.1.unwrap(),
@@ -6070,85 +6145,85 @@ pub mod engine_summary_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Uri;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Uri = S::Uri;
+        type Name = Unset;
     }
     ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Name = S::Name;
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
         type Uri = Set<members::uri>;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Uri = St::Uri;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct EngineSummaryViewBuilder<'a, S: engine_summary_view_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct EngineSummaryViewBuilder<S: BosStr, St: engine_summary_view_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>, Option<AtUri<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> EngineSummaryView<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> EngineSummaryViewBuilder<'a, engine_summary_view_state::Empty> {
+impl<S: BosStr> EngineSummaryView<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> EngineSummaryViewBuilder<S, engine_summary_view_state::Empty> {
         EngineSummaryViewBuilder::new()
     }
 }
 
-impl<'a> EngineSummaryViewBuilder<'a, engine_summary_view_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> EngineSummaryViewBuilder<S, engine_summary_view_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         EngineSummaryViewBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> EngineSummaryViewBuilder<'a, S>
+impl<S: BosStr, St> EngineSummaryViewBuilder<S, St>
 where
-    S: engine_summary_view_state::State,
-    S::Name: engine_summary_view_state::IsUnset,
+    St: engine_summary_view_state::State,
+    St::Name: engine_summary_view_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> EngineSummaryViewBuilder<'a, engine_summary_view_state::SetName<S>> {
+    ) -> EngineSummaryViewBuilder<S, engine_summary_view_state::SetName<St>> {
         self._fields.0 = Option::Some(value.into());
         EngineSummaryViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: engine_summary_view_state::State> EngineSummaryViewBuilder<'a, S> {
+impl<S: BosStr, St: engine_summary_view_state::State> EngineSummaryViewBuilder<S, St> {
     /// Set the `slug` field (optional)
     pub fn slug(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -6161,33 +6236,33 @@ impl<'a, S: engine_summary_view_state::State> EngineSummaryViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S> EngineSummaryViewBuilder<'a, S>
+impl<S: BosStr, St> EngineSummaryViewBuilder<S, St>
 where
-    S: engine_summary_view_state::State,
-    S::Uri: engine_summary_view_state::IsUnset,
+    St: engine_summary_view_state::State,
+    St::Uri: engine_summary_view_state::IsUnset,
 {
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> EngineSummaryViewBuilder<'a, engine_summary_view_state::SetUri<S>> {
+    ) -> EngineSummaryViewBuilder<S, engine_summary_view_state::SetUri<St>> {
         self._fields.2 = Option::Some(value.into());
         EngineSummaryViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> EngineSummaryViewBuilder<'a, S>
+impl<S: BosStr, St> EngineSummaryViewBuilder<S, St>
 where
-    S: engine_summary_view_state::State,
-    S::Name: engine_summary_view_state::IsSet,
-    S::Uri: engine_summary_view_state::IsSet,
+    St: engine_summary_view_state::State,
+    St::Uri: engine_summary_view_state::IsSet,
+    St::Name: engine_summary_view_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> EngineSummaryView<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> EngineSummaryView<S> {
         EngineSummaryView {
             name: self._fields.0.unwrap(),
             slug: self._fields.1,
@@ -6195,11 +6270,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> EngineSummaryView<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> EngineSummaryView<S> {
         EngineSummaryView {
             name: self._fields.0.unwrap(),
             slug: self._fields.1,
@@ -6219,57 +6294,57 @@ pub mod game_detail_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Uri;
         type CreatedAt;
         type Name;
-        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Uri = Unset;
         type CreatedAt = Unset;
         type Name = Unset;
-        type Uri = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Name = S::Name;
-        type Uri = S::Uri;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type CreatedAt = S::CreatedAt;
-        type Name = Set<members::name>;
-        type Uri = S::Uri;
     }
     ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type CreatedAt = S::CreatedAt;
-        type Name = S::Name;
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
         type Uri = Set<members::uri>;
+        type CreatedAt = St::CreatedAt;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Uri = St::Uri;
+        type CreatedAt = Set<members::created_at>;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Uri = St::Uri;
+        type CreatedAt = St::CreatedAt;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `uri` field
+        pub struct uri(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `name` field
         pub struct name(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GameDetailViewBuilder<'a, S: game_detail_view_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GameDetailViewBuilder<S: BosStr, St: game_detail_view_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<games_gamesgamesgamesgames::ActorCreditView<S>>>,
         Option<Vec<games_gamesgamesgamesgames::AgeRating<S>>>,
@@ -6300,18 +6375,18 @@ pub struct GameDetailViewBuilder<'a, S: game_detail_view_state::State> {
         Option<Vec<games_gamesgamesgamesgames::ExternalVideo<S>>>,
         Option<Vec<games_gamesgamesgamesgames::Website<S>>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GameDetailView<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GameDetailViewBuilder<'a, game_detail_view_state::Empty> {
+impl<S: BosStr> GameDetailView<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GameDetailViewBuilder<S, game_detail_view_state::Empty> {
         GameDetailViewBuilder::new()
     }
 }
 
-impl<'a> GameDetailViewBuilder<'a, game_detail_view_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GameDetailViewBuilder<S, game_detail_view_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GameDetailViewBuilder {
             _state: PhantomData,
@@ -6345,12 +6420,12 @@ impl<'a> GameDetailViewBuilder<'a, game_detail_view_state::Empty> {
                 None,
                 None,
             ),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
+impl<S: BosStr, St: game_detail_view_state::State> GameDetailViewBuilder<S, St> {
     /// Set the `actorCredits` field (optional)
     pub fn actor_credits(
         mut self,
@@ -6369,7 +6444,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
+impl<S: BosStr, St: game_detail_view_state::State> GameDetailViewBuilder<S, St> {
     /// Set the `ageRatings` field (optional)
     pub fn age_ratings(
         mut self,
@@ -6388,7 +6463,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
+impl<S: BosStr, St: game_detail_view_state::State> GameDetailViewBuilder<S, St> {
     /// Set the `alternativeNames` field (optional)
     pub fn alternative_names(
         mut self,
@@ -6407,7 +6482,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
+impl<S: BosStr, St: game_detail_view_state::State> GameDetailViewBuilder<S, St> {
     /// Set the `applicationType` field (optional)
     pub fn application_type(
         mut self,
@@ -6426,7 +6501,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
+impl<S: BosStr, St: game_detail_view_state::State> GameDetailViewBuilder<S, St> {
     /// Set the `collections` field (optional)
     pub fn collections(mut self, value: impl Into<Option<Vec<AtUri<S>>>>) -> Self {
         self._fields.4 = value.into();
@@ -6439,26 +6514,26 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GameDetailViewBuilder<'a, S>
+impl<S: BosStr, St> GameDetailViewBuilder<S, St>
 where
-    S: game_detail_view_state::State,
-    S::CreatedAt: game_detail_view_state::IsUnset,
+    St: game_detail_view_state::State,
+    St::CreatedAt: game_detail_view_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> GameDetailViewBuilder<'a, game_detail_view_state::SetCreatedAt<S>> {
+    ) -> GameDetailViewBuilder<S, game_detail_view_state::SetCreatedAt<St>> {
         self._fields.5 = Option::Some(value.into());
         GameDetailViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
+impl<S: BosStr, St: game_detail_view_state::State> GameDetailViewBuilder<S, St> {
     /// Set the `engines` field (optional)
     pub fn engines(mut self, value: impl Into<Option<Vec<AtUri<S>>>>) -> Self {
         self._fields.6 = value.into();
@@ -6471,7 +6546,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
+impl<S: BosStr, St: game_detail_view_state::State> GameDetailViewBuilder<S, St> {
     /// Set the `externalIds` field (optional)
     pub fn external_ids(
         mut self,
@@ -6490,7 +6565,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
+impl<S: BosStr, St: game_detail_view_state::State> GameDetailViewBuilder<S, St> {
     /// Set the `genres` field (optional)
     pub fn genres(
         mut self,
@@ -6509,7 +6584,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
+impl<S: BosStr, St: game_detail_view_state::State> GameDetailViewBuilder<S, St> {
     /// Set the `keywords` field (optional)
     pub fn keywords(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.9 = value.into();
@@ -6522,7 +6597,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
+impl<S: BosStr, St: game_detail_view_state::State> GameDetailViewBuilder<S, St> {
     /// Set the `languageSupports` field (optional)
     pub fn language_supports(
         mut self,
@@ -6541,7 +6616,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
+impl<S: BosStr, St: game_detail_view_state::State> GameDetailViewBuilder<S, St> {
     /// Set the `media` field (optional)
     pub fn media(
         mut self,
@@ -6560,7 +6635,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
+impl<S: BosStr, St: game_detail_view_state::State> GameDetailViewBuilder<S, St> {
     /// Set the `modes` field (optional)
     pub fn modes(
         mut self,
@@ -6579,7 +6654,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
+impl<S: BosStr, St: game_detail_view_state::State> GameDetailViewBuilder<S, St> {
     /// Set the `multiplayerModes` field (optional)
     pub fn multiplayer_modes(
         mut self,
@@ -6598,26 +6673,26 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GameDetailViewBuilder<'a, S>
+impl<S: BosStr, St> GameDetailViewBuilder<S, St>
 where
-    S: game_detail_view_state::State,
-    S::Name: game_detail_view_state::IsUnset,
+    St: game_detail_view_state::State,
+    St::Name: game_detail_view_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> GameDetailViewBuilder<'a, game_detail_view_state::SetName<S>> {
+    ) -> GameDetailViewBuilder<S, game_detail_view_state::SetName<St>> {
         self._fields.14 = Option::Some(value.into());
         GameDetailViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
+impl<S: BosStr, St: game_detail_view_state::State> GameDetailViewBuilder<S, St> {
     /// Set the `orgCredits` field (optional)
     pub fn org_credits(
         mut self,
@@ -6636,7 +6711,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
+impl<S: BosStr, St: game_detail_view_state::State> GameDetailViewBuilder<S, St> {
     /// Set the `parent` field (optional)
     pub fn parent(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.16 = value.into();
@@ -6649,7 +6724,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
+impl<S: BosStr, St: game_detail_view_state::State> GameDetailViewBuilder<S, St> {
     /// Set the `playerPerspectives` field (optional)
     pub fn player_perspectives(
         mut self,
@@ -6668,7 +6743,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
+impl<S: BosStr, St: game_detail_view_state::State> GameDetailViewBuilder<S, St> {
     /// Set the `publishedAt` field (optional)
     pub fn published_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.18 = value.into();
@@ -6681,7 +6756,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
+impl<S: BosStr, St: game_detail_view_state::State> GameDetailViewBuilder<S, St> {
     /// Set the `releases` field (optional)
     pub fn releases(
         mut self,
@@ -6700,7 +6775,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
+impl<S: BosStr, St: game_detail_view_state::State> GameDetailViewBuilder<S, St> {
     /// Set the `slug` field (optional)
     pub fn slug(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.20 = value.into();
@@ -6713,7 +6788,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
+impl<S: BosStr, St: game_detail_view_state::State> GameDetailViewBuilder<S, St> {
     /// Set the `storyline` field (optional)
     pub fn storyline(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.21 = value.into();
@@ -6726,7 +6801,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
+impl<S: BosStr, St: game_detail_view_state::State> GameDetailViewBuilder<S, St> {
     /// Set the `summary` field (optional)
     pub fn summary(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.22 = value.into();
@@ -6739,7 +6814,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
+impl<S: BosStr, St: game_detail_view_state::State> GameDetailViewBuilder<S, St> {
     /// Set the `themes` field (optional)
     pub fn themes(
         mut self,
@@ -6758,7 +6833,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
+impl<S: BosStr, St: game_detail_view_state::State> GameDetailViewBuilder<S, St> {
     /// Set the `timeToBeat` field (optional)
     pub fn time_to_beat(
         mut self,
@@ -6777,26 +6852,26 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GameDetailViewBuilder<'a, S>
+impl<S: BosStr, St> GameDetailViewBuilder<S, St>
 where
-    S: game_detail_view_state::State,
-    S::Uri: game_detail_view_state::IsUnset,
+    St: game_detail_view_state::State,
+    St::Uri: game_detail_view_state::IsUnset,
 {
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> GameDetailViewBuilder<'a, game_detail_view_state::SetUri<S>> {
+    ) -> GameDetailViewBuilder<S, game_detail_view_state::SetUri<St>> {
         self._fields.25 = Option::Some(value.into());
         GameDetailViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
+impl<S: BosStr, St: game_detail_view_state::State> GameDetailViewBuilder<S, St> {
     /// Set the `videos` field (optional)
     pub fn videos(
         mut self,
@@ -6815,7 +6890,7 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
+impl<S: BosStr, St: game_detail_view_state::State> GameDetailViewBuilder<S, St> {
     /// Set the `websites` field (optional)
     pub fn websites(
         mut self,
@@ -6834,15 +6909,15 @@ impl<'a, S: game_detail_view_state::State> GameDetailViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GameDetailViewBuilder<'a, S>
+impl<S: BosStr, St> GameDetailViewBuilder<S, St>
 where
-    S: game_detail_view_state::State,
-    S::CreatedAt: game_detail_view_state::IsSet,
-    S::Name: game_detail_view_state::IsSet,
-    S::Uri: game_detail_view_state::IsSet,
+    St: game_detail_view_state::State,
+    St::Uri: game_detail_view_state::IsSet,
+    St::CreatedAt: game_detail_view_state::IsSet,
+    St::Name: game_detail_view_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GameDetailView<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GameDetailView<S> {
         GameDetailView {
             actor_credits: self._fields.0,
             age_ratings: self._fields.1,
@@ -6875,11 +6950,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> GameDetailView<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> GameDetailView<S> {
         GameDetailView {
             actor_credits: self._fields.0,
             age_ratings: self._fields.1,
@@ -6933,9 +7008,9 @@ pub mod game_feed_view_item_state {
         type Game = Unset;
     }
     ///State transition - sets the `game` field to Set
-    pub struct SetGame<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGame<S> {}
-    impl<S: State> State for SetGame<S> {
+    pub struct SetGame<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetGame<St> {}
+    impl<St: State> State for SetGame<St> {
         type Game = Set<members::game>;
     }
     /// Marker types for field names
@@ -6946,32 +7021,32 @@ pub mod game_feed_view_item_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GameFeedViewItemBuilder<'a, S: game_feed_view_item_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GameFeedViewItemBuilder<S: BosStr, St: game_feed_view_item_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<games_gamesgamesgamesgames::GameView<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GameFeedViewItem<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GameFeedViewItemBuilder<'a, game_feed_view_item_state::Empty> {
+impl<S: BosStr> GameFeedViewItem<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GameFeedViewItemBuilder<S, game_feed_view_item_state::Empty> {
         GameFeedViewItemBuilder::new()
     }
 }
 
-impl<'a> GameFeedViewItemBuilder<'a, game_feed_view_item_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GameFeedViewItemBuilder<S, game_feed_view_item_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GameFeedViewItemBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: game_feed_view_item_state::State> GameFeedViewItemBuilder<'a, S> {
+impl<S: BosStr, St: game_feed_view_item_state::State> GameFeedViewItemBuilder<S, St> {
     /// Set the `feedContext` field (optional)
     pub fn feed_context(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -6984,43 +7059,43 @@ impl<'a, S: game_feed_view_item_state::State> GameFeedViewItemBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GameFeedViewItemBuilder<'a, S>
+impl<S: BosStr, St> GameFeedViewItemBuilder<S, St>
 where
-    S: game_feed_view_item_state::State,
-    S::Game: game_feed_view_item_state::IsUnset,
+    St: game_feed_view_item_state::State,
+    St::Game: game_feed_view_item_state::IsUnset,
 {
     /// Set the `game` field (required)
     pub fn game(
         mut self,
         value: impl Into<games_gamesgamesgamesgames::GameView<S>>,
-    ) -> GameFeedViewItemBuilder<'a, game_feed_view_item_state::SetGame<S>> {
+    ) -> GameFeedViewItemBuilder<S, game_feed_view_item_state::SetGame<St>> {
         self._fields.1 = Option::Some(value.into());
         GameFeedViewItemBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GameFeedViewItemBuilder<'a, S>
+impl<S: BosStr, St> GameFeedViewItemBuilder<S, St>
 where
-    S: game_feed_view_item_state::State,
-    S::Game: game_feed_view_item_state::IsSet,
+    St: game_feed_view_item_state::State,
+    St::Game: game_feed_view_item_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GameFeedViewItem<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GameFeedViewItem<S> {
         GameFeedViewItem {
             feed_context: self._fields.0,
             game: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> GameFeedViewItem<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> GameFeedViewItem<S> {
         GameFeedViewItem {
             feed_context: self._fields.0,
             game: self._fields.1.unwrap(),
@@ -7050,17 +7125,17 @@ pub mod game_summary_view_state {
         type Name = Unset;
     }
     ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
         type Uri = Set<members::uri>;
-        type Name = S::Name;
+        type Name = St::Name;
     }
     ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Uri = S::Uri;
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Uri = St::Uri;
         type Name = Set<members::name>;
     }
     /// Marker types for field names
@@ -7073,9 +7148,9 @@ pub mod game_summary_view_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GameSummaryViewBuilder<'a, S: game_summary_view_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GameSummaryViewBuilder<S: BosStr, St: game_summary_view_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<games_gamesgamesgamesgames::ApplicationType<S>>,
         Option<i64>,
@@ -7085,28 +7160,28 @@ pub struct GameSummaryViewBuilder<'a, S: game_summary_view_state::State> {
         Option<S>,
         Option<AtUri<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GameSummaryView<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GameSummaryViewBuilder<'a, game_summary_view_state::Empty> {
+impl<S: BosStr> GameSummaryView<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GameSummaryViewBuilder<S, game_summary_view_state::Empty> {
         GameSummaryViewBuilder::new()
     }
 }
 
-impl<'a> GameSummaryViewBuilder<'a, game_summary_view_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GameSummaryViewBuilder<S, game_summary_view_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GameSummaryViewBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: game_summary_view_state::State> GameSummaryViewBuilder<'a, S> {
+impl<S: BosStr, St: game_summary_view_state::State> GameSummaryViewBuilder<S, St> {
     /// Set the `applicationType` field (optional)
     pub fn application_type(
         mut self,
@@ -7125,7 +7200,7 @@ impl<'a, S: game_summary_view_state::State> GameSummaryViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: game_summary_view_state::State> GameSummaryViewBuilder<'a, S> {
+impl<S: BosStr, St: game_summary_view_state::State> GameSummaryViewBuilder<S, St> {
     /// Set the `firstReleaseDate` field (optional)
     pub fn first_release_date(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -7138,7 +7213,7 @@ impl<'a, S: game_summary_view_state::State> GameSummaryViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: game_summary_view_state::State> GameSummaryViewBuilder<'a, S> {
+impl<S: BosStr, St: game_summary_view_state::State> GameSummaryViewBuilder<S, St> {
     /// Set the `media` field (optional)
     pub fn media(
         mut self,
@@ -7157,26 +7232,26 @@ impl<'a, S: game_summary_view_state::State> GameSummaryViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GameSummaryViewBuilder<'a, S>
+impl<S: BosStr, St> GameSummaryViewBuilder<S, St>
 where
-    S: game_summary_view_state::State,
-    S::Name: game_summary_view_state::IsUnset,
+    St: game_summary_view_state::State,
+    St::Name: game_summary_view_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> GameSummaryViewBuilder<'a, game_summary_view_state::SetName<S>> {
+    ) -> GameSummaryViewBuilder<S, game_summary_view_state::SetName<St>> {
         self._fields.3 = Option::Some(value.into());
         GameSummaryViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: game_summary_view_state::State> GameSummaryViewBuilder<'a, S> {
+impl<S: BosStr, St: game_summary_view_state::State> GameSummaryViewBuilder<S, St> {
     /// Set the `slug` field (optional)
     pub fn slug(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
@@ -7189,7 +7264,7 @@ impl<'a, S: game_summary_view_state::State> GameSummaryViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: game_summary_view_state::State> GameSummaryViewBuilder<'a, S> {
+impl<S: BosStr, St: game_summary_view_state::State> GameSummaryViewBuilder<S, St> {
     /// Set the `summary` field (optional)
     pub fn summary(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
@@ -7202,33 +7277,33 @@ impl<'a, S: game_summary_view_state::State> GameSummaryViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GameSummaryViewBuilder<'a, S>
+impl<S: BosStr, St> GameSummaryViewBuilder<S, St>
 where
-    S: game_summary_view_state::State,
-    S::Uri: game_summary_view_state::IsUnset,
+    St: game_summary_view_state::State,
+    St::Uri: game_summary_view_state::IsUnset,
 {
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> GameSummaryViewBuilder<'a, game_summary_view_state::SetUri<S>> {
+    ) -> GameSummaryViewBuilder<S, game_summary_view_state::SetUri<St>> {
         self._fields.6 = Option::Some(value.into());
         GameSummaryViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GameSummaryViewBuilder<'a, S>
+impl<S: BosStr, St> GameSummaryViewBuilder<S, St>
 where
-    S: game_summary_view_state::State,
-    S::Uri: game_summary_view_state::IsSet,
-    S::Name: game_summary_view_state::IsSet,
+    St: game_summary_view_state::State,
+    St::Uri: game_summary_view_state::IsSet,
+    St::Name: game_summary_view_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GameSummaryView<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GameSummaryView<S> {
         GameSummaryView {
             application_type: self._fields.0,
             first_release_date: self._fields.1,
@@ -7240,11 +7315,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> GameSummaryView<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> GameSummaryView<S> {
         GameSummaryView {
             application_type: self._fields.0,
             first_release_date: self._fields.1,
@@ -7268,57 +7343,57 @@ pub mod game_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type ApplicationType;
         type Uri;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type ApplicationType = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type ApplicationType = S::ApplicationType;
-        type Uri = S::Uri;
+        type Name = Unset;
     }
     ///State transition - sets the `application_type` field to Set
-    pub struct SetApplicationType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetApplicationType<S> {}
-    impl<S: State> State for SetApplicationType<S> {
-        type Name = S::Name;
+    pub struct SetApplicationType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetApplicationType<St> {}
+    impl<St: State> State for SetApplicationType<St> {
         type ApplicationType = Set<members::application_type>;
-        type Uri = S::Uri;
+        type Uri = St::Uri;
+        type Name = St::Name;
     }
     ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Name = S::Name;
-        type ApplicationType = S::ApplicationType;
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type ApplicationType = St::ApplicationType;
         type Uri = Set<members::uri>;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type ApplicationType = St::ApplicationType;
+        type Uri = St::Uri;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `application_type` field
         pub struct application_type(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GameViewBuilder<'a, S: game_view_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GameViewBuilder<S: BosStr, St: game_view_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<games_gamesgamesgamesgames::ApplicationType<S>>,
         Option<Vec<games_gamesgamesgamesgames::Genre<S>>>,
@@ -7332,47 +7407,47 @@ pub struct GameViewBuilder<'a, S: game_view_state::State> {
         Option<AtUri<S>>,
         Option<games_gamesgamesgamesgames::ViewerState<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GameView<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GameViewBuilder<'a, game_view_state::Empty> {
+impl<S: BosStr> GameView<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GameViewBuilder<S, game_view_state::Empty> {
         GameViewBuilder::new()
     }
 }
 
-impl<'a> GameViewBuilder<'a, game_view_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GameViewBuilder<S, game_view_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GameViewBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GameViewBuilder<'a, S>
+impl<S: BosStr, St> GameViewBuilder<S, St>
 where
-    S: game_view_state::State,
-    S::ApplicationType: game_view_state::IsUnset,
+    St: game_view_state::State,
+    St::ApplicationType: game_view_state::IsUnset,
 {
     /// Set the `applicationType` field (required)
     pub fn application_type(
         mut self,
         value: impl Into<games_gamesgamesgamesgames::ApplicationType<S>>,
-    ) -> GameViewBuilder<'a, game_view_state::SetApplicationType<S>> {
+    ) -> GameViewBuilder<S, game_view_state::SetApplicationType<St>> {
         self._fields.0 = Option::Some(value.into());
         GameViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: game_view_state::State> GameViewBuilder<'a, S> {
+impl<S: BosStr, St: game_view_state::State> GameViewBuilder<S, St> {
     /// Set the `genres` field (optional)
     pub fn genres(
         mut self,
@@ -7391,7 +7466,7 @@ impl<'a, S: game_view_state::State> GameViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: game_view_state::State> GameViewBuilder<'a, S> {
+impl<S: BosStr, St: game_view_state::State> GameViewBuilder<S, St> {
     /// Set the `likeCount` field (optional)
     pub fn like_count(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -7404,7 +7479,7 @@ impl<'a, S: game_view_state::State> GameViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: game_view_state::State> GameViewBuilder<'a, S> {
+impl<S: BosStr, St: game_view_state::State> GameViewBuilder<S, St> {
     /// Set the `media` field (optional)
     pub fn media(
         mut self,
@@ -7423,26 +7498,26 @@ impl<'a, S: game_view_state::State> GameViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GameViewBuilder<'a, S>
+impl<S: BosStr, St> GameViewBuilder<S, St>
 where
-    S: game_view_state::State,
-    S::Name: game_view_state::IsUnset,
+    St: game_view_state::State,
+    St::Name: game_view_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> GameViewBuilder<'a, game_view_state::SetName<S>> {
+    ) -> GameViewBuilder<S, game_view_state::SetName<St>> {
         self._fields.4 = Option::Some(value.into());
         GameViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: game_view_state::State> GameViewBuilder<'a, S> {
+impl<S: BosStr, St: game_view_state::State> GameViewBuilder<S, St> {
     /// Set the `releases` field (optional)
     pub fn releases(
         mut self,
@@ -7461,7 +7536,7 @@ impl<'a, S: game_view_state::State> GameViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: game_view_state::State> GameViewBuilder<'a, S> {
+impl<S: BosStr, St: game_view_state::State> GameViewBuilder<S, St> {
     /// Set the `slug` field (optional)
     pub fn slug(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.6 = value.into();
@@ -7474,7 +7549,7 @@ impl<'a, S: game_view_state::State> GameViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: game_view_state::State> GameViewBuilder<'a, S> {
+impl<S: BosStr, St: game_view_state::State> GameViewBuilder<S, St> {
     /// Set the `summary` field (optional)
     pub fn summary(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.7 = value.into();
@@ -7487,7 +7562,7 @@ impl<'a, S: game_view_state::State> GameViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: game_view_state::State> GameViewBuilder<'a, S> {
+impl<S: BosStr, St: game_view_state::State> GameViewBuilder<S, St> {
     /// Set the `themes` field (optional)
     pub fn themes(
         mut self,
@@ -7506,26 +7581,26 @@ impl<'a, S: game_view_state::State> GameViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GameViewBuilder<'a, S>
+impl<S: BosStr, St> GameViewBuilder<S, St>
 where
-    S: game_view_state::State,
-    S::Uri: game_view_state::IsUnset,
+    St: game_view_state::State,
+    St::Uri: game_view_state::IsUnset,
 {
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> GameViewBuilder<'a, game_view_state::SetUri<S>> {
+    ) -> GameViewBuilder<S, game_view_state::SetUri<St>> {
         self._fields.9 = Option::Some(value.into());
         GameViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: game_view_state::State> GameViewBuilder<'a, S> {
+impl<S: BosStr, St: game_view_state::State> GameViewBuilder<S, St> {
     /// Set the `viewer` field (optional)
     pub fn viewer(
         mut self,
@@ -7544,15 +7619,15 @@ impl<'a, S: game_view_state::State> GameViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GameViewBuilder<'a, S>
+impl<S: BosStr, St> GameViewBuilder<S, St>
 where
-    S: game_view_state::State,
-    S::Name: game_view_state::IsSet,
-    S::ApplicationType: game_view_state::IsSet,
-    S::Uri: game_view_state::IsSet,
+    St: game_view_state::State,
+    St::ApplicationType: game_view_state::IsSet,
+    St::Uri: game_view_state::IsSet,
+    St::Name: game_view_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GameView<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GameView<S> {
         GameView {
             application_type: self._fields.0.unwrap(),
             genres: self._fields.1,
@@ -7568,11 +7643,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> GameView<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> GameView<S> {
         GameView {
             application_type: self._fields.0.unwrap(),
             genres: self._fields.1,
@@ -7611,17 +7683,17 @@ pub mod org_credit_view_state {
         type Roles = Unset;
     }
     ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
         type Uri = Set<members::uri>;
-        type Roles = S::Roles;
+        type Roles = St::Roles;
     }
     ///State transition - sets the `roles` field to Set
-    pub struct SetRoles<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRoles<S> {}
-    impl<S: State> State for SetRoles<S> {
-        type Uri = S::Uri;
+    pub struct SetRoles<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRoles<St> {}
+    impl<St: State> State for SetRoles<St> {
+        type Uri = St::Uri;
         type Roles = Set<members::roles>;
     }
     /// Marker types for field names
@@ -7634,37 +7706,37 @@ pub mod org_credit_view_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct OrgCreditViewBuilder<'a, S: org_credit_view_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct OrgCreditViewBuilder<S: BosStr, St: org_credit_view_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
         Option<AtUri<S>>,
         Option<Vec<games_gamesgamesgamesgames::CompanyRole<S>>>,
         Option<AtUri<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> OrgCreditView<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> OrgCreditViewBuilder<'a, org_credit_view_state::Empty> {
+impl<S: BosStr> OrgCreditView<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> OrgCreditViewBuilder<S, org_credit_view_state::Empty> {
         OrgCreditViewBuilder::new()
     }
 }
 
-impl<'a> OrgCreditViewBuilder<'a, org_credit_view_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> OrgCreditViewBuilder<S, org_credit_view_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         OrgCreditViewBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: org_credit_view_state::State> OrgCreditViewBuilder<'a, S> {
+impl<S: BosStr, St: org_credit_view_state::State> OrgCreditViewBuilder<S, St> {
     /// Set the `displayName` field (optional)
     pub fn display_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -7677,7 +7749,7 @@ impl<'a, S: org_credit_view_state::State> OrgCreditViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: org_credit_view_state::State> OrgCreditViewBuilder<'a, S> {
+impl<S: BosStr, St: org_credit_view_state::State> OrgCreditViewBuilder<S, St> {
     /// Set the `orgUri` field (optional)
     pub fn org_uri(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -7690,52 +7762,52 @@ impl<'a, S: org_credit_view_state::State> OrgCreditViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S> OrgCreditViewBuilder<'a, S>
+impl<S: BosStr, St> OrgCreditViewBuilder<S, St>
 where
-    S: org_credit_view_state::State,
-    S::Roles: org_credit_view_state::IsUnset,
+    St: org_credit_view_state::State,
+    St::Roles: org_credit_view_state::IsUnset,
 {
     /// Set the `roles` field (required)
     pub fn roles(
         mut self,
         value: impl Into<Vec<games_gamesgamesgamesgames::CompanyRole<S>>>,
-    ) -> OrgCreditViewBuilder<'a, org_credit_view_state::SetRoles<S>> {
+    ) -> OrgCreditViewBuilder<S, org_credit_view_state::SetRoles<St>> {
         self._fields.2 = Option::Some(value.into());
         OrgCreditViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> OrgCreditViewBuilder<'a, S>
+impl<S: BosStr, St> OrgCreditViewBuilder<S, St>
 where
-    S: org_credit_view_state::State,
-    S::Uri: org_credit_view_state::IsUnset,
+    St: org_credit_view_state::State,
+    St::Uri: org_credit_view_state::IsUnset,
 {
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> OrgCreditViewBuilder<'a, org_credit_view_state::SetUri<S>> {
+    ) -> OrgCreditViewBuilder<S, org_credit_view_state::SetUri<St>> {
         self._fields.3 = Option::Some(value.into());
         OrgCreditViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> OrgCreditViewBuilder<'a, S>
+impl<S: BosStr, St> OrgCreditViewBuilder<S, St>
 where
-    S: org_credit_view_state::State,
-    S::Uri: org_credit_view_state::IsSet,
-    S::Roles: org_credit_view_state::IsSet,
+    St: org_credit_view_state::State,
+    St::Uri: org_credit_view_state::IsSet,
+    St::Roles: org_credit_view_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> OrgCreditView<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> OrgCreditView<S> {
         OrgCreditView {
             display_name: self._fields.0,
             org_uri: self._fields.1,
@@ -7744,11 +7816,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> OrgCreditView<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> OrgCreditView<S> {
         OrgCreditView {
             display_name: self._fields.0,
             org_uri: self._fields.1,
@@ -7780,17 +7852,17 @@ pub mod org_profile_detail_view_state {
         type Uri = Unset;
     }
     ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
         type Did = Set<members::did>;
-        type Uri = S::Uri;
+        type Uri = St::Uri;
     }
     ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Did = S::Did;
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Did = St::Did;
         type Uri = Set<members::uri>;
     }
     /// Marker types for field names
@@ -7803,9 +7875,12 @@ pub mod org_profile_detail_view_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct OrgProfileDetailViewBuilder<'a, S: org_profile_detail_view_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct OrgProfileDetailViewBuilder<
+    S: BosStr,
+    St: org_profile_detail_view_state::State,
+> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<BlobRef<S>>,
         Option<S>,
@@ -7821,21 +7896,21 @@ pub struct OrgProfileDetailViewBuilder<'a, S: org_profile_detail_view_state::Sta
         Option<AtUri<S>>,
         Option<Vec<games_gamesgamesgamesgames::Website<S>>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> OrgProfileDetailView<'a> {
-    /// Create a new builder for this type
+impl<S: BosStr> OrgProfileDetailView<S> {
+    /// Create a new builder for this type.
     pub fn new() -> OrgProfileDetailViewBuilder<
-        'a,
+        S,
         org_profile_detail_view_state::Empty,
     > {
         OrgProfileDetailViewBuilder::new()
     }
 }
 
-impl<'a> OrgProfileDetailViewBuilder<'a, org_profile_detail_view_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> OrgProfileDetailViewBuilder<S, org_profile_detail_view_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         OrgProfileDetailViewBuilder {
             _state: PhantomData,
@@ -7854,12 +7929,15 @@ impl<'a> OrgProfileDetailViewBuilder<'a, org_profile_detail_view_state::Empty> {
                 None,
                 None,
             ),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: org_profile_detail_view_state::State> OrgProfileDetailViewBuilder<'a, S> {
+impl<
+    S: BosStr,
+    St: org_profile_detail_view_state::State,
+> OrgProfileDetailViewBuilder<S, St> {
     /// Set the `avatar` field (optional)
     pub fn avatar(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -7872,7 +7950,10 @@ impl<'a, S: org_profile_detail_view_state::State> OrgProfileDetailViewBuilder<'a
     }
 }
 
-impl<'a, S: org_profile_detail_view_state::State> OrgProfileDetailViewBuilder<'a, S> {
+impl<
+    S: BosStr,
+    St: org_profile_detail_view_state::State,
+> OrgProfileDetailViewBuilder<S, St> {
     /// Set the `country` field (optional)
     pub fn country(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -7885,7 +7966,10 @@ impl<'a, S: org_profile_detail_view_state::State> OrgProfileDetailViewBuilder<'a
     }
 }
 
-impl<'a, S: org_profile_detail_view_state::State> OrgProfileDetailViewBuilder<'a, S> {
+impl<
+    S: BosStr,
+    St: org_profile_detail_view_state::State,
+> OrgProfileDetailViewBuilder<S, St> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.2 = value.into();
@@ -7898,7 +7982,10 @@ impl<'a, S: org_profile_detail_view_state::State> OrgProfileDetailViewBuilder<'a
     }
 }
 
-impl<'a, S: org_profile_detail_view_state::State> OrgProfileDetailViewBuilder<'a, S> {
+impl<
+    S: BosStr,
+    St: org_profile_detail_view_state::State,
+> OrgProfileDetailViewBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -7911,7 +7998,10 @@ impl<'a, S: org_profile_detail_view_state::State> OrgProfileDetailViewBuilder<'a
     }
 }
 
-impl<'a, S: org_profile_detail_view_state::State> OrgProfileDetailViewBuilder<'a, S> {
+impl<
+    S: BosStr,
+    St: org_profile_detail_view_state::State,
+> OrgProfileDetailViewBuilder<S, St> {
     /// Set the `descriptionFacets` field (optional)
     pub fn description_facets(
         mut self,
@@ -7927,26 +8017,29 @@ impl<'a, S: org_profile_detail_view_state::State> OrgProfileDetailViewBuilder<'a
     }
 }
 
-impl<'a, S> OrgProfileDetailViewBuilder<'a, S>
+impl<S: BosStr, St> OrgProfileDetailViewBuilder<S, St>
 where
-    S: org_profile_detail_view_state::State,
-    S::Did: org_profile_detail_view_state::IsUnset,
+    St: org_profile_detail_view_state::State,
+    St::Did: org_profile_detail_view_state::IsUnset,
 {
     /// Set the `did` field (required)
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> OrgProfileDetailViewBuilder<'a, org_profile_detail_view_state::SetDid<S>> {
+    ) -> OrgProfileDetailViewBuilder<S, org_profile_detail_view_state::SetDid<St>> {
         self._fields.5 = Option::Some(value.into());
         OrgProfileDetailViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: org_profile_detail_view_state::State> OrgProfileDetailViewBuilder<'a, S> {
+impl<
+    S: BosStr,
+    St: org_profile_detail_view_state::State,
+> OrgProfileDetailViewBuilder<S, St> {
     /// Set the `displayName` field (optional)
     pub fn display_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.6 = value.into();
@@ -7959,7 +8052,10 @@ impl<'a, S: org_profile_detail_view_state::State> OrgProfileDetailViewBuilder<'a
     }
 }
 
-impl<'a, S: org_profile_detail_view_state::State> OrgProfileDetailViewBuilder<'a, S> {
+impl<
+    S: BosStr,
+    St: org_profile_detail_view_state::State,
+> OrgProfileDetailViewBuilder<S, St> {
     /// Set the `foundedAt` field (optional)
     pub fn founded_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.7 = value.into();
@@ -7972,7 +8068,10 @@ impl<'a, S: org_profile_detail_view_state::State> OrgProfileDetailViewBuilder<'a
     }
 }
 
-impl<'a, S: org_profile_detail_view_state::State> OrgProfileDetailViewBuilder<'a, S> {
+impl<
+    S: BosStr,
+    St: org_profile_detail_view_state::State,
+> OrgProfileDetailViewBuilder<S, St> {
     /// Set the `media` field (optional)
     pub fn media(
         mut self,
@@ -7991,7 +8090,10 @@ impl<'a, S: org_profile_detail_view_state::State> OrgProfileDetailViewBuilder<'a
     }
 }
 
-impl<'a, S: org_profile_detail_view_state::State> OrgProfileDetailViewBuilder<'a, S> {
+impl<
+    S: BosStr,
+    St: org_profile_detail_view_state::State,
+> OrgProfileDetailViewBuilder<S, St> {
     /// Set the `parent` field (optional)
     pub fn parent(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.9 = value.into();
@@ -8004,7 +8106,10 @@ impl<'a, S: org_profile_detail_view_state::State> OrgProfileDetailViewBuilder<'a
     }
 }
 
-impl<'a, S: org_profile_detail_view_state::State> OrgProfileDetailViewBuilder<'a, S> {
+impl<
+    S: BosStr,
+    St: org_profile_detail_view_state::State,
+> OrgProfileDetailViewBuilder<S, St> {
     /// Set the `status` field (optional)
     pub fn status(
         mut self,
@@ -8020,26 +8125,29 @@ impl<'a, S: org_profile_detail_view_state::State> OrgProfileDetailViewBuilder<'a
     }
 }
 
-impl<'a, S> OrgProfileDetailViewBuilder<'a, S>
+impl<S: BosStr, St> OrgProfileDetailViewBuilder<S, St>
 where
-    S: org_profile_detail_view_state::State,
-    S::Uri: org_profile_detail_view_state::IsUnset,
+    St: org_profile_detail_view_state::State,
+    St::Uri: org_profile_detail_view_state::IsUnset,
 {
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> OrgProfileDetailViewBuilder<'a, org_profile_detail_view_state::SetUri<S>> {
+    ) -> OrgProfileDetailViewBuilder<S, org_profile_detail_view_state::SetUri<St>> {
         self._fields.11 = Option::Some(value.into());
         OrgProfileDetailViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: org_profile_detail_view_state::State> OrgProfileDetailViewBuilder<'a, S> {
+impl<
+    S: BosStr,
+    St: org_profile_detail_view_state::State,
+> OrgProfileDetailViewBuilder<S, St> {
     /// Set the `websites` field (optional)
     pub fn websites(
         mut self,
@@ -8058,14 +8166,14 @@ impl<'a, S: org_profile_detail_view_state::State> OrgProfileDetailViewBuilder<'a
     }
 }
 
-impl<'a, S> OrgProfileDetailViewBuilder<'a, S>
+impl<S: BosStr, St> OrgProfileDetailViewBuilder<S, St>
 where
-    S: org_profile_detail_view_state::State,
-    S::Did: org_profile_detail_view_state::IsSet,
-    S::Uri: org_profile_detail_view_state::IsSet,
+    St: org_profile_detail_view_state::State,
+    St::Did: org_profile_detail_view_state::IsSet,
+    St::Uri: org_profile_detail_view_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> OrgProfileDetailView<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> OrgProfileDetailView<S> {
         OrgProfileDetailView {
             avatar: self._fields.0,
             country: self._fields.1,
@@ -8083,11 +8191,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> OrgProfileDetailView<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> OrgProfileDetailView<S> {
         OrgProfileDetailView {
             avatar: self._fields.0,
             country: self._fields.1,
@@ -8128,17 +8236,17 @@ pub mod org_profile_summary_view_state {
         type Uri = Unset;
     }
     ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
         type Did = Set<members::did>;
-        type Uri = S::Uri;
+        type Uri = St::Uri;
     }
     ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Did = S::Did;
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Did = St::Did;
         type Uri = Set<members::uri>;
     }
     /// Marker types for field names
@@ -8151,35 +8259,41 @@ pub mod org_profile_summary_view_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct OrgProfileSummaryViewBuilder<'a, S: org_profile_summary_view_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct OrgProfileSummaryViewBuilder<
+    S: BosStr,
+    St: org_profile_summary_view_state::State,
+> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<BlobRef<S>>, Option<Did<S>>, Option<S>, Option<AtUri<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> OrgProfileSummaryView<'a> {
-    /// Create a new builder for this type
+impl<S: BosStr> OrgProfileSummaryView<S> {
+    /// Create a new builder for this type.
     pub fn new() -> OrgProfileSummaryViewBuilder<
-        'a,
+        S,
         org_profile_summary_view_state::Empty,
     > {
         OrgProfileSummaryViewBuilder::new()
     }
 }
 
-impl<'a> OrgProfileSummaryViewBuilder<'a, org_profile_summary_view_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> OrgProfileSummaryViewBuilder<S, org_profile_summary_view_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         OrgProfileSummaryViewBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: org_profile_summary_view_state::State> OrgProfileSummaryViewBuilder<'a, S> {
+impl<
+    S: BosStr,
+    St: org_profile_summary_view_state::State,
+> OrgProfileSummaryViewBuilder<S, St> {
     /// Set the `avatar` field (optional)
     pub fn avatar(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -8192,26 +8306,29 @@ impl<'a, S: org_profile_summary_view_state::State> OrgProfileSummaryViewBuilder<
     }
 }
 
-impl<'a, S> OrgProfileSummaryViewBuilder<'a, S>
+impl<S: BosStr, St> OrgProfileSummaryViewBuilder<S, St>
 where
-    S: org_profile_summary_view_state::State,
-    S::Did: org_profile_summary_view_state::IsUnset,
+    St: org_profile_summary_view_state::State,
+    St::Did: org_profile_summary_view_state::IsUnset,
 {
     /// Set the `did` field (required)
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> OrgProfileSummaryViewBuilder<'a, org_profile_summary_view_state::SetDid<S>> {
+    ) -> OrgProfileSummaryViewBuilder<S, org_profile_summary_view_state::SetDid<St>> {
         self._fields.1 = Option::Some(value.into());
         OrgProfileSummaryViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: org_profile_summary_view_state::State> OrgProfileSummaryViewBuilder<'a, S> {
+impl<
+    S: BosStr,
+    St: org_profile_summary_view_state::State,
+> OrgProfileSummaryViewBuilder<S, St> {
     /// Set the `displayName` field (optional)
     pub fn display_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -8224,33 +8341,33 @@ impl<'a, S: org_profile_summary_view_state::State> OrgProfileSummaryViewBuilder<
     }
 }
 
-impl<'a, S> OrgProfileSummaryViewBuilder<'a, S>
+impl<S: BosStr, St> OrgProfileSummaryViewBuilder<S, St>
 where
-    S: org_profile_summary_view_state::State,
-    S::Uri: org_profile_summary_view_state::IsUnset,
+    St: org_profile_summary_view_state::State,
+    St::Uri: org_profile_summary_view_state::IsUnset,
 {
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> OrgProfileSummaryViewBuilder<'a, org_profile_summary_view_state::SetUri<S>> {
+    ) -> OrgProfileSummaryViewBuilder<S, org_profile_summary_view_state::SetUri<St>> {
         self._fields.3 = Option::Some(value.into());
         OrgProfileSummaryViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> OrgProfileSummaryViewBuilder<'a, S>
+impl<S: BosStr, St> OrgProfileSummaryViewBuilder<S, St>
 where
-    S: org_profile_summary_view_state::State,
-    S::Did: org_profile_summary_view_state::IsSet,
-    S::Uri: org_profile_summary_view_state::IsSet,
+    St: org_profile_summary_view_state::State,
+    St::Did: org_profile_summary_view_state::IsSet,
+    St::Uri: org_profile_summary_view_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> OrgProfileSummaryView<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> OrgProfileSummaryView<S> {
         OrgProfileSummaryView {
             avatar: self._fields.0,
             did: self._fields.1.unwrap(),
@@ -8259,11 +8376,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> OrgProfileSummaryView<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> OrgProfileSummaryView<S> {
         OrgProfileSummaryView {
             avatar: self._fields.0,
             did: self._fields.1.unwrap(),
@@ -8284,122 +8401,122 @@ pub mod platform_features_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Platform;
         type Features;
+        type Platform;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Platform = Unset;
         type Features = Unset;
-    }
-    ///State transition - sets the `platform` field to Set
-    pub struct SetPlatform<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPlatform<S> {}
-    impl<S: State> State for SetPlatform<S> {
-        type Platform = Set<members::platform>;
-        type Features = S::Features;
+        type Platform = Unset;
     }
     ///State transition - sets the `features` field to Set
-    pub struct SetFeatures<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFeatures<S> {}
-    impl<S: State> State for SetFeatures<S> {
-        type Platform = S::Platform;
+    pub struct SetFeatures<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetFeatures<St> {}
+    impl<St: State> State for SetFeatures<St> {
         type Features = Set<members::features>;
+        type Platform = St::Platform;
+    }
+    ///State transition - sets the `platform` field to Set
+    pub struct SetPlatform<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPlatform<St> {}
+    impl<St: State> State for SetPlatform<St> {
+        type Features = St::Features;
+        type Platform = Set<members::platform>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `platform` field
-        pub struct platform(());
         ///Marker type for the `features` field
         pub struct features(());
+        ///Marker type for the `platform` field
+        pub struct platform(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct PlatformFeaturesBuilder<'a, S: platform_features_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct PlatformFeaturesBuilder<S: BosStr, St: platform_features_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<S>>, Option<PlatformFeaturesPlatform<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> PlatformFeatures<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> PlatformFeaturesBuilder<'a, platform_features_state::Empty> {
+impl<S: BosStr> PlatformFeatures<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> PlatformFeaturesBuilder<S, platform_features_state::Empty> {
         PlatformFeaturesBuilder::new()
     }
 }
 
-impl<'a> PlatformFeaturesBuilder<'a, platform_features_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> PlatformFeaturesBuilder<S, platform_features_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         PlatformFeaturesBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PlatformFeaturesBuilder<'a, S>
+impl<S: BosStr, St> PlatformFeaturesBuilder<S, St>
 where
-    S: platform_features_state::State,
-    S::Features: platform_features_state::IsUnset,
+    St: platform_features_state::State,
+    St::Features: platform_features_state::IsUnset,
 {
     /// Set the `features` field (required)
     pub fn features(
         mut self,
         value: impl Into<Vec<S>>,
-    ) -> PlatformFeaturesBuilder<'a, platform_features_state::SetFeatures<S>> {
+    ) -> PlatformFeaturesBuilder<S, platform_features_state::SetFeatures<St>> {
         self._fields.0 = Option::Some(value.into());
         PlatformFeaturesBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PlatformFeaturesBuilder<'a, S>
+impl<S: BosStr, St> PlatformFeaturesBuilder<S, St>
 where
-    S: platform_features_state::State,
-    S::Platform: platform_features_state::IsUnset,
+    St: platform_features_state::State,
+    St::Platform: platform_features_state::IsUnset,
 {
     /// Set the `platform` field (required)
     pub fn platform(
         mut self,
         value: impl Into<PlatformFeaturesPlatform<S>>,
-    ) -> PlatformFeaturesBuilder<'a, platform_features_state::SetPlatform<S>> {
+    ) -> PlatformFeaturesBuilder<S, platform_features_state::SetPlatform<St>> {
         self._fields.1 = Option::Some(value.into());
         PlatformFeaturesBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PlatformFeaturesBuilder<'a, S>
+impl<S: BosStr, St> PlatformFeaturesBuilder<S, St>
 where
-    S: platform_features_state::State,
-    S::Platform: platform_features_state::IsSet,
-    S::Features: platform_features_state::IsSet,
+    St: platform_features_state::State,
+    St::Features: platform_features_state::IsSet,
+    St::Platform: platform_features_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> PlatformFeatures<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> PlatformFeatures<S> {
         PlatformFeatures {
             features: self._fields.0.unwrap(),
             platform: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> PlatformFeatures<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> PlatformFeatures<S> {
         PlatformFeatures {
             features: self._fields.0.unwrap(),
             platform: self._fields.1.unwrap(),
@@ -8429,17 +8546,17 @@ pub mod platform_summary_view_state {
         type Name = Unset;
     }
     ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
         type Uri = Set<members::uri>;
-        type Name = S::Name;
+        type Name = St::Name;
     }
     ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Uri = S::Uri;
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Uri = St::Uri;
         type Name = Set<members::name>;
     }
     /// Marker types for field names
@@ -8452,9 +8569,12 @@ pub mod platform_summary_view_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct PlatformSummaryViewBuilder<'a, S: platform_summary_view_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct PlatformSummaryViewBuilder<
+    S: BosStr,
+    St: platform_summary_view_state::State,
+> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
         Option<games_gamesgamesgamesgames::PlatformCategory<S>>,
@@ -8462,28 +8582,31 @@ pub struct PlatformSummaryViewBuilder<'a, S: platform_summary_view_state::State>
         Option<S>,
         Option<AtUri<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> PlatformSummaryView<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> PlatformSummaryViewBuilder<'a, platform_summary_view_state::Empty> {
+impl<S: BosStr> PlatformSummaryView<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> PlatformSummaryViewBuilder<S, platform_summary_view_state::Empty> {
         PlatformSummaryViewBuilder::new()
     }
 }
 
-impl<'a> PlatformSummaryViewBuilder<'a, platform_summary_view_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> PlatformSummaryViewBuilder<S, platform_summary_view_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         PlatformSummaryViewBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: platform_summary_view_state::State> PlatformSummaryViewBuilder<'a, S> {
+impl<
+    S: BosStr,
+    St: platform_summary_view_state::State,
+> PlatformSummaryViewBuilder<S, St> {
     /// Set the `abbreviation` field (optional)
     pub fn abbreviation(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -8496,7 +8619,10 @@ impl<'a, S: platform_summary_view_state::State> PlatformSummaryViewBuilder<'a, S
     }
 }
 
-impl<'a, S: platform_summary_view_state::State> PlatformSummaryViewBuilder<'a, S> {
+impl<
+    S: BosStr,
+    St: platform_summary_view_state::State,
+> PlatformSummaryViewBuilder<S, St> {
     /// Set the `category` field (optional)
     pub fn category(
         mut self,
@@ -8515,26 +8641,29 @@ impl<'a, S: platform_summary_view_state::State> PlatformSummaryViewBuilder<'a, S
     }
 }
 
-impl<'a, S> PlatformSummaryViewBuilder<'a, S>
+impl<S: BosStr, St> PlatformSummaryViewBuilder<S, St>
 where
-    S: platform_summary_view_state::State,
-    S::Name: platform_summary_view_state::IsUnset,
+    St: platform_summary_view_state::State,
+    St::Name: platform_summary_view_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> PlatformSummaryViewBuilder<'a, platform_summary_view_state::SetName<S>> {
+    ) -> PlatformSummaryViewBuilder<S, platform_summary_view_state::SetName<St>> {
         self._fields.2 = Option::Some(value.into());
         PlatformSummaryViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: platform_summary_view_state::State> PlatformSummaryViewBuilder<'a, S> {
+impl<
+    S: BosStr,
+    St: platform_summary_view_state::State,
+> PlatformSummaryViewBuilder<S, St> {
     /// Set the `slug` field (optional)
     pub fn slug(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -8547,33 +8676,33 @@ impl<'a, S: platform_summary_view_state::State> PlatformSummaryViewBuilder<'a, S
     }
 }
 
-impl<'a, S> PlatformSummaryViewBuilder<'a, S>
+impl<S: BosStr, St> PlatformSummaryViewBuilder<S, St>
 where
-    S: platform_summary_view_state::State,
-    S::Uri: platform_summary_view_state::IsUnset,
+    St: platform_summary_view_state::State,
+    St::Uri: platform_summary_view_state::IsUnset,
 {
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> PlatformSummaryViewBuilder<'a, platform_summary_view_state::SetUri<S>> {
+    ) -> PlatformSummaryViewBuilder<S, platform_summary_view_state::SetUri<St>> {
         self._fields.4 = Option::Some(value.into());
         PlatformSummaryViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PlatformSummaryViewBuilder<'a, S>
+impl<S: BosStr, St> PlatformSummaryViewBuilder<S, St>
 where
-    S: platform_summary_view_state::State,
-    S::Uri: platform_summary_view_state::IsSet,
-    S::Name: platform_summary_view_state::IsSet,
+    St: platform_summary_view_state::State,
+    St::Uri: platform_summary_view_state::IsSet,
+    St::Name: platform_summary_view_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> PlatformSummaryView<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> PlatformSummaryView<S> {
         PlatformSummaryView {
             abbreviation: self._fields.0,
             category: self._fields.1,
@@ -8583,11 +8712,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> PlatformSummaryView<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> PlatformSummaryView<S> {
         PlatformSummaryView {
             abbreviation: self._fields.0,
             category: self._fields.1,
@@ -8609,57 +8738,57 @@ pub mod profile_summary_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type ProfileType;
         type Uri;
         type Did;
-        type ProfileType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type ProfileType = Unset;
         type Uri = Unset;
         type Did = Unset;
-        type ProfileType = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Uri = Set<members::uri>;
-        type Did = S::Did;
-        type ProfileType = S::ProfileType;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Uri = S::Uri;
-        type Did = Set<members::did>;
-        type ProfileType = S::ProfileType;
     }
     ///State transition - sets the `profile_type` field to Set
-    pub struct SetProfileType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetProfileType<S> {}
-    impl<S: State> State for SetProfileType<S> {
-        type Uri = S::Uri;
-        type Did = S::Did;
+    pub struct SetProfileType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetProfileType<St> {}
+    impl<St: State> State for SetProfileType<St> {
         type ProfileType = Set<members::profile_type>;
+        type Uri = St::Uri;
+        type Did = St::Did;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type ProfileType = St::ProfileType;
+        type Uri = Set<members::uri>;
+        type Did = St::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
+        type ProfileType = St::ProfileType;
+        type Uri = St::Uri;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `profile_type` field
+        pub struct profile_type(());
         ///Marker type for the `uri` field
         pub struct uri(());
         ///Marker type for the `did` field
         pub struct did(());
-        ///Marker type for the `profile_type` field
-        pub struct profile_type(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ProfileSummaryViewBuilder<'a, S: profile_summary_view_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ProfileSummaryViewBuilder<S: BosStr, St: profile_summary_view_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<BlobRef<S>>,
         Option<Did<S>>,
@@ -8667,28 +8796,28 @@ pub struct ProfileSummaryViewBuilder<'a, S: profile_summary_view_state::State> {
         Option<ProfileSummaryViewProfileType<S>>,
         Option<AtUri<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ProfileSummaryView<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ProfileSummaryViewBuilder<'a, profile_summary_view_state::Empty> {
+impl<S: BosStr> ProfileSummaryView<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ProfileSummaryViewBuilder<S, profile_summary_view_state::Empty> {
         ProfileSummaryViewBuilder::new()
     }
 }
 
-impl<'a> ProfileSummaryViewBuilder<'a, profile_summary_view_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ProfileSummaryViewBuilder<S, profile_summary_view_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ProfileSummaryViewBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: profile_summary_view_state::State> ProfileSummaryViewBuilder<'a, S> {
+impl<S: BosStr, St: profile_summary_view_state::State> ProfileSummaryViewBuilder<S, St> {
     /// Set the `avatar` field (optional)
     pub fn avatar(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -8701,26 +8830,26 @@ impl<'a, S: profile_summary_view_state::State> ProfileSummaryViewBuilder<'a, S> 
     }
 }
 
-impl<'a, S> ProfileSummaryViewBuilder<'a, S>
+impl<S: BosStr, St> ProfileSummaryViewBuilder<S, St>
 where
-    S: profile_summary_view_state::State,
-    S::Did: profile_summary_view_state::IsUnset,
+    St: profile_summary_view_state::State,
+    St::Did: profile_summary_view_state::IsUnset,
 {
     /// Set the `did` field (required)
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> ProfileSummaryViewBuilder<'a, profile_summary_view_state::SetDid<S>> {
+    ) -> ProfileSummaryViewBuilder<S, profile_summary_view_state::SetDid<St>> {
         self._fields.1 = Option::Some(value.into());
         ProfileSummaryViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: profile_summary_view_state::State> ProfileSummaryViewBuilder<'a, S> {
+impl<S: BosStr, St: profile_summary_view_state::State> ProfileSummaryViewBuilder<S, St> {
     /// Set the `displayName` field (optional)
     pub fn display_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -8733,53 +8862,53 @@ impl<'a, S: profile_summary_view_state::State> ProfileSummaryViewBuilder<'a, S> 
     }
 }
 
-impl<'a, S> ProfileSummaryViewBuilder<'a, S>
+impl<S: BosStr, St> ProfileSummaryViewBuilder<S, St>
 where
-    S: profile_summary_view_state::State,
-    S::ProfileType: profile_summary_view_state::IsUnset,
+    St: profile_summary_view_state::State,
+    St::ProfileType: profile_summary_view_state::IsUnset,
 {
     /// Set the `profileType` field (required)
     pub fn profile_type(
         mut self,
         value: impl Into<ProfileSummaryViewProfileType<S>>,
-    ) -> ProfileSummaryViewBuilder<'a, profile_summary_view_state::SetProfileType<S>> {
+    ) -> ProfileSummaryViewBuilder<S, profile_summary_view_state::SetProfileType<St>> {
         self._fields.3 = Option::Some(value.into());
         ProfileSummaryViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ProfileSummaryViewBuilder<'a, S>
+impl<S: BosStr, St> ProfileSummaryViewBuilder<S, St>
 where
-    S: profile_summary_view_state::State,
-    S::Uri: profile_summary_view_state::IsUnset,
+    St: profile_summary_view_state::State,
+    St::Uri: profile_summary_view_state::IsUnset,
 {
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> ProfileSummaryViewBuilder<'a, profile_summary_view_state::SetUri<S>> {
+    ) -> ProfileSummaryViewBuilder<S, profile_summary_view_state::SetUri<St>> {
         self._fields.4 = Option::Some(value.into());
         ProfileSummaryViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ProfileSummaryViewBuilder<'a, S>
+impl<S: BosStr, St> ProfileSummaryViewBuilder<S, St>
 where
-    S: profile_summary_view_state::State,
-    S::Uri: profile_summary_view_state::IsSet,
-    S::Did: profile_summary_view_state::IsSet,
-    S::ProfileType: profile_summary_view_state::IsSet,
+    St: profile_summary_view_state::State,
+    St::ProfileType: profile_summary_view_state::IsSet,
+    St::Uri: profile_summary_view_state::IsSet,
+    St::Did: profile_summary_view_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ProfileSummaryView<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ProfileSummaryView<S> {
         ProfileSummaryView {
             avatar: self._fields.0,
             did: self._fields.1.unwrap(),
@@ -8789,11 +8918,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> ProfileSummaryView<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ProfileSummaryView<S> {
         ProfileSummaryView {
             avatar: self._fields.0,
             did: self._fields.1.unwrap(),
@@ -8824,9 +8953,9 @@ pub mod skeleton_game_feed_item_state {
         type Game = Unset;
     }
     ///State transition - sets the `game` field to Set
-    pub struct SetGame<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGame<S> {}
-    impl<S: State> State for SetGame<S> {
+    pub struct SetGame<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetGame<St> {}
+    impl<St: State> State for SetGame<St> {
         type Game = Set<members::game>;
     }
     /// Marker types for field names
@@ -8837,35 +8966,41 @@ pub mod skeleton_game_feed_item_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct SkeletonGameFeedItemBuilder<'a, S: skeleton_game_feed_item_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct SkeletonGameFeedItemBuilder<
+    S: BosStr,
+    St: skeleton_game_feed_item_state::State,
+> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<AtUri<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> SkeletonGameFeedItem<'a> {
-    /// Create a new builder for this type
+impl<S: BosStr> SkeletonGameFeedItem<S> {
+    /// Create a new builder for this type.
     pub fn new() -> SkeletonGameFeedItemBuilder<
-        'a,
+        S,
         skeleton_game_feed_item_state::Empty,
     > {
         SkeletonGameFeedItemBuilder::new()
     }
 }
 
-impl<'a> SkeletonGameFeedItemBuilder<'a, skeleton_game_feed_item_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> SkeletonGameFeedItemBuilder<S, skeleton_game_feed_item_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SkeletonGameFeedItemBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: skeleton_game_feed_item_state::State> SkeletonGameFeedItemBuilder<'a, S> {
+impl<
+    S: BosStr,
+    St: skeleton_game_feed_item_state::State,
+> SkeletonGameFeedItemBuilder<S, St> {
     /// Set the `feedContext` field (optional)
     pub fn feed_context(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -8878,43 +9013,43 @@ impl<'a, S: skeleton_game_feed_item_state::State> SkeletonGameFeedItemBuilder<'a
     }
 }
 
-impl<'a, S> SkeletonGameFeedItemBuilder<'a, S>
+impl<S: BosStr, St> SkeletonGameFeedItemBuilder<S, St>
 where
-    S: skeleton_game_feed_item_state::State,
-    S::Game: skeleton_game_feed_item_state::IsUnset,
+    St: skeleton_game_feed_item_state::State,
+    St::Game: skeleton_game_feed_item_state::IsUnset,
 {
     /// Set the `game` field (required)
     pub fn game(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> SkeletonGameFeedItemBuilder<'a, skeleton_game_feed_item_state::SetGame<S>> {
+    ) -> SkeletonGameFeedItemBuilder<S, skeleton_game_feed_item_state::SetGame<St>> {
         self._fields.1 = Option::Some(value.into());
         SkeletonGameFeedItemBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SkeletonGameFeedItemBuilder<'a, S>
+impl<S: BosStr, St> SkeletonGameFeedItemBuilder<S, St>
 where
-    S: skeleton_game_feed_item_state::State,
-    S::Game: skeleton_game_feed_item_state::IsSet,
+    St: skeleton_game_feed_item_state::State,
+    St::Game: skeleton_game_feed_item_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> SkeletonGameFeedItem<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> SkeletonGameFeedItem<S> {
         SkeletonGameFeedItem {
             feed_context: self._fields.0,
             game: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> SkeletonGameFeedItem<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> SkeletonGameFeedItem<S> {
         SkeletonGameFeedItem {
             feed_context: self._fields.0,
             game: self._fields.1.unwrap(),
@@ -8942,9 +9077,9 @@ pub mod website_state {
         type Url = Unset;
     }
     ///State transition - sets the `url` field to Set
-    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrl<S> {}
-    impl<S: State> State for SetUrl<S> {
+    pub struct SetUrl<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUrl<St> {}
+    impl<St: State> State for SetUrl<St> {
         type Url = Set<members::url>;
     }
     /// Marker types for field names
@@ -8955,32 +9090,32 @@ pub mod website_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct WebsiteBuilder<'a, S: website_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct WebsiteBuilder<S: BosStr, St: website_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<WebsiteType<S>>, Option<UriValue<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Website<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> WebsiteBuilder<'a, website_state::Empty> {
+impl<S: BosStr> Website<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> WebsiteBuilder<S, website_state::Empty> {
         WebsiteBuilder::new()
     }
 }
 
-impl<'a> WebsiteBuilder<'a, website_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> WebsiteBuilder<S, website_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         WebsiteBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: website_state::State> WebsiteBuilder<'a, S> {
+impl<S: BosStr, St: website_state::State> WebsiteBuilder<S, St> {
     /// Set the `type` field (optional)
     pub fn r#type(mut self, value: impl Into<Option<WebsiteType<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -8993,43 +9128,40 @@ impl<'a, S: website_state::State> WebsiteBuilder<'a, S> {
     }
 }
 
-impl<'a, S> WebsiteBuilder<'a, S>
+impl<S: BosStr, St> WebsiteBuilder<S, St>
 where
-    S: website_state::State,
-    S::Url: website_state::IsUnset,
+    St: website_state::State,
+    St::Url: website_state::IsUnset,
 {
     /// Set the `url` field (required)
     pub fn url(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> WebsiteBuilder<'a, website_state::SetUrl<S>> {
+    ) -> WebsiteBuilder<S, website_state::SetUrl<St>> {
         self._fields.1 = Option::Some(value.into());
         WebsiteBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> WebsiteBuilder<'a, S>
+impl<S: BosStr, St> WebsiteBuilder<S, St>
 where
-    S: website_state::State,
-    S::Url: website_state::IsSet,
+    St: website_state::State,
+    St::Url: website_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Website<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Website<S> {
         Website {
             r#type: self._fields.0,
             url: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Website<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Website<S> {
         Website {
             r#type: self._fields.0,
             url: self._fields.1.unwrap(),

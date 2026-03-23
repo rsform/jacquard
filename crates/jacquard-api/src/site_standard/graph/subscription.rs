@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "site.standard.graph.subscription",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Subscription<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Subscription<S: BosStr = DefaultStr> {
     pub publication: AtUri<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -51,18 +51,18 @@ pub struct Subscription<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SubscriptionGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SubscriptionGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Subscription<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Subscription<S> {
+impl<S: BosStr> Subscription<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, SubscriptionRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -75,17 +75,17 @@ pub struct SubscriptionRecord;
 impl XrpcResp for SubscriptionRecord {
     const NSID: &'static str = "site.standard.graph.subscription";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = SubscriptionGetRecordOutput<S>;
+    type Output<S: BosStr> = SubscriptionGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<SubscriptionGetRecordOutput<S>> for Subscription<S> {
+impl<S: BosStr> From<SubscriptionGetRecordOutput<S>> for Subscription<S> {
     fn from(output: SubscriptionGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Subscription<S> {
+impl<S: BosStr> Collection for Subscription<S> {
     const NSID: &'static str = "site.standard.graph.subscription";
     type Record = SubscriptionRecord;
 }
@@ -95,7 +95,7 @@ impl Collection for SubscriptionRecord {
     type Record = SubscriptionRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Subscription<S> {
+impl<S: BosStr> LexiconSchema for Subscription<S> {
     fn nsid() -> &'static str {
         "site.standard.graph.subscription"
     }
@@ -129,9 +129,9 @@ pub mod subscription_state {
         type Publication = Unset;
     }
     ///State transition - sets the `publication` field to Set
-    pub struct SetPublication<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPublication<S> {}
-    impl<S: State> State for SetPublication<S> {
+    pub struct SetPublication<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPublication<St> {}
+    impl<St: State> State for SetPublication<St> {
         type Publication = Set<members::publication>;
     }
     /// Marker types for field names
@@ -142,67 +142,67 @@ pub mod subscription_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct SubscriptionBuilder<'a, S: subscription_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct SubscriptionBuilder<S: BosStr, St: subscription_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Subscription<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> SubscriptionBuilder<'a, subscription_state::Empty> {
+impl<S: BosStr> Subscription<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> SubscriptionBuilder<S, subscription_state::Empty> {
         SubscriptionBuilder::new()
     }
 }
 
-impl<'a> SubscriptionBuilder<'a, subscription_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> SubscriptionBuilder<S, subscription_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SubscriptionBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SubscriptionBuilder<'a, S>
+impl<S: BosStr, St> SubscriptionBuilder<S, St>
 where
-    S: subscription_state::State,
-    S::Publication: subscription_state::IsUnset,
+    St: subscription_state::State,
+    St::Publication: subscription_state::IsUnset,
 {
     /// Set the `publication` field (required)
     pub fn publication(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> SubscriptionBuilder<'a, subscription_state::SetPublication<S>> {
+    ) -> SubscriptionBuilder<S, subscription_state::SetPublication<St>> {
         self._fields.0 = Option::Some(value.into());
         SubscriptionBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SubscriptionBuilder<'a, S>
+impl<S: BosStr, St> SubscriptionBuilder<S, St>
 where
-    S: subscription_state::State,
-    S::Publication: subscription_state::IsSet,
+    St: subscription_state::State,
+    St::Publication: subscription_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Subscription<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Subscription<S> {
         Subscription {
             publication: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Subscription<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Subscription<S> {
         Subscription {
             publication: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

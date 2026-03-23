@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "top.launchpadx.agent.journal",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Journal<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Journal<S: BosStr = DefaultStr> {
     ///Timestamp when the journal entry was created.
     pub created_at: Datetime,
     ///Journal entry content written by the agent.
@@ -55,18 +55,18 @@ pub struct Journal<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct JournalGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct JournalGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Journal<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Journal<S> {
+impl<S: BosStr> Journal<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, JournalRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -79,17 +79,17 @@ pub struct JournalRecord;
 impl XrpcResp for JournalRecord {
     const NSID: &'static str = "top.launchpadx.agent.journal";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = JournalGetRecordOutput<S>;
+    type Output<S: BosStr> = JournalGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<JournalGetRecordOutput<S>> for Journal<S> {
+impl<S: BosStr> From<JournalGetRecordOutput<S>> for Journal<S> {
     fn from(output: JournalGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Journal<S> {
+impl<S: BosStr> Collection for Journal<S> {
     const NSID: &'static str = "top.launchpadx.agent.journal";
     type Record = JournalRecord;
 }
@@ -99,7 +99,7 @@ impl Collection for JournalRecord {
     type Record = JournalRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Journal<S> {
+impl<S: BosStr> LexiconSchema for Journal<S> {
     fn nsid() -> &'static str {
         "top.launchpadx.agent.journal"
     }
@@ -133,9 +133,9 @@ pub mod journal_state {
         type CreatedAt = Unset;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
@@ -146,51 +146,51 @@ pub mod journal_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct JournalBuilder<'a, S: journal_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct JournalBuilder<S: BosStr, St: journal_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Journal<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> JournalBuilder<'a, journal_state::Empty> {
+impl<S: BosStr> Journal<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> JournalBuilder<S, journal_state::Empty> {
         JournalBuilder::new()
     }
 }
 
-impl<'a> JournalBuilder<'a, journal_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> JournalBuilder<S, journal_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         JournalBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> JournalBuilder<'a, S>
+impl<S: BosStr, St> JournalBuilder<S, St>
 where
-    S: journal_state::State,
-    S::CreatedAt: journal_state::IsUnset,
+    St: journal_state::State,
+    St::CreatedAt: journal_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> JournalBuilder<'a, journal_state::SetCreatedAt<S>> {
+    ) -> JournalBuilder<S, journal_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         JournalBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: journal_state::State> JournalBuilder<'a, S> {
+impl<S: BosStr, St: journal_state::State> JournalBuilder<S, St> {
     /// Set the `journal` field (optional)
     pub fn journal(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -203,24 +203,21 @@ impl<'a, S: journal_state::State> JournalBuilder<'a, S> {
     }
 }
 
-impl<'a, S> JournalBuilder<'a, S>
+impl<S: BosStr, St> JournalBuilder<S, St>
 where
-    S: journal_state::State,
-    S::CreatedAt: journal_state::IsSet,
+    St: journal_state::State,
+    St::CreatedAt: journal_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Journal<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Journal<S> {
         Journal {
             created_at: self._fields.0.unwrap(),
             journal: self._fields.1,
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Journal<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Journal<S> {
         Journal {
             created_at: self._fields.0.unwrap(),
             journal: self._fields.1,

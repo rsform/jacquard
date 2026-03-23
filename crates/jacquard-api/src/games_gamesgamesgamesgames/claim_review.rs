@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
     rename = "games.gamesgamesgamesgames.claimReview",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ClaimReview<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ClaimReview<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub approved_games: Option<Vec<AtUri<S>>>,
     pub claim: StrongRef<S>,
@@ -55,13 +55,13 @@ pub struct ClaimReview<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ClaimReviewStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ClaimReviewStatus<S: BosStr = DefaultStr> {
     Approved,
     Denied,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> ClaimReviewStatus<S> {
+impl<S: BosStr> ClaimReviewStatus<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Approved => "approved",
@@ -79,19 +79,19 @@ impl<S: Bos<str> + AsRef<str>> ClaimReviewStatus<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ClaimReviewStatus<S> {
+impl<S: BosStr> core::fmt::Display for ClaimReviewStatus<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for ClaimReviewStatus<S> {
+impl<S: BosStr> AsRef<str> for ClaimReviewStatus<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for ClaimReviewStatus<S> {
+impl<S: BosStr> Serialize for ClaimReviewStatus<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -100,8 +100,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for ClaimReviewStatus<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for ClaimReviewStatus<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ClaimReviewStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -111,14 +110,18 @@ for ClaimReviewStatus<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for ClaimReviewStatus<S> {
+impl<S: BosStr + Default> Default for ClaimReviewStatus<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for ClaimReviewStatus<S> {
-    type Output = ClaimReviewStatus<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for ClaimReviewStatus<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ClaimReviewStatus<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             ClaimReviewStatus::Approved => ClaimReviewStatus::Approved,
@@ -134,18 +137,18 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for ClaimReviewStatus<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ClaimReviewGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ClaimReviewGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: ClaimReview<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> ClaimReview<S> {
+impl<S: BosStr> ClaimReview<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, ClaimReviewRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -158,17 +161,17 @@ pub struct ClaimReviewRecord;
 impl XrpcResp for ClaimReviewRecord {
     const NSID: &'static str = "games.gamesgamesgamesgames.claimReview";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ClaimReviewGetRecordOutput<S>;
+    type Output<S: BosStr> = ClaimReviewGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<ClaimReviewGetRecordOutput<S>> for ClaimReview<S> {
+impl<S: BosStr> From<ClaimReviewGetRecordOutput<S>> for ClaimReview<S> {
     fn from(output: ClaimReviewGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for ClaimReview<S> {
+impl<S: BosStr> Collection for ClaimReview<S> {
     const NSID: &'static str = "games.gamesgamesgamesgames.claimReview";
     type Record = ClaimReviewRecord;
 }
@@ -178,7 +181,7 @@ impl Collection for ClaimReviewRecord {
     type Record = ClaimReviewRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ClaimReview<S> {
+impl<S: BosStr> LexiconSchema for ClaimReview<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.claimReview"
     }
@@ -215,73 +218,73 @@ pub mod claim_review_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type ReviewedBy;
         type Claim;
+        type ReviewedBy;
         type Status;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type ReviewedBy = Unset;
         type Claim = Unset;
+        type ReviewedBy = Unset;
         type Status = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type ReviewedBy = S::ReviewedBy;
-        type Claim = S::Claim;
-        type Status = S::Status;
-    }
-    ///State transition - sets the `reviewed_by` field to Set
-    pub struct SetReviewedBy<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetReviewedBy<S> {}
-    impl<S: State> State for SetReviewedBy<S> {
-        type CreatedAt = S::CreatedAt;
-        type ReviewedBy = Set<members::reviewed_by>;
-        type Claim = S::Claim;
-        type Status = S::Status;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `claim` field to Set
-    pub struct SetClaim<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetClaim<S> {}
-    impl<S: State> State for SetClaim<S> {
-        type CreatedAt = S::CreatedAt;
-        type ReviewedBy = S::ReviewedBy;
+    pub struct SetClaim<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetClaim<St> {}
+    impl<St: State> State for SetClaim<St> {
         type Claim = Set<members::claim>;
-        type Status = S::Status;
+        type ReviewedBy = St::ReviewedBy;
+        type Status = St::Status;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `reviewed_by` field to Set
+    pub struct SetReviewedBy<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetReviewedBy<St> {}
+    impl<St: State> State for SetReviewedBy<St> {
+        type Claim = St::Claim;
+        type ReviewedBy = Set<members::reviewed_by>;
+        type Status = St::Status;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `status` field to Set
-    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStatus<S> {}
-    impl<S: State> State for SetStatus<S> {
-        type CreatedAt = S::CreatedAt;
-        type ReviewedBy = S::ReviewedBy;
-        type Claim = S::Claim;
+    pub struct SetStatus<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStatus<St> {}
+    impl<St: State> State for SetStatus<St> {
+        type Claim = St::Claim;
+        type ReviewedBy = St::ReviewedBy;
         type Status = Set<members::status>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Claim = St::Claim;
+        type ReviewedBy = St::ReviewedBy;
+        type Status = St::Status;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `reviewed_by` field
-        pub struct reviewed_by(());
         ///Marker type for the `claim` field
         pub struct claim(());
+        ///Marker type for the `reviewed_by` field
+        pub struct reviewed_by(());
         ///Marker type for the `status` field
         pub struct status(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ClaimReviewBuilder<'a, S: claim_review_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ClaimReviewBuilder<S: BosStr, St: claim_review_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<AtUri<S>>>,
         Option<StrongRef<S>>,
@@ -290,28 +293,28 @@ pub struct ClaimReviewBuilder<'a, S: claim_review_state::State> {
         Option<Did<S>>,
         Option<ClaimReviewStatus<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ClaimReview<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ClaimReviewBuilder<'a, claim_review_state::Empty> {
+impl<S: BosStr> ClaimReview<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ClaimReviewBuilder<S, claim_review_state::Empty> {
         ClaimReviewBuilder::new()
     }
 }
 
-impl<'a> ClaimReviewBuilder<'a, claim_review_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ClaimReviewBuilder<S, claim_review_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ClaimReviewBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: claim_review_state::State> ClaimReviewBuilder<'a, S> {
+impl<S: BosStr, St: claim_review_state::State> ClaimReviewBuilder<S, St> {
     /// Set the `approvedGames` field (optional)
     pub fn approved_games(mut self, value: impl Into<Option<Vec<AtUri<S>>>>) -> Self {
         self._fields.0 = value.into();
@@ -324,45 +327,45 @@ impl<'a, S: claim_review_state::State> ClaimReviewBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ClaimReviewBuilder<'a, S>
+impl<S: BosStr, St> ClaimReviewBuilder<S, St>
 where
-    S: claim_review_state::State,
-    S::Claim: claim_review_state::IsUnset,
+    St: claim_review_state::State,
+    St::Claim: claim_review_state::IsUnset,
 {
     /// Set the `claim` field (required)
     pub fn claim(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> ClaimReviewBuilder<'a, claim_review_state::SetClaim<S>> {
+    ) -> ClaimReviewBuilder<S, claim_review_state::SetClaim<St>> {
         self._fields.1 = Option::Some(value.into());
         ClaimReviewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ClaimReviewBuilder<'a, S>
+impl<S: BosStr, St> ClaimReviewBuilder<S, St>
 where
-    S: claim_review_state::State,
-    S::CreatedAt: claim_review_state::IsUnset,
+    St: claim_review_state::State,
+    St::CreatedAt: claim_review_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ClaimReviewBuilder<'a, claim_review_state::SetCreatedAt<S>> {
+    ) -> ClaimReviewBuilder<S, claim_review_state::SetCreatedAt<St>> {
         self._fields.2 = Option::Some(value.into());
         ClaimReviewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: claim_review_state::State> ClaimReviewBuilder<'a, S> {
+impl<S: BosStr, St: claim_review_state::State> ClaimReviewBuilder<S, St> {
     /// Set the `reason` field (optional)
     pub fn reason(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -375,54 +378,54 @@ impl<'a, S: claim_review_state::State> ClaimReviewBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ClaimReviewBuilder<'a, S>
+impl<S: BosStr, St> ClaimReviewBuilder<S, St>
 where
-    S: claim_review_state::State,
-    S::ReviewedBy: claim_review_state::IsUnset,
+    St: claim_review_state::State,
+    St::ReviewedBy: claim_review_state::IsUnset,
 {
     /// Set the `reviewedBy` field (required)
     pub fn reviewed_by(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> ClaimReviewBuilder<'a, claim_review_state::SetReviewedBy<S>> {
+    ) -> ClaimReviewBuilder<S, claim_review_state::SetReviewedBy<St>> {
         self._fields.4 = Option::Some(value.into());
         ClaimReviewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ClaimReviewBuilder<'a, S>
+impl<S: BosStr, St> ClaimReviewBuilder<S, St>
 where
-    S: claim_review_state::State,
-    S::Status: claim_review_state::IsUnset,
+    St: claim_review_state::State,
+    St::Status: claim_review_state::IsUnset,
 {
     /// Set the `status` field (required)
     pub fn status(
         mut self,
         value: impl Into<ClaimReviewStatus<S>>,
-    ) -> ClaimReviewBuilder<'a, claim_review_state::SetStatus<S>> {
+    ) -> ClaimReviewBuilder<S, claim_review_state::SetStatus<St>> {
         self._fields.5 = Option::Some(value.into());
         ClaimReviewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ClaimReviewBuilder<'a, S>
+impl<S: BosStr, St> ClaimReviewBuilder<S, St>
 where
-    S: claim_review_state::State,
-    S::CreatedAt: claim_review_state::IsSet,
-    S::ReviewedBy: claim_review_state::IsSet,
-    S::Claim: claim_review_state::IsSet,
-    S::Status: claim_review_state::IsSet,
+    St: claim_review_state::State,
+    St::Claim: claim_review_state::IsSet,
+    St::ReviewedBy: claim_review_state::IsSet,
+    St::Status: claim_review_state::IsSet,
+    St::CreatedAt: claim_review_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ClaimReview<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ClaimReview<S> {
         ClaimReview {
             approved_games: self._fields.0,
             claim: self._fields.1.unwrap(),
@@ -433,11 +436,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> ClaimReview<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ClaimReview<S> {
         ClaimReview {
             approved_games: self._fields.0,
             claim: self._fields.1.unwrap(),

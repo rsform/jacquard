@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -38,11 +38,11 @@ use crate::org_hypercerts::Uri;
     rename = "org.hyperboards.displayProfile",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DisplayProfile<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DisplayProfile<S: BosStr = DefaultStr> {
     ///Client-declared timestamp when this record was originally created.
     pub created_at: Datetime,
     ///Display name override for this user on hyperboards.
@@ -73,11 +73,11 @@ pub struct DisplayProfile<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum DisplayProfileHoverImage<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum DisplayProfileHoverImage<S: BosStr = DefaultStr> {
     #[serde(rename = "org.hypercerts.defs#uri")]
     Uri(Box<Uri<S>>),
     #[serde(rename = "org.hypercerts.defs#smallImage")]
@@ -90,11 +90,11 @@ pub enum DisplayProfileHoverImage<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum DisplayProfileImage<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum DisplayProfileImage<S: BosStr = DefaultStr> {
     #[serde(rename = "org.hypercerts.defs#uri")]
     Uri(Box<Uri<S>>),
     #[serde(rename = "org.hypercerts.defs#smallImage")]
@@ -107,11 +107,11 @@ pub enum DisplayProfileImage<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum DisplayProfileVideo<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum DisplayProfileVideo<S: BosStr = DefaultStr> {
     #[serde(rename = "org.hypercerts.defs#uri")]
     Uri(Box<Uri<S>>),
     #[serde(rename = "org.hypercerts.defs#smallVideo")]
@@ -124,18 +124,18 @@ pub enum DisplayProfileVideo<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DisplayProfileGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DisplayProfileGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: DisplayProfile<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> DisplayProfile<S> {
+impl<S: BosStr> DisplayProfile<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, DisplayProfileRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -148,18 +148,17 @@ pub struct DisplayProfileRecord;
 impl XrpcResp for DisplayProfileRecord {
     const NSID: &'static str = "org.hyperboards.displayProfile";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = DisplayProfileGetRecordOutput<S>;
+    type Output<S: BosStr> = DisplayProfileGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<DisplayProfileGetRecordOutput<S>>
-for DisplayProfile<S> {
+impl<S: BosStr> From<DisplayProfileGetRecordOutput<S>> for DisplayProfile<S> {
     fn from(output: DisplayProfileGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for DisplayProfile<S> {
+impl<S: BosStr> Collection for DisplayProfile<S> {
     const NSID: &'static str = "org.hyperboards.displayProfile";
     type Record = DisplayProfileRecord;
 }
@@ -169,7 +168,7 @@ impl Collection for DisplayProfileRecord {
     type Record = DisplayProfileRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for DisplayProfile<S> {
+impl<S: BosStr> LexiconSchema for DisplayProfile<S> {
     fn nsid() -> &'static str {
         "org.hyperboards.displayProfile"
     }
@@ -245,9 +244,9 @@ pub mod display_profile_state {
         type CreatedAt = Unset;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
@@ -258,9 +257,9 @@ pub mod display_profile_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct DisplayProfileBuilder<'a, S: display_profile_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct DisplayProfileBuilder<S: BosStr, St: display_profile_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
         Option<S>,
@@ -270,47 +269,47 @@ pub struct DisplayProfileBuilder<'a, S: display_profile_state::State> {
         Option<UriValue<S>>,
         Option<DisplayProfileVideo<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> DisplayProfile<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> DisplayProfileBuilder<'a, display_profile_state::Empty> {
+impl<S: BosStr> DisplayProfile<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> DisplayProfileBuilder<S, display_profile_state::Empty> {
         DisplayProfileBuilder::new()
     }
 }
 
-impl<'a> DisplayProfileBuilder<'a, display_profile_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> DisplayProfileBuilder<S, display_profile_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         DisplayProfileBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DisplayProfileBuilder<'a, S>
+impl<S: BosStr, St> DisplayProfileBuilder<S, St>
 where
-    S: display_profile_state::State,
-    S::CreatedAt: display_profile_state::IsUnset,
+    St: display_profile_state::State,
+    St::CreatedAt: display_profile_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> DisplayProfileBuilder<'a, display_profile_state::SetCreatedAt<S>> {
+    ) -> DisplayProfileBuilder<S, display_profile_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         DisplayProfileBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: display_profile_state::State> DisplayProfileBuilder<'a, S> {
+impl<S: BosStr, St: display_profile_state::State> DisplayProfileBuilder<S, St> {
     /// Set the `displayName` field (optional)
     pub fn display_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -323,7 +322,7 @@ impl<'a, S: display_profile_state::State> DisplayProfileBuilder<'a, S> {
     }
 }
 
-impl<'a, S: display_profile_state::State> DisplayProfileBuilder<'a, S> {
+impl<S: BosStr, St: display_profile_state::State> DisplayProfileBuilder<S, St> {
     /// Set the `hoverIframeUrl` field (optional)
     pub fn hover_iframe_url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -336,7 +335,7 @@ impl<'a, S: display_profile_state::State> DisplayProfileBuilder<'a, S> {
     }
 }
 
-impl<'a, S: display_profile_state::State> DisplayProfileBuilder<'a, S> {
+impl<S: BosStr, St: display_profile_state::State> DisplayProfileBuilder<S, St> {
     /// Set the `hoverImage` field (optional)
     pub fn hover_image(
         mut self,
@@ -355,7 +354,7 @@ impl<'a, S: display_profile_state::State> DisplayProfileBuilder<'a, S> {
     }
 }
 
-impl<'a, S: display_profile_state::State> DisplayProfileBuilder<'a, S> {
+impl<S: BosStr, St: display_profile_state::State> DisplayProfileBuilder<S, St> {
     /// Set the `image` field (optional)
     pub fn image(mut self, value: impl Into<Option<DisplayProfileImage<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -368,7 +367,7 @@ impl<'a, S: display_profile_state::State> DisplayProfileBuilder<'a, S> {
     }
 }
 
-impl<'a, S: display_profile_state::State> DisplayProfileBuilder<'a, S> {
+impl<S: BosStr, St: display_profile_state::State> DisplayProfileBuilder<S, St> {
     /// Set the `url` field (optional)
     pub fn url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -381,7 +380,7 @@ impl<'a, S: display_profile_state::State> DisplayProfileBuilder<'a, S> {
     }
 }
 
-impl<'a, S: display_profile_state::State> DisplayProfileBuilder<'a, S> {
+impl<S: BosStr, St: display_profile_state::State> DisplayProfileBuilder<S, St> {
     /// Set the `video` field (optional)
     pub fn video(mut self, value: impl Into<Option<DisplayProfileVideo<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -394,13 +393,13 @@ impl<'a, S: display_profile_state::State> DisplayProfileBuilder<'a, S> {
     }
 }
 
-impl<'a, S> DisplayProfileBuilder<'a, S>
+impl<S: BosStr, St> DisplayProfileBuilder<S, St>
 where
-    S: display_profile_state::State,
-    S::CreatedAt: display_profile_state::IsSet,
+    St: display_profile_state::State,
+    St::CreatedAt: display_profile_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> DisplayProfile<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> DisplayProfile<S> {
         DisplayProfile {
             created_at: self._fields.0.unwrap(),
             display_name: self._fields.1,
@@ -412,11 +411,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> DisplayProfile<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> DisplayProfile<S> {
         DisplayProfile {
             created_at: self._fields.0.unwrap(),
             display_name: self._fields.1,

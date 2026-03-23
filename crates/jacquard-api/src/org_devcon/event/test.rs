@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,11 +34,11 @@ use serde::{Serialize, Deserialize};
     rename = "org.devcon.event.test",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Test<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Test<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
     ///Description of the event
@@ -66,18 +66,18 @@ pub struct Test<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct TestGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct TestGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Test<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Test<S> {
+impl<S: BosStr> Test<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, TestRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -90,17 +90,17 @@ pub struct TestRecord;
 impl XrpcResp for TestRecord {
     const NSID: &'static str = "org.devcon.event.test";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = TestGetRecordOutput<S>;
+    type Output<S: BosStr> = TestGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<TestGetRecordOutput<S>> for Test<S> {
+impl<S: BosStr> From<TestGetRecordOutput<S>> for Test<S> {
     fn from(output: TestGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Test<S> {
+impl<S: BosStr> Collection for Test<S> {
     const NSID: &'static str = "org.devcon.event.test";
     type Record = TestRecord;
 }
@@ -110,7 +110,7 @@ impl Collection for TestRecord {
     type Record = TestRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Test<S> {
+impl<S: BosStr> LexiconSchema for Test<S> {
     fn nsid() -> &'static str {
         "org.devcon.event.test"
     }
@@ -135,57 +135,57 @@ pub mod test_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type End;
         type Title;
         type Start;
-        type End;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type End = Unset;
         type Title = Unset;
         type Start = Unset;
-        type End = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type Start = S::Start;
-        type End = S::End;
-    }
-    ///State transition - sets the `start` field to Set
-    pub struct SetStart<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStart<S> {}
-    impl<S: State> State for SetStart<S> {
-        type Title = S::Title;
-        type Start = Set<members::start>;
-        type End = S::End;
     }
     ///State transition - sets the `end` field to Set
-    pub struct SetEnd<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEnd<S> {}
-    impl<S: State> State for SetEnd<S> {
-        type Title = S::Title;
-        type Start = S::Start;
+    pub struct SetEnd<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetEnd<St> {}
+    impl<St: State> State for SetEnd<St> {
         type End = Set<members::end>;
+        type Title = St::Title;
+        type Start = St::Start;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
+        type End = St::End;
+        type Title = Set<members::title>;
+        type Start = St::Start;
+    }
+    ///State transition - sets the `start` field to Set
+    pub struct SetStart<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStart<St> {}
+    impl<St: State> State for SetStart<St> {
+        type End = St::End;
+        type Title = St::Title;
+        type Start = Set<members::start>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `end` field
+        pub struct end(());
         ///Marker type for the `title` field
         pub struct title(());
         ///Marker type for the `start` field
         pub struct start(());
-        ///Marker type for the `end` field
-        pub struct end(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct TestBuilder<'a, S: test_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct TestBuilder<S: BosStr, St: test_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
         Option<S>,
@@ -195,28 +195,28 @@ pub struct TestBuilder<'a, S: test_state::State> {
         Option<S>,
         Option<S>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Test<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> TestBuilder<'a, test_state::Empty> {
+impl<S: BosStr> Test<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> TestBuilder<S, test_state::Empty> {
         TestBuilder::new()
     }
 }
 
-impl<'a> TestBuilder<'a, test_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> TestBuilder<S, test_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         TestBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: test_state::State> TestBuilder<'a, S> {
+impl<S: BosStr, St: test_state::State> TestBuilder<S, St> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.0 = value.into();
@@ -229,7 +229,7 @@ impl<'a, S: test_state::State> TestBuilder<'a, S> {
     }
 }
 
-impl<'a, S: test_state::State> TestBuilder<'a, S> {
+impl<S: BosStr, St: test_state::State> TestBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -242,26 +242,26 @@ impl<'a, S: test_state::State> TestBuilder<'a, S> {
     }
 }
 
-impl<'a, S> TestBuilder<'a, S>
+impl<S: BosStr, St> TestBuilder<S, St>
 where
-    S: test_state::State,
-    S::End: test_state::IsUnset,
+    St: test_state::State,
+    St::End: test_state::IsUnset,
 {
     /// Set the `end` field (required)
     pub fn end(
         mut self,
         value: impl Into<Datetime>,
-    ) -> TestBuilder<'a, test_state::SetEnd<S>> {
+    ) -> TestBuilder<S, test_state::SetEnd<St>> {
         self._fields.2 = Option::Some(value.into());
         TestBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: test_state::State> TestBuilder<'a, S> {
+impl<S: BosStr, St: test_state::State> TestBuilder<S, St> {
     /// Set the `location` field (optional)
     pub fn location(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -274,45 +274,45 @@ impl<'a, S: test_state::State> TestBuilder<'a, S> {
     }
 }
 
-impl<'a, S> TestBuilder<'a, S>
+impl<S: BosStr, St> TestBuilder<S, St>
 where
-    S: test_state::State,
-    S::Start: test_state::IsUnset,
+    St: test_state::State,
+    St::Start: test_state::IsUnset,
 {
     /// Set the `start` field (required)
     pub fn start(
         mut self,
         value: impl Into<Datetime>,
-    ) -> TestBuilder<'a, test_state::SetStart<S>> {
+    ) -> TestBuilder<S, test_state::SetStart<St>> {
         self._fields.4 = Option::Some(value.into());
         TestBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> TestBuilder<'a, S>
+impl<S: BosStr, St> TestBuilder<S, St>
 where
-    S: test_state::State,
-    S::Title: test_state::IsUnset,
+    St: test_state::State,
+    St::Title: test_state::IsUnset,
 {
     /// Set the `title` field (required)
     pub fn title(
         mut self,
         value: impl Into<S>,
-    ) -> TestBuilder<'a, test_state::SetTitle<S>> {
+    ) -> TestBuilder<S, test_state::SetTitle<St>> {
         self._fields.5 = Option::Some(value.into());
         TestBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: test_state::State> TestBuilder<'a, S> {
+impl<S: BosStr, St: test_state::State> TestBuilder<S, St> {
     /// Set the `url` field (optional)
     pub fn url(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.6 = value.into();
@@ -325,15 +325,15 @@ impl<'a, S: test_state::State> TestBuilder<'a, S> {
     }
 }
 
-impl<'a, S> TestBuilder<'a, S>
+impl<S: BosStr, St> TestBuilder<S, St>
 where
-    S: test_state::State,
-    S::Title: test_state::IsSet,
-    S::Start: test_state::IsSet,
-    S::End: test_state::IsSet,
+    St: test_state::State,
+    St::End: test_state::IsSet,
+    St::Title: test_state::IsSet,
+    St::Start: test_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Test<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Test<S> {
         Test {
             created_at: self._fields.0,
             description: self._fields.1,
@@ -345,8 +345,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Test<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Test<S> {
         Test {
             created_at: self._fields.0,
             description: self._fields.1,

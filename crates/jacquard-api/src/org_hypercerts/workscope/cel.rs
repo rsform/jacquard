@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -31,11 +31,11 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Cel<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Cel<S: BosStr = DefaultStr> {
     ///Client-declared timestamp when this expression was originally created.
     pub created_at: Datetime,
     ///A CEL expression encoding the work scope conditions. Example: scope.hasAll(['mangrove_restoration', 'environmental_education']) && location.country == 'KE'
@@ -51,12 +51,12 @@ pub struct Cel<S: Bos<str> + AsRef<str> = DefaultStr> {
 /// CEL context schema version.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum CelVersion<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum CelVersion<S: BosStr = DefaultStr> {
     V1,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> CelVersion<S> {
+impl<S: BosStr> CelVersion<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::V1 => "v1",
@@ -72,19 +72,19 @@ impl<S: Bos<str> + AsRef<str>> CelVersion<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for CelVersion<S> {
+impl<S: BosStr> core::fmt::Display for CelVersion<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for CelVersion<S> {
+impl<S: BosStr> AsRef<str> for CelVersion<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for CelVersion<S> {
+impl<S: BosStr> Serialize for CelVersion<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -93,8 +93,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for CelVersion<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for CelVersion<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for CelVersion<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -104,14 +103,18 @@ for CelVersion<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for CelVersion<S> {
+impl<S: BosStr + Default> Default for CelVersion<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for CelVersion<S> {
-    type Output = CelVersion<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for CelVersion<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = CelVersion<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             CelVersion::V1 => CelVersion::V1,
@@ -120,7 +123,7 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for CelVersion<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Cel<S> {
+impl<S: BosStr> LexiconSchema for Cel<S> {
     fn nsid() -> &'static str {
         "org.hypercerts.workscope.cel"
     }
@@ -191,186 +194,186 @@ pub mod cel_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type UsedTags;
-        type Version;
         type CreatedAt;
         type Expression;
+        type Version;
+        type UsedTags;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type UsedTags = Unset;
-        type Version = Unset;
         type CreatedAt = Unset;
         type Expression = Unset;
-    }
-    ///State transition - sets the `used_tags` field to Set
-    pub struct SetUsedTags<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUsedTags<S> {}
-    impl<S: State> State for SetUsedTags<S> {
-        type UsedTags = Set<members::used_tags>;
-        type Version = S::Version;
-        type CreatedAt = S::CreatedAt;
-        type Expression = S::Expression;
-    }
-    ///State transition - sets the `version` field to Set
-    pub struct SetVersion<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVersion<S> {}
-    impl<S: State> State for SetVersion<S> {
-        type UsedTags = S::UsedTags;
-        type Version = Set<members::version>;
-        type CreatedAt = S::CreatedAt;
-        type Expression = S::Expression;
+        type Version = Unset;
+        type UsedTags = Unset;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type UsedTags = S::UsedTags;
-        type Version = S::Version;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
-        type Expression = S::Expression;
+        type Expression = St::Expression;
+        type Version = St::Version;
+        type UsedTags = St::UsedTags;
     }
     ///State transition - sets the `expression` field to Set
-    pub struct SetExpression<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetExpression<S> {}
-    impl<S: State> State for SetExpression<S> {
-        type UsedTags = S::UsedTags;
-        type Version = S::Version;
-        type CreatedAt = S::CreatedAt;
+    pub struct SetExpression<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetExpression<St> {}
+    impl<St: State> State for SetExpression<St> {
+        type CreatedAt = St::CreatedAt;
         type Expression = Set<members::expression>;
+        type Version = St::Version;
+        type UsedTags = St::UsedTags;
+    }
+    ///State transition - sets the `version` field to Set
+    pub struct SetVersion<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetVersion<St> {}
+    impl<St: State> State for SetVersion<St> {
+        type CreatedAt = St::CreatedAt;
+        type Expression = St::Expression;
+        type Version = Set<members::version>;
+        type UsedTags = St::UsedTags;
+    }
+    ///State transition - sets the `used_tags` field to Set
+    pub struct SetUsedTags<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUsedTags<St> {}
+    impl<St: State> State for SetUsedTags<St> {
+        type CreatedAt = St::CreatedAt;
+        type Expression = St::Expression;
+        type Version = St::Version;
+        type UsedTags = Set<members::used_tags>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `used_tags` field
-        pub struct used_tags(());
-        ///Marker type for the `version` field
-        pub struct version(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `expression` field
         pub struct expression(());
+        ///Marker type for the `version` field
+        pub struct version(());
+        ///Marker type for the `used_tags` field
+        pub struct used_tags(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct CelBuilder<'a, S: cel_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct CelBuilder<S: BosStr, St: cel_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
         Option<S>,
         Option<Vec<StrongRef<S>>>,
         Option<CelVersion<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Cel<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> CelBuilder<'a, cel_state::Empty> {
+impl<S: BosStr> Cel<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> CelBuilder<S, cel_state::Empty> {
         CelBuilder::new()
     }
 }
 
-impl<'a> CelBuilder<'a, cel_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> CelBuilder<S, cel_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         CelBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CelBuilder<'a, S>
+impl<S: BosStr, St> CelBuilder<S, St>
 where
-    S: cel_state::State,
-    S::CreatedAt: cel_state::IsUnset,
+    St: cel_state::State,
+    St::CreatedAt: cel_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> CelBuilder<'a, cel_state::SetCreatedAt<S>> {
+    ) -> CelBuilder<S, cel_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         CelBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CelBuilder<'a, S>
+impl<S: BosStr, St> CelBuilder<S, St>
 where
-    S: cel_state::State,
-    S::Expression: cel_state::IsUnset,
+    St: cel_state::State,
+    St::Expression: cel_state::IsUnset,
 {
     /// Set the `expression` field (required)
     pub fn expression(
         mut self,
         value: impl Into<S>,
-    ) -> CelBuilder<'a, cel_state::SetExpression<S>> {
+    ) -> CelBuilder<S, cel_state::SetExpression<St>> {
         self._fields.1 = Option::Some(value.into());
         CelBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CelBuilder<'a, S>
+impl<S: BosStr, St> CelBuilder<S, St>
 where
-    S: cel_state::State,
-    S::UsedTags: cel_state::IsUnset,
+    St: cel_state::State,
+    St::UsedTags: cel_state::IsUnset,
 {
     /// Set the `usedTags` field (required)
     pub fn used_tags(
         mut self,
         value: impl Into<Vec<StrongRef<S>>>,
-    ) -> CelBuilder<'a, cel_state::SetUsedTags<S>> {
+    ) -> CelBuilder<S, cel_state::SetUsedTags<St>> {
         self._fields.2 = Option::Some(value.into());
         CelBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CelBuilder<'a, S>
+impl<S: BosStr, St> CelBuilder<S, St>
 where
-    S: cel_state::State,
-    S::Version: cel_state::IsUnset,
+    St: cel_state::State,
+    St::Version: cel_state::IsUnset,
 {
     /// Set the `version` field (required)
     pub fn version(
         mut self,
         value: impl Into<CelVersion<S>>,
-    ) -> CelBuilder<'a, cel_state::SetVersion<S>> {
+    ) -> CelBuilder<S, cel_state::SetVersion<St>> {
         self._fields.3 = Option::Some(value.into());
         CelBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CelBuilder<'a, S>
+impl<S: BosStr, St> CelBuilder<S, St>
 where
-    S: cel_state::State,
-    S::UsedTags: cel_state::IsSet,
-    S::Version: cel_state::IsSet,
-    S::CreatedAt: cel_state::IsSet,
-    S::Expression: cel_state::IsSet,
+    St: cel_state::State,
+    St::CreatedAt: cel_state::IsSet,
+    St::Expression: cel_state::IsSet,
+    St::Version: cel_state::IsSet,
+    St::UsedTags: cel_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Cel<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Cel<S> {
         Cel {
             created_at: self._fields.0.unwrap(),
             expression: self._fields.1.unwrap(),
@@ -379,8 +382,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Cel<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Cel<S> {
         Cel {
             created_at: self._fields.0.unwrap(),
             expression: self._fields.1.unwrap(),

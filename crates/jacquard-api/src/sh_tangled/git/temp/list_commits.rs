@@ -6,33 +6,35 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[allow(unused_imports)]
+use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
+use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ListCommits<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ListCommits<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub cursor: Option<S>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub r#ref: Option<S>,
-    #[serde(borrow)]
     pub repo: AtUri<S>,
 }
 
@@ -59,22 +61,19 @@ pub struct ListCommitsOutput {
 pub enum ListCommitsError {
     /// Repository not found or access denied
     #[serde(rename = "RepoNotFound")]
-    RepoNotFound(Option<jacquard_common::deps::smol_str::SmolStr>),
+    RepoNotFound(Option<SmolStr>),
     /// Git reference not found
     #[serde(rename = "RefNotFound")]
-    RefNotFound(Option<jacquard_common::deps::smol_str::SmolStr>),
+    RefNotFound(Option<SmolStr>),
     /// Path not found in repository
     #[serde(rename = "PathNotFound")]
-    PathNotFound(Option<jacquard_common::deps::smol_str::SmolStr>),
+    PathNotFound(Option<SmolStr>),
     /// Invalid request parameters
     #[serde(rename = "InvalidRequest")]
-    InvalidRequest(Option<jacquard_common::deps::smol_str::SmolStr>),
+    InvalidRequest(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: jacquard_common::deps::smol_str::SmolStr,
-        message: Option<jacquard_common::deps::smol_str::SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for ListCommitsError {
@@ -124,9 +123,9 @@ pub struct ListCommitsResponse;
 impl jacquard_common::xrpc::XrpcResp for ListCommitsResponse {
     const NSID: &'static str = "sh.tangled.git.temp.listCommits";
     const ENCODING: &'static str = "*/*";
-    type Output<S: Bos<str> + AsRef<str>> = ListCommitsOutput;
+    type Output<S: BosStr> = ListCommitsOutput;
     type Err = ListCommitsError;
-    fn encode_output<S: Bos<str> + AsRef<str>>(
+    fn encode_output<S: BosStr>(
         output: &Self::Output<S>,
     ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError>
     where
@@ -138,7 +137,7 @@ impl jacquard_common::xrpc::XrpcResp for ListCommitsResponse {
         body: &'de [u8],
     ) -> Result<Self::Output<S>, jacquard_common::error::DecodeError>
     where
-        S: Bos<str> + AsRef<str> + Deserialize<'de>,
+        S: BosStr + Deserialize<'de>,
         Self::Output<S>: Deserialize<'de>,
     {
         Ok(ListCommitsOutput {
@@ -147,8 +146,7 @@ impl jacquard_common::xrpc::XrpcResp for ListCommitsResponse {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for ListCommits<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ListCommits<S> {
     const NSID: &'static str = "sh.tangled.git.temp.listCommits";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ListCommitsResponse;
@@ -159,7 +157,7 @@ pub struct ListCommitsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListCommitsRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.git.temp.listCommits";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = ListCommits<S>;
+    type Request<S: BosStr> = ListCommits<S>;
     type Response = ListCommitsResponse;
 }
 
@@ -186,9 +184,9 @@ pub mod list_commits_state {
         type Repo = Unset;
     }
     ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
+    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRepo<St> {}
+    impl<St: State> State for SetRepo<St> {
         type Repo = Set<members::repo>;
     }
     /// Marker types for field names
@@ -199,32 +197,32 @@ pub mod list_commits_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ListCommitsBuilder<'a, S: list_commits_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ListCommitsBuilder<S: BosStr, St: list_commits_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>, Option<S>, Option<AtUri<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ListCommits<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ListCommitsBuilder<'a, list_commits_state::Empty> {
+impl<S: BosStr> ListCommits<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ListCommitsBuilder<S, list_commits_state::Empty> {
         ListCommitsBuilder::new()
     }
 }
 
-impl<'a> ListCommitsBuilder<'a, list_commits_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ListCommitsBuilder<S, list_commits_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ListCommitsBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: list_commits_state::State> ListCommitsBuilder<'a, S> {
+impl<S: BosStr, St: list_commits_state::State> ListCommitsBuilder<S, St> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -237,7 +235,7 @@ impl<'a, S: list_commits_state::State> ListCommitsBuilder<'a, S> {
     }
 }
 
-impl<'a, S: list_commits_state::State> ListCommitsBuilder<'a, S> {
+impl<S: BosStr, St: list_commits_state::State> ListCommitsBuilder<S, St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -250,7 +248,7 @@ impl<'a, S: list_commits_state::State> ListCommitsBuilder<'a, S> {
     }
 }
 
-impl<'a, S: list_commits_state::State> ListCommitsBuilder<'a, S> {
+impl<S: BosStr, St: list_commits_state::State> ListCommitsBuilder<S, St> {
     /// Set the `ref` field (optional)
     pub fn r#ref(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -263,32 +261,32 @@ impl<'a, S: list_commits_state::State> ListCommitsBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ListCommitsBuilder<'a, S>
+impl<S: BosStr, St> ListCommitsBuilder<S, St>
 where
-    S: list_commits_state::State,
-    S::Repo: list_commits_state::IsUnset,
+    St: list_commits_state::State,
+    St::Repo: list_commits_state::IsUnset,
 {
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> ListCommitsBuilder<'a, list_commits_state::SetRepo<S>> {
+    ) -> ListCommitsBuilder<S, list_commits_state::SetRepo<St>> {
         self._fields.3 = Option::Some(value.into());
         ListCommitsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ListCommitsBuilder<'a, S>
+impl<S: BosStr, St> ListCommitsBuilder<S, St>
 where
-    S: list_commits_state::State,
-    S::Repo: list_commits_state::IsSet,
+    St: list_commits_state::State,
+    St::Repo: list_commits_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ListCommits<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ListCommits<S> {
         ListCommits {
             cursor: self._fields.0,
             limit: self._fields.1,

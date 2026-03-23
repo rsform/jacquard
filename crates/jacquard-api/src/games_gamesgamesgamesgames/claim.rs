@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "games.gamesgamesgamesgames.claim",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Claim<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Claim<S: BosStr = DefaultStr> {
     ///Contact information for the claimant (filtered from responses unless caller is admin)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub contact: Option<S>,
@@ -57,13 +57,13 @@ pub struct Claim<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ClaimType<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ClaimType<S: BosStr = DefaultStr> {
     Game,
     Org,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> ClaimType<S> {
+impl<S: BosStr> ClaimType<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Game => "game",
@@ -81,19 +81,19 @@ impl<S: Bos<str> + AsRef<str>> ClaimType<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ClaimType<S> {
+impl<S: BosStr> core::fmt::Display for ClaimType<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for ClaimType<S> {
+impl<S: BosStr> AsRef<str> for ClaimType<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for ClaimType<S> {
+impl<S: BosStr> Serialize for ClaimType<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -102,8 +102,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for ClaimType<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for ClaimType<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ClaimType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -113,14 +112,18 @@ for ClaimType<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for ClaimType<S> {
+impl<S: BosStr + Default> Default for ClaimType<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for ClaimType<S> {
-    type Output = ClaimType<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for ClaimType<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ClaimType<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             ClaimType::Game => ClaimType::Game,
@@ -136,18 +139,18 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for ClaimType<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ClaimGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ClaimGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Claim<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Claim<S> {
+impl<S: BosStr> Claim<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, ClaimRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -160,17 +163,17 @@ pub struct ClaimRecord;
 impl XrpcResp for ClaimRecord {
     const NSID: &'static str = "games.gamesgamesgamesgames.claim";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ClaimGetRecordOutput<S>;
+    type Output<S: BosStr> = ClaimGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<ClaimGetRecordOutput<S>> for Claim<S> {
+impl<S: BosStr> From<ClaimGetRecordOutput<S>> for Claim<S> {
     fn from(output: ClaimGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Claim<S> {
+impl<S: BosStr> Collection for Claim<S> {
     const NSID: &'static str = "games.gamesgamesgamesgames.claim";
     type Record = ClaimRecord;
 }
@@ -180,7 +183,7 @@ impl Collection for ClaimRecord {
     type Record = ClaimRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Claim<S> {
+impl<S: BosStr> LexiconSchema for Claim<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.claim"
     }
@@ -240,17 +243,17 @@ pub mod claim_state {
         type Type = Unset;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
-        type Type = S::Type;
+        type Type = St::Type;
     }
     ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type CreatedAt = S::CreatedAt;
+    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetType<St> {}
+    impl<St: State> State for SetType<St> {
+        type CreatedAt = St::CreatedAt;
         type Type = Set<members::r#type>;
     }
     /// Marker types for field names
@@ -263,9 +266,9 @@ pub mod claim_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ClaimBuilder<'a, S: claim_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ClaimBuilder<S: BosStr, St: claim_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
         Option<Datetime>,
@@ -274,28 +277,28 @@ pub struct ClaimBuilder<'a, S: claim_state::State> {
         Option<AtUri<S>>,
         Option<ClaimType<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Claim<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ClaimBuilder<'a, claim_state::Empty> {
+impl<S: BosStr> Claim<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ClaimBuilder<S, claim_state::Empty> {
         ClaimBuilder::new()
     }
 }
 
-impl<'a> ClaimBuilder<'a, claim_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ClaimBuilder<S, claim_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ClaimBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: claim_state::State> ClaimBuilder<'a, S> {
+impl<S: BosStr, St: claim_state::State> ClaimBuilder<S, St> {
     /// Set the `contact` field (optional)
     pub fn contact(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -308,26 +311,26 @@ impl<'a, S: claim_state::State> ClaimBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ClaimBuilder<'a, S>
+impl<S: BosStr, St> ClaimBuilder<S, St>
 where
-    S: claim_state::State,
-    S::CreatedAt: claim_state::IsUnset,
+    St: claim_state::State,
+    St::CreatedAt: claim_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ClaimBuilder<'a, claim_state::SetCreatedAt<S>> {
+    ) -> ClaimBuilder<S, claim_state::SetCreatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         ClaimBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: claim_state::State> ClaimBuilder<'a, S> {
+impl<S: BosStr, St: claim_state::State> ClaimBuilder<S, St> {
     /// Set the `games` field (optional)
     pub fn games(mut self, value: impl Into<Option<Vec<AtUri<S>>>>) -> Self {
         self._fields.2 = value.into();
@@ -340,7 +343,7 @@ impl<'a, S: claim_state::State> ClaimBuilder<'a, S> {
     }
 }
 
-impl<'a, S: claim_state::State> ClaimBuilder<'a, S> {
+impl<S: BosStr, St: claim_state::State> ClaimBuilder<S, St> {
     /// Set the `message` field (optional)
     pub fn message(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -353,7 +356,7 @@ impl<'a, S: claim_state::State> ClaimBuilder<'a, S> {
     }
 }
 
-impl<'a, S: claim_state::State> ClaimBuilder<'a, S> {
+impl<S: BosStr, St: claim_state::State> ClaimBuilder<S, St> {
     /// Set the `org` field (optional)
     pub fn org(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -366,33 +369,33 @@ impl<'a, S: claim_state::State> ClaimBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ClaimBuilder<'a, S>
+impl<S: BosStr, St> ClaimBuilder<S, St>
 where
-    S: claim_state::State,
-    S::Type: claim_state::IsUnset,
+    St: claim_state::State,
+    St::Type: claim_state::IsUnset,
 {
     /// Set the `type` field (required)
     pub fn r#type(
         mut self,
         value: impl Into<ClaimType<S>>,
-    ) -> ClaimBuilder<'a, claim_state::SetType<S>> {
+    ) -> ClaimBuilder<S, claim_state::SetType<St>> {
         self._fields.5 = Option::Some(value.into());
         ClaimBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ClaimBuilder<'a, S>
+impl<S: BosStr, St> ClaimBuilder<S, St>
 where
-    S: claim_state::State,
-    S::CreatedAt: claim_state::IsSet,
-    S::Type: claim_state::IsSet,
+    St: claim_state::State,
+    St::CreatedAt: claim_state::IsSet,
+    St::Type: claim_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Claim<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Claim<S> {
         Claim {
             contact: self._fields.0,
             created_at: self._fields.1.unwrap(),
@@ -403,8 +406,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Claim<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Claim<S> {
         Claim {
             contact: self._fields.0,
             created_at: self._fields.1.unwrap(),

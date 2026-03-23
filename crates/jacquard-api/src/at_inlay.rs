@@ -22,7 +22,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -43,11 +43,11 @@ use crate::at_inlay;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CachePolicy<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CachePolicy<S: BosStr = DefaultStr> {
     ///How frequently the underlying data changes
     #[serde(skip_serializing_if = "Option::is_none")]
     pub life: Option<CachePolicyLife<S>>,
@@ -61,7 +61,7 @@ pub struct CachePolicy<S: Bos<str> + AsRef<str> = DefaultStr> {
 /// How frequently the underlying data changes
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum CachePolicyLife<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum CachePolicyLife<S: BosStr = DefaultStr> {
     Seconds,
     Minutes,
     Hours,
@@ -69,7 +69,7 @@ pub enum CachePolicyLife<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> CachePolicyLife<S> {
+impl<S: BosStr> CachePolicyLife<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Seconds => "seconds",
@@ -91,19 +91,19 @@ impl<S: Bos<str> + AsRef<str>> CachePolicyLife<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for CachePolicyLife<S> {
+impl<S: BosStr> core::fmt::Display for CachePolicyLife<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for CachePolicyLife<S> {
+impl<S: BosStr> AsRef<str> for CachePolicyLife<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for CachePolicyLife<S> {
+impl<S: BosStr> Serialize for CachePolicyLife<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -112,8 +112,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for CachePolicyLife<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for CachePolicyLife<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for CachePolicyLife<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -123,14 +122,18 @@ for CachePolicyLife<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for CachePolicyLife<S> {
+impl<S: BosStr + Default> Default for CachePolicyLife<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for CachePolicyLife<S> {
-    type Output = CachePolicyLife<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for CachePolicyLife<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = CachePolicyLife<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             CachePolicyLife::Seconds => CachePolicyLife::Seconds,
@@ -148,11 +151,11 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for CachePolicyLife<S> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum CachePolicyTagsItem<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum CachePolicyTagsItem<S: BosStr = DefaultStr> {
     #[serde(rename = "at.inlay.defs#tagRecord")]
     TagRecord(Box<at_inlay::TagRecord<S>>),
     #[serde(rename = "at.inlay.defs#tagLink")]
@@ -165,11 +168,11 @@ pub enum CachePolicyTagsItem<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Element<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Element<S: BosStr = DefaultStr> {
     ///Stable key that identifies the component among its siblings.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub key: Option<S>,
@@ -188,11 +191,11 @@ pub struct Element<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Response<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Response<S: BosStr = DefaultStr> {
     ///Cache lifetime and invalidation tags
     pub cache: at_inlay::CachePolicy<S>,
     ///Rendered element tree
@@ -207,11 +210,11 @@ pub struct Response<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct TagLink<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct TagLink<S: BosStr = DefaultStr> {
     ///Collection NSID of the linking records. Omit for any collection.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub from: Option<Nsid<S>>,
@@ -227,11 +230,11 @@ pub struct TagLink<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct TagRecord<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct TagRecord<S: BosStr = DefaultStr> {
     ///AT URI at record, collection, or identity granularity
     pub uri: AtUri<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -243,18 +246,18 @@ pub struct TagRecord<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ViaValtown<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ViaValtown<S: BosStr = DefaultStr> {
     ///Val Town val UUID
     pub val_id: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for CachePolicy<S> {
+impl<S: BosStr> LexiconSchema for CachePolicy<S> {
     fn nsid() -> &'static str {
         "at.inlay.defs"
     }
@@ -279,7 +282,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for CachePolicy<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Element<S> {
+impl<S: BosStr> LexiconSchema for Element<S> {
     fn nsid() -> &'static str {
         "at.inlay.defs"
     }
@@ -304,7 +307,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Element<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Response<S> {
+impl<S: BosStr> LexiconSchema for Response<S> {
     fn nsid() -> &'static str {
         "at.inlay.defs"
     }
@@ -319,7 +322,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Response<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for TagLink<S> {
+impl<S: BosStr> LexiconSchema for TagLink<S> {
     fn nsid() -> &'static str {
         "at.inlay.defs"
     }
@@ -334,7 +337,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for TagLink<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for TagRecord<S> {
+impl<S: BosStr> LexiconSchema for TagRecord<S> {
     fn nsid() -> &'static str {
         "at.inlay.defs"
     }
@@ -349,7 +352,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for TagRecord<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ViaValtown<S> {
+impl<S: BosStr> LexiconSchema for ViaValtown<S> {
     fn nsid() -> &'static str {
         "at.inlay.defs"
     }
@@ -618,9 +621,9 @@ pub mod element_state {
         type Type = Unset;
     }
     ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
+    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetType<St> {}
+    impl<St: State> State for SetType<St> {
         type Type = Set<members::r#type>;
     }
     /// Marker types for field names
@@ -631,32 +634,32 @@ pub mod element_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ElementBuilder<'a, S: element_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ElementBuilder<S: BosStr, St: element_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<Data<S>>, Option<Nsid<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Element<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ElementBuilder<'a, element_state::Empty> {
+impl<S: BosStr> Element<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ElementBuilder<S, element_state::Empty> {
         ElementBuilder::new()
     }
 }
 
-impl<'a> ElementBuilder<'a, element_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ElementBuilder<S, element_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ElementBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: element_state::State> ElementBuilder<'a, S> {
+impl<S: BosStr, St: element_state::State> ElementBuilder<S, St> {
     /// Set the `key` field (optional)
     pub fn key(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -669,7 +672,7 @@ impl<'a, S: element_state::State> ElementBuilder<'a, S> {
     }
 }
 
-impl<'a, S: element_state::State> ElementBuilder<'a, S> {
+impl<S: BosStr, St: element_state::State> ElementBuilder<S, St> {
     /// Set the `props` field (optional)
     pub fn props(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -682,32 +685,32 @@ impl<'a, S: element_state::State> ElementBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ElementBuilder<'a, S>
+impl<S: BosStr, St> ElementBuilder<S, St>
 where
-    S: element_state::State,
-    S::Type: element_state::IsUnset,
+    St: element_state::State,
+    St::Type: element_state::IsUnset,
 {
     /// Set the `type` field (required)
     pub fn r#type(
         mut self,
         value: impl Into<Nsid<S>>,
-    ) -> ElementBuilder<'a, element_state::SetType<S>> {
+    ) -> ElementBuilder<S, element_state::SetType<St>> {
         self._fields.2 = Option::Some(value.into());
         ElementBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ElementBuilder<'a, S>
+impl<S: BosStr, St> ElementBuilder<S, St>
 where
-    S: element_state::State,
-    S::Type: element_state::IsSet,
+    St: element_state::State,
+    St::Type: element_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Element<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Element<S> {
         Element {
             key: self._fields.0,
             props: self._fields.1,
@@ -715,11 +718,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Element<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Element<S> {
         Element {
             key: self._fields.0,
             props: self._fields.1,
@@ -739,122 +739,119 @@ pub mod response_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Cache;
         type Node;
+        type Cache;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Cache = Unset;
         type Node = Unset;
-    }
-    ///State transition - sets the `cache` field to Set
-    pub struct SetCache<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCache<S> {}
-    impl<S: State> State for SetCache<S> {
-        type Cache = Set<members::cache>;
-        type Node = S::Node;
+        type Cache = Unset;
     }
     ///State transition - sets the `node` field to Set
-    pub struct SetNode<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNode<S> {}
-    impl<S: State> State for SetNode<S> {
-        type Cache = S::Cache;
+    pub struct SetNode<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetNode<St> {}
+    impl<St: State> State for SetNode<St> {
         type Node = Set<members::node>;
+        type Cache = St::Cache;
+    }
+    ///State transition - sets the `cache` field to Set
+    pub struct SetCache<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCache<St> {}
+    impl<St: State> State for SetCache<St> {
+        type Node = St::Node;
+        type Cache = Set<members::cache>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `cache` field
-        pub struct cache(());
         ///Marker type for the `node` field
         pub struct node(());
+        ///Marker type for the `cache` field
+        pub struct cache(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ResponseBuilder<'a, S: response_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ResponseBuilder<S: BosStr, St: response_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<at_inlay::CachePolicy<S>>, Option<at_inlay::Element<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Response<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ResponseBuilder<'a, response_state::Empty> {
+impl<S: BosStr> Response<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ResponseBuilder<S, response_state::Empty> {
         ResponseBuilder::new()
     }
 }
 
-impl<'a> ResponseBuilder<'a, response_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ResponseBuilder<S, response_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ResponseBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ResponseBuilder<'a, S>
+impl<S: BosStr, St> ResponseBuilder<S, St>
 where
-    S: response_state::State,
-    S::Cache: response_state::IsUnset,
+    St: response_state::State,
+    St::Cache: response_state::IsUnset,
 {
     /// Set the `cache` field (required)
     pub fn cache(
         mut self,
         value: impl Into<at_inlay::CachePolicy<S>>,
-    ) -> ResponseBuilder<'a, response_state::SetCache<S>> {
+    ) -> ResponseBuilder<S, response_state::SetCache<St>> {
         self._fields.0 = Option::Some(value.into());
         ResponseBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ResponseBuilder<'a, S>
+impl<S: BosStr, St> ResponseBuilder<S, St>
 where
-    S: response_state::State,
-    S::Node: response_state::IsUnset,
+    St: response_state::State,
+    St::Node: response_state::IsUnset,
 {
     /// Set the `node` field (required)
     pub fn node(
         mut self,
         value: impl Into<at_inlay::Element<S>>,
-    ) -> ResponseBuilder<'a, response_state::SetNode<S>> {
+    ) -> ResponseBuilder<S, response_state::SetNode<St>> {
         self._fields.1 = Option::Some(value.into());
         ResponseBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ResponseBuilder<'a, S>
+impl<S: BosStr, St> ResponseBuilder<S, St>
 where
-    S: response_state::State,
-    S::Cache: response_state::IsSet,
-    S::Node: response_state::IsSet,
+    St: response_state::State,
+    St::Node: response_state::IsSet,
+    St::Cache: response_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Response<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Response<S> {
         Response {
             cache: self._fields.0.unwrap(),
             node: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Response<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Response<S> {
         Response {
             cache: self._fields.0.unwrap(),
             node: self._fields.1.unwrap(),
@@ -882,9 +879,9 @@ pub mod tag_link_state {
         type Subject = Unset;
     }
     ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
+    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubject<St> {}
+    impl<St: State> State for SetSubject<St> {
         type Subject = Set<members::subject>;
     }
     /// Marker types for field names
@@ -895,32 +892,32 @@ pub mod tag_link_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct TagLinkBuilder<'a, S: tag_link_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct TagLinkBuilder<S: BosStr, St: tag_link_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Nsid<S>>, Option<AtUri<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> TagLink<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> TagLinkBuilder<'a, tag_link_state::Empty> {
+impl<S: BosStr> TagLink<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> TagLinkBuilder<S, tag_link_state::Empty> {
         TagLinkBuilder::new()
     }
 }
 
-impl<'a> TagLinkBuilder<'a, tag_link_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> TagLinkBuilder<S, tag_link_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         TagLinkBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: tag_link_state::State> TagLinkBuilder<'a, S> {
+impl<S: BosStr, St: tag_link_state::State> TagLinkBuilder<S, St> {
     /// Set the `from` field (optional)
     pub fn from(mut self, value: impl Into<Option<Nsid<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -933,43 +930,40 @@ impl<'a, S: tag_link_state::State> TagLinkBuilder<'a, S> {
     }
 }
 
-impl<'a, S> TagLinkBuilder<'a, S>
+impl<S: BosStr, St> TagLinkBuilder<S, St>
 where
-    S: tag_link_state::State,
-    S::Subject: tag_link_state::IsUnset,
+    St: tag_link_state::State,
+    St::Subject: tag_link_state::IsUnset,
 {
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> TagLinkBuilder<'a, tag_link_state::SetSubject<S>> {
+    ) -> TagLinkBuilder<S, tag_link_state::SetSubject<St>> {
         self._fields.1 = Option::Some(value.into());
         TagLinkBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> TagLinkBuilder<'a, S>
+impl<S: BosStr, St> TagLinkBuilder<S, St>
 where
-    S: tag_link_state::State,
-    S::Subject: tag_link_state::IsSet,
+    St: tag_link_state::State,
+    St::Subject: tag_link_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> TagLink<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> TagLink<S> {
         TagLink {
             from: self._fields.0,
             subject: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> TagLink<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> TagLink<S> {
         TagLink {
             from: self._fields.0,
             subject: self._fields.1.unwrap(),
@@ -997,9 +991,9 @@ pub mod tag_record_state {
         type Uri = Unset;
     }
     ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
         type Uri = Set<members::uri>;
     }
     /// Marker types for field names
@@ -1010,67 +1004,67 @@ pub mod tag_record_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct TagRecordBuilder<'a, S: tag_record_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct TagRecordBuilder<S: BosStr, St: tag_record_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> TagRecord<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> TagRecordBuilder<'a, tag_record_state::Empty> {
+impl<S: BosStr> TagRecord<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> TagRecordBuilder<S, tag_record_state::Empty> {
         TagRecordBuilder::new()
     }
 }
 
-impl<'a> TagRecordBuilder<'a, tag_record_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> TagRecordBuilder<S, tag_record_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         TagRecordBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> TagRecordBuilder<'a, S>
+impl<S: BosStr, St> TagRecordBuilder<S, St>
 where
-    S: tag_record_state::State,
-    S::Uri: tag_record_state::IsUnset,
+    St: tag_record_state::State,
+    St::Uri: tag_record_state::IsUnset,
 {
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> TagRecordBuilder<'a, tag_record_state::SetUri<S>> {
+    ) -> TagRecordBuilder<S, tag_record_state::SetUri<St>> {
         self._fields.0 = Option::Some(value.into());
         TagRecordBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> TagRecordBuilder<'a, S>
+impl<S: BosStr, St> TagRecordBuilder<S, St>
 where
-    S: tag_record_state::State,
-    S::Uri: tag_record_state::IsSet,
+    St: tag_record_state::State,
+    St::Uri: tag_record_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> TagRecord<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> TagRecord<S> {
         TagRecord {
             uri: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> TagRecord<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> TagRecord<S> {
         TagRecord {
             uri: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

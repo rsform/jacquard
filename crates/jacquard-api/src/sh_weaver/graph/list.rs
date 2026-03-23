@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -31,13 +31,13 @@ use serde::{Serialize, Deserialize};
 use crate::sh_weaver::graph::list;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ListPurpose<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ListPurpose<S: BosStr = DefaultStr> {
     ShWeaverGraphDefsCuratelist,
     ShWeaverGraphDefsReadinglist,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> ListPurpose<S> {
+impl<S: BosStr> ListPurpose<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::ShWeaverGraphDefsCuratelist => "sh.weaver.graph.defs#curatelist",
@@ -55,19 +55,19 @@ impl<S: Bos<str> + AsRef<str>> ListPurpose<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for ListPurpose<S> {
+impl<S: BosStr> AsRef<str> for ListPurpose<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ListPurpose<S> {
+impl<S: BosStr> core::fmt::Display for ListPurpose<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for ListPurpose<S> {
+impl<S: BosStr> Serialize for ListPurpose<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -76,8 +76,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for ListPurpose<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for ListPurpose<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ListPurpose<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -87,8 +86,12 @@ for ListPurpose<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for ListPurpose<S> {
-    type Output = ListPurpose<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for ListPurpose<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ListPurpose<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             ListPurpose::ShWeaverGraphDefsCuratelist => {
@@ -110,11 +113,11 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for ListPurpose<S> {
     rename = "sh.weaver.graph.list",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct List<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct List<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avatar: Option<BlobRef<S>>,
     pub created_at: Datetime,
@@ -134,18 +137,18 @@ pub struct List<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ListGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ListGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: List<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> List<S> {
+impl<S: BosStr> List<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, ListRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -158,17 +161,17 @@ pub struct ListRecord;
 impl XrpcResp for ListRecord {
     const NSID: &'static str = "sh.weaver.graph.list";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ListGetRecordOutput<S>;
+    type Output<S: BosStr> = ListGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<ListGetRecordOutput<S>> for List<S> {
+impl<S: BosStr> From<ListGetRecordOutput<S>> for List<S> {
     fn from(output: ListGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for List<S> {
+impl<S: BosStr> Collection for List<S> {
     const NSID: &'static str = "sh.weaver.graph.list";
     type Record = ListRecord;
 }
@@ -178,7 +181,7 @@ impl Collection for ListRecord {
     type Record = ListRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for List<S> {
+impl<S: BosStr> LexiconSchema for List<S> {
     fn nsid() -> &'static str {
         "sh.weaver.graph.list"
     }
@@ -300,27 +303,27 @@ pub mod list_state {
         type CreatedAt = Unset;
     }
     ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
         type Name = Set<members::name>;
-        type Purpose = S::Purpose;
-        type CreatedAt = S::CreatedAt;
+        type Purpose = St::Purpose;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `purpose` field to Set
-    pub struct SetPurpose<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPurpose<S> {}
-    impl<S: State> State for SetPurpose<S> {
-        type Name = S::Name;
+    pub struct SetPurpose<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPurpose<St> {}
+    impl<St: State> State for SetPurpose<St> {
+        type Name = St::Name;
         type Purpose = Set<members::purpose>;
-        type CreatedAt = S::CreatedAt;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Name = S::Name;
-        type Purpose = S::Purpose;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Name = St::Name;
+        type Purpose = St::Purpose;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
@@ -335,9 +338,9 @@ pub mod list_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ListBuilder<'a, S: list_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ListBuilder<S: BosStr, St: list_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<BlobRef<S>>,
         Option<Datetime>,
@@ -345,28 +348,28 @@ pub struct ListBuilder<'a, S: list_state::State> {
         Option<S>,
         Option<list::ListPurpose<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> List<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ListBuilder<'a, list_state::Empty> {
+impl<S: BosStr> List<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ListBuilder<S, list_state::Empty> {
         ListBuilder::new()
     }
 }
 
-impl<'a> ListBuilder<'a, list_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ListBuilder<S, list_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ListBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: list_state::State> ListBuilder<'a, S> {
+impl<S: BosStr, St: list_state::State> ListBuilder<S, St> {
     /// Set the `avatar` field (optional)
     pub fn avatar(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -379,26 +382,26 @@ impl<'a, S: list_state::State> ListBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ListBuilder<'a, S>
+impl<S: BosStr, St> ListBuilder<S, St>
 where
-    S: list_state::State,
-    S::CreatedAt: list_state::IsUnset,
+    St: list_state::State,
+    St::CreatedAt: list_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ListBuilder<'a, list_state::SetCreatedAt<S>> {
+    ) -> ListBuilder<S, list_state::SetCreatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         ListBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: list_state::State> ListBuilder<'a, S> {
+impl<S: BosStr, St: list_state::State> ListBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -411,53 +414,53 @@ impl<'a, S: list_state::State> ListBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ListBuilder<'a, S>
+impl<S: BosStr, St> ListBuilder<S, St>
 where
-    S: list_state::State,
-    S::Name: list_state::IsUnset,
+    St: list_state::State,
+    St::Name: list_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> ListBuilder<'a, list_state::SetName<S>> {
+    ) -> ListBuilder<S, list_state::SetName<St>> {
         self._fields.3 = Option::Some(value.into());
         ListBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ListBuilder<'a, S>
+impl<S: BosStr, St> ListBuilder<S, St>
 where
-    S: list_state::State,
-    S::Purpose: list_state::IsUnset,
+    St: list_state::State,
+    St::Purpose: list_state::IsUnset,
 {
     /// Set the `purpose` field (required)
     pub fn purpose(
         mut self,
         value: impl Into<list::ListPurpose<S>>,
-    ) -> ListBuilder<'a, list_state::SetPurpose<S>> {
+    ) -> ListBuilder<S, list_state::SetPurpose<St>> {
         self._fields.4 = Option::Some(value.into());
         ListBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ListBuilder<'a, S>
+impl<S: BosStr, St> ListBuilder<S, St>
 where
-    S: list_state::State,
-    S::Name: list_state::IsSet,
-    S::Purpose: list_state::IsSet,
-    S::CreatedAt: list_state::IsSet,
+    St: list_state::State,
+    St::Name: list_state::IsSet,
+    St::Purpose: list_state::IsSet,
+    St::CreatedAt: list_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> List<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> List<S> {
         List {
             avatar: self._fields.0,
             created_at: self._fields.1.unwrap(),
@@ -467,8 +470,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> List<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> List<S> {
         List {
             avatar: self._fields.0,
             created_at: self._fields.1.unwrap(),

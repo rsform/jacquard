@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "app.protoimsg.chat.channel",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Channel<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Channel<S: BosStr = DefaultStr> {
     ///Timestamp of channel creation.
     pub created_at: Datetime,
     ///What the channel is about.
@@ -62,14 +62,14 @@ pub struct Channel<S: Bos<str> + AsRef<str> = DefaultStr> {
 /// Who can post messages in this channel.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ChannelPostPolicy<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ChannelPostPolicy<S: BosStr = DefaultStr> {
     Everyone,
     Owner,
     Moderators,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> ChannelPostPolicy<S> {
+impl<S: BosStr> ChannelPostPolicy<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Everyone => "everyone",
@@ -89,19 +89,19 @@ impl<S: Bos<str> + AsRef<str>> ChannelPostPolicy<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ChannelPostPolicy<S> {
+impl<S: BosStr> core::fmt::Display for ChannelPostPolicy<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for ChannelPostPolicy<S> {
+impl<S: BosStr> AsRef<str> for ChannelPostPolicy<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for ChannelPostPolicy<S> {
+impl<S: BosStr> Serialize for ChannelPostPolicy<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -110,8 +110,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for ChannelPostPolicy<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for ChannelPostPolicy<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ChannelPostPolicy<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -121,14 +120,18 @@ for ChannelPostPolicy<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for ChannelPostPolicy<S> {
+impl<S: BosStr + Default> Default for ChannelPostPolicy<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for ChannelPostPolicy<S> {
-    type Output = ChannelPostPolicy<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for ChannelPostPolicy<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ChannelPostPolicy<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             ChannelPostPolicy::Everyone => ChannelPostPolicy::Everyone,
@@ -145,18 +148,18 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for ChannelPostPolicy<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ChannelGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ChannelGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Channel<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Channel<S> {
+impl<S: BosStr> Channel<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, ChannelRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -169,17 +172,17 @@ pub struct ChannelRecord;
 impl XrpcResp for ChannelRecord {
     const NSID: &'static str = "app.protoimsg.chat.channel";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ChannelGetRecordOutput<S>;
+    type Output<S: BosStr> = ChannelGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<ChannelGetRecordOutput<S>> for Channel<S> {
+impl<S: BosStr> From<ChannelGetRecordOutput<S>> for Channel<S> {
     fn from(output: ChannelGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Channel<S> {
+impl<S: BosStr> Collection for Channel<S> {
     const NSID: &'static str = "app.protoimsg.chat.channel";
     type Record = ChannelRecord;
 }
@@ -189,7 +192,7 @@ impl Collection for ChannelRecord {
     type Record = ChannelRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Channel<S> {
+impl<S: BosStr> LexiconSchema for Channel<S> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.channel"
     }
@@ -244,57 +247,57 @@ pub mod channel_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Room;
         type Name;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Room = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Room = S::Room;
-        type Name = S::Name;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `room` field to Set
-    pub struct SetRoom<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRoom<S> {}
-    impl<S: State> State for SetRoom<S> {
-        type CreatedAt = S::CreatedAt;
+    pub struct SetRoom<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRoom<St> {}
+    impl<St: State> State for SetRoom<St> {
         type Room = Set<members::room>;
-        type Name = S::Name;
+        type Name = St::Name;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type CreatedAt = S::CreatedAt;
-        type Room = S::Room;
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Room = St::Room;
         type Name = Set<members::name>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Room = St::Room;
+        type Name = St::Name;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `room` field
         pub struct room(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ChannelBuilder<'a, S: channel_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ChannelBuilder<S: BosStr, St: channel_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
         Option<S>,
@@ -303,47 +306,47 @@ pub struct ChannelBuilder<'a, S: channel_state::State> {
         Option<ChannelPostPolicy<S>>,
         Option<AtUri<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Channel<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ChannelBuilder<'a, channel_state::Empty> {
+impl<S: BosStr> Channel<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ChannelBuilder<S, channel_state::Empty> {
         ChannelBuilder::new()
     }
 }
 
-impl<'a> ChannelBuilder<'a, channel_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ChannelBuilder<S, channel_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ChannelBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ChannelBuilder<'a, S>
+impl<S: BosStr, St> ChannelBuilder<S, St>
 where
-    S: channel_state::State,
-    S::CreatedAt: channel_state::IsUnset,
+    St: channel_state::State,
+    St::CreatedAt: channel_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ChannelBuilder<'a, channel_state::SetCreatedAt<S>> {
+    ) -> ChannelBuilder<S, channel_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         ChannelBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: channel_state::State> ChannelBuilder<'a, S> {
+impl<S: BosStr, St: channel_state::State> ChannelBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -356,26 +359,26 @@ impl<'a, S: channel_state::State> ChannelBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ChannelBuilder<'a, S>
+impl<S: BosStr, St> ChannelBuilder<S, St>
 where
-    S: channel_state::State,
-    S::Name: channel_state::IsUnset,
+    St: channel_state::State,
+    St::Name: channel_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> ChannelBuilder<'a, channel_state::SetName<S>> {
+    ) -> ChannelBuilder<S, channel_state::SetName<St>> {
         self._fields.2 = Option::Some(value.into());
         ChannelBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: channel_state::State> ChannelBuilder<'a, S> {
+impl<S: BosStr, St: channel_state::State> ChannelBuilder<S, St> {
     /// Set the `position` field (optional)
     pub fn position(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.3 = value.into();
@@ -388,7 +391,7 @@ impl<'a, S: channel_state::State> ChannelBuilder<'a, S> {
     }
 }
 
-impl<'a, S: channel_state::State> ChannelBuilder<'a, S> {
+impl<S: BosStr, St: channel_state::State> ChannelBuilder<S, St> {
     /// Set the `postPolicy` field (optional)
     pub fn post_policy(
         mut self,
@@ -404,34 +407,34 @@ impl<'a, S: channel_state::State> ChannelBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ChannelBuilder<'a, S>
+impl<S: BosStr, St> ChannelBuilder<S, St>
 where
-    S: channel_state::State,
-    S::Room: channel_state::IsUnset,
+    St: channel_state::State,
+    St::Room: channel_state::IsUnset,
 {
     /// Set the `room` field (required)
     pub fn room(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> ChannelBuilder<'a, channel_state::SetRoom<S>> {
+    ) -> ChannelBuilder<S, channel_state::SetRoom<St>> {
         self._fields.5 = Option::Some(value.into());
         ChannelBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ChannelBuilder<'a, S>
+impl<S: BosStr, St> ChannelBuilder<S, St>
 where
-    S: channel_state::State,
-    S::CreatedAt: channel_state::IsSet,
-    S::Room: channel_state::IsSet,
-    S::Name: channel_state::IsSet,
+    St: channel_state::State,
+    St::Room: channel_state::IsSet,
+    St::Name: channel_state::IsSet,
+    St::CreatedAt: channel_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Channel<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Channel<S> {
         Channel {
             created_at: self._fields.0.unwrap(),
             description: self._fields.1,
@@ -442,11 +445,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Channel<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Channel<S> {
         Channel {
             created_at: self._fields.0.unwrap(),
             description: self._fields.1,

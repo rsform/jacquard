@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::value::Data;
@@ -19,16 +19,15 @@ use serde::{Serialize, Deserialize};
 use crate::app_rocksky::scrobble::ScrobbleViewBasic;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetScrobbles<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetScrobbles<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub did: Option<AtIdentifier<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub following: Option<bool>,
@@ -42,19 +41,17 @@ pub struct GetScrobbles<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetScrobblesOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetScrobblesOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub scrobbles: Option<Vec<ScrobbleViewBasic<S>>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -63,12 +60,11 @@ pub struct GetScrobblesResponse;
 impl jacquard_common::xrpc::XrpcResp for GetScrobblesResponse {
     const NSID: &'static str = "app.rocksky.scrobble.getScrobbles";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetScrobblesOutput<S>;
+    type Output<S: BosStr> = GetScrobblesOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetScrobbles<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetScrobbles<S> {
     const NSID: &'static str = "app.rocksky.scrobble.getScrobbles";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetScrobblesResponse;
@@ -79,7 +75,7 @@ pub struct GetScrobblesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetScrobblesRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.scrobble.getScrobbles";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetScrobbles<S>;
+    type Request<S: BosStr> = GetScrobbles<S>;
     type Response = GetScrobblesResponse;
 }
 
@@ -102,32 +98,32 @@ pub mod get_scrobbles_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetScrobblesBuilder<'a, S: get_scrobbles_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetScrobblesBuilder<S: BosStr, St: get_scrobbles_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtIdentifier<S>>, Option<bool>, Option<i64>, Option<i64>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetScrobbles<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetScrobblesBuilder<'a, get_scrobbles_state::Empty> {
+impl<S: BosStr> GetScrobbles<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetScrobblesBuilder<S, get_scrobbles_state::Empty> {
         GetScrobblesBuilder::new()
     }
 }
 
-impl<'a> GetScrobblesBuilder<'a, get_scrobbles_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetScrobblesBuilder<S, get_scrobbles_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetScrobblesBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: get_scrobbles_state::State> GetScrobblesBuilder<'a, S> {
+impl<S: BosStr, St: get_scrobbles_state::State> GetScrobblesBuilder<S, St> {
     /// Set the `did` field (optional)
     pub fn did(mut self, value: impl Into<Option<AtIdentifier<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -140,7 +136,7 @@ impl<'a, S: get_scrobbles_state::State> GetScrobblesBuilder<'a, S> {
     }
 }
 
-impl<'a, S: get_scrobbles_state::State> GetScrobblesBuilder<'a, S> {
+impl<S: BosStr, St: get_scrobbles_state::State> GetScrobblesBuilder<S, St> {
     /// Set the `following` field (optional)
     pub fn following(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.1 = value.into();
@@ -153,7 +149,7 @@ impl<'a, S: get_scrobbles_state::State> GetScrobblesBuilder<'a, S> {
     }
 }
 
-impl<'a, S: get_scrobbles_state::State> GetScrobblesBuilder<'a, S> {
+impl<S: BosStr, St: get_scrobbles_state::State> GetScrobblesBuilder<S, St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -166,7 +162,7 @@ impl<'a, S: get_scrobbles_state::State> GetScrobblesBuilder<'a, S> {
     }
 }
 
-impl<'a, S: get_scrobbles_state::State> GetScrobblesBuilder<'a, S> {
+impl<S: BosStr, St: get_scrobbles_state::State> GetScrobblesBuilder<S, St> {
     /// Set the `offset` field (optional)
     pub fn offset(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.3 = value.into();
@@ -179,12 +175,12 @@ impl<'a, S: get_scrobbles_state::State> GetScrobblesBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GetScrobblesBuilder<'a, S>
+impl<S: BosStr, St> GetScrobblesBuilder<S, St>
 where
-    S: get_scrobbles_state::State,
+    St: get_scrobbles_state::State,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetScrobbles<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetScrobbles<S> {
         GetScrobbles {
             did: self._fields.0,
             following: self._fields.1,

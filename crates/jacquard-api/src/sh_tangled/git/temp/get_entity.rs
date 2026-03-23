@@ -6,55 +6,49 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[allow(unused_imports)]
+use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
+use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 use crate::sh_tangled::git::temp::Blob;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetEntity<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct GetEntity<S: BosStr = DefaultStr> {
     pub path: S,
     ///Defaults to `"HEAD"`.
     #[serde(default = "_default_ref")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub r#ref: Option<S>,
-    #[serde(borrow)]
     pub repo: AtUri<S>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetEntityOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetEntityOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
-    #[serde(borrow)]
     pub value: Blob<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
-    pub extra_data: Option<
-        alloc::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<S>,
-        >,
-    >,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
@@ -73,19 +67,16 @@ pub struct GetEntityOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 pub enum GetEntityError {
     /// Repository not found or access denied
     #[serde(rename = "RepoNotFound")]
-    RepoNotFound(Option<jacquard_common::deps::smol_str::SmolStr>),
+    RepoNotFound(Option<SmolStr>),
     /// Blob not found
     #[serde(rename = "BlobNotFound")]
-    BlobNotFound(Option<jacquard_common::deps::smol_str::SmolStr>),
+    BlobNotFound(Option<SmolStr>),
     /// Invalid request parameters
     #[serde(rename = "InvalidRequest")]
-    InvalidRequest(Option<jacquard_common::deps::smol_str::SmolStr>),
+    InvalidRequest(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: jacquard_common::deps::smol_str::SmolStr,
-        message: Option<jacquard_common::deps::smol_str::SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for GetEntityError {
@@ -128,12 +119,11 @@ pub struct GetEntityResponse;
 impl jacquard_common::xrpc::XrpcResp for GetEntityResponse {
     const NSID: &'static str = "sh.tangled.git.temp.getEntity";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetEntityOutput<S>;
+    type Output<S: BosStr> = GetEntityOutput<S>;
     type Err = GetEntityError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetEntity<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetEntity<S> {
     const NSID: &'static str = "sh.tangled.git.temp.getEntity";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetEntityResponse;
@@ -144,12 +134,12 @@ pub struct GetEntityRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetEntityRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.git.temp.getEntity";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetEntity<S>;
+    type Request<S: BosStr> = GetEntity<S>;
     type Response = GetEntityResponse;
 }
 
-fn _default_ref() -> Option<CowStr<'static>> {
-    Some(CowStr::from("HEAD"))
+fn _default_ref<S: jacquard_common::FromStaticStr>() -> Option<S> {
+    Some(S::from_static("HEAD"))
 }
 
 pub mod get_entity_state {
@@ -162,85 +152,85 @@ pub mod get_entity_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Path;
         type Repo;
+        type Path;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Path = Unset;
         type Repo = Unset;
-    }
-    ///State transition - sets the `path` field to Set
-    pub struct SetPath<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPath<S> {}
-    impl<S: State> State for SetPath<S> {
-        type Path = Set<members::path>;
-        type Repo = S::Repo;
+        type Path = Unset;
     }
     ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
-        type Path = S::Path;
+    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRepo<St> {}
+    impl<St: State> State for SetRepo<St> {
         type Repo = Set<members::repo>;
+        type Path = St::Path;
+    }
+    ///State transition - sets the `path` field to Set
+    pub struct SetPath<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPath<St> {}
+    impl<St: State> State for SetPath<St> {
+        type Repo = St::Repo;
+        type Path = Set<members::path>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `path` field
-        pub struct path(());
         ///Marker type for the `repo` field
         pub struct repo(());
+        ///Marker type for the `path` field
+        pub struct path(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetEntityBuilder<'a, S: get_entity_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetEntityBuilder<S: BosStr, St: get_entity_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>, Option<AtUri<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetEntity<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetEntityBuilder<'a, get_entity_state::Empty> {
+impl<S: BosStr> GetEntity<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetEntityBuilder<S, get_entity_state::Empty> {
         GetEntityBuilder::new()
     }
 }
 
-impl<'a> GetEntityBuilder<'a, get_entity_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetEntityBuilder<S, get_entity_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetEntityBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetEntityBuilder<'a, S>
+impl<S: BosStr, St> GetEntityBuilder<S, St>
 where
-    S: get_entity_state::State,
-    S::Path: get_entity_state::IsUnset,
+    St: get_entity_state::State,
+    St::Path: get_entity_state::IsUnset,
 {
     /// Set the `path` field (required)
     pub fn path(
         mut self,
         value: impl Into<S>,
-    ) -> GetEntityBuilder<'a, get_entity_state::SetPath<S>> {
+    ) -> GetEntityBuilder<S, get_entity_state::SetPath<St>> {
         self._fields.0 = Option::Some(value.into());
         GetEntityBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: get_entity_state::State> GetEntityBuilder<'a, S> {
+impl<S: BosStr, St: get_entity_state::State> GetEntityBuilder<S, St> {
     /// Set the `ref` field (optional)
     pub fn r#ref(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -253,33 +243,33 @@ impl<'a, S: get_entity_state::State> GetEntityBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GetEntityBuilder<'a, S>
+impl<S: BosStr, St> GetEntityBuilder<S, St>
 where
-    S: get_entity_state::State,
-    S::Repo: get_entity_state::IsUnset,
+    St: get_entity_state::State,
+    St::Repo: get_entity_state::IsUnset,
 {
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> GetEntityBuilder<'a, get_entity_state::SetRepo<S>> {
+    ) -> GetEntityBuilder<S, get_entity_state::SetRepo<St>> {
         self._fields.2 = Option::Some(value.into());
         GetEntityBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetEntityBuilder<'a, S>
+impl<S: BosStr, St> GetEntityBuilder<S, St>
 where
-    S: get_entity_state::State,
-    S::Path: get_entity_state::IsSet,
-    S::Repo: get_entity_state::IsSet,
+    St: get_entity_state::State,
+    St::Repo: get_entity_state::IsSet,
+    St::Path: get_entity_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetEntity<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetEntity<S> {
         GetEntity {
             path: self._fields.0.unwrap(),
             r#ref: self._fields.1,

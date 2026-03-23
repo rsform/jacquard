@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
@@ -19,35 +19,33 @@ use serde::{Serialize, Deserialize};
 use crate::com_atproto::repo::strong_ref::StrongRef;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ReviewClaim<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ReviewClaim<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub approved_games: Option<Vec<AtUri<S>>>,
     pub claim: StrongRef<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reason: Option<S>,
     pub status: ReviewClaimStatus<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ReviewClaimStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ReviewClaimStatus<S: BosStr = DefaultStr> {
     Approved,
     Denied,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> ReviewClaimStatus<S> {
+impl<S: BosStr> ReviewClaimStatus<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Approved => "approved",
@@ -65,19 +63,19 @@ impl<S: Bos<str> + AsRef<str>> ReviewClaimStatus<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ReviewClaimStatus<S> {
+impl<S: BosStr> core::fmt::Display for ReviewClaimStatus<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for ReviewClaimStatus<S> {
+impl<S: BosStr> AsRef<str> for ReviewClaimStatus<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for ReviewClaimStatus<S> {
+impl<S: BosStr> Serialize for ReviewClaimStatus<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -86,8 +84,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for ReviewClaimStatus<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for ReviewClaimStatus<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ReviewClaimStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -97,14 +94,18 @@ for ReviewClaimStatus<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for ReviewClaimStatus<S> {
+impl<S: BosStr + Default> Default for ReviewClaimStatus<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for ReviewClaimStatus<S> {
-    type Output = ReviewClaimStatus<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for ReviewClaimStatus<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ReviewClaimStatus<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             ReviewClaimStatus::Approved => ReviewClaimStatus::Approved,
@@ -116,18 +117,16 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for ReviewClaimStatus<S> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ReviewClaimOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ReviewClaimOutput<S: BosStr = DefaultStr> {
     pub uri: AtUri<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -136,12 +135,11 @@ pub struct ReviewClaimResponse;
 impl jacquard_common::xrpc::XrpcResp for ReviewClaimResponse {
     const NSID: &'static str = "games.gamesgamesgamesgames.reviewClaim";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ReviewClaimOutput<S>;
+    type Output<S: BosStr> = ReviewClaimOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for ReviewClaim<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ReviewClaim<S> {
     const NSID: &'static str = "games.gamesgamesgamesgames.reviewClaim";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -156,7 +154,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for ReviewClaimRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = ReviewClaim<S>;
+    type Request<S: BosStr> = ReviewClaim<S>;
     type Response = ReviewClaimResponse;
 }
 
@@ -181,17 +179,17 @@ pub mod review_claim_state {
         type Status = Unset;
     }
     ///State transition - sets the `claim` field to Set
-    pub struct SetClaim<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetClaim<S> {}
-    impl<S: State> State for SetClaim<S> {
+    pub struct SetClaim<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetClaim<St> {}
+    impl<St: State> State for SetClaim<St> {
         type Claim = Set<members::claim>;
-        type Status = S::Status;
+        type Status = St::Status;
     }
     ///State transition - sets the `status` field to Set
-    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStatus<S> {}
-    impl<S: State> State for SetStatus<S> {
-        type Claim = S::Claim;
+    pub struct SetStatus<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStatus<St> {}
+    impl<St: State> State for SetStatus<St> {
+        type Claim = St::Claim;
         type Status = Set<members::status>;
     }
     /// Marker types for field names
@@ -204,37 +202,37 @@ pub mod review_claim_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ReviewClaimBuilder<'a, S: review_claim_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ReviewClaimBuilder<S: BosStr, St: review_claim_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<AtUri<S>>>,
         Option<StrongRef<S>>,
         Option<S>,
         Option<ReviewClaimStatus<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ReviewClaim<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ReviewClaimBuilder<'a, review_claim_state::Empty> {
+impl<S: BosStr> ReviewClaim<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ReviewClaimBuilder<S, review_claim_state::Empty> {
         ReviewClaimBuilder::new()
     }
 }
 
-impl<'a> ReviewClaimBuilder<'a, review_claim_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ReviewClaimBuilder<S, review_claim_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ReviewClaimBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: review_claim_state::State> ReviewClaimBuilder<'a, S> {
+impl<S: BosStr, St: review_claim_state::State> ReviewClaimBuilder<S, St> {
     /// Set the `approvedGames` field (optional)
     pub fn approved_games(mut self, value: impl Into<Option<Vec<AtUri<S>>>>) -> Self {
         self._fields.0 = value.into();
@@ -247,26 +245,26 @@ impl<'a, S: review_claim_state::State> ReviewClaimBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ReviewClaimBuilder<'a, S>
+impl<S: BosStr, St> ReviewClaimBuilder<S, St>
 where
-    S: review_claim_state::State,
-    S::Claim: review_claim_state::IsUnset,
+    St: review_claim_state::State,
+    St::Claim: review_claim_state::IsUnset,
 {
     /// Set the `claim` field (required)
     pub fn claim(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> ReviewClaimBuilder<'a, review_claim_state::SetClaim<S>> {
+    ) -> ReviewClaimBuilder<S, review_claim_state::SetClaim<St>> {
         self._fields.1 = Option::Some(value.into());
         ReviewClaimBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: review_claim_state::State> ReviewClaimBuilder<'a, S> {
+impl<S: BosStr, St: review_claim_state::State> ReviewClaimBuilder<S, St> {
     /// Set the `reason` field (optional)
     pub fn reason(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -279,33 +277,33 @@ impl<'a, S: review_claim_state::State> ReviewClaimBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ReviewClaimBuilder<'a, S>
+impl<S: BosStr, St> ReviewClaimBuilder<S, St>
 where
-    S: review_claim_state::State,
-    S::Status: review_claim_state::IsUnset,
+    St: review_claim_state::State,
+    St::Status: review_claim_state::IsUnset,
 {
     /// Set the `status` field (required)
     pub fn status(
         mut self,
         value: impl Into<ReviewClaimStatus<S>>,
-    ) -> ReviewClaimBuilder<'a, review_claim_state::SetStatus<S>> {
+    ) -> ReviewClaimBuilder<S, review_claim_state::SetStatus<St>> {
         self._fields.3 = Option::Some(value.into());
         ReviewClaimBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ReviewClaimBuilder<'a, S>
+impl<S: BosStr, St> ReviewClaimBuilder<S, St>
 where
-    S: review_claim_state::State,
-    S::Claim: review_claim_state::IsSet,
-    S::Status: review_claim_state::IsSet,
+    St: review_claim_state::State,
+    St::Claim: review_claim_state::IsSet,
+    St::Status: review_claim_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ReviewClaim<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ReviewClaim<S> {
         ReviewClaim {
             approved_games: self._fields.0,
             claim: self._fields.1.unwrap(),
@@ -314,11 +312,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> ReviewClaim<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ReviewClaim<S> {
         ReviewClaim {
             approved_games: self._fields.0,
             claim: self._fields.1.unwrap(),

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "net.bnewbold.demo.mushies",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Mushies<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Mushies<S: BosStr = DefaultStr> {
     pub common_name: S,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub edible: Option<bool>,
@@ -55,18 +55,18 @@ pub struct Mushies<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct MushiesGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct MushiesGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Mushies<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Mushies<S> {
+impl<S: BosStr> Mushies<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, MushiesRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -79,17 +79,17 @@ pub struct MushiesRecord;
 impl XrpcResp for MushiesRecord {
     const NSID: &'static str = "net.bnewbold.demo.mushies";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = MushiesGetRecordOutput<S>;
+    type Output<S: BosStr> = MushiesGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<MushiesGetRecordOutput<S>> for Mushies<S> {
+impl<S: BosStr> From<MushiesGetRecordOutput<S>> for Mushies<S> {
     fn from(output: MushiesGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Mushies<S> {
+impl<S: BosStr> Collection for Mushies<S> {
     const NSID: &'static str = "net.bnewbold.demo.mushies";
     type Record = MushiesRecord;
 }
@@ -99,7 +99,7 @@ impl Collection for MushiesRecord {
     type Record = MushiesRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Mushies<S> {
+impl<S: BosStr> LexiconSchema for Mushies<S> {
     fn nsid() -> &'static str {
         "net.bnewbold.demo.mushies"
     }
@@ -179,9 +179,9 @@ pub mod mushies_state {
         type CommonName = Unset;
     }
     ///State transition - sets the `common_name` field to Set
-    pub struct SetCommonName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCommonName<S> {}
-    impl<S: State> State for SetCommonName<S> {
+    pub struct SetCommonName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCommonName<St> {}
+    impl<St: State> State for SetCommonName<St> {
         type CommonName = Set<members::common_name>;
     }
     /// Marker types for field names
@@ -192,51 +192,51 @@ pub mod mushies_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct MushiesBuilder<'a, S: mushies_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct MushiesBuilder<S: BosStr, St: mushies_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<bool>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Mushies<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> MushiesBuilder<'a, mushies_state::Empty> {
+impl<S: BosStr> Mushies<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> MushiesBuilder<S, mushies_state::Empty> {
         MushiesBuilder::new()
     }
 }
 
-impl<'a> MushiesBuilder<'a, mushies_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> MushiesBuilder<S, mushies_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         MushiesBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> MushiesBuilder<'a, S>
+impl<S: BosStr, St> MushiesBuilder<S, St>
 where
-    S: mushies_state::State,
-    S::CommonName: mushies_state::IsUnset,
+    St: mushies_state::State,
+    St::CommonName: mushies_state::IsUnset,
 {
     /// Set the `commonName` field (required)
     pub fn common_name(
         mut self,
         value: impl Into<S>,
-    ) -> MushiesBuilder<'a, mushies_state::SetCommonName<S>> {
+    ) -> MushiesBuilder<S, mushies_state::SetCommonName<St>> {
         self._fields.0 = Option::Some(value.into());
         MushiesBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: mushies_state::State> MushiesBuilder<'a, S> {
+impl<S: BosStr, St: mushies_state::State> MushiesBuilder<S, St> {
     /// Set the `edible` field (optional)
     pub fn edible(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.1 = value.into();
@@ -249,7 +249,7 @@ impl<'a, S: mushies_state::State> MushiesBuilder<'a, S> {
     }
 }
 
-impl<'a, S: mushies_state::State> MushiesBuilder<'a, S> {
+impl<S: BosStr, St: mushies_state::State> MushiesBuilder<S, St> {
     /// Set the `species` field (optional)
     pub fn species(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -262,13 +262,13 @@ impl<'a, S: mushies_state::State> MushiesBuilder<'a, S> {
     }
 }
 
-impl<'a, S> MushiesBuilder<'a, S>
+impl<S: BosStr, St> MushiesBuilder<S, St>
 where
-    S: mushies_state::State,
-    S::CommonName: mushies_state::IsSet,
+    St: mushies_state::State,
+    St::CommonName: mushies_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Mushies<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Mushies<S> {
         Mushies {
             common_name: self._fields.0.unwrap(),
             edible: self._fields.1,
@@ -276,11 +276,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Mushies<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Mushies<S> {
         Mushies {
             common_name: self._fields.0.unwrap(),
             edible: self._fields.1,

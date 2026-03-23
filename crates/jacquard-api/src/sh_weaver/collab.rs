@@ -19,7 +19,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -53,11 +53,11 @@ impl core::fmt::Display for Chapter {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CollaborationStateView<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CollaborationStateView<S: BosStr = DefaultStr> {
     ///The 'canonical' version URI (usually owner's)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub canonical_uri: Option<AtUri<S>>,
@@ -91,7 +91,7 @@ pub struct CollaborationStateView<S: Bos<str> + AsRef<str> = DefaultStr> {
 /// active=normal, broken=all invites revoked/expired, diverged=versions differ, reconciled=was diverged but resolved
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum CollaborationStateViewStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum CollaborationStateViewStatus<S: BosStr = DefaultStr> {
     Active,
     Broken,
     Diverged,
@@ -99,7 +99,7 @@ pub enum CollaborationStateViewStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> CollaborationStateViewStatus<S> {
+impl<S: BosStr> CollaborationStateViewStatus<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Active => "active",
@@ -121,19 +121,19 @@ impl<S: Bos<str> + AsRef<str>> CollaborationStateViewStatus<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for CollaborationStateViewStatus<S> {
+impl<S: BosStr> core::fmt::Display for CollaborationStateViewStatus<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for CollaborationStateViewStatus<S> {
+impl<S: BosStr> AsRef<str> for CollaborationStateViewStatus<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for CollaborationStateViewStatus<S> {
+impl<S: BosStr> Serialize for CollaborationStateViewStatus<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -142,7 +142,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for CollaborationStateViewStatus<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
 for CollaborationStateViewStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
@@ -153,14 +153,18 @@ for CollaborationStateViewStatus<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for CollaborationStateViewStatus<S> {
+impl<S: BosStr + Default> Default for CollaborationStateViewStatus<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for CollaborationStateViewStatus<S> {
-    type Output = CollaborationStateViewStatus<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for CollaborationStateViewStatus<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = CollaborationStateViewStatus<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             CollaborationStateViewStatus::Active => CollaborationStateViewStatus::Active,
@@ -194,11 +198,11 @@ impl core::fmt::Display for Entry {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct FormerCollaboratorView<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct FormerCollaboratorView<S: BosStr = DefaultStr> {
     ///Number of diffs they created while active
     #[serde(skip_serializing_if = "Option::is_none")]
     pub contribution_count: Option<i64>,
@@ -216,7 +220,7 @@ pub struct FormerCollaboratorView<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum FormerCollaboratorViewEndReason<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum FormerCollaboratorViewEndReason<S: BosStr = DefaultStr> {
     VoluntaryLeave,
     InviteRevoked,
     InviteExpired,
@@ -224,7 +228,7 @@ pub enum FormerCollaboratorViewEndReason<S: Bos<str> + AsRef<str> = DefaultStr> 
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> FormerCollaboratorViewEndReason<S> {
+impl<S: BosStr> FormerCollaboratorViewEndReason<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::VoluntaryLeave => "voluntary_leave",
@@ -246,20 +250,19 @@ impl<S: Bos<str> + AsRef<str>> FormerCollaboratorViewEndReason<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display
-for FormerCollaboratorViewEndReason<S> {
+impl<S: BosStr> core::fmt::Display for FormerCollaboratorViewEndReason<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for FormerCollaboratorViewEndReason<S> {
+impl<S: BosStr> AsRef<str> for FormerCollaboratorViewEndReason<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for FormerCollaboratorViewEndReason<S> {
+impl<S: BosStr> Serialize for FormerCollaboratorViewEndReason<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -268,7 +271,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for FormerCollaboratorViewEndReason<S> 
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
 for FormerCollaboratorViewEndReason<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
@@ -279,14 +282,18 @@ for FormerCollaboratorViewEndReason<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for FormerCollaboratorViewEndReason<S> {
+impl<S: BosStr + Default> Default for FormerCollaboratorViewEndReason<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for FormerCollaboratorViewEndReason<S> {
-    type Output = FormerCollaboratorViewEndReason<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for FormerCollaboratorViewEndReason<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = FormerCollaboratorViewEndReason<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             FormerCollaboratorViewEndReason::VoluntaryLeave => {
@@ -314,11 +321,11 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for FormerCollaboratorViewEndReason<S>
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct InviteView<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct InviteView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub accept_uri: Option<AtUri<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -344,14 +351,14 @@ pub struct InviteView<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum InviteViewScope<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum InviteViewScope<S: BosStr = DefaultStr> {
     Notebook,
     Entry,
     Chapter,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> InviteViewScope<S> {
+impl<S: BosStr> InviteViewScope<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Notebook => "notebook",
@@ -371,19 +378,19 @@ impl<S: Bos<str> + AsRef<str>> InviteViewScope<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for InviteViewScope<S> {
+impl<S: BosStr> core::fmt::Display for InviteViewScope<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for InviteViewScope<S> {
+impl<S: BosStr> AsRef<str> for InviteViewScope<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for InviteViewScope<S> {
+impl<S: BosStr> Serialize for InviteViewScope<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -392,8 +399,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for InviteViewScope<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for InviteViewScope<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for InviteViewScope<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -403,14 +409,18 @@ for InviteViewScope<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for InviteViewScope<S> {
+impl<S: BosStr + Default> Default for InviteViewScope<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for InviteViewScope<S> {
-    type Output = InviteViewScope<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for InviteViewScope<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = InviteViewScope<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             InviteViewScope::Notebook => InviteViewScope::Notebook,
@@ -423,7 +433,7 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for InviteViewScope<S> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum InviteViewStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum InviteViewStatus<S: BosStr = DefaultStr> {
     Pending,
     Accepted,
     Expired,
@@ -431,7 +441,7 @@ pub enum InviteViewStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> InviteViewStatus<S> {
+impl<S: BosStr> InviteViewStatus<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Pending => "pending",
@@ -453,19 +463,19 @@ impl<S: Bos<str> + AsRef<str>> InviteViewStatus<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for InviteViewStatus<S> {
+impl<S: BosStr> core::fmt::Display for InviteViewStatus<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for InviteViewStatus<S> {
+impl<S: BosStr> AsRef<str> for InviteViewStatus<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for InviteViewStatus<S> {
+impl<S: BosStr> Serialize for InviteViewStatus<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -474,8 +484,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for InviteViewStatus<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for InviteViewStatus<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for InviteViewStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -485,14 +494,18 @@ for InviteViewStatus<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for InviteViewStatus<S> {
+impl<S: BosStr + Default> Default for InviteViewStatus<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for InviteViewStatus<S> {
-    type Output = InviteViewStatus<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for InviteViewStatus<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = InviteViewStatus<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             InviteViewStatus::Pending => InviteViewStatus::Pending,
@@ -520,11 +533,11 @@ impl core::fmt::Display for Notebook {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ParticipantStateView<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ParticipantStateView<S: BosStr = DefaultStr> {
     ///If they accepted (even if later broken)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub accept_uri: Option<AtUri<S>>,
@@ -558,7 +571,7 @@ pub struct ParticipantStateView<S: Bos<str> + AsRef<str> = DefaultStr> {
 /// Why the relationship ended, if applicable
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ParticipantStateViewEndReason<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ParticipantStateViewEndReason<S: BosStr = DefaultStr> {
     VoluntaryLeave,
     InviteRevoked,
     InviteExpired,
@@ -566,7 +579,7 @@ pub enum ParticipantStateViewEndReason<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> ParticipantStateViewEndReason<S> {
+impl<S: BosStr> ParticipantStateViewEndReason<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::VoluntaryLeave => "voluntary_leave",
@@ -588,19 +601,19 @@ impl<S: Bos<str> + AsRef<str>> ParticipantStateViewEndReason<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ParticipantStateViewEndReason<S> {
+impl<S: BosStr> core::fmt::Display for ParticipantStateViewEndReason<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for ParticipantStateViewEndReason<S> {
+impl<S: BosStr> AsRef<str> for ParticipantStateViewEndReason<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for ParticipantStateViewEndReason<S> {
+impl<S: BosStr> Serialize for ParticipantStateViewEndReason<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -609,7 +622,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for ParticipantStateViewEndReason<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
 for ParticipantStateViewEndReason<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
@@ -620,14 +633,18 @@ for ParticipantStateViewEndReason<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for ParticipantStateViewEndReason<S> {
+impl<S: BosStr + Default> Default for ParticipantStateViewEndReason<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for ParticipantStateViewEndReason<S> {
-    type Output = ParticipantStateViewEndReason<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for ParticipantStateViewEndReason<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ParticipantStateViewEndReason<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             ParticipantStateViewEndReason::VoluntaryLeave => {
@@ -651,14 +668,14 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for ParticipantStateViewEndReason<S> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ParticipantStateViewRole<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ParticipantStateViewRole<S: BosStr = DefaultStr> {
     Owner,
     Collaborator,
     FormerCollaborator,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> ParticipantStateViewRole<S> {
+impl<S: BosStr> ParticipantStateViewRole<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Owner => "owner",
@@ -678,19 +695,19 @@ impl<S: Bos<str> + AsRef<str>> ParticipantStateViewRole<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ParticipantStateViewRole<S> {
+impl<S: BosStr> core::fmt::Display for ParticipantStateViewRole<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for ParticipantStateViewRole<S> {
+impl<S: BosStr> AsRef<str> for ParticipantStateViewRole<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for ParticipantStateViewRole<S> {
+impl<S: BosStr> Serialize for ParticipantStateViewRole<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -699,7 +716,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for ParticipantStateViewRole<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
 for ParticipantStateViewRole<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
@@ -710,14 +727,18 @@ for ParticipantStateViewRole<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for ParticipantStateViewRole<S> {
+impl<S: BosStr + Default> Default for ParticipantStateViewRole<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for ParticipantStateViewRole<S> {
-    type Output = ParticipantStateViewRole<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for ParticipantStateViewRole<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ParticipantStateViewRole<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             ParticipantStateViewRole::Owner => ParticipantStateViewRole::Owner,
@@ -737,7 +758,7 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for ParticipantStateViewRole<S> {
 /// active=can edit, invited=pending, left=voluntarily departed, removed=invite revoked, expired=invite timed out
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ParticipantStateViewStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ParticipantStateViewStatus<S: BosStr = DefaultStr> {
     Active,
     Invited,
     Left,
@@ -746,7 +767,7 @@ pub enum ParticipantStateViewStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> ParticipantStateViewStatus<S> {
+impl<S: BosStr> ParticipantStateViewStatus<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Active => "active",
@@ -770,19 +791,19 @@ impl<S: Bos<str> + AsRef<str>> ParticipantStateViewStatus<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ParticipantStateViewStatus<S> {
+impl<S: BosStr> core::fmt::Display for ParticipantStateViewStatus<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for ParticipantStateViewStatus<S> {
+impl<S: BosStr> AsRef<str> for ParticipantStateViewStatus<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for ParticipantStateViewStatus<S> {
+impl<S: BosStr> Serialize for ParticipantStateViewStatus<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -791,7 +812,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for ParticipantStateViewStatus<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
 for ParticipantStateViewStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
@@ -802,14 +823,18 @@ for ParticipantStateViewStatus<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for ParticipantStateViewStatus<S> {
+impl<S: BosStr + Default> Default for ParticipantStateViewStatus<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for ParticipantStateViewStatus<S> {
-    type Output = ParticipantStateViewStatus<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for ParticipantStateViewStatus<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ParticipantStateViewStatus<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             ParticipantStateViewStatus::Active => ParticipantStateViewStatus::Active,
@@ -830,11 +855,11 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for ParticipantStateViewStatus<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SessionView<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SessionView<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub expires_at: Option<Datetime>,
@@ -848,7 +873,7 @@ pub struct SessionView<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for CollaborationStateView<S> {
+impl<S: BosStr> LexiconSchema for CollaborationStateView<S> {
     fn nsid() -> &'static str {
         "sh.weaver.collab.defs"
     }
@@ -863,7 +888,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for CollaborationStateView<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for FormerCollaboratorView<S> {
+impl<S: BosStr> LexiconSchema for FormerCollaboratorView<S> {
     fn nsid() -> &'static str {
         "sh.weaver.collab.defs"
     }
@@ -878,7 +903,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for FormerCollaboratorView<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for InviteView<S> {
+impl<S: BosStr> LexiconSchema for InviteView<S> {
     fn nsid() -> &'static str {
         "sh.weaver.collab.defs"
     }
@@ -893,7 +918,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for InviteView<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ParticipantStateView<S> {
+impl<S: BosStr> LexiconSchema for ParticipantStateView<S> {
     fn nsid() -> &'static str {
         "sh.weaver.collab.defs"
     }
@@ -908,7 +933,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for ParticipantStateView<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for SessionView<S> {
+impl<S: BosStr> LexiconSchema for SessionView<S> {
     fn nsid() -> &'static str {
         "sh.weaver.collab.defs"
     }
@@ -934,56 +959,59 @@ pub mod collaboration_state_view_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Resource;
-        type Participants;
         type Status;
+        type Participants;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Resource = Unset;
-        type Participants = Unset;
         type Status = Unset;
+        type Participants = Unset;
     }
     ///State transition - sets the `resource` field to Set
-    pub struct SetResource<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetResource<S> {}
-    impl<S: State> State for SetResource<S> {
+    pub struct SetResource<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetResource<St> {}
+    impl<St: State> State for SetResource<St> {
         type Resource = Set<members::resource>;
-        type Participants = S::Participants;
-        type Status = S::Status;
-    }
-    ///State transition - sets the `participants` field to Set
-    pub struct SetParticipants<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetParticipants<S> {}
-    impl<S: State> State for SetParticipants<S> {
-        type Resource = S::Resource;
-        type Participants = Set<members::participants>;
-        type Status = S::Status;
+        type Status = St::Status;
+        type Participants = St::Participants;
     }
     ///State transition - sets the `status` field to Set
-    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStatus<S> {}
-    impl<S: State> State for SetStatus<S> {
-        type Resource = S::Resource;
-        type Participants = S::Participants;
+    pub struct SetStatus<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStatus<St> {}
+    impl<St: State> State for SetStatus<St> {
+        type Resource = St::Resource;
         type Status = Set<members::status>;
+        type Participants = St::Participants;
+    }
+    ///State transition - sets the `participants` field to Set
+    pub struct SetParticipants<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetParticipants<St> {}
+    impl<St: State> State for SetParticipants<St> {
+        type Resource = St::Resource;
+        type Status = St::Status;
+        type Participants = Set<members::participants>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `resource` field
         pub struct resource(());
-        ///Marker type for the `participants` field
-        pub struct participants(());
         ///Marker type for the `status` field
         pub struct status(());
+        ///Marker type for the `participants` field
+        pub struct participants(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct CollaborationStateViewBuilder<'a, S: collaboration_state_view_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct CollaborationStateViewBuilder<
+    S: BosStr,
+    St: collaboration_state_view_state::State,
+> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<AtUri<S>>,
         Option<Datetime>,
@@ -998,21 +1026,21 @@ pub struct CollaborationStateViewBuilder<'a, S: collaboration_state_view_state::
         Option<StrongRef<S>>,
         Option<CollaborationStateViewStatus<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> CollaborationStateView<'a> {
-    /// Create a new builder for this type
+impl<S: BosStr> CollaborationStateView<S> {
+    /// Create a new builder for this type.
     pub fn new() -> CollaborationStateViewBuilder<
-        'a,
+        S,
         collaboration_state_view_state::Empty,
     > {
         CollaborationStateViewBuilder::new()
     }
 }
 
-impl<'a> CollaborationStateViewBuilder<'a, collaboration_state_view_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> CollaborationStateViewBuilder<S, collaboration_state_view_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         CollaborationStateViewBuilder {
             _state: PhantomData,
@@ -1030,12 +1058,15 @@ impl<'a> CollaborationStateViewBuilder<'a, collaboration_state_view_state::Empty
                 None,
                 None,
             ),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: collaboration_state_view_state::State> CollaborationStateViewBuilder<'a, S> {
+impl<
+    S: BosStr,
+    St: collaboration_state_view_state::State,
+> CollaborationStateViewBuilder<S, St> {
     /// Set the `canonicalUri` field (optional)
     pub fn canonical_uri(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -1048,7 +1079,10 @@ impl<'a, S: collaboration_state_view_state::State> CollaborationStateViewBuilder
     }
 }
 
-impl<'a, S: collaboration_state_view_state::State> CollaborationStateViewBuilder<'a, S> {
+impl<
+    S: BosStr,
+    St: collaboration_state_view_state::State,
+> CollaborationStateViewBuilder<S, St> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.1 = value.into();
@@ -1061,7 +1095,10 @@ impl<'a, S: collaboration_state_view_state::State> CollaborationStateViewBuilder
     }
 }
 
-impl<'a, S: collaboration_state_view_state::State> CollaborationStateViewBuilder<'a, S> {
+impl<
+    S: BosStr,
+    St: collaboration_state_view_state::State,
+> CollaborationStateViewBuilder<S, St> {
     /// Set the `firstCollaboratorAddedAt` field (optional)
     pub fn first_collaborator_added_at(
         mut self,
@@ -1077,7 +1114,10 @@ impl<'a, S: collaboration_state_view_state::State> CollaborationStateViewBuilder
     }
 }
 
-impl<'a, S: collaboration_state_view_state::State> CollaborationStateViewBuilder<'a, S> {
+impl<
+    S: BosStr,
+    St: collaboration_state_view_state::State,
+> CollaborationStateViewBuilder<S, St> {
     /// Set the `formerParticipants` field (optional)
     pub fn former_participants(
         mut self,
@@ -1096,7 +1136,10 @@ impl<'a, S: collaboration_state_view_state::State> CollaborationStateViewBuilder
     }
 }
 
-impl<'a, S: collaboration_state_view_state::State> CollaborationStateViewBuilder<'a, S> {
+impl<
+    S: BosStr,
+    St: collaboration_state_view_state::State,
+> CollaborationStateViewBuilder<S, St> {
     /// Set the `hasDivergence` field (optional)
     pub fn has_divergence(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.4 = value.into();
@@ -1109,7 +1152,10 @@ impl<'a, S: collaboration_state_view_state::State> CollaborationStateViewBuilder
     }
 }
 
-impl<'a, S: collaboration_state_view_state::State> CollaborationStateViewBuilder<'a, S> {
+impl<
+    S: BosStr,
+    St: collaboration_state_view_state::State,
+> CollaborationStateViewBuilder<S, St> {
     /// Set the `hasFormerCollaborators` field (optional)
     pub fn has_former_collaborators(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.5 = value.into();
@@ -1122,7 +1168,10 @@ impl<'a, S: collaboration_state_view_state::State> CollaborationStateViewBuilder
     }
 }
 
-impl<'a, S: collaboration_state_view_state::State> CollaborationStateViewBuilder<'a, S> {
+impl<
+    S: BosStr,
+    St: collaboration_state_view_state::State,
+> CollaborationStateViewBuilder<S, St> {
     /// Set the `hasOrphanedVersions` field (optional)
     pub fn has_orphaned_versions(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.6 = value.into();
@@ -1135,7 +1184,10 @@ impl<'a, S: collaboration_state_view_state::State> CollaborationStateViewBuilder
     }
 }
 
-impl<'a, S: collaboration_state_view_state::State> CollaborationStateViewBuilder<'a, S> {
+impl<
+    S: BosStr,
+    St: collaboration_state_view_state::State,
+> CollaborationStateViewBuilder<S, St> {
     /// Set the `lastSyncedAt` field (optional)
     pub fn last_synced_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.7 = value.into();
@@ -1148,29 +1200,32 @@ impl<'a, S: collaboration_state_view_state::State> CollaborationStateViewBuilder
     }
 }
 
-impl<'a, S> CollaborationStateViewBuilder<'a, S>
+impl<S: BosStr, St> CollaborationStateViewBuilder<S, St>
 where
-    S: collaboration_state_view_state::State,
-    S::Participants: collaboration_state_view_state::IsUnset,
+    St: collaboration_state_view_state::State,
+    St::Participants: collaboration_state_view_state::IsUnset,
 {
     /// Set the `participants` field (required)
     pub fn participants(
         mut self,
         value: impl Into<Vec<collab::ParticipantStateView<S>>>,
     ) -> CollaborationStateViewBuilder<
-        'a,
-        collaboration_state_view_state::SetParticipants<S>,
+        S,
+        collaboration_state_view_state::SetParticipants<St>,
     > {
         self._fields.8 = Option::Some(value.into());
         CollaborationStateViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: collaboration_state_view_state::State> CollaborationStateViewBuilder<'a, S> {
+impl<
+    S: BosStr,
+    St: collaboration_state_view_state::State,
+> CollaborationStateViewBuilder<S, St> {
     /// Set the `publishedVersions` field (optional)
     pub fn published_versions(
         mut self,
@@ -1189,59 +1244,59 @@ impl<'a, S: collaboration_state_view_state::State> CollaborationStateViewBuilder
     }
 }
 
-impl<'a, S> CollaborationStateViewBuilder<'a, S>
+impl<S: BosStr, St> CollaborationStateViewBuilder<S, St>
 where
-    S: collaboration_state_view_state::State,
-    S::Resource: collaboration_state_view_state::IsUnset,
+    St: collaboration_state_view_state::State,
+    St::Resource: collaboration_state_view_state::IsUnset,
 {
     /// Set the `resource` field (required)
     pub fn resource(
         mut self,
         value: impl Into<StrongRef<S>>,
     ) -> CollaborationStateViewBuilder<
-        'a,
-        collaboration_state_view_state::SetResource<S>,
+        S,
+        collaboration_state_view_state::SetResource<St>,
     > {
         self._fields.10 = Option::Some(value.into());
         CollaborationStateViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CollaborationStateViewBuilder<'a, S>
+impl<S: BosStr, St> CollaborationStateViewBuilder<S, St>
 where
-    S: collaboration_state_view_state::State,
-    S::Status: collaboration_state_view_state::IsUnset,
+    St: collaboration_state_view_state::State,
+    St::Status: collaboration_state_view_state::IsUnset,
 {
     /// Set the `status` field (required)
     pub fn status(
         mut self,
         value: impl Into<CollaborationStateViewStatus<S>>,
     ) -> CollaborationStateViewBuilder<
-        'a,
-        collaboration_state_view_state::SetStatus<S>,
+        S,
+        collaboration_state_view_state::SetStatus<St>,
     > {
         self._fields.11 = Option::Some(value.into());
         CollaborationStateViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CollaborationStateViewBuilder<'a, S>
+impl<S: BosStr, St> CollaborationStateViewBuilder<S, St>
 where
-    S: collaboration_state_view_state::State,
-    S::Resource: collaboration_state_view_state::IsSet,
-    S::Participants: collaboration_state_view_state::IsSet,
-    S::Status: collaboration_state_view_state::IsSet,
+    St: collaboration_state_view_state::State,
+    St::Resource: collaboration_state_view_state::IsSet,
+    St::Status: collaboration_state_view_state::IsSet,
+    St::Participants: collaboration_state_view_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> CollaborationStateView<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> CollaborationStateView<S> {
         CollaborationStateView {
             canonical_uri: self._fields.0,
             created_at: self._fields.1,
@@ -1258,11 +1313,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> CollaborationStateView<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> CollaborationStateView<S> {
         CollaborationStateView {
             canonical_uri: self._fields.0,
             created_at: self._fields.1,
@@ -1816,73 +1871,76 @@ pub mod former_collaborator_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type WasActiveUntil;
-        type WasActiveFrom;
         type User;
         type EndReason;
+        type WasActiveFrom;
+        type WasActiveUntil;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type WasActiveUntil = Unset;
-        type WasActiveFrom = Unset;
         type User = Unset;
         type EndReason = Unset;
-    }
-    ///State transition - sets the `was_active_until` field to Set
-    pub struct SetWasActiveUntil<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWasActiveUntil<S> {}
-    impl<S: State> State for SetWasActiveUntil<S> {
-        type WasActiveUntil = Set<members::was_active_until>;
-        type WasActiveFrom = S::WasActiveFrom;
-        type User = S::User;
-        type EndReason = S::EndReason;
-    }
-    ///State transition - sets the `was_active_from` field to Set
-    pub struct SetWasActiveFrom<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWasActiveFrom<S> {}
-    impl<S: State> State for SetWasActiveFrom<S> {
-        type WasActiveUntil = S::WasActiveUntil;
-        type WasActiveFrom = Set<members::was_active_from>;
-        type User = S::User;
-        type EndReason = S::EndReason;
+        type WasActiveFrom = Unset;
+        type WasActiveUntil = Unset;
     }
     ///State transition - sets the `user` field to Set
-    pub struct SetUser<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUser<S> {}
-    impl<S: State> State for SetUser<S> {
-        type WasActiveUntil = S::WasActiveUntil;
-        type WasActiveFrom = S::WasActiveFrom;
+    pub struct SetUser<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUser<St> {}
+    impl<St: State> State for SetUser<St> {
         type User = Set<members::user>;
-        type EndReason = S::EndReason;
+        type EndReason = St::EndReason;
+        type WasActiveFrom = St::WasActiveFrom;
+        type WasActiveUntil = St::WasActiveUntil;
     }
     ///State transition - sets the `end_reason` field to Set
-    pub struct SetEndReason<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEndReason<S> {}
-    impl<S: State> State for SetEndReason<S> {
-        type WasActiveUntil = S::WasActiveUntil;
-        type WasActiveFrom = S::WasActiveFrom;
-        type User = S::User;
+    pub struct SetEndReason<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetEndReason<St> {}
+    impl<St: State> State for SetEndReason<St> {
+        type User = St::User;
         type EndReason = Set<members::end_reason>;
+        type WasActiveFrom = St::WasActiveFrom;
+        type WasActiveUntil = St::WasActiveUntil;
+    }
+    ///State transition - sets the `was_active_from` field to Set
+    pub struct SetWasActiveFrom<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetWasActiveFrom<St> {}
+    impl<St: State> State for SetWasActiveFrom<St> {
+        type User = St::User;
+        type EndReason = St::EndReason;
+        type WasActiveFrom = Set<members::was_active_from>;
+        type WasActiveUntil = St::WasActiveUntil;
+    }
+    ///State transition - sets the `was_active_until` field to Set
+    pub struct SetWasActiveUntil<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetWasActiveUntil<St> {}
+    impl<St: State> State for SetWasActiveUntil<St> {
+        type User = St::User;
+        type EndReason = St::EndReason;
+        type WasActiveFrom = St::WasActiveFrom;
+        type WasActiveUntil = Set<members::was_active_until>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `was_active_until` field
-        pub struct was_active_until(());
-        ///Marker type for the `was_active_from` field
-        pub struct was_active_from(());
         ///Marker type for the `user` field
         pub struct user(());
         ///Marker type for the `end_reason` field
         pub struct end_reason(());
+        ///Marker type for the `was_active_from` field
+        pub struct was_active_from(());
+        ///Marker type for the `was_active_until` field
+        pub struct was_active_until(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct FormerCollaboratorViewBuilder<'a, S: former_collaborator_view_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct FormerCollaboratorViewBuilder<
+    S: BosStr,
+    St: former_collaborator_view_state::State,
+> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<i64>,
         Option<FormerCollaboratorViewEndReason<S>>,
@@ -1892,31 +1950,34 @@ pub struct FormerCollaboratorViewBuilder<'a, S: former_collaborator_view_state::
         Option<Datetime>,
         Option<Datetime>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> FormerCollaboratorView<'a> {
-    /// Create a new builder for this type
+impl<S: BosStr> FormerCollaboratorView<S> {
+    /// Create a new builder for this type.
     pub fn new() -> FormerCollaboratorViewBuilder<
-        'a,
+        S,
         former_collaborator_view_state::Empty,
     > {
         FormerCollaboratorViewBuilder::new()
     }
 }
 
-impl<'a> FormerCollaboratorViewBuilder<'a, former_collaborator_view_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> FormerCollaboratorViewBuilder<S, former_collaborator_view_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         FormerCollaboratorViewBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: former_collaborator_view_state::State> FormerCollaboratorViewBuilder<'a, S> {
+impl<
+    S: BosStr,
+    St: former_collaborator_view_state::State,
+> FormerCollaboratorViewBuilder<S, St> {
     /// Set the `contributionCount` field (optional)
     pub fn contribution_count(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
@@ -1929,29 +1990,32 @@ impl<'a, S: former_collaborator_view_state::State> FormerCollaboratorViewBuilder
     }
 }
 
-impl<'a, S> FormerCollaboratorViewBuilder<'a, S>
+impl<S: BosStr, St> FormerCollaboratorViewBuilder<S, St>
 where
-    S: former_collaborator_view_state::State,
-    S::EndReason: former_collaborator_view_state::IsUnset,
+    St: former_collaborator_view_state::State,
+    St::EndReason: former_collaborator_view_state::IsUnset,
 {
     /// Set the `endReason` field (required)
     pub fn end_reason(
         mut self,
         value: impl Into<FormerCollaboratorViewEndReason<S>>,
     ) -> FormerCollaboratorViewBuilder<
-        'a,
-        former_collaborator_view_state::SetEndReason<S>,
+        S,
+        former_collaborator_view_state::SetEndReason<St>,
     > {
         self._fields.1 = Option::Some(value.into());
         FormerCollaboratorViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: former_collaborator_view_state::State> FormerCollaboratorViewBuilder<'a, S> {
+impl<
+    S: BosStr,
+    St: former_collaborator_view_state::State,
+> FormerCollaboratorViewBuilder<S, St> {
     /// Set the `hasPublishedVersion` field (optional)
     pub fn has_published_version(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.2 = value.into();
@@ -1964,7 +2028,10 @@ impl<'a, S: former_collaborator_view_state::State> FormerCollaboratorViewBuilder
     }
 }
 
-impl<'a, S: former_collaborator_view_state::State> FormerCollaboratorViewBuilder<'a, S> {
+impl<
+    S: BosStr,
+    St: former_collaborator_view_state::State,
+> FormerCollaboratorViewBuilder<S, St> {
     /// Set the `publishedVersionUri` field (optional)
     pub fn published_version_uri(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -1977,79 +2044,79 @@ impl<'a, S: former_collaborator_view_state::State> FormerCollaboratorViewBuilder
     }
 }
 
-impl<'a, S> FormerCollaboratorViewBuilder<'a, S>
+impl<S: BosStr, St> FormerCollaboratorViewBuilder<S, St>
 where
-    S: former_collaborator_view_state::State,
-    S::User: former_collaborator_view_state::IsUnset,
+    St: former_collaborator_view_state::State,
+    St::User: former_collaborator_view_state::IsUnset,
 {
     /// Set the `user` field (required)
     pub fn user(
         mut self,
         value: impl Into<ProfileViewBasic<S>>,
-    ) -> FormerCollaboratorViewBuilder<'a, former_collaborator_view_state::SetUser<S>> {
+    ) -> FormerCollaboratorViewBuilder<S, former_collaborator_view_state::SetUser<St>> {
         self._fields.4 = Option::Some(value.into());
         FormerCollaboratorViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> FormerCollaboratorViewBuilder<'a, S>
+impl<S: BosStr, St> FormerCollaboratorViewBuilder<S, St>
 where
-    S: former_collaborator_view_state::State,
-    S::WasActiveFrom: former_collaborator_view_state::IsUnset,
+    St: former_collaborator_view_state::State,
+    St::WasActiveFrom: former_collaborator_view_state::IsUnset,
 {
     /// Set the `wasActiveFrom` field (required)
     pub fn was_active_from(
         mut self,
         value: impl Into<Datetime>,
     ) -> FormerCollaboratorViewBuilder<
-        'a,
-        former_collaborator_view_state::SetWasActiveFrom<S>,
+        S,
+        former_collaborator_view_state::SetWasActiveFrom<St>,
     > {
         self._fields.5 = Option::Some(value.into());
         FormerCollaboratorViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> FormerCollaboratorViewBuilder<'a, S>
+impl<S: BosStr, St> FormerCollaboratorViewBuilder<S, St>
 where
-    S: former_collaborator_view_state::State,
-    S::WasActiveUntil: former_collaborator_view_state::IsUnset,
+    St: former_collaborator_view_state::State,
+    St::WasActiveUntil: former_collaborator_view_state::IsUnset,
 {
     /// Set the `wasActiveUntil` field (required)
     pub fn was_active_until(
         mut self,
         value: impl Into<Datetime>,
     ) -> FormerCollaboratorViewBuilder<
-        'a,
-        former_collaborator_view_state::SetWasActiveUntil<S>,
+        S,
+        former_collaborator_view_state::SetWasActiveUntil<St>,
     > {
         self._fields.6 = Option::Some(value.into());
         FormerCollaboratorViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> FormerCollaboratorViewBuilder<'a, S>
+impl<S: BosStr, St> FormerCollaboratorViewBuilder<S, St>
 where
-    S: former_collaborator_view_state::State,
-    S::WasActiveUntil: former_collaborator_view_state::IsSet,
-    S::WasActiveFrom: former_collaborator_view_state::IsSet,
-    S::User: former_collaborator_view_state::IsSet,
-    S::EndReason: former_collaborator_view_state::IsSet,
+    St: former_collaborator_view_state::State,
+    St::User: former_collaborator_view_state::IsSet,
+    St::EndReason: former_collaborator_view_state::IsSet,
+    St::WasActiveFrom: former_collaborator_view_state::IsSet,
+    St::WasActiveUntil: former_collaborator_view_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> FormerCollaboratorView<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> FormerCollaboratorView<S> {
         FormerCollaboratorView {
             contribution_count: self._fields.0,
             end_reason: self._fields.1.unwrap(),
@@ -2061,11 +2128,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> FormerCollaboratorView<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> FormerCollaboratorView<S> {
         FormerCollaboratorView {
             contribution_count: self._fields.0,
             end_reason: self._fields.1.unwrap(),
@@ -2089,133 +2156,133 @@ pub mod invite_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
+        type Cid;
+        type Invitee;
+        type Uri;
+        type Resource;
         type Status;
         type Inviter;
-        type Cid;
-        type Uri;
-        type Invitee;
-        type Resource;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
+        type Cid = Unset;
+        type Invitee = Unset;
+        type Uri = Unset;
+        type Resource = Unset;
         type Status = Unset;
         type Inviter = Unset;
-        type Cid = Unset;
-        type Uri = Unset;
-        type Invitee = Unset;
-        type Resource = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Status = S::Status;
-        type Inviter = S::Inviter;
-        type Cid = S::Cid;
-        type Uri = S::Uri;
-        type Invitee = S::Invitee;
-        type Resource = S::Resource;
-    }
-    ///State transition - sets the `status` field to Set
-    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStatus<S> {}
-    impl<S: State> State for SetStatus<S> {
-        type CreatedAt = S::CreatedAt;
-        type Status = Set<members::status>;
-        type Inviter = S::Inviter;
-        type Cid = S::Cid;
-        type Uri = S::Uri;
-        type Invitee = S::Invitee;
-        type Resource = S::Resource;
-    }
-    ///State transition - sets the `inviter` field to Set
-    pub struct SetInviter<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetInviter<S> {}
-    impl<S: State> State for SetInviter<S> {
-        type CreatedAt = S::CreatedAt;
-        type Status = S::Status;
-        type Inviter = Set<members::inviter>;
-        type Cid = S::Cid;
-        type Uri = S::Uri;
-        type Invitee = S::Invitee;
-        type Resource = S::Resource;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type CreatedAt = S::CreatedAt;
-        type Status = S::Status;
-        type Inviter = S::Inviter;
+    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCid<St> {}
+    impl<St: State> State for SetCid<St> {
         type Cid = Set<members::cid>;
-        type Uri = S::Uri;
-        type Invitee = S::Invitee;
-        type Resource = S::Resource;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type CreatedAt = S::CreatedAt;
-        type Status = S::Status;
-        type Inviter = S::Inviter;
-        type Cid = S::Cid;
-        type Uri = Set<members::uri>;
-        type Invitee = S::Invitee;
-        type Resource = S::Resource;
+        type Invitee = St::Invitee;
+        type Uri = St::Uri;
+        type Resource = St::Resource;
+        type Status = St::Status;
+        type Inviter = St::Inviter;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `invitee` field to Set
-    pub struct SetInvitee<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetInvitee<S> {}
-    impl<S: State> State for SetInvitee<S> {
-        type CreatedAt = S::CreatedAt;
-        type Status = S::Status;
-        type Inviter = S::Inviter;
-        type Cid = S::Cid;
-        type Uri = S::Uri;
+    pub struct SetInvitee<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetInvitee<St> {}
+    impl<St: State> State for SetInvitee<St> {
+        type Cid = St::Cid;
         type Invitee = Set<members::invitee>;
-        type Resource = S::Resource;
+        type Uri = St::Uri;
+        type Resource = St::Resource;
+        type Status = St::Status;
+        type Inviter = St::Inviter;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Cid = St::Cid;
+        type Invitee = St::Invitee;
+        type Uri = Set<members::uri>;
+        type Resource = St::Resource;
+        type Status = St::Status;
+        type Inviter = St::Inviter;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `resource` field to Set
-    pub struct SetResource<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetResource<S> {}
-    impl<S: State> State for SetResource<S> {
-        type CreatedAt = S::CreatedAt;
-        type Status = S::Status;
-        type Inviter = S::Inviter;
-        type Cid = S::Cid;
-        type Uri = S::Uri;
-        type Invitee = S::Invitee;
+    pub struct SetResource<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetResource<St> {}
+    impl<St: State> State for SetResource<St> {
+        type Cid = St::Cid;
+        type Invitee = St::Invitee;
+        type Uri = St::Uri;
         type Resource = Set<members::resource>;
+        type Status = St::Status;
+        type Inviter = St::Inviter;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `status` field to Set
+    pub struct SetStatus<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStatus<St> {}
+    impl<St: State> State for SetStatus<St> {
+        type Cid = St::Cid;
+        type Invitee = St::Invitee;
+        type Uri = St::Uri;
+        type Resource = St::Resource;
+        type Status = Set<members::status>;
+        type Inviter = St::Inviter;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `inviter` field to Set
+    pub struct SetInviter<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetInviter<St> {}
+    impl<St: State> State for SetInviter<St> {
+        type Cid = St::Cid;
+        type Invitee = St::Invitee;
+        type Uri = St::Uri;
+        type Resource = St::Resource;
+        type Status = St::Status;
+        type Inviter = Set<members::inviter>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Cid = St::Cid;
+        type Invitee = St::Invitee;
+        type Uri = St::Uri;
+        type Resource = St::Resource;
+        type Status = St::Status;
+        type Inviter = St::Inviter;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
+        ///Marker type for the `invitee` field
+        pub struct invitee(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `resource` field
+        pub struct resource(());
         ///Marker type for the `status` field
         pub struct status(());
         ///Marker type for the `inviter` field
         pub struct inviter(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
-        ///Marker type for the `invitee` field
-        pub struct invitee(());
-        ///Marker type for the `resource` field
-        pub struct resource(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct InviteViewBuilder<'a, S: invite_view_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct InviteViewBuilder<S: BosStr, St: invite_view_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<AtUri<S>>,
         Option<Datetime>,
@@ -2231,18 +2298,18 @@ pub struct InviteViewBuilder<'a, S: invite_view_state::State> {
         Option<InviteViewStatus<S>>,
         Option<AtUri<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> InviteView<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> InviteViewBuilder<'a, invite_view_state::Empty> {
+impl<S: BosStr> InviteView<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> InviteViewBuilder<S, invite_view_state::Empty> {
         InviteViewBuilder::new()
     }
 }
 
-impl<'a> InviteViewBuilder<'a, invite_view_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> InviteViewBuilder<S, invite_view_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         InviteViewBuilder {
             _state: PhantomData,
@@ -2261,12 +2328,12 @@ impl<'a> InviteViewBuilder<'a, invite_view_state::Empty> {
                 None,
                 None,
             ),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: invite_view_state::State> InviteViewBuilder<'a, S> {
+impl<S: BosStr, St: invite_view_state::State> InviteViewBuilder<S, St> {
     /// Set the `acceptUri` field (optional)
     pub fn accept_uri(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -2279,7 +2346,7 @@ impl<'a, S: invite_view_state::State> InviteViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: invite_view_state::State> InviteViewBuilder<'a, S> {
+impl<S: BosStr, St: invite_view_state::State> InviteViewBuilder<S, St> {
     /// Set the `acceptedAt` field (optional)
     pub fn accepted_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.1 = value.into();
@@ -2292,45 +2359,45 @@ impl<'a, S: invite_view_state::State> InviteViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S> InviteViewBuilder<'a, S>
+impl<S: BosStr, St> InviteViewBuilder<S, St>
 where
-    S: invite_view_state::State,
-    S::Cid: invite_view_state::IsUnset,
+    St: invite_view_state::State,
+    St::Cid: invite_view_state::IsUnset,
 {
     /// Set the `cid` field (required)
     pub fn cid(
         mut self,
         value: impl Into<Cid<S>>,
-    ) -> InviteViewBuilder<'a, invite_view_state::SetCid<S>> {
+    ) -> InviteViewBuilder<S, invite_view_state::SetCid<St>> {
         self._fields.2 = Option::Some(value.into());
         InviteViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> InviteViewBuilder<'a, S>
+impl<S: BosStr, St> InviteViewBuilder<S, St>
 where
-    S: invite_view_state::State,
-    S::CreatedAt: invite_view_state::IsUnset,
+    St: invite_view_state::State,
+    St::CreatedAt: invite_view_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> InviteViewBuilder<'a, invite_view_state::SetCreatedAt<S>> {
+    ) -> InviteViewBuilder<S, invite_view_state::SetCreatedAt<St>> {
         self._fields.3 = Option::Some(value.into());
         InviteViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: invite_view_state::State> InviteViewBuilder<'a, S> {
+impl<S: BosStr, St: invite_view_state::State> InviteViewBuilder<S, St> {
     /// Set the `expiresAt` field (optional)
     pub fn expires_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.4 = value.into();
@@ -2343,45 +2410,45 @@ impl<'a, S: invite_view_state::State> InviteViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S> InviteViewBuilder<'a, S>
+impl<S: BosStr, St> InviteViewBuilder<S, St>
 where
-    S: invite_view_state::State,
-    S::Invitee: invite_view_state::IsUnset,
+    St: invite_view_state::State,
+    St::Invitee: invite_view_state::IsUnset,
 {
     /// Set the `invitee` field (required)
     pub fn invitee(
         mut self,
         value: impl Into<ProfileViewBasic<S>>,
-    ) -> InviteViewBuilder<'a, invite_view_state::SetInvitee<S>> {
+    ) -> InviteViewBuilder<S, invite_view_state::SetInvitee<St>> {
         self._fields.5 = Option::Some(value.into());
         InviteViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> InviteViewBuilder<'a, S>
+impl<S: BosStr, St> InviteViewBuilder<S, St>
 where
-    S: invite_view_state::State,
-    S::Inviter: invite_view_state::IsUnset,
+    St: invite_view_state::State,
+    St::Inviter: invite_view_state::IsUnset,
 {
     /// Set the `inviter` field (required)
     pub fn inviter(
         mut self,
         value: impl Into<ProfileViewBasic<S>>,
-    ) -> InviteViewBuilder<'a, invite_view_state::SetInviter<S>> {
+    ) -> InviteViewBuilder<S, invite_view_state::SetInviter<St>> {
         self._fields.6 = Option::Some(value.into());
         InviteViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: invite_view_state::State> InviteViewBuilder<'a, S> {
+impl<S: BosStr, St: invite_view_state::State> InviteViewBuilder<S, St> {
     /// Set the `message` field (optional)
     pub fn message(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.7 = value.into();
@@ -2394,26 +2461,26 @@ impl<'a, S: invite_view_state::State> InviteViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S> InviteViewBuilder<'a, S>
+impl<S: BosStr, St> InviteViewBuilder<S, St>
 where
-    S: invite_view_state::State,
-    S::Resource: invite_view_state::IsUnset,
+    St: invite_view_state::State,
+    St::Resource: invite_view_state::IsUnset,
 {
     /// Set the `resource` field (required)
     pub fn resource(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> InviteViewBuilder<'a, invite_view_state::SetResource<S>> {
+    ) -> InviteViewBuilder<S, invite_view_state::SetResource<St>> {
         self._fields.8 = Option::Some(value.into());
         InviteViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: invite_view_state::State> InviteViewBuilder<'a, S> {
+impl<S: BosStr, St: invite_view_state::State> InviteViewBuilder<S, St> {
     /// Set the `resourceTitle` field (optional)
     pub fn resource_title(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.9 = value.into();
@@ -2426,7 +2493,7 @@ impl<'a, S: invite_view_state::State> InviteViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: invite_view_state::State> InviteViewBuilder<'a, S> {
+impl<S: BosStr, St: invite_view_state::State> InviteViewBuilder<S, St> {
     /// Set the `scope` field (optional)
     pub fn scope(mut self, value: impl Into<Option<InviteViewScope<S>>>) -> Self {
         self._fields.10 = value.into();
@@ -2439,57 +2506,57 @@ impl<'a, S: invite_view_state::State> InviteViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S> InviteViewBuilder<'a, S>
+impl<S: BosStr, St> InviteViewBuilder<S, St>
 where
-    S: invite_view_state::State,
-    S::Status: invite_view_state::IsUnset,
+    St: invite_view_state::State,
+    St::Status: invite_view_state::IsUnset,
 {
     /// Set the `status` field (required)
     pub fn status(
         mut self,
         value: impl Into<InviteViewStatus<S>>,
-    ) -> InviteViewBuilder<'a, invite_view_state::SetStatus<S>> {
+    ) -> InviteViewBuilder<S, invite_view_state::SetStatus<St>> {
         self._fields.11 = Option::Some(value.into());
         InviteViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> InviteViewBuilder<'a, S>
+impl<S: BosStr, St> InviteViewBuilder<S, St>
 where
-    S: invite_view_state::State,
-    S::Uri: invite_view_state::IsUnset,
+    St: invite_view_state::State,
+    St::Uri: invite_view_state::IsUnset,
 {
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> InviteViewBuilder<'a, invite_view_state::SetUri<S>> {
+    ) -> InviteViewBuilder<S, invite_view_state::SetUri<St>> {
         self._fields.12 = Option::Some(value.into());
         InviteViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> InviteViewBuilder<'a, S>
+impl<S: BosStr, St> InviteViewBuilder<S, St>
 where
-    S: invite_view_state::State,
-    S::CreatedAt: invite_view_state::IsSet,
-    S::Status: invite_view_state::IsSet,
-    S::Inviter: invite_view_state::IsSet,
-    S::Cid: invite_view_state::IsSet,
-    S::Uri: invite_view_state::IsSet,
-    S::Invitee: invite_view_state::IsSet,
-    S::Resource: invite_view_state::IsSet,
+    St: invite_view_state::State,
+    St::Cid: invite_view_state::IsSet,
+    St::Invitee: invite_view_state::IsSet,
+    St::Uri: invite_view_state::IsSet,
+    St::Resource: invite_view_state::IsSet,
+    St::Status: invite_view_state::IsSet,
+    St::Inviter: invite_view_state::IsSet,
+    St::CreatedAt: invite_view_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> InviteView<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> InviteView<S> {
         InviteView {
             accept_uri: self._fields.0,
             accepted_at: self._fields.1,
@@ -2507,11 +2574,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> InviteView<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> InviteView<S> {
         InviteView {
             accept_uri: self._fields.0,
             accepted_at: self._fields.1,
@@ -2541,57 +2608,60 @@ pub mod participant_state_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Status;
         type User;
         type Role;
+        type Status;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Status = Unset;
         type User = Unset;
         type Role = Unset;
-    }
-    ///State transition - sets the `status` field to Set
-    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStatus<S> {}
-    impl<S: State> State for SetStatus<S> {
-        type Status = Set<members::status>;
-        type User = S::User;
-        type Role = S::Role;
+        type Status = Unset;
     }
     ///State transition - sets the `user` field to Set
-    pub struct SetUser<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUser<S> {}
-    impl<S: State> State for SetUser<S> {
-        type Status = S::Status;
+    pub struct SetUser<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUser<St> {}
+    impl<St: State> State for SetUser<St> {
         type User = Set<members::user>;
-        type Role = S::Role;
+        type Role = St::Role;
+        type Status = St::Status;
     }
     ///State transition - sets the `role` field to Set
-    pub struct SetRole<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRole<S> {}
-    impl<S: State> State for SetRole<S> {
-        type Status = S::Status;
-        type User = S::User;
+    pub struct SetRole<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRole<St> {}
+    impl<St: State> State for SetRole<St> {
+        type User = St::User;
         type Role = Set<members::role>;
+        type Status = St::Status;
+    }
+    ///State transition - sets the `status` field to Set
+    pub struct SetStatus<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStatus<St> {}
+    impl<St: State> State for SetStatus<St> {
+        type User = St::User;
+        type Role = St::Role;
+        type Status = Set<members::status>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `status` field
-        pub struct status(());
         ///Marker type for the `user` field
         pub struct user(());
         ///Marker type for the `role` field
         pub struct role(());
+        ///Marker type for the `status` field
+        pub struct status(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ParticipantStateViewBuilder<'a, S: participant_state_view_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ParticipantStateViewBuilder<
+    S: BosStr,
+    St: participant_state_view_state::State,
+> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<AtUri<S>>,
         Option<ParticipantStateViewEndReason<S>>,
@@ -2605,31 +2675,31 @@ pub struct ParticipantStateViewBuilder<'a, S: participant_state_view_state::Stat
         Option<ProfileViewBasic<S>>,
         Option<bool>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ParticipantStateView<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ParticipantStateViewBuilder<
-        'a,
-        participant_state_view_state::Empty,
-    > {
+impl<S: BosStr> ParticipantStateView<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ParticipantStateViewBuilder<S, participant_state_view_state::Empty> {
         ParticipantStateViewBuilder::new()
     }
 }
 
-impl<'a> ParticipantStateViewBuilder<'a, participant_state_view_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ParticipantStateViewBuilder<S, participant_state_view_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ParticipantStateViewBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: participant_state_view_state::State> ParticipantStateViewBuilder<'a, S> {
+impl<
+    S: BosStr,
+    St: participant_state_view_state::State,
+> ParticipantStateViewBuilder<S, St> {
     /// Set the `acceptUri` field (optional)
     pub fn accept_uri(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -2642,7 +2712,10 @@ impl<'a, S: participant_state_view_state::State> ParticipantStateViewBuilder<'a,
     }
 }
 
-impl<'a, S: participant_state_view_state::State> ParticipantStateViewBuilder<'a, S> {
+impl<
+    S: BosStr,
+    St: participant_state_view_state::State,
+> ParticipantStateViewBuilder<S, St> {
     /// Set the `endReason` field (optional)
     pub fn end_reason(
         mut self,
@@ -2661,7 +2734,10 @@ impl<'a, S: participant_state_view_state::State> ParticipantStateViewBuilder<'a,
     }
 }
 
-impl<'a, S: participant_state_view_state::State> ParticipantStateViewBuilder<'a, S> {
+impl<
+    S: BosStr,
+    St: participant_state_view_state::State,
+> ParticipantStateViewBuilder<S, St> {
     /// Set the `firstEditAt` field (optional)
     pub fn first_edit_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.2 = value.into();
@@ -2674,7 +2750,10 @@ impl<'a, S: participant_state_view_state::State> ParticipantStateViewBuilder<'a,
     }
 }
 
-impl<'a, S: participant_state_view_state::State> ParticipantStateViewBuilder<'a, S> {
+impl<
+    S: BosStr,
+    St: participant_state_view_state::State,
+> ParticipantStateViewBuilder<S, St> {
     /// Set the `inviteUri` field (optional)
     pub fn invite_uri(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -2687,7 +2766,10 @@ impl<'a, S: participant_state_view_state::State> ParticipantStateViewBuilder<'a,
     }
 }
 
-impl<'a, S: participant_state_view_state::State> ParticipantStateViewBuilder<'a, S> {
+impl<
+    S: BosStr,
+    St: participant_state_view_state::State,
+> ParticipantStateViewBuilder<S, St> {
     /// Set the `lastEditAt` field (optional)
     pub fn last_edit_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.4 = value.into();
@@ -2700,7 +2782,10 @@ impl<'a, S: participant_state_view_state::State> ParticipantStateViewBuilder<'a,
     }
 }
 
-impl<'a, S: participant_state_view_state::State> ParticipantStateViewBuilder<'a, S> {
+impl<
+    S: BosStr,
+    St: participant_state_view_state::State,
+> ParticipantStateViewBuilder<S, St> {
     /// Set the `publishedVersion` field (optional)
     pub fn published_version(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -2713,7 +2798,10 @@ impl<'a, S: participant_state_view_state::State> ParticipantStateViewBuilder<'a,
     }
 }
 
-impl<'a, S: participant_state_view_state::State> ParticipantStateViewBuilder<'a, S> {
+impl<
+    S: BosStr,
+    St: participant_state_view_state::State,
+> ParticipantStateViewBuilder<S, St> {
     /// Set the `relationshipEndedAt` field (optional)
     pub fn relationship_ended_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.6 = value.into();
@@ -2726,64 +2814,67 @@ impl<'a, S: participant_state_view_state::State> ParticipantStateViewBuilder<'a,
     }
 }
 
-impl<'a, S> ParticipantStateViewBuilder<'a, S>
+impl<S: BosStr, St> ParticipantStateViewBuilder<S, St>
 where
-    S: participant_state_view_state::State,
-    S::Role: participant_state_view_state::IsUnset,
+    St: participant_state_view_state::State,
+    St::Role: participant_state_view_state::IsUnset,
 {
     /// Set the `role` field (required)
     pub fn role(
         mut self,
         value: impl Into<ParticipantStateViewRole<S>>,
-    ) -> ParticipantStateViewBuilder<'a, participant_state_view_state::SetRole<S>> {
+    ) -> ParticipantStateViewBuilder<S, participant_state_view_state::SetRole<St>> {
         self._fields.7 = Option::Some(value.into());
         ParticipantStateViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ParticipantStateViewBuilder<'a, S>
+impl<S: BosStr, St> ParticipantStateViewBuilder<S, St>
 where
-    S: participant_state_view_state::State,
-    S::Status: participant_state_view_state::IsUnset,
+    St: participant_state_view_state::State,
+    St::Status: participant_state_view_state::IsUnset,
 {
     /// Set the `status` field (required)
     pub fn status(
         mut self,
         value: impl Into<ParticipantStateViewStatus<S>>,
-    ) -> ParticipantStateViewBuilder<'a, participant_state_view_state::SetStatus<S>> {
+    ) -> ParticipantStateViewBuilder<S, participant_state_view_state::SetStatus<St>> {
         self._fields.8 = Option::Some(value.into());
         ParticipantStateViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ParticipantStateViewBuilder<'a, S>
+impl<S: BosStr, St> ParticipantStateViewBuilder<S, St>
 where
-    S: participant_state_view_state::State,
-    S::User: participant_state_view_state::IsUnset,
+    St: participant_state_view_state::State,
+    St::User: participant_state_view_state::IsUnset,
 {
     /// Set the `user` field (required)
     pub fn user(
         mut self,
         value: impl Into<ProfileViewBasic<S>>,
-    ) -> ParticipantStateViewBuilder<'a, participant_state_view_state::SetUser<S>> {
+    ) -> ParticipantStateViewBuilder<S, participant_state_view_state::SetUser<St>> {
         self._fields.9 = Option::Some(value.into());
         ParticipantStateViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: participant_state_view_state::State> ParticipantStateViewBuilder<'a, S> {
+impl<
+    S: BosStr,
+    St: participant_state_view_state::State,
+> ParticipantStateViewBuilder<S, St> {
     /// Set the `wasCollaborator` field (optional)
     pub fn was_collaborator(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.10 = value.into();
@@ -2796,15 +2887,15 @@ impl<'a, S: participant_state_view_state::State> ParticipantStateViewBuilder<'a,
     }
 }
 
-impl<'a, S> ParticipantStateViewBuilder<'a, S>
+impl<S: BosStr, St> ParticipantStateViewBuilder<S, St>
 where
-    S: participant_state_view_state::State,
-    S::Status: participant_state_view_state::IsSet,
-    S::User: participant_state_view_state::IsSet,
-    S::Role: participant_state_view_state::IsSet,
+    St: participant_state_view_state::State,
+    St::User: participant_state_view_state::IsSet,
+    St::Role: participant_state_view_state::IsSet,
+    St::Status: participant_state_view_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ParticipantStateView<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ParticipantStateView<S> {
         ParticipantStateView {
             accept_uri: self._fields.0,
             end_reason: self._fields.1,
@@ -2820,11 +2911,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> ParticipantStateView<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ParticipantStateView<S> {
         ParticipantStateView {
             accept_uri: self._fields.0,
             end_reason: self._fields.1,
@@ -2852,91 +2943,91 @@ pub mod session_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Uri;
-        type Resource;
         type User;
+        type Uri;
+        type CreatedAt;
         type NodeId;
+        type Resource;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Uri = Unset;
-        type Resource = Unset;
         type User = Unset;
+        type Uri = Unset;
+        type CreatedAt = Unset;
         type NodeId = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Uri = S::Uri;
-        type Resource = S::Resource;
-        type User = S::User;
-        type NodeId = S::NodeId;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type CreatedAt = S::CreatedAt;
-        type Uri = Set<members::uri>;
-        type Resource = S::Resource;
-        type User = S::User;
-        type NodeId = S::NodeId;
-    }
-    ///State transition - sets the `resource` field to Set
-    pub struct SetResource<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetResource<S> {}
-    impl<S: State> State for SetResource<S> {
-        type CreatedAt = S::CreatedAt;
-        type Uri = S::Uri;
-        type Resource = Set<members::resource>;
-        type User = S::User;
-        type NodeId = S::NodeId;
+        type Resource = Unset;
     }
     ///State transition - sets the `user` field to Set
-    pub struct SetUser<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUser<S> {}
-    impl<S: State> State for SetUser<S> {
-        type CreatedAt = S::CreatedAt;
-        type Uri = S::Uri;
-        type Resource = S::Resource;
+    pub struct SetUser<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUser<St> {}
+    impl<St: State> State for SetUser<St> {
         type User = Set<members::user>;
-        type NodeId = S::NodeId;
+        type Uri = St::Uri;
+        type CreatedAt = St::CreatedAt;
+        type NodeId = St::NodeId;
+        type Resource = St::Resource;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type User = St::User;
+        type Uri = Set<members::uri>;
+        type CreatedAt = St::CreatedAt;
+        type NodeId = St::NodeId;
+        type Resource = St::Resource;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type User = St::User;
+        type Uri = St::Uri;
+        type CreatedAt = Set<members::created_at>;
+        type NodeId = St::NodeId;
+        type Resource = St::Resource;
     }
     ///State transition - sets the `node_id` field to Set
-    pub struct SetNodeId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNodeId<S> {}
-    impl<S: State> State for SetNodeId<S> {
-        type CreatedAt = S::CreatedAt;
-        type Uri = S::Uri;
-        type Resource = S::Resource;
-        type User = S::User;
+    pub struct SetNodeId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetNodeId<St> {}
+    impl<St: State> State for SetNodeId<St> {
+        type User = St::User;
+        type Uri = St::Uri;
+        type CreatedAt = St::CreatedAt;
         type NodeId = Set<members::node_id>;
+        type Resource = St::Resource;
+    }
+    ///State transition - sets the `resource` field to Set
+    pub struct SetResource<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetResource<St> {}
+    impl<St: State> State for SetResource<St> {
+        type User = St::User;
+        type Uri = St::Uri;
+        type CreatedAt = St::CreatedAt;
+        type NodeId = St::NodeId;
+        type Resource = Set<members::resource>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
-        ///Marker type for the `resource` field
-        pub struct resource(());
         ///Marker type for the `user` field
         pub struct user(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `node_id` field
         pub struct node_id(());
+        ///Marker type for the `resource` field
+        pub struct resource(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct SessionViewBuilder<'a, S: session_view_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct SessionViewBuilder<S: BosStr, St: session_view_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
         Option<Datetime>,
@@ -2946,47 +3037,47 @@ pub struct SessionViewBuilder<'a, S: session_view_state::State> {
         Option<AtUri<S>>,
         Option<ProfileViewBasic<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> SessionView<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> SessionViewBuilder<'a, session_view_state::Empty> {
+impl<S: BosStr> SessionView<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> SessionViewBuilder<S, session_view_state::Empty> {
         SessionViewBuilder::new()
     }
 }
 
-impl<'a> SessionViewBuilder<'a, session_view_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> SessionViewBuilder<S, session_view_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SessionViewBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SessionViewBuilder<'a, S>
+impl<S: BosStr, St> SessionViewBuilder<S, St>
 where
-    S: session_view_state::State,
-    S::CreatedAt: session_view_state::IsUnset,
+    St: session_view_state::State,
+    St::CreatedAt: session_view_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> SessionViewBuilder<'a, session_view_state::SetCreatedAt<S>> {
+    ) -> SessionViewBuilder<S, session_view_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         SessionViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: session_view_state::State> SessionViewBuilder<'a, S> {
+impl<S: BosStr, St: session_view_state::State> SessionViewBuilder<S, St> {
     /// Set the `expiresAt` field (optional)
     pub fn expires_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.1 = value.into();
@@ -2999,26 +3090,26 @@ impl<'a, S: session_view_state::State> SessionViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S> SessionViewBuilder<'a, S>
+impl<S: BosStr, St> SessionViewBuilder<S, St>
 where
-    S: session_view_state::State,
-    S::NodeId: session_view_state::IsUnset,
+    St: session_view_state::State,
+    St::NodeId: session_view_state::IsUnset,
 {
     /// Set the `nodeId` field (required)
     pub fn node_id(
         mut self,
         value: impl Into<S>,
-    ) -> SessionViewBuilder<'a, session_view_state::SetNodeId<S>> {
+    ) -> SessionViewBuilder<S, session_view_state::SetNodeId<St>> {
         self._fields.2 = Option::Some(value.into());
         SessionViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: session_view_state::State> SessionViewBuilder<'a, S> {
+impl<S: BosStr, St: session_view_state::State> SessionViewBuilder<S, St> {
     /// Set the `relayUrl` field (optional)
     pub fn relay_url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -3031,74 +3122,74 @@ impl<'a, S: session_view_state::State> SessionViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S> SessionViewBuilder<'a, S>
+impl<S: BosStr, St> SessionViewBuilder<S, St>
 where
-    S: session_view_state::State,
-    S::Resource: session_view_state::IsUnset,
+    St: session_view_state::State,
+    St::Resource: session_view_state::IsUnset,
 {
     /// Set the `resource` field (required)
     pub fn resource(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> SessionViewBuilder<'a, session_view_state::SetResource<S>> {
+    ) -> SessionViewBuilder<S, session_view_state::SetResource<St>> {
         self._fields.4 = Option::Some(value.into());
         SessionViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SessionViewBuilder<'a, S>
+impl<S: BosStr, St> SessionViewBuilder<S, St>
 where
-    S: session_view_state::State,
-    S::Uri: session_view_state::IsUnset,
+    St: session_view_state::State,
+    St::Uri: session_view_state::IsUnset,
 {
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> SessionViewBuilder<'a, session_view_state::SetUri<S>> {
+    ) -> SessionViewBuilder<S, session_view_state::SetUri<St>> {
         self._fields.5 = Option::Some(value.into());
         SessionViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SessionViewBuilder<'a, S>
+impl<S: BosStr, St> SessionViewBuilder<S, St>
 where
-    S: session_view_state::State,
-    S::User: session_view_state::IsUnset,
+    St: session_view_state::State,
+    St::User: session_view_state::IsUnset,
 {
     /// Set the `user` field (required)
     pub fn user(
         mut self,
         value: impl Into<ProfileViewBasic<S>>,
-    ) -> SessionViewBuilder<'a, session_view_state::SetUser<S>> {
+    ) -> SessionViewBuilder<S, session_view_state::SetUser<St>> {
         self._fields.6 = Option::Some(value.into());
         SessionViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SessionViewBuilder<'a, S>
+impl<S: BosStr, St> SessionViewBuilder<S, St>
 where
-    S: session_view_state::State,
-    S::CreatedAt: session_view_state::IsSet,
-    S::Uri: session_view_state::IsSet,
-    S::Resource: session_view_state::IsSet,
-    S::User: session_view_state::IsSet,
-    S::NodeId: session_view_state::IsSet,
+    St: session_view_state::State,
+    St::User: session_view_state::IsSet,
+    St::Uri: session_view_state::IsSet,
+    St::CreatedAt: session_view_state::IsSet,
+    St::NodeId: session_view_state::IsSet,
+    St::Resource: session_view_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> SessionView<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> SessionView<S> {
         SessionView {
             created_at: self._fields.0.unwrap(),
             expires_at: self._fields.1,
@@ -3110,11 +3201,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> SessionView<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> SessionView<S> {
         SessionView {
             created_at: self._fields.0.unwrap(),
             expires_at: self._fields.1,

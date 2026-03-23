@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -29,18 +29,18 @@ use crate::blog_pckt::block::list_item::ListItem;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct BulletList<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct BulletList<S: BosStr = DefaultStr> {
     ///Array of list items
     pub content: Vec<ListItem<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for BulletList<S> {
+impl<S: BosStr> LexiconSchema for BulletList<S> {
     fn nsid() -> &'static str {
         "blog.pckt.block.bulletList"
     }
@@ -74,9 +74,9 @@ pub mod bullet_list_state {
         type Content = Unset;
     }
     ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
+    pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetContent<St> {}
+    impl<St: State> State for SetContent<St> {
         type Content = Set<members::content>;
     }
     /// Marker types for field names
@@ -87,67 +87,67 @@ pub mod bullet_list_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct BulletListBuilder<'a, S: bullet_list_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct BulletListBuilder<S: BosStr, St: bullet_list_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<ListItem<S>>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> BulletList<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> BulletListBuilder<'a, bullet_list_state::Empty> {
+impl<S: BosStr> BulletList<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> BulletListBuilder<S, bullet_list_state::Empty> {
         BulletListBuilder::new()
     }
 }
 
-impl<'a> BulletListBuilder<'a, bullet_list_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> BulletListBuilder<S, bullet_list_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         BulletListBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BulletListBuilder<'a, S>
+impl<S: BosStr, St> BulletListBuilder<S, St>
 where
-    S: bullet_list_state::State,
-    S::Content: bullet_list_state::IsUnset,
+    St: bullet_list_state::State,
+    St::Content: bullet_list_state::IsUnset,
 {
     /// Set the `content` field (required)
     pub fn content(
         mut self,
         value: impl Into<Vec<ListItem<S>>>,
-    ) -> BulletListBuilder<'a, bullet_list_state::SetContent<S>> {
+    ) -> BulletListBuilder<S, bullet_list_state::SetContent<St>> {
         self._fields.0 = Option::Some(value.into());
         BulletListBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BulletListBuilder<'a, S>
+impl<S: BosStr, St> BulletListBuilder<S, St>
 where
-    S: bullet_list_state::State,
-    S::Content: bullet_list_state::IsSet,
+    St: bullet_list_state::State,
+    St::Content: bullet_list_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> BulletList<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> BulletList<S> {
         BulletList {
             content: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> BulletList<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> BulletList<S> {
         BulletList {
             content: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

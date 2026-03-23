@@ -7,7 +7,7 @@
 
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,11 +26,11 @@ use serde::{Serialize, Deserialize};
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Browser<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Browser<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -45,11 +45,11 @@ pub struct Browser<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Machine<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Machine<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub app: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -62,7 +62,7 @@ pub struct Machine<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Browser<S> {
+impl<S: BosStr> LexiconSchema for Browser<S> {
     fn nsid() -> &'static str {
         "blue.zio.atfile.finger"
     }
@@ -77,7 +77,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Browser<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Machine<S> {
+impl<S: BosStr> LexiconSchema for Machine<S> {
     fn nsid() -> &'static str {
         "blue.zio.atfile.finger"
     }

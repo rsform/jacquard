@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, Handle};
 use jacquard_common::types::value::Data;
@@ -18,14 +18,14 @@ use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetSessionOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetSessionOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub active: Option<bool>,
     pub did: Did<S>,
@@ -41,23 +41,21 @@ pub struct GetSessionOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///If active=false, this optional field indicates a possible reason for why the account is not active. If active=false and no status is supplied, then the host makes no claim for why the repository is no longer being hosted.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub status: Option<GetSessionOutputStatus<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// If active=false, this optional field indicates a possible reason for why the account is not active. If active=false and no status is supplied, then the host makes no claim for why the repository is no longer being hosted.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum GetSessionOutputStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum GetSessionOutputStatus<S: BosStr = DefaultStr> {
     Takendown,
     Suspended,
     Deactivated,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> GetSessionOutputStatus<S> {
+impl<S: BosStr> GetSessionOutputStatus<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Takendown => "takendown",
@@ -77,19 +75,19 @@ impl<S: Bos<str> + AsRef<str>> GetSessionOutputStatus<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for GetSessionOutputStatus<S> {
+impl<S: BosStr> core::fmt::Display for GetSessionOutputStatus<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for GetSessionOutputStatus<S> {
+impl<S: BosStr> AsRef<str> for GetSessionOutputStatus<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for GetSessionOutputStatus<S> {
+impl<S: BosStr> Serialize for GetSessionOutputStatus<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -98,8 +96,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for GetSessionOutputStatus<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for GetSessionOutputStatus<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for GetSessionOutputStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -109,14 +106,18 @@ for GetSessionOutputStatus<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for GetSessionOutputStatus<S> {
+impl<S: BosStr + Default> Default for GetSessionOutputStatus<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for GetSessionOutputStatus<S> {
-    type Output = GetSessionOutputStatus<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for GetSessionOutputStatus<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = GetSessionOutputStatus<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             GetSessionOutputStatus::Takendown => GetSessionOutputStatus::Takendown,
@@ -138,7 +139,7 @@ pub struct GetSessionResponse;
 impl jacquard_common::xrpc::XrpcResp for GetSessionResponse {
     const NSID: &'static str = "com.atproto.server.getSession";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetSessionOutput<S>;
+    type Output<S: BosStr> = GetSessionOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
@@ -153,6 +154,6 @@ pub struct GetSessionRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetSessionRequest {
     const PATH: &'static str = "/xrpc/com.atproto.server.getSession";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetSession;
+    type Request<S: BosStr> = GetSession;
     type Response = GetSessionResponse;
 }

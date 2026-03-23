@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "dev.fudgeu.experimental.atforumv1.forum.category",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Category<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Category<S: BosStr = DefaultStr> {
     pub category_type: S,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
@@ -55,18 +55,18 @@ pub struct Category<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CategoryGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CategoryGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Category<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Category<S> {
+impl<S: BosStr> Category<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, CategoryRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -79,17 +79,17 @@ pub struct CategoryRecord;
 impl XrpcResp for CategoryRecord {
     const NSID: &'static str = "dev.fudgeu.experimental.atforumv1.forum.category";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = CategoryGetRecordOutput<S>;
+    type Output<S: BosStr> = CategoryGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<CategoryGetRecordOutput<S>> for Category<S> {
+impl<S: BosStr> From<CategoryGetRecordOutput<S>> for Category<S> {
     fn from(output: CategoryGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Category<S> {
+impl<S: BosStr> Collection for Category<S> {
     const NSID: &'static str = "dev.fudgeu.experimental.atforumv1.forum.category";
     type Record = CategoryRecord;
 }
@@ -99,7 +99,7 @@ impl Collection for CategoryRecord {
     type Record = CategoryRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Category<S> {
+impl<S: BosStr> LexiconSchema for Category<S> {
     fn nsid() -> &'static str {
         "dev.fudgeu.experimental.atforumv1.forum.category"
     }
@@ -167,99 +167,99 @@ pub mod category_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Group;
+        type Name;
         type CategoryType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Group = Unset;
+        type Name = Unset;
         type CategoryType = Unset;
     }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Group = S::Group;
-        type CategoryType = S::CategoryType;
-    }
     ///State transition - sets the `group` field to Set
-    pub struct SetGroup<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGroup<S> {}
-    impl<S: State> State for SetGroup<S> {
-        type Name = S::Name;
+    pub struct SetGroup<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetGroup<St> {}
+    impl<St: State> State for SetGroup<St> {
         type Group = Set<members::group>;
-        type CategoryType = S::CategoryType;
+        type Name = St::Name;
+        type CategoryType = St::CategoryType;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Group = St::Group;
+        type Name = Set<members::name>;
+        type CategoryType = St::CategoryType;
     }
     ///State transition - sets the `category_type` field to Set
-    pub struct SetCategoryType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCategoryType<S> {}
-    impl<S: State> State for SetCategoryType<S> {
-        type Name = S::Name;
-        type Group = S::Group;
+    pub struct SetCategoryType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCategoryType<St> {}
+    impl<St: State> State for SetCategoryType<St> {
+        type Group = St::Group;
+        type Name = St::Name;
         type CategoryType = Set<members::category_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `group` field
         pub struct group(());
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `category_type` field
         pub struct category_type(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct CategoryBuilder<'a, S: category_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct CategoryBuilder<S: BosStr, St: category_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>, Option<AtUri<S>>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Category<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> CategoryBuilder<'a, category_state::Empty> {
+impl<S: BosStr> Category<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> CategoryBuilder<S, category_state::Empty> {
         CategoryBuilder::new()
     }
 }
 
-impl<'a> CategoryBuilder<'a, category_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> CategoryBuilder<S, category_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         CategoryBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CategoryBuilder<'a, S>
+impl<S: BosStr, St> CategoryBuilder<S, St>
 where
-    S: category_state::State,
-    S::CategoryType: category_state::IsUnset,
+    St: category_state::State,
+    St::CategoryType: category_state::IsUnset,
 {
     /// Set the `categoryType` field (required)
     pub fn category_type(
         mut self,
         value: impl Into<S>,
-    ) -> CategoryBuilder<'a, category_state::SetCategoryType<S>> {
+    ) -> CategoryBuilder<S, category_state::SetCategoryType<St>> {
         self._fields.0 = Option::Some(value.into());
         CategoryBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: category_state::State> CategoryBuilder<'a, S> {
+impl<S: BosStr, St: category_state::State> CategoryBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -272,53 +272,53 @@ impl<'a, S: category_state::State> CategoryBuilder<'a, S> {
     }
 }
 
-impl<'a, S> CategoryBuilder<'a, S>
+impl<S: BosStr, St> CategoryBuilder<S, St>
 where
-    S: category_state::State,
-    S::Group: category_state::IsUnset,
+    St: category_state::State,
+    St::Group: category_state::IsUnset,
 {
     /// Set the `group` field (required)
     pub fn group(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> CategoryBuilder<'a, category_state::SetGroup<S>> {
+    ) -> CategoryBuilder<S, category_state::SetGroup<St>> {
         self._fields.2 = Option::Some(value.into());
         CategoryBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CategoryBuilder<'a, S>
+impl<S: BosStr, St> CategoryBuilder<S, St>
 where
-    S: category_state::State,
-    S::Name: category_state::IsUnset,
+    St: category_state::State,
+    St::Name: category_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> CategoryBuilder<'a, category_state::SetName<S>> {
+    ) -> CategoryBuilder<S, category_state::SetName<St>> {
         self._fields.3 = Option::Some(value.into());
         CategoryBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CategoryBuilder<'a, S>
+impl<S: BosStr, St> CategoryBuilder<S, St>
 where
-    S: category_state::State,
-    S::Name: category_state::IsSet,
-    S::Group: category_state::IsSet,
-    S::CategoryType: category_state::IsSet,
+    St: category_state::State,
+    St::Group: category_state::IsSet,
+    St::Name: category_state::IsSet,
+    St::CategoryType: category_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Category<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Category<S> {
         Category {
             category_type: self._fields.0.unwrap(),
             description: self._fields.1,
@@ -327,11 +327,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Category<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Category<S> {
         Category {
             category_type: self._fields.0.unwrap(),
             description: self._fields.1,

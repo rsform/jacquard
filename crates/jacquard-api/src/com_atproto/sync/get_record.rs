@@ -6,27 +6,29 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[allow(unused_imports)]
+use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, Nsid, RecordKey, Rkey};
+use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetRecord<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct GetRecord<S: BosStr = DefaultStr> {
     pub collection: Nsid<S>,
-    #[serde(borrow)]
     pub did: Did<S>,
-    #[serde(borrow)]
     pub rkey: RecordKey<Rkey<S>>,
 }
 
@@ -52,21 +54,18 @@ pub struct GetRecordOutput {
 #[serde(tag = "error", content = "message")]
 pub enum GetRecordError {
     #[serde(rename = "RecordNotFound")]
-    RecordNotFound(Option<jacquard_common::deps::smol_str::SmolStr>),
+    RecordNotFound(Option<SmolStr>),
     #[serde(rename = "RepoNotFound")]
-    RepoNotFound(Option<jacquard_common::deps::smol_str::SmolStr>),
+    RepoNotFound(Option<SmolStr>),
     #[serde(rename = "RepoTakendown")]
-    RepoTakendown(Option<jacquard_common::deps::smol_str::SmolStr>),
+    RepoTakendown(Option<SmolStr>),
     #[serde(rename = "RepoSuspended")]
-    RepoSuspended(Option<jacquard_common::deps::smol_str::SmolStr>),
+    RepoSuspended(Option<SmolStr>),
     #[serde(rename = "RepoDeactivated")]
-    RepoDeactivated(Option<jacquard_common::deps::smol_str::SmolStr>),
+    RepoDeactivated(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: jacquard_common::deps::smol_str::SmolStr,
-        message: Option<jacquard_common::deps::smol_str::SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for GetRecordError {
@@ -123,9 +122,9 @@ pub struct GetRecordResponse;
 impl jacquard_common::xrpc::XrpcResp for GetRecordResponse {
     const NSID: &'static str = "com.atproto.sync.getRecord";
     const ENCODING: &'static str = "application/vnd.ipld.car";
-    type Output<S: Bos<str> + AsRef<str>> = GetRecordOutput;
+    type Output<S: BosStr> = GetRecordOutput;
     type Err = GetRecordError;
-    fn encode_output<S: Bos<str> + AsRef<str>>(
+    fn encode_output<S: BosStr>(
         output: &Self::Output<S>,
     ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError>
     where
@@ -137,7 +136,7 @@ impl jacquard_common::xrpc::XrpcResp for GetRecordResponse {
         body: &'de [u8],
     ) -> Result<Self::Output<S>, jacquard_common::error::DecodeError>
     where
-        S: Bos<str> + AsRef<str> + Deserialize<'de>,
+        S: BosStr + Deserialize<'de>,
         Self::Output<S>: Deserialize<'de>,
     {
         Ok(GetRecordOutput {
@@ -146,8 +145,7 @@ impl jacquard_common::xrpc::XrpcResp for GetRecordResponse {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetRecord<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetRecord<S> {
     const NSID: &'static str = "com.atproto.sync.getRecord";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetRecordResponse;
@@ -158,7 +156,7 @@ pub struct GetRecordRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetRecordRequest {
     const PATH: &'static str = "/xrpc/com.atproto.sync.getRecord";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetRecord<S>;
+    type Request<S: BosStr> = GetRecord<S>;
     type Response = GetRecordResponse;
 }
 
@@ -172,145 +170,145 @@ pub mod get_record_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
         type Collection;
+        type Did;
         type Rkey;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
         type Collection = Unset;
+        type Did = Unset;
         type Rkey = Unset;
     }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Did = Set<members::did>;
-        type Collection = S::Collection;
-        type Rkey = S::Rkey;
-    }
     ///State transition - sets the `collection` field to Set
-    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCollection<S> {}
-    impl<S: State> State for SetCollection<S> {
-        type Did = S::Did;
+    pub struct SetCollection<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCollection<St> {}
+    impl<St: State> State for SetCollection<St> {
         type Collection = Set<members::collection>;
-        type Rkey = S::Rkey;
+        type Did = St::Did;
+        type Rkey = St::Rkey;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
+        type Collection = St::Collection;
+        type Did = Set<members::did>;
+        type Rkey = St::Rkey;
     }
     ///State transition - sets the `rkey` field to Set
-    pub struct SetRkey<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRkey<S> {}
-    impl<S: State> State for SetRkey<S> {
-        type Did = S::Did;
-        type Collection = S::Collection;
+    pub struct SetRkey<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRkey<St> {}
+    impl<St: State> State for SetRkey<St> {
+        type Collection = St::Collection;
+        type Did = St::Did;
         type Rkey = Set<members::rkey>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `collection` field
         pub struct collection(());
+        ///Marker type for the `did` field
+        pub struct did(());
         ///Marker type for the `rkey` field
         pub struct rkey(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetRecordBuilder<'a, S: get_record_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetRecordBuilder<S: BosStr, St: get_record_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Nsid<S>>, Option<Did<S>>, Option<RecordKey<Rkey<S>>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetRecord<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetRecordBuilder<'a, get_record_state::Empty> {
+impl<S: BosStr> GetRecord<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetRecordBuilder<S, get_record_state::Empty> {
         GetRecordBuilder::new()
     }
 }
 
-impl<'a> GetRecordBuilder<'a, get_record_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetRecordBuilder<S, get_record_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetRecordBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetRecordBuilder<'a, S>
+impl<S: BosStr, St> GetRecordBuilder<S, St>
 where
-    S: get_record_state::State,
-    S::Collection: get_record_state::IsUnset,
+    St: get_record_state::State,
+    St::Collection: get_record_state::IsUnset,
 {
     /// Set the `collection` field (required)
     pub fn collection(
         mut self,
         value: impl Into<Nsid<S>>,
-    ) -> GetRecordBuilder<'a, get_record_state::SetCollection<S>> {
+    ) -> GetRecordBuilder<S, get_record_state::SetCollection<St>> {
         self._fields.0 = Option::Some(value.into());
         GetRecordBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetRecordBuilder<'a, S>
+impl<S: BosStr, St> GetRecordBuilder<S, St>
 where
-    S: get_record_state::State,
-    S::Did: get_record_state::IsUnset,
+    St: get_record_state::State,
+    St::Did: get_record_state::IsUnset,
 {
     /// Set the `did` field (required)
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> GetRecordBuilder<'a, get_record_state::SetDid<S>> {
+    ) -> GetRecordBuilder<S, get_record_state::SetDid<St>> {
         self._fields.1 = Option::Some(value.into());
         GetRecordBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetRecordBuilder<'a, S>
+impl<S: BosStr, St> GetRecordBuilder<S, St>
 where
-    S: get_record_state::State,
-    S::Rkey: get_record_state::IsUnset,
+    St: get_record_state::State,
+    St::Rkey: get_record_state::IsUnset,
 {
     /// Set the `rkey` field (required)
     pub fn rkey(
         mut self,
         value: impl Into<RecordKey<Rkey<S>>>,
-    ) -> GetRecordBuilder<'a, get_record_state::SetRkey<S>> {
+    ) -> GetRecordBuilder<S, get_record_state::SetRkey<St>> {
         self._fields.2 = Option::Some(value.into());
         GetRecordBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetRecordBuilder<'a, S>
+impl<S: BosStr, St> GetRecordBuilder<S, St>
 where
-    S: get_record_state::State,
-    S::Did: get_record_state::IsSet,
-    S::Collection: get_record_state::IsSet,
-    S::Rkey: get_record_state::IsSet,
+    St: get_record_state::State,
+    St::Collection: get_record_state::IsSet,
+    St::Did: get_record_state::IsSet,
+    St::Rkey: get_record_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetRecord<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetRecord<S> {
         GetRecord {
             collection: self._fields.0.unwrap(),
             did: self._fields.1.unwrap(),

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -38,11 +38,11 @@ use crate::ai_syui::log::chat;
     rename = "ai.syui.log.chat",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Chat<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Chat<S: BosStr = DefaultStr> {
     ///Strong reference to a Bluesky post.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub bsky_post_ref: Option<StrongRef<S>>,
@@ -95,11 +95,11 @@ pub struct Chat<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ChatGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ChatGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
@@ -112,11 +112,11 @@ pub struct ChatGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Markdown<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Markdown<S: BosStr = DefaultStr> {
     ///Markdown text content.
     pub text: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -129,11 +129,11 @@ pub struct Markdown<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Translation<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Translation<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub content: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -148,11 +148,11 @@ pub struct Translation<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct TranslationMap<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct TranslationMap<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub en: Option<chat::Translation<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -161,7 +161,7 @@ pub struct TranslationMap<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Chat<S> {
+impl<S: BosStr> Chat<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, ChatRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -174,17 +174,17 @@ pub struct ChatRecord;
 impl XrpcResp for ChatRecord {
     const NSID: &'static str = "ai.syui.log.chat";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ChatGetRecordOutput<S>;
+    type Output<S: BosStr> = ChatGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<ChatGetRecordOutput<S>> for Chat<S> {
+impl<S: BosStr> From<ChatGetRecordOutput<S>> for Chat<S> {
     fn from(output: ChatGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Chat<S> {
+impl<S: BosStr> Collection for Chat<S> {
     const NSID: &'static str = "ai.syui.log.chat";
     type Record = ChatRecord;
 }
@@ -194,7 +194,7 @@ impl Collection for ChatRecord {
     type Record = ChatRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Chat<S> {
+impl<S: BosStr> LexiconSchema for Chat<S> {
     fn nsid() -> &'static str {
         "ai.syui.log.chat"
     }
@@ -303,7 +303,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Chat<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Markdown<S> {
+impl<S: BosStr> LexiconSchema for Markdown<S> {
     fn nsid() -> &'static str {
         "ai.syui.log.chat"
     }
@@ -342,7 +342,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Markdown<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Translation<S> {
+impl<S: BosStr> LexiconSchema for Translation<S> {
     fn nsid() -> &'static str {
         "ai.syui.log.chat"
     }
@@ -401,7 +401,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Translation<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for TranslationMap<S> {
+impl<S: BosStr> LexiconSchema for TranslationMap<S> {
     fn nsid() -> &'static str {
         "ai.syui.log.chat"
     }
@@ -439,27 +439,27 @@ pub mod chat_state {
         type PublishedAt = Unset;
     }
     ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
         type Title = Set<members::title>;
-        type Site = S::Site;
-        type PublishedAt = S::PublishedAt;
+        type Site = St::Site;
+        type PublishedAt = St::PublishedAt;
     }
     ///State transition - sets the `site` field to Set
-    pub struct SetSite<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSite<S> {}
-    impl<S: State> State for SetSite<S> {
-        type Title = S::Title;
+    pub struct SetSite<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSite<St> {}
+    impl<St: State> State for SetSite<St> {
+        type Title = St::Title;
         type Site = Set<members::site>;
-        type PublishedAt = S::PublishedAt;
+        type PublishedAt = St::PublishedAt;
     }
     ///State transition - sets the `published_at` field to Set
-    pub struct SetPublishedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPublishedAt<S> {}
-    impl<S: State> State for SetPublishedAt<S> {
-        type Title = S::Title;
-        type Site = S::Site;
+    pub struct SetPublishedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPublishedAt<St> {}
+    impl<St: State> State for SetPublishedAt<St> {
+        type Title = St::Title;
+        type Site = St::Site;
         type PublishedAt = Set<members::published_at>;
     }
     /// Marker types for field names
@@ -474,9 +474,9 @@ pub mod chat_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ChatBuilder<'a, S: chat_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ChatBuilder<S: BosStr, St: chat_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<StrongRef<S>>,
         Option<chat::Markdown<S>>,
@@ -494,18 +494,18 @@ pub struct ChatBuilder<'a, S: chat_state::State> {
         Option<chat::TranslationMap<S>>,
         Option<Datetime>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Chat<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ChatBuilder<'a, chat_state::Empty> {
+impl<S: BosStr> Chat<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ChatBuilder<S, chat_state::Empty> {
         ChatBuilder::new()
     }
 }
 
-impl<'a> ChatBuilder<'a, chat_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ChatBuilder<S, chat_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ChatBuilder {
             _state: PhantomData,
@@ -526,12 +526,12 @@ impl<'a> ChatBuilder<'a, chat_state::Empty> {
                 None,
                 None,
             ),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: chat_state::State> ChatBuilder<'a, S> {
+impl<S: BosStr, St: chat_state::State> ChatBuilder<S, St> {
     /// Set the `bskyPostRef` field (optional)
     pub fn bsky_post_ref(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -544,7 +544,7 @@ impl<'a, S: chat_state::State> ChatBuilder<'a, S> {
     }
 }
 
-impl<'a, S: chat_state::State> ChatBuilder<'a, S> {
+impl<S: BosStr, St: chat_state::State> ChatBuilder<S, St> {
     /// Set the `content` field (optional)
     pub fn content(mut self, value: impl Into<Option<chat::Markdown<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -557,7 +557,7 @@ impl<'a, S: chat_state::State> ChatBuilder<'a, S> {
     }
 }
 
-impl<'a, S: chat_state::State> ChatBuilder<'a, S> {
+impl<S: BosStr, St: chat_state::State> ChatBuilder<S, St> {
     /// Set the `coverImage` field (optional)
     pub fn cover_image(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -570,7 +570,7 @@ impl<'a, S: chat_state::State> ChatBuilder<'a, S> {
     }
 }
 
-impl<'a, S: chat_state::State> ChatBuilder<'a, S> {
+impl<S: BosStr, St: chat_state::State> ChatBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -583,7 +583,7 @@ impl<'a, S: chat_state::State> ChatBuilder<'a, S> {
     }
 }
 
-impl<'a, S: chat_state::State> ChatBuilder<'a, S> {
+impl<S: BosStr, St: chat_state::State> ChatBuilder<S, St> {
     /// Set the `langs` field (optional)
     pub fn langs(mut self, value: impl Into<Option<Vec<Language>>>) -> Self {
         self._fields.4 = value.into();
@@ -596,7 +596,7 @@ impl<'a, S: chat_state::State> ChatBuilder<'a, S> {
     }
 }
 
-impl<'a, S: chat_state::State> ChatBuilder<'a, S> {
+impl<S: BosStr, St: chat_state::State> ChatBuilder<S, St> {
     /// Set the `parent` field (optional)
     pub fn parent(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -609,7 +609,7 @@ impl<'a, S: chat_state::State> ChatBuilder<'a, S> {
     }
 }
 
-impl<'a, S: chat_state::State> ChatBuilder<'a, S> {
+impl<S: BosStr, St: chat_state::State> ChatBuilder<S, St> {
     /// Set the `path` field (optional)
     pub fn path(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.6 = value.into();
@@ -622,26 +622,26 @@ impl<'a, S: chat_state::State> ChatBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ChatBuilder<'a, S>
+impl<S: BosStr, St> ChatBuilder<S, St>
 where
-    S: chat_state::State,
-    S::PublishedAt: chat_state::IsUnset,
+    St: chat_state::State,
+    St::PublishedAt: chat_state::IsUnset,
 {
     /// Set the `publishedAt` field (required)
     pub fn published_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ChatBuilder<'a, chat_state::SetPublishedAt<S>> {
+    ) -> ChatBuilder<S, chat_state::SetPublishedAt<St>> {
         self._fields.7 = Option::Some(value.into());
         ChatBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: chat_state::State> ChatBuilder<'a, S> {
+impl<S: BosStr, St: chat_state::State> ChatBuilder<S, St> {
     /// Set the `root` field (optional)
     pub fn root(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.8 = value.into();
@@ -654,26 +654,26 @@ impl<'a, S: chat_state::State> ChatBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ChatBuilder<'a, S>
+impl<S: BosStr, St> ChatBuilder<S, St>
 where
-    S: chat_state::State,
-    S::Site: chat_state::IsUnset,
+    St: chat_state::State,
+    St::Site: chat_state::IsUnset,
 {
     /// Set the `site` field (required)
     pub fn site(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> ChatBuilder<'a, chat_state::SetSite<S>> {
+    ) -> ChatBuilder<S, chat_state::SetSite<St>> {
         self._fields.9 = Option::Some(value.into());
         ChatBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: chat_state::State> ChatBuilder<'a, S> {
+impl<S: BosStr, St: chat_state::State> ChatBuilder<S, St> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.10 = value.into();
@@ -686,7 +686,7 @@ impl<'a, S: chat_state::State> ChatBuilder<'a, S> {
     }
 }
 
-impl<'a, S: chat_state::State> ChatBuilder<'a, S> {
+impl<S: BosStr, St: chat_state::State> ChatBuilder<S, St> {
     /// Set the `textContent` field (optional)
     pub fn text_content(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.11 = value.into();
@@ -699,26 +699,26 @@ impl<'a, S: chat_state::State> ChatBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ChatBuilder<'a, S>
+impl<S: BosStr, St> ChatBuilder<S, St>
 where
-    S: chat_state::State,
-    S::Title: chat_state::IsUnset,
+    St: chat_state::State,
+    St::Title: chat_state::IsUnset,
 {
     /// Set the `title` field (required)
     pub fn title(
         mut self,
         value: impl Into<S>,
-    ) -> ChatBuilder<'a, chat_state::SetTitle<S>> {
+    ) -> ChatBuilder<S, chat_state::SetTitle<St>> {
         self._fields.12 = Option::Some(value.into());
         ChatBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: chat_state::State> ChatBuilder<'a, S> {
+impl<S: BosStr, St: chat_state::State> ChatBuilder<S, St> {
     /// Set the `translations` field (optional)
     pub fn translations(
         mut self,
@@ -734,7 +734,7 @@ impl<'a, S: chat_state::State> ChatBuilder<'a, S> {
     }
 }
 
-impl<'a, S: chat_state::State> ChatBuilder<'a, S> {
+impl<S: BosStr, St: chat_state::State> ChatBuilder<S, St> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.14 = value.into();
@@ -747,15 +747,15 @@ impl<'a, S: chat_state::State> ChatBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ChatBuilder<'a, S>
+impl<S: BosStr, St> ChatBuilder<S, St>
 where
-    S: chat_state::State,
-    S::Title: chat_state::IsSet,
-    S::Site: chat_state::IsSet,
-    S::PublishedAt: chat_state::IsSet,
+    St: chat_state::State,
+    St::Title: chat_state::IsSet,
+    St::Site: chat_state::IsSet,
+    St::PublishedAt: chat_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Chat<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Chat<S> {
         Chat {
             bsky_post_ref: self._fields.0,
             content: self._fields.1,
@@ -775,8 +775,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Chat<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Chat<S> {
         Chat {
             bsky_post_ref: self._fields.0,
             content: self._fields.1,

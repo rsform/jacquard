@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use crate::net_mimonelu::klearsky::repost_mutes;
     rename = "net.mimonelu.klearsky.repostMutes",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct RepostMutes<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct RepostMutes<S: BosStr = DefaultStr> {
     ///Timestamp when this record was created (or last rewritten).
     pub created_at: Datetime,
     ///List of subjects (DIDs) whose reposts are muted in this client. Each entry includes when it was added.
@@ -55,11 +55,11 @@ pub struct RepostMutes<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct RepostMutesGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct RepostMutesGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
@@ -72,11 +72,11 @@ pub struct RepostMutesGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Subject<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Subject<S: BosStr = DefaultStr> {
     ///Timestamp when this DID was added to the mute list.
     pub created_at: Datetime,
     ///DID of the user whose reposts are muted.
@@ -85,7 +85,7 @@ pub struct Subject<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> RepostMutes<S> {
+impl<S: BosStr> RepostMutes<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, RepostMutesRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -98,17 +98,17 @@ pub struct RepostMutesRecord;
 impl XrpcResp for RepostMutesRecord {
     const NSID: &'static str = "net.mimonelu.klearsky.repostMutes";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = RepostMutesGetRecordOutput<S>;
+    type Output<S: BosStr> = RepostMutesGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<RepostMutesGetRecordOutput<S>> for RepostMutes<S> {
+impl<S: BosStr> From<RepostMutesGetRecordOutput<S>> for RepostMutes<S> {
     fn from(output: RepostMutesGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for RepostMutes<S> {
+impl<S: BosStr> Collection for RepostMutes<S> {
     const NSID: &'static str = "net.mimonelu.klearsky.repostMutes";
     type Record = RepostMutesRecord;
 }
@@ -118,7 +118,7 @@ impl Collection for RepostMutesRecord {
     type Record = RepostMutesRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for RepostMutes<S> {
+impl<S: BosStr> LexiconSchema for RepostMutes<S> {
     fn nsid() -> &'static str {
         "net.mimonelu.klearsky.repostMutes"
     }
@@ -133,7 +133,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for RepostMutes<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Subject<S> {
+impl<S: BosStr> LexiconSchema for Subject<S> {
     fn nsid() -> &'static str {
         "net.mimonelu.klearsky.repostMutes"
     }
@@ -158,122 +158,122 @@ pub mod repost_mutes_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Subjects;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Subjects = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Subjects = S::Subjects;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `subjects` field to Set
-    pub struct SetSubjects<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubjects<S> {}
-    impl<S: State> State for SetSubjects<S> {
-        type CreatedAt = S::CreatedAt;
+    pub struct SetSubjects<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubjects<St> {}
+    impl<St: State> State for SetSubjects<St> {
         type Subjects = Set<members::subjects>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Subjects = St::Subjects;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `subjects` field
         pub struct subjects(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct RepostMutesBuilder<'a, S: repost_mutes_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct RepostMutesBuilder<S: BosStr, St: repost_mutes_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<Vec<repost_mutes::Subject<S>>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> RepostMutes<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> RepostMutesBuilder<'a, repost_mutes_state::Empty> {
+impl<S: BosStr> RepostMutes<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> RepostMutesBuilder<S, repost_mutes_state::Empty> {
         RepostMutesBuilder::new()
     }
 }
 
-impl<'a> RepostMutesBuilder<'a, repost_mutes_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> RepostMutesBuilder<S, repost_mutes_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         RepostMutesBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RepostMutesBuilder<'a, S>
+impl<S: BosStr, St> RepostMutesBuilder<S, St>
 where
-    S: repost_mutes_state::State,
-    S::CreatedAt: repost_mutes_state::IsUnset,
+    St: repost_mutes_state::State,
+    St::CreatedAt: repost_mutes_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> RepostMutesBuilder<'a, repost_mutes_state::SetCreatedAt<S>> {
+    ) -> RepostMutesBuilder<S, repost_mutes_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         RepostMutesBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RepostMutesBuilder<'a, S>
+impl<S: BosStr, St> RepostMutesBuilder<S, St>
 where
-    S: repost_mutes_state::State,
-    S::Subjects: repost_mutes_state::IsUnset,
+    St: repost_mutes_state::State,
+    St::Subjects: repost_mutes_state::IsUnset,
 {
     /// Set the `subjects` field (required)
     pub fn subjects(
         mut self,
         value: impl Into<Vec<repost_mutes::Subject<S>>>,
-    ) -> RepostMutesBuilder<'a, repost_mutes_state::SetSubjects<S>> {
+    ) -> RepostMutesBuilder<S, repost_mutes_state::SetSubjects<St>> {
         self._fields.1 = Option::Some(value.into());
         RepostMutesBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RepostMutesBuilder<'a, S>
+impl<S: BosStr, St> RepostMutesBuilder<S, St>
 where
-    S: repost_mutes_state::State,
-    S::CreatedAt: repost_mutes_state::IsSet,
-    S::Subjects: repost_mutes_state::IsSet,
+    St: repost_mutes_state::State,
+    St::Subjects: repost_mutes_state::IsSet,
+    St::CreatedAt: repost_mutes_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> RepostMutes<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> RepostMutes<S> {
         RepostMutes {
             created_at: self._fields.0.unwrap(),
             subjects: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> RepostMutes<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> RepostMutes<S> {
         RepostMutes {
             created_at: self._fields.0.unwrap(),
             subjects: self._fields.1.unwrap(),
@@ -417,17 +417,17 @@ pub mod subject_state {
         type Did = Unset;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
-        type Did = S::Did;
+        type Did = St::Did;
     }
     ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type CreatedAt = S::CreatedAt;
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
+        type CreatedAt = St::CreatedAt;
         type Did = Set<members::did>;
     }
     /// Marker types for field names
@@ -440,88 +440,85 @@ pub mod subject_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct SubjectBuilder<'a, S: subject_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct SubjectBuilder<S: BosStr, St: subject_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<Did<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Subject<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> SubjectBuilder<'a, subject_state::Empty> {
+impl<S: BosStr> Subject<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> SubjectBuilder<S, subject_state::Empty> {
         SubjectBuilder::new()
     }
 }
 
-impl<'a> SubjectBuilder<'a, subject_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> SubjectBuilder<S, subject_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SubjectBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SubjectBuilder<'a, S>
+impl<S: BosStr, St> SubjectBuilder<S, St>
 where
-    S: subject_state::State,
-    S::CreatedAt: subject_state::IsUnset,
+    St: subject_state::State,
+    St::CreatedAt: subject_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> SubjectBuilder<'a, subject_state::SetCreatedAt<S>> {
+    ) -> SubjectBuilder<S, subject_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         SubjectBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SubjectBuilder<'a, S>
+impl<S: BosStr, St> SubjectBuilder<S, St>
 where
-    S: subject_state::State,
-    S::Did: subject_state::IsUnset,
+    St: subject_state::State,
+    St::Did: subject_state::IsUnset,
 {
     /// Set the `did` field (required)
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> SubjectBuilder<'a, subject_state::SetDid<S>> {
+    ) -> SubjectBuilder<S, subject_state::SetDid<St>> {
         self._fields.1 = Option::Some(value.into());
         SubjectBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SubjectBuilder<'a, S>
+impl<S: BosStr, St> SubjectBuilder<S, St>
 where
-    S: subject_state::State,
-    S::CreatedAt: subject_state::IsSet,
-    S::Did: subject_state::IsSet,
+    St: subject_state::State,
+    St::CreatedAt: subject_state::IsSet,
+    St::Did: subject_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Subject<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Subject<S> {
         Subject {
             created_at: self._fields.0.unwrap(),
             did: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Subject<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Subject<S> {
         Subject {
             created_at: self._fields.0.unwrap(),
             did: self._fields.1.unwrap(),

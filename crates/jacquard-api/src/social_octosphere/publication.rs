@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "social.octosphere.publication",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Publication<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Publication<S: BosStr = DefaultStr> {
     ///Public Octopus URL for the publication version.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub canonical_url: Option<UriValue<S>>,
@@ -83,7 +83,7 @@ pub struct Publication<S: Bos<str> + AsRef<str> = DefaultStr> {
 /// Octopus publication type.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum PublicationPublicationType<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum PublicationPublicationType<S: BosStr = DefaultStr> {
     ResearchProblem,
     Hypothesis,
     Protocol,
@@ -95,7 +95,7 @@ pub enum PublicationPublicationType<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> PublicationPublicationType<S> {
+impl<S: BosStr> PublicationPublicationType<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::ResearchProblem => "RESEARCH_PROBLEM",
@@ -125,19 +125,19 @@ impl<S: Bos<str> + AsRef<str>> PublicationPublicationType<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for PublicationPublicationType<S> {
+impl<S: BosStr> core::fmt::Display for PublicationPublicationType<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for PublicationPublicationType<S> {
+impl<S: BosStr> AsRef<str> for PublicationPublicationType<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for PublicationPublicationType<S> {
+impl<S: BosStr> Serialize for PublicationPublicationType<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -146,7 +146,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for PublicationPublicationType<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
 for PublicationPublicationType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
@@ -157,14 +157,18 @@ for PublicationPublicationType<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for PublicationPublicationType<S> {
+impl<S: BosStr + Default> Default for PublicationPublicationType<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for PublicationPublicationType<S> {
-    type Output = PublicationPublicationType<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for PublicationPublicationType<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = PublicationPublicationType<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             PublicationPublicationType::ResearchProblem => {
@@ -195,14 +199,14 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for PublicationPublicationType<S> {
 /// Octopus publication status (expected LIVE).
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum PublicationStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum PublicationStatus<S: BosStr = DefaultStr> {
     Live,
     Draft,
     Archived,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> PublicationStatus<S> {
+impl<S: BosStr> PublicationStatus<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Live => "LIVE",
@@ -222,19 +226,19 @@ impl<S: Bos<str> + AsRef<str>> PublicationStatus<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for PublicationStatus<S> {
+impl<S: BosStr> core::fmt::Display for PublicationStatus<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for PublicationStatus<S> {
+impl<S: BosStr> AsRef<str> for PublicationStatus<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for PublicationStatus<S> {
+impl<S: BosStr> Serialize for PublicationStatus<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -243,8 +247,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for PublicationStatus<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for PublicationStatus<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for PublicationStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -254,14 +257,18 @@ for PublicationStatus<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for PublicationStatus<S> {
+impl<S: BosStr + Default> Default for PublicationStatus<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for PublicationStatus<S> {
-    type Output = PublicationStatus<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for PublicationStatus<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = PublicationStatus<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             PublicationStatus::Live => PublicationStatus::Live,
@@ -278,18 +285,18 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for PublicationStatus<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct PublicationGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct PublicationGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Publication<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Publication<S> {
+impl<S: BosStr> Publication<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, PublicationRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -302,17 +309,17 @@ pub struct PublicationRecord;
 impl XrpcResp for PublicationRecord {
     const NSID: &'static str = "social.octosphere.publication";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = PublicationGetRecordOutput<S>;
+    type Output<S: BosStr> = PublicationGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<PublicationGetRecordOutput<S>> for Publication<S> {
+impl<S: BosStr> From<PublicationGetRecordOutput<S>> for Publication<S> {
     fn from(output: PublicationGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Publication<S> {
+impl<S: BosStr> Collection for Publication<S> {
     const NSID: &'static str = "social.octosphere.publication";
     type Record = PublicationRecord;
 }
@@ -322,7 +329,7 @@ impl Collection for PublicationRecord {
     type Record = PublicationRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Publication<S> {
+impl<S: BosStr> LexiconSchema for Publication<S> {
     fn nsid() -> &'static str {
         "social.octosphere.publication"
     }
@@ -358,273 +365,273 @@ pub mod publication_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type LinkedFrom;
-        type Citations;
-        type CreatedAt;
         type UpdatedAt;
+        type Status;
+        type PublicationType;
+        type CreatedAt;
+        type VersionId;
+        type Citations;
+        type OctopusId;
         type Title;
-        type ContentText;
         type ContentHtml;
         type LinkedTo;
-        type Status;
-        type VersionId;
-        type PublicationType;
-        type OctopusId;
+        type ContentText;
+        type LinkedFrom;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type LinkedFrom = Unset;
-        type Citations = Unset;
-        type CreatedAt = Unset;
         type UpdatedAt = Unset;
+        type Status = Unset;
+        type PublicationType = Unset;
+        type CreatedAt = Unset;
+        type VersionId = Unset;
+        type Citations = Unset;
+        type OctopusId = Unset;
         type Title = Unset;
-        type ContentText = Unset;
         type ContentHtml = Unset;
         type LinkedTo = Unset;
-        type Status = Unset;
-        type VersionId = Unset;
-        type PublicationType = Unset;
-        type OctopusId = Unset;
-    }
-    ///State transition - sets the `linked_from` field to Set
-    pub struct SetLinkedFrom<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLinkedFrom<S> {}
-    impl<S: State> State for SetLinkedFrom<S> {
-        type LinkedFrom = Set<members::linked_from>;
-        type Citations = S::Citations;
-        type CreatedAt = S::CreatedAt;
-        type UpdatedAt = S::UpdatedAt;
-        type Title = S::Title;
-        type ContentText = S::ContentText;
-        type ContentHtml = S::ContentHtml;
-        type LinkedTo = S::LinkedTo;
-        type Status = S::Status;
-        type VersionId = S::VersionId;
-        type PublicationType = S::PublicationType;
-        type OctopusId = S::OctopusId;
-    }
-    ///State transition - sets the `citations` field to Set
-    pub struct SetCitations<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCitations<S> {}
-    impl<S: State> State for SetCitations<S> {
-        type LinkedFrom = S::LinkedFrom;
-        type Citations = Set<members::citations>;
-        type CreatedAt = S::CreatedAt;
-        type UpdatedAt = S::UpdatedAt;
-        type Title = S::Title;
-        type ContentText = S::ContentText;
-        type ContentHtml = S::ContentHtml;
-        type LinkedTo = S::LinkedTo;
-        type Status = S::Status;
-        type VersionId = S::VersionId;
-        type PublicationType = S::PublicationType;
-        type OctopusId = S::OctopusId;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type LinkedFrom = S::LinkedFrom;
-        type Citations = S::Citations;
-        type CreatedAt = Set<members::created_at>;
-        type UpdatedAt = S::UpdatedAt;
-        type Title = S::Title;
-        type ContentText = S::ContentText;
-        type ContentHtml = S::ContentHtml;
-        type LinkedTo = S::LinkedTo;
-        type Status = S::Status;
-        type VersionId = S::VersionId;
-        type PublicationType = S::PublicationType;
-        type OctopusId = S::OctopusId;
+        type ContentText = Unset;
+        type LinkedFrom = Unset;
     }
     ///State transition - sets the `updated_at` field to Set
-    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
-    impl<S: State> State for SetUpdatedAt<S> {
-        type LinkedFrom = S::LinkedFrom;
-        type Citations = S::Citations;
-        type CreatedAt = S::CreatedAt;
+    pub struct SetUpdatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUpdatedAt<St> {}
+    impl<St: State> State for SetUpdatedAt<St> {
         type UpdatedAt = Set<members::updated_at>;
-        type Title = S::Title;
-        type ContentText = S::ContentText;
-        type ContentHtml = S::ContentHtml;
-        type LinkedTo = S::LinkedTo;
-        type Status = S::Status;
-        type VersionId = S::VersionId;
-        type PublicationType = S::PublicationType;
-        type OctopusId = S::OctopusId;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type LinkedFrom = S::LinkedFrom;
-        type Citations = S::Citations;
-        type CreatedAt = S::CreatedAt;
-        type UpdatedAt = S::UpdatedAt;
-        type Title = Set<members::title>;
-        type ContentText = S::ContentText;
-        type ContentHtml = S::ContentHtml;
-        type LinkedTo = S::LinkedTo;
-        type Status = S::Status;
-        type VersionId = S::VersionId;
-        type PublicationType = S::PublicationType;
-        type OctopusId = S::OctopusId;
-    }
-    ///State transition - sets the `content_text` field to Set
-    pub struct SetContentText<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContentText<S> {}
-    impl<S: State> State for SetContentText<S> {
-        type LinkedFrom = S::LinkedFrom;
-        type Citations = S::Citations;
-        type CreatedAt = S::CreatedAt;
-        type UpdatedAt = S::UpdatedAt;
-        type Title = S::Title;
-        type ContentText = Set<members::content_text>;
-        type ContentHtml = S::ContentHtml;
-        type LinkedTo = S::LinkedTo;
-        type Status = S::Status;
-        type VersionId = S::VersionId;
-        type PublicationType = S::PublicationType;
-        type OctopusId = S::OctopusId;
-    }
-    ///State transition - sets the `content_html` field to Set
-    pub struct SetContentHtml<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContentHtml<S> {}
-    impl<S: State> State for SetContentHtml<S> {
-        type LinkedFrom = S::LinkedFrom;
-        type Citations = S::Citations;
-        type CreatedAt = S::CreatedAt;
-        type UpdatedAt = S::UpdatedAt;
-        type Title = S::Title;
-        type ContentText = S::ContentText;
-        type ContentHtml = Set<members::content_html>;
-        type LinkedTo = S::LinkedTo;
-        type Status = S::Status;
-        type VersionId = S::VersionId;
-        type PublicationType = S::PublicationType;
-        type OctopusId = S::OctopusId;
-    }
-    ///State transition - sets the `linked_to` field to Set
-    pub struct SetLinkedTo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLinkedTo<S> {}
-    impl<S: State> State for SetLinkedTo<S> {
-        type LinkedFrom = S::LinkedFrom;
-        type Citations = S::Citations;
-        type CreatedAt = S::CreatedAt;
-        type UpdatedAt = S::UpdatedAt;
-        type Title = S::Title;
-        type ContentText = S::ContentText;
-        type ContentHtml = S::ContentHtml;
-        type LinkedTo = Set<members::linked_to>;
-        type Status = S::Status;
-        type VersionId = S::VersionId;
-        type PublicationType = S::PublicationType;
-        type OctopusId = S::OctopusId;
+        type Status = St::Status;
+        type PublicationType = St::PublicationType;
+        type CreatedAt = St::CreatedAt;
+        type VersionId = St::VersionId;
+        type Citations = St::Citations;
+        type OctopusId = St::OctopusId;
+        type Title = St::Title;
+        type ContentHtml = St::ContentHtml;
+        type LinkedTo = St::LinkedTo;
+        type ContentText = St::ContentText;
+        type LinkedFrom = St::LinkedFrom;
     }
     ///State transition - sets the `status` field to Set
-    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStatus<S> {}
-    impl<S: State> State for SetStatus<S> {
-        type LinkedFrom = S::LinkedFrom;
-        type Citations = S::Citations;
-        type CreatedAt = S::CreatedAt;
-        type UpdatedAt = S::UpdatedAt;
-        type Title = S::Title;
-        type ContentText = S::ContentText;
-        type ContentHtml = S::ContentHtml;
-        type LinkedTo = S::LinkedTo;
+    pub struct SetStatus<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStatus<St> {}
+    impl<St: State> State for SetStatus<St> {
+        type UpdatedAt = St::UpdatedAt;
         type Status = Set<members::status>;
-        type VersionId = S::VersionId;
-        type PublicationType = S::PublicationType;
-        type OctopusId = S::OctopusId;
-    }
-    ///State transition - sets the `version_id` field to Set
-    pub struct SetVersionId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVersionId<S> {}
-    impl<S: State> State for SetVersionId<S> {
-        type LinkedFrom = S::LinkedFrom;
-        type Citations = S::Citations;
-        type CreatedAt = S::CreatedAt;
-        type UpdatedAt = S::UpdatedAt;
-        type Title = S::Title;
-        type ContentText = S::ContentText;
-        type ContentHtml = S::ContentHtml;
-        type LinkedTo = S::LinkedTo;
-        type Status = S::Status;
-        type VersionId = Set<members::version_id>;
-        type PublicationType = S::PublicationType;
-        type OctopusId = S::OctopusId;
+        type PublicationType = St::PublicationType;
+        type CreatedAt = St::CreatedAt;
+        type VersionId = St::VersionId;
+        type Citations = St::Citations;
+        type OctopusId = St::OctopusId;
+        type Title = St::Title;
+        type ContentHtml = St::ContentHtml;
+        type LinkedTo = St::LinkedTo;
+        type ContentText = St::ContentText;
+        type LinkedFrom = St::LinkedFrom;
     }
     ///State transition - sets the `publication_type` field to Set
-    pub struct SetPublicationType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPublicationType<S> {}
-    impl<S: State> State for SetPublicationType<S> {
-        type LinkedFrom = S::LinkedFrom;
-        type Citations = S::Citations;
-        type CreatedAt = S::CreatedAt;
-        type UpdatedAt = S::UpdatedAt;
-        type Title = S::Title;
-        type ContentText = S::ContentText;
-        type ContentHtml = S::ContentHtml;
-        type LinkedTo = S::LinkedTo;
-        type Status = S::Status;
-        type VersionId = S::VersionId;
+    pub struct SetPublicationType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPublicationType<St> {}
+    impl<St: State> State for SetPublicationType<St> {
+        type UpdatedAt = St::UpdatedAt;
+        type Status = St::Status;
         type PublicationType = Set<members::publication_type>;
-        type OctopusId = S::OctopusId;
+        type CreatedAt = St::CreatedAt;
+        type VersionId = St::VersionId;
+        type Citations = St::Citations;
+        type OctopusId = St::OctopusId;
+        type Title = St::Title;
+        type ContentHtml = St::ContentHtml;
+        type LinkedTo = St::LinkedTo;
+        type ContentText = St::ContentText;
+        type LinkedFrom = St::LinkedFrom;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type UpdatedAt = St::UpdatedAt;
+        type Status = St::Status;
+        type PublicationType = St::PublicationType;
+        type CreatedAt = Set<members::created_at>;
+        type VersionId = St::VersionId;
+        type Citations = St::Citations;
+        type OctopusId = St::OctopusId;
+        type Title = St::Title;
+        type ContentHtml = St::ContentHtml;
+        type LinkedTo = St::LinkedTo;
+        type ContentText = St::ContentText;
+        type LinkedFrom = St::LinkedFrom;
+    }
+    ///State transition - sets the `version_id` field to Set
+    pub struct SetVersionId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetVersionId<St> {}
+    impl<St: State> State for SetVersionId<St> {
+        type UpdatedAt = St::UpdatedAt;
+        type Status = St::Status;
+        type PublicationType = St::PublicationType;
+        type CreatedAt = St::CreatedAt;
+        type VersionId = Set<members::version_id>;
+        type Citations = St::Citations;
+        type OctopusId = St::OctopusId;
+        type Title = St::Title;
+        type ContentHtml = St::ContentHtml;
+        type LinkedTo = St::LinkedTo;
+        type ContentText = St::ContentText;
+        type LinkedFrom = St::LinkedFrom;
+    }
+    ///State transition - sets the `citations` field to Set
+    pub struct SetCitations<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCitations<St> {}
+    impl<St: State> State for SetCitations<St> {
+        type UpdatedAt = St::UpdatedAt;
+        type Status = St::Status;
+        type PublicationType = St::PublicationType;
+        type CreatedAt = St::CreatedAt;
+        type VersionId = St::VersionId;
+        type Citations = Set<members::citations>;
+        type OctopusId = St::OctopusId;
+        type Title = St::Title;
+        type ContentHtml = St::ContentHtml;
+        type LinkedTo = St::LinkedTo;
+        type ContentText = St::ContentText;
+        type LinkedFrom = St::LinkedFrom;
     }
     ///State transition - sets the `octopus_id` field to Set
-    pub struct SetOctopusId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetOctopusId<S> {}
-    impl<S: State> State for SetOctopusId<S> {
-        type LinkedFrom = S::LinkedFrom;
-        type Citations = S::Citations;
-        type CreatedAt = S::CreatedAt;
-        type UpdatedAt = S::UpdatedAt;
-        type Title = S::Title;
-        type ContentText = S::ContentText;
-        type ContentHtml = S::ContentHtml;
-        type LinkedTo = S::LinkedTo;
-        type Status = S::Status;
-        type VersionId = S::VersionId;
-        type PublicationType = S::PublicationType;
+    pub struct SetOctopusId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetOctopusId<St> {}
+    impl<St: State> State for SetOctopusId<St> {
+        type UpdatedAt = St::UpdatedAt;
+        type Status = St::Status;
+        type PublicationType = St::PublicationType;
+        type CreatedAt = St::CreatedAt;
+        type VersionId = St::VersionId;
+        type Citations = St::Citations;
         type OctopusId = Set<members::octopus_id>;
+        type Title = St::Title;
+        type ContentHtml = St::ContentHtml;
+        type LinkedTo = St::LinkedTo;
+        type ContentText = St::ContentText;
+        type LinkedFrom = St::LinkedFrom;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
+        type UpdatedAt = St::UpdatedAt;
+        type Status = St::Status;
+        type PublicationType = St::PublicationType;
+        type CreatedAt = St::CreatedAt;
+        type VersionId = St::VersionId;
+        type Citations = St::Citations;
+        type OctopusId = St::OctopusId;
+        type Title = Set<members::title>;
+        type ContentHtml = St::ContentHtml;
+        type LinkedTo = St::LinkedTo;
+        type ContentText = St::ContentText;
+        type LinkedFrom = St::LinkedFrom;
+    }
+    ///State transition - sets the `content_html` field to Set
+    pub struct SetContentHtml<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetContentHtml<St> {}
+    impl<St: State> State for SetContentHtml<St> {
+        type UpdatedAt = St::UpdatedAt;
+        type Status = St::Status;
+        type PublicationType = St::PublicationType;
+        type CreatedAt = St::CreatedAt;
+        type VersionId = St::VersionId;
+        type Citations = St::Citations;
+        type OctopusId = St::OctopusId;
+        type Title = St::Title;
+        type ContentHtml = Set<members::content_html>;
+        type LinkedTo = St::LinkedTo;
+        type ContentText = St::ContentText;
+        type LinkedFrom = St::LinkedFrom;
+    }
+    ///State transition - sets the `linked_to` field to Set
+    pub struct SetLinkedTo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLinkedTo<St> {}
+    impl<St: State> State for SetLinkedTo<St> {
+        type UpdatedAt = St::UpdatedAt;
+        type Status = St::Status;
+        type PublicationType = St::PublicationType;
+        type CreatedAt = St::CreatedAt;
+        type VersionId = St::VersionId;
+        type Citations = St::Citations;
+        type OctopusId = St::OctopusId;
+        type Title = St::Title;
+        type ContentHtml = St::ContentHtml;
+        type LinkedTo = Set<members::linked_to>;
+        type ContentText = St::ContentText;
+        type LinkedFrom = St::LinkedFrom;
+    }
+    ///State transition - sets the `content_text` field to Set
+    pub struct SetContentText<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetContentText<St> {}
+    impl<St: State> State for SetContentText<St> {
+        type UpdatedAt = St::UpdatedAt;
+        type Status = St::Status;
+        type PublicationType = St::PublicationType;
+        type CreatedAt = St::CreatedAt;
+        type VersionId = St::VersionId;
+        type Citations = St::Citations;
+        type OctopusId = St::OctopusId;
+        type Title = St::Title;
+        type ContentHtml = St::ContentHtml;
+        type LinkedTo = St::LinkedTo;
+        type ContentText = Set<members::content_text>;
+        type LinkedFrom = St::LinkedFrom;
+    }
+    ///State transition - sets the `linked_from` field to Set
+    pub struct SetLinkedFrom<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLinkedFrom<St> {}
+    impl<St: State> State for SetLinkedFrom<St> {
+        type UpdatedAt = St::UpdatedAt;
+        type Status = St::Status;
+        type PublicationType = St::PublicationType;
+        type CreatedAt = St::CreatedAt;
+        type VersionId = St::VersionId;
+        type Citations = St::Citations;
+        type OctopusId = St::OctopusId;
+        type Title = St::Title;
+        type ContentHtml = St::ContentHtml;
+        type LinkedTo = St::LinkedTo;
+        type ContentText = St::ContentText;
+        type LinkedFrom = Set<members::linked_from>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `linked_from` field
-        pub struct linked_from(());
-        ///Marker type for the `citations` field
-        pub struct citations(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `updated_at` field
         pub struct updated_at(());
+        ///Marker type for the `status` field
+        pub struct status(());
+        ///Marker type for the `publication_type` field
+        pub struct publication_type(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `version_id` field
+        pub struct version_id(());
+        ///Marker type for the `citations` field
+        pub struct citations(());
+        ///Marker type for the `octopus_id` field
+        pub struct octopus_id(());
         ///Marker type for the `title` field
         pub struct title(());
-        ///Marker type for the `content_text` field
-        pub struct content_text(());
         ///Marker type for the `content_html` field
         pub struct content_html(());
         ///Marker type for the `linked_to` field
         pub struct linked_to(());
-        ///Marker type for the `status` field
-        pub struct status(());
-        ///Marker type for the `version_id` field
-        pub struct version_id(());
-        ///Marker type for the `publication_type` field
-        pub struct publication_type(());
-        ///Marker type for the `octopus_id` field
-        pub struct octopus_id(());
+        ///Marker type for the `content_text` field
+        pub struct content_text(());
+        ///Marker type for the `linked_from` field
+        pub struct linked_from(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct PublicationBuilder<'a, S: publication_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct PublicationBuilder<S: BosStr, St: publication_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<UriValue<S>>,
         Option<Vec<S>>,
@@ -643,18 +650,18 @@ pub struct PublicationBuilder<'a, S: publication_state::State> {
         Option<Datetime>,
         Option<S>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Publication<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> PublicationBuilder<'a, publication_state::Empty> {
+impl<S: BosStr> Publication<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> PublicationBuilder<S, publication_state::Empty> {
         PublicationBuilder::new()
     }
 }
 
-impl<'a> PublicationBuilder<'a, publication_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> PublicationBuilder<S, publication_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         PublicationBuilder {
             _state: PhantomData,
@@ -676,12 +683,12 @@ impl<'a> PublicationBuilder<'a, publication_state::Empty> {
                 None,
                 None,
             ),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: publication_state::State> PublicationBuilder<'a, S> {
+impl<S: BosStr, St: publication_state::State> PublicationBuilder<S, St> {
     /// Set the `canonicalUrl` field (optional)
     pub fn canonical_url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -694,83 +701,83 @@ impl<'a, S: publication_state::State> PublicationBuilder<'a, S> {
     }
 }
 
-impl<'a, S> PublicationBuilder<'a, S>
+impl<S: BosStr, St> PublicationBuilder<S, St>
 where
-    S: publication_state::State,
-    S::Citations: publication_state::IsUnset,
+    St: publication_state::State,
+    St::Citations: publication_state::IsUnset,
 {
     /// Set the `citations` field (required)
     pub fn citations(
         mut self,
         value: impl Into<Vec<S>>,
-    ) -> PublicationBuilder<'a, publication_state::SetCitations<S>> {
+    ) -> PublicationBuilder<S, publication_state::SetCitations<St>> {
         self._fields.1 = Option::Some(value.into());
         PublicationBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PublicationBuilder<'a, S>
+impl<S: BosStr, St> PublicationBuilder<S, St>
 where
-    S: publication_state::State,
-    S::ContentHtml: publication_state::IsUnset,
+    St: publication_state::State,
+    St::ContentHtml: publication_state::IsUnset,
 {
     /// Set the `contentHtml` field (required)
     pub fn content_html(
         mut self,
         value: impl Into<S>,
-    ) -> PublicationBuilder<'a, publication_state::SetContentHtml<S>> {
+    ) -> PublicationBuilder<S, publication_state::SetContentHtml<St>> {
         self._fields.2 = Option::Some(value.into());
         PublicationBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PublicationBuilder<'a, S>
+impl<S: BosStr, St> PublicationBuilder<S, St>
 where
-    S: publication_state::State,
-    S::ContentText: publication_state::IsUnset,
+    St: publication_state::State,
+    St::ContentText: publication_state::IsUnset,
 {
     /// Set the `contentText` field (required)
     pub fn content_text(
         mut self,
         value: impl Into<S>,
-    ) -> PublicationBuilder<'a, publication_state::SetContentText<S>> {
+    ) -> PublicationBuilder<S, publication_state::SetContentText<St>> {
         self._fields.3 = Option::Some(value.into());
         PublicationBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PublicationBuilder<'a, S>
+impl<S: BosStr, St> PublicationBuilder<S, St>
 where
-    S: publication_state::State,
-    S::CreatedAt: publication_state::IsUnset,
+    St: publication_state::State,
+    St::CreatedAt: publication_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> PublicationBuilder<'a, publication_state::SetCreatedAt<S>> {
+    ) -> PublicationBuilder<S, publication_state::SetCreatedAt<St>> {
         self._fields.4 = Option::Some(value.into());
         PublicationBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: publication_state::State> PublicationBuilder<'a, S> {
+impl<S: BosStr, St: publication_state::State> PublicationBuilder<S, St> {
     /// Set the `doi` field (optional)
     pub fn doi(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -783,64 +790,64 @@ impl<'a, S: publication_state::State> PublicationBuilder<'a, S> {
     }
 }
 
-impl<'a, S> PublicationBuilder<'a, S>
+impl<S: BosStr, St> PublicationBuilder<S, St>
 where
-    S: publication_state::State,
-    S::LinkedFrom: publication_state::IsUnset,
+    St: publication_state::State,
+    St::LinkedFrom: publication_state::IsUnset,
 {
     /// Set the `linkedFrom` field (required)
     pub fn linked_from(
         mut self,
         value: impl Into<Vec<S>>,
-    ) -> PublicationBuilder<'a, publication_state::SetLinkedFrom<S>> {
+    ) -> PublicationBuilder<S, publication_state::SetLinkedFrom<St>> {
         self._fields.6 = Option::Some(value.into());
         PublicationBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PublicationBuilder<'a, S>
+impl<S: BosStr, St> PublicationBuilder<S, St>
 where
-    S: publication_state::State,
-    S::LinkedTo: publication_state::IsUnset,
+    St: publication_state::State,
+    St::LinkedTo: publication_state::IsUnset,
 {
     /// Set the `linkedTo` field (required)
     pub fn linked_to(
         mut self,
         value: impl Into<Vec<S>>,
-    ) -> PublicationBuilder<'a, publication_state::SetLinkedTo<S>> {
+    ) -> PublicationBuilder<S, publication_state::SetLinkedTo<St>> {
         self._fields.7 = Option::Some(value.into());
         PublicationBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PublicationBuilder<'a, S>
+impl<S: BosStr, St> PublicationBuilder<S, St>
 where
-    S: publication_state::State,
-    S::OctopusId: publication_state::IsUnset,
+    St: publication_state::State,
+    St::OctopusId: publication_state::IsUnset,
 {
     /// Set the `octopusId` field (required)
     pub fn octopus_id(
         mut self,
         value: impl Into<S>,
-    ) -> PublicationBuilder<'a, publication_state::SetOctopusId<S>> {
+    ) -> PublicationBuilder<S, publication_state::SetOctopusId<St>> {
         self._fields.8 = Option::Some(value.into());
         PublicationBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: publication_state::State> PublicationBuilder<'a, S> {
+impl<S: BosStr, St: publication_state::State> PublicationBuilder<S, St> {
     /// Set the `ownerOrcid` field (optional)
     pub fn owner_orcid(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.9 = value.into();
@@ -853,7 +860,7 @@ impl<'a, S: publication_state::State> PublicationBuilder<'a, S> {
     }
 }
 
-impl<'a, S: publication_state::State> PublicationBuilder<'a, S> {
+impl<S: BosStr, St: publication_state::State> PublicationBuilder<S, St> {
     /// Set the `peerReviewOf` field (optional)
     pub fn peer_review_of(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.10 = value.into();
@@ -866,119 +873,119 @@ impl<'a, S: publication_state::State> PublicationBuilder<'a, S> {
     }
 }
 
-impl<'a, S> PublicationBuilder<'a, S>
+impl<S: BosStr, St> PublicationBuilder<S, St>
 where
-    S: publication_state::State,
-    S::PublicationType: publication_state::IsUnset,
+    St: publication_state::State,
+    St::PublicationType: publication_state::IsUnset,
 {
     /// Set the `publicationType` field (required)
     pub fn publication_type(
         mut self,
         value: impl Into<PublicationPublicationType<S>>,
-    ) -> PublicationBuilder<'a, publication_state::SetPublicationType<S>> {
+    ) -> PublicationBuilder<S, publication_state::SetPublicationType<St>> {
         self._fields.11 = Option::Some(value.into());
         PublicationBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PublicationBuilder<'a, S>
+impl<S: BosStr, St> PublicationBuilder<S, St>
 where
-    S: publication_state::State,
-    S::Status: publication_state::IsUnset,
+    St: publication_state::State,
+    St::Status: publication_state::IsUnset,
 {
     /// Set the `status` field (required)
     pub fn status(
         mut self,
         value: impl Into<PublicationStatus<S>>,
-    ) -> PublicationBuilder<'a, publication_state::SetStatus<S>> {
+    ) -> PublicationBuilder<S, publication_state::SetStatus<St>> {
         self._fields.12 = Option::Some(value.into());
         PublicationBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PublicationBuilder<'a, S>
+impl<S: BosStr, St> PublicationBuilder<S, St>
 where
-    S: publication_state::State,
-    S::Title: publication_state::IsUnset,
+    St: publication_state::State,
+    St::Title: publication_state::IsUnset,
 {
     /// Set the `title` field (required)
     pub fn title(
         mut self,
         value: impl Into<S>,
-    ) -> PublicationBuilder<'a, publication_state::SetTitle<S>> {
+    ) -> PublicationBuilder<S, publication_state::SetTitle<St>> {
         self._fields.13 = Option::Some(value.into());
         PublicationBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PublicationBuilder<'a, S>
+impl<S: BosStr, St> PublicationBuilder<S, St>
 where
-    S: publication_state::State,
-    S::UpdatedAt: publication_state::IsUnset,
+    St: publication_state::State,
+    St::UpdatedAt: publication_state::IsUnset,
 {
     /// Set the `updatedAt` field (required)
     pub fn updated_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> PublicationBuilder<'a, publication_state::SetUpdatedAt<S>> {
+    ) -> PublicationBuilder<S, publication_state::SetUpdatedAt<St>> {
         self._fields.14 = Option::Some(value.into());
         PublicationBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PublicationBuilder<'a, S>
+impl<S: BosStr, St> PublicationBuilder<S, St>
 where
-    S: publication_state::State,
-    S::VersionId: publication_state::IsUnset,
+    St: publication_state::State,
+    St::VersionId: publication_state::IsUnset,
 {
     /// Set the `versionId` field (required)
     pub fn version_id(
         mut self,
         value: impl Into<S>,
-    ) -> PublicationBuilder<'a, publication_state::SetVersionId<S>> {
+    ) -> PublicationBuilder<S, publication_state::SetVersionId<St>> {
         self._fields.15 = Option::Some(value.into());
         PublicationBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PublicationBuilder<'a, S>
+impl<S: BosStr, St> PublicationBuilder<S, St>
 where
-    S: publication_state::State,
-    S::LinkedFrom: publication_state::IsSet,
-    S::Citations: publication_state::IsSet,
-    S::CreatedAt: publication_state::IsSet,
-    S::UpdatedAt: publication_state::IsSet,
-    S::Title: publication_state::IsSet,
-    S::ContentText: publication_state::IsSet,
-    S::ContentHtml: publication_state::IsSet,
-    S::LinkedTo: publication_state::IsSet,
-    S::Status: publication_state::IsSet,
-    S::VersionId: publication_state::IsSet,
-    S::PublicationType: publication_state::IsSet,
-    S::OctopusId: publication_state::IsSet,
+    St: publication_state::State,
+    St::UpdatedAt: publication_state::IsSet,
+    St::Status: publication_state::IsSet,
+    St::PublicationType: publication_state::IsSet,
+    St::CreatedAt: publication_state::IsSet,
+    St::VersionId: publication_state::IsSet,
+    St::Citations: publication_state::IsSet,
+    St::OctopusId: publication_state::IsSet,
+    St::Title: publication_state::IsSet,
+    St::ContentHtml: publication_state::IsSet,
+    St::LinkedTo: publication_state::IsSet,
+    St::ContentText: publication_state::IsSet,
+    St::LinkedFrom: publication_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Publication<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Publication<S> {
         Publication {
             canonical_url: self._fields.0,
             citations: self._fields.1.unwrap(),
@@ -999,11 +1006,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Publication<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Publication<S> {
         Publication {
             canonical_url: self._fields.0,
             citations: self._fields.1.unwrap(),

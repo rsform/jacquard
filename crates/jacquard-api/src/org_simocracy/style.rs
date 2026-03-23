@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -37,11 +37,11 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
     rename = "org.simocracy.style",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Style<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Style<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     ///A description of the sim's speaking and reply style.
     pub description: S,
@@ -58,18 +58,18 @@ pub struct Style<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct StyleGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct StyleGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Style<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Style<S> {
+impl<S: BosStr> Style<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, StyleRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -82,17 +82,17 @@ pub struct StyleRecord;
 impl XrpcResp for StyleRecord {
     const NSID: &'static str = "org.simocracy.style";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = StyleGetRecordOutput<S>;
+    type Output<S: BosStr> = StyleGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<StyleGetRecordOutput<S>> for Style<S> {
+impl<S: BosStr> From<StyleGetRecordOutput<S>> for Style<S> {
     fn from(output: StyleGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Style<S> {
+impl<S: BosStr> Collection for Style<S> {
     const NSID: &'static str = "org.simocracy.style";
     type Record = StyleRecord;
 }
@@ -102,7 +102,7 @@ impl Collection for StyleRecord {
     type Record = StyleRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Style<S> {
+impl<S: BosStr> LexiconSchema for Style<S> {
     fn nsid() -> &'static str {
         "org.simocracy.style"
     }
@@ -152,117 +152,117 @@ pub mod style_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Sim;
-        type CreatedAt;
         type Description;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Sim = Unset;
-        type CreatedAt = Unset;
         type Description = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `sim` field to Set
-    pub struct SetSim<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSim<S> {}
-    impl<S: State> State for SetSim<S> {
+    pub struct SetSim<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSim<St> {}
+    impl<St: State> State for SetSim<St> {
         type Sim = Set<members::sim>;
-        type CreatedAt = S::CreatedAt;
-        type Description = S::Description;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Sim = S::Sim;
-        type CreatedAt = Set<members::created_at>;
-        type Description = S::Description;
+        type Description = St::Description;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `description` field to Set
-    pub struct SetDescription<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDescription<S> {}
-    impl<S: State> State for SetDescription<S> {
-        type Sim = S::Sim;
-        type CreatedAt = S::CreatedAt;
+    pub struct SetDescription<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDescription<St> {}
+    impl<St: State> State for SetDescription<St> {
+        type Sim = St::Sim;
         type Description = Set<members::description>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Sim = St::Sim;
+        type Description = St::Description;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `sim` field
         pub struct sim(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `description` field
         pub struct description(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct StyleBuilder<'a, S: style_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct StyleBuilder<S: BosStr, St: style_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<S>, Option<Vec<Facet<S>>>, Option<StrongRef<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Style<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> StyleBuilder<'a, style_state::Empty> {
+impl<S: BosStr> Style<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> StyleBuilder<S, style_state::Empty> {
         StyleBuilder::new()
     }
 }
 
-impl<'a> StyleBuilder<'a, style_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> StyleBuilder<S, style_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         StyleBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> StyleBuilder<'a, S>
+impl<S: BosStr, St> StyleBuilder<S, St>
 where
-    S: style_state::State,
-    S::CreatedAt: style_state::IsUnset,
+    St: style_state::State,
+    St::CreatedAt: style_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> StyleBuilder<'a, style_state::SetCreatedAt<S>> {
+    ) -> StyleBuilder<S, style_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         StyleBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> StyleBuilder<'a, S>
+impl<S: BosStr, St> StyleBuilder<S, St>
 where
-    S: style_state::State,
-    S::Description: style_state::IsUnset,
+    St: style_state::State,
+    St::Description: style_state::IsUnset,
 {
     /// Set the `description` field (required)
     pub fn description(
         mut self,
         value: impl Into<S>,
-    ) -> StyleBuilder<'a, style_state::SetDescription<S>> {
+    ) -> StyleBuilder<S, style_state::SetDescription<St>> {
         self._fields.1 = Option::Some(value.into());
         StyleBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: style_state::State> StyleBuilder<'a, S> {
+impl<S: BosStr, St: style_state::State> StyleBuilder<S, St> {
     /// Set the `descriptionFacets` field (optional)
     pub fn description_facets(
         mut self,
@@ -278,34 +278,34 @@ impl<'a, S: style_state::State> StyleBuilder<'a, S> {
     }
 }
 
-impl<'a, S> StyleBuilder<'a, S>
+impl<S: BosStr, St> StyleBuilder<S, St>
 where
-    S: style_state::State,
-    S::Sim: style_state::IsUnset,
+    St: style_state::State,
+    St::Sim: style_state::IsUnset,
 {
     /// Set the `sim` field (required)
     pub fn sim(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> StyleBuilder<'a, style_state::SetSim<S>> {
+    ) -> StyleBuilder<S, style_state::SetSim<St>> {
         self._fields.3 = Option::Some(value.into());
         StyleBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> StyleBuilder<'a, S>
+impl<S: BosStr, St> StyleBuilder<S, St>
 where
-    S: style_state::State,
-    S::Sim: style_state::IsSet,
-    S::CreatedAt: style_state::IsSet,
-    S::Description: style_state::IsSet,
+    St: style_state::State,
+    St::Sim: style_state::IsSet,
+    St::Description: style_state::IsSet,
+    St::CreatedAt: style_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Style<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Style<S> {
         Style {
             created_at: self._fields.0.unwrap(),
             description: self._fields.1.unwrap(),
@@ -314,8 +314,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Style<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Style<S> {
         Style {
             created_at: self._fields.0.unwrap(),
             description: self._fields.1.unwrap(),

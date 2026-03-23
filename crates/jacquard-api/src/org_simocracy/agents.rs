@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -37,11 +37,11 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
     rename = "org.simocracy.agents",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Agents<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Agents<S: BosStr = DefaultStr> {
     ///Timestamp when the record was created
     pub created_at: Datetime,
     ///Full constitution text: beliefs, values, governance positions. Rich text annotations may be provided via descriptionFacets.
@@ -67,18 +67,18 @@ pub struct Agents<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct AgentsGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct AgentsGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Agents<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Agents<S> {
+impl<S: BosStr> Agents<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, AgentsRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -91,17 +91,17 @@ pub struct AgentsRecord;
 impl XrpcResp for AgentsRecord {
     const NSID: &'static str = "org.simocracy.agents";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = AgentsGetRecordOutput<S>;
+    type Output<S: BosStr> = AgentsGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<AgentsGetRecordOutput<S>> for Agents<S> {
+impl<S: BosStr> From<AgentsGetRecordOutput<S>> for Agents<S> {
     fn from(output: AgentsGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Agents<S> {
+impl<S: BosStr> Collection for Agents<S> {
     const NSID: &'static str = "org.simocracy.agents";
     type Record = AgentsRecord;
 }
@@ -111,7 +111,7 @@ impl Collection for AgentsRecord {
     type Record = AgentsRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Agents<S> {
+impl<S: BosStr> LexiconSchema for Agents<S> {
     fn nsid() -> &'static str {
         "org.simocracy.agents"
     }
@@ -182,57 +182,57 @@ pub mod agents_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Sim;
         type ShortDescription;
         type CreatedAt;
+        type Sim;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Sim = Unset;
         type ShortDescription = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `sim` field to Set
-    pub struct SetSim<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSim<S> {}
-    impl<S: State> State for SetSim<S> {
-        type Sim = Set<members::sim>;
-        type ShortDescription = S::ShortDescription;
-        type CreatedAt = S::CreatedAt;
+        type Sim = Unset;
     }
     ///State transition - sets the `short_description` field to Set
-    pub struct SetShortDescription<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetShortDescription<S> {}
-    impl<S: State> State for SetShortDescription<S> {
-        type Sim = S::Sim;
+    pub struct SetShortDescription<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetShortDescription<St> {}
+    impl<St: State> State for SetShortDescription<St> {
         type ShortDescription = Set<members::short_description>;
-        type CreatedAt = S::CreatedAt;
+        type CreatedAt = St::CreatedAt;
+        type Sim = St::Sim;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Sim = S::Sim;
-        type ShortDescription = S::ShortDescription;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type ShortDescription = St::ShortDescription;
         type CreatedAt = Set<members::created_at>;
+        type Sim = St::Sim;
+    }
+    ///State transition - sets the `sim` field to Set
+    pub struct SetSim<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSim<St> {}
+    impl<St: State> State for SetSim<St> {
+        type ShortDescription = St::ShortDescription;
+        type CreatedAt = St::CreatedAt;
+        type Sim = Set<members::sim>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `sim` field
-        pub struct sim(());
         ///Marker type for the `short_description` field
         pub struct short_description(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `sim` field
+        pub struct sim(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct AgentsBuilder<'a, S: agents_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct AgentsBuilder<S: BosStr, St: agents_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
         Option<S>,
@@ -241,47 +241,47 @@ pub struct AgentsBuilder<'a, S: agents_state::State> {
         Option<Vec<Facet<S>>>,
         Option<StrongRef<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Agents<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> AgentsBuilder<'a, agents_state::Empty> {
+impl<S: BosStr> Agents<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> AgentsBuilder<S, agents_state::Empty> {
         AgentsBuilder::new()
     }
 }
 
-impl<'a> AgentsBuilder<'a, agents_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> AgentsBuilder<S, agents_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         AgentsBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AgentsBuilder<'a, S>
+impl<S: BosStr, St> AgentsBuilder<S, St>
 where
-    S: agents_state::State,
-    S::CreatedAt: agents_state::IsUnset,
+    St: agents_state::State,
+    St::CreatedAt: agents_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> AgentsBuilder<'a, agents_state::SetCreatedAt<S>> {
+    ) -> AgentsBuilder<S, agents_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         AgentsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: agents_state::State> AgentsBuilder<'a, S> {
+impl<S: BosStr, St: agents_state::State> AgentsBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -294,7 +294,7 @@ impl<'a, S: agents_state::State> AgentsBuilder<'a, S> {
     }
 }
 
-impl<'a, S: agents_state::State> AgentsBuilder<'a, S> {
+impl<S: BosStr, St: agents_state::State> AgentsBuilder<S, St> {
     /// Set the `descriptionFacets` field (optional)
     pub fn description_facets(
         mut self,
@@ -310,26 +310,26 @@ impl<'a, S: agents_state::State> AgentsBuilder<'a, S> {
     }
 }
 
-impl<'a, S> AgentsBuilder<'a, S>
+impl<S: BosStr, St> AgentsBuilder<S, St>
 where
-    S: agents_state::State,
-    S::ShortDescription: agents_state::IsUnset,
+    St: agents_state::State,
+    St::ShortDescription: agents_state::IsUnset,
 {
     /// Set the `shortDescription` field (required)
     pub fn short_description(
         mut self,
         value: impl Into<S>,
-    ) -> AgentsBuilder<'a, agents_state::SetShortDescription<S>> {
+    ) -> AgentsBuilder<S, agents_state::SetShortDescription<St>> {
         self._fields.3 = Option::Some(value.into());
         AgentsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: agents_state::State> AgentsBuilder<'a, S> {
+impl<S: BosStr, St: agents_state::State> AgentsBuilder<S, St> {
     /// Set the `shortDescriptionFacets` field (optional)
     pub fn short_description_facets(
         mut self,
@@ -348,34 +348,34 @@ impl<'a, S: agents_state::State> AgentsBuilder<'a, S> {
     }
 }
 
-impl<'a, S> AgentsBuilder<'a, S>
+impl<S: BosStr, St> AgentsBuilder<S, St>
 where
-    S: agents_state::State,
-    S::Sim: agents_state::IsUnset,
+    St: agents_state::State,
+    St::Sim: agents_state::IsUnset,
 {
     /// Set the `sim` field (required)
     pub fn sim(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> AgentsBuilder<'a, agents_state::SetSim<S>> {
+    ) -> AgentsBuilder<S, agents_state::SetSim<St>> {
         self._fields.5 = Option::Some(value.into());
         AgentsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AgentsBuilder<'a, S>
+impl<S: BosStr, St> AgentsBuilder<S, St>
 where
-    S: agents_state::State,
-    S::Sim: agents_state::IsSet,
-    S::ShortDescription: agents_state::IsSet,
-    S::CreatedAt: agents_state::IsSet,
+    St: agents_state::State,
+    St::ShortDescription: agents_state::IsSet,
+    St::CreatedAt: agents_state::IsSet,
+    St::Sim: agents_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Agents<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Agents<S> {
         Agents {
             created_at: self._fields.0.unwrap(),
             description: self._fields.1,
@@ -386,8 +386,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Agents<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Agents<S> {
         Agents {
             created_at: self._fields.0.unwrap(),
             description: self._fields.1,

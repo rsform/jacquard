@@ -6,52 +6,48 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[allow(unused_imports)]
+use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
+use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 use crate::sh_weaver::notebook::BookEntryView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetBookEntry<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetBookEntry<S: BosStr = DefaultStr> {
     ///Defaults to `0`. Min: 0.
     #[serde(default = "_default_index")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub index: Option<i64>,
-    #[serde(borrow)]
     pub notebook: AtUri<S>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetBookEntryOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetBookEntryOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
-    #[serde(borrow)]
     pub value: BookEntryView<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
-    pub extra_data: Option<
-        alloc::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<S>,
-        >,
-    >,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
@@ -69,15 +65,12 @@ pub struct GetBookEntryOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(tag = "error", content = "message")]
 pub enum GetBookEntryError {
     #[serde(rename = "NotebookNotFound")]
-    NotebookNotFound(Option<jacquard_common::deps::smol_str::SmolStr>),
+    NotebookNotFound(Option<SmolStr>),
     #[serde(rename = "EntryNotFound")]
-    EntryNotFound(Option<jacquard_common::deps::smol_str::SmolStr>),
+    EntryNotFound(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: jacquard_common::deps::smol_str::SmolStr,
-        message: Option<jacquard_common::deps::smol_str::SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for GetBookEntryError {
@@ -113,12 +106,11 @@ pub struct GetBookEntryResponse;
 impl jacquard_common::xrpc::XrpcResp for GetBookEntryResponse {
     const NSID: &'static str = "sh.weaver.notebook.getBookEntry";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetBookEntryOutput<S>;
+    type Output<S: BosStr> = GetBookEntryOutput<S>;
     type Err = GetBookEntryError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetBookEntry<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetBookEntry<S> {
     const NSID: &'static str = "sh.weaver.notebook.getBookEntry";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetBookEntryResponse;
@@ -129,7 +121,7 @@ pub struct GetBookEntryRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetBookEntryRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.notebook.getBookEntry";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetBookEntry<S>;
+    type Request<S: BosStr> = GetBookEntry<S>;
     type Response = GetBookEntryResponse;
 }
 
@@ -156,9 +148,9 @@ pub mod get_book_entry_state {
         type Notebook = Unset;
     }
     ///State transition - sets the `notebook` field to Set
-    pub struct SetNotebook<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNotebook<S> {}
-    impl<S: State> State for SetNotebook<S> {
+    pub struct SetNotebook<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetNotebook<St> {}
+    impl<St: State> State for SetNotebook<St> {
         type Notebook = Set<members::notebook>;
     }
     /// Marker types for field names
@@ -169,32 +161,32 @@ pub mod get_book_entry_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetBookEntryBuilder<'a, S: get_book_entry_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetBookEntryBuilder<S: BosStr, St: get_book_entry_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<AtUri<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetBookEntry<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetBookEntryBuilder<'a, get_book_entry_state::Empty> {
+impl<S: BosStr> GetBookEntry<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetBookEntryBuilder<S, get_book_entry_state::Empty> {
         GetBookEntryBuilder::new()
     }
 }
 
-impl<'a> GetBookEntryBuilder<'a, get_book_entry_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetBookEntryBuilder<S, get_book_entry_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetBookEntryBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: get_book_entry_state::State> GetBookEntryBuilder<'a, S> {
+impl<S: BosStr, St: get_book_entry_state::State> GetBookEntryBuilder<S, St> {
     /// Set the `index` field (optional)
     pub fn index(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
@@ -207,32 +199,32 @@ impl<'a, S: get_book_entry_state::State> GetBookEntryBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GetBookEntryBuilder<'a, S>
+impl<S: BosStr, St> GetBookEntryBuilder<S, St>
 where
-    S: get_book_entry_state::State,
-    S::Notebook: get_book_entry_state::IsUnset,
+    St: get_book_entry_state::State,
+    St::Notebook: get_book_entry_state::IsUnset,
 {
     /// Set the `notebook` field (required)
     pub fn notebook(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> GetBookEntryBuilder<'a, get_book_entry_state::SetNotebook<S>> {
+    ) -> GetBookEntryBuilder<S, get_book_entry_state::SetNotebook<St>> {
         self._fields.1 = Option::Some(value.into());
         GetBookEntryBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetBookEntryBuilder<'a, S>
+impl<S: BosStr, St> GetBookEntryBuilder<S, St>
 where
-    S: get_book_entry_state::State,
-    S::Notebook: get_book_entry_state::IsSet,
+    St: get_book_entry_state::State,
+    St::Notebook: get_book_entry_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetBookEntry<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetBookEntry<S> {
         GetBookEntry {
             index: self._fields.0,
             notebook: self._fields.1.unwrap(),

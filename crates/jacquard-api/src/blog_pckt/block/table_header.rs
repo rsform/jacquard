@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -29,11 +29,11 @@ use crate::blog_pckt::block::text::Text;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct TableHeader<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct TableHeader<S: BosStr = DefaultStr> {
     ///Number of columns this cell spans
     #[serde(skip_serializing_if = "Option::is_none")]
     pub colspan: Option<i64>,
@@ -46,7 +46,7 @@ pub struct TableHeader<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for TableHeader<S> {
+impl<S: BosStr> LexiconSchema for TableHeader<S> {
     fn nsid() -> &'static str {
         "blog.pckt.block.tableHeader"
     }
@@ -98,9 +98,9 @@ pub mod table_header_state {
         type Content = Unset;
     }
     ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
+    pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetContent<St> {}
+    impl<St: State> State for SetContent<St> {
         type Content = Set<members::content>;
     }
     /// Marker types for field names
@@ -111,32 +111,32 @@ pub mod table_header_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct TableHeaderBuilder<'a, S: table_header_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct TableHeaderBuilder<S: BosStr, St: table_header_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<Vec<Text<S>>>, Option<i64>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> TableHeader<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> TableHeaderBuilder<'a, table_header_state::Empty> {
+impl<S: BosStr> TableHeader<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> TableHeaderBuilder<S, table_header_state::Empty> {
         TableHeaderBuilder::new()
     }
 }
 
-impl<'a> TableHeaderBuilder<'a, table_header_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> TableHeaderBuilder<S, table_header_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         TableHeaderBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: table_header_state::State> TableHeaderBuilder<'a, S> {
+impl<S: BosStr, St: table_header_state::State> TableHeaderBuilder<S, St> {
     /// Set the `colspan` field (optional)
     pub fn colspan(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
@@ -149,26 +149,26 @@ impl<'a, S: table_header_state::State> TableHeaderBuilder<'a, S> {
     }
 }
 
-impl<'a, S> TableHeaderBuilder<'a, S>
+impl<S: BosStr, St> TableHeaderBuilder<S, St>
 where
-    S: table_header_state::State,
-    S::Content: table_header_state::IsUnset,
+    St: table_header_state::State,
+    St::Content: table_header_state::IsUnset,
 {
     /// Set the `content` field (required)
     pub fn content(
         mut self,
         value: impl Into<Vec<Text<S>>>,
-    ) -> TableHeaderBuilder<'a, table_header_state::SetContent<S>> {
+    ) -> TableHeaderBuilder<S, table_header_state::SetContent<St>> {
         self._fields.1 = Option::Some(value.into());
         TableHeaderBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: table_header_state::State> TableHeaderBuilder<'a, S> {
+impl<S: BosStr, St: table_header_state::State> TableHeaderBuilder<S, St> {
     /// Set the `rowspan` field (optional)
     pub fn rowspan(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -181,13 +181,13 @@ impl<'a, S: table_header_state::State> TableHeaderBuilder<'a, S> {
     }
 }
 
-impl<'a, S> TableHeaderBuilder<'a, S>
+impl<S: BosStr, St> TableHeaderBuilder<S, St>
 where
-    S: table_header_state::State,
-    S::Content: table_header_state::IsSet,
+    St: table_header_state::State,
+    St::Content: table_header_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> TableHeader<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> TableHeader<S> {
         TableHeader {
             colspan: self._fields.0,
             content: self._fields.1.unwrap(),
@@ -195,11 +195,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> TableHeader<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> TableHeader<S> {
         TableHeader {
             colspan: self._fields.0,
             content: self._fields.1.unwrap(),

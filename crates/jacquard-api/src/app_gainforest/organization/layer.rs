@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "app.gainforest.organization.layer",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Layer<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Layer<S: BosStr = DefaultStr> {
     ///The date and time of the creation of the record
     pub created_at: Datetime,
     ///The description of the layer
@@ -61,18 +61,18 @@ pub struct Layer<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct LayerGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct LayerGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Layer<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Layer<S> {
+impl<S: BosStr> Layer<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, LayerRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -85,17 +85,17 @@ pub struct LayerRecord;
 impl XrpcResp for LayerRecord {
     const NSID: &'static str = "app.gainforest.organization.layer";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = LayerGetRecordOutput<S>;
+    type Output<S: BosStr> = LayerGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<LayerGetRecordOutput<S>> for Layer<S> {
+impl<S: BosStr> From<LayerGetRecordOutput<S>> for Layer<S> {
     fn from(output: LayerGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Layer<S> {
+impl<S: BosStr> Collection for Layer<S> {
     const NSID: &'static str = "app.gainforest.organization.layer";
     type Record = LayerRecord;
 }
@@ -105,7 +105,7 @@ impl Collection for LayerRecord {
     type Record = LayerRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Layer<S> {
+impl<S: BosStr> LexiconSchema for Layer<S> {
     fn nsid() -> &'static str {
         "app.gainforest.organization.layer"
     }
@@ -130,115 +130,115 @@ pub mod layer_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type CreatedAt;
         type Uri;
+        type Name;
         type Type;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type CreatedAt = Unset;
         type Uri = Unset;
+        type Name = Unset;
         type Type = Unset;
     }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type CreatedAt = S::CreatedAt;
-        type Uri = S::Uri;
-        type Type = S::Type;
-    }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Name = S::Name;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
-        type Uri = S::Uri;
-        type Type = S::Type;
+        type Uri = St::Uri;
+        type Name = St::Name;
+        type Type = St::Type;
     }
     ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Name = S::Name;
-        type CreatedAt = S::CreatedAt;
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type CreatedAt = St::CreatedAt;
         type Uri = Set<members::uri>;
-        type Type = S::Type;
+        type Name = St::Name;
+        type Type = St::Type;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type CreatedAt = St::CreatedAt;
+        type Uri = St::Uri;
+        type Name = Set<members::name>;
+        type Type = St::Type;
     }
     ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type Name = S::Name;
-        type CreatedAt = S::CreatedAt;
-        type Uri = S::Uri;
+    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetType<St> {}
+    impl<St: State> State for SetType<St> {
+        type CreatedAt = St::CreatedAt;
+        type Uri = St::Uri;
+        type Name = St::Name;
         type Type = Set<members::r#type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `type` field
         pub struct r#type(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct LayerBuilder<'a, S: layer_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct LayerBuilder<S: BosStr, St: layer_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<S>, Option<S>, Option<S>, Option<UriValue<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Layer<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> LayerBuilder<'a, layer_state::Empty> {
+impl<S: BosStr> Layer<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> LayerBuilder<S, layer_state::Empty> {
         LayerBuilder::new()
     }
 }
 
-impl<'a> LayerBuilder<'a, layer_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> LayerBuilder<S, layer_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         LayerBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LayerBuilder<'a, S>
+impl<S: BosStr, St> LayerBuilder<S, St>
 where
-    S: layer_state::State,
-    S::CreatedAt: layer_state::IsUnset,
+    St: layer_state::State,
+    St::CreatedAt: layer_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> LayerBuilder<'a, layer_state::SetCreatedAt<S>> {
+    ) -> LayerBuilder<S, layer_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         LayerBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: layer_state::State> LayerBuilder<'a, S> {
+impl<S: BosStr, St: layer_state::State> LayerBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -251,73 +251,73 @@ impl<'a, S: layer_state::State> LayerBuilder<'a, S> {
     }
 }
 
-impl<'a, S> LayerBuilder<'a, S>
+impl<S: BosStr, St> LayerBuilder<S, St>
 where
-    S: layer_state::State,
-    S::Name: layer_state::IsUnset,
+    St: layer_state::State,
+    St::Name: layer_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> LayerBuilder<'a, layer_state::SetName<S>> {
+    ) -> LayerBuilder<S, layer_state::SetName<St>> {
         self._fields.2 = Option::Some(value.into());
         LayerBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LayerBuilder<'a, S>
+impl<S: BosStr, St> LayerBuilder<S, St>
 where
-    S: layer_state::State,
-    S::Type: layer_state::IsUnset,
+    St: layer_state::State,
+    St::Type: layer_state::IsUnset,
 {
     /// Set the `type` field (required)
     pub fn r#type(
         mut self,
         value: impl Into<S>,
-    ) -> LayerBuilder<'a, layer_state::SetType<S>> {
+    ) -> LayerBuilder<S, layer_state::SetType<St>> {
         self._fields.3 = Option::Some(value.into());
         LayerBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LayerBuilder<'a, S>
+impl<S: BosStr, St> LayerBuilder<S, St>
 where
-    S: layer_state::State,
-    S::Uri: layer_state::IsUnset,
+    St: layer_state::State,
+    St::Uri: layer_state::IsUnset,
 {
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> LayerBuilder<'a, layer_state::SetUri<S>> {
+    ) -> LayerBuilder<S, layer_state::SetUri<St>> {
         self._fields.4 = Option::Some(value.into());
         LayerBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LayerBuilder<'a, S>
+impl<S: BosStr, St> LayerBuilder<S, St>
 where
-    S: layer_state::State,
-    S::Name: layer_state::IsSet,
-    S::CreatedAt: layer_state::IsSet,
-    S::Uri: layer_state::IsSet,
-    S::Type: layer_state::IsSet,
+    St: layer_state::State,
+    St::CreatedAt: layer_state::IsSet,
+    St::Uri: layer_state::IsSet,
+    St::Name: layer_state::IsSet,
+    St::Type: layer_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Layer<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Layer<S> {
         Layer {
             created_at: self._fields.0.unwrap(),
             description: self._fields.1,
@@ -327,8 +327,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Layer<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Layer<S> {
         Layer {
             created_at: self._fields.0.unwrap(),
             description: self._fields.1,

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use crate::app_protoimsg::chat::message;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct AspectRatio<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct AspectRatio<S: BosStr = DefaultStr> {
     pub height: i64,
     pub width: i64,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -52,11 +52,11 @@ pub struct AspectRatio<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Blockquote<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Blockquote<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
@@ -67,11 +67,11 @@ pub struct Blockquote<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Bold<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Bold<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
@@ -82,11 +82,11 @@ pub struct Bold<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ByteSlice<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ByteSlice<S: BosStr = DefaultStr> {
     pub byte_end: i64,
     pub byte_start: i64,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -99,11 +99,11 @@ pub struct ByteSlice<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CodeBlock<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CodeBlock<S: BosStr = DefaultStr> {
     ///Programming language for syntax highlighting.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub lang: Option<S>,
@@ -117,11 +117,11 @@ pub struct CodeBlock<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CodeInline<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CodeInline<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
@@ -132,11 +132,11 @@ pub struct CodeInline<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ExternalEmbed<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ExternalEmbed<S: BosStr = DefaultStr> {
     ///Description or summary.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
@@ -157,11 +157,11 @@ pub struct ExternalEmbed<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ImageEmbed<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ImageEmbed<S: BosStr = DefaultStr> {
     pub images: Vec<message::ImageItem<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -173,11 +173,11 @@ pub struct ImageEmbed<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ImageItem<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ImageItem<S: BosStr = DefaultStr> {
     ///Alt text for accessibility.
     pub alt: S,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -194,11 +194,11 @@ pub struct ImageItem<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Italic<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Italic<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
@@ -209,11 +209,11 @@ pub struct Italic<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Link<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Link<S: BosStr = DefaultStr> {
     pub uri: UriValue<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -227,11 +227,11 @@ pub struct Link<S: Bos<str> + AsRef<str> = DefaultStr> {
     rename = "app.protoimsg.chat.message",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Message<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Message<S: BosStr = DefaultStr> {
     ///AT-URI of the channel record this message belongs to.
     pub channel: AtUri<S>,
     ///Timestamp of message creation.
@@ -257,11 +257,11 @@ pub struct Message<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum MessageEmbed<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum MessageEmbed<S: BosStr = DefaultStr> {
     #[serde(rename = "app.protoimsg.chat.message#imageEmbed")]
     ImageEmbed(Box<message::ImageEmbed<S>>),
     #[serde(rename = "app.protoimsg.chat.message#videoEmbed")]
@@ -276,11 +276,11 @@ pub enum MessageEmbed<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct MessageGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct MessageGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
@@ -293,11 +293,11 @@ pub struct MessageGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Mention<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Mention<S: BosStr = DefaultStr> {
     pub did: Did<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -309,11 +309,11 @@ pub struct Mention<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ReplyRef<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ReplyRef<S: BosStr = DefaultStr> {
     ///AT-URI of the direct parent message being replied to.
     pub parent: AtUri<S>,
     ///AT-URI of the root message in the thread.
@@ -328,11 +328,11 @@ pub struct ReplyRef<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct RichTextFacet<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct RichTextFacet<S: BosStr = DefaultStr> {
     pub features: Vec<RichTextFacetFeaturesItem<S>>,
     pub index: message::ByteSlice<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -345,11 +345,11 @@ pub struct RichTextFacet<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RichTextFacetFeaturesItem<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum RichTextFacetFeaturesItem<S: BosStr = DefaultStr> {
     #[serde(rename = "app.protoimsg.chat.message#mention")]
     Mention(Box<message::Mention<S>>),
     #[serde(rename = "app.protoimsg.chat.message#link")]
@@ -376,11 +376,11 @@ pub enum RichTextFacetFeaturesItem<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Strikethrough<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Strikethrough<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
@@ -391,11 +391,11 @@ pub struct Strikethrough<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Tag<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Tag<S: BosStr = DefaultStr> {
     pub tag: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -407,11 +407,11 @@ pub struct Tag<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct VideoEmbed<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct VideoEmbed<S: BosStr = DefaultStr> {
     ///Alt text for accessibility.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub alt: Option<S>,
@@ -426,13 +426,13 @@ pub struct VideoEmbed<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Message<S> {
+impl<S: BosStr> Message<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, MessageRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for AspectRatio<S> {
+impl<S: BosStr> LexiconSchema for AspectRatio<S> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.message"
     }
@@ -467,7 +467,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for AspectRatio<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Blockquote<S> {
+impl<S: BosStr> LexiconSchema for Blockquote<S> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.message"
     }
@@ -482,7 +482,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Blockquote<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Bold<S> {
+impl<S: BosStr> LexiconSchema for Bold<S> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.message"
     }
@@ -497,7 +497,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Bold<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ByteSlice<S> {
+impl<S: BosStr> LexiconSchema for ByteSlice<S> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.message"
     }
@@ -532,7 +532,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for ByteSlice<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for CodeBlock<S> {
+impl<S: BosStr> LexiconSchema for CodeBlock<S> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.message"
     }
@@ -557,7 +557,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for CodeBlock<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for CodeInline<S> {
+impl<S: BosStr> LexiconSchema for CodeInline<S> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.message"
     }
@@ -572,7 +572,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for CodeInline<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ExternalEmbed<S> {
+impl<S: BosStr> LexiconSchema for ExternalEmbed<S> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.message"
     }
@@ -648,7 +648,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for ExternalEmbed<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ImageEmbed<S> {
+impl<S: BosStr> LexiconSchema for ImageEmbed<S> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.message"
     }
@@ -674,7 +674,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for ImageEmbed<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ImageItem<S> {
+impl<S: BosStr> LexiconSchema for ImageItem<S> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.message"
     }
@@ -748,7 +748,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for ImageItem<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Italic<S> {
+impl<S: BosStr> LexiconSchema for Italic<S> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.message"
     }
@@ -763,7 +763,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Italic<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Link<S> {
+impl<S: BosStr> LexiconSchema for Link<S> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.message"
     }
@@ -785,17 +785,17 @@ pub struct MessageRecord;
 impl XrpcResp for MessageRecord {
     const NSID: &'static str = "app.protoimsg.chat.message";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = MessageGetRecordOutput<S>;
+    type Output<S: BosStr> = MessageGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<MessageGetRecordOutput<S>> for Message<S> {
+impl<S: BosStr> From<MessageGetRecordOutput<S>> for Message<S> {
     fn from(output: MessageGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Message<S> {
+impl<S: BosStr> Collection for Message<S> {
     const NSID: &'static str = "app.protoimsg.chat.message";
     type Record = MessageRecord;
 }
@@ -805,7 +805,7 @@ impl Collection for MessageRecord {
     type Record = MessageRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Message<S> {
+impl<S: BosStr> LexiconSchema for Message<S> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.message"
     }
@@ -844,7 +844,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Message<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Mention<S> {
+impl<S: BosStr> LexiconSchema for Mention<S> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.message"
     }
@@ -859,7 +859,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Mention<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ReplyRef<S> {
+impl<S: BosStr> LexiconSchema for ReplyRef<S> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.message"
     }
@@ -874,7 +874,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for ReplyRef<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for RichTextFacet<S> {
+impl<S: BosStr> LexiconSchema for RichTextFacet<S> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.message"
     }
@@ -889,7 +889,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for RichTextFacet<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Strikethrough<S> {
+impl<S: BosStr> LexiconSchema for Strikethrough<S> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.message"
     }
@@ -904,7 +904,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Strikethrough<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Tag<S> {
+impl<S: BosStr> LexiconSchema for Tag<S> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.message"
     }
@@ -943,7 +943,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Tag<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for VideoEmbed<S> {
+impl<S: BosStr> LexiconSchema for VideoEmbed<S> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.message"
     }
@@ -1060,122 +1060,122 @@ pub mod aspect_ratio_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Width;
         type Height;
+        type Width;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Width = Unset;
         type Height = Unset;
-    }
-    ///State transition - sets the `width` field to Set
-    pub struct SetWidth<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWidth<S> {}
-    impl<S: State> State for SetWidth<S> {
-        type Width = Set<members::width>;
-        type Height = S::Height;
+        type Width = Unset;
     }
     ///State transition - sets the `height` field to Set
-    pub struct SetHeight<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHeight<S> {}
-    impl<S: State> State for SetHeight<S> {
-        type Width = S::Width;
+    pub struct SetHeight<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHeight<St> {}
+    impl<St: State> State for SetHeight<St> {
         type Height = Set<members::height>;
+        type Width = St::Width;
+    }
+    ///State transition - sets the `width` field to Set
+    pub struct SetWidth<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetWidth<St> {}
+    impl<St: State> State for SetWidth<St> {
+        type Height = St::Height;
+        type Width = Set<members::width>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `width` field
-        pub struct width(());
         ///Marker type for the `height` field
         pub struct height(());
+        ///Marker type for the `width` field
+        pub struct width(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct AspectRatioBuilder<'a, S: aspect_ratio_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct AspectRatioBuilder<S: BosStr, St: aspect_ratio_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<i64>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> AspectRatio<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> AspectRatioBuilder<'a, aspect_ratio_state::Empty> {
+impl<S: BosStr> AspectRatio<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> AspectRatioBuilder<S, aspect_ratio_state::Empty> {
         AspectRatioBuilder::new()
     }
 }
 
-impl<'a> AspectRatioBuilder<'a, aspect_ratio_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> AspectRatioBuilder<S, aspect_ratio_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         AspectRatioBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AspectRatioBuilder<'a, S>
+impl<S: BosStr, St> AspectRatioBuilder<S, St>
 where
-    S: aspect_ratio_state::State,
-    S::Height: aspect_ratio_state::IsUnset,
+    St: aspect_ratio_state::State,
+    St::Height: aspect_ratio_state::IsUnset,
 {
     /// Set the `height` field (required)
     pub fn height(
         mut self,
         value: impl Into<i64>,
-    ) -> AspectRatioBuilder<'a, aspect_ratio_state::SetHeight<S>> {
+    ) -> AspectRatioBuilder<S, aspect_ratio_state::SetHeight<St>> {
         self._fields.0 = Option::Some(value.into());
         AspectRatioBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AspectRatioBuilder<'a, S>
+impl<S: BosStr, St> AspectRatioBuilder<S, St>
 where
-    S: aspect_ratio_state::State,
-    S::Width: aspect_ratio_state::IsUnset,
+    St: aspect_ratio_state::State,
+    St::Width: aspect_ratio_state::IsUnset,
 {
     /// Set the `width` field (required)
     pub fn width(
         mut self,
         value: impl Into<i64>,
-    ) -> AspectRatioBuilder<'a, aspect_ratio_state::SetWidth<S>> {
+    ) -> AspectRatioBuilder<S, aspect_ratio_state::SetWidth<St>> {
         self._fields.1 = Option::Some(value.into());
         AspectRatioBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AspectRatioBuilder<'a, S>
+impl<S: BosStr, St> AspectRatioBuilder<S, St>
 where
-    S: aspect_ratio_state::State,
-    S::Width: aspect_ratio_state::IsSet,
-    S::Height: aspect_ratio_state::IsSet,
+    St: aspect_ratio_state::State,
+    St::Height: aspect_ratio_state::IsSet,
+    St::Width: aspect_ratio_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> AspectRatio<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> AspectRatio<S> {
         AspectRatio {
             height: self._fields.0.unwrap(),
             width: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> AspectRatio<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> AspectRatio<S> {
         AspectRatio {
             height: self._fields.0.unwrap(),
             width: self._fields.1.unwrap(),
@@ -1781,122 +1781,122 @@ pub mod byte_slice_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ByteEnd;
         type ByteStart;
+        type ByteEnd;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ByteEnd = Unset;
         type ByteStart = Unset;
-    }
-    ///State transition - sets the `byte_end` field to Set
-    pub struct SetByteEnd<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetByteEnd<S> {}
-    impl<S: State> State for SetByteEnd<S> {
-        type ByteEnd = Set<members::byte_end>;
-        type ByteStart = S::ByteStart;
+        type ByteEnd = Unset;
     }
     ///State transition - sets the `byte_start` field to Set
-    pub struct SetByteStart<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetByteStart<S> {}
-    impl<S: State> State for SetByteStart<S> {
-        type ByteEnd = S::ByteEnd;
+    pub struct SetByteStart<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetByteStart<St> {}
+    impl<St: State> State for SetByteStart<St> {
         type ByteStart = Set<members::byte_start>;
+        type ByteEnd = St::ByteEnd;
+    }
+    ///State transition - sets the `byte_end` field to Set
+    pub struct SetByteEnd<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetByteEnd<St> {}
+    impl<St: State> State for SetByteEnd<St> {
+        type ByteStart = St::ByteStart;
+        type ByteEnd = Set<members::byte_end>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `byte_end` field
-        pub struct byte_end(());
         ///Marker type for the `byte_start` field
         pub struct byte_start(());
+        ///Marker type for the `byte_end` field
+        pub struct byte_end(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ByteSliceBuilder<'a, S: byte_slice_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ByteSliceBuilder<S: BosStr, St: byte_slice_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<i64>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ByteSlice<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ByteSliceBuilder<'a, byte_slice_state::Empty> {
+impl<S: BosStr> ByteSlice<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ByteSliceBuilder<S, byte_slice_state::Empty> {
         ByteSliceBuilder::new()
     }
 }
 
-impl<'a> ByteSliceBuilder<'a, byte_slice_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ByteSliceBuilder<S, byte_slice_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ByteSliceBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ByteSliceBuilder<'a, S>
+impl<S: BosStr, St> ByteSliceBuilder<S, St>
 where
-    S: byte_slice_state::State,
-    S::ByteEnd: byte_slice_state::IsUnset,
+    St: byte_slice_state::State,
+    St::ByteEnd: byte_slice_state::IsUnset,
 {
     /// Set the `byteEnd` field (required)
     pub fn byte_end(
         mut self,
         value: impl Into<i64>,
-    ) -> ByteSliceBuilder<'a, byte_slice_state::SetByteEnd<S>> {
+    ) -> ByteSliceBuilder<S, byte_slice_state::SetByteEnd<St>> {
         self._fields.0 = Option::Some(value.into());
         ByteSliceBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ByteSliceBuilder<'a, S>
+impl<S: BosStr, St> ByteSliceBuilder<S, St>
 where
-    S: byte_slice_state::State,
-    S::ByteStart: byte_slice_state::IsUnset,
+    St: byte_slice_state::State,
+    St::ByteStart: byte_slice_state::IsUnset,
 {
     /// Set the `byteStart` field (required)
     pub fn byte_start(
         mut self,
         value: impl Into<i64>,
-    ) -> ByteSliceBuilder<'a, byte_slice_state::SetByteStart<S>> {
+    ) -> ByteSliceBuilder<S, byte_slice_state::SetByteStart<St>> {
         self._fields.1 = Option::Some(value.into());
         ByteSliceBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ByteSliceBuilder<'a, S>
+impl<S: BosStr, St> ByteSliceBuilder<S, St>
 where
-    S: byte_slice_state::State,
-    S::ByteEnd: byte_slice_state::IsSet,
-    S::ByteStart: byte_slice_state::IsSet,
+    St: byte_slice_state::State,
+    St::ByteStart: byte_slice_state::IsSet,
+    St::ByteEnd: byte_slice_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ByteSlice<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ByteSlice<S> {
         ByteSlice {
             byte_end: self._fields.0.unwrap(),
             byte_start: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> ByteSlice<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ByteSlice<S> {
         ByteSlice {
             byte_end: self._fields.0.unwrap(),
             byte_start: self._fields.1.unwrap(),
@@ -1915,66 +1915,66 @@ pub mod external_embed_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
         type Title;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Uri = Set<members::uri>;
-        type Title = S::Title;
+        type Uri = Unset;
     }
     ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Uri = S::Uri;
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
         type Title = Set<members::title>;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Title = St::Title;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ExternalEmbedBuilder<'a, S: external_embed_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ExternalEmbedBuilder<S: BosStr, St: external_embed_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<BlobRef<S>>, Option<S>, Option<UriValue<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ExternalEmbed<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ExternalEmbedBuilder<'a, external_embed_state::Empty> {
+impl<S: BosStr> ExternalEmbed<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ExternalEmbedBuilder<S, external_embed_state::Empty> {
         ExternalEmbedBuilder::new()
     }
 }
 
-impl<'a> ExternalEmbedBuilder<'a, external_embed_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ExternalEmbedBuilder<S, external_embed_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ExternalEmbedBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: external_embed_state::State> ExternalEmbedBuilder<'a, S> {
+impl<S: BosStr, St: external_embed_state::State> ExternalEmbedBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -1987,7 +1987,7 @@ impl<'a, S: external_embed_state::State> ExternalEmbedBuilder<'a, S> {
     }
 }
 
-impl<'a, S: external_embed_state::State> ExternalEmbedBuilder<'a, S> {
+impl<S: BosStr, St: external_embed_state::State> ExternalEmbedBuilder<S, St> {
     /// Set the `thumb` field (optional)
     pub fn thumb(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -2000,52 +2000,52 @@ impl<'a, S: external_embed_state::State> ExternalEmbedBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ExternalEmbedBuilder<'a, S>
+impl<S: BosStr, St> ExternalEmbedBuilder<S, St>
 where
-    S: external_embed_state::State,
-    S::Title: external_embed_state::IsUnset,
+    St: external_embed_state::State,
+    St::Title: external_embed_state::IsUnset,
 {
     /// Set the `title` field (required)
     pub fn title(
         mut self,
         value: impl Into<S>,
-    ) -> ExternalEmbedBuilder<'a, external_embed_state::SetTitle<S>> {
+    ) -> ExternalEmbedBuilder<S, external_embed_state::SetTitle<St>> {
         self._fields.2 = Option::Some(value.into());
         ExternalEmbedBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ExternalEmbedBuilder<'a, S>
+impl<S: BosStr, St> ExternalEmbedBuilder<S, St>
 where
-    S: external_embed_state::State,
-    S::Uri: external_embed_state::IsUnset,
+    St: external_embed_state::State,
+    St::Uri: external_embed_state::IsUnset,
 {
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> ExternalEmbedBuilder<'a, external_embed_state::SetUri<S>> {
+    ) -> ExternalEmbedBuilder<S, external_embed_state::SetUri<St>> {
         self._fields.3 = Option::Some(value.into());
         ExternalEmbedBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ExternalEmbedBuilder<'a, S>
+impl<S: BosStr, St> ExternalEmbedBuilder<S, St>
 where
-    S: external_embed_state::State,
-    S::Uri: external_embed_state::IsSet,
-    S::Title: external_embed_state::IsSet,
+    St: external_embed_state::State,
+    St::Title: external_embed_state::IsSet,
+    St::Uri: external_embed_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ExternalEmbed<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ExternalEmbed<S> {
         ExternalEmbed {
             description: self._fields.0,
             thumb: self._fields.1,
@@ -2054,11 +2054,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> ExternalEmbed<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ExternalEmbed<S> {
         ExternalEmbed {
             description: self._fields.0,
             thumb: self._fields.1,
@@ -2088,9 +2088,9 @@ pub mod image_embed_state {
         type Images = Unset;
     }
     ///State transition - sets the `images` field to Set
-    pub struct SetImages<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetImages<S> {}
-    impl<S: State> State for SetImages<S> {
+    pub struct SetImages<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetImages<St> {}
+    impl<St: State> State for SetImages<St> {
         type Images = Set<members::images>;
     }
     /// Marker types for field names
@@ -2101,67 +2101,67 @@ pub mod image_embed_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ImageEmbedBuilder<'a, S: image_embed_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ImageEmbedBuilder<S: BosStr, St: image_embed_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<message::ImageItem<S>>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ImageEmbed<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ImageEmbedBuilder<'a, image_embed_state::Empty> {
+impl<S: BosStr> ImageEmbed<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ImageEmbedBuilder<S, image_embed_state::Empty> {
         ImageEmbedBuilder::new()
     }
 }
 
-impl<'a> ImageEmbedBuilder<'a, image_embed_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ImageEmbedBuilder<S, image_embed_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ImageEmbedBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ImageEmbedBuilder<'a, S>
+impl<S: BosStr, St> ImageEmbedBuilder<S, St>
 where
-    S: image_embed_state::State,
-    S::Images: image_embed_state::IsUnset,
+    St: image_embed_state::State,
+    St::Images: image_embed_state::IsUnset,
 {
     /// Set the `images` field (required)
     pub fn images(
         mut self,
         value: impl Into<Vec<message::ImageItem<S>>>,
-    ) -> ImageEmbedBuilder<'a, image_embed_state::SetImages<S>> {
+    ) -> ImageEmbedBuilder<S, image_embed_state::SetImages<St>> {
         self._fields.0 = Option::Some(value.into());
         ImageEmbedBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ImageEmbedBuilder<'a, S>
+impl<S: BosStr, St> ImageEmbedBuilder<S, St>
 where
-    S: image_embed_state::State,
-    S::Images: image_embed_state::IsSet,
+    St: image_embed_state::State,
+    St::Images: image_embed_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ImageEmbed<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ImageEmbed<S> {
         ImageEmbed {
             images: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> ImageEmbed<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ImageEmbed<S> {
         ImageEmbed {
             images: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -2190,17 +2190,17 @@ pub mod image_item_state {
         type Alt = Unset;
     }
     ///State transition - sets the `image` field to Set
-    pub struct SetImage<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetImage<S> {}
-    impl<S: State> State for SetImage<S> {
+    pub struct SetImage<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetImage<St> {}
+    impl<St: State> State for SetImage<St> {
         type Image = Set<members::image>;
-        type Alt = S::Alt;
+        type Alt = St::Alt;
     }
     ///State transition - sets the `alt` field to Set
-    pub struct SetAlt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAlt<S> {}
-    impl<S: State> State for SetAlt<S> {
-        type Image = S::Image;
+    pub struct SetAlt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAlt<St> {}
+    impl<St: State> State for SetAlt<St> {
+        type Image = St::Image;
         type Alt = Set<members::alt>;
     }
     /// Marker types for field names
@@ -2213,51 +2213,51 @@ pub mod image_item_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ImageItemBuilder<'a, S: image_item_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ImageItemBuilder<S: BosStr, St: image_item_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<message::AspectRatio<S>>, Option<BlobRef<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ImageItem<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ImageItemBuilder<'a, image_item_state::Empty> {
+impl<S: BosStr> ImageItem<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ImageItemBuilder<S, image_item_state::Empty> {
         ImageItemBuilder::new()
     }
 }
 
-impl<'a> ImageItemBuilder<'a, image_item_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ImageItemBuilder<S, image_item_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ImageItemBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ImageItemBuilder<'a, S>
+impl<S: BosStr, St> ImageItemBuilder<S, St>
 where
-    S: image_item_state::State,
-    S::Alt: image_item_state::IsUnset,
+    St: image_item_state::State,
+    St::Alt: image_item_state::IsUnset,
 {
     /// Set the `alt` field (required)
     pub fn alt(
         mut self,
         value: impl Into<S>,
-    ) -> ImageItemBuilder<'a, image_item_state::SetAlt<S>> {
+    ) -> ImageItemBuilder<S, image_item_state::SetAlt<St>> {
         self._fields.0 = Option::Some(value.into());
         ImageItemBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: image_item_state::State> ImageItemBuilder<'a, S> {
+impl<S: BosStr, St: image_item_state::State> ImageItemBuilder<S, St> {
     /// Set the `aspectRatio` field (optional)
     pub fn aspect_ratio(
         mut self,
@@ -2273,33 +2273,33 @@ impl<'a, S: image_item_state::State> ImageItemBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ImageItemBuilder<'a, S>
+impl<S: BosStr, St> ImageItemBuilder<S, St>
 where
-    S: image_item_state::State,
-    S::Image: image_item_state::IsUnset,
+    St: image_item_state::State,
+    St::Image: image_item_state::IsUnset,
 {
     /// Set the `image` field (required)
     pub fn image(
         mut self,
         value: impl Into<BlobRef<S>>,
-    ) -> ImageItemBuilder<'a, image_item_state::SetImage<S>> {
+    ) -> ImageItemBuilder<S, image_item_state::SetImage<St>> {
         self._fields.2 = Option::Some(value.into());
         ImageItemBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ImageItemBuilder<'a, S>
+impl<S: BosStr, St> ImageItemBuilder<S, St>
 where
-    S: image_item_state::State,
-    S::Image: image_item_state::IsSet,
-    S::Alt: image_item_state::IsSet,
+    St: image_item_state::State,
+    St::Image: image_item_state::IsSet,
+    St::Alt: image_item_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ImageItem<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ImageItem<S> {
         ImageItem {
             alt: self._fields.0.unwrap(),
             aspect_ratio: self._fields.1,
@@ -2307,11 +2307,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> ImageItem<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ImageItem<S> {
         ImageItem {
             alt: self._fields.0.unwrap(),
             aspect_ratio: self._fields.1,
@@ -2340,9 +2340,9 @@ pub mod link_state {
         type Uri = Unset;
     }
     ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
         type Uri = Set<members::uri>;
     }
     /// Marker types for field names
@@ -2353,64 +2353,64 @@ pub mod link_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct LinkBuilder<'a, S: link_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct LinkBuilder<S: BosStr, St: link_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<UriValue<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Link<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> LinkBuilder<'a, link_state::Empty> {
+impl<S: BosStr> Link<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> LinkBuilder<S, link_state::Empty> {
         LinkBuilder::new()
     }
 }
 
-impl<'a> LinkBuilder<'a, link_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> LinkBuilder<S, link_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         LinkBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LinkBuilder<'a, S>
+impl<S: BosStr, St> LinkBuilder<S, St>
 where
-    S: link_state::State,
-    S::Uri: link_state::IsUnset,
+    St: link_state::State,
+    St::Uri: link_state::IsUnset,
 {
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> LinkBuilder<'a, link_state::SetUri<S>> {
+    ) -> LinkBuilder<S, link_state::SetUri<St>> {
         self._fields.0 = Option::Some(value.into());
         LinkBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LinkBuilder<'a, S>
+impl<S: BosStr, St> LinkBuilder<S, St>
 where
-    S: link_state::State,
-    S::Uri: link_state::IsSet,
+    St: link_state::State,
+    St::Uri: link_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Link<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Link<S> {
         Link {
             uri: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Link<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Link<S> {
         Link {
             uri: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -2441,27 +2441,27 @@ pub mod message_state {
         type CreatedAt = Unset;
     }
     ///State transition - sets the `channel` field to Set
-    pub struct SetChannel<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetChannel<S> {}
-    impl<S: State> State for SetChannel<S> {
+    pub struct SetChannel<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetChannel<St> {}
+    impl<St: State> State for SetChannel<St> {
         type Channel = Set<members::channel>;
-        type Text = S::Text;
-        type CreatedAt = S::CreatedAt;
+        type Text = St::Text;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `text` field to Set
-    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetText<S> {}
-    impl<S: State> State for SetText<S> {
-        type Channel = S::Channel;
+    pub struct SetText<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetText<St> {}
+    impl<St: State> State for SetText<St> {
+        type Channel = St::Channel;
         type Text = Set<members::text>;
-        type CreatedAt = S::CreatedAt;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Channel = S::Channel;
-        type Text = S::Text;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Channel = St::Channel;
+        type Text = St::Text;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
@@ -2476,9 +2476,9 @@ pub mod message_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct MessageBuilder<'a, S: message_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct MessageBuilder<S: BosStr, St: message_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<AtUri<S>>,
         Option<Datetime>,
@@ -2487,66 +2487,66 @@ pub struct MessageBuilder<'a, S: message_state::State> {
         Option<message::ReplyRef<S>>,
         Option<S>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Message<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> MessageBuilder<'a, message_state::Empty> {
+impl<S: BosStr> Message<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> MessageBuilder<S, message_state::Empty> {
         MessageBuilder::new()
     }
 }
 
-impl<'a> MessageBuilder<'a, message_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> MessageBuilder<S, message_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         MessageBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> MessageBuilder<'a, S>
+impl<S: BosStr, St> MessageBuilder<S, St>
 where
-    S: message_state::State,
-    S::Channel: message_state::IsUnset,
+    St: message_state::State,
+    St::Channel: message_state::IsUnset,
 {
     /// Set the `channel` field (required)
     pub fn channel(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> MessageBuilder<'a, message_state::SetChannel<S>> {
+    ) -> MessageBuilder<S, message_state::SetChannel<St>> {
         self._fields.0 = Option::Some(value.into());
         MessageBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> MessageBuilder<'a, S>
+impl<S: BosStr, St> MessageBuilder<S, St>
 where
-    S: message_state::State,
-    S::CreatedAt: message_state::IsUnset,
+    St: message_state::State,
+    St::CreatedAt: message_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> MessageBuilder<'a, message_state::SetCreatedAt<S>> {
+    ) -> MessageBuilder<S, message_state::SetCreatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         MessageBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: message_state::State> MessageBuilder<'a, S> {
+impl<S: BosStr, St: message_state::State> MessageBuilder<S, St> {
     /// Set the `embed` field (optional)
     pub fn embed(mut self, value: impl Into<Option<MessageEmbed<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -2559,7 +2559,7 @@ impl<'a, S: message_state::State> MessageBuilder<'a, S> {
     }
 }
 
-impl<'a, S: message_state::State> MessageBuilder<'a, S> {
+impl<S: BosStr, St: message_state::State> MessageBuilder<S, St> {
     /// Set the `facets` field (optional)
     pub fn facets(
         mut self,
@@ -2578,7 +2578,7 @@ impl<'a, S: message_state::State> MessageBuilder<'a, S> {
     }
 }
 
-impl<'a, S: message_state::State> MessageBuilder<'a, S> {
+impl<S: BosStr, St: message_state::State> MessageBuilder<S, St> {
     /// Set the `reply` field (optional)
     pub fn reply(mut self, value: impl Into<Option<message::ReplyRef<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -2591,34 +2591,34 @@ impl<'a, S: message_state::State> MessageBuilder<'a, S> {
     }
 }
 
-impl<'a, S> MessageBuilder<'a, S>
+impl<S: BosStr, St> MessageBuilder<S, St>
 where
-    S: message_state::State,
-    S::Text: message_state::IsUnset,
+    St: message_state::State,
+    St::Text: message_state::IsUnset,
 {
     /// Set the `text` field (required)
     pub fn text(
         mut self,
         value: impl Into<S>,
-    ) -> MessageBuilder<'a, message_state::SetText<S>> {
+    ) -> MessageBuilder<S, message_state::SetText<St>> {
         self._fields.5 = Option::Some(value.into());
         MessageBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> MessageBuilder<'a, S>
+impl<S: BosStr, St> MessageBuilder<S, St>
 where
-    S: message_state::State,
-    S::Channel: message_state::IsSet,
-    S::Text: message_state::IsSet,
-    S::CreatedAt: message_state::IsSet,
+    St: message_state::State,
+    St::Channel: message_state::IsSet,
+    St::Text: message_state::IsSet,
+    St::CreatedAt: message_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Message<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Message<S> {
         Message {
             channel: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
@@ -2629,11 +2629,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Message<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Message<S> {
         Message {
             channel: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
@@ -2665,9 +2662,9 @@ pub mod mention_state {
         type Did = Unset;
     }
     ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
         type Did = Set<members::did>;
     }
     /// Marker types for field names
@@ -2678,67 +2675,64 @@ pub mod mention_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct MentionBuilder<'a, S: mention_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct MentionBuilder<S: BosStr, St: mention_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Mention<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> MentionBuilder<'a, mention_state::Empty> {
+impl<S: BosStr> Mention<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> MentionBuilder<S, mention_state::Empty> {
         MentionBuilder::new()
     }
 }
 
-impl<'a> MentionBuilder<'a, mention_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> MentionBuilder<S, mention_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         MentionBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> MentionBuilder<'a, S>
+impl<S: BosStr, St> MentionBuilder<S, St>
 where
-    S: mention_state::State,
-    S::Did: mention_state::IsUnset,
+    St: mention_state::State,
+    St::Did: mention_state::IsUnset,
 {
     /// Set the `did` field (required)
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> MentionBuilder<'a, mention_state::SetDid<S>> {
+    ) -> MentionBuilder<S, mention_state::SetDid<St>> {
         self._fields.0 = Option::Some(value.into());
         MentionBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> MentionBuilder<'a, S>
+impl<S: BosStr, St> MentionBuilder<S, St>
 where
-    S: mention_state::State,
-    S::Did: mention_state::IsSet,
+    St: mention_state::State,
+    St::Did: mention_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Mention<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Mention<S> {
         Mention {
             did: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Mention<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Mention<S> {
         Mention {
             did: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -2767,17 +2761,17 @@ pub mod reply_ref_state {
         type Parent = Unset;
     }
     ///State transition - sets the `root` field to Set
-    pub struct SetRoot<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRoot<S> {}
-    impl<S: State> State for SetRoot<S> {
+    pub struct SetRoot<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRoot<St> {}
+    impl<St: State> State for SetRoot<St> {
         type Root = Set<members::root>;
-        type Parent = S::Parent;
+        type Parent = St::Parent;
     }
     ///State transition - sets the `parent` field to Set
-    pub struct SetParent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetParent<S> {}
-    impl<S: State> State for SetParent<S> {
-        type Root = S::Root;
+    pub struct SetParent<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetParent<St> {}
+    impl<St: State> State for SetParent<St> {
+        type Root = St::Root;
         type Parent = Set<members::parent>;
     }
     /// Marker types for field names
@@ -2790,88 +2784,85 @@ pub mod reply_ref_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ReplyRefBuilder<'a, S: reply_ref_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ReplyRefBuilder<S: BosStr, St: reply_ref_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>, Option<AtUri<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ReplyRef<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ReplyRefBuilder<'a, reply_ref_state::Empty> {
+impl<S: BosStr> ReplyRef<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ReplyRefBuilder<S, reply_ref_state::Empty> {
         ReplyRefBuilder::new()
     }
 }
 
-impl<'a> ReplyRefBuilder<'a, reply_ref_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ReplyRefBuilder<S, reply_ref_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ReplyRefBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ReplyRefBuilder<'a, S>
+impl<S: BosStr, St> ReplyRefBuilder<S, St>
 where
-    S: reply_ref_state::State,
-    S::Parent: reply_ref_state::IsUnset,
+    St: reply_ref_state::State,
+    St::Parent: reply_ref_state::IsUnset,
 {
     /// Set the `parent` field (required)
     pub fn parent(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> ReplyRefBuilder<'a, reply_ref_state::SetParent<S>> {
+    ) -> ReplyRefBuilder<S, reply_ref_state::SetParent<St>> {
         self._fields.0 = Option::Some(value.into());
         ReplyRefBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ReplyRefBuilder<'a, S>
+impl<S: BosStr, St> ReplyRefBuilder<S, St>
 where
-    S: reply_ref_state::State,
-    S::Root: reply_ref_state::IsUnset,
+    St: reply_ref_state::State,
+    St::Root: reply_ref_state::IsUnset,
 {
     /// Set the `root` field (required)
     pub fn root(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> ReplyRefBuilder<'a, reply_ref_state::SetRoot<S>> {
+    ) -> ReplyRefBuilder<S, reply_ref_state::SetRoot<St>> {
         self._fields.1 = Option::Some(value.into());
         ReplyRefBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ReplyRefBuilder<'a, S>
+impl<S: BosStr, St> ReplyRefBuilder<S, St>
 where
-    S: reply_ref_state::State,
-    S::Root: reply_ref_state::IsSet,
-    S::Parent: reply_ref_state::IsSet,
+    St: reply_ref_state::State,
+    St::Root: reply_ref_state::IsSet,
+    St::Parent: reply_ref_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ReplyRef<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ReplyRef<S> {
         ReplyRef {
             parent: self._fields.0.unwrap(),
             root: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> ReplyRef<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ReplyRef<S> {
         ReplyRef {
             parent: self._fields.0.unwrap(),
             root: self._fields.1.unwrap(),
@@ -2901,17 +2892,17 @@ pub mod rich_text_facet_state {
         type Features = Unset;
     }
     ///State transition - sets the `index` field to Set
-    pub struct SetIndex<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIndex<S> {}
-    impl<S: State> State for SetIndex<S> {
+    pub struct SetIndex<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIndex<St> {}
+    impl<St: State> State for SetIndex<St> {
         type Index = Set<members::index>;
-        type Features = S::Features;
+        type Features = St::Features;
     }
     ///State transition - sets the `features` field to Set
-    pub struct SetFeatures<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFeatures<S> {}
-    impl<S: State> State for SetFeatures<S> {
-        type Index = S::Index;
+    pub struct SetFeatures<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetFeatures<St> {}
+    impl<St: State> State for SetFeatures<St> {
+        type Index = St::Index;
         type Features = Set<members::features>;
     }
     /// Marker types for field names
@@ -2924,88 +2915,88 @@ pub mod rich_text_facet_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct RichTextFacetBuilder<'a, S: rich_text_facet_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct RichTextFacetBuilder<S: BosStr, St: rich_text_facet_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<RichTextFacetFeaturesItem<S>>>, Option<message::ByteSlice<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> RichTextFacet<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> RichTextFacetBuilder<'a, rich_text_facet_state::Empty> {
+impl<S: BosStr> RichTextFacet<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> RichTextFacetBuilder<S, rich_text_facet_state::Empty> {
         RichTextFacetBuilder::new()
     }
 }
 
-impl<'a> RichTextFacetBuilder<'a, rich_text_facet_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> RichTextFacetBuilder<S, rich_text_facet_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         RichTextFacetBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RichTextFacetBuilder<'a, S>
+impl<S: BosStr, St> RichTextFacetBuilder<S, St>
 where
-    S: rich_text_facet_state::State,
-    S::Features: rich_text_facet_state::IsUnset,
+    St: rich_text_facet_state::State,
+    St::Features: rich_text_facet_state::IsUnset,
 {
     /// Set the `features` field (required)
     pub fn features(
         mut self,
         value: impl Into<Vec<RichTextFacetFeaturesItem<S>>>,
-    ) -> RichTextFacetBuilder<'a, rich_text_facet_state::SetFeatures<S>> {
+    ) -> RichTextFacetBuilder<S, rich_text_facet_state::SetFeatures<St>> {
         self._fields.0 = Option::Some(value.into());
         RichTextFacetBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RichTextFacetBuilder<'a, S>
+impl<S: BosStr, St> RichTextFacetBuilder<S, St>
 where
-    S: rich_text_facet_state::State,
-    S::Index: rich_text_facet_state::IsUnset,
+    St: rich_text_facet_state::State,
+    St::Index: rich_text_facet_state::IsUnset,
 {
     /// Set the `index` field (required)
     pub fn index(
         mut self,
         value: impl Into<message::ByteSlice<S>>,
-    ) -> RichTextFacetBuilder<'a, rich_text_facet_state::SetIndex<S>> {
+    ) -> RichTextFacetBuilder<S, rich_text_facet_state::SetIndex<St>> {
         self._fields.1 = Option::Some(value.into());
         RichTextFacetBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RichTextFacetBuilder<'a, S>
+impl<S: BosStr, St> RichTextFacetBuilder<S, St>
 where
-    S: rich_text_facet_state::State,
-    S::Index: rich_text_facet_state::IsSet,
-    S::Features: rich_text_facet_state::IsSet,
+    St: rich_text_facet_state::State,
+    St::Index: rich_text_facet_state::IsSet,
+    St::Features: rich_text_facet_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> RichTextFacet<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> RichTextFacet<S> {
         RichTextFacet {
             features: self._fields.0.unwrap(),
             index: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> RichTextFacet<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> RichTextFacet<S> {
         RichTextFacet {
             features: self._fields.0.unwrap(),
             index: self._fields.1.unwrap(),
@@ -3033,9 +3024,9 @@ pub mod video_embed_state {
         type Video = Unset;
     }
     ///State transition - sets the `video` field to Set
-    pub struct SetVideo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetVideo<S> {}
-    impl<S: State> State for SetVideo<S> {
+    pub struct SetVideo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetVideo<St> {}
+    impl<St: State> State for SetVideo<St> {
         type Video = Set<members::video>;
     }
     /// Marker types for field names
@@ -3046,37 +3037,37 @@ pub mod video_embed_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct VideoEmbedBuilder<'a, S: video_embed_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct VideoEmbedBuilder<S: BosStr, St: video_embed_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
         Option<message::AspectRatio<S>>,
         Option<BlobRef<S>>,
         Option<BlobRef<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> VideoEmbed<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> VideoEmbedBuilder<'a, video_embed_state::Empty> {
+impl<S: BosStr> VideoEmbed<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> VideoEmbedBuilder<S, video_embed_state::Empty> {
         VideoEmbedBuilder::new()
     }
 }
 
-impl<'a> VideoEmbedBuilder<'a, video_embed_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> VideoEmbedBuilder<S, video_embed_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         VideoEmbedBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: video_embed_state::State> VideoEmbedBuilder<'a, S> {
+impl<S: BosStr, St: video_embed_state::State> VideoEmbedBuilder<S, St> {
     /// Set the `alt` field (optional)
     pub fn alt(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -3089,7 +3080,7 @@ impl<'a, S: video_embed_state::State> VideoEmbedBuilder<'a, S> {
     }
 }
 
-impl<'a, S: video_embed_state::State> VideoEmbedBuilder<'a, S> {
+impl<S: BosStr, St: video_embed_state::State> VideoEmbedBuilder<S, St> {
     /// Set the `aspectRatio` field (optional)
     pub fn aspect_ratio(
         mut self,
@@ -3105,7 +3096,7 @@ impl<'a, S: video_embed_state::State> VideoEmbedBuilder<'a, S> {
     }
 }
 
-impl<'a, S: video_embed_state::State> VideoEmbedBuilder<'a, S> {
+impl<S: BosStr, St: video_embed_state::State> VideoEmbedBuilder<S, St> {
     /// Set the `thumbnail` field (optional)
     pub fn thumbnail(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -3118,32 +3109,32 @@ impl<'a, S: video_embed_state::State> VideoEmbedBuilder<'a, S> {
     }
 }
 
-impl<'a, S> VideoEmbedBuilder<'a, S>
+impl<S: BosStr, St> VideoEmbedBuilder<S, St>
 where
-    S: video_embed_state::State,
-    S::Video: video_embed_state::IsUnset,
+    St: video_embed_state::State,
+    St::Video: video_embed_state::IsUnset,
 {
     /// Set the `video` field (required)
     pub fn video(
         mut self,
         value: impl Into<BlobRef<S>>,
-    ) -> VideoEmbedBuilder<'a, video_embed_state::SetVideo<S>> {
+    ) -> VideoEmbedBuilder<S, video_embed_state::SetVideo<St>> {
         self._fields.3 = Option::Some(value.into());
         VideoEmbedBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> VideoEmbedBuilder<'a, S>
+impl<S: BosStr, St> VideoEmbedBuilder<S, St>
 where
-    S: video_embed_state::State,
-    S::Video: video_embed_state::IsSet,
+    St: video_embed_state::State,
+    St::Video: video_embed_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> VideoEmbed<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> VideoEmbed<S> {
         VideoEmbed {
             alt: self._fields.0,
             aspect_ratio: self._fields.1,
@@ -3152,11 +3143,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> VideoEmbed<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> VideoEmbed<S> {
         VideoEmbed {
             alt: self._fields.0,
             aspect_ratio: self._fields.1,

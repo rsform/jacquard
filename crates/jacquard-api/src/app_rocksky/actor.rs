@@ -18,7 +18,7 @@ pub mod get_profile;
 
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -39,11 +39,11 @@ use crate::app_rocksky::artist;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ArtistViewBasic<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ArtistViewBasic<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -67,11 +67,11 @@ pub struct ArtistViewBasic<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CompatibilityViewBasic<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CompatibilityViewBasic<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub compatibility_level: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -95,11 +95,11 @@ pub struct CompatibilityViewBasic<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct NeighbourViewBasic<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct NeighbourViewBasic<S: BosStr = DefaultStr> {
     ///The URL of the actor's avatar image.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avatar: Option<UriValue<S>>,
@@ -132,11 +132,11 @@ pub struct NeighbourViewBasic<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ProfileViewBasic<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ProfileViewBasic<S: BosStr = DefaultStr> {
     ///The URL of the actor's avatar image.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avatar: Option<UriValue<S>>,
@@ -167,11 +167,11 @@ pub struct ProfileViewBasic<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ProfileViewDetailed<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ProfileViewDetailed<S: BosStr = DefaultStr> {
     ///The URL of the actor's avatar image.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avatar: Option<UriValue<S>>,
@@ -197,7 +197,7 @@ pub struct ProfileViewDetailed<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ArtistViewBasic<S> {
+impl<S: BosStr> LexiconSchema for ArtistViewBasic<S> {
     fn nsid() -> &'static str {
         "app.rocksky.actor.defs"
     }
@@ -212,7 +212,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for ArtistViewBasic<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for CompatibilityViewBasic<S> {
+impl<S: BosStr> LexiconSchema for CompatibilityViewBasic<S> {
     fn nsid() -> &'static str {
         "app.rocksky.actor.defs"
     }
@@ -227,7 +227,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for CompatibilityViewBasic<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for NeighbourViewBasic<S> {
+impl<S: BosStr> LexiconSchema for NeighbourViewBasic<S> {
     fn nsid() -> &'static str {
         "app.rocksky.actor.defs"
     }
@@ -242,7 +242,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for NeighbourViewBasic<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ProfileViewBasic<S> {
+impl<S: BosStr> LexiconSchema for ProfileViewBasic<S> {
     fn nsid() -> &'static str {
         "app.rocksky.actor.defs"
     }
@@ -257,7 +257,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for ProfileViewBasic<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ProfileViewDetailed<S> {
+impl<S: BosStr> LexiconSchema for ProfileViewDetailed<S> {
     fn nsid() -> &'static str {
         "app.rocksky.actor.defs"
     }

@@ -16,7 +16,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -38,11 +38,11 @@ use crate::org_okazu_diary::embed::record::Record;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Subject<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Subject<S: BosStr = DefaultStr> {
     ///User-specified self-label values for the material. The Lexicon by its nature assumes the material to be possibly sensitive by default, so the explicit label values are intended to signal that a warning should be put on the material even for the Okazu-Diary.org application users who are willing to see mature contents in general.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub labels: Option<SelfLabels<S>>,
@@ -57,11 +57,11 @@ pub struct Subject<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum SubjectValue<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum SubjectValue<S: BosStr = DefaultStr> {
     #[serde(rename = "org.okazu-diary.embed.external")]
     External(Box<External<S>>),
     #[serde(rename = "org.okazu-diary.embed.record")]
@@ -73,17 +73,17 @@ pub enum SubjectValue<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Tag<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Tag<S: BosStr = DefaultStr> {
     pub value: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Subject<S> {
+impl<S: BosStr> LexiconSchema for Subject<S> {
     fn nsid() -> &'static str {
         "org.okazu-diary.feed.defs"
     }
@@ -98,7 +98,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Subject<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Tag<S> {
+impl<S: BosStr> LexiconSchema for Tag<S> {
     fn nsid() -> &'static str {
         "org.okazu-diary.feed.defs"
     }
@@ -154,9 +154,9 @@ pub mod subject_state {
         type Value = Unset;
     }
     ///State transition - sets the `value` field to Set
-    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValue<S> {}
-    impl<S: State> State for SetValue<S> {
+    pub struct SetValue<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetValue<St> {}
+    impl<St: State> State for SetValue<St> {
         type Value = Set<members::value>;
     }
     /// Marker types for field names
@@ -167,32 +167,32 @@ pub mod subject_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct SubjectBuilder<'a, S: subject_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct SubjectBuilder<S: BosStr, St: subject_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<SelfLabels<S>>, Option<SubjectValue<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Subject<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> SubjectBuilder<'a, subject_state::Empty> {
+impl<S: BosStr> Subject<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> SubjectBuilder<S, subject_state::Empty> {
         SubjectBuilder::new()
     }
 }
 
-impl<'a> SubjectBuilder<'a, subject_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> SubjectBuilder<S, subject_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SubjectBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: subject_state::State> SubjectBuilder<'a, S> {
+impl<S: BosStr, St: subject_state::State> SubjectBuilder<S, St> {
     /// Set the `labels` field (optional)
     pub fn labels(mut self, value: impl Into<Option<SelfLabels<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -205,43 +205,40 @@ impl<'a, S: subject_state::State> SubjectBuilder<'a, S> {
     }
 }
 
-impl<'a, S> SubjectBuilder<'a, S>
+impl<S: BosStr, St> SubjectBuilder<S, St>
 where
-    S: subject_state::State,
-    S::Value: subject_state::IsUnset,
+    St: subject_state::State,
+    St::Value: subject_state::IsUnset,
 {
     /// Set the `value` field (required)
     pub fn value(
         mut self,
         value: impl Into<SubjectValue<S>>,
-    ) -> SubjectBuilder<'a, subject_state::SetValue<S>> {
+    ) -> SubjectBuilder<S, subject_state::SetValue<St>> {
         self._fields.1 = Option::Some(value.into());
         SubjectBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SubjectBuilder<'a, S>
+impl<S: BosStr, St> SubjectBuilder<S, St>
 where
-    S: subject_state::State,
-    S::Value: subject_state::IsSet,
+    St: subject_state::State,
+    St::Value: subject_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Subject<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Subject<S> {
         Subject {
             labels: self._fields.0,
             value: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Subject<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Subject<S> {
         Subject {
             labels: self._fields.0,
             value: self._fields.1.unwrap(),

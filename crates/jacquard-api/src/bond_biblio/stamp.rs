@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "bond.biblio.stamp",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Stamp<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Stamp<S: BosStr = DefaultStr> {
     ///AT-URI of the reader's book record. Lexicon-agnostic: works with bond.biblio.book, buzz.bookhive.book, or any future book lexicon.
     pub book: AtUri<S>,
     ///When this stamp was issued
@@ -56,18 +56,18 @@ pub struct Stamp<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct StampGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct StampGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Stamp<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Stamp<S> {
+impl<S: BosStr> Stamp<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, StampRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -80,17 +80,17 @@ pub struct StampRecord;
 impl XrpcResp for StampRecord {
     const NSID: &'static str = "bond.biblio.stamp";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = StampGetRecordOutput<S>;
+    type Output<S: BosStr> = StampGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<StampGetRecordOutput<S>> for Stamp<S> {
+impl<S: BosStr> From<StampGetRecordOutput<S>> for Stamp<S> {
     fn from(output: StampGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Stamp<S> {
+impl<S: BosStr> Collection for Stamp<S> {
     const NSID: &'static str = "bond.biblio.stamp";
     type Record = StampRecord;
 }
@@ -100,7 +100,7 @@ impl Collection for StampRecord {
     type Record = StampRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Stamp<S> {
+impl<S: BosStr> LexiconSchema for Stamp<S> {
     fn nsid() -> &'static str {
         "bond.biblio.stamp"
     }
@@ -125,145 +125,145 @@ pub mod stamp_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Book;
-        type List;
         type CreatedAt;
+        type List;
+        type Book;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Book = Unset;
-        type List = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `book` field to Set
-    pub struct SetBook<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBook<S> {}
-    impl<S: State> State for SetBook<S> {
-        type Book = Set<members::book>;
-        type List = S::List;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `list` field to Set
-    pub struct SetList<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetList<S> {}
-    impl<S: State> State for SetList<S> {
-        type Book = S::Book;
-        type List = Set<members::list>;
-        type CreatedAt = S::CreatedAt;
+        type List = Unset;
+        type Book = Unset;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Book = S::Book;
-        type List = S::List;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
+        type List = St::List;
+        type Book = St::Book;
+    }
+    ///State transition - sets the `list` field to Set
+    pub struct SetList<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetList<St> {}
+    impl<St: State> State for SetList<St> {
+        type CreatedAt = St::CreatedAt;
+        type List = Set<members::list>;
+        type Book = St::Book;
+    }
+    ///State transition - sets the `book` field to Set
+    pub struct SetBook<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBook<St> {}
+    impl<St: State> State for SetBook<St> {
+        type CreatedAt = St::CreatedAt;
+        type List = St::List;
+        type Book = Set<members::book>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `book` field
-        pub struct book(());
-        ///Marker type for the `list` field
-        pub struct list(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `list` field
+        pub struct list(());
+        ///Marker type for the `book` field
+        pub struct book(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct StampBuilder<'a, S: stamp_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct StampBuilder<S: BosStr, St: stamp_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>, Option<Datetime>, Option<AtUri<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Stamp<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> StampBuilder<'a, stamp_state::Empty> {
+impl<S: BosStr> Stamp<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> StampBuilder<S, stamp_state::Empty> {
         StampBuilder::new()
     }
 }
 
-impl<'a> StampBuilder<'a, stamp_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> StampBuilder<S, stamp_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         StampBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> StampBuilder<'a, S>
+impl<S: BosStr, St> StampBuilder<S, St>
 where
-    S: stamp_state::State,
-    S::Book: stamp_state::IsUnset,
+    St: stamp_state::State,
+    St::Book: stamp_state::IsUnset,
 {
     /// Set the `book` field (required)
     pub fn book(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> StampBuilder<'a, stamp_state::SetBook<S>> {
+    ) -> StampBuilder<S, stamp_state::SetBook<St>> {
         self._fields.0 = Option::Some(value.into());
         StampBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> StampBuilder<'a, S>
+impl<S: BosStr, St> StampBuilder<S, St>
 where
-    S: stamp_state::State,
-    S::CreatedAt: stamp_state::IsUnset,
+    St: stamp_state::State,
+    St::CreatedAt: stamp_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> StampBuilder<'a, stamp_state::SetCreatedAt<S>> {
+    ) -> StampBuilder<S, stamp_state::SetCreatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         StampBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> StampBuilder<'a, S>
+impl<S: BosStr, St> StampBuilder<S, St>
 where
-    S: stamp_state::State,
-    S::List: stamp_state::IsUnset,
+    St: stamp_state::State,
+    St::List: stamp_state::IsUnset,
 {
     /// Set the `list` field (required)
     pub fn list(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> StampBuilder<'a, stamp_state::SetList<S>> {
+    ) -> StampBuilder<S, stamp_state::SetList<St>> {
         self._fields.2 = Option::Some(value.into());
         StampBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> StampBuilder<'a, S>
+impl<S: BosStr, St> StampBuilder<S, St>
 where
-    S: stamp_state::State,
-    S::Book: stamp_state::IsSet,
-    S::List: stamp_state::IsSet,
-    S::CreatedAt: stamp_state::IsSet,
+    St: stamp_state::State,
+    St::CreatedAt: stamp_state::IsSet,
+    St::List: stamp_state::IsSet,
+    St::Book: stamp_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Stamp<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Stamp<S> {
         Stamp {
             book: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
@@ -271,8 +271,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Stamp<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Stamp<S> {
         Stamp {
             book: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "place.stream.live.teleport",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Teleport<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Teleport<S: BosStr = DefaultStr> {
     ///The time limit in seconds for the teleport. If not set, the teleport is permanent. Must be at least 60 seconds, and no more than 32,400 seconds (9 hours).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub duration_seconds: Option<i64>,
@@ -57,18 +57,18 @@ pub struct Teleport<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct TeleportGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct TeleportGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Teleport<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Teleport<S> {
+impl<S: BosStr> Teleport<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, TeleportRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -81,17 +81,17 @@ pub struct TeleportRecord;
 impl XrpcResp for TeleportRecord {
     const NSID: &'static str = "place.stream.live.teleport";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = TeleportGetRecordOutput<S>;
+    type Output<S: BosStr> = TeleportGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<TeleportGetRecordOutput<S>> for Teleport<S> {
+impl<S: BosStr> From<TeleportGetRecordOutput<S>> for Teleport<S> {
     fn from(output: TeleportGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Teleport<S> {
+impl<S: BosStr> Collection for Teleport<S> {
     const NSID: &'static str = "place.stream.live.teleport";
     type Record = TeleportRecord;
 }
@@ -101,7 +101,7 @@ impl Collection for TeleportRecord {
     type Record = TeleportRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Teleport<S> {
+impl<S: BosStr> LexiconSchema for Teleport<S> {
     fn nsid() -> &'static str {
         "place.stream.live.teleport"
     }
@@ -155,17 +155,17 @@ pub mod teleport_state {
         type StartsAt = Unset;
     }
     ///State transition - sets the `streamer` field to Set
-    pub struct SetStreamer<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStreamer<S> {}
-    impl<S: State> State for SetStreamer<S> {
+    pub struct SetStreamer<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStreamer<St> {}
+    impl<St: State> State for SetStreamer<St> {
         type Streamer = Set<members::streamer>;
-        type StartsAt = S::StartsAt;
+        type StartsAt = St::StartsAt;
     }
     ///State transition - sets the `starts_at` field to Set
-    pub struct SetStartsAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStartsAt<S> {}
-    impl<S: State> State for SetStartsAt<S> {
-        type Streamer = S::Streamer;
+    pub struct SetStartsAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStartsAt<St> {}
+    impl<St: State> State for SetStartsAt<St> {
+        type Streamer = St::Streamer;
         type StartsAt = Set<members::starts_at>;
     }
     /// Marker types for field names
@@ -178,32 +178,32 @@ pub mod teleport_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct TeleportBuilder<'a, S: teleport_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct TeleportBuilder<S: BosStr, St: teleport_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<Datetime>, Option<Did<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Teleport<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> TeleportBuilder<'a, teleport_state::Empty> {
+impl<S: BosStr> Teleport<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> TeleportBuilder<S, teleport_state::Empty> {
         TeleportBuilder::new()
     }
 }
 
-impl<'a> TeleportBuilder<'a, teleport_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> TeleportBuilder<S, teleport_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         TeleportBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: teleport_state::State> TeleportBuilder<'a, S> {
+impl<S: BosStr, St: teleport_state::State> TeleportBuilder<S, St> {
     /// Set the `durationSeconds` field (optional)
     pub fn duration_seconds(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
@@ -216,52 +216,52 @@ impl<'a, S: teleport_state::State> TeleportBuilder<'a, S> {
     }
 }
 
-impl<'a, S> TeleportBuilder<'a, S>
+impl<S: BosStr, St> TeleportBuilder<S, St>
 where
-    S: teleport_state::State,
-    S::StartsAt: teleport_state::IsUnset,
+    St: teleport_state::State,
+    St::StartsAt: teleport_state::IsUnset,
 {
     /// Set the `startsAt` field (required)
     pub fn starts_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> TeleportBuilder<'a, teleport_state::SetStartsAt<S>> {
+    ) -> TeleportBuilder<S, teleport_state::SetStartsAt<St>> {
         self._fields.1 = Option::Some(value.into());
         TeleportBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> TeleportBuilder<'a, S>
+impl<S: BosStr, St> TeleportBuilder<S, St>
 where
-    S: teleport_state::State,
-    S::Streamer: teleport_state::IsUnset,
+    St: teleport_state::State,
+    St::Streamer: teleport_state::IsUnset,
 {
     /// Set the `streamer` field (required)
     pub fn streamer(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> TeleportBuilder<'a, teleport_state::SetStreamer<S>> {
+    ) -> TeleportBuilder<S, teleport_state::SetStreamer<St>> {
         self._fields.2 = Option::Some(value.into());
         TeleportBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> TeleportBuilder<'a, S>
+impl<S: BosStr, St> TeleportBuilder<S, St>
 where
-    S: teleport_state::State,
-    S::Streamer: teleport_state::IsSet,
-    S::StartsAt: teleport_state::IsSet,
+    St: teleport_state::State,
+    St::Streamer: teleport_state::IsSet,
+    St::StartsAt: teleport_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Teleport<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Teleport<S> {
         Teleport {
             duration_seconds: self._fields.0,
             starts_at: self._fields.1.unwrap(),
@@ -269,11 +269,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Teleport<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Teleport<S> {
         Teleport {
             duration_seconds: self._fields.0,
             starts_at: self._fields.1.unwrap(),

@@ -13,7 +13,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -38,11 +38,11 @@ use serde::{Serialize, Deserialize};
     rename = "lol.gayfamicom.hi",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Hi<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Hi<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
     ///Hi
@@ -58,18 +58,18 @@ pub struct Hi<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct HiGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct HiGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Hi<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Hi<S> {
+impl<S: BosStr> Hi<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, HiRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -82,17 +82,17 @@ pub struct HiRecord;
 impl XrpcResp for HiRecord {
     const NSID: &'static str = "lol.gayfamicom.hi";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = HiGetRecordOutput<S>;
+    type Output<S: BosStr> = HiGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<HiGetRecordOutput<S>> for Hi<S> {
+impl<S: BosStr> From<HiGetRecordOutput<S>> for Hi<S> {
     fn from(output: HiGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Hi<S> {
+impl<S: BosStr> Collection for Hi<S> {
     const NSID: &'static str = "lol.gayfamicom.hi";
     type Record = HiRecord;
 }
@@ -102,7 +102,7 @@ impl Collection for HiRecord {
     type Record = HiRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Hi<S> {
+impl<S: BosStr> LexiconSchema for Hi<S> {
     fn nsid() -> &'static str {
         "lol.gayfamicom.hi"
     }
@@ -136,32 +136,32 @@ pub mod hi_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct HiBuilder<'a, S: hi_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct HiBuilder<S: BosStr, St: hi_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Hi<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> HiBuilder<'a, hi_state::Empty> {
+impl<S: BosStr> Hi<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> HiBuilder<S, hi_state::Empty> {
         HiBuilder::new()
     }
 }
 
-impl<'a> HiBuilder<'a, hi_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> HiBuilder<S, hi_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         HiBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: hi_state::State> HiBuilder<'a, S> {
+impl<S: BosStr, St: hi_state::State> HiBuilder<S, St> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.0 = value.into();
@@ -174,7 +174,7 @@ impl<'a, S: hi_state::State> HiBuilder<'a, S> {
     }
 }
 
-impl<'a, S: hi_state::State> HiBuilder<'a, S> {
+impl<S: BosStr, St: hi_state::State> HiBuilder<S, St> {
     /// Set the `hello` field (optional)
     pub fn hello(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -187,20 +187,20 @@ impl<'a, S: hi_state::State> HiBuilder<'a, S> {
     }
 }
 
-impl<'a, S> HiBuilder<'a, S>
+impl<S: BosStr, St> HiBuilder<S, St>
 where
-    S: hi_state::State,
+    St: hi_state::State,
 {
-    /// Build the final struct
-    pub fn build(self) -> Hi<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Hi<S> {
         Hi {
             created_at: self._fields.0,
             hello: self._fields.1,
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Hi<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Hi<S> {
         Hi {
             created_at: self._fields.0,
             hello: self._fields.1,

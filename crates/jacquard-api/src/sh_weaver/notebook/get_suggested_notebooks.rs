@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -39,18 +39,16 @@ pub struct GetSuggestedNotebooks {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetSuggestedNotebooksOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetSuggestedNotebooksOutput<S: BosStr = DefaultStr> {
     pub notebooks: Vec<get_suggested_notebooks::SuggestedNotebook<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -59,11 +57,11 @@ pub struct GetSuggestedNotebooksOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SuggestedNotebook<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SuggestedNotebook<S: BosStr = DefaultStr> {
     pub notebook: NotebookView<S>,
     pub reason: get_suggested_notebooks::SuggestionReason<S>,
     ///Appview-computed relevance score.
@@ -79,11 +77,11 @@ pub struct SuggestedNotebook<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SuggestionReason<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SuggestionReason<S: BosStr = DefaultStr> {
     ///If followed-author, the author.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub related_author: Option<ProfileViewBasic<S>>,
@@ -103,7 +101,7 @@ pub struct SuggestionReason<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum SuggestionReasonType<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum SuggestionReasonType<S: BosStr = DefaultStr> {
     SimilarTags,
     SimilarToLiked,
     SimilarToRead,
@@ -114,7 +112,7 @@ pub enum SuggestionReasonType<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> SuggestionReasonType<S> {
+impl<S: BosStr> SuggestionReasonType<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::SimilarTags => "similar-tags",
@@ -142,19 +140,19 @@ impl<S: Bos<str> + AsRef<str>> SuggestionReasonType<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for SuggestionReasonType<S> {
+impl<S: BosStr> core::fmt::Display for SuggestionReasonType<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for SuggestionReasonType<S> {
+impl<S: BosStr> AsRef<str> for SuggestionReasonType<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for SuggestionReasonType<S> {
+impl<S: BosStr> Serialize for SuggestionReasonType<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -163,8 +161,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for SuggestionReasonType<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for SuggestionReasonType<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for SuggestionReasonType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -174,14 +171,18 @@ for SuggestionReasonType<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for SuggestionReasonType<S> {
+impl<S: BosStr + Default> Default for SuggestionReasonType<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for SuggestionReasonType<S> {
-    type Output = SuggestionReasonType<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for SuggestionReasonType<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = SuggestionReasonType<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             SuggestionReasonType::SimilarTags => SuggestionReasonType::SimilarTags,
@@ -203,7 +204,7 @@ pub struct GetSuggestedNotebooksResponse;
 impl jacquard_common::xrpc::XrpcResp for GetSuggestedNotebooksResponse {
     const NSID: &'static str = "sh.weaver.notebook.getSuggestedNotebooks";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetSuggestedNotebooksOutput<S>;
+    type Output<S: BosStr> = GetSuggestedNotebooksOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
@@ -218,11 +219,11 @@ pub struct GetSuggestedNotebooksRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetSuggestedNotebooksRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.notebook.getSuggestedNotebooks";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetSuggestedNotebooks;
+    type Request<S: BosStr> = GetSuggestedNotebooks;
     type Response = GetSuggestedNotebooksResponse;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for SuggestedNotebook<S> {
+impl<S: BosStr> LexiconSchema for SuggestedNotebook<S> {
     fn nsid() -> &'static str {
         "sh.weaver.notebook.getSuggestedNotebooks"
     }
@@ -237,7 +238,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for SuggestedNotebook<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for SuggestionReason<S> {
+impl<S: BosStr> LexiconSchema for SuggestionReason<S> {
     fn nsid() -> &'static str {
         "sh.weaver.notebook.getSuggestedNotebooks"
     }
@@ -275,21 +276,21 @@ pub mod get_suggested_notebooks_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetSuggestedNotebooksBuilder<S: get_suggested_notebooks_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetSuggestedNotebooksBuilder<St: get_suggested_notebooks_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>,),
 }
 
 impl GetSuggestedNotebooks {
-    /// Create a new builder for this type
+    /// Create a new builder for this type.
     pub fn new() -> GetSuggestedNotebooksBuilder<get_suggested_notebooks_state::Empty> {
         GetSuggestedNotebooksBuilder::new()
     }
 }
 
 impl GetSuggestedNotebooksBuilder<get_suggested_notebooks_state::Empty> {
-    /// Create a new builder with all fields unset
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetSuggestedNotebooksBuilder {
             _state: PhantomData,
@@ -298,7 +299,7 @@ impl GetSuggestedNotebooksBuilder<get_suggested_notebooks_state::Empty> {
     }
 }
 
-impl<S: get_suggested_notebooks_state::State> GetSuggestedNotebooksBuilder<S> {
+impl<St: get_suggested_notebooks_state::State> GetSuggestedNotebooksBuilder<St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
@@ -311,11 +312,11 @@ impl<S: get_suggested_notebooks_state::State> GetSuggestedNotebooksBuilder<S> {
     }
 }
 
-impl<S> GetSuggestedNotebooksBuilder<S>
+impl<St> GetSuggestedNotebooksBuilder<St>
 where
-    S: get_suggested_notebooks_state::State,
+    St: get_suggested_notebooks_state::State,
 {
-    /// Build the final struct
+    /// Build the final struct.
     pub fn build(self) -> GetSuggestedNotebooks {
         GetSuggestedNotebooks {
             limit: self._fields.0,
@@ -344,17 +345,17 @@ pub mod suggested_notebook_state {
         type Notebook = Unset;
     }
     ///State transition - sets the `reason` field to Set
-    pub struct SetReason<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetReason<S> {}
-    impl<S: State> State for SetReason<S> {
+    pub struct SetReason<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetReason<St> {}
+    impl<St: State> State for SetReason<St> {
         type Reason = Set<members::reason>;
-        type Notebook = S::Notebook;
+        type Notebook = St::Notebook;
     }
     ///State transition - sets the `notebook` field to Set
-    pub struct SetNotebook<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNotebook<S> {}
-    impl<S: State> State for SetNotebook<S> {
-        type Reason = S::Reason;
+    pub struct SetNotebook<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetNotebook<St> {}
+    impl<St: State> State for SetNotebook<St> {
+        type Reason = St::Reason;
         type Notebook = Set<members::notebook>;
     }
     /// Marker types for field names
@@ -367,74 +368,74 @@ pub mod suggested_notebook_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct SuggestedNotebookBuilder<'a, S: suggested_notebook_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct SuggestedNotebookBuilder<S: BosStr, St: suggested_notebook_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<NotebookView<S>>,
         Option<get_suggested_notebooks::SuggestionReason<S>>,
         Option<i64>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> SuggestedNotebook<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> SuggestedNotebookBuilder<'a, suggested_notebook_state::Empty> {
+impl<S: BosStr> SuggestedNotebook<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> SuggestedNotebookBuilder<S, suggested_notebook_state::Empty> {
         SuggestedNotebookBuilder::new()
     }
 }
 
-impl<'a> SuggestedNotebookBuilder<'a, suggested_notebook_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> SuggestedNotebookBuilder<S, suggested_notebook_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SuggestedNotebookBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SuggestedNotebookBuilder<'a, S>
+impl<S: BosStr, St> SuggestedNotebookBuilder<S, St>
 where
-    S: suggested_notebook_state::State,
-    S::Notebook: suggested_notebook_state::IsUnset,
+    St: suggested_notebook_state::State,
+    St::Notebook: suggested_notebook_state::IsUnset,
 {
     /// Set the `notebook` field (required)
     pub fn notebook(
         mut self,
         value: impl Into<NotebookView<S>>,
-    ) -> SuggestedNotebookBuilder<'a, suggested_notebook_state::SetNotebook<S>> {
+    ) -> SuggestedNotebookBuilder<S, suggested_notebook_state::SetNotebook<St>> {
         self._fields.0 = Option::Some(value.into());
         SuggestedNotebookBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SuggestedNotebookBuilder<'a, S>
+impl<S: BosStr, St> SuggestedNotebookBuilder<S, St>
 where
-    S: suggested_notebook_state::State,
-    S::Reason: suggested_notebook_state::IsUnset,
+    St: suggested_notebook_state::State,
+    St::Reason: suggested_notebook_state::IsUnset,
 {
     /// Set the `reason` field (required)
     pub fn reason(
         mut self,
         value: impl Into<get_suggested_notebooks::SuggestionReason<S>>,
-    ) -> SuggestedNotebookBuilder<'a, suggested_notebook_state::SetReason<S>> {
+    ) -> SuggestedNotebookBuilder<S, suggested_notebook_state::SetReason<St>> {
         self._fields.1 = Option::Some(value.into());
         SuggestedNotebookBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: suggested_notebook_state::State> SuggestedNotebookBuilder<'a, S> {
+impl<S: BosStr, St: suggested_notebook_state::State> SuggestedNotebookBuilder<S, St> {
     /// Set the `score` field (optional)
     pub fn score(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -447,14 +448,14 @@ impl<'a, S: suggested_notebook_state::State> SuggestedNotebookBuilder<'a, S> {
     }
 }
 
-impl<'a, S> SuggestedNotebookBuilder<'a, S>
+impl<S: BosStr, St> SuggestedNotebookBuilder<S, St>
 where
-    S: suggested_notebook_state::State,
-    S::Reason: suggested_notebook_state::IsSet,
-    S::Notebook: suggested_notebook_state::IsSet,
+    St: suggested_notebook_state::State,
+    St::Reason: suggested_notebook_state::IsSet,
+    St::Notebook: suggested_notebook_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> SuggestedNotebook<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> SuggestedNotebook<S> {
         SuggestedNotebook {
             notebook: self._fields.0.unwrap(),
             reason: self._fields.1.unwrap(),
@@ -462,11 +463,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> SuggestedNotebook<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> SuggestedNotebook<S> {
         SuggestedNotebook {
             notebook: self._fields.0.unwrap(),
             reason: self._fields.1.unwrap(),

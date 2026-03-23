@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
@@ -18,38 +18,33 @@ use serde::{Serialize, Deserialize};
 use crate::at_inlay::Response;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Missing<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Missing<S: BosStr = DefaultStr> {
     ///Path segments identifying what is missing
     pub path: Vec<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct MissingOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct MissingOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
-    #[serde(borrow)]
     pub value: Response<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -58,12 +53,11 @@ pub struct MissingResponse;
 impl jacquard_common::xrpc::XrpcResp for MissingResponse {
     const NSID: &'static str = "at.inlay.Missing";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = MissingOutput<S>;
+    type Output<S: BosStr> = MissingOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for Missing<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Missing<S> {
     const NSID: &'static str = "at.inlay.Missing";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -78,7 +72,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for MissingRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = Missing<S>;
+    type Request<S: BosStr> = Missing<S>;
     type Response = MissingResponse;
 }
 
@@ -101,9 +95,9 @@ pub mod missing_state {
         type Path = Unset;
     }
     ///State transition - sets the `path` field to Set
-    pub struct SetPath<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPath<S> {}
-    impl<S: State> State for SetPath<S> {
+    pub struct SetPath<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPath<St> {}
+    impl<St: State> State for SetPath<St> {
         type Path = Set<members::path>;
     }
     /// Marker types for field names
@@ -114,67 +108,64 @@ pub mod missing_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct MissingBuilder<'a, S: missing_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct MissingBuilder<S: BosStr, St: missing_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Missing<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> MissingBuilder<'a, missing_state::Empty> {
+impl<S: BosStr> Missing<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> MissingBuilder<S, missing_state::Empty> {
         MissingBuilder::new()
     }
 }
 
-impl<'a> MissingBuilder<'a, missing_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> MissingBuilder<S, missing_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         MissingBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> MissingBuilder<'a, S>
+impl<S: BosStr, St> MissingBuilder<S, St>
 where
-    S: missing_state::State,
-    S::Path: missing_state::IsUnset,
+    St: missing_state::State,
+    St::Path: missing_state::IsUnset,
 {
     /// Set the `path` field (required)
     pub fn path(
         mut self,
         value: impl Into<Vec<S>>,
-    ) -> MissingBuilder<'a, missing_state::SetPath<S>> {
+    ) -> MissingBuilder<S, missing_state::SetPath<St>> {
         self._fields.0 = Option::Some(value.into());
         MissingBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> MissingBuilder<'a, S>
+impl<S: BosStr, St> MissingBuilder<S, St>
 where
-    S: missing_state::State,
-    S::Path: missing_state::IsSet,
+    St: missing_state::State,
+    St::Path: missing_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Missing<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Missing<S> {
         Missing {
             path: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Missing<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Missing<S> {
         Missing {
             path: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

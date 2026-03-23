@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "app.mathr.leaderboard.entry",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Entry<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Entry<S: BosStr = DefaultStr> {
     ///Timestamp when the score was verified and added to the leaderboard
     pub created_at: Datetime,
     ///The highest level reached by the player
@@ -75,18 +75,18 @@ pub struct Entry<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct EntryGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct EntryGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Entry<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Entry<S> {
+impl<S: BosStr> Entry<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, EntryRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -99,17 +99,17 @@ pub struct EntryRecord;
 impl XrpcResp for EntryRecord {
     const NSID: &'static str = "app.mathr.leaderboard.entry";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = EntryGetRecordOutput<S>;
+    type Output<S: BosStr> = EntryGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<EntryGetRecordOutput<S>> for Entry<S> {
+impl<S: BosStr> From<EntryGetRecordOutput<S>> for Entry<S> {
     fn from(output: EntryGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Entry<S> {
+impl<S: BosStr> Collection for Entry<S> {
     const NSID: &'static str = "app.mathr.leaderboard.entry";
     type Record = EntryRecord;
 }
@@ -119,7 +119,7 @@ impl Collection for EntryRecord {
     type Record = EntryRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Entry<S> {
+impl<S: BosStr> LexiconSchema for Entry<S> {
     fn nsid() -> &'static str {
         "app.mathr.leaderboard.entry"
     }
@@ -192,91 +192,91 @@ pub mod entry_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
         type TotalChallenges;
         type Level;
-        type TotalSuccesses;
         type PlayerDid;
-        type CreatedAt;
+        type TotalSuccesses;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
         type TotalChallenges = Unset;
         type Level = Unset;
-        type TotalSuccesses = Unset;
         type PlayerDid = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `total_challenges` field to Set
-    pub struct SetTotalChallenges<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTotalChallenges<S> {}
-    impl<S: State> State for SetTotalChallenges<S> {
-        type TotalChallenges = Set<members::total_challenges>;
-        type Level = S::Level;
-        type TotalSuccesses = S::TotalSuccesses;
-        type PlayerDid = S::PlayerDid;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `level` field to Set
-    pub struct SetLevel<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLevel<S> {}
-    impl<S: State> State for SetLevel<S> {
-        type TotalChallenges = S::TotalChallenges;
-        type Level = Set<members::level>;
-        type TotalSuccesses = S::TotalSuccesses;
-        type PlayerDid = S::PlayerDid;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `total_successes` field to Set
-    pub struct SetTotalSuccesses<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTotalSuccesses<S> {}
-    impl<S: State> State for SetTotalSuccesses<S> {
-        type TotalChallenges = S::TotalChallenges;
-        type Level = S::Level;
-        type TotalSuccesses = Set<members::total_successes>;
-        type PlayerDid = S::PlayerDid;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `player_did` field to Set
-    pub struct SetPlayerDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPlayerDid<S> {}
-    impl<S: State> State for SetPlayerDid<S> {
-        type TotalChallenges = S::TotalChallenges;
-        type Level = S::Level;
-        type TotalSuccesses = S::TotalSuccesses;
-        type PlayerDid = Set<members::player_did>;
-        type CreatedAt = S::CreatedAt;
+        type TotalSuccesses = Unset;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type TotalChallenges = S::TotalChallenges;
-        type Level = S::Level;
-        type TotalSuccesses = S::TotalSuccesses;
-        type PlayerDid = S::PlayerDid;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
+        type TotalChallenges = St::TotalChallenges;
+        type Level = St::Level;
+        type PlayerDid = St::PlayerDid;
+        type TotalSuccesses = St::TotalSuccesses;
+    }
+    ///State transition - sets the `total_challenges` field to Set
+    pub struct SetTotalChallenges<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTotalChallenges<St> {}
+    impl<St: State> State for SetTotalChallenges<St> {
+        type CreatedAt = St::CreatedAt;
+        type TotalChallenges = Set<members::total_challenges>;
+        type Level = St::Level;
+        type PlayerDid = St::PlayerDid;
+        type TotalSuccesses = St::TotalSuccesses;
+    }
+    ///State transition - sets the `level` field to Set
+    pub struct SetLevel<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLevel<St> {}
+    impl<St: State> State for SetLevel<St> {
+        type CreatedAt = St::CreatedAt;
+        type TotalChallenges = St::TotalChallenges;
+        type Level = Set<members::level>;
+        type PlayerDid = St::PlayerDid;
+        type TotalSuccesses = St::TotalSuccesses;
+    }
+    ///State transition - sets the `player_did` field to Set
+    pub struct SetPlayerDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPlayerDid<St> {}
+    impl<St: State> State for SetPlayerDid<St> {
+        type CreatedAt = St::CreatedAt;
+        type TotalChallenges = St::TotalChallenges;
+        type Level = St::Level;
+        type PlayerDid = Set<members::player_did>;
+        type TotalSuccesses = St::TotalSuccesses;
+    }
+    ///State transition - sets the `total_successes` field to Set
+    pub struct SetTotalSuccesses<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTotalSuccesses<St> {}
+    impl<St: State> State for SetTotalSuccesses<St> {
+        type CreatedAt = St::CreatedAt;
+        type TotalChallenges = St::TotalChallenges;
+        type Level = St::Level;
+        type PlayerDid = St::PlayerDid;
+        type TotalSuccesses = Set<members::total_successes>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `total_challenges` field
         pub struct total_challenges(());
         ///Marker type for the `level` field
         pub struct level(());
-        ///Marker type for the `total_successes` field
-        pub struct total_successes(());
         ///Marker type for the `player_did` field
         pub struct player_did(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
+        ///Marker type for the `total_successes` field
+        pub struct total_successes(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct EntryBuilder<'a, S: entry_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct EntryBuilder<S: BosStr, St: entry_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
         Option<i64>,
@@ -289,66 +289,66 @@ pub struct EntryBuilder<'a, S: entry_state::State> {
         Option<i64>,
         Option<i64>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Entry<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> EntryBuilder<'a, entry_state::Empty> {
+impl<S: BosStr> Entry<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> EntryBuilder<S, entry_state::Empty> {
         EntryBuilder::new()
     }
 }
 
-impl<'a> EntryBuilder<'a, entry_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> EntryBuilder<S, entry_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         EntryBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> EntryBuilder<'a, S>
+impl<S: BosStr, St> EntryBuilder<S, St>
 where
-    S: entry_state::State,
-    S::CreatedAt: entry_state::IsUnset,
+    St: entry_state::State,
+    St::CreatedAt: entry_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> EntryBuilder<'a, entry_state::SetCreatedAt<S>> {
+    ) -> EntryBuilder<S, entry_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         EntryBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> EntryBuilder<'a, S>
+impl<S: BosStr, St> EntryBuilder<S, St>
 where
-    S: entry_state::State,
-    S::Level: entry_state::IsUnset,
+    St: entry_state::State,
+    St::Level: entry_state::IsUnset,
 {
     /// Set the `level` field (required)
     pub fn level(
         mut self,
         value: impl Into<i64>,
-    ) -> EntryBuilder<'a, entry_state::SetLevel<S>> {
+    ) -> EntryBuilder<S, entry_state::SetLevel<St>> {
         self._fields.1 = Option::Some(value.into());
         EntryBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
+impl<S: BosStr, St: entry_state::State> EntryBuilder<S, St> {
     /// Set the `percentage` field (optional)
     pub fn percentage(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -361,7 +361,7 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     }
 }
 
-impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
+impl<S: BosStr, St: entry_state::State> EntryBuilder<S, St> {
     /// Set the `playerAvatar` field (optional)
     pub fn player_avatar(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -374,26 +374,26 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     }
 }
 
-impl<'a, S> EntryBuilder<'a, S>
+impl<S: BosStr, St> EntryBuilder<S, St>
 where
-    S: entry_state::State,
-    S::PlayerDid: entry_state::IsUnset,
+    St: entry_state::State,
+    St::PlayerDid: entry_state::IsUnset,
 {
     /// Set the `playerDid` field (required)
     pub fn player_did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> EntryBuilder<'a, entry_state::SetPlayerDid<S>> {
+    ) -> EntryBuilder<S, entry_state::SetPlayerDid<St>> {
         self._fields.4 = Option::Some(value.into());
         EntryBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
+impl<S: BosStr, St: entry_state::State> EntryBuilder<S, St> {
     /// Set the `playerDisplayName` field (optional)
     pub fn player_display_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
@@ -406,7 +406,7 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     }
 }
 
-impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
+impl<S: BosStr, St: entry_state::State> EntryBuilder<S, St> {
     /// Set the `playerHandle` field (optional)
     pub fn player_handle(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.6 = value.into();
@@ -419,7 +419,7 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     }
 }
 
-impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
+impl<S: BosStr, St: entry_state::State> EntryBuilder<S, St> {
     /// Set the `postUri` field (optional)
     pub fn post_uri(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.7 = value.into();
@@ -432,55 +432,55 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     }
 }
 
-impl<'a, S> EntryBuilder<'a, S>
+impl<S: BosStr, St> EntryBuilder<S, St>
 where
-    S: entry_state::State,
-    S::TotalChallenges: entry_state::IsUnset,
+    St: entry_state::State,
+    St::TotalChallenges: entry_state::IsUnset,
 {
     /// Set the `totalChallenges` field (required)
     pub fn total_challenges(
         mut self,
         value: impl Into<i64>,
-    ) -> EntryBuilder<'a, entry_state::SetTotalChallenges<S>> {
+    ) -> EntryBuilder<S, entry_state::SetTotalChallenges<St>> {
         self._fields.8 = Option::Some(value.into());
         EntryBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> EntryBuilder<'a, S>
+impl<S: BosStr, St> EntryBuilder<S, St>
 where
-    S: entry_state::State,
-    S::TotalSuccesses: entry_state::IsUnset,
+    St: entry_state::State,
+    St::TotalSuccesses: entry_state::IsUnset,
 {
     /// Set the `totalSuccesses` field (required)
     pub fn total_successes(
         mut self,
         value: impl Into<i64>,
-    ) -> EntryBuilder<'a, entry_state::SetTotalSuccesses<S>> {
+    ) -> EntryBuilder<S, entry_state::SetTotalSuccesses<St>> {
         self._fields.9 = Option::Some(value.into());
         EntryBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> EntryBuilder<'a, S>
+impl<S: BosStr, St> EntryBuilder<S, St>
 where
-    S: entry_state::State,
-    S::TotalChallenges: entry_state::IsSet,
-    S::Level: entry_state::IsSet,
-    S::TotalSuccesses: entry_state::IsSet,
-    S::PlayerDid: entry_state::IsSet,
-    S::CreatedAt: entry_state::IsSet,
+    St: entry_state::State,
+    St::CreatedAt: entry_state::IsSet,
+    St::TotalChallenges: entry_state::IsSet,
+    St::Level: entry_state::IsSet,
+    St::PlayerDid: entry_state::IsSet,
+    St::TotalSuccesses: entry_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Entry<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Entry<S> {
         Entry {
             created_at: self._fields.0.unwrap(),
             level: self._fields.1.unwrap(),
@@ -495,8 +495,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Entry<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Entry<S> {
         Entry {
             created_at: self._fields.0.unwrap(),
             level: self._fields.1.unwrap(),

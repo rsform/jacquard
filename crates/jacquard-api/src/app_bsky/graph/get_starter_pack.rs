@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
@@ -19,32 +19,29 @@ use serde::{Serialize, Deserialize};
 use crate::app_bsky::graph::StarterPackView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetStarterPack<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct GetStarterPack<S: BosStr = DefaultStr> {
     pub starter_pack: AtUri<S>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetStarterPackOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetStarterPackOutput<S: BosStr = DefaultStr> {
     pub starter_pack: StarterPackView<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -53,12 +50,11 @@ pub struct GetStarterPackResponse;
 impl jacquard_common::xrpc::XrpcResp for GetStarterPackResponse {
     const NSID: &'static str = "app.bsky.graph.getStarterPack";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetStarterPackOutput<S>;
+    type Output<S: BosStr> = GetStarterPackOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetStarterPack<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetStarterPack<S> {
     const NSID: &'static str = "app.bsky.graph.getStarterPack";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetStarterPackResponse;
@@ -69,7 +65,7 @@ pub struct GetStarterPackRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetStarterPackRequest {
     const PATH: &'static str = "/xrpc/app.bsky.graph.getStarterPack";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetStarterPack<S>;
+    type Request<S: BosStr> = GetStarterPack<S>;
     type Response = GetStarterPackResponse;
 }
 
@@ -92,9 +88,9 @@ pub mod get_starter_pack_state {
         type StarterPack = Unset;
     }
     ///State transition - sets the `starter_pack` field to Set
-    pub struct SetStarterPack<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStarterPack<S> {}
-    impl<S: State> State for SetStarterPack<S> {
+    pub struct SetStarterPack<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStarterPack<St> {}
+    impl<St: State> State for SetStarterPack<St> {
         type StarterPack = Set<members::starter_pack>;
     }
     /// Marker types for field names
@@ -105,57 +101,57 @@ pub mod get_starter_pack_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetStarterPackBuilder<'a, S: get_starter_pack_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetStarterPackBuilder<S: BosStr, St: get_starter_pack_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetStarterPack<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetStarterPackBuilder<'a, get_starter_pack_state::Empty> {
+impl<S: BosStr> GetStarterPack<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetStarterPackBuilder<S, get_starter_pack_state::Empty> {
         GetStarterPackBuilder::new()
     }
 }
 
-impl<'a> GetStarterPackBuilder<'a, get_starter_pack_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetStarterPackBuilder<S, get_starter_pack_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetStarterPackBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetStarterPackBuilder<'a, S>
+impl<S: BosStr, St> GetStarterPackBuilder<S, St>
 where
-    S: get_starter_pack_state::State,
-    S::StarterPack: get_starter_pack_state::IsUnset,
+    St: get_starter_pack_state::State,
+    St::StarterPack: get_starter_pack_state::IsUnset,
 {
     /// Set the `starterPack` field (required)
     pub fn starter_pack(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> GetStarterPackBuilder<'a, get_starter_pack_state::SetStarterPack<S>> {
+    ) -> GetStarterPackBuilder<S, get_starter_pack_state::SetStarterPack<St>> {
         self._fields.0 = Option::Some(value.into());
         GetStarterPackBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetStarterPackBuilder<'a, S>
+impl<S: BosStr, St> GetStarterPackBuilder<S, St>
 where
-    S: get_starter_pack_state::State,
-    S::StarterPack: get_starter_pack_state::IsSet,
+    St: get_starter_pack_state::State,
+    St::StarterPack: get_starter_pack_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetStarterPack<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetStarterPack<S> {
         GetStarterPack {
             starter_pack: self._fields.0.unwrap(),
         }

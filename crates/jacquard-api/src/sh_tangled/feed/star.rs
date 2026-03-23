@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,11 +34,11 @@ use serde::{Serialize, Deserialize};
     rename = "sh.tangled.feed.star",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Star<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Star<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     pub subject: AtUri<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -51,18 +51,18 @@ pub struct Star<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct StarGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct StarGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Star<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Star<S> {
+impl<S: BosStr> Star<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, StarRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -75,17 +75,17 @@ pub struct StarRecord;
 impl XrpcResp for StarRecord {
     const NSID: &'static str = "sh.tangled.feed.star";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = StarGetRecordOutput<S>;
+    type Output<S: BosStr> = StarGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<StarGetRecordOutput<S>> for Star<S> {
+impl<S: BosStr> From<StarGetRecordOutput<S>> for Star<S> {
     fn from(output: StarGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Star<S> {
+impl<S: BosStr> Collection for Star<S> {
     const NSID: &'static str = "sh.tangled.feed.star";
     type Record = StarRecord;
 }
@@ -95,7 +95,7 @@ impl Collection for StarRecord {
     type Record = StarRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Star<S> {
+impl<S: BosStr> LexiconSchema for Star<S> {
     fn nsid() -> &'static str {
         "sh.tangled.feed.star"
     }
@@ -120,119 +120,119 @@ pub mod star_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Subject;
         type CreatedAt;
+        type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Subject = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type Subject = Set<members::subject>;
-        type CreatedAt = S::CreatedAt;
+        type Subject = Unset;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Subject = S::Subject;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
+        type Subject = St::Subject;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubject<St> {}
+    impl<St: State> State for SetSubject<St> {
+        type CreatedAt = St::CreatedAt;
+        type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `subject` field
-        pub struct subject(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct StarBuilder<'a, S: star_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct StarBuilder<S: BosStr, St: star_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<AtUri<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Star<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> StarBuilder<'a, star_state::Empty> {
+impl<S: BosStr> Star<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> StarBuilder<S, star_state::Empty> {
         StarBuilder::new()
     }
 }
 
-impl<'a> StarBuilder<'a, star_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> StarBuilder<S, star_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         StarBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> StarBuilder<'a, S>
+impl<S: BosStr, St> StarBuilder<S, St>
 where
-    S: star_state::State,
-    S::CreatedAt: star_state::IsUnset,
+    St: star_state::State,
+    St::CreatedAt: star_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> StarBuilder<'a, star_state::SetCreatedAt<S>> {
+    ) -> StarBuilder<S, star_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         StarBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> StarBuilder<'a, S>
+impl<S: BosStr, St> StarBuilder<S, St>
 where
-    S: star_state::State,
-    S::Subject: star_state::IsUnset,
+    St: star_state::State,
+    St::Subject: star_state::IsUnset,
 {
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> StarBuilder<'a, star_state::SetSubject<S>> {
+    ) -> StarBuilder<S, star_state::SetSubject<St>> {
         self._fields.1 = Option::Some(value.into());
         StarBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> StarBuilder<'a, S>
+impl<S: BosStr, St> StarBuilder<S, St>
 where
-    S: star_state::State,
-    S::Subject: star_state::IsSet,
-    S::CreatedAt: star_state::IsSet,
+    St: star_state::State,
+    St::CreatedAt: star_state::IsSet,
+    St::Subject: star_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Star<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Star<S> {
         Star {
             created_at: self._fields.0.unwrap(),
             subject: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Star<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Star<S> {
         Star {
             created_at: self._fields.0.unwrap(),
             subject: self._fields.1.unwrap(),

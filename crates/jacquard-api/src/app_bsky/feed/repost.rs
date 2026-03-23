@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
     rename = "app.bsky.feed.repost",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Repost<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Repost<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     pub subject: StrongRef<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -55,18 +55,18 @@ pub struct Repost<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct RepostGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct RepostGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Repost<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Repost<S> {
+impl<S: BosStr> Repost<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, RepostRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -79,17 +79,17 @@ pub struct RepostRecord;
 impl XrpcResp for RepostRecord {
     const NSID: &'static str = "app.bsky.feed.repost";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = RepostGetRecordOutput<S>;
+    type Output<S: BosStr> = RepostGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<RepostGetRecordOutput<S>> for Repost<S> {
+impl<S: BosStr> From<RepostGetRecordOutput<S>> for Repost<S> {
     fn from(output: RepostGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Repost<S> {
+impl<S: BosStr> Collection for Repost<S> {
     const NSID: &'static str = "app.bsky.feed.repost";
     type Record = RepostRecord;
 }
@@ -99,7 +99,7 @@ impl Collection for RepostRecord {
     type Record = RepostRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Repost<S> {
+impl<S: BosStr> LexiconSchema for Repost<S> {
     fn nsid() -> &'static str {
         "app.bsky.feed.repost"
     }
@@ -124,104 +124,104 @@ pub mod repost_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Subject;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Subject = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Subject = S::Subject;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type CreatedAt = S::CreatedAt;
+    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubject<St> {}
+    impl<St: State> State for SetSubject<St> {
         type Subject = Set<members::subject>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Subject = St::Subject;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `subject` field
         pub struct subject(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct RepostBuilder<'a, S: repost_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct RepostBuilder<S: BosStr, St: repost_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<StrongRef<S>>, Option<StrongRef<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Repost<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> RepostBuilder<'a, repost_state::Empty> {
+impl<S: BosStr> Repost<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> RepostBuilder<S, repost_state::Empty> {
         RepostBuilder::new()
     }
 }
 
-impl<'a> RepostBuilder<'a, repost_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> RepostBuilder<S, repost_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         RepostBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RepostBuilder<'a, S>
+impl<S: BosStr, St> RepostBuilder<S, St>
 where
-    S: repost_state::State,
-    S::CreatedAt: repost_state::IsUnset,
+    St: repost_state::State,
+    St::CreatedAt: repost_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> RepostBuilder<'a, repost_state::SetCreatedAt<S>> {
+    ) -> RepostBuilder<S, repost_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         RepostBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RepostBuilder<'a, S>
+impl<S: BosStr, St> RepostBuilder<S, St>
 where
-    S: repost_state::State,
-    S::Subject: repost_state::IsUnset,
+    St: repost_state::State,
+    St::Subject: repost_state::IsUnset,
 {
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> RepostBuilder<'a, repost_state::SetSubject<S>> {
+    ) -> RepostBuilder<S, repost_state::SetSubject<St>> {
         self._fields.1 = Option::Some(value.into());
         RepostBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: repost_state::State> RepostBuilder<'a, S> {
+impl<S: BosStr, St: repost_state::State> RepostBuilder<S, St> {
     /// Set the `via` field (optional)
     pub fn via(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -234,14 +234,14 @@ impl<'a, S: repost_state::State> RepostBuilder<'a, S> {
     }
 }
 
-impl<'a, S> RepostBuilder<'a, S>
+impl<S: BosStr, St> RepostBuilder<S, St>
 where
-    S: repost_state::State,
-    S::CreatedAt: repost_state::IsSet,
-    S::Subject: repost_state::IsSet,
+    St: repost_state::State,
+    St::Subject: repost_state::IsSet,
+    St::CreatedAt: repost_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Repost<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Repost<S> {
         Repost {
             created_at: self._fields.0.unwrap(),
             subject: self._fields.1.unwrap(),
@@ -249,8 +249,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Repost<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Repost<S> {
         Repost {
             created_at: self._fields.0.unwrap(),
             subject: self._fields.1.unwrap(),

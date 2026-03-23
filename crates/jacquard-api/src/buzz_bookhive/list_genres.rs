@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -29,11 +29,11 @@ use crate::buzz_bookhive::list_genres;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GenreWithCount<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GenreWithCount<S: BosStr = DefaultStr> {
     ///Number of books in this genre
     pub count: i64,
     ///Genre name
@@ -60,25 +60,23 @@ pub struct ListGenres {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ListGenresOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ListGenresOutput<S: BosStr = DefaultStr> {
     pub genres: Vec<list_genres::GenreWithCount<S>>,
     ///Next offset for pagination
     #[serde(skip_serializing_if = "Option::is_none")]
     pub offset: Option<i64>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for GenreWithCount<S> {
+impl<S: BosStr> LexiconSchema for GenreWithCount<S> {
     fn nsid() -> &'static str {
         "buzz.bookhive.listGenres"
     }
@@ -98,7 +96,7 @@ pub struct ListGenresResponse;
 impl jacquard_common::xrpc::XrpcResp for ListGenresResponse {
     const NSID: &'static str = "buzz.bookhive.listGenres";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ListGenresOutput<S>;
+    type Output<S: BosStr> = ListGenresOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
@@ -113,7 +111,7 @@ pub struct ListGenresRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListGenresRequest {
     const PATH: &'static str = "/xrpc/buzz.bookhive.listGenres";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = ListGenres;
+    type Request<S: BosStr> = ListGenres;
     type Response = ListGenresResponse;
 }
 
@@ -138,17 +136,17 @@ pub mod genre_with_count_state {
         type Count = Unset;
     }
     ///State transition - sets the `genre` field to Set
-    pub struct SetGenre<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGenre<S> {}
-    impl<S: State> State for SetGenre<S> {
+    pub struct SetGenre<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetGenre<St> {}
+    impl<St: State> State for SetGenre<St> {
         type Genre = Set<members::genre>;
-        type Count = S::Count;
+        type Count = St::Count;
     }
     ///State transition - sets the `count` field to Set
-    pub struct SetCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCount<S> {}
-    impl<S: State> State for SetCount<S> {
-        type Genre = S::Genre;
+    pub struct SetCount<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCount<St> {}
+    impl<St: State> State for SetCount<St> {
+        type Genre = St::Genre;
         type Count = Set<members::count>;
     }
     /// Marker types for field names
@@ -161,88 +159,88 @@ pub mod genre_with_count_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GenreWithCountBuilder<'a, S: genre_with_count_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GenreWithCountBuilder<S: BosStr, St: genre_with_count_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GenreWithCount<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GenreWithCountBuilder<'a, genre_with_count_state::Empty> {
+impl<S: BosStr> GenreWithCount<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GenreWithCountBuilder<S, genre_with_count_state::Empty> {
         GenreWithCountBuilder::new()
     }
 }
 
-impl<'a> GenreWithCountBuilder<'a, genre_with_count_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GenreWithCountBuilder<S, genre_with_count_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GenreWithCountBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GenreWithCountBuilder<'a, S>
+impl<S: BosStr, St> GenreWithCountBuilder<S, St>
 where
-    S: genre_with_count_state::State,
-    S::Count: genre_with_count_state::IsUnset,
+    St: genre_with_count_state::State,
+    St::Count: genre_with_count_state::IsUnset,
 {
     /// Set the `count` field (required)
     pub fn count(
         mut self,
         value: impl Into<i64>,
-    ) -> GenreWithCountBuilder<'a, genre_with_count_state::SetCount<S>> {
+    ) -> GenreWithCountBuilder<S, genre_with_count_state::SetCount<St>> {
         self._fields.0 = Option::Some(value.into());
         GenreWithCountBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GenreWithCountBuilder<'a, S>
+impl<S: BosStr, St> GenreWithCountBuilder<S, St>
 where
-    S: genre_with_count_state::State,
-    S::Genre: genre_with_count_state::IsUnset,
+    St: genre_with_count_state::State,
+    St::Genre: genre_with_count_state::IsUnset,
 {
     /// Set the `genre` field (required)
     pub fn genre(
         mut self,
         value: impl Into<S>,
-    ) -> GenreWithCountBuilder<'a, genre_with_count_state::SetGenre<S>> {
+    ) -> GenreWithCountBuilder<S, genre_with_count_state::SetGenre<St>> {
         self._fields.1 = Option::Some(value.into());
         GenreWithCountBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GenreWithCountBuilder<'a, S>
+impl<S: BosStr, St> GenreWithCountBuilder<S, St>
 where
-    S: genre_with_count_state::State,
-    S::Genre: genre_with_count_state::IsSet,
-    S::Count: genre_with_count_state::IsSet,
+    St: genre_with_count_state::State,
+    St::Genre: genre_with_count_state::IsSet,
+    St::Count: genre_with_count_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GenreWithCount<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GenreWithCount<S> {
         GenreWithCount {
             count: self._fields.0.unwrap(),
             genre: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> GenreWithCount<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> GenreWithCount<S> {
         GenreWithCount {
             count: self._fields.0.unwrap(),
             genre: self._fields.1.unwrap(),
@@ -355,21 +353,21 @@ pub mod list_genres_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct ListGenresBuilder<S: list_genres_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ListGenresBuilder<St: list_genres_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<i64>, Option<i64>),
 }
 
 impl ListGenres {
-    /// Create a new builder for this type
+    /// Create a new builder for this type.
     pub fn new() -> ListGenresBuilder<list_genres_state::Empty> {
         ListGenresBuilder::new()
     }
 }
 
 impl ListGenresBuilder<list_genres_state::Empty> {
-    /// Create a new builder with all fields unset
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ListGenresBuilder {
             _state: PhantomData,
@@ -378,7 +376,7 @@ impl ListGenresBuilder<list_genres_state::Empty> {
     }
 }
 
-impl<S: list_genres_state::State> ListGenresBuilder<S> {
+impl<St: list_genres_state::State> ListGenresBuilder<St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
@@ -391,7 +389,7 @@ impl<S: list_genres_state::State> ListGenresBuilder<S> {
     }
 }
 
-impl<S: list_genres_state::State> ListGenresBuilder<S> {
+impl<St: list_genres_state::State> ListGenresBuilder<St> {
     /// Set the `minBooks` field (optional)
     pub fn min_books(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -404,7 +402,7 @@ impl<S: list_genres_state::State> ListGenresBuilder<S> {
     }
 }
 
-impl<S: list_genres_state::State> ListGenresBuilder<S> {
+impl<St: list_genres_state::State> ListGenresBuilder<St> {
     /// Set the `offset` field (optional)
     pub fn offset(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -417,11 +415,11 @@ impl<S: list_genres_state::State> ListGenresBuilder<S> {
     }
 }
 
-impl<S> ListGenresBuilder<S>
+impl<St> ListGenresBuilder<St>
 where
-    S: list_genres_state::State,
+    St: list_genres_state::State,
 {
-    /// Build the final struct
+    /// Build the final struct.
     pub fn build(self) -> ListGenres {
         ListGenres {
             limit: self._fields.0,

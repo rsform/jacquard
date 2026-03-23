@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
@@ -19,25 +19,23 @@ use serde::{Serialize, Deserialize};
 use crate::tools_ozone::team::Member;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct AddMember<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct AddMember<S: BosStr = DefaultStr> {
     pub did: Did<S>,
     pub role: AddMemberRole<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum AddMemberRole<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum AddMemberRole<S: BosStr = DefaultStr> {
     RoleAdmin,
     RoleModerator,
     RoleVerifier,
@@ -45,7 +43,7 @@ pub enum AddMemberRole<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> AddMemberRole<S> {
+impl<S: BosStr> AddMemberRole<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::RoleAdmin => "tools.ozone.team.defs#roleAdmin",
@@ -67,19 +65,19 @@ impl<S: Bos<str> + AsRef<str>> AddMemberRole<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for AddMemberRole<S> {
+impl<S: BosStr> core::fmt::Display for AddMemberRole<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for AddMemberRole<S> {
+impl<S: BosStr> AsRef<str> for AddMemberRole<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for AddMemberRole<S> {
+impl<S: BosStr> Serialize for AddMemberRole<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -88,8 +86,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for AddMemberRole<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for AddMemberRole<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for AddMemberRole<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -99,14 +96,18 @@ for AddMemberRole<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for AddMemberRole<S> {
+impl<S: BosStr + Default> Default for AddMemberRole<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for AddMemberRole<S> {
-    type Output = AddMemberRole<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for AddMemberRole<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = AddMemberRole<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             AddMemberRole::RoleAdmin => AddMemberRole::RoleAdmin,
@@ -120,20 +121,17 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for AddMemberRole<S> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct AddMemberOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct AddMemberOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
-    #[serde(borrow)]
     pub value: Member<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -185,12 +183,11 @@ pub struct AddMemberResponse;
 impl jacquard_common::xrpc::XrpcResp for AddMemberResponse {
     const NSID: &'static str = "tools.ozone.team.addMember";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = AddMemberOutput<S>;
+    type Output<S: BosStr> = AddMemberOutput<S>;
     type Err = AddMemberError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for AddMember<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for AddMember<S> {
     const NSID: &'static str = "tools.ozone.team.addMember";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -205,7 +202,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for AddMemberRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = AddMember<S>;
+    type Request<S: BosStr> = AddMember<S>;
     type Response = AddMemberResponse;
 }
 
@@ -230,17 +227,17 @@ pub mod add_member_state {
         type Role = Unset;
     }
     ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
         type Did = Set<members::did>;
-        type Role = S::Role;
+        type Role = St::Role;
     }
     ///State transition - sets the `role` field to Set
-    pub struct SetRole<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRole<S> {}
-    impl<S: State> State for SetRole<S> {
-        type Did = S::Did;
+    pub struct SetRole<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRole<St> {}
+    impl<St: State> State for SetRole<St> {
+        type Did = St::Did;
         type Role = Set<members::role>;
     }
     /// Marker types for field names
@@ -253,88 +250,88 @@ pub mod add_member_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct AddMemberBuilder<'a, S: add_member_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct AddMemberBuilder<S: BosStr, St: add_member_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>, Option<AddMemberRole<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> AddMember<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> AddMemberBuilder<'a, add_member_state::Empty> {
+impl<S: BosStr> AddMember<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> AddMemberBuilder<S, add_member_state::Empty> {
         AddMemberBuilder::new()
     }
 }
 
-impl<'a> AddMemberBuilder<'a, add_member_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> AddMemberBuilder<S, add_member_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         AddMemberBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AddMemberBuilder<'a, S>
+impl<S: BosStr, St> AddMemberBuilder<S, St>
 where
-    S: add_member_state::State,
-    S::Did: add_member_state::IsUnset,
+    St: add_member_state::State,
+    St::Did: add_member_state::IsUnset,
 {
     /// Set the `did` field (required)
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> AddMemberBuilder<'a, add_member_state::SetDid<S>> {
+    ) -> AddMemberBuilder<S, add_member_state::SetDid<St>> {
         self._fields.0 = Option::Some(value.into());
         AddMemberBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AddMemberBuilder<'a, S>
+impl<S: BosStr, St> AddMemberBuilder<S, St>
 where
-    S: add_member_state::State,
-    S::Role: add_member_state::IsUnset,
+    St: add_member_state::State,
+    St::Role: add_member_state::IsUnset,
 {
     /// Set the `role` field (required)
     pub fn role(
         mut self,
         value: impl Into<AddMemberRole<S>>,
-    ) -> AddMemberBuilder<'a, add_member_state::SetRole<S>> {
+    ) -> AddMemberBuilder<S, add_member_state::SetRole<St>> {
         self._fields.1 = Option::Some(value.into());
         AddMemberBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AddMemberBuilder<'a, S>
+impl<S: BosStr, St> AddMemberBuilder<S, St>
 where
-    S: add_member_state::State,
-    S::Did: add_member_state::IsSet,
-    S::Role: add_member_state::IsSet,
+    St: add_member_state::State,
+    St::Did: add_member_state::IsSet,
+    St::Role: add_member_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> AddMember<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> AddMember<S> {
         AddMember {
             did: self._fields.0.unwrap(),
             role: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> AddMember<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> AddMember<S> {
         AddMember {
             did: self._fields.0.unwrap(),
             role: self._fields.1.unwrap(),

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "lol.jbc.feed.bite",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Bite<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Bite<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -54,18 +54,18 @@ pub struct Bite<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct BiteGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct BiteGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Bite<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Bite<S> {
+impl<S: BosStr> Bite<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, BiteRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -78,17 +78,17 @@ pub struct BiteRecord;
 impl XrpcResp for BiteRecord {
     const NSID: &'static str = "lol.jbc.feed.bite";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = BiteGetRecordOutput<S>;
+    type Output<S: BosStr> = BiteGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<BiteGetRecordOutput<S>> for Bite<S> {
+impl<S: BosStr> From<BiteGetRecordOutput<S>> for Bite<S> {
     fn from(output: BiteGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Bite<S> {
+impl<S: BosStr> Collection for Bite<S> {
     const NSID: &'static str = "lol.jbc.feed.bite";
     type Record = BiteRecord;
 }
@@ -98,7 +98,7 @@ impl Collection for BiteRecord {
     type Record = BiteRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Bite<S> {
+impl<S: BosStr> LexiconSchema for Bite<S> {
     fn nsid() -> &'static str {
         "lol.jbc.feed.bite"
     }
@@ -132,32 +132,32 @@ pub mod bite_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct BiteBuilder<'a, S: bite_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct BiteBuilder<S: BosStr, St: bite_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Bite<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> BiteBuilder<'a, bite_state::Empty> {
+impl<S: BosStr> Bite<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> BiteBuilder<S, bite_state::Empty> {
         BiteBuilder::new()
     }
 }
 
-impl<'a> BiteBuilder<'a, bite_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> BiteBuilder<S, bite_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         BiteBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: bite_state::State> BiteBuilder<'a, S> {
+impl<S: BosStr, St: bite_state::State> BiteBuilder<S, St> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.0 = value.into();
@@ -170,7 +170,7 @@ impl<'a, S: bite_state::State> BiteBuilder<'a, S> {
     }
 }
 
-impl<'a, S: bite_state::State> BiteBuilder<'a, S> {
+impl<S: BosStr, St: bite_state::State> BiteBuilder<S, St> {
     /// Set the `subject` field (optional)
     pub fn subject(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -183,20 +183,20 @@ impl<'a, S: bite_state::State> BiteBuilder<'a, S> {
     }
 }
 
-impl<'a, S> BiteBuilder<'a, S>
+impl<S: BosStr, St> BiteBuilder<S, St>
 where
-    S: bite_state::State,
+    St: bite_state::State,
 {
-    /// Build the final struct
-    pub fn build(self) -> Bite<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Bite<S> {
         Bite {
             created_at: self._fields.0,
             subject: self._fields.1,
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Bite<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Bite<S> {
         Bite {
             created_at: self._fields.0,
             subject: self._fields.1,

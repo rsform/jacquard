@@ -37,7 +37,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -62,11 +62,11 @@ use crate::sh_weaver::graph;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CommunityTagCount<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CommunityTagCount<S: BosStr = DefaultStr> {
     pub count: i64,
     pub tag: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -89,11 +89,11 @@ impl core::fmt::Display for Curatelist {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ListItemView<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ListItemView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub added_at: Option<Datetime>,
     pub subject: ListItemViewSubject<S>,
@@ -108,11 +108,11 @@ pub struct ListItemView<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ListItemViewSubject<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ListItemViewSubject<S: BosStr = DefaultStr> {
     #[serde(rename = "sh.weaver.notebook.defs#notebookView")]
     NotebookView(Box<NotebookView<S>>),
     #[serde(rename = "sh.weaver.notebook.defs#entryView")]
@@ -121,14 +121,14 @@ pub enum ListItemViewSubject<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ListPurpose<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ListPurpose<S: BosStr = DefaultStr> {
     ShWeaverGraphDefsCuratelist,
     ShWeaverGraphDefsReadinglist,
     ShWeaverGraphDefsSerieslist,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> ListPurpose<S> {
+impl<S: BosStr> ListPurpose<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::ShWeaverGraphDefsCuratelist => "sh.weaver.graph.defs#curatelist",
@@ -148,19 +148,19 @@ impl<S: Bos<str> + AsRef<str>> ListPurpose<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for ListPurpose<S> {
+impl<S: BosStr> AsRef<str> for ListPurpose<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ListPurpose<S> {
+impl<S: BosStr> core::fmt::Display for ListPurpose<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for ListPurpose<S> {
+impl<S: BosStr> Serialize for ListPurpose<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -169,8 +169,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for ListPurpose<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for ListPurpose<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ListPurpose<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -180,8 +179,12 @@ for ListPurpose<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for ListPurpose<S> {
-    type Output = ListPurpose<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for ListPurpose<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ListPurpose<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             ListPurpose::ShWeaverGraphDefsCuratelist => {
@@ -204,11 +207,11 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for ListPurpose<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ListView<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ListView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avatar: Option<UriValue<S>>,
     pub cid: Cid<S>,
@@ -242,11 +245,11 @@ impl core::fmt::Display for Readinglist {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ResourceTagsView<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ResourceTagsView<S: BosStr = DefaultStr> {
     ///Tags from the record itself (author-applied).
     pub author_tags: Vec<S>,
     ///Aggregated community-applied tags with counts.
@@ -275,11 +278,11 @@ impl core::fmt::Display for Serieslist {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct TagApplicationView<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct TagApplicationView<S: BosStr = DefaultStr> {
     pub applied_by: ProfileViewBasic<S>,
     pub created_at: Datetime,
     pub tag: S,
@@ -294,11 +297,11 @@ pub struct TagApplicationView<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct TagView<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct TagView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub entry_count: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -316,7 +319,7 @@ pub struct TagView<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for CommunityTagCount<S> {
+impl<S: BosStr> LexiconSchema for CommunityTagCount<S> {
     fn nsid() -> &'static str {
         "sh.weaver.graph.defs"
     }
@@ -331,7 +334,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for CommunityTagCount<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ListItemView<S> {
+impl<S: BosStr> LexiconSchema for ListItemView<S> {
     fn nsid() -> &'static str {
         "sh.weaver.graph.defs"
     }
@@ -346,7 +349,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for ListItemView<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ListView<S> {
+impl<S: BosStr> LexiconSchema for ListView<S> {
     fn nsid() -> &'static str {
         "sh.weaver.graph.defs"
     }
@@ -361,7 +364,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for ListView<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ResourceTagsView<S> {
+impl<S: BosStr> LexiconSchema for ResourceTagsView<S> {
     fn nsid() -> &'static str {
         "sh.weaver.graph.defs"
     }
@@ -376,7 +379,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for ResourceTagsView<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for TagApplicationView<S> {
+impl<S: BosStr> LexiconSchema for TagApplicationView<S> {
     fn nsid() -> &'static str {
         "sh.weaver.graph.defs"
     }
@@ -391,7 +394,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for TagApplicationView<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for TagView<S> {
+impl<S: BosStr> LexiconSchema for TagView<S> {
     fn nsid() -> &'static str {
         "sh.weaver.graph.defs"
     }
@@ -416,122 +419,122 @@ pub mod community_tag_count_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Tag;
         type Count;
+        type Tag;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Tag = Unset;
         type Count = Unset;
-    }
-    ///State transition - sets the `tag` field to Set
-    pub struct SetTag<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTag<S> {}
-    impl<S: State> State for SetTag<S> {
-        type Tag = Set<members::tag>;
-        type Count = S::Count;
+        type Tag = Unset;
     }
     ///State transition - sets the `count` field to Set
-    pub struct SetCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCount<S> {}
-    impl<S: State> State for SetCount<S> {
-        type Tag = S::Tag;
+    pub struct SetCount<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCount<St> {}
+    impl<St: State> State for SetCount<St> {
         type Count = Set<members::count>;
+        type Tag = St::Tag;
+    }
+    ///State transition - sets the `tag` field to Set
+    pub struct SetTag<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTag<St> {}
+    impl<St: State> State for SetTag<St> {
+        type Count = St::Count;
+        type Tag = Set<members::tag>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `tag` field
-        pub struct tag(());
         ///Marker type for the `count` field
         pub struct count(());
+        ///Marker type for the `tag` field
+        pub struct tag(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct CommunityTagCountBuilder<'a, S: community_tag_count_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct CommunityTagCountBuilder<S: BosStr, St: community_tag_count_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> CommunityTagCount<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> CommunityTagCountBuilder<'a, community_tag_count_state::Empty> {
+impl<S: BosStr> CommunityTagCount<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> CommunityTagCountBuilder<S, community_tag_count_state::Empty> {
         CommunityTagCountBuilder::new()
     }
 }
 
-impl<'a> CommunityTagCountBuilder<'a, community_tag_count_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> CommunityTagCountBuilder<S, community_tag_count_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         CommunityTagCountBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CommunityTagCountBuilder<'a, S>
+impl<S: BosStr, St> CommunityTagCountBuilder<S, St>
 where
-    S: community_tag_count_state::State,
-    S::Count: community_tag_count_state::IsUnset,
+    St: community_tag_count_state::State,
+    St::Count: community_tag_count_state::IsUnset,
 {
     /// Set the `count` field (required)
     pub fn count(
         mut self,
         value: impl Into<i64>,
-    ) -> CommunityTagCountBuilder<'a, community_tag_count_state::SetCount<S>> {
+    ) -> CommunityTagCountBuilder<S, community_tag_count_state::SetCount<St>> {
         self._fields.0 = Option::Some(value.into());
         CommunityTagCountBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CommunityTagCountBuilder<'a, S>
+impl<S: BosStr, St> CommunityTagCountBuilder<S, St>
 where
-    S: community_tag_count_state::State,
-    S::Tag: community_tag_count_state::IsUnset,
+    St: community_tag_count_state::State,
+    St::Tag: community_tag_count_state::IsUnset,
 {
     /// Set the `tag` field (required)
     pub fn tag(
         mut self,
         value: impl Into<S>,
-    ) -> CommunityTagCountBuilder<'a, community_tag_count_state::SetTag<S>> {
+    ) -> CommunityTagCountBuilder<S, community_tag_count_state::SetTag<St>> {
         self._fields.1 = Option::Some(value.into());
         CommunityTagCountBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CommunityTagCountBuilder<'a, S>
+impl<S: BosStr, St> CommunityTagCountBuilder<S, St>
 where
-    S: community_tag_count_state::State,
-    S::Tag: community_tag_count_state::IsSet,
-    S::Count: community_tag_count_state::IsSet,
+    St: community_tag_count_state::State,
+    St::Count: community_tag_count_state::IsSet,
+    St::Tag: community_tag_count_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> CommunityTagCount<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> CommunityTagCount<S> {
         CommunityTagCount {
             count: self._fields.0.unwrap(),
             tag: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> CommunityTagCount<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> CommunityTagCount<S> {
         CommunityTagCount {
             count: self._fields.0.unwrap(),
             tag: self._fields.1.unwrap(),
@@ -921,17 +924,17 @@ pub mod list_item_view_state {
         type Uri = Unset;
     }
     ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
+    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubject<St> {}
+    impl<St: State> State for SetSubject<St> {
         type Subject = Set<members::subject>;
-        type Uri = S::Uri;
+        type Uri = St::Uri;
     }
     ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Subject = S::Subject;
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Subject = St::Subject;
         type Uri = Set<members::uri>;
     }
     /// Marker types for field names
@@ -944,32 +947,32 @@ pub mod list_item_view_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ListItemViewBuilder<'a, S: list_item_view_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ListItemViewBuilder<S: BosStr, St: list_item_view_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<ListItemViewSubject<S>>, Option<AtUri<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ListItemView<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ListItemViewBuilder<'a, list_item_view_state::Empty> {
+impl<S: BosStr> ListItemView<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ListItemViewBuilder<S, list_item_view_state::Empty> {
         ListItemViewBuilder::new()
     }
 }
 
-impl<'a> ListItemViewBuilder<'a, list_item_view_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ListItemViewBuilder<S, list_item_view_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ListItemViewBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: list_item_view_state::State> ListItemViewBuilder<'a, S> {
+impl<S: BosStr, St: list_item_view_state::State> ListItemViewBuilder<S, St> {
     /// Set the `addedAt` field (optional)
     pub fn added_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.0 = value.into();
@@ -982,52 +985,52 @@ impl<'a, S: list_item_view_state::State> ListItemViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ListItemViewBuilder<'a, S>
+impl<S: BosStr, St> ListItemViewBuilder<S, St>
 where
-    S: list_item_view_state::State,
-    S::Subject: list_item_view_state::IsUnset,
+    St: list_item_view_state::State,
+    St::Subject: list_item_view_state::IsUnset,
 {
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
         value: impl Into<ListItemViewSubject<S>>,
-    ) -> ListItemViewBuilder<'a, list_item_view_state::SetSubject<S>> {
+    ) -> ListItemViewBuilder<S, list_item_view_state::SetSubject<St>> {
         self._fields.1 = Option::Some(value.into());
         ListItemViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ListItemViewBuilder<'a, S>
+impl<S: BosStr, St> ListItemViewBuilder<S, St>
 where
-    S: list_item_view_state::State,
-    S::Uri: list_item_view_state::IsUnset,
+    St: list_item_view_state::State,
+    St::Uri: list_item_view_state::IsUnset,
 {
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> ListItemViewBuilder<'a, list_item_view_state::SetUri<S>> {
+    ) -> ListItemViewBuilder<S, list_item_view_state::SetUri<St>> {
         self._fields.2 = Option::Some(value.into());
         ListItemViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ListItemViewBuilder<'a, S>
+impl<S: BosStr, St> ListItemViewBuilder<S, St>
 where
-    S: list_item_view_state::State,
-    S::Subject: list_item_view_state::IsSet,
-    S::Uri: list_item_view_state::IsSet,
+    St: list_item_view_state::State,
+    St::Subject: list_item_view_state::IsSet,
+    St::Uri: list_item_view_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ListItemView<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ListItemView<S> {
         ListItemView {
             added_at: self._fields.0,
             subject: self._fields.1.unwrap(),
@@ -1035,11 +1038,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> ListItemView<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ListItemView<S> {
         ListItemView {
             added_at: self._fields.0,
             subject: self._fields.1.unwrap(),
@@ -1059,133 +1062,133 @@ pub mod list_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
-        type Name;
-        type Purpose;
-        type Cid;
         type ItemCount;
         type IndexedAt;
+        type Purpose;
+        type Name;
+        type Cid;
         type Creator;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
-        type Name = Unset;
-        type Purpose = Unset;
-        type Cid = Unset;
         type ItemCount = Unset;
         type IndexedAt = Unset;
+        type Purpose = Unset;
+        type Name = Unset;
+        type Cid = Unset;
         type Creator = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Uri = Set<members::uri>;
-        type Name = S::Name;
-        type Purpose = S::Purpose;
-        type Cid = S::Cid;
-        type ItemCount = S::ItemCount;
-        type IndexedAt = S::IndexedAt;
-        type Creator = S::Creator;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Uri = S::Uri;
-        type Name = Set<members::name>;
-        type Purpose = S::Purpose;
-        type Cid = S::Cid;
-        type ItemCount = S::ItemCount;
-        type IndexedAt = S::IndexedAt;
-        type Creator = S::Creator;
-    }
-    ///State transition - sets the `purpose` field to Set
-    pub struct SetPurpose<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPurpose<S> {}
-    impl<S: State> State for SetPurpose<S> {
-        type Uri = S::Uri;
-        type Name = S::Name;
-        type Purpose = Set<members::purpose>;
-        type Cid = S::Cid;
-        type ItemCount = S::ItemCount;
-        type IndexedAt = S::IndexedAt;
-        type Creator = S::Creator;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Uri = S::Uri;
-        type Name = S::Name;
-        type Purpose = S::Purpose;
-        type Cid = Set<members::cid>;
-        type ItemCount = S::ItemCount;
-        type IndexedAt = S::IndexedAt;
-        type Creator = S::Creator;
+        type Uri = Unset;
     }
     ///State transition - sets the `item_count` field to Set
-    pub struct SetItemCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetItemCount<S> {}
-    impl<S: State> State for SetItemCount<S> {
-        type Uri = S::Uri;
-        type Name = S::Name;
-        type Purpose = S::Purpose;
-        type Cid = S::Cid;
+    pub struct SetItemCount<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetItemCount<St> {}
+    impl<St: State> State for SetItemCount<St> {
         type ItemCount = Set<members::item_count>;
-        type IndexedAt = S::IndexedAt;
-        type Creator = S::Creator;
+        type IndexedAt = St::IndexedAt;
+        type Purpose = St::Purpose;
+        type Name = St::Name;
+        type Cid = St::Cid;
+        type Creator = St::Creator;
+        type Uri = St::Uri;
     }
     ///State transition - sets the `indexed_at` field to Set
-    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
-    impl<S: State> State for SetIndexedAt<S> {
-        type Uri = S::Uri;
-        type Name = S::Name;
-        type Purpose = S::Purpose;
-        type Cid = S::Cid;
-        type ItemCount = S::ItemCount;
+    pub struct SetIndexedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIndexedAt<St> {}
+    impl<St: State> State for SetIndexedAt<St> {
+        type ItemCount = St::ItemCount;
         type IndexedAt = Set<members::indexed_at>;
-        type Creator = S::Creator;
+        type Purpose = St::Purpose;
+        type Name = St::Name;
+        type Cid = St::Cid;
+        type Creator = St::Creator;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `purpose` field to Set
+    pub struct SetPurpose<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPurpose<St> {}
+    impl<St: State> State for SetPurpose<St> {
+        type ItemCount = St::ItemCount;
+        type IndexedAt = St::IndexedAt;
+        type Purpose = Set<members::purpose>;
+        type Name = St::Name;
+        type Cid = St::Cid;
+        type Creator = St::Creator;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type ItemCount = St::ItemCount;
+        type IndexedAt = St::IndexedAt;
+        type Purpose = St::Purpose;
+        type Name = Set<members::name>;
+        type Cid = St::Cid;
+        type Creator = St::Creator;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCid<St> {}
+    impl<St: State> State for SetCid<St> {
+        type ItemCount = St::ItemCount;
+        type IndexedAt = St::IndexedAt;
+        type Purpose = St::Purpose;
+        type Name = St::Name;
+        type Cid = Set<members::cid>;
+        type Creator = St::Creator;
+        type Uri = St::Uri;
     }
     ///State transition - sets the `creator` field to Set
-    pub struct SetCreator<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreator<S> {}
-    impl<S: State> State for SetCreator<S> {
-        type Uri = S::Uri;
-        type Name = S::Name;
-        type Purpose = S::Purpose;
-        type Cid = S::Cid;
-        type ItemCount = S::ItemCount;
-        type IndexedAt = S::IndexedAt;
+    pub struct SetCreator<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreator<St> {}
+    impl<St: State> State for SetCreator<St> {
+        type ItemCount = St::ItemCount;
+        type IndexedAt = St::IndexedAt;
+        type Purpose = St::Purpose;
+        type Name = St::Name;
+        type Cid = St::Cid;
         type Creator = Set<members::creator>;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type ItemCount = St::ItemCount;
+        type IndexedAt = St::IndexedAt;
+        type Purpose = St::Purpose;
+        type Name = St::Name;
+        type Cid = St::Cid;
+        type Creator = St::Creator;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
-        ///Marker type for the `name` field
-        pub struct name(());
-        ///Marker type for the `purpose` field
-        pub struct purpose(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `item_count` field
         pub struct item_count(());
         ///Marker type for the `indexed_at` field
         pub struct indexed_at(());
+        ///Marker type for the `purpose` field
+        pub struct purpose(());
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
         ///Marker type for the `creator` field
         pub struct creator(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ListViewBuilder<'a, S: list_view_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ListViewBuilder<S: BosStr, St: list_view_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<UriValue<S>>,
         Option<Cid<S>>,
@@ -1198,28 +1201,28 @@ pub struct ListViewBuilder<'a, S: list_view_state::State> {
         Option<AtUri<S>>,
         Option<AtUri<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ListView<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ListViewBuilder<'a, list_view_state::Empty> {
+impl<S: BosStr> ListView<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ListViewBuilder<S, list_view_state::Empty> {
         ListViewBuilder::new()
     }
 }
 
-impl<'a> ListViewBuilder<'a, list_view_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ListViewBuilder<S, list_view_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ListViewBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: list_view_state::State> ListViewBuilder<'a, S> {
+impl<S: BosStr, St: list_view_state::State> ListViewBuilder<S, St> {
     /// Set the `avatar` field (optional)
     pub fn avatar(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -1232,45 +1235,45 @@ impl<'a, S: list_view_state::State> ListViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ListViewBuilder<'a, S>
+impl<S: BosStr, St> ListViewBuilder<S, St>
 where
-    S: list_view_state::State,
-    S::Cid: list_view_state::IsUnset,
+    St: list_view_state::State,
+    St::Cid: list_view_state::IsUnset,
 {
     /// Set the `cid` field (required)
     pub fn cid(
         mut self,
         value: impl Into<Cid<S>>,
-    ) -> ListViewBuilder<'a, list_view_state::SetCid<S>> {
+    ) -> ListViewBuilder<S, list_view_state::SetCid<St>> {
         self._fields.1 = Option::Some(value.into());
         ListViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ListViewBuilder<'a, S>
+impl<S: BosStr, St> ListViewBuilder<S, St>
 where
-    S: list_view_state::State,
-    S::Creator: list_view_state::IsUnset,
+    St: list_view_state::State,
+    St::Creator: list_view_state::IsUnset,
 {
     /// Set the `creator` field (required)
     pub fn creator(
         mut self,
         value: impl Into<ProfileViewBasic<S>>,
-    ) -> ListViewBuilder<'a, list_view_state::SetCreator<S>> {
+    ) -> ListViewBuilder<S, list_view_state::SetCreator<St>> {
         self._fields.2 = Option::Some(value.into());
         ListViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: list_view_state::State> ListViewBuilder<'a, S> {
+impl<S: BosStr, St: list_view_state::State> ListViewBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -1283,102 +1286,102 @@ impl<'a, S: list_view_state::State> ListViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ListViewBuilder<'a, S>
+impl<S: BosStr, St> ListViewBuilder<S, St>
 where
-    S: list_view_state::State,
-    S::IndexedAt: list_view_state::IsUnset,
+    St: list_view_state::State,
+    St::IndexedAt: list_view_state::IsUnset,
 {
     /// Set the `indexedAt` field (required)
     pub fn indexed_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ListViewBuilder<'a, list_view_state::SetIndexedAt<S>> {
+    ) -> ListViewBuilder<S, list_view_state::SetIndexedAt<St>> {
         self._fields.4 = Option::Some(value.into());
         ListViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ListViewBuilder<'a, S>
+impl<S: BosStr, St> ListViewBuilder<S, St>
 where
-    S: list_view_state::State,
-    S::ItemCount: list_view_state::IsUnset,
+    St: list_view_state::State,
+    St::ItemCount: list_view_state::IsUnset,
 {
     /// Set the `itemCount` field (required)
     pub fn item_count(
         mut self,
         value: impl Into<i64>,
-    ) -> ListViewBuilder<'a, list_view_state::SetItemCount<S>> {
+    ) -> ListViewBuilder<S, list_view_state::SetItemCount<St>> {
         self._fields.5 = Option::Some(value.into());
         ListViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ListViewBuilder<'a, S>
+impl<S: BosStr, St> ListViewBuilder<S, St>
 where
-    S: list_view_state::State,
-    S::Name: list_view_state::IsUnset,
+    St: list_view_state::State,
+    St::Name: list_view_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> ListViewBuilder<'a, list_view_state::SetName<S>> {
+    ) -> ListViewBuilder<S, list_view_state::SetName<St>> {
         self._fields.6 = Option::Some(value.into());
         ListViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ListViewBuilder<'a, S>
+impl<S: BosStr, St> ListViewBuilder<S, St>
 where
-    S: list_view_state::State,
-    S::Purpose: list_view_state::IsUnset,
+    St: list_view_state::State,
+    St::Purpose: list_view_state::IsUnset,
 {
     /// Set the `purpose` field (required)
     pub fn purpose(
         mut self,
         value: impl Into<graph::ListPurpose<S>>,
-    ) -> ListViewBuilder<'a, list_view_state::SetPurpose<S>> {
+    ) -> ListViewBuilder<S, list_view_state::SetPurpose<St>> {
         self._fields.7 = Option::Some(value.into());
         ListViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ListViewBuilder<'a, S>
+impl<S: BosStr, St> ListViewBuilder<S, St>
 where
-    S: list_view_state::State,
-    S::Uri: list_view_state::IsUnset,
+    St: list_view_state::State,
+    St::Uri: list_view_state::IsUnset,
 {
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> ListViewBuilder<'a, list_view_state::SetUri<S>> {
+    ) -> ListViewBuilder<S, list_view_state::SetUri<St>> {
         self._fields.8 = Option::Some(value.into());
         ListViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: list_view_state::State> ListViewBuilder<'a, S> {
+impl<S: BosStr, St: list_view_state::State> ListViewBuilder<S, St> {
     /// Set the `viewerSubscribed` field (optional)
     pub fn viewer_subscribed(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.9 = value.into();
@@ -1391,19 +1394,19 @@ impl<'a, S: list_view_state::State> ListViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ListViewBuilder<'a, S>
+impl<S: BosStr, St> ListViewBuilder<S, St>
 where
-    S: list_view_state::State,
-    S::Uri: list_view_state::IsSet,
-    S::Name: list_view_state::IsSet,
-    S::Purpose: list_view_state::IsSet,
-    S::Cid: list_view_state::IsSet,
-    S::ItemCount: list_view_state::IsSet,
-    S::IndexedAt: list_view_state::IsSet,
-    S::Creator: list_view_state::IsSet,
+    St: list_view_state::State,
+    St::ItemCount: list_view_state::IsSet,
+    St::IndexedAt: list_view_state::IsSet,
+    St::Purpose: list_view_state::IsSet,
+    St::Name: list_view_state::IsSet,
+    St::Cid: list_view_state::IsSet,
+    St::Creator: list_view_state::IsSet,
+    St::Uri: list_view_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ListView<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ListView<S> {
         ListView {
             avatar: self._fields.0,
             cid: self._fields.1.unwrap(),
@@ -1418,11 +1421,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> ListView<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ListView<S> {
         ListView {
             avatar: self._fields.0,
             cid: self._fields.1.unwrap(),
@@ -1449,142 +1449,142 @@ pub mod resource_tags_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CommunityTags;
         type Resource;
+        type CommunityTags;
         type AuthorTags;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CommunityTags = Unset;
         type Resource = Unset;
+        type CommunityTags = Unset;
         type AuthorTags = Unset;
     }
-    ///State transition - sets the `community_tags` field to Set
-    pub struct SetCommunityTags<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCommunityTags<S> {}
-    impl<S: State> State for SetCommunityTags<S> {
-        type CommunityTags = Set<members::community_tags>;
-        type Resource = S::Resource;
-        type AuthorTags = S::AuthorTags;
-    }
     ///State transition - sets the `resource` field to Set
-    pub struct SetResource<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetResource<S> {}
-    impl<S: State> State for SetResource<S> {
-        type CommunityTags = S::CommunityTags;
+    pub struct SetResource<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetResource<St> {}
+    impl<St: State> State for SetResource<St> {
         type Resource = Set<members::resource>;
-        type AuthorTags = S::AuthorTags;
+        type CommunityTags = St::CommunityTags;
+        type AuthorTags = St::AuthorTags;
+    }
+    ///State transition - sets the `community_tags` field to Set
+    pub struct SetCommunityTags<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCommunityTags<St> {}
+    impl<St: State> State for SetCommunityTags<St> {
+        type Resource = St::Resource;
+        type CommunityTags = Set<members::community_tags>;
+        type AuthorTags = St::AuthorTags;
     }
     ///State transition - sets the `author_tags` field to Set
-    pub struct SetAuthorTags<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthorTags<S> {}
-    impl<S: State> State for SetAuthorTags<S> {
-        type CommunityTags = S::CommunityTags;
-        type Resource = S::Resource;
+    pub struct SetAuthorTags<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAuthorTags<St> {}
+    impl<St: State> State for SetAuthorTags<St> {
+        type Resource = St::Resource;
+        type CommunityTags = St::CommunityTags;
         type AuthorTags = Set<members::author_tags>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `community_tags` field
-        pub struct community_tags(());
         ///Marker type for the `resource` field
         pub struct resource(());
+        ///Marker type for the `community_tags` field
+        pub struct community_tags(());
         ///Marker type for the `author_tags` field
         pub struct author_tags(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ResourceTagsViewBuilder<'a, S: resource_tags_view_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ResourceTagsViewBuilder<S: BosStr, St: resource_tags_view_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<S>>,
         Option<Vec<graph::CommunityTagCount<S>>>,
         Option<StrongRef<S>>,
         Option<Vec<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ResourceTagsView<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ResourceTagsViewBuilder<'a, resource_tags_view_state::Empty> {
+impl<S: BosStr> ResourceTagsView<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ResourceTagsViewBuilder<S, resource_tags_view_state::Empty> {
         ResourceTagsViewBuilder::new()
     }
 }
 
-impl<'a> ResourceTagsViewBuilder<'a, resource_tags_view_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ResourceTagsViewBuilder<S, resource_tags_view_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ResourceTagsViewBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ResourceTagsViewBuilder<'a, S>
+impl<S: BosStr, St> ResourceTagsViewBuilder<S, St>
 where
-    S: resource_tags_view_state::State,
-    S::AuthorTags: resource_tags_view_state::IsUnset,
+    St: resource_tags_view_state::State,
+    St::AuthorTags: resource_tags_view_state::IsUnset,
 {
     /// Set the `authorTags` field (required)
     pub fn author_tags(
         mut self,
         value: impl Into<Vec<S>>,
-    ) -> ResourceTagsViewBuilder<'a, resource_tags_view_state::SetAuthorTags<S>> {
+    ) -> ResourceTagsViewBuilder<S, resource_tags_view_state::SetAuthorTags<St>> {
         self._fields.0 = Option::Some(value.into());
         ResourceTagsViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ResourceTagsViewBuilder<'a, S>
+impl<S: BosStr, St> ResourceTagsViewBuilder<S, St>
 where
-    S: resource_tags_view_state::State,
-    S::CommunityTags: resource_tags_view_state::IsUnset,
+    St: resource_tags_view_state::State,
+    St::CommunityTags: resource_tags_view_state::IsUnset,
 {
     /// Set the `communityTags` field (required)
     pub fn community_tags(
         mut self,
         value: impl Into<Vec<graph::CommunityTagCount<S>>>,
-    ) -> ResourceTagsViewBuilder<'a, resource_tags_view_state::SetCommunityTags<S>> {
+    ) -> ResourceTagsViewBuilder<S, resource_tags_view_state::SetCommunityTags<St>> {
         self._fields.1 = Option::Some(value.into());
         ResourceTagsViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ResourceTagsViewBuilder<'a, S>
+impl<S: BosStr, St> ResourceTagsViewBuilder<S, St>
 where
-    S: resource_tags_view_state::State,
-    S::Resource: resource_tags_view_state::IsUnset,
+    St: resource_tags_view_state::State,
+    St::Resource: resource_tags_view_state::IsUnset,
 {
     /// Set the `resource` field (required)
     pub fn resource(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> ResourceTagsViewBuilder<'a, resource_tags_view_state::SetResource<S>> {
+    ) -> ResourceTagsViewBuilder<S, resource_tags_view_state::SetResource<St>> {
         self._fields.2 = Option::Some(value.into());
         ResourceTagsViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: resource_tags_view_state::State> ResourceTagsViewBuilder<'a, S> {
+impl<S: BosStr, St: resource_tags_view_state::State> ResourceTagsViewBuilder<S, St> {
     /// Set the `viewerAppliedTags` field (optional)
     pub fn viewer_applied_tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -1597,15 +1597,15 @@ impl<'a, S: resource_tags_view_state::State> ResourceTagsViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ResourceTagsViewBuilder<'a, S>
+impl<S: BosStr, St> ResourceTagsViewBuilder<S, St>
 where
-    S: resource_tags_view_state::State,
-    S::CommunityTags: resource_tags_view_state::IsSet,
-    S::Resource: resource_tags_view_state::IsSet,
-    S::AuthorTags: resource_tags_view_state::IsSet,
+    St: resource_tags_view_state::State,
+    St::Resource: resource_tags_view_state::IsSet,
+    St::CommunityTags: resource_tags_view_state::IsSet,
+    St::AuthorTags: resource_tags_view_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ResourceTagsView<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ResourceTagsView<S> {
         ResourceTagsView {
             author_tags: self._fields.0.unwrap(),
             community_tags: self._fields.1.unwrap(),
@@ -1614,11 +1614,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> ResourceTagsView<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ResourceTagsView<S> {
         ResourceTagsView {
             author_tags: self._fields.0.unwrap(),
             community_tags: self._fields.1.unwrap(),
@@ -1641,8 +1641,8 @@ pub mod tag_application_view_state {
     pub trait State: sealed::Sealed {
         type Uri;
         type AppliedBy;
-        type Tag;
         type CreatedAt;
+        type Tag;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -1650,44 +1650,44 @@ pub mod tag_application_view_state {
     impl State for Empty {
         type Uri = Unset;
         type AppliedBy = Unset;
-        type Tag = Unset;
         type CreatedAt = Unset;
+        type Tag = Unset;
     }
     ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
         type Uri = Set<members::uri>;
-        type AppliedBy = S::AppliedBy;
-        type Tag = S::Tag;
-        type CreatedAt = S::CreatedAt;
+        type AppliedBy = St::AppliedBy;
+        type CreatedAt = St::CreatedAt;
+        type Tag = St::Tag;
     }
     ///State transition - sets the `applied_by` field to Set
-    pub struct SetAppliedBy<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAppliedBy<S> {}
-    impl<S: State> State for SetAppliedBy<S> {
-        type Uri = S::Uri;
+    pub struct SetAppliedBy<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAppliedBy<St> {}
+    impl<St: State> State for SetAppliedBy<St> {
+        type Uri = St::Uri;
         type AppliedBy = Set<members::applied_by>;
-        type Tag = S::Tag;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `tag` field to Set
-    pub struct SetTag<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTag<S> {}
-    impl<S: State> State for SetTag<S> {
-        type Uri = S::Uri;
-        type AppliedBy = S::AppliedBy;
-        type Tag = Set<members::tag>;
-        type CreatedAt = S::CreatedAt;
+        type CreatedAt = St::CreatedAt;
+        type Tag = St::Tag;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Uri = S::Uri;
-        type AppliedBy = S::AppliedBy;
-        type Tag = S::Tag;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Uri = St::Uri;
+        type AppliedBy = St::AppliedBy;
         type CreatedAt = Set<members::created_at>;
+        type Tag = St::Tag;
+    }
+    ///State transition - sets the `tag` field to Set
+    pub struct SetTag<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTag<St> {}
+    impl<St: State> State for SetTag<St> {
+        type Uri = St::Uri;
+        type AppliedBy = St::AppliedBy;
+        type CreatedAt = St::CreatedAt;
+        type Tag = Set<members::tag>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -1696,129 +1696,129 @@ pub mod tag_application_view_state {
         pub struct uri(());
         ///Marker type for the `applied_by` field
         pub struct applied_by(());
-        ///Marker type for the `tag` field
-        pub struct tag(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `tag` field
+        pub struct tag(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct TagApplicationViewBuilder<'a, S: tag_application_view_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct TagApplicationViewBuilder<S: BosStr, St: tag_application_view_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<ProfileViewBasic<S>>,
         Option<Datetime>,
         Option<S>,
         Option<AtUri<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> TagApplicationView<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> TagApplicationViewBuilder<'a, tag_application_view_state::Empty> {
+impl<S: BosStr> TagApplicationView<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> TagApplicationViewBuilder<S, tag_application_view_state::Empty> {
         TagApplicationViewBuilder::new()
     }
 }
 
-impl<'a> TagApplicationViewBuilder<'a, tag_application_view_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> TagApplicationViewBuilder<S, tag_application_view_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         TagApplicationViewBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> TagApplicationViewBuilder<'a, S>
+impl<S: BosStr, St> TagApplicationViewBuilder<S, St>
 where
-    S: tag_application_view_state::State,
-    S::AppliedBy: tag_application_view_state::IsUnset,
+    St: tag_application_view_state::State,
+    St::AppliedBy: tag_application_view_state::IsUnset,
 {
     /// Set the `appliedBy` field (required)
     pub fn applied_by(
         mut self,
         value: impl Into<ProfileViewBasic<S>>,
-    ) -> TagApplicationViewBuilder<'a, tag_application_view_state::SetAppliedBy<S>> {
+    ) -> TagApplicationViewBuilder<S, tag_application_view_state::SetAppliedBy<St>> {
         self._fields.0 = Option::Some(value.into());
         TagApplicationViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> TagApplicationViewBuilder<'a, S>
+impl<S: BosStr, St> TagApplicationViewBuilder<S, St>
 where
-    S: tag_application_view_state::State,
-    S::CreatedAt: tag_application_view_state::IsUnset,
+    St: tag_application_view_state::State,
+    St::CreatedAt: tag_application_view_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> TagApplicationViewBuilder<'a, tag_application_view_state::SetCreatedAt<S>> {
+    ) -> TagApplicationViewBuilder<S, tag_application_view_state::SetCreatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         TagApplicationViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> TagApplicationViewBuilder<'a, S>
+impl<S: BosStr, St> TagApplicationViewBuilder<S, St>
 where
-    S: tag_application_view_state::State,
-    S::Tag: tag_application_view_state::IsUnset,
+    St: tag_application_view_state::State,
+    St::Tag: tag_application_view_state::IsUnset,
 {
     /// Set the `tag` field (required)
     pub fn tag(
         mut self,
         value: impl Into<S>,
-    ) -> TagApplicationViewBuilder<'a, tag_application_view_state::SetTag<S>> {
+    ) -> TagApplicationViewBuilder<S, tag_application_view_state::SetTag<St>> {
         self._fields.2 = Option::Some(value.into());
         TagApplicationViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> TagApplicationViewBuilder<'a, S>
+impl<S: BosStr, St> TagApplicationViewBuilder<S, St>
 where
-    S: tag_application_view_state::State,
-    S::Uri: tag_application_view_state::IsUnset,
+    St: tag_application_view_state::State,
+    St::Uri: tag_application_view_state::IsUnset,
 {
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> TagApplicationViewBuilder<'a, tag_application_view_state::SetUri<S>> {
+    ) -> TagApplicationViewBuilder<S, tag_application_view_state::SetUri<St>> {
         self._fields.3 = Option::Some(value.into());
         TagApplicationViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> TagApplicationViewBuilder<'a, S>
+impl<S: BosStr, St> TagApplicationViewBuilder<S, St>
 where
-    S: tag_application_view_state::State,
-    S::Uri: tag_application_view_state::IsSet,
-    S::AppliedBy: tag_application_view_state::IsSet,
-    S::Tag: tag_application_view_state::IsSet,
-    S::CreatedAt: tag_application_view_state::IsSet,
+    St: tag_application_view_state::State,
+    St::Uri: tag_application_view_state::IsSet,
+    St::AppliedBy: tag_application_view_state::IsSet,
+    St::CreatedAt: tag_application_view_state::IsSet,
+    St::Tag: tag_application_view_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> TagApplicationView<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> TagApplicationView<S> {
         TagApplicationView {
             applied_by: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
@@ -1827,11 +1827,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> TagApplicationView<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> TagApplicationView<S> {
         TagApplicationView {
             applied_by: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
@@ -1852,43 +1852,43 @@ pub mod tag_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type UseCount;
         type Tag;
+        type UseCount;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type UseCount = Unset;
         type Tag = Unset;
-    }
-    ///State transition - sets the `use_count` field to Set
-    pub struct SetUseCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUseCount<S> {}
-    impl<S: State> State for SetUseCount<S> {
-        type UseCount = Set<members::use_count>;
-        type Tag = S::Tag;
+        type UseCount = Unset;
     }
     ///State transition - sets the `tag` field to Set
-    pub struct SetTag<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTag<S> {}
-    impl<S: State> State for SetTag<S> {
-        type UseCount = S::UseCount;
+    pub struct SetTag<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTag<St> {}
+    impl<St: State> State for SetTag<St> {
         type Tag = Set<members::tag>;
+        type UseCount = St::UseCount;
+    }
+    ///State transition - sets the `use_count` field to Set
+    pub struct SetUseCount<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUseCount<St> {}
+    impl<St: State> State for SetUseCount<St> {
+        type Tag = St::Tag;
+        type UseCount = Set<members::use_count>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `use_count` field
-        pub struct use_count(());
         ///Marker type for the `tag` field
         pub struct tag(());
+        ///Marker type for the `use_count` field
+        pub struct use_count(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct TagViewBuilder<'a, S: tag_view_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct TagViewBuilder<S: BosStr, St: tag_view_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<i64>,
         Option<i64>,
@@ -1897,28 +1897,28 @@ pub struct TagViewBuilder<'a, S: tag_view_state::State> {
         Option<i64>,
         Option<i64>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> TagView<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> TagViewBuilder<'a, tag_view_state::Empty> {
+impl<S: BosStr> TagView<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> TagViewBuilder<S, tag_view_state::Empty> {
         TagViewBuilder::new()
     }
 }
 
-impl<'a> TagViewBuilder<'a, tag_view_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> TagViewBuilder<S, tag_view_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         TagViewBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: tag_view_state::State> TagViewBuilder<'a, S> {
+impl<S: BosStr, St: tag_view_state::State> TagViewBuilder<S, St> {
     /// Set the `entryCount` field (optional)
     pub fn entry_count(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
@@ -1931,7 +1931,7 @@ impl<'a, S: tag_view_state::State> TagViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: tag_view_state::State> TagViewBuilder<'a, S> {
+impl<S: BosStr, St: tag_view_state::State> TagViewBuilder<S, St> {
     /// Set the `notebookCount` field (optional)
     pub fn notebook_count(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -1944,7 +1944,7 @@ impl<'a, S: tag_view_state::State> TagViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: tag_view_state::State> TagViewBuilder<'a, S> {
+impl<S: BosStr, St: tag_view_state::State> TagViewBuilder<S, St> {
     /// Set the `recentUseCount` field (optional)
     pub fn recent_use_count(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -1957,26 +1957,26 @@ impl<'a, S: tag_view_state::State> TagViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S> TagViewBuilder<'a, S>
+impl<S: BosStr, St> TagViewBuilder<S, St>
 where
-    S: tag_view_state::State,
-    S::Tag: tag_view_state::IsUnset,
+    St: tag_view_state::State,
+    St::Tag: tag_view_state::IsUnset,
 {
     /// Set the `tag` field (required)
     pub fn tag(
         mut self,
         value: impl Into<S>,
-    ) -> TagViewBuilder<'a, tag_view_state::SetTag<S>> {
+    ) -> TagViewBuilder<S, tag_view_state::SetTag<St>> {
         self._fields.3 = Option::Some(value.into());
         TagViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: tag_view_state::State> TagViewBuilder<'a, S> {
+impl<S: BosStr, St: tag_view_state::State> TagViewBuilder<S, St> {
     /// Set the `trendingScore` field (optional)
     pub fn trending_score(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.4 = value.into();
@@ -1989,33 +1989,33 @@ impl<'a, S: tag_view_state::State> TagViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S> TagViewBuilder<'a, S>
+impl<S: BosStr, St> TagViewBuilder<S, St>
 where
-    S: tag_view_state::State,
-    S::UseCount: tag_view_state::IsUnset,
+    St: tag_view_state::State,
+    St::UseCount: tag_view_state::IsUnset,
 {
     /// Set the `useCount` field (required)
     pub fn use_count(
         mut self,
         value: impl Into<i64>,
-    ) -> TagViewBuilder<'a, tag_view_state::SetUseCount<S>> {
+    ) -> TagViewBuilder<S, tag_view_state::SetUseCount<St>> {
         self._fields.5 = Option::Some(value.into());
         TagViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> TagViewBuilder<'a, S>
+impl<S: BosStr, St> TagViewBuilder<S, St>
 where
-    S: tag_view_state::State,
-    S::UseCount: tag_view_state::IsSet,
-    S::Tag: tag_view_state::IsSet,
+    St: tag_view_state::State,
+    St::Tag: tag_view_state::IsSet,
+    St::UseCount: tag_view_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> TagView<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> TagView<S> {
         TagView {
             entry_count: self._fields.0,
             notebook_count: self._fields.1,
@@ -2026,11 +2026,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> TagView<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> TagView<S> {
         TagView {
             entry_count: self._fields.0,
             notebook_count: self._fields.1,

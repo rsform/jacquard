@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -37,11 +37,11 @@ use crate::fyi_questionable::richtext::content::Content;
     rename = "fyi.questionable.answer",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Answer<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Answer<S: BosStr = DefaultStr> {
     pub content: Content<S>,
     pub created_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -58,18 +58,18 @@ pub struct Answer<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct AnswerGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct AnswerGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Answer<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Answer<S> {
+impl<S: BosStr> Answer<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, AnswerRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -82,17 +82,17 @@ pub struct AnswerRecord;
 impl XrpcResp for AnswerRecord {
     const NSID: &'static str = "fyi.questionable.answer";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = AnswerGetRecordOutput<S>;
+    type Output<S: BosStr> = AnswerGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<AnswerGetRecordOutput<S>> for Answer<S> {
+impl<S: BosStr> From<AnswerGetRecordOutput<S>> for Answer<S> {
     fn from(output: AnswerGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Answer<S> {
+impl<S: BosStr> Collection for Answer<S> {
     const NSID: &'static str = "fyi.questionable.answer";
     type Record = AnswerRecord;
 }
@@ -102,7 +102,7 @@ impl Collection for AnswerRecord {
     type Record = AnswerRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Answer<S> {
+impl<S: BosStr> LexiconSchema for Answer<S> {
     fn nsid() -> &'static str {
         "fyi.questionable.answer"
     }
@@ -137,123 +137,123 @@ pub mod answer_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
         type Question;
         type Content;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
         type Question = Unset;
         type Content = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `question` field to Set
-    pub struct SetQuestion<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetQuestion<S> {}
-    impl<S: State> State for SetQuestion<S> {
-        type Question = Set<members::question>;
-        type Content = S::Content;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type Question = S::Question;
-        type Content = Set<members::content>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Question = S::Question;
-        type Content = S::Content;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
+        type Question = St::Question;
+        type Content = St::Content;
+    }
+    ///State transition - sets the `question` field to Set
+    pub struct SetQuestion<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetQuestion<St> {}
+    impl<St: State> State for SetQuestion<St> {
+        type CreatedAt = St::CreatedAt;
+        type Question = Set<members::question>;
+        type Content = St::Content;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetContent<St> {}
+    impl<St: State> State for SetContent<St> {
+        type CreatedAt = St::CreatedAt;
+        type Question = St::Question;
+        type Content = Set<members::content>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `question` field
         pub struct question(());
         ///Marker type for the `content` field
         pub struct content(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct AnswerBuilder<'a, S: answer_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct AnswerBuilder<S: BosStr, St: answer_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Content<S>>,
         Option<Datetime>,
         Option<Vec<Language>>,
         Option<StrongRef<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Answer<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> AnswerBuilder<'a, answer_state::Empty> {
+impl<S: BosStr> Answer<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> AnswerBuilder<S, answer_state::Empty> {
         AnswerBuilder::new()
     }
 }
 
-impl<'a> AnswerBuilder<'a, answer_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> AnswerBuilder<S, answer_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         AnswerBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AnswerBuilder<'a, S>
+impl<S: BosStr, St> AnswerBuilder<S, St>
 where
-    S: answer_state::State,
-    S::Content: answer_state::IsUnset,
+    St: answer_state::State,
+    St::Content: answer_state::IsUnset,
 {
     /// Set the `content` field (required)
     pub fn content(
         mut self,
         value: impl Into<Content<S>>,
-    ) -> AnswerBuilder<'a, answer_state::SetContent<S>> {
+    ) -> AnswerBuilder<S, answer_state::SetContent<St>> {
         self._fields.0 = Option::Some(value.into());
         AnswerBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AnswerBuilder<'a, S>
+impl<S: BosStr, St> AnswerBuilder<S, St>
 where
-    S: answer_state::State,
-    S::CreatedAt: answer_state::IsUnset,
+    St: answer_state::State,
+    St::CreatedAt: answer_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> AnswerBuilder<'a, answer_state::SetCreatedAt<S>> {
+    ) -> AnswerBuilder<S, answer_state::SetCreatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         AnswerBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: answer_state::State> AnswerBuilder<'a, S> {
+impl<S: BosStr, St: answer_state::State> AnswerBuilder<S, St> {
     /// Set the `languages` field (optional)
     pub fn languages(mut self, value: impl Into<Option<Vec<Language>>>) -> Self {
         self._fields.2 = value.into();
@@ -266,34 +266,34 @@ impl<'a, S: answer_state::State> AnswerBuilder<'a, S> {
     }
 }
 
-impl<'a, S> AnswerBuilder<'a, S>
+impl<S: BosStr, St> AnswerBuilder<S, St>
 where
-    S: answer_state::State,
-    S::Question: answer_state::IsUnset,
+    St: answer_state::State,
+    St::Question: answer_state::IsUnset,
 {
     /// Set the `question` field (required)
     pub fn question(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> AnswerBuilder<'a, answer_state::SetQuestion<S>> {
+    ) -> AnswerBuilder<S, answer_state::SetQuestion<St>> {
         self._fields.3 = Option::Some(value.into());
         AnswerBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AnswerBuilder<'a, S>
+impl<S: BosStr, St> AnswerBuilder<S, St>
 where
-    S: answer_state::State,
-    S::Question: answer_state::IsSet,
-    S::Content: answer_state::IsSet,
-    S::CreatedAt: answer_state::IsSet,
+    St: answer_state::State,
+    St::CreatedAt: answer_state::IsSet,
+    St::Question: answer_state::IsSet,
+    St::Content: answer_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Answer<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Answer<S> {
         Answer {
             content: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
@@ -302,8 +302,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Answer<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Answer<S> {
         Answer {
             content: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),

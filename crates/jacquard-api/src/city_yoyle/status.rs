@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "city.yoyle.status",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Status<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Status<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
     pub text: S,
@@ -53,18 +53,18 @@ pub struct Status<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct StatusGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct StatusGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Status<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Status<S> {
+impl<S: BosStr> Status<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, StatusRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -77,17 +77,17 @@ pub struct StatusRecord;
 impl XrpcResp for StatusRecord {
     const NSID: &'static str = "city.yoyle.status";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = StatusGetRecordOutput<S>;
+    type Output<S: BosStr> = StatusGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<StatusGetRecordOutput<S>> for Status<S> {
+impl<S: BosStr> From<StatusGetRecordOutput<S>> for Status<S> {
     fn from(output: StatusGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Status<S> {
+impl<S: BosStr> Collection for Status<S> {
     const NSID: &'static str = "city.yoyle.status";
     type Record = StatusRecord;
 }
@@ -97,7 +97,7 @@ impl Collection for StatusRecord {
     type Record = StatusRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Status<S> {
+impl<S: BosStr> LexiconSchema for Status<S> {
     fn nsid() -> &'static str {
         "city.yoyle.status"
     }
@@ -155,9 +155,9 @@ pub mod status_state {
         type Text = Unset;
     }
     ///State transition - sets the `text` field to Set
-    pub struct SetText<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetText<S> {}
-    impl<S: State> State for SetText<S> {
+    pub struct SetText<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetText<St> {}
+    impl<St: State> State for SetText<St> {
         type Text = Set<members::text>;
     }
     /// Marker types for field names
@@ -168,32 +168,32 @@ pub mod status_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct StatusBuilder<'a, S: status_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct StatusBuilder<S: BosStr, St: status_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Status<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> StatusBuilder<'a, status_state::Empty> {
+impl<S: BosStr> Status<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> StatusBuilder<S, status_state::Empty> {
         StatusBuilder::new()
     }
 }
 
-impl<'a> StatusBuilder<'a, status_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> StatusBuilder<S, status_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         StatusBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: status_state::State> StatusBuilder<'a, S> {
+impl<S: BosStr, St: status_state::State> StatusBuilder<S, St> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.0 = value.into();
@@ -206,40 +206,40 @@ impl<'a, S: status_state::State> StatusBuilder<'a, S> {
     }
 }
 
-impl<'a, S> StatusBuilder<'a, S>
+impl<S: BosStr, St> StatusBuilder<S, St>
 where
-    S: status_state::State,
-    S::Text: status_state::IsUnset,
+    St: status_state::State,
+    St::Text: status_state::IsUnset,
 {
     /// Set the `text` field (required)
     pub fn text(
         mut self,
         value: impl Into<S>,
-    ) -> StatusBuilder<'a, status_state::SetText<S>> {
+    ) -> StatusBuilder<S, status_state::SetText<St>> {
         self._fields.1 = Option::Some(value.into());
         StatusBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> StatusBuilder<'a, S>
+impl<S: BosStr, St> StatusBuilder<S, St>
 where
-    S: status_state::State,
-    S::Text: status_state::IsSet,
+    St: status_state::State,
+    St::Text: status_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Status<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Status<S> {
         Status {
             created_at: self._fields.0,
             text: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Status<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Status<S> {
         Status {
             created_at: self._fields.0,
             text: self._fields.1.unwrap(),

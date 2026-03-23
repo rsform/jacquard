@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -38,11 +38,11 @@ use crate::place_stream::metadata::distribution_policy::DistributionPolicy;
     rename = "place.stream.metadata.configuration",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Configuration<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Configuration<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub content_rights: Option<ContentRights<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -59,18 +59,18 @@ pub struct Configuration<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ConfigurationGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ConfigurationGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Configuration<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Configuration<S> {
+impl<S: BosStr> Configuration<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, ConfigurationRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -83,18 +83,17 @@ pub struct ConfigurationRecord;
 impl XrpcResp for ConfigurationRecord {
     const NSID: &'static str = "place.stream.metadata.configuration";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ConfigurationGetRecordOutput<S>;
+    type Output<S: BosStr> = ConfigurationGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<ConfigurationGetRecordOutput<S>>
-for Configuration<S> {
+impl<S: BosStr> From<ConfigurationGetRecordOutput<S>> for Configuration<S> {
     fn from(output: ConfigurationGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Configuration<S> {
+impl<S: BosStr> Collection for Configuration<S> {
     const NSID: &'static str = "place.stream.metadata.configuration";
     type Record = ConfigurationRecord;
 }
@@ -104,7 +103,7 @@ impl Collection for ConfigurationRecord {
     type Record = ConfigurationRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Configuration<S> {
+impl<S: BosStr> LexiconSchema for Configuration<S> {
     fn nsid() -> &'static str {
         "place.stream.metadata.configuration"
     }
@@ -138,36 +137,36 @@ pub mod configuration_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct ConfigurationBuilder<'a, S: configuration_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ConfigurationBuilder<S: BosStr, St: configuration_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<ContentRights<S>>,
         Option<ContentWarnings<S>>,
         Option<DistributionPolicy<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Configuration<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ConfigurationBuilder<'a, configuration_state::Empty> {
+impl<S: BosStr> Configuration<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ConfigurationBuilder<S, configuration_state::Empty> {
         ConfigurationBuilder::new()
     }
 }
 
-impl<'a> ConfigurationBuilder<'a, configuration_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ConfigurationBuilder<S, configuration_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ConfigurationBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: configuration_state::State> ConfigurationBuilder<'a, S> {
+impl<S: BosStr, St: configuration_state::State> ConfigurationBuilder<S, St> {
     /// Set the `contentRights` field (optional)
     pub fn content_rights(mut self, value: impl Into<Option<ContentRights<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -180,7 +179,7 @@ impl<'a, S: configuration_state::State> ConfigurationBuilder<'a, S> {
     }
 }
 
-impl<'a, S: configuration_state::State> ConfigurationBuilder<'a, S> {
+impl<S: BosStr, St: configuration_state::State> ConfigurationBuilder<S, St> {
     /// Set the `contentWarnings` field (optional)
     pub fn content_warnings(
         mut self,
@@ -196,7 +195,7 @@ impl<'a, S: configuration_state::State> ConfigurationBuilder<'a, S> {
     }
 }
 
-impl<'a, S: configuration_state::State> ConfigurationBuilder<'a, S> {
+impl<S: BosStr, St: configuration_state::State> ConfigurationBuilder<S, St> {
     /// Set the `distributionPolicy` field (optional)
     pub fn distribution_policy(
         mut self,
@@ -215,12 +214,12 @@ impl<'a, S: configuration_state::State> ConfigurationBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ConfigurationBuilder<'a, S>
+impl<S: BosStr, St> ConfigurationBuilder<S, St>
 where
-    S: configuration_state::State,
+    St: configuration_state::State,
 {
-    /// Build the final struct
-    pub fn build(self) -> Configuration<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Configuration<S> {
         Configuration {
             content_rights: self._fields.0,
             content_warnings: self._fields.1,
@@ -228,11 +227,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Configuration<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Configuration<S> {
         Configuration {
             content_rights: self._fields.0,
             content_warnings: self._fields.1,

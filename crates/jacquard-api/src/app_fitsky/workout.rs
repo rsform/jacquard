@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,11 +34,11 @@ use crate::app_fitsky::workout;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CardioDetails<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CardioDetails<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub calories: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -71,11 +71,11 @@ pub struct CardioDetails<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CardioZoneData<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CardioZoneData<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub zone1_rest: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -95,11 +95,11 @@ pub struct CardioZoneData<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Exercise<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Exercise<S: BosStr = DefaultStr> {
     pub name: S,
     pub sets: Vec<workout::ExerciseSet<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -111,11 +111,11 @@ pub struct Exercise<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ExerciseSet<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ExerciseSet<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reps: Option<i64>,
     ///Weight in grams
@@ -130,11 +130,11 @@ pub struct ExerciseSet<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct FlexibilityDetails<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct FlexibilityDetails<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub calories: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -155,14 +155,14 @@ pub struct FlexibilityDetails<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum FlexibilityDetailsIntensity<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum FlexibilityDetailsIntensity<S: BosStr = DefaultStr> {
     Light,
     Moderate,
     Intense,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> FlexibilityDetailsIntensity<S> {
+impl<S: BosStr> FlexibilityDetailsIntensity<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Light => "light",
@@ -182,19 +182,19 @@ impl<S: Bos<str> + AsRef<str>> FlexibilityDetailsIntensity<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for FlexibilityDetailsIntensity<S> {
+impl<S: BosStr> core::fmt::Display for FlexibilityDetailsIntensity<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for FlexibilityDetailsIntensity<S> {
+impl<S: BosStr> AsRef<str> for FlexibilityDetailsIntensity<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for FlexibilityDetailsIntensity<S> {
+impl<S: BosStr> Serialize for FlexibilityDetailsIntensity<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -203,7 +203,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for FlexibilityDetailsIntensity<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
 for FlexibilityDetailsIntensity<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
@@ -214,14 +214,18 @@ for FlexibilityDetailsIntensity<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for FlexibilityDetailsIntensity<S> {
+impl<S: BosStr + Default> Default for FlexibilityDetailsIntensity<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for FlexibilityDetailsIntensity<S> {
-    type Output = FlexibilityDetailsIntensity<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for FlexibilityDetailsIntensity<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = FlexibilityDetailsIntensity<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             FlexibilityDetailsIntensity::Light => FlexibilityDetailsIntensity::Light,
@@ -241,11 +245,11 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for FlexibilityDetailsIntensity<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct HeartRateData<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct HeartRateData<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avg: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -263,11 +267,11 @@ pub struct HeartRateData<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct HeartRateSample<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct HeartRateSample<S: BosStr = DefaultStr> {
     pub bpm: i64,
     pub timestamp: Datetime,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -279,11 +283,11 @@ pub struct HeartRateSample<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct HiitSportsDetails<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct HiitSportsDetails<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub calories: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -315,14 +319,14 @@ pub struct HiitSportsDetails<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum HiitSportsDetailsIntensity<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum HiitSportsDetailsIntensity<S: BosStr = DefaultStr> {
     Light,
     Moderate,
     Intense,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> HiitSportsDetailsIntensity<S> {
+impl<S: BosStr> HiitSportsDetailsIntensity<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Light => "light",
@@ -342,19 +346,19 @@ impl<S: Bos<str> + AsRef<str>> HiitSportsDetailsIntensity<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for HiitSportsDetailsIntensity<S> {
+impl<S: BosStr> core::fmt::Display for HiitSportsDetailsIntensity<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for HiitSportsDetailsIntensity<S> {
+impl<S: BosStr> AsRef<str> for HiitSportsDetailsIntensity<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for HiitSportsDetailsIntensity<S> {
+impl<S: BosStr> Serialize for HiitSportsDetailsIntensity<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -363,7 +367,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for HiitSportsDetailsIntensity<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
 for HiitSportsDetailsIntensity<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
@@ -374,14 +378,18 @@ for HiitSportsDetailsIntensity<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for HiitSportsDetailsIntensity<S> {
+impl<S: BosStr + Default> Default for HiitSportsDetailsIntensity<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for HiitSportsDetailsIntensity<S> {
-    type Output = HiitSportsDetailsIntensity<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for HiitSportsDetailsIntensity<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = HiitSportsDetailsIntensity<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             HiitSportsDetailsIntensity::Light => HiitSportsDetailsIntensity::Light,
@@ -402,11 +410,11 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for HiitSportsDetailsIntensity<S> {
     rename = "app.fitsky.workout",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Workout<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Workout<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub details: Option<WorkoutDetails<S>>,
@@ -443,11 +451,11 @@ pub struct Workout<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum WorkoutDetails<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum WorkoutDetails<S: BosStr = DefaultStr> {
     #[serde(rename = "app.fitsky.workout#cardioDetails")]
     CardioDetails(Box<workout::CardioDetails<S>>),
     #[serde(rename = "app.fitsky.workout#strengthDetails")]
@@ -461,13 +469,13 @@ pub enum WorkoutDetails<S: Bos<str> + AsRef<str> = DefaultStr> {
 /// Whether the workout is in progress or finished. Omitted for legacy workouts (treat as completed).
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum WorkoutStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum WorkoutStatus<S: BosStr = DefaultStr> {
     Active,
     Completed,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> WorkoutStatus<S> {
+impl<S: BosStr> WorkoutStatus<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Active => "active",
@@ -485,19 +493,19 @@ impl<S: Bos<str> + AsRef<str>> WorkoutStatus<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for WorkoutStatus<S> {
+impl<S: BosStr> core::fmt::Display for WorkoutStatus<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for WorkoutStatus<S> {
+impl<S: BosStr> AsRef<str> for WorkoutStatus<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for WorkoutStatus<S> {
+impl<S: BosStr> Serialize for WorkoutStatus<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -506,8 +514,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for WorkoutStatus<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for WorkoutStatus<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for WorkoutStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -517,14 +524,18 @@ for WorkoutStatus<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for WorkoutStatus<S> {
+impl<S: BosStr + Default> Default for WorkoutStatus<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for WorkoutStatus<S> {
-    type Output = WorkoutStatus<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for WorkoutStatus<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = WorkoutStatus<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             WorkoutStatus::Active => WorkoutStatus::Active,
@@ -536,7 +547,7 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for WorkoutStatus<S> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum WorkoutType<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum WorkoutType<S: BosStr = DefaultStr> {
     Running,
     Cycling,
     Swimming,
@@ -551,7 +562,7 @@ pub enum WorkoutType<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> WorkoutType<S> {
+impl<S: BosStr> WorkoutType<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Running => "running",
@@ -587,19 +598,19 @@ impl<S: Bos<str> + AsRef<str>> WorkoutType<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for WorkoutType<S> {
+impl<S: BosStr> core::fmt::Display for WorkoutType<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for WorkoutType<S> {
+impl<S: BosStr> AsRef<str> for WorkoutType<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for WorkoutType<S> {
+impl<S: BosStr> Serialize for WorkoutType<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -608,8 +619,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for WorkoutType<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for WorkoutType<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for WorkoutType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -619,14 +629,18 @@ for WorkoutType<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for WorkoutType<S> {
+impl<S: BosStr + Default> Default for WorkoutType<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for WorkoutType<S> {
-    type Output = WorkoutType<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for WorkoutType<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = WorkoutType<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             WorkoutType::Running => WorkoutType::Running,
@@ -651,11 +665,11 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for WorkoutType<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct WorkoutGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct WorkoutGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
@@ -667,11 +681,11 @@ pub struct WorkoutGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Milestone<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Milestone<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub note: Option<S>,
     pub timestamp: Datetime,
@@ -685,14 +699,14 @@ pub struct Milestone<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum MilestoneType<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum MilestoneType<S: BosStr = DefaultStr> {
     Distance,
     Lap,
     Note,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> MilestoneType<S> {
+impl<S: BosStr> MilestoneType<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Distance => "distance",
@@ -712,19 +726,19 @@ impl<S: Bos<str> + AsRef<str>> MilestoneType<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for MilestoneType<S> {
+impl<S: BosStr> core::fmt::Display for MilestoneType<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for MilestoneType<S> {
+impl<S: BosStr> AsRef<str> for MilestoneType<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for MilestoneType<S> {
+impl<S: BosStr> Serialize for MilestoneType<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -733,8 +747,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for MilestoneType<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for MilestoneType<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for MilestoneType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -744,14 +757,18 @@ for MilestoneType<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for MilestoneType<S> {
+impl<S: BosStr + Default> Default for MilestoneType<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for MilestoneType<S> {
-    type Output = MilestoneType<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for MilestoneType<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = MilestoneType<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             MilestoneType::Distance => MilestoneType::Distance,
@@ -767,11 +784,11 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for MilestoneType<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct RoutePoint<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct RoutePoint<S: BosStr = DefaultStr> {
     ///Latitude in microdegrees (degrees * 1,000,000)
     pub lat_e6: i64,
     ///Longitude in microdegrees (degrees * 1,000,000)
@@ -786,11 +803,11 @@ pub struct RoutePoint<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct StrengthDetails<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct StrengthDetails<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub calories: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -813,11 +830,11 @@ pub struct StrengthDetails<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct VisibilitySettings<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct VisibilitySettings<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub calories: Option<VisibilitySettingsCalories<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -836,13 +853,13 @@ pub struct VisibilitySettings<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum VisibilitySettingsCalories<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum VisibilitySettingsCalories<S: BosStr = DefaultStr> {
     Public,
     Private,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> VisibilitySettingsCalories<S> {
+impl<S: BosStr> VisibilitySettingsCalories<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Public => "public",
@@ -860,19 +877,19 @@ impl<S: Bos<str> + AsRef<str>> VisibilitySettingsCalories<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for VisibilitySettingsCalories<S> {
+impl<S: BosStr> core::fmt::Display for VisibilitySettingsCalories<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for VisibilitySettingsCalories<S> {
+impl<S: BosStr> AsRef<str> for VisibilitySettingsCalories<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for VisibilitySettingsCalories<S> {
+impl<S: BosStr> Serialize for VisibilitySettingsCalories<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -881,7 +898,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for VisibilitySettingsCalories<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
 for VisibilitySettingsCalories<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
@@ -892,14 +909,18 @@ for VisibilitySettingsCalories<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for VisibilitySettingsCalories<S> {
+impl<S: BosStr + Default> Default for VisibilitySettingsCalories<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for VisibilitySettingsCalories<S> {
-    type Output = VisibilitySettingsCalories<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for VisibilitySettingsCalories<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = VisibilitySettingsCalories<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             VisibilitySettingsCalories::Public => VisibilitySettingsCalories::Public,
@@ -913,13 +934,13 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for VisibilitySettingsCalories<S> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum VisibilitySettingsCardioZones<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum VisibilitySettingsCardioZones<S: BosStr = DefaultStr> {
     Public,
     Private,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> VisibilitySettingsCardioZones<S> {
+impl<S: BosStr> VisibilitySettingsCardioZones<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Public => "public",
@@ -937,19 +958,19 @@ impl<S: Bos<str> + AsRef<str>> VisibilitySettingsCardioZones<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for VisibilitySettingsCardioZones<S> {
+impl<S: BosStr> core::fmt::Display for VisibilitySettingsCardioZones<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for VisibilitySettingsCardioZones<S> {
+impl<S: BosStr> AsRef<str> for VisibilitySettingsCardioZones<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for VisibilitySettingsCardioZones<S> {
+impl<S: BosStr> Serialize for VisibilitySettingsCardioZones<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -958,7 +979,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for VisibilitySettingsCardioZones<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
 for VisibilitySettingsCardioZones<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
@@ -969,14 +990,18 @@ for VisibilitySettingsCardioZones<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for VisibilitySettingsCardioZones<S> {
+impl<S: BosStr + Default> Default for VisibilitySettingsCardioZones<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for VisibilitySettingsCardioZones<S> {
-    type Output = VisibilitySettingsCardioZones<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for VisibilitySettingsCardioZones<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = VisibilitySettingsCardioZones<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             VisibilitySettingsCardioZones::Public => {
@@ -994,13 +1019,13 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for VisibilitySettingsCardioZones<S> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum VisibilitySettingsDetails<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum VisibilitySettingsDetails<S: BosStr = DefaultStr> {
     Public,
     Private,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> VisibilitySettingsDetails<S> {
+impl<S: BosStr> VisibilitySettingsDetails<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Public => "public",
@@ -1018,19 +1043,19 @@ impl<S: Bos<str> + AsRef<str>> VisibilitySettingsDetails<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for VisibilitySettingsDetails<S> {
+impl<S: BosStr> core::fmt::Display for VisibilitySettingsDetails<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for VisibilitySettingsDetails<S> {
+impl<S: BosStr> AsRef<str> for VisibilitySettingsDetails<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for VisibilitySettingsDetails<S> {
+impl<S: BosStr> Serialize for VisibilitySettingsDetails<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -1039,7 +1064,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for VisibilitySettingsDetails<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
 for VisibilitySettingsDetails<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
@@ -1050,14 +1075,18 @@ for VisibilitySettingsDetails<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for VisibilitySettingsDetails<S> {
+impl<S: BosStr + Default> Default for VisibilitySettingsDetails<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for VisibilitySettingsDetails<S> {
-    type Output = VisibilitySettingsDetails<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for VisibilitySettingsDetails<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = VisibilitySettingsDetails<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             VisibilitySettingsDetails::Public => VisibilitySettingsDetails::Public,
@@ -1071,13 +1100,13 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for VisibilitySettingsDetails<S> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum VisibilitySettingsHeartRate<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum VisibilitySettingsHeartRate<S: BosStr = DefaultStr> {
     Public,
     Private,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> VisibilitySettingsHeartRate<S> {
+impl<S: BosStr> VisibilitySettingsHeartRate<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Public => "public",
@@ -1095,19 +1124,19 @@ impl<S: Bos<str> + AsRef<str>> VisibilitySettingsHeartRate<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for VisibilitySettingsHeartRate<S> {
+impl<S: BosStr> core::fmt::Display for VisibilitySettingsHeartRate<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for VisibilitySettingsHeartRate<S> {
+impl<S: BosStr> AsRef<str> for VisibilitySettingsHeartRate<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for VisibilitySettingsHeartRate<S> {
+impl<S: BosStr> Serialize for VisibilitySettingsHeartRate<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -1116,7 +1145,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for VisibilitySettingsHeartRate<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
 for VisibilitySettingsHeartRate<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
@@ -1127,14 +1156,18 @@ for VisibilitySettingsHeartRate<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for VisibilitySettingsHeartRate<S> {
+impl<S: BosStr + Default> Default for VisibilitySettingsHeartRate<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for VisibilitySettingsHeartRate<S> {
-    type Output = VisibilitySettingsHeartRate<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for VisibilitySettingsHeartRate<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = VisibilitySettingsHeartRate<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             VisibilitySettingsHeartRate::Public => VisibilitySettingsHeartRate::Public,
@@ -1148,13 +1181,13 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for VisibilitySettingsHeartRate<S> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum VisibilitySettingsNotes<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum VisibilitySettingsNotes<S: BosStr = DefaultStr> {
     Public,
     Private,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> VisibilitySettingsNotes<S> {
+impl<S: BosStr> VisibilitySettingsNotes<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Public => "public",
@@ -1172,19 +1205,19 @@ impl<S: Bos<str> + AsRef<str>> VisibilitySettingsNotes<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for VisibilitySettingsNotes<S> {
+impl<S: BosStr> core::fmt::Display for VisibilitySettingsNotes<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for VisibilitySettingsNotes<S> {
+impl<S: BosStr> AsRef<str> for VisibilitySettingsNotes<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for VisibilitySettingsNotes<S> {
+impl<S: BosStr> Serialize for VisibilitySettingsNotes<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -1193,8 +1226,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for VisibilitySettingsNotes<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for VisibilitySettingsNotes<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for VisibilitySettingsNotes<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -1204,14 +1236,18 @@ for VisibilitySettingsNotes<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for VisibilitySettingsNotes<S> {
+impl<S: BosStr + Default> Default for VisibilitySettingsNotes<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for VisibilitySettingsNotes<S> {
-    type Output = VisibilitySettingsNotes<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for VisibilitySettingsNotes<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = VisibilitySettingsNotes<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             VisibilitySettingsNotes::Public => VisibilitySettingsNotes::Public,
@@ -1225,13 +1261,13 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for VisibilitySettingsNotes<S> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum VisibilitySettingsSteps<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum VisibilitySettingsSteps<S: BosStr = DefaultStr> {
     Public,
     Private,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> VisibilitySettingsSteps<S> {
+impl<S: BosStr> VisibilitySettingsSteps<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Public => "public",
@@ -1249,19 +1285,19 @@ impl<S: Bos<str> + AsRef<str>> VisibilitySettingsSteps<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for VisibilitySettingsSteps<S> {
+impl<S: BosStr> core::fmt::Display for VisibilitySettingsSteps<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for VisibilitySettingsSteps<S> {
+impl<S: BosStr> AsRef<str> for VisibilitySettingsSteps<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for VisibilitySettingsSteps<S> {
+impl<S: BosStr> Serialize for VisibilitySettingsSteps<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -1270,8 +1306,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for VisibilitySettingsSteps<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for VisibilitySettingsSteps<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for VisibilitySettingsSteps<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -1281,14 +1316,18 @@ for VisibilitySettingsSteps<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for VisibilitySettingsSteps<S> {
+impl<S: BosStr + Default> Default for VisibilitySettingsSteps<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for VisibilitySettingsSteps<S> {
-    type Output = VisibilitySettingsSteps<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for VisibilitySettingsSteps<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = VisibilitySettingsSteps<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             VisibilitySettingsSteps::Public => VisibilitySettingsSteps::Public,
@@ -1300,13 +1339,13 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for VisibilitySettingsSteps<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Workout<S> {
+impl<S: BosStr> Workout<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, WorkoutRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for CardioDetails<S> {
+impl<S: BosStr> LexiconSchema for CardioDetails<S> {
     fn nsid() -> &'static str {
         "app.fitsky.workout"
     }
@@ -1348,7 +1387,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for CardioDetails<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for CardioZoneData<S> {
+impl<S: BosStr> LexiconSchema for CardioZoneData<S> {
     fn nsid() -> &'static str {
         "app.fitsky.workout"
     }
@@ -1363,7 +1402,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for CardioZoneData<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Exercise<S> {
+impl<S: BosStr> LexiconSchema for Exercise<S> {
     fn nsid() -> &'static str {
         "app.fitsky.workout"
     }
@@ -1389,7 +1428,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Exercise<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ExerciseSet<S> {
+impl<S: BosStr> LexiconSchema for ExerciseSet<S> {
     fn nsid() -> &'static str {
         "app.fitsky.workout"
     }
@@ -1413,7 +1452,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for ExerciseSet<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for FlexibilityDetails<S> {
+impl<S: BosStr> LexiconSchema for FlexibilityDetails<S> {
     fn nsid() -> &'static str {
         "app.fitsky.workout"
     }
@@ -1438,7 +1477,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for FlexibilityDetails<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for HeartRateData<S> {
+impl<S: BosStr> LexiconSchema for HeartRateData<S> {
     fn nsid() -> &'static str {
         "app.fitsky.workout"
     }
@@ -1453,7 +1492,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for HeartRateData<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for HeartRateSample<S> {
+impl<S: BosStr> LexiconSchema for HeartRateSample<S> {
     fn nsid() -> &'static str {
         "app.fitsky.workout"
     }
@@ -1468,7 +1507,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for HeartRateSample<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for HiitSportsDetails<S> {
+impl<S: BosStr> LexiconSchema for HiitSportsDetails<S> {
     fn nsid() -> &'static str {
         "app.fitsky.workout"
     }
@@ -1528,17 +1567,17 @@ pub struct WorkoutRecord;
 impl XrpcResp for WorkoutRecord {
     const NSID: &'static str = "app.fitsky.workout";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = WorkoutGetRecordOutput<S>;
+    type Output<S: BosStr> = WorkoutGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<WorkoutGetRecordOutput<S>> for Workout<S> {
+impl<S: BosStr> From<WorkoutGetRecordOutput<S>> for Workout<S> {
     fn from(output: WorkoutGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Workout<S> {
+impl<S: BosStr> Collection for Workout<S> {
     const NSID: &'static str = "app.fitsky.workout";
     type Record = WorkoutRecord;
 }
@@ -1548,7 +1587,7 @@ impl Collection for WorkoutRecord {
     type Record = WorkoutRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Workout<S> {
+impl<S: BosStr> LexiconSchema for Workout<S> {
     fn nsid() -> &'static str {
         "app.fitsky.workout"
     }
@@ -1656,7 +1695,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Workout<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Milestone<S> {
+impl<S: BosStr> LexiconSchema for Milestone<S> {
     fn nsid() -> &'static str {
         "app.fitsky.workout"
     }
@@ -1701,7 +1740,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Milestone<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for RoutePoint<S> {
+impl<S: BosStr> LexiconSchema for RoutePoint<S> {
     fn nsid() -> &'static str {
         "app.fitsky.workout"
     }
@@ -1716,7 +1755,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for RoutePoint<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for StrengthDetails<S> {
+impl<S: BosStr> LexiconSchema for StrengthDetails<S> {
     fn nsid() -> &'static str {
         "app.fitsky.workout"
     }
@@ -1731,7 +1770,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for StrengthDetails<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for VisibilitySettings<S> {
+impl<S: BosStr> LexiconSchema for VisibilitySettings<S> {
     fn nsid() -> &'static str {
         "app.fitsky.workout"
     }
@@ -2577,17 +2616,17 @@ pub mod exercise_state {
         type Name = Unset;
     }
     ///State transition - sets the `sets` field to Set
-    pub struct SetSets<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSets<S> {}
-    impl<S: State> State for SetSets<S> {
+    pub struct SetSets<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSets<St> {}
+    impl<St: State> State for SetSets<St> {
         type Sets = Set<members::sets>;
-        type Name = S::Name;
+        type Name = St::Name;
     }
     ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Sets = S::Sets;
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Sets = St::Sets;
         type Name = Set<members::name>;
     }
     /// Marker types for field names
@@ -2600,88 +2639,85 @@ pub mod exercise_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ExerciseBuilder<'a, S: exercise_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ExerciseBuilder<S: BosStr, St: exercise_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<Vec<workout::ExerciseSet<S>>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Exercise<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ExerciseBuilder<'a, exercise_state::Empty> {
+impl<S: BosStr> Exercise<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ExerciseBuilder<S, exercise_state::Empty> {
         ExerciseBuilder::new()
     }
 }
 
-impl<'a> ExerciseBuilder<'a, exercise_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ExerciseBuilder<S, exercise_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ExerciseBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ExerciseBuilder<'a, S>
+impl<S: BosStr, St> ExerciseBuilder<S, St>
 where
-    S: exercise_state::State,
-    S::Name: exercise_state::IsUnset,
+    St: exercise_state::State,
+    St::Name: exercise_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> ExerciseBuilder<'a, exercise_state::SetName<S>> {
+    ) -> ExerciseBuilder<S, exercise_state::SetName<St>> {
         self._fields.0 = Option::Some(value.into());
         ExerciseBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ExerciseBuilder<'a, S>
+impl<S: BosStr, St> ExerciseBuilder<S, St>
 where
-    S: exercise_state::State,
-    S::Sets: exercise_state::IsUnset,
+    St: exercise_state::State,
+    St::Sets: exercise_state::IsUnset,
 {
     /// Set the `sets` field (required)
     pub fn sets(
         mut self,
         value: impl Into<Vec<workout::ExerciseSet<S>>>,
-    ) -> ExerciseBuilder<'a, exercise_state::SetSets<S>> {
+    ) -> ExerciseBuilder<S, exercise_state::SetSets<St>> {
         self._fields.1 = Option::Some(value.into());
         ExerciseBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ExerciseBuilder<'a, S>
+impl<S: BosStr, St> ExerciseBuilder<S, St>
 where
-    S: exercise_state::State,
-    S::Sets: exercise_state::IsSet,
-    S::Name: exercise_state::IsSet,
+    St: exercise_state::State,
+    St::Sets: exercise_state::IsSet,
+    St::Name: exercise_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Exercise<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Exercise<S> {
         Exercise {
             name: self._fields.0.unwrap(),
             sets: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Exercise<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Exercise<S> {
         Exercise {
             name: self._fields.0.unwrap(),
             sets: self._fields.1.unwrap(),
@@ -2700,122 +2736,122 @@ pub mod heart_rate_sample_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Timestamp;
         type Bpm;
+        type Timestamp;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Timestamp = Unset;
         type Bpm = Unset;
-    }
-    ///State transition - sets the `timestamp` field to Set
-    pub struct SetTimestamp<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTimestamp<S> {}
-    impl<S: State> State for SetTimestamp<S> {
-        type Timestamp = Set<members::timestamp>;
-        type Bpm = S::Bpm;
+        type Timestamp = Unset;
     }
     ///State transition - sets the `bpm` field to Set
-    pub struct SetBpm<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBpm<S> {}
-    impl<S: State> State for SetBpm<S> {
-        type Timestamp = S::Timestamp;
+    pub struct SetBpm<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBpm<St> {}
+    impl<St: State> State for SetBpm<St> {
         type Bpm = Set<members::bpm>;
+        type Timestamp = St::Timestamp;
+    }
+    ///State transition - sets the `timestamp` field to Set
+    pub struct SetTimestamp<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTimestamp<St> {}
+    impl<St: State> State for SetTimestamp<St> {
+        type Bpm = St::Bpm;
+        type Timestamp = Set<members::timestamp>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `timestamp` field
-        pub struct timestamp(());
         ///Marker type for the `bpm` field
         pub struct bpm(());
+        ///Marker type for the `timestamp` field
+        pub struct timestamp(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct HeartRateSampleBuilder<'a, S: heart_rate_sample_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct HeartRateSampleBuilder<S: BosStr, St: heart_rate_sample_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<Datetime>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> HeartRateSample<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> HeartRateSampleBuilder<'a, heart_rate_sample_state::Empty> {
+impl<S: BosStr> HeartRateSample<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> HeartRateSampleBuilder<S, heart_rate_sample_state::Empty> {
         HeartRateSampleBuilder::new()
     }
 }
 
-impl<'a> HeartRateSampleBuilder<'a, heart_rate_sample_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> HeartRateSampleBuilder<S, heart_rate_sample_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         HeartRateSampleBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> HeartRateSampleBuilder<'a, S>
+impl<S: BosStr, St> HeartRateSampleBuilder<S, St>
 where
-    S: heart_rate_sample_state::State,
-    S::Bpm: heart_rate_sample_state::IsUnset,
+    St: heart_rate_sample_state::State,
+    St::Bpm: heart_rate_sample_state::IsUnset,
 {
     /// Set the `bpm` field (required)
     pub fn bpm(
         mut self,
         value: impl Into<i64>,
-    ) -> HeartRateSampleBuilder<'a, heart_rate_sample_state::SetBpm<S>> {
+    ) -> HeartRateSampleBuilder<S, heart_rate_sample_state::SetBpm<St>> {
         self._fields.0 = Option::Some(value.into());
         HeartRateSampleBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> HeartRateSampleBuilder<'a, S>
+impl<S: BosStr, St> HeartRateSampleBuilder<S, St>
 where
-    S: heart_rate_sample_state::State,
-    S::Timestamp: heart_rate_sample_state::IsUnset,
+    St: heart_rate_sample_state::State,
+    St::Timestamp: heart_rate_sample_state::IsUnset,
 {
     /// Set the `timestamp` field (required)
     pub fn timestamp(
         mut self,
         value: impl Into<Datetime>,
-    ) -> HeartRateSampleBuilder<'a, heart_rate_sample_state::SetTimestamp<S>> {
+    ) -> HeartRateSampleBuilder<S, heart_rate_sample_state::SetTimestamp<St>> {
         self._fields.1 = Option::Some(value.into());
         HeartRateSampleBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> HeartRateSampleBuilder<'a, S>
+impl<S: BosStr, St> HeartRateSampleBuilder<S, St>
 where
-    S: heart_rate_sample_state::State,
-    S::Timestamp: heart_rate_sample_state::IsSet,
-    S::Bpm: heart_rate_sample_state::IsSet,
+    St: heart_rate_sample_state::State,
+    St::Bpm: heart_rate_sample_state::IsSet,
+    St::Timestamp: heart_rate_sample_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> HeartRateSample<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> HeartRateSample<S> {
         HeartRateSample {
             bpm: self._fields.0.unwrap(),
             timestamp: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> HeartRateSample<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> HeartRateSample<S> {
         HeartRateSample {
             bpm: self._fields.0.unwrap(),
             timestamp: self._fields.1.unwrap(),
@@ -2834,91 +2870,91 @@ pub mod workout_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Type;
         type Title;
+        type StartedAt;
+        type Type;
         type CreatedAt;
         type Duration;
-        type StartedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Type = Unset;
         type Title = Unset;
+        type StartedAt = Unset;
+        type Type = Unset;
         type CreatedAt = Unset;
         type Duration = Unset;
-        type StartedAt = Unset;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type Type = Set<members::r#type>;
-        type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
-        type Duration = S::Duration;
-        type StartedAt = S::StartedAt;
     }
     ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Type = S::Type;
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
         type Title = Set<members::title>;
-        type CreatedAt = S::CreatedAt;
-        type Duration = S::Duration;
-        type StartedAt = S::StartedAt;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Type = S::Type;
-        type Title = S::Title;
-        type CreatedAt = Set<members::created_at>;
-        type Duration = S::Duration;
-        type StartedAt = S::StartedAt;
-    }
-    ///State transition - sets the `duration` field to Set
-    pub struct SetDuration<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDuration<S> {}
-    impl<S: State> State for SetDuration<S> {
-        type Type = S::Type;
-        type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
-        type Duration = Set<members::duration>;
-        type StartedAt = S::StartedAt;
+        type StartedAt = St::StartedAt;
+        type Type = St::Type;
+        type CreatedAt = St::CreatedAt;
+        type Duration = St::Duration;
     }
     ///State transition - sets the `started_at` field to Set
-    pub struct SetStartedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStartedAt<S> {}
-    impl<S: State> State for SetStartedAt<S> {
-        type Type = S::Type;
-        type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
-        type Duration = S::Duration;
+    pub struct SetStartedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStartedAt<St> {}
+    impl<St: State> State for SetStartedAt<St> {
+        type Title = St::Title;
         type StartedAt = Set<members::started_at>;
+        type Type = St::Type;
+        type CreatedAt = St::CreatedAt;
+        type Duration = St::Duration;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetType<St> {}
+    impl<St: State> State for SetType<St> {
+        type Title = St::Title;
+        type StartedAt = St::StartedAt;
+        type Type = Set<members::r#type>;
+        type CreatedAt = St::CreatedAt;
+        type Duration = St::Duration;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Title = St::Title;
+        type StartedAt = St::StartedAt;
+        type Type = St::Type;
+        type CreatedAt = Set<members::created_at>;
+        type Duration = St::Duration;
+    }
+    ///State transition - sets the `duration` field to Set
+    pub struct SetDuration<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDuration<St> {}
+    impl<St: State> State for SetDuration<St> {
+        type Title = St::Title;
+        type StartedAt = St::StartedAt;
+        type Type = St::Type;
+        type CreatedAt = St::CreatedAt;
+        type Duration = Set<members::duration>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `type` field
-        pub struct r#type(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `started_at` field
+        pub struct started_at(());
+        ///Marker type for the `type` field
+        pub struct r#type(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `duration` field
         pub struct duration(());
-        ///Marker type for the `started_at` field
-        pub struct started_at(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct WorkoutBuilder<'a, S: workout_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct WorkoutBuilder<S: BosStr, St: workout_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
         Option<WorkoutDetails<S>>,
@@ -2934,18 +2970,18 @@ pub struct WorkoutBuilder<'a, S: workout_state::State> {
         Option<WorkoutType<S>>,
         Option<workout::VisibilitySettings<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Workout<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> WorkoutBuilder<'a, workout_state::Empty> {
+impl<S: BosStr> Workout<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> WorkoutBuilder<S, workout_state::Empty> {
         WorkoutBuilder::new()
     }
 }
 
-impl<'a> WorkoutBuilder<'a, workout_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> WorkoutBuilder<S, workout_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         WorkoutBuilder {
             _state: PhantomData,
@@ -2964,31 +3000,31 @@ impl<'a> WorkoutBuilder<'a, workout_state::Empty> {
                 None,
                 None,
             ),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> WorkoutBuilder<'a, S>
+impl<S: BosStr, St> WorkoutBuilder<S, St>
 where
-    S: workout_state::State,
-    S::CreatedAt: workout_state::IsUnset,
+    St: workout_state::State,
+    St::CreatedAt: workout_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> WorkoutBuilder<'a, workout_state::SetCreatedAt<S>> {
+    ) -> WorkoutBuilder<S, workout_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         WorkoutBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: workout_state::State> WorkoutBuilder<'a, S> {
+impl<S: BosStr, St: workout_state::State> WorkoutBuilder<S, St> {
     /// Set the `details` field (optional)
     pub fn details(mut self, value: impl Into<Option<WorkoutDetails<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -3001,26 +3037,26 @@ impl<'a, S: workout_state::State> WorkoutBuilder<'a, S> {
     }
 }
 
-impl<'a, S> WorkoutBuilder<'a, S>
+impl<S: BosStr, St> WorkoutBuilder<S, St>
 where
-    S: workout_state::State,
-    S::Duration: workout_state::IsUnset,
+    St: workout_state::State,
+    St::Duration: workout_state::IsUnset,
 {
     /// Set the `duration` field (required)
     pub fn duration(
         mut self,
         value: impl Into<i64>,
-    ) -> WorkoutBuilder<'a, workout_state::SetDuration<S>> {
+    ) -> WorkoutBuilder<S, workout_state::SetDuration<St>> {
         self._fields.2 = Option::Some(value.into());
         WorkoutBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: workout_state::State> WorkoutBuilder<'a, S> {
+impl<S: BosStr, St: workout_state::State> WorkoutBuilder<S, St> {
     /// Set the `endedAt` field (optional)
     pub fn ended_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.3 = value.into();
@@ -3033,7 +3069,7 @@ impl<'a, S: workout_state::State> WorkoutBuilder<'a, S> {
     }
 }
 
-impl<'a, S: workout_state::State> WorkoutBuilder<'a, S> {
+impl<S: BosStr, St: workout_state::State> WorkoutBuilder<S, St> {
     /// Set the `milestones` field (optional)
     pub fn milestones(
         mut self,
@@ -3052,7 +3088,7 @@ impl<'a, S: workout_state::State> WorkoutBuilder<'a, S> {
     }
 }
 
-impl<'a, S: workout_state::State> WorkoutBuilder<'a, S> {
+impl<S: BosStr, St: workout_state::State> WorkoutBuilder<S, St> {
     /// Set the `notes` field (optional)
     pub fn notes(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
@@ -3065,7 +3101,7 @@ impl<'a, S: workout_state::State> WorkoutBuilder<'a, S> {
     }
 }
 
-impl<'a, S: workout_state::State> WorkoutBuilder<'a, S> {
+impl<S: BosStr, St: workout_state::State> WorkoutBuilder<S, St> {
     /// Set the `ogImage` field (optional)
     pub fn og_image(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -3078,7 +3114,7 @@ impl<'a, S: workout_state::State> WorkoutBuilder<'a, S> {
     }
 }
 
-impl<'a, S: workout_state::State> WorkoutBuilder<'a, S> {
+impl<S: BosStr, St: workout_state::State> WorkoutBuilder<S, St> {
     /// Set the `planUri` field (optional)
     pub fn plan_uri(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.7 = value.into();
@@ -3091,26 +3127,26 @@ impl<'a, S: workout_state::State> WorkoutBuilder<'a, S> {
     }
 }
 
-impl<'a, S> WorkoutBuilder<'a, S>
+impl<S: BosStr, St> WorkoutBuilder<S, St>
 where
-    S: workout_state::State,
-    S::StartedAt: workout_state::IsUnset,
+    St: workout_state::State,
+    St::StartedAt: workout_state::IsUnset,
 {
     /// Set the `startedAt` field (required)
     pub fn started_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> WorkoutBuilder<'a, workout_state::SetStartedAt<S>> {
+    ) -> WorkoutBuilder<S, workout_state::SetStartedAt<St>> {
         self._fields.8 = Option::Some(value.into());
         WorkoutBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: workout_state::State> WorkoutBuilder<'a, S> {
+impl<S: BosStr, St: workout_state::State> WorkoutBuilder<S, St> {
     /// Set the `status` field (optional)
     pub fn status(mut self, value: impl Into<Option<WorkoutStatus<S>>>) -> Self {
         self._fields.9 = value.into();
@@ -3123,45 +3159,45 @@ impl<'a, S: workout_state::State> WorkoutBuilder<'a, S> {
     }
 }
 
-impl<'a, S> WorkoutBuilder<'a, S>
+impl<S: BosStr, St> WorkoutBuilder<S, St>
 where
-    S: workout_state::State,
-    S::Title: workout_state::IsUnset,
+    St: workout_state::State,
+    St::Title: workout_state::IsUnset,
 {
     /// Set the `title` field (required)
     pub fn title(
         mut self,
         value: impl Into<S>,
-    ) -> WorkoutBuilder<'a, workout_state::SetTitle<S>> {
+    ) -> WorkoutBuilder<S, workout_state::SetTitle<St>> {
         self._fields.10 = Option::Some(value.into());
         WorkoutBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> WorkoutBuilder<'a, S>
+impl<S: BosStr, St> WorkoutBuilder<S, St>
 where
-    S: workout_state::State,
-    S::Type: workout_state::IsUnset,
+    St: workout_state::State,
+    St::Type: workout_state::IsUnset,
 {
     /// Set the `type` field (required)
     pub fn r#type(
         mut self,
         value: impl Into<WorkoutType<S>>,
-    ) -> WorkoutBuilder<'a, workout_state::SetType<S>> {
+    ) -> WorkoutBuilder<S, workout_state::SetType<St>> {
         self._fields.11 = Option::Some(value.into());
         WorkoutBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: workout_state::State> WorkoutBuilder<'a, S> {
+impl<S: BosStr, St: workout_state::State> WorkoutBuilder<S, St> {
     /// Set the `visibility` field (optional)
     pub fn visibility(
         mut self,
@@ -3180,17 +3216,17 @@ impl<'a, S: workout_state::State> WorkoutBuilder<'a, S> {
     }
 }
 
-impl<'a, S> WorkoutBuilder<'a, S>
+impl<S: BosStr, St> WorkoutBuilder<S, St>
 where
-    S: workout_state::State,
-    S::Type: workout_state::IsSet,
-    S::Title: workout_state::IsSet,
-    S::CreatedAt: workout_state::IsSet,
-    S::Duration: workout_state::IsSet,
-    S::StartedAt: workout_state::IsSet,
+    St: workout_state::State,
+    St::Title: workout_state::IsSet,
+    St::StartedAt: workout_state::IsSet,
+    St::Type: workout_state::IsSet,
+    St::CreatedAt: workout_state::IsSet,
+    St::Duration: workout_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Workout<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Workout<S> {
         Workout {
             created_at: self._fields.0.unwrap(),
             details: self._fields.1,
@@ -3208,11 +3244,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Workout<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Workout<S> {
         Workout {
             created_at: self._fields.0.unwrap(),
             details: self._fields.1,
@@ -3242,66 +3275,66 @@ pub mod milestone_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Type;
         type Timestamp;
+        type Type;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Type = Unset;
         type Timestamp = Unset;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type Type = Set<members::r#type>;
-        type Timestamp = S::Timestamp;
+        type Type = Unset;
     }
     ///State transition - sets the `timestamp` field to Set
-    pub struct SetTimestamp<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTimestamp<S> {}
-    impl<S: State> State for SetTimestamp<S> {
-        type Type = S::Type;
+    pub struct SetTimestamp<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTimestamp<St> {}
+    impl<St: State> State for SetTimestamp<St> {
         type Timestamp = Set<members::timestamp>;
+        type Type = St::Type;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetType<St> {}
+    impl<St: State> State for SetType<St> {
+        type Timestamp = St::Timestamp;
+        type Type = Set<members::r#type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `type` field
-        pub struct r#type(());
         ///Marker type for the `timestamp` field
         pub struct timestamp(());
+        ///Marker type for the `type` field
+        pub struct r#type(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct MilestoneBuilder<'a, S: milestone_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct MilestoneBuilder<S: BosStr, St: milestone_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<Datetime>, Option<MilestoneType<S>>, Option<i64>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Milestone<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> MilestoneBuilder<'a, milestone_state::Empty> {
+impl<S: BosStr> Milestone<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> MilestoneBuilder<S, milestone_state::Empty> {
         MilestoneBuilder::new()
     }
 }
 
-impl<'a> MilestoneBuilder<'a, milestone_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> MilestoneBuilder<S, milestone_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         MilestoneBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: milestone_state::State> MilestoneBuilder<'a, S> {
+impl<S: BosStr, St: milestone_state::State> MilestoneBuilder<S, St> {
     /// Set the `note` field (optional)
     pub fn note(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -3314,45 +3347,45 @@ impl<'a, S: milestone_state::State> MilestoneBuilder<'a, S> {
     }
 }
 
-impl<'a, S> MilestoneBuilder<'a, S>
+impl<S: BosStr, St> MilestoneBuilder<S, St>
 where
-    S: milestone_state::State,
-    S::Timestamp: milestone_state::IsUnset,
+    St: milestone_state::State,
+    St::Timestamp: milestone_state::IsUnset,
 {
     /// Set the `timestamp` field (required)
     pub fn timestamp(
         mut self,
         value: impl Into<Datetime>,
-    ) -> MilestoneBuilder<'a, milestone_state::SetTimestamp<S>> {
+    ) -> MilestoneBuilder<S, milestone_state::SetTimestamp<St>> {
         self._fields.1 = Option::Some(value.into());
         MilestoneBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> MilestoneBuilder<'a, S>
+impl<S: BosStr, St> MilestoneBuilder<S, St>
 where
-    S: milestone_state::State,
-    S::Type: milestone_state::IsUnset,
+    St: milestone_state::State,
+    St::Type: milestone_state::IsUnset,
 {
     /// Set the `type` field (required)
     pub fn r#type(
         mut self,
         value: impl Into<MilestoneType<S>>,
-    ) -> MilestoneBuilder<'a, milestone_state::SetType<S>> {
+    ) -> MilestoneBuilder<S, milestone_state::SetType<St>> {
         self._fields.2 = Option::Some(value.into());
         MilestoneBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: milestone_state::State> MilestoneBuilder<'a, S> {
+impl<S: BosStr, St: milestone_state::State> MilestoneBuilder<S, St> {
     /// Set the `valueMeters` field (optional)
     pub fn value_meters(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.3 = value.into();
@@ -3365,14 +3398,14 @@ impl<'a, S: milestone_state::State> MilestoneBuilder<'a, S> {
     }
 }
 
-impl<'a, S> MilestoneBuilder<'a, S>
+impl<S: BosStr, St> MilestoneBuilder<S, St>
 where
-    S: milestone_state::State,
-    S::Type: milestone_state::IsSet,
-    S::Timestamp: milestone_state::IsSet,
+    St: milestone_state::State,
+    St::Timestamp: milestone_state::IsSet,
+    St::Type: milestone_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Milestone<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Milestone<S> {
         Milestone {
             note: self._fields.0,
             timestamp: self._fields.1.unwrap(),
@@ -3381,11 +3414,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Milestone<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Milestone<S> {
         Milestone {
             note: self._fields.0,
             timestamp: self._fields.1.unwrap(),
@@ -3406,145 +3439,145 @@ pub mod route_point_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type LngE6;
         type LatE6;
+        type LngE6;
         type Timestamp;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type LngE6 = Unset;
         type LatE6 = Unset;
+        type LngE6 = Unset;
         type Timestamp = Unset;
     }
-    ///State transition - sets the `lng_e6` field to Set
-    pub struct SetLngE6<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLngE6<S> {}
-    impl<S: State> State for SetLngE6<S> {
-        type LngE6 = Set<members::lng_e6>;
-        type LatE6 = S::LatE6;
-        type Timestamp = S::Timestamp;
-    }
     ///State transition - sets the `lat_e6` field to Set
-    pub struct SetLatE6<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLatE6<S> {}
-    impl<S: State> State for SetLatE6<S> {
-        type LngE6 = S::LngE6;
+    pub struct SetLatE6<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLatE6<St> {}
+    impl<St: State> State for SetLatE6<St> {
         type LatE6 = Set<members::lat_e6>;
-        type Timestamp = S::Timestamp;
+        type LngE6 = St::LngE6;
+        type Timestamp = St::Timestamp;
+    }
+    ///State transition - sets the `lng_e6` field to Set
+    pub struct SetLngE6<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLngE6<St> {}
+    impl<St: State> State for SetLngE6<St> {
+        type LatE6 = St::LatE6;
+        type LngE6 = Set<members::lng_e6>;
+        type Timestamp = St::Timestamp;
     }
     ///State transition - sets the `timestamp` field to Set
-    pub struct SetTimestamp<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTimestamp<S> {}
-    impl<S: State> State for SetTimestamp<S> {
-        type LngE6 = S::LngE6;
-        type LatE6 = S::LatE6;
+    pub struct SetTimestamp<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTimestamp<St> {}
+    impl<St: State> State for SetTimestamp<St> {
+        type LatE6 = St::LatE6;
+        type LngE6 = St::LngE6;
         type Timestamp = Set<members::timestamp>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `lng_e6` field
-        pub struct lng_e6(());
         ///Marker type for the `lat_e6` field
         pub struct lat_e6(());
+        ///Marker type for the `lng_e6` field
+        pub struct lng_e6(());
         ///Marker type for the `timestamp` field
         pub struct timestamp(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct RoutePointBuilder<'a, S: route_point_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct RoutePointBuilder<S: BosStr, St: route_point_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<i64>, Option<Datetime>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> RoutePoint<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> RoutePointBuilder<'a, route_point_state::Empty> {
+impl<S: BosStr> RoutePoint<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> RoutePointBuilder<S, route_point_state::Empty> {
         RoutePointBuilder::new()
     }
 }
 
-impl<'a> RoutePointBuilder<'a, route_point_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> RoutePointBuilder<S, route_point_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         RoutePointBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RoutePointBuilder<'a, S>
+impl<S: BosStr, St> RoutePointBuilder<S, St>
 where
-    S: route_point_state::State,
-    S::LatE6: route_point_state::IsUnset,
+    St: route_point_state::State,
+    St::LatE6: route_point_state::IsUnset,
 {
     /// Set the `latE6` field (required)
     pub fn lat_e6(
         mut self,
         value: impl Into<i64>,
-    ) -> RoutePointBuilder<'a, route_point_state::SetLatE6<S>> {
+    ) -> RoutePointBuilder<S, route_point_state::SetLatE6<St>> {
         self._fields.0 = Option::Some(value.into());
         RoutePointBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RoutePointBuilder<'a, S>
+impl<S: BosStr, St> RoutePointBuilder<S, St>
 where
-    S: route_point_state::State,
-    S::LngE6: route_point_state::IsUnset,
+    St: route_point_state::State,
+    St::LngE6: route_point_state::IsUnset,
 {
     /// Set the `lngE6` field (required)
     pub fn lng_e6(
         mut self,
         value: impl Into<i64>,
-    ) -> RoutePointBuilder<'a, route_point_state::SetLngE6<S>> {
+    ) -> RoutePointBuilder<S, route_point_state::SetLngE6<St>> {
         self._fields.1 = Option::Some(value.into());
         RoutePointBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RoutePointBuilder<'a, S>
+impl<S: BosStr, St> RoutePointBuilder<S, St>
 where
-    S: route_point_state::State,
-    S::Timestamp: route_point_state::IsUnset,
+    St: route_point_state::State,
+    St::Timestamp: route_point_state::IsUnset,
 {
     /// Set the `timestamp` field (required)
     pub fn timestamp(
         mut self,
         value: impl Into<Datetime>,
-    ) -> RoutePointBuilder<'a, route_point_state::SetTimestamp<S>> {
+    ) -> RoutePointBuilder<S, route_point_state::SetTimestamp<St>> {
         self._fields.2 = Option::Some(value.into());
         RoutePointBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RoutePointBuilder<'a, S>
+impl<S: BosStr, St> RoutePointBuilder<S, St>
 where
-    S: route_point_state::State,
-    S::LngE6: route_point_state::IsSet,
-    S::LatE6: route_point_state::IsSet,
-    S::Timestamp: route_point_state::IsSet,
+    St: route_point_state::State,
+    St::LatE6: route_point_state::IsSet,
+    St::LngE6: route_point_state::IsSet,
+    St::Timestamp: route_point_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> RoutePoint<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> RoutePoint<S> {
         RoutePoint {
             lat_e6: self._fields.0.unwrap(),
             lng_e6: self._fields.1.unwrap(),
@@ -3552,11 +3585,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> RoutePoint<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> RoutePoint<S> {
         RoutePoint {
             lat_e6: self._fields.0.unwrap(),
             lng_e6: self._fields.1.unwrap(),

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use serde::{Serialize, Deserialize};
     rename = "app.chavatar.avatar",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Avatar<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Avatar<S: BosStr = DefaultStr> {
     pub avatar: BlobRef<S>,
     pub created_at: Datetime,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -53,18 +53,18 @@ pub struct Avatar<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct AvatarGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct AvatarGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Avatar<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Avatar<S> {
+impl<S: BosStr> Avatar<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, AvatarRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -77,17 +77,17 @@ pub struct AvatarRecord;
 impl XrpcResp for AvatarRecord {
     const NSID: &'static str = "app.chavatar.avatar";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = AvatarGetRecordOutput<S>;
+    type Output<S: BosStr> = AvatarGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<AvatarGetRecordOutput<S>> for Avatar<S> {
+impl<S: BosStr> From<AvatarGetRecordOutput<S>> for Avatar<S> {
     fn from(output: AvatarGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Avatar<S> {
+impl<S: BosStr> Collection for Avatar<S> {
     const NSID: &'static str = "app.chavatar.avatar";
     type Record = AvatarRecord;
 }
@@ -97,7 +97,7 @@ impl Collection for AvatarRecord {
     type Record = AvatarRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Avatar<S> {
+impl<S: BosStr> LexiconSchema for Avatar<S> {
     fn nsid() -> &'static str {
         "app.chavatar.avatar"
     }
@@ -176,17 +176,17 @@ pub mod avatar_state {
         type CreatedAt = Unset;
     }
     ///State transition - sets the `avatar` field to Set
-    pub struct SetAvatar<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAvatar<S> {}
-    impl<S: State> State for SetAvatar<S> {
+    pub struct SetAvatar<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAvatar<St> {}
+    impl<St: State> State for SetAvatar<St> {
         type Avatar = Set<members::avatar>;
-        type CreatedAt = S::CreatedAt;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Avatar = S::Avatar;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Avatar = St::Avatar;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
@@ -199,85 +199,85 @@ pub mod avatar_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct AvatarBuilder<'a, S: avatar_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct AvatarBuilder<S: BosStr, St: avatar_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<BlobRef<S>>, Option<Datetime>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Avatar<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> AvatarBuilder<'a, avatar_state::Empty> {
+impl<S: BosStr> Avatar<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> AvatarBuilder<S, avatar_state::Empty> {
         AvatarBuilder::new()
     }
 }
 
-impl<'a> AvatarBuilder<'a, avatar_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> AvatarBuilder<S, avatar_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         AvatarBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AvatarBuilder<'a, S>
+impl<S: BosStr, St> AvatarBuilder<S, St>
 where
-    S: avatar_state::State,
-    S::Avatar: avatar_state::IsUnset,
+    St: avatar_state::State,
+    St::Avatar: avatar_state::IsUnset,
 {
     /// Set the `avatar` field (required)
     pub fn avatar(
         mut self,
         value: impl Into<BlobRef<S>>,
-    ) -> AvatarBuilder<'a, avatar_state::SetAvatar<S>> {
+    ) -> AvatarBuilder<S, avatar_state::SetAvatar<St>> {
         self._fields.0 = Option::Some(value.into());
         AvatarBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AvatarBuilder<'a, S>
+impl<S: BosStr, St> AvatarBuilder<S, St>
 where
-    S: avatar_state::State,
-    S::CreatedAt: avatar_state::IsUnset,
+    St: avatar_state::State,
+    St::CreatedAt: avatar_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> AvatarBuilder<'a, avatar_state::SetCreatedAt<S>> {
+    ) -> AvatarBuilder<S, avatar_state::SetCreatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         AvatarBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AvatarBuilder<'a, S>
+impl<S: BosStr, St> AvatarBuilder<S, St>
 where
-    S: avatar_state::State,
-    S::Avatar: avatar_state::IsSet,
-    S::CreatedAt: avatar_state::IsSet,
+    St: avatar_state::State,
+    St::Avatar: avatar_state::IsSet,
+    St::CreatedAt: avatar_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Avatar<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Avatar<S> {
         Avatar {
             avatar: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Avatar<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Avatar<S> {
         Avatar {
             avatar: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),

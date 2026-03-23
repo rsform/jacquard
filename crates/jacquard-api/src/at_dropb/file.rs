@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use serde::{Serialize, Deserialize};
     rename = "at.dropb.file",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct File<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct File<S: BosStr = DefaultStr> {
     pub blob: BlobRef<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
@@ -60,18 +60,18 @@ pub struct File<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct FileGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct FileGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: File<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> File<S> {
+impl<S: BosStr> File<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, FileRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -84,17 +84,17 @@ pub struct FileRecord;
 impl XrpcResp for FileRecord {
     const NSID: &'static str = "at.dropb.file";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = FileGetRecordOutput<S>;
+    type Output<S: BosStr> = FileGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<FileGetRecordOutput<S>> for File<S> {
+impl<S: BosStr> From<FileGetRecordOutput<S>> for File<S> {
     fn from(output: FileGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for File<S> {
+impl<S: BosStr> Collection for File<S> {
     const NSID: &'static str = "at.dropb.file";
     type Record = FileRecord;
 }
@@ -104,7 +104,7 @@ impl Collection for FileRecord {
     type Record = FileRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for File<S> {
+impl<S: BosStr> LexiconSchema for File<S> {
     fn nsid() -> &'static str {
         "at.dropb.file"
     }
@@ -213,9 +213,9 @@ pub mod file_state {
         type Blob = Unset;
     }
     ///State transition - sets the `blob` field to Set
-    pub struct SetBlob<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBlob<S> {}
-    impl<S: State> State for SetBlob<S> {
+    pub struct SetBlob<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBlob<St> {}
+    impl<St: State> State for SetBlob<St> {
         type Blob = Set<members::blob>;
     }
     /// Marker types for field names
@@ -226,9 +226,9 @@ pub mod file_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct FileBuilder<'a, S: file_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct FileBuilder<S: BosStr, St: file_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<BlobRef<S>>,
         Option<Datetime>,
@@ -236,47 +236,47 @@ pub struct FileBuilder<'a, S: file_state::State> {
         Option<BlobRef<S>>,
         Option<Datetime>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> File<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> FileBuilder<'a, file_state::Empty> {
+impl<S: BosStr> File<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> FileBuilder<S, file_state::Empty> {
         FileBuilder::new()
     }
 }
 
-impl<'a> FileBuilder<'a, file_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> FileBuilder<S, file_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         FileBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> FileBuilder<'a, S>
+impl<S: BosStr, St> FileBuilder<S, St>
 where
-    S: file_state::State,
-    S::Blob: file_state::IsUnset,
+    St: file_state::State,
+    St::Blob: file_state::IsUnset,
 {
     /// Set the `blob` field (required)
     pub fn blob(
         mut self,
         value: impl Into<BlobRef<S>>,
-    ) -> FileBuilder<'a, file_state::SetBlob<S>> {
+    ) -> FileBuilder<S, file_state::SetBlob<St>> {
         self._fields.0 = Option::Some(value.into());
         FileBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: file_state::State> FileBuilder<'a, S> {
+impl<S: BosStr, St: file_state::State> FileBuilder<S, St> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.1 = value.into();
@@ -289,7 +289,7 @@ impl<'a, S: file_state::State> FileBuilder<'a, S> {
     }
 }
 
-impl<'a, S: file_state::State> FileBuilder<'a, S> {
+impl<S: BosStr, St: file_state::State> FileBuilder<S, St> {
     /// Set the `name` field (optional)
     pub fn name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -302,7 +302,7 @@ impl<'a, S: file_state::State> FileBuilder<'a, S> {
     }
 }
 
-impl<'a, S: file_state::State> FileBuilder<'a, S> {
+impl<S: BosStr, St: file_state::State> FileBuilder<S, St> {
     /// Set the `thumbnail` field (optional)
     pub fn thumbnail(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -315,7 +315,7 @@ impl<'a, S: file_state::State> FileBuilder<'a, S> {
     }
 }
 
-impl<'a, S: file_state::State> FileBuilder<'a, S> {
+impl<S: BosStr, St: file_state::State> FileBuilder<S, St> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.4 = value.into();
@@ -328,13 +328,13 @@ impl<'a, S: file_state::State> FileBuilder<'a, S> {
     }
 }
 
-impl<'a, S> FileBuilder<'a, S>
+impl<S: BosStr, St> FileBuilder<S, St>
 where
-    S: file_state::State,
-    S::Blob: file_state::IsSet,
+    St: file_state::State,
+    St::Blob: file_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> File<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> File<S> {
         File {
             blob: self._fields.0.unwrap(),
             created_at: self._fields.1,
@@ -344,8 +344,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> File<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> File<S> {
         File {
             blob: self._fields.0.unwrap(),
             created_at: self._fields.1,

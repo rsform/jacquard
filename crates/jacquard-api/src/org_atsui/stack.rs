@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
@@ -18,14 +18,14 @@ use serde::{Serialize, Deserialize};
 use crate::at_inlay::Response;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Stack<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Stack<S: BosStr = DefaultStr> {
     ///Cross-axis alignment of children.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub align: Option<StackAlign<S>>,
@@ -48,16 +48,14 @@ pub struct Stack<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Whether the container sticks to the top of the scroll area.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sticky: Option<bool>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Cross-axis alignment of children.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum StackAlign<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum StackAlign<S: BosStr = DefaultStr> {
     Start,
     Center,
     End,
@@ -65,7 +63,7 @@ pub enum StackAlign<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> StackAlign<S> {
+impl<S: BosStr> StackAlign<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Start => "start",
@@ -87,19 +85,19 @@ impl<S: Bos<str> + AsRef<str>> StackAlign<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for StackAlign<S> {
+impl<S: BosStr> core::fmt::Display for StackAlign<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for StackAlign<S> {
+impl<S: BosStr> AsRef<str> for StackAlign<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for StackAlign<S> {
+impl<S: BosStr> Serialize for StackAlign<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -108,8 +106,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for StackAlign<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for StackAlign<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for StackAlign<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -119,14 +116,18 @@ for StackAlign<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for StackAlign<S> {
+impl<S: BosStr + Default> Default for StackAlign<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for StackAlign<S> {
-    type Output = StackAlign<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for StackAlign<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = StackAlign<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             StackAlign::Start => StackAlign::Start,
@@ -141,7 +142,7 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for StackAlign<S> {
 /// Space between children.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum StackGap<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum StackGap<S: BosStr = DefaultStr> {
     None,
     Small,
     Medium,
@@ -149,7 +150,7 @@ pub enum StackGap<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> StackGap<S> {
+impl<S: BosStr> StackGap<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::None => "none",
@@ -171,19 +172,19 @@ impl<S: Bos<str> + AsRef<str>> StackGap<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for StackGap<S> {
+impl<S: BosStr> core::fmt::Display for StackGap<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for StackGap<S> {
+impl<S: BosStr> AsRef<str> for StackGap<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for StackGap<S> {
+impl<S: BosStr> Serialize for StackGap<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -192,7 +193,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for StackGap<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de> for StackGap<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for StackGap<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -202,14 +203,18 @@ impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de> for Stac
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for StackGap<S> {
+impl<S: BosStr + Default> Default for StackGap<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for StackGap<S> {
-    type Output = StackGap<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for StackGap<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = StackGap<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             StackGap::None => StackGap::None,
@@ -224,7 +229,7 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for StackGap<S> {
 /// Main-axis distribution of children.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum StackJustify<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum StackJustify<S: BosStr = DefaultStr> {
     Start,
     Center,
     End,
@@ -232,7 +237,7 @@ pub enum StackJustify<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> StackJustify<S> {
+impl<S: BosStr> StackJustify<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Start => "start",
@@ -254,19 +259,19 @@ impl<S: Bos<str> + AsRef<str>> StackJustify<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for StackJustify<S> {
+impl<S: BosStr> core::fmt::Display for StackJustify<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for StackJustify<S> {
+impl<S: BosStr> AsRef<str> for StackJustify<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for StackJustify<S> {
+impl<S: BosStr> Serialize for StackJustify<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -275,8 +280,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for StackJustify<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for StackJustify<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for StackJustify<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -286,14 +290,18 @@ for StackJustify<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for StackJustify<S> {
+impl<S: BosStr + Default> Default for StackJustify<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for StackJustify<S> {
-    type Output = StackJustify<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for StackJustify<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = StackJustify<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             StackJustify::Start => StackJustify::Start,
@@ -307,20 +315,17 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for StackJustify<S> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct StackOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct StackOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
-    #[serde(borrow)]
     pub value: Response<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -329,12 +334,11 @@ pub struct StackResponse;
 impl jacquard_common::xrpc::XrpcResp for StackResponse {
     const NSID: &'static str = "org.atsui.Stack";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = StackOutput<S>;
+    type Output<S: BosStr> = StackOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for Stack<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Stack<S> {
     const NSID: &'static str = "org.atsui.Stack";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -349,7 +353,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for StackRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = Stack<S>;
+    type Request<S: BosStr> = Stack<S>;
     type Response = StackResponse;
 }
 
@@ -372,9 +376,9 @@ pub mod stack_state {
         type Children = Unset;
     }
     ///State transition - sets the `children` field to Set
-    pub struct SetChildren<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetChildren<S> {}
-    impl<S: State> State for SetChildren<S> {
+    pub struct SetChildren<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetChildren<St> {}
+    impl<St: State> State for SetChildren<St> {
         type Children = Set<members::children>;
     }
     /// Marker types for field names
@@ -385,9 +389,9 @@ pub mod stack_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct StackBuilder<'a, S: stack_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct StackBuilder<S: BosStr, St: stack_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<StackAlign<S>>,
         Option<Data<S>>,
@@ -398,28 +402,28 @@ pub struct StackBuilder<'a, S: stack_state::State> {
         Option<bool>,
         Option<bool>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Stack<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> StackBuilder<'a, stack_state::Empty> {
+impl<S: BosStr> Stack<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> StackBuilder<S, stack_state::Empty> {
         StackBuilder::new()
     }
 }
 
-impl<'a> StackBuilder<'a, stack_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> StackBuilder<S, stack_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         StackBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: stack_state::State> StackBuilder<'a, S> {
+impl<S: BosStr, St: stack_state::State> StackBuilder<S, St> {
     /// Set the `align` field (optional)
     pub fn align(mut self, value: impl Into<Option<StackAlign<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -432,26 +436,26 @@ impl<'a, S: stack_state::State> StackBuilder<'a, S> {
     }
 }
 
-impl<'a, S> StackBuilder<'a, S>
+impl<S: BosStr, St> StackBuilder<S, St>
 where
-    S: stack_state::State,
-    S::Children: stack_state::IsUnset,
+    St: stack_state::State,
+    St::Children: stack_state::IsUnset,
 {
     /// Set the `children` field (required)
     pub fn children(
         mut self,
         value: impl Into<Data<S>>,
-    ) -> StackBuilder<'a, stack_state::SetChildren<S>> {
+    ) -> StackBuilder<S, stack_state::SetChildren<St>> {
         self._fields.1 = Option::Some(value.into());
         StackBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: stack_state::State> StackBuilder<'a, S> {
+impl<S: BosStr, St: stack_state::State> StackBuilder<S, St> {
     /// Set the `gap` field (optional)
     pub fn gap(mut self, value: impl Into<Option<StackGap<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -464,7 +468,7 @@ impl<'a, S: stack_state::State> StackBuilder<'a, S> {
     }
 }
 
-impl<'a, S: stack_state::State> StackBuilder<'a, S> {
+impl<S: BosStr, St: stack_state::State> StackBuilder<S, St> {
     /// Set the `inset` field (optional)
     pub fn inset(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.3 = value.into();
@@ -477,7 +481,7 @@ impl<'a, S: stack_state::State> StackBuilder<'a, S> {
     }
 }
 
-impl<'a, S: stack_state::State> StackBuilder<'a, S> {
+impl<S: BosStr, St: stack_state::State> StackBuilder<S, St> {
     /// Set the `justify` field (optional)
     pub fn justify(mut self, value: impl Into<Option<StackJustify<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -490,7 +494,7 @@ impl<'a, S: stack_state::State> StackBuilder<'a, S> {
     }
 }
 
-impl<'a, S: stack_state::State> StackBuilder<'a, S> {
+impl<S: BosStr, St: stack_state::State> StackBuilder<S, St> {
     /// Set the `opaque` field (optional)
     pub fn opaque(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.5 = value.into();
@@ -503,7 +507,7 @@ impl<'a, S: stack_state::State> StackBuilder<'a, S> {
     }
 }
 
-impl<'a, S: stack_state::State> StackBuilder<'a, S> {
+impl<S: BosStr, St: stack_state::State> StackBuilder<S, St> {
     /// Set the `separator` field (optional)
     pub fn separator(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.6 = value.into();
@@ -516,7 +520,7 @@ impl<'a, S: stack_state::State> StackBuilder<'a, S> {
     }
 }
 
-impl<'a, S: stack_state::State> StackBuilder<'a, S> {
+impl<S: BosStr, St: stack_state::State> StackBuilder<S, St> {
     /// Set the `sticky` field (optional)
     pub fn sticky(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.7 = value.into();
@@ -529,13 +533,13 @@ impl<'a, S: stack_state::State> StackBuilder<'a, S> {
     }
 }
 
-impl<'a, S> StackBuilder<'a, S>
+impl<S: BosStr, St> StackBuilder<S, St>
 where
-    S: stack_state::State,
-    S::Children: stack_state::IsSet,
+    St: stack_state::State,
+    St::Children: stack_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Stack<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Stack<S> {
         Stack {
             align: self._fields.0,
             children: self._fields.1.unwrap(),
@@ -548,8 +552,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Stack<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Stack<S> {
         Stack {
             align: self._fields.0,
             children: self._fields.1.unwrap(),

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
@@ -19,38 +19,35 @@ use serde::{Serialize, Deserialize};
 use crate::app_bsky::unspecced::TrendingTopic;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetTrendingTopics<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetTrendingTopics<S: BosStr = DefaultStr> {
     ///Defaults to `10`. Min: 1. Max: 25.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub viewer: Option<Did<S>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetTrendingTopicsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetTrendingTopicsOutput<S: BosStr = DefaultStr> {
     pub suggested: Vec<TrendingTopic<S>>,
     pub topics: Vec<TrendingTopic<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -59,12 +56,11 @@ pub struct GetTrendingTopicsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetTrendingTopicsResponse {
     const NSID: &'static str = "app.bsky.unspecced.getTrendingTopics";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetTrendingTopicsOutput<S>;
+    type Output<S: BosStr> = GetTrendingTopicsOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetTrendingTopics<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetTrendingTopics<S> {
     const NSID: &'static str = "app.bsky.unspecced.getTrendingTopics";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetTrendingTopicsResponse;
@@ -75,7 +71,7 @@ pub struct GetTrendingTopicsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetTrendingTopicsRequest {
     const PATH: &'static str = "/xrpc/app.bsky.unspecced.getTrendingTopics";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetTrendingTopics<S>;
+    type Request<S: BosStr> = GetTrendingTopics<S>;
     type Response = GetTrendingTopicsResponse;
 }
 
@@ -102,32 +98,32 @@ pub mod get_trending_topics_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetTrendingTopicsBuilder<'a, S: get_trending_topics_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetTrendingTopicsBuilder<S: BosStr, St: get_trending_topics_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<Did<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetTrendingTopics<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetTrendingTopicsBuilder<'a, get_trending_topics_state::Empty> {
+impl<S: BosStr> GetTrendingTopics<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetTrendingTopicsBuilder<S, get_trending_topics_state::Empty> {
         GetTrendingTopicsBuilder::new()
     }
 }
 
-impl<'a> GetTrendingTopicsBuilder<'a, get_trending_topics_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetTrendingTopicsBuilder<S, get_trending_topics_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetTrendingTopicsBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: get_trending_topics_state::State> GetTrendingTopicsBuilder<'a, S> {
+impl<S: BosStr, St: get_trending_topics_state::State> GetTrendingTopicsBuilder<S, St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
@@ -140,7 +136,7 @@ impl<'a, S: get_trending_topics_state::State> GetTrendingTopicsBuilder<'a, S> {
     }
 }
 
-impl<'a, S: get_trending_topics_state::State> GetTrendingTopicsBuilder<'a, S> {
+impl<S: BosStr, St: get_trending_topics_state::State> GetTrendingTopicsBuilder<S, St> {
     /// Set the `viewer` field (optional)
     pub fn viewer(mut self, value: impl Into<Option<Did<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -153,12 +149,12 @@ impl<'a, S: get_trending_topics_state::State> GetTrendingTopicsBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GetTrendingTopicsBuilder<'a, S>
+impl<S: BosStr, St> GetTrendingTopicsBuilder<S, St>
 where
-    S: get_trending_topics_state::State,
+    St: get_trending_topics_state::State,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetTrendingTopics<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetTrendingTopics<S> {
         GetTrendingTopics {
             limit: self._fields.0,
             viewer: self._fields.1,

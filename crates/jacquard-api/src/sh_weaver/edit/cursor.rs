@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -33,11 +33,11 @@ use crate::sh_weaver::edit::cursor;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ContainerId<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ContainerId<S: BosStr = DefaultStr> {
     pub value: ContainerIdValue<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -49,11 +49,11 @@ pub struct ContainerId<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ContainerIdValue<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ContainerIdValue<S: BosStr = DefaultStr> {
     #[serde(rename = "sh.weaver.edit.cursor#normalContainerId")]
     NormalContainerId(Box<cursor::NormalContainerId<S>>),
     #[serde(rename = "sh.weaver.edit.cursor#rootContainerId")]
@@ -65,11 +65,11 @@ pub enum ContainerIdValue<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CursorSide<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CursorSide<S: BosStr = DefaultStr> {
     ///The side of an item the cursor is on (left = -1, right = 1, middle = 0)
     pub value: i64,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -81,11 +81,11 @@ pub struct CursorSide<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Id<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Id<S: BosStr = DefaultStr> {
     pub counter: i64,
     pub peer: i64,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -100,11 +100,11 @@ pub struct Id<S: Bos<str> + AsRef<str> = DefaultStr> {
     rename = "sh.weaver.edit.cursor",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Cursor<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Cursor<S: BosStr = DefaultStr> {
     pub container: cursor::ContainerId<S>,
     pub id: cursor::Id<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -119,11 +119,11 @@ pub struct Cursor<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CursorGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CursorGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
@@ -135,11 +135,11 @@ pub struct CursorGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct NormalContainerId<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct NormalContainerId<S: BosStr = DefaultStr> {
     pub container_type: S,
     pub counter: i64,
     pub peer: i64,
@@ -152,24 +152,24 @@ pub struct NormalContainerId<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct RootContainerId<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct RootContainerId<S: BosStr = DefaultStr> {
     pub container_type: S,
     pub name: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Cursor<S> {
+impl<S: BosStr> Cursor<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, CursorRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ContainerId<S> {
+impl<S: BosStr> LexiconSchema for ContainerId<S> {
     fn nsid() -> &'static str {
         "sh.weaver.edit.cursor"
     }
@@ -184,7 +184,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for ContainerId<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for CursorSide<S> {
+impl<S: BosStr> LexiconSchema for CursorSide<S> {
     fn nsid() -> &'static str {
         "sh.weaver.edit.cursor"
     }
@@ -199,7 +199,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for CursorSide<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Id<S> {
+impl<S: BosStr> LexiconSchema for Id<S> {
     fn nsid() -> &'static str {
         "sh.weaver.edit.cursor"
     }
@@ -221,17 +221,17 @@ pub struct CursorRecord;
 impl XrpcResp for CursorRecord {
     const NSID: &'static str = "sh.weaver.edit.cursor";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = CursorGetRecordOutput<S>;
+    type Output<S: BosStr> = CursorGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<CursorGetRecordOutput<S>> for Cursor<S> {
+impl<S: BosStr> From<CursorGetRecordOutput<S>> for Cursor<S> {
     fn from(output: CursorGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Cursor<S> {
+impl<S: BosStr> Collection for Cursor<S> {
     const NSID: &'static str = "sh.weaver.edit.cursor";
     type Record = CursorRecord;
 }
@@ -241,7 +241,7 @@ impl Collection for CursorRecord {
     type Record = CursorRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Cursor<S> {
+impl<S: BosStr> LexiconSchema for Cursor<S> {
     fn nsid() -> &'static str {
         "sh.weaver.edit.cursor"
     }
@@ -256,7 +256,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Cursor<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for NormalContainerId<S> {
+impl<S: BosStr> LexiconSchema for NormalContainerId<S> {
     fn nsid() -> &'static str {
         "sh.weaver.edit.cursor"
     }
@@ -271,7 +271,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for NormalContainerId<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for RootContainerId<S> {
+impl<S: BosStr> LexiconSchema for RootContainerId<S> {
     fn nsid() -> &'static str {
         "sh.weaver.edit.cursor"
     }
@@ -305,9 +305,9 @@ pub mod container_id_state {
         type Value = Unset;
     }
     ///State transition - sets the `value` field to Set
-    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValue<S> {}
-    impl<S: State> State for SetValue<S> {
+    pub struct SetValue<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetValue<St> {}
+    impl<St: State> State for SetValue<St> {
         type Value = Set<members::value>;
     }
     /// Marker types for field names
@@ -318,67 +318,67 @@ pub mod container_id_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ContainerIdBuilder<'a, S: container_id_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ContainerIdBuilder<S: BosStr, St: container_id_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<ContainerIdValue<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ContainerId<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ContainerIdBuilder<'a, container_id_state::Empty> {
+impl<S: BosStr> ContainerId<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ContainerIdBuilder<S, container_id_state::Empty> {
         ContainerIdBuilder::new()
     }
 }
 
-impl<'a> ContainerIdBuilder<'a, container_id_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ContainerIdBuilder<S, container_id_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ContainerIdBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ContainerIdBuilder<'a, S>
+impl<S: BosStr, St> ContainerIdBuilder<S, St>
 where
-    S: container_id_state::State,
-    S::Value: container_id_state::IsUnset,
+    St: container_id_state::State,
+    St::Value: container_id_state::IsUnset,
 {
     /// Set the `value` field (required)
     pub fn value(
         mut self,
         value: impl Into<ContainerIdValue<S>>,
-    ) -> ContainerIdBuilder<'a, container_id_state::SetValue<S>> {
+    ) -> ContainerIdBuilder<S, container_id_state::SetValue<St>> {
         self._fields.0 = Option::Some(value.into());
         ContainerIdBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ContainerIdBuilder<'a, S>
+impl<S: BosStr, St> ContainerIdBuilder<S, St>
 where
-    S: container_id_state::State,
-    S::Value: container_id_state::IsSet,
+    St: container_id_state::State,
+    St::Value: container_id_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ContainerId<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ContainerId<S> {
         ContainerId {
             value: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> ContainerId<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ContainerId<S> {
         ContainerId {
             value: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -589,9 +589,9 @@ pub mod cursor_side_state {
         type Value = Unset;
     }
     ///State transition - sets the `value` field to Set
-    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValue<S> {}
-    impl<S: State> State for SetValue<S> {
+    pub struct SetValue<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetValue<St> {}
+    impl<St: State> State for SetValue<St> {
         type Value = Set<members::value>;
     }
     /// Marker types for field names
@@ -602,67 +602,67 @@ pub mod cursor_side_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct CursorSideBuilder<'a, S: cursor_side_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct CursorSideBuilder<S: BosStr, St: cursor_side_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> CursorSide<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> CursorSideBuilder<'a, cursor_side_state::Empty> {
+impl<S: BosStr> CursorSide<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> CursorSideBuilder<S, cursor_side_state::Empty> {
         CursorSideBuilder::new()
     }
 }
 
-impl<'a> CursorSideBuilder<'a, cursor_side_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> CursorSideBuilder<S, cursor_side_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         CursorSideBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CursorSideBuilder<'a, S>
+impl<S: BosStr, St> CursorSideBuilder<S, St>
 where
-    S: cursor_side_state::State,
-    S::Value: cursor_side_state::IsUnset,
+    St: cursor_side_state::State,
+    St::Value: cursor_side_state::IsUnset,
 {
     /// Set the `value` field (required)
     pub fn value(
         mut self,
         value: impl Into<i64>,
-    ) -> CursorSideBuilder<'a, cursor_side_state::SetValue<S>> {
+    ) -> CursorSideBuilder<S, cursor_side_state::SetValue<St>> {
         self._fields.0 = Option::Some(value.into());
         CursorSideBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CursorSideBuilder<'a, S>
+impl<S: BosStr, St> CursorSideBuilder<S, St>
 where
-    S: cursor_side_state::State,
-    S::Value: cursor_side_state::IsSet,
+    St: cursor_side_state::State,
+    St::Value: cursor_side_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> CursorSide<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> CursorSide<S> {
         CursorSide {
             value: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> CursorSide<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> CursorSide<S> {
         CursorSide {
             value: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -680,116 +680,116 @@ pub mod id_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Peer;
         type Counter;
+        type Peer;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Peer = Unset;
         type Counter = Unset;
-    }
-    ///State transition - sets the `peer` field to Set
-    pub struct SetPeer<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPeer<S> {}
-    impl<S: State> State for SetPeer<S> {
-        type Peer = Set<members::peer>;
-        type Counter = S::Counter;
+        type Peer = Unset;
     }
     ///State transition - sets the `counter` field to Set
-    pub struct SetCounter<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCounter<S> {}
-    impl<S: State> State for SetCounter<S> {
-        type Peer = S::Peer;
+    pub struct SetCounter<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCounter<St> {}
+    impl<St: State> State for SetCounter<St> {
         type Counter = Set<members::counter>;
+        type Peer = St::Peer;
+    }
+    ///State transition - sets the `peer` field to Set
+    pub struct SetPeer<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPeer<St> {}
+    impl<St: State> State for SetPeer<St> {
+        type Counter = St::Counter;
+        type Peer = Set<members::peer>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `peer` field
-        pub struct peer(());
         ///Marker type for the `counter` field
         pub struct counter(());
+        ///Marker type for the `peer` field
+        pub struct peer(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct IdBuilder<'a, S: id_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct IdBuilder<S: BosStr, St: id_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<i64>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Id<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> IdBuilder<'a, id_state::Empty> {
+impl<S: BosStr> Id<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> IdBuilder<S, id_state::Empty> {
         IdBuilder::new()
     }
 }
 
-impl<'a> IdBuilder<'a, id_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> IdBuilder<S, id_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         IdBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> IdBuilder<'a, S>
+impl<S: BosStr, St> IdBuilder<S, St>
 where
-    S: id_state::State,
-    S::Counter: id_state::IsUnset,
+    St: id_state::State,
+    St::Counter: id_state::IsUnset,
 {
     /// Set the `counter` field (required)
     pub fn counter(
         mut self,
         value: impl Into<i64>,
-    ) -> IdBuilder<'a, id_state::SetCounter<S>> {
+    ) -> IdBuilder<S, id_state::SetCounter<St>> {
         self._fields.0 = Option::Some(value.into());
         IdBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> IdBuilder<'a, S>
+impl<S: BosStr, St> IdBuilder<S, St>
 where
-    S: id_state::State,
-    S::Peer: id_state::IsUnset,
+    St: id_state::State,
+    St::Peer: id_state::IsUnset,
 {
     /// Set the `peer` field (required)
-    pub fn peer(mut self, value: impl Into<i64>) -> IdBuilder<'a, id_state::SetPeer<S>> {
+    pub fn peer(mut self, value: impl Into<i64>) -> IdBuilder<S, id_state::SetPeer<St>> {
         self._fields.1 = Option::Some(value.into());
         IdBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> IdBuilder<'a, S>
+impl<S: BosStr, St> IdBuilder<S, St>
 where
-    S: id_state::State,
-    S::Peer: id_state::IsSet,
-    S::Counter: id_state::IsSet,
+    St: id_state::State,
+    St::Counter: id_state::IsSet,
+    St::Peer: id_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Id<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Id<S> {
         Id {
             counter: self._fields.0.unwrap(),
             peer: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Id<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Id<S> {
         Id {
             counter: self._fields.0.unwrap(),
             peer: self._fields.1.unwrap(),
@@ -819,17 +819,17 @@ pub mod cursor_state {
         type Container = Unset;
     }
     ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
+    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetId<St> {}
+    impl<St: State> State for SetId<St> {
         type Id = Set<members::id>;
-        type Container = S::Container;
+        type Container = St::Container;
     }
     ///State transition - sets the `container` field to Set
-    pub struct SetContainer<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContainer<S> {}
-    impl<S: State> State for SetContainer<S> {
-        type Id = S::Id;
+    pub struct SetContainer<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetContainer<St> {}
+    impl<St: State> State for SetContainer<St> {
+        type Id = St::Id;
         type Container = Set<members::container>;
     }
     /// Marker types for field names
@@ -842,74 +842,74 @@ pub mod cursor_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct CursorBuilder<'a, S: cursor_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct CursorBuilder<S: BosStr, St: cursor_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<cursor::ContainerId<S>>,
         Option<cursor::Id<S>>,
         Option<cursor::CursorSide<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Cursor<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> CursorBuilder<'a, cursor_state::Empty> {
+impl<S: BosStr> Cursor<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> CursorBuilder<S, cursor_state::Empty> {
         CursorBuilder::new()
     }
 }
 
-impl<'a> CursorBuilder<'a, cursor_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> CursorBuilder<S, cursor_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         CursorBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CursorBuilder<'a, S>
+impl<S: BosStr, St> CursorBuilder<S, St>
 where
-    S: cursor_state::State,
-    S::Container: cursor_state::IsUnset,
+    St: cursor_state::State,
+    St::Container: cursor_state::IsUnset,
 {
     /// Set the `container` field (required)
     pub fn container(
         mut self,
         value: impl Into<cursor::ContainerId<S>>,
-    ) -> CursorBuilder<'a, cursor_state::SetContainer<S>> {
+    ) -> CursorBuilder<S, cursor_state::SetContainer<St>> {
         self._fields.0 = Option::Some(value.into());
         CursorBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CursorBuilder<'a, S>
+impl<S: BosStr, St> CursorBuilder<S, St>
 where
-    S: cursor_state::State,
-    S::Id: cursor_state::IsUnset,
+    St: cursor_state::State,
+    St::Id: cursor_state::IsUnset,
 {
     /// Set the `id` field (required)
     pub fn id(
         mut self,
         value: impl Into<cursor::Id<S>>,
-    ) -> CursorBuilder<'a, cursor_state::SetId<S>> {
+    ) -> CursorBuilder<S, cursor_state::SetId<St>> {
         self._fields.1 = Option::Some(value.into());
         CursorBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: cursor_state::State> CursorBuilder<'a, S> {
+impl<S: BosStr, St: cursor_state::State> CursorBuilder<S, St> {
     /// Set the `side` field (optional)
     pub fn side(mut self, value: impl Into<Option<cursor::CursorSide<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -922,14 +922,14 @@ impl<'a, S: cursor_state::State> CursorBuilder<'a, S> {
     }
 }
 
-impl<'a, S> CursorBuilder<'a, S>
+impl<S: BosStr, St> CursorBuilder<S, St>
 where
-    S: cursor_state::State,
-    S::Id: cursor_state::IsSet,
-    S::Container: cursor_state::IsSet,
+    St: cursor_state::State,
+    St::Id: cursor_state::IsSet,
+    St::Container: cursor_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Cursor<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Cursor<S> {
         Cursor {
             container: self._fields.0.unwrap(),
             id: self._fields.1.unwrap(),
@@ -937,8 +937,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Cursor<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Cursor<S> {
         Cursor {
             container: self._fields.0.unwrap(),
             id: self._fields.1.unwrap(),
@@ -971,27 +971,27 @@ pub mod normal_container_id_state {
         type Peer = Unset;
     }
     ///State transition - sets the `container_type` field to Set
-    pub struct SetContainerType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContainerType<S> {}
-    impl<S: State> State for SetContainerType<S> {
+    pub struct SetContainerType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetContainerType<St> {}
+    impl<St: State> State for SetContainerType<St> {
         type ContainerType = Set<members::container_type>;
-        type Counter = S::Counter;
-        type Peer = S::Peer;
+        type Counter = St::Counter;
+        type Peer = St::Peer;
     }
     ///State transition - sets the `counter` field to Set
-    pub struct SetCounter<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCounter<S> {}
-    impl<S: State> State for SetCounter<S> {
-        type ContainerType = S::ContainerType;
+    pub struct SetCounter<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCounter<St> {}
+    impl<St: State> State for SetCounter<St> {
+        type ContainerType = St::ContainerType;
         type Counter = Set<members::counter>;
-        type Peer = S::Peer;
+        type Peer = St::Peer;
     }
     ///State transition - sets the `peer` field to Set
-    pub struct SetPeer<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPeer<S> {}
-    impl<S: State> State for SetPeer<S> {
-        type ContainerType = S::ContainerType;
-        type Counter = S::Counter;
+    pub struct SetPeer<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPeer<St> {}
+    impl<St: State> State for SetPeer<St> {
+        type ContainerType = St::ContainerType;
+        type Counter = St::Counter;
         type Peer = Set<members::peer>;
     }
     /// Marker types for field names
@@ -1006,97 +1006,97 @@ pub mod normal_container_id_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct NormalContainerIdBuilder<'a, S: normal_container_id_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct NormalContainerIdBuilder<S: BosStr, St: normal_container_id_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>, Option<i64>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> NormalContainerId<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> NormalContainerIdBuilder<'a, normal_container_id_state::Empty> {
+impl<S: BosStr> NormalContainerId<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> NormalContainerIdBuilder<S, normal_container_id_state::Empty> {
         NormalContainerIdBuilder::new()
     }
 }
 
-impl<'a> NormalContainerIdBuilder<'a, normal_container_id_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> NormalContainerIdBuilder<S, normal_container_id_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         NormalContainerIdBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> NormalContainerIdBuilder<'a, S>
+impl<S: BosStr, St> NormalContainerIdBuilder<S, St>
 where
-    S: normal_container_id_state::State,
-    S::ContainerType: normal_container_id_state::IsUnset,
+    St: normal_container_id_state::State,
+    St::ContainerType: normal_container_id_state::IsUnset,
 {
     /// Set the `container_type` field (required)
     pub fn container_type(
         mut self,
         value: impl Into<S>,
-    ) -> NormalContainerIdBuilder<'a, normal_container_id_state::SetContainerType<S>> {
+    ) -> NormalContainerIdBuilder<S, normal_container_id_state::SetContainerType<St>> {
         self._fields.0 = Option::Some(value.into());
         NormalContainerIdBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> NormalContainerIdBuilder<'a, S>
+impl<S: BosStr, St> NormalContainerIdBuilder<S, St>
 where
-    S: normal_container_id_state::State,
-    S::Counter: normal_container_id_state::IsUnset,
+    St: normal_container_id_state::State,
+    St::Counter: normal_container_id_state::IsUnset,
 {
     /// Set the `counter` field (required)
     pub fn counter(
         mut self,
         value: impl Into<i64>,
-    ) -> NormalContainerIdBuilder<'a, normal_container_id_state::SetCounter<S>> {
+    ) -> NormalContainerIdBuilder<S, normal_container_id_state::SetCounter<St>> {
         self._fields.1 = Option::Some(value.into());
         NormalContainerIdBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> NormalContainerIdBuilder<'a, S>
+impl<S: BosStr, St> NormalContainerIdBuilder<S, St>
 where
-    S: normal_container_id_state::State,
-    S::Peer: normal_container_id_state::IsUnset,
+    St: normal_container_id_state::State,
+    St::Peer: normal_container_id_state::IsUnset,
 {
     /// Set the `peer` field (required)
     pub fn peer(
         mut self,
         value: impl Into<i64>,
-    ) -> NormalContainerIdBuilder<'a, normal_container_id_state::SetPeer<S>> {
+    ) -> NormalContainerIdBuilder<S, normal_container_id_state::SetPeer<St>> {
         self._fields.2 = Option::Some(value.into());
         NormalContainerIdBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> NormalContainerIdBuilder<'a, S>
+impl<S: BosStr, St> NormalContainerIdBuilder<S, St>
 where
-    S: normal_container_id_state::State,
-    S::ContainerType: normal_container_id_state::IsSet,
-    S::Counter: normal_container_id_state::IsSet,
-    S::Peer: normal_container_id_state::IsSet,
+    St: normal_container_id_state::State,
+    St::ContainerType: normal_container_id_state::IsSet,
+    St::Counter: normal_container_id_state::IsSet,
+    St::Peer: normal_container_id_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> NormalContainerId<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> NormalContainerId<S> {
         NormalContainerId {
             container_type: self._fields.0.unwrap(),
             counter: self._fields.1.unwrap(),
@@ -1104,11 +1104,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> NormalContainerId<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> NormalContainerId<S> {
         NormalContainerId {
             container_type: self._fields.0.unwrap(),
             counter: self._fields.1.unwrap(),

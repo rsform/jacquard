@@ -6,22 +6,26 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[allow(unused_imports)]
+use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct PreviousParams<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct PreviousParams<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub player_id: Option<S>,
 }
 
@@ -34,7 +38,7 @@ pub struct PreviousResponse;
 impl jacquard_common::xrpc::XrpcResp for PreviousResponse {
     const NSID: &'static str = "app.rocksky.player.previous";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ();
+    type Output<S: BosStr> = ();
     type Err = jacquard_common::xrpc::GenericError;
 }
 
@@ -53,7 +57,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for PreviousRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = Previous;
+    type Request<S: BosStr> = Previous;
     type Response = PreviousResponse;
 }
 
@@ -76,32 +80,32 @@ pub mod previous_params_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct PreviousParamsBuilder<'a, S: previous_params_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct PreviousParamsBuilder<S: BosStr, St: previous_params_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> PreviousParams<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> PreviousParamsBuilder<'a, previous_params_state::Empty> {
+impl<S: BosStr> PreviousParams<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> PreviousParamsBuilder<S, previous_params_state::Empty> {
         PreviousParamsBuilder::new()
     }
 }
 
-impl<'a> PreviousParamsBuilder<'a, previous_params_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> PreviousParamsBuilder<S, previous_params_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         PreviousParamsBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: previous_params_state::State> PreviousParamsBuilder<'a, S> {
+impl<S: BosStr, St: previous_params_state::State> PreviousParamsBuilder<S, St> {
     /// Set the `playerId` field (optional)
     pub fn player_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -114,12 +118,12 @@ impl<'a, S: previous_params_state::State> PreviousParamsBuilder<'a, S> {
     }
 }
 
-impl<'a, S> PreviousParamsBuilder<'a, S>
+impl<S: BosStr, St> PreviousParamsBuilder<S, St>
 where
-    S: previous_params_state::State,
+    St: previous_params_state::State,
 {
-    /// Build the final struct
-    pub fn build(self) -> PreviousParams<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> PreviousParams<S> {
         PreviousParams {
             player_id: self._fields.0,
         }

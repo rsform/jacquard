@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
     rename = "sh.weaver.collab.accept",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Accept<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Accept<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     ///Reference to the invite record being accepted.
     pub invite: StrongRef<S>,
@@ -56,18 +56,18 @@ pub struct Accept<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct AcceptGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct AcceptGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Accept<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Accept<S> {
+impl<S: BosStr> Accept<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, AcceptRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -80,17 +80,17 @@ pub struct AcceptRecord;
 impl XrpcResp for AcceptRecord {
     const NSID: &'static str = "sh.weaver.collab.accept";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = AcceptGetRecordOutput<S>;
+    type Output<S: BosStr> = AcceptGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<AcceptGetRecordOutput<S>> for Accept<S> {
+impl<S: BosStr> From<AcceptGetRecordOutput<S>> for Accept<S> {
     fn from(output: AcceptGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Accept<S> {
+impl<S: BosStr> Collection for Accept<S> {
     const NSID: &'static str = "sh.weaver.collab.accept";
     type Record = AcceptRecord;
 }
@@ -100,7 +100,7 @@ impl Collection for AcceptRecord {
     type Record = AcceptRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Accept<S> {
+impl<S: BosStr> LexiconSchema for Accept<S> {
     fn nsid() -> &'static str {
         "sh.weaver.collab.accept"
     }
@@ -125,145 +125,145 @@ pub mod accept_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Invite;
-        type Resource;
         type CreatedAt;
+        type Resource;
+        type Invite;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Invite = Unset;
-        type Resource = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `invite` field to Set
-    pub struct SetInvite<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetInvite<S> {}
-    impl<S: State> State for SetInvite<S> {
-        type Invite = Set<members::invite>;
-        type Resource = S::Resource;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `resource` field to Set
-    pub struct SetResource<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetResource<S> {}
-    impl<S: State> State for SetResource<S> {
-        type Invite = S::Invite;
-        type Resource = Set<members::resource>;
-        type CreatedAt = S::CreatedAt;
+        type Resource = Unset;
+        type Invite = Unset;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Invite = S::Invite;
-        type Resource = S::Resource;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
+        type Resource = St::Resource;
+        type Invite = St::Invite;
+    }
+    ///State transition - sets the `resource` field to Set
+    pub struct SetResource<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetResource<St> {}
+    impl<St: State> State for SetResource<St> {
+        type CreatedAt = St::CreatedAt;
+        type Resource = Set<members::resource>;
+        type Invite = St::Invite;
+    }
+    ///State transition - sets the `invite` field to Set
+    pub struct SetInvite<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetInvite<St> {}
+    impl<St: State> State for SetInvite<St> {
+        type CreatedAt = St::CreatedAt;
+        type Resource = St::Resource;
+        type Invite = Set<members::invite>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `invite` field
-        pub struct invite(());
-        ///Marker type for the `resource` field
-        pub struct resource(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `resource` field
+        pub struct resource(());
+        ///Marker type for the `invite` field
+        pub struct invite(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct AcceptBuilder<'a, S: accept_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct AcceptBuilder<S: BosStr, St: accept_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<StrongRef<S>>, Option<AtUri<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Accept<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> AcceptBuilder<'a, accept_state::Empty> {
+impl<S: BosStr> Accept<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> AcceptBuilder<S, accept_state::Empty> {
         AcceptBuilder::new()
     }
 }
 
-impl<'a> AcceptBuilder<'a, accept_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> AcceptBuilder<S, accept_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         AcceptBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AcceptBuilder<'a, S>
+impl<S: BosStr, St> AcceptBuilder<S, St>
 where
-    S: accept_state::State,
-    S::CreatedAt: accept_state::IsUnset,
+    St: accept_state::State,
+    St::CreatedAt: accept_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> AcceptBuilder<'a, accept_state::SetCreatedAt<S>> {
+    ) -> AcceptBuilder<S, accept_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         AcceptBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AcceptBuilder<'a, S>
+impl<S: BosStr, St> AcceptBuilder<S, St>
 where
-    S: accept_state::State,
-    S::Invite: accept_state::IsUnset,
+    St: accept_state::State,
+    St::Invite: accept_state::IsUnset,
 {
     /// Set the `invite` field (required)
     pub fn invite(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> AcceptBuilder<'a, accept_state::SetInvite<S>> {
+    ) -> AcceptBuilder<S, accept_state::SetInvite<St>> {
         self._fields.1 = Option::Some(value.into());
         AcceptBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AcceptBuilder<'a, S>
+impl<S: BosStr, St> AcceptBuilder<S, St>
 where
-    S: accept_state::State,
-    S::Resource: accept_state::IsUnset,
+    St: accept_state::State,
+    St::Resource: accept_state::IsUnset,
 {
     /// Set the `resource` field (required)
     pub fn resource(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> AcceptBuilder<'a, accept_state::SetResource<S>> {
+    ) -> AcceptBuilder<S, accept_state::SetResource<St>> {
         self._fields.2 = Option::Some(value.into());
         AcceptBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AcceptBuilder<'a, S>
+impl<S: BosStr, St> AcceptBuilder<S, St>
 where
-    S: accept_state::State,
-    S::Invite: accept_state::IsSet,
-    S::Resource: accept_state::IsSet,
-    S::CreatedAt: accept_state::IsSet,
+    St: accept_state::State,
+    St::CreatedAt: accept_state::IsSet,
+    St::Resource: accept_state::IsSet,
+    St::Invite: accept_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Accept<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Accept<S> {
         Accept {
             created_at: self._fields.0.unwrap(),
             invite: self._fields.1.unwrap(),
@@ -271,8 +271,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Accept<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Accept<S> {
         Accept {
             created_at: self._fields.0.unwrap(),
             invite: self._fields.1.unwrap(),

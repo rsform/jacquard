@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,11 +34,11 @@ use serde::{Serialize, Deserialize};
     rename = "dev.vielle.guestbook.entry",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Entry<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Entry<S: BosStr = DefaultStr> {
     pub book: AtUri<S>,
     pub contents: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -51,18 +51,18 @@ pub struct Entry<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct EntryGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct EntryGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Entry<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Entry<S> {
+impl<S: BosStr> Entry<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, EntryRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -75,17 +75,17 @@ pub struct EntryRecord;
 impl XrpcResp for EntryRecord {
     const NSID: &'static str = "dev.vielle.guestbook.entry";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = EntryGetRecordOutput<S>;
+    type Output<S: BosStr> = EntryGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<EntryGetRecordOutput<S>> for Entry<S> {
+impl<S: BosStr> From<EntryGetRecordOutput<S>> for Entry<S> {
     fn from(output: EntryGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Entry<S> {
+impl<S: BosStr> Collection for Entry<S> {
     const NSID: &'static str = "dev.vielle.guestbook.entry";
     type Record = EntryRecord;
 }
@@ -95,7 +95,7 @@ impl Collection for EntryRecord {
     type Record = EntryRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Entry<S> {
+impl<S: BosStr> LexiconSchema for Entry<S> {
     fn nsid() -> &'static str {
         "dev.vielle.guestbook.entry"
     }
@@ -120,119 +120,119 @@ pub mod entry_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Book;
         type Contents;
+        type Book;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Book = Unset;
         type Contents = Unset;
-    }
-    ///State transition - sets the `book` field to Set
-    pub struct SetBook<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBook<S> {}
-    impl<S: State> State for SetBook<S> {
-        type Book = Set<members::book>;
-        type Contents = S::Contents;
+        type Book = Unset;
     }
     ///State transition - sets the `contents` field to Set
-    pub struct SetContents<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContents<S> {}
-    impl<S: State> State for SetContents<S> {
-        type Book = S::Book;
+    pub struct SetContents<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetContents<St> {}
+    impl<St: State> State for SetContents<St> {
         type Contents = Set<members::contents>;
+        type Book = St::Book;
+    }
+    ///State transition - sets the `book` field to Set
+    pub struct SetBook<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBook<St> {}
+    impl<St: State> State for SetBook<St> {
+        type Contents = St::Contents;
+        type Book = Set<members::book>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `book` field
-        pub struct book(());
         ///Marker type for the `contents` field
         pub struct contents(());
+        ///Marker type for the `book` field
+        pub struct book(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct EntryBuilder<'a, S: entry_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct EntryBuilder<S: BosStr, St: entry_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Entry<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> EntryBuilder<'a, entry_state::Empty> {
+impl<S: BosStr> Entry<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> EntryBuilder<S, entry_state::Empty> {
         EntryBuilder::new()
     }
 }
 
-impl<'a> EntryBuilder<'a, entry_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> EntryBuilder<S, entry_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         EntryBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> EntryBuilder<'a, S>
+impl<S: BosStr, St> EntryBuilder<S, St>
 where
-    S: entry_state::State,
-    S::Book: entry_state::IsUnset,
+    St: entry_state::State,
+    St::Book: entry_state::IsUnset,
 {
     /// Set the `book` field (required)
     pub fn book(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> EntryBuilder<'a, entry_state::SetBook<S>> {
+    ) -> EntryBuilder<S, entry_state::SetBook<St>> {
         self._fields.0 = Option::Some(value.into());
         EntryBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> EntryBuilder<'a, S>
+impl<S: BosStr, St> EntryBuilder<S, St>
 where
-    S: entry_state::State,
-    S::Contents: entry_state::IsUnset,
+    St: entry_state::State,
+    St::Contents: entry_state::IsUnset,
 {
     /// Set the `contents` field (required)
     pub fn contents(
         mut self,
         value: impl Into<S>,
-    ) -> EntryBuilder<'a, entry_state::SetContents<S>> {
+    ) -> EntryBuilder<S, entry_state::SetContents<St>> {
         self._fields.1 = Option::Some(value.into());
         EntryBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> EntryBuilder<'a, S>
+impl<S: BosStr, St> EntryBuilder<S, St>
 where
-    S: entry_state::State,
-    S::Book: entry_state::IsSet,
-    S::Contents: entry_state::IsSet,
+    St: entry_state::State,
+    St::Contents: entry_state::IsSet,
+    St::Book: entry_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Entry<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Entry<S> {
         Entry {
             book: self._fields.0.unwrap(),
             contents: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Entry<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Entry<S> {
         Entry {
             book: self._fields.0.unwrap(),
             contents: self._fields.1.unwrap(),

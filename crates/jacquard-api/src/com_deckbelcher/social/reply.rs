@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -37,11 +37,11 @@ use crate::com_deckbelcher::richtext::Document;
     rename = "com.deckbelcher.social.reply",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Reply<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Reply<S: BosStr = DefaultStr> {
     ///Rich text content.
     pub content: Document<S>,
     pub created_at: Datetime,
@@ -61,18 +61,18 @@ pub struct Reply<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ReplyGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ReplyGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Reply<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Reply<S> {
+impl<S: BosStr> Reply<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, ReplyRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -85,17 +85,17 @@ pub struct ReplyRecord;
 impl XrpcResp for ReplyRecord {
     const NSID: &'static str = "com.deckbelcher.social.reply";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ReplyGetRecordOutput<S>;
+    type Output<S: BosStr> = ReplyGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<ReplyGetRecordOutput<S>> for Reply<S> {
+impl<S: BosStr> From<ReplyGetRecordOutput<S>> for Reply<S> {
     fn from(output: ReplyGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Reply<S> {
+impl<S: BosStr> Collection for Reply<S> {
     const NSID: &'static str = "com.deckbelcher.social.reply";
     type Record = ReplyRecord;
 }
@@ -105,7 +105,7 @@ impl Collection for ReplyRecord {
     type Record = ReplyRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Reply<S> {
+impl<S: BosStr> LexiconSchema for Reply<S> {
     fn nsid() -> &'static str {
         "com.deckbelcher.social.reply"
     }
@@ -130,73 +130,73 @@ pub mod reply_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Content;
+        type Parent;
         type Root;
         type CreatedAt;
-        type Parent;
-        type Content;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Content = Unset;
+        type Parent = Unset;
         type Root = Unset;
         type CreatedAt = Unset;
-        type Parent = Unset;
-        type Content = Unset;
-    }
-    ///State transition - sets the `root` field to Set
-    pub struct SetRoot<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRoot<S> {}
-    impl<S: State> State for SetRoot<S> {
-        type Root = Set<members::root>;
-        type CreatedAt = S::CreatedAt;
-        type Parent = S::Parent;
-        type Content = S::Content;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Root = S::Root;
-        type CreatedAt = Set<members::created_at>;
-        type Parent = S::Parent;
-        type Content = S::Content;
-    }
-    ///State transition - sets the `parent` field to Set
-    pub struct SetParent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetParent<S> {}
-    impl<S: State> State for SetParent<S> {
-        type Root = S::Root;
-        type CreatedAt = S::CreatedAt;
-        type Parent = Set<members::parent>;
-        type Content = S::Content;
     }
     ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type Root = S::Root;
-        type CreatedAt = S::CreatedAt;
-        type Parent = S::Parent;
+    pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetContent<St> {}
+    impl<St: State> State for SetContent<St> {
         type Content = Set<members::content>;
+        type Parent = St::Parent;
+        type Root = St::Root;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `parent` field to Set
+    pub struct SetParent<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetParent<St> {}
+    impl<St: State> State for SetParent<St> {
+        type Content = St::Content;
+        type Parent = Set<members::parent>;
+        type Root = St::Root;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `root` field to Set
+    pub struct SetRoot<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRoot<St> {}
+    impl<St: State> State for SetRoot<St> {
+        type Content = St::Content;
+        type Parent = St::Parent;
+        type Root = Set<members::root>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Content = St::Content;
+        type Parent = St::Parent;
+        type Root = St::Root;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `content` field
+        pub struct content(());
+        ///Marker type for the `parent` field
+        pub struct parent(());
         ///Marker type for the `root` field
         pub struct root(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `parent` field
-        pub struct parent(());
-        ///Marker type for the `content` field
-        pub struct content(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ReplyBuilder<'a, S: reply_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ReplyBuilder<S: BosStr, St: reply_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Document<S>>,
         Option<Datetime>,
@@ -204,104 +204,104 @@ pub struct ReplyBuilder<'a, S: reply_state::State> {
         Option<StrongRef<S>>,
         Option<Datetime>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Reply<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ReplyBuilder<'a, reply_state::Empty> {
+impl<S: BosStr> Reply<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ReplyBuilder<S, reply_state::Empty> {
         ReplyBuilder::new()
     }
 }
 
-impl<'a> ReplyBuilder<'a, reply_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ReplyBuilder<S, reply_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ReplyBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ReplyBuilder<'a, S>
+impl<S: BosStr, St> ReplyBuilder<S, St>
 where
-    S: reply_state::State,
-    S::Content: reply_state::IsUnset,
+    St: reply_state::State,
+    St::Content: reply_state::IsUnset,
 {
     /// Set the `content` field (required)
     pub fn content(
         mut self,
         value: impl Into<Document<S>>,
-    ) -> ReplyBuilder<'a, reply_state::SetContent<S>> {
+    ) -> ReplyBuilder<S, reply_state::SetContent<St>> {
         self._fields.0 = Option::Some(value.into());
         ReplyBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ReplyBuilder<'a, S>
+impl<S: BosStr, St> ReplyBuilder<S, St>
 where
-    S: reply_state::State,
-    S::CreatedAt: reply_state::IsUnset,
+    St: reply_state::State,
+    St::CreatedAt: reply_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ReplyBuilder<'a, reply_state::SetCreatedAt<S>> {
+    ) -> ReplyBuilder<S, reply_state::SetCreatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         ReplyBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ReplyBuilder<'a, S>
+impl<S: BosStr, St> ReplyBuilder<S, St>
 where
-    S: reply_state::State,
-    S::Parent: reply_state::IsUnset,
+    St: reply_state::State,
+    St::Parent: reply_state::IsUnset,
 {
     /// Set the `parent` field (required)
     pub fn parent(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> ReplyBuilder<'a, reply_state::SetParent<S>> {
+    ) -> ReplyBuilder<S, reply_state::SetParent<St>> {
         self._fields.2 = Option::Some(value.into());
         ReplyBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ReplyBuilder<'a, S>
+impl<S: BosStr, St> ReplyBuilder<S, St>
 where
-    S: reply_state::State,
-    S::Root: reply_state::IsUnset,
+    St: reply_state::State,
+    St::Root: reply_state::IsUnset,
 {
     /// Set the `root` field (required)
     pub fn root(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> ReplyBuilder<'a, reply_state::SetRoot<S>> {
+    ) -> ReplyBuilder<S, reply_state::SetRoot<St>> {
         self._fields.3 = Option::Some(value.into());
         ReplyBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: reply_state::State> ReplyBuilder<'a, S> {
+impl<S: BosStr, St: reply_state::State> ReplyBuilder<S, St> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.4 = value.into();
@@ -314,16 +314,16 @@ impl<'a, S: reply_state::State> ReplyBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ReplyBuilder<'a, S>
+impl<S: BosStr, St> ReplyBuilder<S, St>
 where
-    S: reply_state::State,
-    S::Root: reply_state::IsSet,
-    S::CreatedAt: reply_state::IsSet,
-    S::Parent: reply_state::IsSet,
-    S::Content: reply_state::IsSet,
+    St: reply_state::State,
+    St::Content: reply_state::IsSet,
+    St::Parent: reply_state::IsSet,
+    St::Root: reply_state::IsSet,
+    St::CreatedAt: reply_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Reply<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Reply<S> {
         Reply {
             content: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
@@ -333,8 +333,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Reply<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Reply<S> {
         Reply {
             content: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),

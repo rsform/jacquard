@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
 
 #[allow(unused_imports)]
@@ -36,11 +36,11 @@ use serde::{Serialize, Deserialize};
     rename = "sh.tangled.repo.artifact",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Artifact<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Artifact<S: BosStr = DefaultStr> {
     ///the artifact
     pub artifact: BlobRef<S>,
     ///time of creation of this artifact
@@ -62,18 +62,18 @@ pub struct Artifact<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ArtifactGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ArtifactGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Artifact<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Artifact<S> {
+impl<S: BosStr> Artifact<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, ArtifactRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -86,17 +86,17 @@ pub struct ArtifactRecord;
 impl XrpcResp for ArtifactRecord {
     const NSID: &'static str = "sh.tangled.repo.artifact";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ArtifactGetRecordOutput<S>;
+    type Output<S: BosStr> = ArtifactGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<ArtifactGetRecordOutput<S>> for Artifact<S> {
+impl<S: BosStr> From<ArtifactGetRecordOutput<S>> for Artifact<S> {
     fn from(output: ArtifactGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Artifact<S> {
+impl<S: BosStr> Collection for Artifact<S> {
     const NSID: &'static str = "sh.tangled.repo.artifact";
     type Record = ArtifactRecord;
 }
@@ -106,7 +106,7 @@ impl Collection for ArtifactRecord {
     type Record = ArtifactRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Artifact<S> {
+impl<S: BosStr> LexiconSchema for Artifact<S> {
     fn nsid() -> &'static str {
         "sh.tangled.repo.artifact"
     }
@@ -172,90 +172,90 @@ pub mod artifact_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Repo;
-        type CreatedAt;
-        type Artifact;
         type Tag;
         type Name;
+        type CreatedAt;
+        type Artifact;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Repo = Unset;
-        type CreatedAt = Unset;
-        type Artifact = Unset;
         type Tag = Unset;
         type Name = Unset;
+        type CreatedAt = Unset;
+        type Artifact = Unset;
     }
     ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
+    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRepo<St> {}
+    impl<St: State> State for SetRepo<St> {
         type Repo = Set<members::repo>;
-        type CreatedAt = S::CreatedAt;
-        type Artifact = S::Artifact;
-        type Tag = S::Tag;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Repo = S::Repo;
-        type CreatedAt = Set<members::created_at>;
-        type Artifact = S::Artifact;
-        type Tag = S::Tag;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `artifact` field to Set
-    pub struct SetArtifact<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetArtifact<S> {}
-    impl<S: State> State for SetArtifact<S> {
-        type Repo = S::Repo;
-        type CreatedAt = S::CreatedAt;
-        type Artifact = Set<members::artifact>;
-        type Tag = S::Tag;
-        type Name = S::Name;
+        type Tag = St::Tag;
+        type Name = St::Name;
+        type CreatedAt = St::CreatedAt;
+        type Artifact = St::Artifact;
     }
     ///State transition - sets the `tag` field to Set
-    pub struct SetTag<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTag<S> {}
-    impl<S: State> State for SetTag<S> {
-        type Repo = S::Repo;
-        type CreatedAt = S::CreatedAt;
-        type Artifact = S::Artifact;
+    pub struct SetTag<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTag<St> {}
+    impl<St: State> State for SetTag<St> {
+        type Repo = St::Repo;
         type Tag = Set<members::tag>;
-        type Name = S::Name;
+        type Name = St::Name;
+        type CreatedAt = St::CreatedAt;
+        type Artifact = St::Artifact;
     }
     ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Repo = S::Repo;
-        type CreatedAt = S::CreatedAt;
-        type Artifact = S::Artifact;
-        type Tag = S::Tag;
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Repo = St::Repo;
+        type Tag = St::Tag;
         type Name = Set<members::name>;
+        type CreatedAt = St::CreatedAt;
+        type Artifact = St::Artifact;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Repo = St::Repo;
+        type Tag = St::Tag;
+        type Name = St::Name;
+        type CreatedAt = Set<members::created_at>;
+        type Artifact = St::Artifact;
+    }
+    ///State transition - sets the `artifact` field to Set
+    pub struct SetArtifact<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetArtifact<St> {}
+    impl<St: State> State for SetArtifact<St> {
+        type Repo = St::Repo;
+        type Tag = St::Tag;
+        type Name = St::Name;
+        type CreatedAt = St::CreatedAt;
+        type Artifact = Set<members::artifact>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `repo` field
         pub struct repo(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `artifact` field
-        pub struct artifact(());
         ///Marker type for the `tag` field
         pub struct tag(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `artifact` field
+        pub struct artifact(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ArtifactBuilder<'a, S: artifact_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ArtifactBuilder<S: BosStr, St: artifact_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<BlobRef<S>>,
         Option<Datetime>,
@@ -263,133 +263,133 @@ pub struct ArtifactBuilder<'a, S: artifact_state::State> {
         Option<AtUri<S>>,
         Option<Bytes>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Artifact<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ArtifactBuilder<'a, artifact_state::Empty> {
+impl<S: BosStr> Artifact<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ArtifactBuilder<S, artifact_state::Empty> {
         ArtifactBuilder::new()
     }
 }
 
-impl<'a> ArtifactBuilder<'a, artifact_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ArtifactBuilder<S, artifact_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ArtifactBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ArtifactBuilder<'a, S>
+impl<S: BosStr, St> ArtifactBuilder<S, St>
 where
-    S: artifact_state::State,
-    S::Artifact: artifact_state::IsUnset,
+    St: artifact_state::State,
+    St::Artifact: artifact_state::IsUnset,
 {
     /// Set the `artifact` field (required)
     pub fn artifact(
         mut self,
         value: impl Into<BlobRef<S>>,
-    ) -> ArtifactBuilder<'a, artifact_state::SetArtifact<S>> {
+    ) -> ArtifactBuilder<S, artifact_state::SetArtifact<St>> {
         self._fields.0 = Option::Some(value.into());
         ArtifactBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ArtifactBuilder<'a, S>
+impl<S: BosStr, St> ArtifactBuilder<S, St>
 where
-    S: artifact_state::State,
-    S::CreatedAt: artifact_state::IsUnset,
+    St: artifact_state::State,
+    St::CreatedAt: artifact_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ArtifactBuilder<'a, artifact_state::SetCreatedAt<S>> {
+    ) -> ArtifactBuilder<S, artifact_state::SetCreatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         ArtifactBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ArtifactBuilder<'a, S>
+impl<S: BosStr, St> ArtifactBuilder<S, St>
 where
-    S: artifact_state::State,
-    S::Name: artifact_state::IsUnset,
+    St: artifact_state::State,
+    St::Name: artifact_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> ArtifactBuilder<'a, artifact_state::SetName<S>> {
+    ) -> ArtifactBuilder<S, artifact_state::SetName<St>> {
         self._fields.2 = Option::Some(value.into());
         ArtifactBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ArtifactBuilder<'a, S>
+impl<S: BosStr, St> ArtifactBuilder<S, St>
 where
-    S: artifact_state::State,
-    S::Repo: artifact_state::IsUnset,
+    St: artifact_state::State,
+    St::Repo: artifact_state::IsUnset,
 {
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> ArtifactBuilder<'a, artifact_state::SetRepo<S>> {
+    ) -> ArtifactBuilder<S, artifact_state::SetRepo<St>> {
         self._fields.3 = Option::Some(value.into());
         ArtifactBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ArtifactBuilder<'a, S>
+impl<S: BosStr, St> ArtifactBuilder<S, St>
 where
-    S: artifact_state::State,
-    S::Tag: artifact_state::IsUnset,
+    St: artifact_state::State,
+    St::Tag: artifact_state::IsUnset,
 {
     /// Set the `tag` field (required)
     pub fn tag(
         mut self,
         value: impl Into<Bytes>,
-    ) -> ArtifactBuilder<'a, artifact_state::SetTag<S>> {
+    ) -> ArtifactBuilder<S, artifact_state::SetTag<St>> {
         self._fields.4 = Option::Some(value.into());
         ArtifactBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ArtifactBuilder<'a, S>
+impl<S: BosStr, St> ArtifactBuilder<S, St>
 where
-    S: artifact_state::State,
-    S::Repo: artifact_state::IsSet,
-    S::CreatedAt: artifact_state::IsSet,
-    S::Artifact: artifact_state::IsSet,
-    S::Tag: artifact_state::IsSet,
-    S::Name: artifact_state::IsSet,
+    St: artifact_state::State,
+    St::Repo: artifact_state::IsSet,
+    St::Tag: artifact_state::IsSet,
+    St::Name: artifact_state::IsSet,
+    St::CreatedAt: artifact_state::IsSet,
+    St::Artifact: artifact_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Artifact<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Artifact<S> {
         Artifact {
             artifact: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
@@ -399,11 +399,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Artifact<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Artifact<S> {
         Artifact {
             artifact: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),

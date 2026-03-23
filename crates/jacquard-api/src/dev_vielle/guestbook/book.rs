@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,11 +34,11 @@ use serde::{Serialize, Deserialize};
     rename = "dev.vielle.guestbook.book",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Book<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Book<S: BosStr = DefaultStr> {
     pub site: UriValue<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub title: Option<S>,
@@ -52,18 +52,18 @@ pub struct Book<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct BookGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct BookGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Book<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Book<S> {
+impl<S: BosStr> Book<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, BookRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -76,17 +76,17 @@ pub struct BookRecord;
 impl XrpcResp for BookRecord {
     const NSID: &'static str = "dev.vielle.guestbook.book";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = BookGetRecordOutput<S>;
+    type Output<S: BosStr> = BookGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<BookGetRecordOutput<S>> for Book<S> {
+impl<S: BosStr> From<BookGetRecordOutput<S>> for Book<S> {
     fn from(output: BookGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Book<S> {
+impl<S: BosStr> Collection for Book<S> {
     const NSID: &'static str = "dev.vielle.guestbook.book";
     type Record = BookRecord;
 }
@@ -96,7 +96,7 @@ impl Collection for BookRecord {
     type Record = BookRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Book<S> {
+impl<S: BosStr> LexiconSchema for Book<S> {
     fn nsid() -> &'static str {
         "dev.vielle.guestbook.book"
     }
@@ -130,9 +130,9 @@ pub mod book_state {
         type Site = Unset;
     }
     ///State transition - sets the `site` field to Set
-    pub struct SetSite<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSite<S> {}
-    impl<S: State> State for SetSite<S> {
+    pub struct SetSite<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSite<St> {}
+    impl<St: State> State for SetSite<St> {
         type Site = Set<members::site>;
     }
     /// Marker types for field names
@@ -143,51 +143,51 @@ pub mod book_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct BookBuilder<'a, S: book_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct BookBuilder<S: BosStr, St: book_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<UriValue<S>>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Book<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> BookBuilder<'a, book_state::Empty> {
+impl<S: BosStr> Book<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> BookBuilder<S, book_state::Empty> {
         BookBuilder::new()
     }
 }
 
-impl<'a> BookBuilder<'a, book_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> BookBuilder<S, book_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         BookBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BookBuilder<'a, S>
+impl<S: BosStr, St> BookBuilder<S, St>
 where
-    S: book_state::State,
-    S::Site: book_state::IsUnset,
+    St: book_state::State,
+    St::Site: book_state::IsUnset,
 {
     /// Set the `site` field (required)
     pub fn site(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> BookBuilder<'a, book_state::SetSite<S>> {
+    ) -> BookBuilder<S, book_state::SetSite<St>> {
         self._fields.0 = Option::Some(value.into());
         BookBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: book_state::State> BookBuilder<'a, S> {
+impl<S: BosStr, St: book_state::State> BookBuilder<S, St> {
     /// Set the `title` field (optional)
     pub fn title(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -200,21 +200,21 @@ impl<'a, S: book_state::State> BookBuilder<'a, S> {
     }
 }
 
-impl<'a, S> BookBuilder<'a, S>
+impl<S: BosStr, St> BookBuilder<S, St>
 where
-    S: book_state::State,
-    S::Site: book_state::IsSet,
+    St: book_state::State,
+    St::Site: book_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Book<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Book<S> {
         Book {
             site: self._fields.0.unwrap(),
             title: self._fields.1,
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Book<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Book<S> {
         Book {
             site: self._fields.0.unwrap(),
             title: self._fields.1,

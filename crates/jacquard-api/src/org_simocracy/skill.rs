@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -37,11 +37,11 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
     rename = "org.simocracy.skill",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Skill<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Skill<S: BosStr = DefaultStr> {
     ///Timestamp when the skill was created
     pub created_at: Datetime,
     ///Short description of what this skill does. Rich text annotations may be provided via descriptionFacets.
@@ -73,18 +73,18 @@ pub struct Skill<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SkillGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SkillGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Skill<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Skill<S> {
+impl<S: BosStr> Skill<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, SkillRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -97,17 +97,17 @@ pub struct SkillRecord;
 impl XrpcResp for SkillRecord {
     const NSID: &'static str = "org.simocracy.skill";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = SkillGetRecordOutput<S>;
+    type Output<S: BosStr> = SkillGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<SkillGetRecordOutput<S>> for Skill<S> {
+impl<S: BosStr> From<SkillGetRecordOutput<S>> for Skill<S> {
     fn from(output: SkillGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Skill<S> {
+impl<S: BosStr> Collection for Skill<S> {
     const NSID: &'static str = "org.simocracy.skill";
     type Record = SkillRecord;
 }
@@ -117,7 +117,7 @@ impl Collection for SkillRecord {
     type Record = SkillRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Skill<S> {
+impl<S: BosStr> LexiconSchema for Skill<S> {
     fn nsid() -> &'static str {
         "org.simocracy.skill"
     }
@@ -207,57 +207,57 @@ pub mod skill_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Sim;
         type CreatedAt;
         type Name;
+        type Sim;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Sim = Unset;
         type CreatedAt = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `sim` field to Set
-    pub struct SetSim<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSim<S> {}
-    impl<S: State> State for SetSim<S> {
-        type Sim = Set<members::sim>;
-        type CreatedAt = S::CreatedAt;
-        type Name = S::Name;
+        type Sim = Unset;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Sim = S::Sim;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
-        type Name = S::Name;
+        type Name = St::Name;
+        type Sim = St::Sim;
     }
     ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Sim = S::Sim;
-        type CreatedAt = S::CreatedAt;
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type CreatedAt = St::CreatedAt;
         type Name = Set<members::name>;
+        type Sim = St::Sim;
+    }
+    ///State transition - sets the `sim` field to Set
+    pub struct SetSim<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSim<St> {}
+    impl<St: State> State for SetSim<St> {
+        type CreatedAt = St::CreatedAt;
+        type Name = St::Name;
+        type Sim = Set<members::sim>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `sim` field
-        pub struct sim(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `sim` field
+        pub struct sim(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct SkillBuilder<'a, S: skill_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct SkillBuilder<S: BosStr, St: skill_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
         Option<S>,
@@ -268,47 +268,47 @@ pub struct SkillBuilder<'a, S: skill_state::State> {
         Option<StrongRef<S>>,
         Option<Vec<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Skill<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> SkillBuilder<'a, skill_state::Empty> {
+impl<S: BosStr> Skill<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> SkillBuilder<S, skill_state::Empty> {
         SkillBuilder::new()
     }
 }
 
-impl<'a> SkillBuilder<'a, skill_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> SkillBuilder<S, skill_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SkillBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SkillBuilder<'a, S>
+impl<S: BosStr, St> SkillBuilder<S, St>
 where
-    S: skill_state::State,
-    S::CreatedAt: skill_state::IsUnset,
+    St: skill_state::State,
+    St::CreatedAt: skill_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> SkillBuilder<'a, skill_state::SetCreatedAt<S>> {
+    ) -> SkillBuilder<S, skill_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         SkillBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: skill_state::State> SkillBuilder<'a, S> {
+impl<S: BosStr, St: skill_state::State> SkillBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -321,7 +321,7 @@ impl<'a, S: skill_state::State> SkillBuilder<'a, S> {
     }
 }
 
-impl<'a, S: skill_state::State> SkillBuilder<'a, S> {
+impl<S: BosStr, St: skill_state::State> SkillBuilder<S, St> {
     /// Set the `descriptionFacets` field (optional)
     pub fn description_facets(
         mut self,
@@ -337,7 +337,7 @@ impl<'a, S: skill_state::State> SkillBuilder<'a, S> {
     }
 }
 
-impl<'a, S: skill_state::State> SkillBuilder<'a, S> {
+impl<S: BosStr, St: skill_state::State> SkillBuilder<S, St> {
     /// Set the `instructions` field (optional)
     pub fn instructions(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -350,7 +350,7 @@ impl<'a, S: skill_state::State> SkillBuilder<'a, S> {
     }
 }
 
-impl<'a, S: skill_state::State> SkillBuilder<'a, S> {
+impl<S: BosStr, St: skill_state::State> SkillBuilder<S, St> {
     /// Set the `instructionsFacets` field (optional)
     pub fn instructions_facets(
         mut self,
@@ -366,45 +366,45 @@ impl<'a, S: skill_state::State> SkillBuilder<'a, S> {
     }
 }
 
-impl<'a, S> SkillBuilder<'a, S>
+impl<S: BosStr, St> SkillBuilder<S, St>
 where
-    S: skill_state::State,
-    S::Name: skill_state::IsUnset,
+    St: skill_state::State,
+    St::Name: skill_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> SkillBuilder<'a, skill_state::SetName<S>> {
+    ) -> SkillBuilder<S, skill_state::SetName<St>> {
         self._fields.5 = Option::Some(value.into());
         SkillBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SkillBuilder<'a, S>
+impl<S: BosStr, St> SkillBuilder<S, St>
 where
-    S: skill_state::State,
-    S::Sim: skill_state::IsUnset,
+    St: skill_state::State,
+    St::Sim: skill_state::IsUnset,
 {
     /// Set the `sim` field (required)
     pub fn sim(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> SkillBuilder<'a, skill_state::SetSim<S>> {
+    ) -> SkillBuilder<S, skill_state::SetSim<St>> {
         self._fields.6 = Option::Some(value.into());
         SkillBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: skill_state::State> SkillBuilder<'a, S> {
+impl<S: BosStr, St: skill_state::State> SkillBuilder<S, St> {
     /// Set the `triggers` field (optional)
     pub fn triggers(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.7 = value.into();
@@ -417,15 +417,15 @@ impl<'a, S: skill_state::State> SkillBuilder<'a, S> {
     }
 }
 
-impl<'a, S> SkillBuilder<'a, S>
+impl<S: BosStr, St> SkillBuilder<S, St>
 where
-    S: skill_state::State,
-    S::Sim: skill_state::IsSet,
-    S::CreatedAt: skill_state::IsSet,
-    S::Name: skill_state::IsSet,
+    St: skill_state::State,
+    St::CreatedAt: skill_state::IsSet,
+    St::Name: skill_state::IsSet,
+    St::Sim: skill_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Skill<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Skill<S> {
         Skill {
             created_at: self._fields.0.unwrap(),
             description: self._fields.1,
@@ -438,8 +438,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Skill<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Skill<S> {
         Skill {
             created_at: self._fields.0.unwrap(),
             description: self._fields.1,

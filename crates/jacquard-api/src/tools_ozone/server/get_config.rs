@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -27,14 +27,14 @@ use serde::{Serialize, Deserialize};
 use crate::tools_ozone::server::get_config;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetConfigOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetConfigOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub appview: Option<get_config::ServiceConfig<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -48,9 +48,7 @@ pub struct GetConfigOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub verifier_did: Option<Did<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub viewer: Option<get_config::ViewerConfig<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -59,11 +57,11 @@ pub struct GetConfigOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ServiceConfig<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ServiceConfig<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub url: Option<UriValue<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -75,11 +73,11 @@ pub struct ServiceConfig<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ViewerConfig<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ViewerConfig<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub role: Option<ViewerConfigRole<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -88,7 +86,7 @@ pub struct ViewerConfig<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ViewerConfigRole<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ViewerConfigRole<S: BosStr = DefaultStr> {
     RoleAdmin,
     RoleModerator,
     RoleTriage,
@@ -96,7 +94,7 @@ pub enum ViewerConfigRole<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> ViewerConfigRole<S> {
+impl<S: BosStr> ViewerConfigRole<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::RoleAdmin => "tools.ozone.team.defs#roleAdmin",
@@ -118,19 +116,19 @@ impl<S: Bos<str> + AsRef<str>> ViewerConfigRole<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ViewerConfigRole<S> {
+impl<S: BosStr> core::fmt::Display for ViewerConfigRole<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for ViewerConfigRole<S> {
+impl<S: BosStr> AsRef<str> for ViewerConfigRole<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for ViewerConfigRole<S> {
+impl<S: BosStr> Serialize for ViewerConfigRole<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -139,8 +137,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for ViewerConfigRole<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for ViewerConfigRole<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ViewerConfigRole<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -150,14 +147,18 @@ for ViewerConfigRole<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for ViewerConfigRole<S> {
+impl<S: BosStr + Default> Default for ViewerConfigRole<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for ViewerConfigRole<S> {
-    type Output = ViewerConfigRole<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for ViewerConfigRole<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ViewerConfigRole<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             ViewerConfigRole::RoleAdmin => ViewerConfigRole::RoleAdmin,
@@ -178,7 +179,7 @@ pub struct GetConfigResponse;
 impl jacquard_common::xrpc::XrpcResp for GetConfigResponse {
     const NSID: &'static str = "tools.ozone.server.getConfig";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetConfigOutput<S>;
+    type Output<S: BosStr> = GetConfigOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
@@ -193,11 +194,11 @@ pub struct GetConfigRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetConfigRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.server.getConfig";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetConfig;
+    type Request<S: BosStr> = GetConfig;
     type Response = GetConfigResponse;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ServiceConfig<S> {
+impl<S: BosStr> LexiconSchema for ServiceConfig<S> {
     fn nsid() -> &'static str {
         "tools.ozone.server.getConfig"
     }
@@ -212,7 +213,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for ServiceConfig<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ViewerConfig<S> {
+impl<S: BosStr> LexiconSchema for ViewerConfig<S> {
     fn nsid() -> &'static str {
         "tools.ozone.server.getConfig"
     }

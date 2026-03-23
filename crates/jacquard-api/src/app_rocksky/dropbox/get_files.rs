@@ -6,48 +6,44 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[allow(unused_imports)]
+use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::app_rocksky::dropbox::FileListView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetFiles<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetFiles<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub at: Option<S>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetFilesOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetFilesOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
-    #[serde(borrow)]
     pub value: FileListView<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
-    pub extra_data: Option<
-        alloc::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<S>,
-        >,
-    >,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for app.rocksky.dropbox.getFiles
@@ -55,12 +51,11 @@ pub struct GetFilesResponse;
 impl jacquard_common::xrpc::XrpcResp for GetFilesResponse {
     const NSID: &'static str = "app.rocksky.dropbox.getFiles";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetFilesOutput<S>;
+    type Output<S: BosStr> = GetFilesOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetFiles<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetFiles<S> {
     const NSID: &'static str = "app.rocksky.dropbox.getFiles";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetFilesResponse;
@@ -71,7 +66,7 @@ pub struct GetFilesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetFilesRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.dropbox.getFiles";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetFiles<S>;
+    type Request<S: BosStr> = GetFiles<S>;
     type Response = GetFilesResponse;
 }
 
@@ -94,32 +89,32 @@ pub mod get_files_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetFilesBuilder<'a, S: get_files_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetFilesBuilder<S: BosStr, St: get_files_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetFiles<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetFilesBuilder<'a, get_files_state::Empty> {
+impl<S: BosStr> GetFiles<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetFilesBuilder<S, get_files_state::Empty> {
         GetFilesBuilder::new()
     }
 }
 
-impl<'a> GetFilesBuilder<'a, get_files_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetFilesBuilder<S, get_files_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetFilesBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: get_files_state::State> GetFilesBuilder<'a, S> {
+impl<S: BosStr, St: get_files_state::State> GetFilesBuilder<S, St> {
     /// Set the `at` field (optional)
     pub fn at(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -132,12 +127,12 @@ impl<'a, S: get_files_state::State> GetFilesBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GetFilesBuilder<'a, S>
+impl<S: BosStr, St> GetFilesBuilder<S, St>
 where
-    S: get_files_state::State,
+    St: get_files_state::State,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetFiles<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetFiles<S> {
         GetFiles { at: self._fields.0 }
     }
 }

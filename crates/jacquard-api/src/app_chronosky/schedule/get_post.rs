@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
@@ -18,32 +18,29 @@ use serde::{Serialize, Deserialize};
 use crate::app_chronosky::schedule::list_posts::ScheduledPost;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetPost<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct GetPost<S: BosStr = DefaultStr> {
     pub id: S,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetPostOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetPostOutput<S: BosStr = DefaultStr> {
     pub post: ScheduledPost<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -94,12 +91,11 @@ pub struct GetPostResponse;
 impl jacquard_common::xrpc::XrpcResp for GetPostResponse {
     const NSID: &'static str = "app.chronosky.schedule.getPost";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetPostOutput<S>;
+    type Output<S: BosStr> = GetPostOutput<S>;
     type Err = GetPostError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetPost<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetPost<S> {
     const NSID: &'static str = "app.chronosky.schedule.getPost";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetPostResponse;
@@ -110,7 +106,7 @@ pub struct GetPostRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetPostRequest {
     const PATH: &'static str = "/xrpc/app.chronosky.schedule.getPost";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetPost<S>;
+    type Request<S: BosStr> = GetPost<S>;
     type Response = GetPostResponse;
 }
 
@@ -133,9 +129,9 @@ pub mod get_post_state {
         type Id = Unset;
     }
     ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
+    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetId<St> {}
+    impl<St: State> State for SetId<St> {
         type Id = Set<members::id>;
     }
     /// Marker types for field names
@@ -146,57 +142,57 @@ pub mod get_post_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetPostBuilder<'a, S: get_post_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetPostBuilder<S: BosStr, St: get_post_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetPost<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetPostBuilder<'a, get_post_state::Empty> {
+impl<S: BosStr> GetPost<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetPostBuilder<S, get_post_state::Empty> {
         GetPostBuilder::new()
     }
 }
 
-impl<'a> GetPostBuilder<'a, get_post_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetPostBuilder<S, get_post_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetPostBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetPostBuilder<'a, S>
+impl<S: BosStr, St> GetPostBuilder<S, St>
 where
-    S: get_post_state::State,
-    S::Id: get_post_state::IsUnset,
+    St: get_post_state::State,
+    St::Id: get_post_state::IsUnset,
 {
     /// Set the `id` field (required)
     pub fn id(
         mut self,
         value: impl Into<S>,
-    ) -> GetPostBuilder<'a, get_post_state::SetId<S>> {
+    ) -> GetPostBuilder<S, get_post_state::SetId<St>> {
         self._fields.0 = Option::Some(value.into());
         GetPostBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetPostBuilder<'a, S>
+impl<S: BosStr, St> GetPostBuilder<S, St>
 where
-    S: get_post_state::State,
-    S::Id: get_post_state::IsSet,
+    St: get_post_state::State,
+    St::Id: get_post_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetPost<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetPost<S> {
         GetPost {
             id: self._fields.0.unwrap(),
         }

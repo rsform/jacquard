@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -30,11 +30,11 @@ use crate::app_offprint::block::bullet_list;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ListItem<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ListItem<S: BosStr = DefaultStr> {
     ///Nested list items
     #[serde(skip_serializing_if = "Option::is_none")]
     pub children: Option<Vec<bullet_list::ListItem<S>>>,
@@ -49,18 +49,18 @@ pub struct ListItem<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct BulletList<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct BulletList<S: BosStr = DefaultStr> {
     ///List items
     pub children: Vec<bullet_list::ListItem<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ListItem<S> {
+impl<S: BosStr> LexiconSchema for ListItem<S> {
     fn nsid() -> &'static str {
         "app.offprint.block.bulletList"
     }
@@ -75,7 +75,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for ListItem<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for BulletList<S> {
+impl<S: BosStr> LexiconSchema for BulletList<S> {
     fn nsid() -> &'static str {
         "app.offprint.block.bulletList"
     }
@@ -109,9 +109,9 @@ pub mod list_item_state {
         type Content = Unset;
     }
     ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
+    pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetContent<St> {}
+    impl<St: State> State for SetContent<St> {
         type Content = Set<members::content>;
     }
     /// Marker types for field names
@@ -122,32 +122,32 @@ pub mod list_item_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ListItemBuilder<'a, S: list_item_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ListItemBuilder<S: BosStr, St: list_item_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<bullet_list::ListItem<S>>>, Option<Text<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ListItem<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ListItemBuilder<'a, list_item_state::Empty> {
+impl<S: BosStr> ListItem<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ListItemBuilder<S, list_item_state::Empty> {
         ListItemBuilder::new()
     }
 }
 
-impl<'a> ListItemBuilder<'a, list_item_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ListItemBuilder<S, list_item_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ListItemBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: list_item_state::State> ListItemBuilder<'a, S> {
+impl<S: BosStr, St: list_item_state::State> ListItemBuilder<S, St> {
     /// Set the `children` field (optional)
     pub fn children(
         mut self,
@@ -166,43 +166,40 @@ impl<'a, S: list_item_state::State> ListItemBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ListItemBuilder<'a, S>
+impl<S: BosStr, St> ListItemBuilder<S, St>
 where
-    S: list_item_state::State,
-    S::Content: list_item_state::IsUnset,
+    St: list_item_state::State,
+    St::Content: list_item_state::IsUnset,
 {
     /// Set the `content` field (required)
     pub fn content(
         mut self,
         value: impl Into<Text<S>>,
-    ) -> ListItemBuilder<'a, list_item_state::SetContent<S>> {
+    ) -> ListItemBuilder<S, list_item_state::SetContent<St>> {
         self._fields.1 = Option::Some(value.into());
         ListItemBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ListItemBuilder<'a, S>
+impl<S: BosStr, St> ListItemBuilder<S, St>
 where
-    S: list_item_state::State,
-    S::Content: list_item_state::IsSet,
+    St: list_item_state::State,
+    St::Content: list_item_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ListItem<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ListItem<S> {
         ListItem {
             children: self._fields.0,
             content: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> ListItem<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> ListItem<S> {
         ListItem {
             children: self._fields.0,
             content: self._fields.1.unwrap(),
@@ -299,9 +296,9 @@ pub mod bullet_list_state {
         type Children = Unset;
     }
     ///State transition - sets the `children` field to Set
-    pub struct SetChildren<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetChildren<S> {}
-    impl<S: State> State for SetChildren<S> {
+    pub struct SetChildren<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetChildren<St> {}
+    impl<St: State> State for SetChildren<St> {
         type Children = Set<members::children>;
     }
     /// Marker types for field names
@@ -312,67 +309,67 @@ pub mod bullet_list_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct BulletListBuilder<'a, S: bullet_list_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct BulletListBuilder<S: BosStr, St: bullet_list_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<bullet_list::ListItem<S>>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> BulletList<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> BulletListBuilder<'a, bullet_list_state::Empty> {
+impl<S: BosStr> BulletList<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> BulletListBuilder<S, bullet_list_state::Empty> {
         BulletListBuilder::new()
     }
 }
 
-impl<'a> BulletListBuilder<'a, bullet_list_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> BulletListBuilder<S, bullet_list_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         BulletListBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BulletListBuilder<'a, S>
+impl<S: BosStr, St> BulletListBuilder<S, St>
 where
-    S: bullet_list_state::State,
-    S::Children: bullet_list_state::IsUnset,
+    St: bullet_list_state::State,
+    St::Children: bullet_list_state::IsUnset,
 {
     /// Set the `children` field (required)
     pub fn children(
         mut self,
         value: impl Into<Vec<bullet_list::ListItem<S>>>,
-    ) -> BulletListBuilder<'a, bullet_list_state::SetChildren<S>> {
+    ) -> BulletListBuilder<S, bullet_list_state::SetChildren<St>> {
         self._fields.0 = Option::Some(value.into());
         BulletListBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BulletListBuilder<'a, S>
+impl<S: BosStr, St> BulletListBuilder<S, St>
 where
-    S: bullet_list_state::State,
-    S::Children: bullet_list_state::IsSet,
+    St: bullet_list_state::State,
+    St::Children: bullet_list_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> BulletList<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> BulletList<S> {
         BulletList {
             children: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> BulletList<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> BulletList<S> {
         BulletList {
             children: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

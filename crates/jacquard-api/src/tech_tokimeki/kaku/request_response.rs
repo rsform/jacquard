@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
     rename = "tech.tokimeki.kaku.requestResponse",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct RequestResponse<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct RequestResponse<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     ///Optional message to the requester
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -59,18 +59,18 @@ pub struct RequestResponse<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct RequestResponseGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct RequestResponseGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: RequestResponse<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> RequestResponse<S> {
+impl<S: BosStr> RequestResponse<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, RequestResponseRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -83,18 +83,17 @@ pub struct RequestResponseRecord;
 impl XrpcResp for RequestResponseRecord {
     const NSID: &'static str = "tech.tokimeki.kaku.requestResponse";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = RequestResponseGetRecordOutput<S>;
+    type Output<S: BosStr> = RequestResponseGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<RequestResponseGetRecordOutput<S>>
-for RequestResponse<S> {
+impl<S: BosStr> From<RequestResponseGetRecordOutput<S>> for RequestResponse<S> {
     fn from(output: RequestResponseGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for RequestResponse<S> {
+impl<S: BosStr> Collection for RequestResponse<S> {
     const NSID: &'static str = "tech.tokimeki.kaku.requestResponse";
     type Record = RequestResponseRecord;
 }
@@ -104,7 +103,7 @@ impl Collection for RequestResponseRecord {
     type Record = RequestResponseRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for RequestResponse<S> {
+impl<S: BosStr> LexiconSchema for RequestResponse<S> {
     fn nsid() -> &'static str {
         "tech.tokimeki.kaku.requestResponse"
     }
@@ -151,99 +150,99 @@ pub mod request_response_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Request;
         type Post;
+        type Request;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Request = Unset;
         type Post = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Request = S::Request;
-        type Post = S::Post;
-    }
-    ///State transition - sets the `request` field to Set
-    pub struct SetRequest<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRequest<S> {}
-    impl<S: State> State for SetRequest<S> {
-        type CreatedAt = S::CreatedAt;
-        type Request = Set<members::request>;
-        type Post = S::Post;
+        type Request = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `post` field to Set
-    pub struct SetPost<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPost<S> {}
-    impl<S: State> State for SetPost<S> {
-        type CreatedAt = S::CreatedAt;
-        type Request = S::Request;
+    pub struct SetPost<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPost<St> {}
+    impl<St: State> State for SetPost<St> {
         type Post = Set<members::post>;
+        type Request = St::Request;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `request` field to Set
+    pub struct SetRequest<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRequest<St> {}
+    impl<St: State> State for SetRequest<St> {
+        type Post = St::Post;
+        type Request = Set<members::request>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Post = St::Post;
+        type Request = St::Request;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `request` field
-        pub struct request(());
         ///Marker type for the `post` field
         pub struct post(());
+        ///Marker type for the `request` field
+        pub struct request(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct RequestResponseBuilder<'a, S: request_response_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct RequestResponseBuilder<S: BosStr, St: request_response_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<S>, Option<StrongRef<S>>, Option<StrongRef<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> RequestResponse<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> RequestResponseBuilder<'a, request_response_state::Empty> {
+impl<S: BosStr> RequestResponse<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> RequestResponseBuilder<S, request_response_state::Empty> {
         RequestResponseBuilder::new()
     }
 }
 
-impl<'a> RequestResponseBuilder<'a, request_response_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> RequestResponseBuilder<S, request_response_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         RequestResponseBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RequestResponseBuilder<'a, S>
+impl<S: BosStr, St> RequestResponseBuilder<S, St>
 where
-    S: request_response_state::State,
-    S::CreatedAt: request_response_state::IsUnset,
+    St: request_response_state::State,
+    St::CreatedAt: request_response_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> RequestResponseBuilder<'a, request_response_state::SetCreatedAt<S>> {
+    ) -> RequestResponseBuilder<S, request_response_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         RequestResponseBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: request_response_state::State> RequestResponseBuilder<'a, S> {
+impl<S: BosStr, St: request_response_state::State> RequestResponseBuilder<S, St> {
     /// Set the `message` field (optional)
     pub fn message(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -256,53 +255,53 @@ impl<'a, S: request_response_state::State> RequestResponseBuilder<'a, S> {
     }
 }
 
-impl<'a, S> RequestResponseBuilder<'a, S>
+impl<S: BosStr, St> RequestResponseBuilder<S, St>
 where
-    S: request_response_state::State,
-    S::Post: request_response_state::IsUnset,
+    St: request_response_state::State,
+    St::Post: request_response_state::IsUnset,
 {
     /// Set the `post` field (required)
     pub fn post(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> RequestResponseBuilder<'a, request_response_state::SetPost<S>> {
+    ) -> RequestResponseBuilder<S, request_response_state::SetPost<St>> {
         self._fields.2 = Option::Some(value.into());
         RequestResponseBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RequestResponseBuilder<'a, S>
+impl<S: BosStr, St> RequestResponseBuilder<S, St>
 where
-    S: request_response_state::State,
-    S::Request: request_response_state::IsUnset,
+    St: request_response_state::State,
+    St::Request: request_response_state::IsUnset,
 {
     /// Set the `request` field (required)
     pub fn request(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> RequestResponseBuilder<'a, request_response_state::SetRequest<S>> {
+    ) -> RequestResponseBuilder<S, request_response_state::SetRequest<St>> {
         self._fields.3 = Option::Some(value.into());
         RequestResponseBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RequestResponseBuilder<'a, S>
+impl<S: BosStr, St> RequestResponseBuilder<S, St>
 where
-    S: request_response_state::State,
-    S::CreatedAt: request_response_state::IsSet,
-    S::Request: request_response_state::IsSet,
-    S::Post: request_response_state::IsSet,
+    St: request_response_state::State,
+    St::Post: request_response_state::IsSet,
+    St::Request: request_response_state::IsSet,
+    St::CreatedAt: request_response_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> RequestResponse<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> RequestResponse<S> {
         RequestResponse {
             created_at: self._fields.0.unwrap(),
             message: self._fields.1,
@@ -311,11 +310,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> RequestResponse<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> RequestResponse<S> {
         RequestResponse {
             created_at: self._fields.0.unwrap(),
             message: self._fields.1,

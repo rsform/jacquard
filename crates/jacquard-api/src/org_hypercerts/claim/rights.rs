@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -37,11 +37,11 @@ use crate::org_hypercerts::Uri;
     rename = "org.hypercerts.claim.rights",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Rights<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Rights<S: BosStr = DefaultStr> {
     ///An attachment to define the rights further, e.g. a legal document.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub attachment: Option<RightsAttachment<S>>,
@@ -63,11 +63,11 @@ pub struct Rights<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum RightsAttachment<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum RightsAttachment<S: BosStr = DefaultStr> {
     #[serde(rename = "org.hypercerts.defs#uri")]
     Uri(Box<Uri<S>>),
     #[serde(rename = "org.hypercerts.defs#smallBlob")]
@@ -80,18 +80,18 @@ pub enum RightsAttachment<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct RightsGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct RightsGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Rights<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Rights<S> {
+impl<S: BosStr> Rights<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, RightsRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -104,17 +104,17 @@ pub struct RightsRecord;
 impl XrpcResp for RightsRecord {
     const NSID: &'static str = "org.hypercerts.claim.rights";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = RightsGetRecordOutput<S>;
+    type Output<S: BosStr> = RightsGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<RightsGetRecordOutput<S>> for Rights<S> {
+impl<S: BosStr> From<RightsGetRecordOutput<S>> for Rights<S> {
     fn from(output: RightsGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Rights<S> {
+impl<S: BosStr> Collection for Rights<S> {
     const NSID: &'static str = "org.hypercerts.claim.rights";
     type Record = RightsRecord;
 }
@@ -124,7 +124,7 @@ impl Collection for RightsRecord {
     type Record = RightsRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Rights<S> {
+impl<S: BosStr> LexiconSchema for Rights<S> {
     fn nsid() -> &'static str {
         "org.hypercerts.claim.rights"
     }
@@ -195,73 +195,73 @@ pub mod rights_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type RightsName;
         type RightsType;
         type RightsDescription;
-        type RightsName;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type RightsName = Unset;
         type RightsType = Unset;
         type RightsDescription = Unset;
-        type RightsName = Unset;
         type CreatedAt = Unset;
     }
+    ///State transition - sets the `rights_name` field to Set
+    pub struct SetRightsName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRightsName<St> {}
+    impl<St: State> State for SetRightsName<St> {
+        type RightsName = Set<members::rights_name>;
+        type RightsType = St::RightsType;
+        type RightsDescription = St::RightsDescription;
+        type CreatedAt = St::CreatedAt;
+    }
     ///State transition - sets the `rights_type` field to Set
-    pub struct SetRightsType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRightsType<S> {}
-    impl<S: State> State for SetRightsType<S> {
+    pub struct SetRightsType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRightsType<St> {}
+    impl<St: State> State for SetRightsType<St> {
+        type RightsName = St::RightsName;
         type RightsType = Set<members::rights_type>;
-        type RightsDescription = S::RightsDescription;
-        type RightsName = S::RightsName;
-        type CreatedAt = S::CreatedAt;
+        type RightsDescription = St::RightsDescription;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `rights_description` field to Set
-    pub struct SetRightsDescription<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRightsDescription<S> {}
-    impl<S: State> State for SetRightsDescription<S> {
-        type RightsType = S::RightsType;
+    pub struct SetRightsDescription<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRightsDescription<St> {}
+    impl<St: State> State for SetRightsDescription<St> {
+        type RightsName = St::RightsName;
+        type RightsType = St::RightsType;
         type RightsDescription = Set<members::rights_description>;
-        type RightsName = S::RightsName;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `rights_name` field to Set
-    pub struct SetRightsName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRightsName<S> {}
-    impl<S: State> State for SetRightsName<S> {
-        type RightsType = S::RightsType;
-        type RightsDescription = S::RightsDescription;
-        type RightsName = Set<members::rights_name>;
-        type CreatedAt = S::CreatedAt;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type RightsType = S::RightsType;
-        type RightsDescription = S::RightsDescription;
-        type RightsName = S::RightsName;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type RightsName = St::RightsName;
+        type RightsType = St::RightsType;
+        type RightsDescription = St::RightsDescription;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `rights_name` field
+        pub struct rights_name(());
         ///Marker type for the `rights_type` field
         pub struct rights_type(());
         ///Marker type for the `rights_description` field
         pub struct rights_description(());
-        ///Marker type for the `rights_name` field
-        pub struct rights_name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct RightsBuilder<'a, S: rights_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct RightsBuilder<S: BosStr, St: rights_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<RightsAttachment<S>>,
         Option<Datetime>,
@@ -269,28 +269,28 @@ pub struct RightsBuilder<'a, S: rights_state::State> {
         Option<S>,
         Option<S>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Rights<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> RightsBuilder<'a, rights_state::Empty> {
+impl<S: BosStr> Rights<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> RightsBuilder<S, rights_state::Empty> {
         RightsBuilder::new()
     }
 }
 
-impl<'a> RightsBuilder<'a, rights_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> RightsBuilder<S, rights_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         RightsBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: rights_state::State> RightsBuilder<'a, S> {
+impl<S: BosStr, St: rights_state::State> RightsBuilder<S, St> {
     /// Set the `attachment` field (optional)
     pub fn attachment(mut self, value: impl Into<Option<RightsAttachment<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -303,92 +303,92 @@ impl<'a, S: rights_state::State> RightsBuilder<'a, S> {
     }
 }
 
-impl<'a, S> RightsBuilder<'a, S>
+impl<S: BosStr, St> RightsBuilder<S, St>
 where
-    S: rights_state::State,
-    S::CreatedAt: rights_state::IsUnset,
+    St: rights_state::State,
+    St::CreatedAt: rights_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> RightsBuilder<'a, rights_state::SetCreatedAt<S>> {
+    ) -> RightsBuilder<S, rights_state::SetCreatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         RightsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RightsBuilder<'a, S>
+impl<S: BosStr, St> RightsBuilder<S, St>
 where
-    S: rights_state::State,
-    S::RightsDescription: rights_state::IsUnset,
+    St: rights_state::State,
+    St::RightsDescription: rights_state::IsUnset,
 {
     /// Set the `rightsDescription` field (required)
     pub fn rights_description(
         mut self,
         value: impl Into<S>,
-    ) -> RightsBuilder<'a, rights_state::SetRightsDescription<S>> {
+    ) -> RightsBuilder<S, rights_state::SetRightsDescription<St>> {
         self._fields.2 = Option::Some(value.into());
         RightsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RightsBuilder<'a, S>
+impl<S: BosStr, St> RightsBuilder<S, St>
 where
-    S: rights_state::State,
-    S::RightsName: rights_state::IsUnset,
+    St: rights_state::State,
+    St::RightsName: rights_state::IsUnset,
 {
     /// Set the `rightsName` field (required)
     pub fn rights_name(
         mut self,
         value: impl Into<S>,
-    ) -> RightsBuilder<'a, rights_state::SetRightsName<S>> {
+    ) -> RightsBuilder<S, rights_state::SetRightsName<St>> {
         self._fields.3 = Option::Some(value.into());
         RightsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RightsBuilder<'a, S>
+impl<S: BosStr, St> RightsBuilder<S, St>
 where
-    S: rights_state::State,
-    S::RightsType: rights_state::IsUnset,
+    St: rights_state::State,
+    St::RightsType: rights_state::IsUnset,
 {
     /// Set the `rightsType` field (required)
     pub fn rights_type(
         mut self,
         value: impl Into<S>,
-    ) -> RightsBuilder<'a, rights_state::SetRightsType<S>> {
+    ) -> RightsBuilder<S, rights_state::SetRightsType<St>> {
         self._fields.4 = Option::Some(value.into());
         RightsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RightsBuilder<'a, S>
+impl<S: BosStr, St> RightsBuilder<S, St>
 where
-    S: rights_state::State,
-    S::RightsType: rights_state::IsSet,
-    S::RightsDescription: rights_state::IsSet,
-    S::RightsName: rights_state::IsSet,
-    S::CreatedAt: rights_state::IsSet,
+    St: rights_state::State,
+    St::RightsName: rights_state::IsSet,
+    St::RightsType: rights_state::IsSet,
+    St::RightsDescription: rights_state::IsSet,
+    St::CreatedAt: rights_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Rights<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Rights<S> {
         Rights {
             attachment: self._fields.0,
             created_at: self._fields.1.unwrap(),
@@ -398,8 +398,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Rights<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Rights<S> {
         Rights {
             attachment: self._fields.0,
             created_at: self._fields.1.unwrap(),

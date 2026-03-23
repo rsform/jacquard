@@ -14,7 +14,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,11 +34,11 @@ use serde::{Serialize, Deserialize};
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Actor<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Actor<S: BosStr = DefaultStr> {
     pub did: Did<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub display_name: Option<S>,
@@ -54,11 +54,11 @@ pub struct Actor<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct AspectRatio<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct AspectRatio<S: BosStr = DefaultStr> {
     pub height: i64,
     pub width: i64,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -71,11 +71,11 @@ pub struct AspectRatio<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct BookIdEntry<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct BookIdEntry<S: BosStr = DefaultStr> {
     pub id: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -87,18 +87,18 @@ pub struct BookIdEntry<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct LocationEntry<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct LocationEntry<S: BosStr = DefaultStr> {
     pub book_count: i64,
     pub h3: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Actor<S> {
+impl<S: BosStr> LexiconSchema for Actor<S> {
     fn nsid() -> &'static str {
         "org.passingreads.defs"
     }
@@ -123,7 +123,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Actor<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for AspectRatio<S> {
+impl<S: BosStr> LexiconSchema for AspectRatio<S> {
     fn nsid() -> &'static str {
         "org.passingreads.defs"
     }
@@ -158,7 +158,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for AspectRatio<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for BookIdEntry<S> {
+impl<S: BosStr> LexiconSchema for BookIdEntry<S> {
     fn nsid() -> &'static str {
         "org.passingreads.defs"
     }
@@ -173,7 +173,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for BookIdEntry<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for LocationEntry<S> {
+impl<S: BosStr> LexiconSchema for LocationEntry<S> {
     fn nsid() -> &'static str {
         "org.passingreads.defs"
     }
@@ -207,9 +207,9 @@ pub mod actor_state {
         type Did = Unset;
     }
     ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
         type Did = Set<members::did>;
     }
     /// Marker types for field names
@@ -220,51 +220,51 @@ pub mod actor_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ActorBuilder<'a, S: actor_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ActorBuilder<S: BosStr, St: actor_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>, Option<S>, Option<Handle<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Actor<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ActorBuilder<'a, actor_state::Empty> {
+impl<S: BosStr> Actor<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ActorBuilder<S, actor_state::Empty> {
         ActorBuilder::new()
     }
 }
 
-impl<'a> ActorBuilder<'a, actor_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ActorBuilder<S, actor_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ActorBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ActorBuilder<'a, S>
+impl<S: BosStr, St> ActorBuilder<S, St>
 where
-    S: actor_state::State,
-    S::Did: actor_state::IsUnset,
+    St: actor_state::State,
+    St::Did: actor_state::IsUnset,
 {
     /// Set the `did` field (required)
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> ActorBuilder<'a, actor_state::SetDid<S>> {
+    ) -> ActorBuilder<S, actor_state::SetDid<St>> {
         self._fields.0 = Option::Some(value.into());
         ActorBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: actor_state::State> ActorBuilder<'a, S> {
+impl<S: BosStr, St: actor_state::State> ActorBuilder<S, St> {
     /// Set the `displayName` field (optional)
     pub fn display_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -277,7 +277,7 @@ impl<'a, S: actor_state::State> ActorBuilder<'a, S> {
     }
 }
 
-impl<'a, S: actor_state::State> ActorBuilder<'a, S> {
+impl<S: BosStr, St: actor_state::State> ActorBuilder<S, St> {
     /// Set the `handle` field (optional)
     pub fn handle(mut self, value: impl Into<Option<Handle<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -290,13 +290,13 @@ impl<'a, S: actor_state::State> ActorBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ActorBuilder<'a, S>
+impl<S: BosStr, St> ActorBuilder<S, St>
 where
-    S: actor_state::State,
-    S::Did: actor_state::IsSet,
+    St: actor_state::State,
+    St::Did: actor_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Actor<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Actor<S> {
         Actor {
             did: self._fields.0.unwrap(),
             display_name: self._fields.1,
@@ -304,8 +304,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Actor<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Actor<S> {
         Actor {
             did: self._fields.0.unwrap(),
             display_name: self._fields.1,
@@ -456,122 +456,122 @@ pub mod aspect_ratio_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Width;
         type Height;
+        type Width;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Width = Unset;
         type Height = Unset;
-    }
-    ///State transition - sets the `width` field to Set
-    pub struct SetWidth<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWidth<S> {}
-    impl<S: State> State for SetWidth<S> {
-        type Width = Set<members::width>;
-        type Height = S::Height;
+        type Width = Unset;
     }
     ///State transition - sets the `height` field to Set
-    pub struct SetHeight<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHeight<S> {}
-    impl<S: State> State for SetHeight<S> {
-        type Width = S::Width;
+    pub struct SetHeight<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHeight<St> {}
+    impl<St: State> State for SetHeight<St> {
         type Height = Set<members::height>;
+        type Width = St::Width;
+    }
+    ///State transition - sets the `width` field to Set
+    pub struct SetWidth<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetWidth<St> {}
+    impl<St: State> State for SetWidth<St> {
+        type Height = St::Height;
+        type Width = Set<members::width>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `width` field
-        pub struct width(());
         ///Marker type for the `height` field
         pub struct height(());
+        ///Marker type for the `width` field
+        pub struct width(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct AspectRatioBuilder<'a, S: aspect_ratio_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct AspectRatioBuilder<S: BosStr, St: aspect_ratio_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<i64>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> AspectRatio<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> AspectRatioBuilder<'a, aspect_ratio_state::Empty> {
+impl<S: BosStr> AspectRatio<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> AspectRatioBuilder<S, aspect_ratio_state::Empty> {
         AspectRatioBuilder::new()
     }
 }
 
-impl<'a> AspectRatioBuilder<'a, aspect_ratio_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> AspectRatioBuilder<S, aspect_ratio_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         AspectRatioBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AspectRatioBuilder<'a, S>
+impl<S: BosStr, St> AspectRatioBuilder<S, St>
 where
-    S: aspect_ratio_state::State,
-    S::Height: aspect_ratio_state::IsUnset,
+    St: aspect_ratio_state::State,
+    St::Height: aspect_ratio_state::IsUnset,
 {
     /// Set the `height` field (required)
     pub fn height(
         mut self,
         value: impl Into<i64>,
-    ) -> AspectRatioBuilder<'a, aspect_ratio_state::SetHeight<S>> {
+    ) -> AspectRatioBuilder<S, aspect_ratio_state::SetHeight<St>> {
         self._fields.0 = Option::Some(value.into());
         AspectRatioBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AspectRatioBuilder<'a, S>
+impl<S: BosStr, St> AspectRatioBuilder<S, St>
 where
-    S: aspect_ratio_state::State,
-    S::Width: aspect_ratio_state::IsUnset,
+    St: aspect_ratio_state::State,
+    St::Width: aspect_ratio_state::IsUnset,
 {
     /// Set the `width` field (required)
     pub fn width(
         mut self,
         value: impl Into<i64>,
-    ) -> AspectRatioBuilder<'a, aspect_ratio_state::SetWidth<S>> {
+    ) -> AspectRatioBuilder<S, aspect_ratio_state::SetWidth<St>> {
         self._fields.1 = Option::Some(value.into());
         AspectRatioBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AspectRatioBuilder<'a, S>
+impl<S: BosStr, St> AspectRatioBuilder<S, St>
 where
-    S: aspect_ratio_state::State,
-    S::Width: aspect_ratio_state::IsSet,
-    S::Height: aspect_ratio_state::IsSet,
+    St: aspect_ratio_state::State,
+    St::Height: aspect_ratio_state::IsSet,
+    St::Width: aspect_ratio_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> AspectRatio<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> AspectRatio<S> {
         AspectRatio {
             height: self._fields.0.unwrap(),
             width: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> AspectRatio<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> AspectRatio<S> {
         AspectRatio {
             height: self._fields.0.unwrap(),
             width: self._fields.1.unwrap(),
@@ -601,17 +601,17 @@ pub mod location_entry_state {
         type H3 = Unset;
     }
     ///State transition - sets the `book_count` field to Set
-    pub struct SetBookCount<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBookCount<S> {}
-    impl<S: State> State for SetBookCount<S> {
+    pub struct SetBookCount<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBookCount<St> {}
+    impl<St: State> State for SetBookCount<St> {
         type BookCount = Set<members::book_count>;
-        type H3 = S::H3;
+        type H3 = St::H3;
     }
     ///State transition - sets the `h3` field to Set
-    pub struct SetH3<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetH3<S> {}
-    impl<S: State> State for SetH3<S> {
-        type BookCount = S::BookCount;
+    pub struct SetH3<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetH3<St> {}
+    impl<St: State> State for SetH3<St> {
+        type BookCount = St::BookCount;
         type H3 = Set<members::h3>;
     }
     /// Marker types for field names
@@ -624,88 +624,88 @@ pub mod location_entry_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct LocationEntryBuilder<'a, S: location_entry_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct LocationEntryBuilder<S: BosStr, St: location_entry_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> LocationEntry<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> LocationEntryBuilder<'a, location_entry_state::Empty> {
+impl<S: BosStr> LocationEntry<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> LocationEntryBuilder<S, location_entry_state::Empty> {
         LocationEntryBuilder::new()
     }
 }
 
-impl<'a> LocationEntryBuilder<'a, location_entry_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> LocationEntryBuilder<S, location_entry_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         LocationEntryBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LocationEntryBuilder<'a, S>
+impl<S: BosStr, St> LocationEntryBuilder<S, St>
 where
-    S: location_entry_state::State,
-    S::BookCount: location_entry_state::IsUnset,
+    St: location_entry_state::State,
+    St::BookCount: location_entry_state::IsUnset,
 {
     /// Set the `bookCount` field (required)
     pub fn book_count(
         mut self,
         value: impl Into<i64>,
-    ) -> LocationEntryBuilder<'a, location_entry_state::SetBookCount<S>> {
+    ) -> LocationEntryBuilder<S, location_entry_state::SetBookCount<St>> {
         self._fields.0 = Option::Some(value.into());
         LocationEntryBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LocationEntryBuilder<'a, S>
+impl<S: BosStr, St> LocationEntryBuilder<S, St>
 where
-    S: location_entry_state::State,
-    S::H3: location_entry_state::IsUnset,
+    St: location_entry_state::State,
+    St::H3: location_entry_state::IsUnset,
 {
     /// Set the `h3` field (required)
     pub fn h3(
         mut self,
         value: impl Into<S>,
-    ) -> LocationEntryBuilder<'a, location_entry_state::SetH3<S>> {
+    ) -> LocationEntryBuilder<S, location_entry_state::SetH3<St>> {
         self._fields.1 = Option::Some(value.into());
         LocationEntryBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LocationEntryBuilder<'a, S>
+impl<S: BosStr, St> LocationEntryBuilder<S, St>
 where
-    S: location_entry_state::State,
-    S::BookCount: location_entry_state::IsSet,
-    S::H3: location_entry_state::IsSet,
+    St: location_entry_state::State,
+    St::BookCount: location_entry_state::IsSet,
+    St::H3: location_entry_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> LocationEntry<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> LocationEntry<S> {
         LocationEntry {
             book_count: self._fields.0.unwrap(),
             h3: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> LocationEntry<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> LocationEntry<S> {
         LocationEntry {
             book_count: self._fields.0.unwrap(),
             h3: self._fields.1.unwrap(),

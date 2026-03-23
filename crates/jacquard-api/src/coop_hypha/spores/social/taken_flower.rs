@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "coop.hypha.spores.social.takenFlower",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct TakenFlower<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct TakenFlower<S: BosStr = DefaultStr> {
     ///Client-declared timestamp when the flower was taken.
     pub created_at: Datetime,
     ///Optional note or reason for taking this flower
@@ -57,18 +57,18 @@ pub struct TakenFlower<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct TakenFlowerGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct TakenFlowerGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: TakenFlower<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> TakenFlower<S> {
+impl<S: BosStr> TakenFlower<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, TakenFlowerRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -81,17 +81,17 @@ pub struct TakenFlowerRecord;
 impl XrpcResp for TakenFlowerRecord {
     const NSID: &'static str = "coop.hypha.spores.social.takenFlower";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = TakenFlowerGetRecordOutput<S>;
+    type Output<S: BosStr> = TakenFlowerGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<TakenFlowerGetRecordOutput<S>> for TakenFlower<S> {
+impl<S: BosStr> From<TakenFlowerGetRecordOutput<S>> for TakenFlower<S> {
     fn from(output: TakenFlowerGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for TakenFlower<S> {
+impl<S: BosStr> Collection for TakenFlower<S> {
     const NSID: &'static str = "coop.hypha.spores.social.takenFlower";
     type Record = TakenFlowerRecord;
 }
@@ -101,7 +101,7 @@ impl Collection for TakenFlowerRecord {
     type Record = TakenFlowerRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for TakenFlower<S> {
+impl<S: BosStr> LexiconSchema for TakenFlower<S> {
     fn nsid() -> &'static str {
         "coop.hypha.spores.social.takenFlower"
     }
@@ -148,85 +148,85 @@ pub mod taken_flower_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Subject;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Subject = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Subject = S::Subject;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type CreatedAt = S::CreatedAt;
+    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubject<St> {}
+    impl<St: State> State for SetSubject<St> {
         type Subject = Set<members::subject>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Subject = St::Subject;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `subject` field
         pub struct subject(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct TakenFlowerBuilder<'a, S: taken_flower_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct TakenFlowerBuilder<S: BosStr, St: taken_flower_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<S>, Option<Did<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> TakenFlower<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> TakenFlowerBuilder<'a, taken_flower_state::Empty> {
+impl<S: BosStr> TakenFlower<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> TakenFlowerBuilder<S, taken_flower_state::Empty> {
         TakenFlowerBuilder::new()
     }
 }
 
-impl<'a> TakenFlowerBuilder<'a, taken_flower_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> TakenFlowerBuilder<S, taken_flower_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         TakenFlowerBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> TakenFlowerBuilder<'a, S>
+impl<S: BosStr, St> TakenFlowerBuilder<S, St>
 where
-    S: taken_flower_state::State,
-    S::CreatedAt: taken_flower_state::IsUnset,
+    St: taken_flower_state::State,
+    St::CreatedAt: taken_flower_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> TakenFlowerBuilder<'a, taken_flower_state::SetCreatedAt<S>> {
+    ) -> TakenFlowerBuilder<S, taken_flower_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         TakenFlowerBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: taken_flower_state::State> TakenFlowerBuilder<'a, S> {
+impl<S: BosStr, St: taken_flower_state::State> TakenFlowerBuilder<S, St> {
     /// Set the `note` field (optional)
     pub fn note(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -239,33 +239,33 @@ impl<'a, S: taken_flower_state::State> TakenFlowerBuilder<'a, S> {
     }
 }
 
-impl<'a, S> TakenFlowerBuilder<'a, S>
+impl<S: BosStr, St> TakenFlowerBuilder<S, St>
 where
-    S: taken_flower_state::State,
-    S::Subject: taken_flower_state::IsUnset,
+    St: taken_flower_state::State,
+    St::Subject: taken_flower_state::IsUnset,
 {
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> TakenFlowerBuilder<'a, taken_flower_state::SetSubject<S>> {
+    ) -> TakenFlowerBuilder<S, taken_flower_state::SetSubject<St>> {
         self._fields.2 = Option::Some(value.into());
         TakenFlowerBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> TakenFlowerBuilder<'a, S>
+impl<S: BosStr, St> TakenFlowerBuilder<S, St>
 where
-    S: taken_flower_state::State,
-    S::CreatedAt: taken_flower_state::IsSet,
-    S::Subject: taken_flower_state::IsSet,
+    St: taken_flower_state::State,
+    St::Subject: taken_flower_state::IsSet,
+    St::CreatedAt: taken_flower_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> TakenFlower<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> TakenFlower<S> {
         TakenFlower {
             created_at: self._fields.0.unwrap(),
             note: self._fields.1,
@@ -273,11 +273,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> TakenFlower<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> TakenFlower<S> {
         TakenFlower {
             created_at: self._fields.0.unwrap(),
             note: self._fields.1,

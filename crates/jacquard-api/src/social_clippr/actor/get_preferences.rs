@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
@@ -22,19 +22,17 @@ use crate::social_clippr::actor::Preferences;
 pub struct GetPreferences;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetPreferencesOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetPreferencesOutput<S: BosStr = DefaultStr> {
     ///A ref to the user's preferences
     pub preferences: Preferences<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -43,7 +41,7 @@ pub struct GetPreferencesResponse;
 impl jacquard_common::xrpc::XrpcResp for GetPreferencesResponse {
     const NSID: &'static str = "social.clippr.actor.getPreferences";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetPreferencesOutput<S>;
+    type Output<S: BosStr> = GetPreferencesOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
@@ -58,6 +56,6 @@ pub struct GetPreferencesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetPreferencesRequest {
     const PATH: &'static str = "/xrpc/social.clippr.actor.getPreferences";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetPreferences;
+    type Request<S: BosStr> = GetPreferences;
     type Response = GetPreferencesResponse;
 }

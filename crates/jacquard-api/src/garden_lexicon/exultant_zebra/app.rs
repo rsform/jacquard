@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
     rename = "garden.lexicon.exultant-zebra.app",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct App<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct App<S: BosStr = DefaultStr> {
     ///An optional description of the application.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
@@ -58,18 +58,18 @@ pub struct App<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct AppGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct AppGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: App<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> App<S> {
+impl<S: BosStr> App<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, AppRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -82,17 +82,17 @@ pub struct AppRecord;
 impl XrpcResp for AppRecord {
     const NSID: &'static str = "garden.lexicon.exultant-zebra.app";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = AppGetRecordOutput<S>;
+    type Output<S: BosStr> = AppGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<AppGetRecordOutput<S>> for App<S> {
+impl<S: BosStr> From<AppGetRecordOutput<S>> for App<S> {
     fn from(output: AppGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for App<S> {
+impl<S: BosStr> Collection for App<S> {
     const NSID: &'static str = "garden.lexicon.exultant-zebra.app";
     type Record = AppRecord;
 }
@@ -102,7 +102,7 @@ impl Collection for AppRecord {
     type Record = AppRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for App<S> {
+impl<S: BosStr> LexiconSchema for App<S> {
     fn nsid() -> &'static str {
         "garden.lexicon.exultant-zebra.app"
     }
@@ -127,66 +127,66 @@ pub mod app_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Distributions;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Distributions = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type Distributions = S::Distributions;
+        type Name = Unset;
     }
     ///State transition - sets the `distributions` field to Set
-    pub struct SetDistributions<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDistributions<S> {}
-    impl<S: State> State for SetDistributions<S> {
-        type Name = S::Name;
+    pub struct SetDistributions<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDistributions<St> {}
+    impl<St: State> State for SetDistributions<St> {
         type Distributions = Set<members::distributions>;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Distributions = St::Distributions;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `distributions` field
         pub struct distributions(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct AppBuilder<'a, S: app_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct AppBuilder<S: BosStr, St: app_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<Vec<StrongRef<S>>>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> App<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> AppBuilder<'a, app_state::Empty> {
+impl<S: BosStr> App<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> AppBuilder<S, app_state::Empty> {
         AppBuilder::new()
     }
 }
 
-impl<'a> AppBuilder<'a, app_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> AppBuilder<S, app_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         AppBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: app_state::State> AppBuilder<'a, S> {
+impl<S: BosStr, St: app_state::State> AppBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -199,49 +199,49 @@ impl<'a, S: app_state::State> AppBuilder<'a, S> {
     }
 }
 
-impl<'a, S> AppBuilder<'a, S>
+impl<S: BosStr, St> AppBuilder<S, St>
 where
-    S: app_state::State,
-    S::Distributions: app_state::IsUnset,
+    St: app_state::State,
+    St::Distributions: app_state::IsUnset,
 {
     /// Set the `distributions` field (required)
     pub fn distributions(
         mut self,
         value: impl Into<Vec<StrongRef<S>>>,
-    ) -> AppBuilder<'a, app_state::SetDistributions<S>> {
+    ) -> AppBuilder<S, app_state::SetDistributions<St>> {
         self._fields.1 = Option::Some(value.into());
         AppBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AppBuilder<'a, S>
+impl<S: BosStr, St> AppBuilder<S, St>
 where
-    S: app_state::State,
-    S::Name: app_state::IsUnset,
+    St: app_state::State,
+    St::Name: app_state::IsUnset,
 {
     /// Set the `name` field (required)
-    pub fn name(mut self, value: impl Into<S>) -> AppBuilder<'a, app_state::SetName<S>> {
+    pub fn name(mut self, value: impl Into<S>) -> AppBuilder<S, app_state::SetName<St>> {
         self._fields.2 = Option::Some(value.into());
         AppBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AppBuilder<'a, S>
+impl<S: BosStr, St> AppBuilder<S, St>
 where
-    S: app_state::State,
-    S::Name: app_state::IsSet,
-    S::Distributions: app_state::IsSet,
+    St: app_state::State,
+    St::Distributions: app_state::IsSet,
+    St::Name: app_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> App<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> App<S> {
         App {
             description: self._fields.0,
             distributions: self._fields.1.unwrap(),
@@ -249,8 +249,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> App<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> App<S> {
         App {
             description: self._fields.0,
             distributions: self._fields.1.unwrap(),

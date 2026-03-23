@@ -10,40 +10,37 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct IsVerified<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct IsVerified<S: BosStr = DefaultStr> {
     pub domain: S,
 }
 
 /// Whether the user is verified on that domain
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct IsVerifiedOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct IsVerifiedOutput<S: BosStr = DefaultStr> {
     pub verified: bool,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -52,12 +49,11 @@ pub struct IsVerifiedResponse;
 impl jacquard_common::xrpc::XrpcResp for IsVerifiedResponse {
     const NSID: &'static str = "app.ocho.edu.isVerified";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = IsVerifiedOutput<S>;
+    type Output<S: BosStr> = IsVerifiedOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for IsVerified<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for IsVerified<S> {
     const NSID: &'static str = "app.ocho.edu.isVerified";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = IsVerifiedResponse;
@@ -68,7 +64,7 @@ pub struct IsVerifiedRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for IsVerifiedRequest {
     const PATH: &'static str = "/xrpc/app.ocho.edu.isVerified";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = IsVerified<S>;
+    type Request<S: BosStr> = IsVerified<S>;
     type Response = IsVerifiedResponse;
 }
 
@@ -91,9 +87,9 @@ pub mod is_verified_state {
         type Domain = Unset;
     }
     ///State transition - sets the `domain` field to Set
-    pub struct SetDomain<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDomain<S> {}
-    impl<S: State> State for SetDomain<S> {
+    pub struct SetDomain<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDomain<St> {}
+    impl<St: State> State for SetDomain<St> {
         type Domain = Set<members::domain>;
     }
     /// Marker types for field names
@@ -104,57 +100,57 @@ pub mod is_verified_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct IsVerifiedBuilder<'a, S: is_verified_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct IsVerifiedBuilder<S: BosStr, St: is_verified_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> IsVerified<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> IsVerifiedBuilder<'a, is_verified_state::Empty> {
+impl<S: BosStr> IsVerified<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> IsVerifiedBuilder<S, is_verified_state::Empty> {
         IsVerifiedBuilder::new()
     }
 }
 
-impl<'a> IsVerifiedBuilder<'a, is_verified_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> IsVerifiedBuilder<S, is_verified_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         IsVerifiedBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> IsVerifiedBuilder<'a, S>
+impl<S: BosStr, St> IsVerifiedBuilder<S, St>
 where
-    S: is_verified_state::State,
-    S::Domain: is_verified_state::IsUnset,
+    St: is_verified_state::State,
+    St::Domain: is_verified_state::IsUnset,
 {
     /// Set the `domain` field (required)
     pub fn domain(
         mut self,
         value: impl Into<S>,
-    ) -> IsVerifiedBuilder<'a, is_verified_state::SetDomain<S>> {
+    ) -> IsVerifiedBuilder<S, is_verified_state::SetDomain<St>> {
         self._fields.0 = Option::Some(value.into());
         IsVerifiedBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> IsVerifiedBuilder<'a, S>
+impl<S: BosStr, St> IsVerifiedBuilder<S, St>
 where
-    S: is_verified_state::State,
-    S::Domain: is_verified_state::IsSet,
+    St: is_verified_state::State,
+    St::Domain: is_verified_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> IsVerified<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> IsVerified<S> {
         IsVerified {
             domain: self._fields.0.unwrap(),
         }

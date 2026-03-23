@@ -4,7 +4,7 @@ use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::string::Nsid;
 use jacquard_common::xrpc::XrpcExt;
 use jacquard_common::xrpc::atproto::{ListRecords, ListRecordsRecord};
-use jacquard_common::{Bos, IntoStatic};
+use jacquard_common::{BosStr, IntoStatic};
 use jacquard_identity::JacquardResolver;
 use jacquard_identity::lexicon_resolver::LexiconSchemaResolver;
 use jacquard_identity::resolver::{IdentityResolver, ResolverOptions};
@@ -21,7 +21,7 @@ pub struct AtProtoSource {
 
 impl AtProtoSource {
     /// Fetch a single lexicon schema by NSID using DNS + XRPC resolution
-    async fn fetch_single_lexicon<S: Bos<str> + AsRef<str> + Sync>(
+    async fn fetch_single_lexicon<S: BosStr + Sync>(
         &self,
         resolver: &JacquardResolver,
         nsid: &Nsid<S>,
@@ -37,7 +37,7 @@ impl AtProtoSource {
         Ok(lexicons)
     }
 
-    fn parse_lexicon_record<S: Bos<str> + AsRef<str> + Sync + Serialize>(
+    fn parse_lexicon_record<S: BosStr + Sync + Serialize>(
         record_data: &ListRecordsRecord<S>,
     ) -> Option<LexiconDoc<'static>> {
         // // Extract the 'value' field from the record

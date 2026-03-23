@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "win.tomo-x.pushat.allow",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Allow<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Allow<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub config: Option<Data<S>>,
     pub created_at: Datetime,
@@ -53,18 +53,18 @@ pub struct Allow<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct AllowGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct AllowGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Allow<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Allow<S> {
+impl<S: BosStr> Allow<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, AllowRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -77,17 +77,17 @@ pub struct AllowRecord;
 impl XrpcResp for AllowRecord {
     const NSID: &'static str = "win.tomo-x.pushat.allow";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = AllowGetRecordOutput<S>;
+    type Output<S: BosStr> = AllowGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<AllowGetRecordOutput<S>> for Allow<S> {
+impl<S: BosStr> From<AllowGetRecordOutput<S>> for Allow<S> {
     fn from(output: AllowGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Allow<S> {
+impl<S: BosStr> Collection for Allow<S> {
     const NSID: &'static str = "win.tomo-x.pushat.allow";
     type Record = AllowRecord;
 }
@@ -97,7 +97,7 @@ impl Collection for AllowRecord {
     type Record = AllowRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Allow<S> {
+impl<S: BosStr> LexiconSchema for Allow<S> {
     fn nsid() -> &'static str {
         "win.tomo-x.pushat.allow"
     }
@@ -131,9 +131,9 @@ pub mod allow_state {
         type CreatedAt = Unset;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
@@ -144,32 +144,32 @@ pub mod allow_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct AllowBuilder<'a, S: allow_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct AllowBuilder<S: BosStr, St: allow_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Data<S>>, Option<Datetime>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Allow<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> AllowBuilder<'a, allow_state::Empty> {
+impl<S: BosStr> Allow<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> AllowBuilder<S, allow_state::Empty> {
         AllowBuilder::new()
     }
 }
 
-impl<'a> AllowBuilder<'a, allow_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> AllowBuilder<S, allow_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         AllowBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: allow_state::State> AllowBuilder<'a, S> {
+impl<S: BosStr, St: allow_state::State> AllowBuilder<S, St> {
     /// Set the `config` field (optional)
     pub fn config(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -182,40 +182,40 @@ impl<'a, S: allow_state::State> AllowBuilder<'a, S> {
     }
 }
 
-impl<'a, S> AllowBuilder<'a, S>
+impl<S: BosStr, St> AllowBuilder<S, St>
 where
-    S: allow_state::State,
-    S::CreatedAt: allow_state::IsUnset,
+    St: allow_state::State,
+    St::CreatedAt: allow_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> AllowBuilder<'a, allow_state::SetCreatedAt<S>> {
+    ) -> AllowBuilder<S, allow_state::SetCreatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         AllowBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AllowBuilder<'a, S>
+impl<S: BosStr, St> AllowBuilder<S, St>
 where
-    S: allow_state::State,
-    S::CreatedAt: allow_state::IsSet,
+    St: allow_state::State,
+    St::CreatedAt: allow_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Allow<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Allow<S> {
         Allow {
             config: self._fields.0,
             created_at: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Allow<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Allow<S> {
         Allow {
             config: self._fields.0,
             created_at: self._fields.1.unwrap(),

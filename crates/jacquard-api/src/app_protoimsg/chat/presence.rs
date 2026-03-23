@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "app.protoimsg.chat.presence",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Presence<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Presence<S: BosStr = DefaultStr> {
     ///Custom away message / status text.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub away_message: Option<S>,
@@ -54,7 +54,7 @@ pub struct Presence<S: Bos<str> + AsRef<str> = DefaultStr> {
 /// Current presence status.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum PresenceStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum PresenceStatus<S: BosStr = DefaultStr> {
     Online,
     Away,
     Idle,
@@ -63,7 +63,7 @@ pub enum PresenceStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> PresenceStatus<S> {
+impl<S: BosStr> PresenceStatus<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Online => "online",
@@ -87,19 +87,19 @@ impl<S: Bos<str> + AsRef<str>> PresenceStatus<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for PresenceStatus<S> {
+impl<S: BosStr> core::fmt::Display for PresenceStatus<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for PresenceStatus<S> {
+impl<S: BosStr> AsRef<str> for PresenceStatus<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for PresenceStatus<S> {
+impl<S: BosStr> Serialize for PresenceStatus<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -108,8 +108,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for PresenceStatus<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for PresenceStatus<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for PresenceStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -119,14 +118,18 @@ for PresenceStatus<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for PresenceStatus<S> {
+impl<S: BosStr + Default> Default for PresenceStatus<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for PresenceStatus<S> {
-    type Output = PresenceStatus<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for PresenceStatus<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = PresenceStatus<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             PresenceStatus::Online => PresenceStatus::Online,
@@ -145,18 +148,18 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for PresenceStatus<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct PresenceGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct PresenceGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Presence<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Presence<S> {
+impl<S: BosStr> Presence<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, PresenceRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -169,17 +172,17 @@ pub struct PresenceRecord;
 impl XrpcResp for PresenceRecord {
     const NSID: &'static str = "app.protoimsg.chat.presence";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = PresenceGetRecordOutput<S>;
+    type Output<S: BosStr> = PresenceGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<PresenceGetRecordOutput<S>> for Presence<S> {
+impl<S: BosStr> From<PresenceGetRecordOutput<S>> for Presence<S> {
     fn from(output: PresenceGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Presence<S> {
+impl<S: BosStr> Collection for Presence<S> {
     const NSID: &'static str = "app.protoimsg.chat.presence";
     type Record = PresenceRecord;
 }
@@ -189,7 +192,7 @@ impl Collection for PresenceRecord {
     type Record = PresenceRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Presence<S> {
+impl<S: BosStr> LexiconSchema for Presence<S> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.presence"
     }
@@ -235,17 +238,17 @@ pub mod presence_state {
         type Status = Unset;
     }
     ///State transition - sets the `updated_at` field to Set
-    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
-    impl<S: State> State for SetUpdatedAt<S> {
+    pub struct SetUpdatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUpdatedAt<St> {}
+    impl<St: State> State for SetUpdatedAt<St> {
         type UpdatedAt = Set<members::updated_at>;
-        type Status = S::Status;
+        type Status = St::Status;
     }
     ///State transition - sets the `status` field to Set
-    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStatus<S> {}
-    impl<S: State> State for SetStatus<S> {
-        type UpdatedAt = S::UpdatedAt;
+    pub struct SetStatus<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStatus<St> {}
+    impl<St: State> State for SetStatus<St> {
+        type UpdatedAt = St::UpdatedAt;
         type Status = Set<members::status>;
     }
     /// Marker types for field names
@@ -258,32 +261,32 @@ pub mod presence_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct PresenceBuilder<'a, S: presence_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct PresenceBuilder<S: BosStr, St: presence_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<PresenceStatus<S>>, Option<Datetime>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Presence<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> PresenceBuilder<'a, presence_state::Empty> {
+impl<S: BosStr> Presence<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> PresenceBuilder<S, presence_state::Empty> {
         PresenceBuilder::new()
     }
 }
 
-impl<'a> PresenceBuilder<'a, presence_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> PresenceBuilder<S, presence_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         PresenceBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: presence_state::State> PresenceBuilder<'a, S> {
+impl<S: BosStr, St: presence_state::State> PresenceBuilder<S, St> {
     /// Set the `awayMessage` field (optional)
     pub fn away_message(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -296,52 +299,52 @@ impl<'a, S: presence_state::State> PresenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S> PresenceBuilder<'a, S>
+impl<S: BosStr, St> PresenceBuilder<S, St>
 where
-    S: presence_state::State,
-    S::Status: presence_state::IsUnset,
+    St: presence_state::State,
+    St::Status: presence_state::IsUnset,
 {
     /// Set the `status` field (required)
     pub fn status(
         mut self,
         value: impl Into<PresenceStatus<S>>,
-    ) -> PresenceBuilder<'a, presence_state::SetStatus<S>> {
+    ) -> PresenceBuilder<S, presence_state::SetStatus<St>> {
         self._fields.1 = Option::Some(value.into());
         PresenceBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PresenceBuilder<'a, S>
+impl<S: BosStr, St> PresenceBuilder<S, St>
 where
-    S: presence_state::State,
-    S::UpdatedAt: presence_state::IsUnset,
+    St: presence_state::State,
+    St::UpdatedAt: presence_state::IsUnset,
 {
     /// Set the `updatedAt` field (required)
     pub fn updated_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> PresenceBuilder<'a, presence_state::SetUpdatedAt<S>> {
+    ) -> PresenceBuilder<S, presence_state::SetUpdatedAt<St>> {
         self._fields.2 = Option::Some(value.into());
         PresenceBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PresenceBuilder<'a, S>
+impl<S: BosStr, St> PresenceBuilder<S, St>
 where
-    S: presence_state::State,
-    S::UpdatedAt: presence_state::IsSet,
-    S::Status: presence_state::IsSet,
+    St: presence_state::State,
+    St::UpdatedAt: presence_state::IsSet,
+    St::Status: presence_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Presence<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Presence<S> {
         Presence {
             away_message: self._fields.0,
             status: self._fields.1.unwrap(),
@@ -349,11 +352,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Presence<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Presence<S> {
         Presence {
             away_message: self._fields.0,
             status: self._fields.1.unwrap(),

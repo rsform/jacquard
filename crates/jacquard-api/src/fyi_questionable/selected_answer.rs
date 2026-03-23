@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
     rename = "fyi.questionable.selectedAnswer",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SelectedAnswer<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SelectedAnswer<S: BosStr = DefaultStr> {
     pub answer_ref: StrongRef<S>,
     ///Client-declared timestamp when this vote was originally created.
     pub created_at: Datetime,
@@ -55,18 +55,18 @@ pub struct SelectedAnswer<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SelectedAnswerGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SelectedAnswerGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: SelectedAnswer<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> SelectedAnswer<S> {
+impl<S: BosStr> SelectedAnswer<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, SelectedAnswerRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -79,18 +79,17 @@ pub struct SelectedAnswerRecord;
 impl XrpcResp for SelectedAnswerRecord {
     const NSID: &'static str = "fyi.questionable.selectedAnswer";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = SelectedAnswerGetRecordOutput<S>;
+    type Output<S: BosStr> = SelectedAnswerGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<SelectedAnswerGetRecordOutput<S>>
-for SelectedAnswer<S> {
+impl<S: BosStr> From<SelectedAnswerGetRecordOutput<S>> for SelectedAnswer<S> {
     fn from(output: SelectedAnswerGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for SelectedAnswer<S> {
+impl<S: BosStr> Collection for SelectedAnswer<S> {
     const NSID: &'static str = "fyi.questionable.selectedAnswer";
     type Record = SelectedAnswerRecord;
 }
@@ -100,7 +99,7 @@ impl Collection for SelectedAnswerRecord {
     type Record = SelectedAnswerRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for SelectedAnswer<S> {
+impl<S: BosStr> LexiconSchema for SelectedAnswer<S> {
     fn nsid() -> &'static str {
         "fyi.questionable.selectedAnswer"
     }
@@ -126,144 +125,144 @@ pub mod selected_answer_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type AnswerRef;
-        type QuestionRef;
         type CreatedAt;
+        type QuestionRef;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type AnswerRef = Unset;
-        type QuestionRef = Unset;
         type CreatedAt = Unset;
+        type QuestionRef = Unset;
     }
     ///State transition - sets the `answer_ref` field to Set
-    pub struct SetAnswerRef<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAnswerRef<S> {}
-    impl<S: State> State for SetAnswerRef<S> {
+    pub struct SetAnswerRef<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAnswerRef<St> {}
+    impl<St: State> State for SetAnswerRef<St> {
         type AnswerRef = Set<members::answer_ref>;
-        type QuestionRef = S::QuestionRef;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `question_ref` field to Set
-    pub struct SetQuestionRef<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetQuestionRef<S> {}
-    impl<S: State> State for SetQuestionRef<S> {
-        type AnswerRef = S::AnswerRef;
-        type QuestionRef = Set<members::question_ref>;
-        type CreatedAt = S::CreatedAt;
+        type CreatedAt = St::CreatedAt;
+        type QuestionRef = St::QuestionRef;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type AnswerRef = S::AnswerRef;
-        type QuestionRef = S::QuestionRef;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type AnswerRef = St::AnswerRef;
         type CreatedAt = Set<members::created_at>;
+        type QuestionRef = St::QuestionRef;
+    }
+    ///State transition - sets the `question_ref` field to Set
+    pub struct SetQuestionRef<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetQuestionRef<St> {}
+    impl<St: State> State for SetQuestionRef<St> {
+        type AnswerRef = St::AnswerRef;
+        type CreatedAt = St::CreatedAt;
+        type QuestionRef = Set<members::question_ref>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `answer_ref` field
         pub struct answer_ref(());
-        ///Marker type for the `question_ref` field
-        pub struct question_ref(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `question_ref` field
+        pub struct question_ref(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct SelectedAnswerBuilder<'a, S: selected_answer_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct SelectedAnswerBuilder<S: BosStr, St: selected_answer_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<StrongRef<S>>, Option<Datetime>, Option<StrongRef<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> SelectedAnswer<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> SelectedAnswerBuilder<'a, selected_answer_state::Empty> {
+impl<S: BosStr> SelectedAnswer<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> SelectedAnswerBuilder<S, selected_answer_state::Empty> {
         SelectedAnswerBuilder::new()
     }
 }
 
-impl<'a> SelectedAnswerBuilder<'a, selected_answer_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> SelectedAnswerBuilder<S, selected_answer_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SelectedAnswerBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SelectedAnswerBuilder<'a, S>
+impl<S: BosStr, St> SelectedAnswerBuilder<S, St>
 where
-    S: selected_answer_state::State,
-    S::AnswerRef: selected_answer_state::IsUnset,
+    St: selected_answer_state::State,
+    St::AnswerRef: selected_answer_state::IsUnset,
 {
     /// Set the `answerRef` field (required)
     pub fn answer_ref(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> SelectedAnswerBuilder<'a, selected_answer_state::SetAnswerRef<S>> {
+    ) -> SelectedAnswerBuilder<S, selected_answer_state::SetAnswerRef<St>> {
         self._fields.0 = Option::Some(value.into());
         SelectedAnswerBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SelectedAnswerBuilder<'a, S>
+impl<S: BosStr, St> SelectedAnswerBuilder<S, St>
 where
-    S: selected_answer_state::State,
-    S::CreatedAt: selected_answer_state::IsUnset,
+    St: selected_answer_state::State,
+    St::CreatedAt: selected_answer_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> SelectedAnswerBuilder<'a, selected_answer_state::SetCreatedAt<S>> {
+    ) -> SelectedAnswerBuilder<S, selected_answer_state::SetCreatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         SelectedAnswerBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SelectedAnswerBuilder<'a, S>
+impl<S: BosStr, St> SelectedAnswerBuilder<S, St>
 where
-    S: selected_answer_state::State,
-    S::QuestionRef: selected_answer_state::IsUnset,
+    St: selected_answer_state::State,
+    St::QuestionRef: selected_answer_state::IsUnset,
 {
     /// Set the `questionRef` field (required)
     pub fn question_ref(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> SelectedAnswerBuilder<'a, selected_answer_state::SetQuestionRef<S>> {
+    ) -> SelectedAnswerBuilder<S, selected_answer_state::SetQuestionRef<St>> {
         self._fields.2 = Option::Some(value.into());
         SelectedAnswerBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SelectedAnswerBuilder<'a, S>
+impl<S: BosStr, St> SelectedAnswerBuilder<S, St>
 where
-    S: selected_answer_state::State,
-    S::AnswerRef: selected_answer_state::IsSet,
-    S::QuestionRef: selected_answer_state::IsSet,
-    S::CreatedAt: selected_answer_state::IsSet,
+    St: selected_answer_state::State,
+    St::AnswerRef: selected_answer_state::IsSet,
+    St::CreatedAt: selected_answer_state::IsSet,
+    St::QuestionRef: selected_answer_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> SelectedAnswer<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> SelectedAnswer<S> {
         SelectedAnswer {
             answer_ref: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
@@ -271,11 +270,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> SelectedAnswer<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> SelectedAnswer<S> {
         SelectedAnswer {
             answer_ref: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),

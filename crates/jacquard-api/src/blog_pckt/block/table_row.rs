@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -30,11 +30,11 @@ use crate::blog_pckt::block::table_header::TableHeader;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct TableRow<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct TableRow<S: BosStr = DefaultStr> {
     ///Array of table cells or header cells
     pub content: Vec<TableRowContentItem<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -47,18 +47,18 @@ pub struct TableRow<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum TableRowContentItem<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum TableRowContentItem<S: BosStr = DefaultStr> {
     #[serde(rename = "blog.pckt.block.tableCell")]
     TableCell(Box<TableCell<S>>),
     #[serde(rename = "blog.pckt.block.tableHeader")]
     TableHeader(Box<TableHeader<S>>),
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for TableRow<S> {
+impl<S: BosStr> LexiconSchema for TableRow<S> {
     fn nsid() -> &'static str {
         "blog.pckt.block.tableRow"
     }
@@ -92,9 +92,9 @@ pub mod table_row_state {
         type Content = Unset;
     }
     ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
+    pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetContent<St> {}
+    impl<St: State> State for SetContent<St> {
         type Content = Set<members::content>;
     }
     /// Marker types for field names
@@ -105,67 +105,64 @@ pub mod table_row_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct TableRowBuilder<'a, S: table_row_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct TableRowBuilder<S: BosStr, St: table_row_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<TableRowContentItem<S>>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> TableRow<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> TableRowBuilder<'a, table_row_state::Empty> {
+impl<S: BosStr> TableRow<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> TableRowBuilder<S, table_row_state::Empty> {
         TableRowBuilder::new()
     }
 }
 
-impl<'a> TableRowBuilder<'a, table_row_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> TableRowBuilder<S, table_row_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         TableRowBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> TableRowBuilder<'a, S>
+impl<S: BosStr, St> TableRowBuilder<S, St>
 where
-    S: table_row_state::State,
-    S::Content: table_row_state::IsUnset,
+    St: table_row_state::State,
+    St::Content: table_row_state::IsUnset,
 {
     /// Set the `content` field (required)
     pub fn content(
         mut self,
         value: impl Into<Vec<TableRowContentItem<S>>>,
-    ) -> TableRowBuilder<'a, table_row_state::SetContent<S>> {
+    ) -> TableRowBuilder<S, table_row_state::SetContent<St>> {
         self._fields.0 = Option::Some(value.into());
         TableRowBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> TableRowBuilder<'a, S>
+impl<S: BosStr, St> TableRowBuilder<S, St>
 where
-    S: table_row_state::State,
-    S::Content: table_row_state::IsSet,
+    St: table_row_state::State,
+    St::Content: table_row_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> TableRow<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> TableRow<S> {
         TableRow {
             content: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> TableRow<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> TableRow<S> {
         TableRow {
             content: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

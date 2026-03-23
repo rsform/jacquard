@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
@@ -19,14 +19,14 @@ use serde::{Serialize, Deserialize};
 use crate::app_rocksky::song::SongViewBasic;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetArtistTracks<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetArtistTracks<S: BosStr = DefaultStr> {
     ///(min: 1)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
@@ -34,25 +34,22 @@ pub struct GetArtistTracks<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub offset: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub uri: Option<AtUri<S>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetArtistTracksOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetArtistTracksOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tracks: Option<Vec<SongViewBasic<S>>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -61,12 +58,11 @@ pub struct GetArtistTracksResponse;
 impl jacquard_common::xrpc::XrpcResp for GetArtistTracksResponse {
     const NSID: &'static str = "app.rocksky.artist.getArtistTracks";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetArtistTracksOutput<S>;
+    type Output<S: BosStr> = GetArtistTracksOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetArtistTracks<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetArtistTracks<S> {
     const NSID: &'static str = "app.rocksky.artist.getArtistTracks";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetArtistTracksResponse;
@@ -77,7 +73,7 @@ pub struct GetArtistTracksRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetArtistTracksRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.artist.getArtistTracks";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetArtistTracks<S>;
+    type Request<S: BosStr> = GetArtistTracks<S>;
     type Response = GetArtistTracksResponse;
 }
 
@@ -100,32 +96,32 @@ pub mod get_artist_tracks_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetArtistTracksBuilder<'a, S: get_artist_tracks_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetArtistTracksBuilder<S: BosStr, St: get_artist_tracks_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<i64>, Option<AtUri<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetArtistTracks<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetArtistTracksBuilder<'a, get_artist_tracks_state::Empty> {
+impl<S: BosStr> GetArtistTracks<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetArtistTracksBuilder<S, get_artist_tracks_state::Empty> {
         GetArtistTracksBuilder::new()
     }
 }
 
-impl<'a> GetArtistTracksBuilder<'a, get_artist_tracks_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetArtistTracksBuilder<S, get_artist_tracks_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetArtistTracksBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: get_artist_tracks_state::State> GetArtistTracksBuilder<'a, S> {
+impl<S: BosStr, St: get_artist_tracks_state::State> GetArtistTracksBuilder<S, St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
@@ -138,7 +134,7 @@ impl<'a, S: get_artist_tracks_state::State> GetArtistTracksBuilder<'a, S> {
     }
 }
 
-impl<'a, S: get_artist_tracks_state::State> GetArtistTracksBuilder<'a, S> {
+impl<S: BosStr, St: get_artist_tracks_state::State> GetArtistTracksBuilder<S, St> {
     /// Set the `offset` field (optional)
     pub fn offset(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -151,7 +147,7 @@ impl<'a, S: get_artist_tracks_state::State> GetArtistTracksBuilder<'a, S> {
     }
 }
 
-impl<'a, S: get_artist_tracks_state::State> GetArtistTracksBuilder<'a, S> {
+impl<S: BosStr, St: get_artist_tracks_state::State> GetArtistTracksBuilder<S, St> {
     /// Set the `uri` field (optional)
     pub fn uri(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -164,12 +160,12 @@ impl<'a, S: get_artist_tracks_state::State> GetArtistTracksBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GetArtistTracksBuilder<'a, S>
+impl<S: BosStr, St> GetArtistTracksBuilder<S, St>
 where
-    S: get_artist_tracks_state::State,
+    St: get_artist_tracks_state::State,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetArtistTracks<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetArtistTracks<S> {
         GetArtistTracks {
             limit: self._fields.0,
             offset: self._fields.1,

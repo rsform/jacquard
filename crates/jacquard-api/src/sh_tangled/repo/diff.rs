@@ -6,24 +6,27 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[allow(unused_imports)]
+use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Diff<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct Diff<S: BosStr = DefaultStr> {
     pub r#ref: S,
-    #[serde(borrow)]
     pub repo: S,
 }
 
@@ -50,19 +53,16 @@ pub struct DiffOutput {
 pub enum DiffError {
     /// Repository not found or access denied
     #[serde(rename = "RepoNotFound")]
-    RepoNotFound(Option<jacquard_common::deps::smol_str::SmolStr>),
+    RepoNotFound(Option<SmolStr>),
     /// Git reference not found
     #[serde(rename = "RefNotFound")]
-    RefNotFound(Option<jacquard_common::deps::smol_str::SmolStr>),
+    RefNotFound(Option<SmolStr>),
     /// Invalid request parameters
     #[serde(rename = "InvalidRequest")]
-    InvalidRequest(Option<jacquard_common::deps::smol_str::SmolStr>),
+    InvalidRequest(Option<SmolStr>),
     /// Catch-all for unknown error codes.
     #[serde(untagged)]
-    Other {
-        error: jacquard_common::deps::smol_str::SmolStr,
-        message: Option<jacquard_common::deps::smol_str::SmolStr>,
-    },
+    Other { error: SmolStr, message: Option<SmolStr> },
 }
 
 impl core::fmt::Display for DiffError {
@@ -105,9 +105,9 @@ pub struct DiffResponse;
 impl jacquard_common::xrpc::XrpcResp for DiffResponse {
     const NSID: &'static str = "sh.tangled.repo.diff";
     const ENCODING: &'static str = "*/*";
-    type Output<S: Bos<str> + AsRef<str>> = DiffOutput;
+    type Output<S: BosStr> = DiffOutput;
     type Err = DiffError;
-    fn encode_output<S: Bos<str> + AsRef<str>>(
+    fn encode_output<S: BosStr>(
         output: &Self::Output<S>,
     ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError>
     where
@@ -119,7 +119,7 @@ impl jacquard_common::xrpc::XrpcResp for DiffResponse {
         body: &'de [u8],
     ) -> Result<Self::Output<S>, jacquard_common::error::DecodeError>
     where
-        S: Bos<str> + AsRef<str> + Deserialize<'de>,
+        S: BosStr + Deserialize<'de>,
         Self::Output<S>: Deserialize<'de>,
     {
         Ok(DiffOutput {
@@ -128,8 +128,7 @@ impl jacquard_common::xrpc::XrpcResp for DiffResponse {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for Diff<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Diff<S> {
     const NSID: &'static str = "sh.tangled.repo.diff";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = DiffResponse;
@@ -140,7 +139,7 @@ pub struct DiffRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DiffRequest {
     const PATH: &'static str = "/xrpc/sh.tangled.repo.diff";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = Diff<S>;
+    type Request<S: BosStr> = Diff<S>;
     type Response = DiffResponse;
 }
 
@@ -154,111 +153,111 @@ pub mod diff_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Ref;
         type Repo;
+        type Ref;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Ref = Unset;
         type Repo = Unset;
-    }
-    ///State transition - sets the `ref` field to Set
-    pub struct SetRef<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRef<S> {}
-    impl<S: State> State for SetRef<S> {
-        type Ref = Set<members::r#ref>;
-        type Repo = S::Repo;
+        type Ref = Unset;
     }
     ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
-        type Ref = S::Ref;
+    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRepo<St> {}
+    impl<St: State> State for SetRepo<St> {
         type Repo = Set<members::repo>;
+        type Ref = St::Ref;
+    }
+    ///State transition - sets the `ref` field to Set
+    pub struct SetRef<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRef<St> {}
+    impl<St: State> State for SetRef<St> {
+        type Repo = St::Repo;
+        type Ref = Set<members::r#ref>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `ref` field
-        pub struct r#ref(());
         ///Marker type for the `repo` field
         pub struct repo(());
+        ///Marker type for the `ref` field
+        pub struct r#ref(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct DiffBuilder<'a, S: diff_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct DiffBuilder<S: BosStr, St: diff_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Diff<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> DiffBuilder<'a, diff_state::Empty> {
+impl<S: BosStr> Diff<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> DiffBuilder<S, diff_state::Empty> {
         DiffBuilder::new()
     }
 }
 
-impl<'a> DiffBuilder<'a, diff_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> DiffBuilder<S, diff_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         DiffBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DiffBuilder<'a, S>
+impl<S: BosStr, St> DiffBuilder<S, St>
 where
-    S: diff_state::State,
-    S::Ref: diff_state::IsUnset,
+    St: diff_state::State,
+    St::Ref: diff_state::IsUnset,
 {
     /// Set the `ref` field (required)
     pub fn r#ref(
         mut self,
         value: impl Into<S>,
-    ) -> DiffBuilder<'a, diff_state::SetRef<S>> {
+    ) -> DiffBuilder<S, diff_state::SetRef<St>> {
         self._fields.0 = Option::Some(value.into());
         DiffBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DiffBuilder<'a, S>
+impl<S: BosStr, St> DiffBuilder<S, St>
 where
-    S: diff_state::State,
-    S::Repo: diff_state::IsUnset,
+    St: diff_state::State,
+    St::Repo: diff_state::IsUnset,
 {
     /// Set the `repo` field (required)
     pub fn repo(
         mut self,
         value: impl Into<S>,
-    ) -> DiffBuilder<'a, diff_state::SetRepo<S>> {
+    ) -> DiffBuilder<S, diff_state::SetRepo<St>> {
         self._fields.1 = Option::Some(value.into());
         DiffBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DiffBuilder<'a, S>
+impl<S: BosStr, St> DiffBuilder<S, St>
 where
-    S: diff_state::State,
-    S::Ref: diff_state::IsSet,
-    S::Repo: diff_state::IsSet,
+    St: diff_state::State,
+    St::Repo: diff_state::IsSet,
+    St::Ref: diff_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Diff<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Diff<S> {
         Diff {
             r#ref: self._fields.0.unwrap(),
             repo: self._fields.1.unwrap(),

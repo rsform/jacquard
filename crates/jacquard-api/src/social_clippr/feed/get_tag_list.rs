@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::value::Data;
@@ -19,34 +19,31 @@ use serde::{Serialize, Deserialize};
 use crate::social_clippr::feed::TagView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetTagList<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetTagList<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub actor: Option<AtIdentifier<S>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetTagListOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetTagListOutput<S: BosStr = DefaultStr> {
     ///A list of tags and their associated details
     pub tags: Vec<TagView<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -55,12 +52,11 @@ pub struct GetTagListResponse;
 impl jacquard_common::xrpc::XrpcResp for GetTagListResponse {
     const NSID: &'static str = "social.clippr.feed.getTagList";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetTagListOutput<S>;
+    type Output<S: BosStr> = GetTagListOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetTagList<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetTagList<S> {
     const NSID: &'static str = "social.clippr.feed.getTagList";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetTagListResponse;
@@ -71,7 +67,7 @@ pub struct GetTagListRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetTagListRequest {
     const PATH: &'static str = "/xrpc/social.clippr.feed.getTagList";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetTagList<S>;
+    type Request<S: BosStr> = GetTagList<S>;
     type Response = GetTagListResponse;
 }
 
@@ -94,32 +90,32 @@ pub mod get_tag_list_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetTagListBuilder<'a, S: get_tag_list_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetTagListBuilder<S: BosStr, St: get_tag_list_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtIdentifier<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetTagList<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetTagListBuilder<'a, get_tag_list_state::Empty> {
+impl<S: BosStr> GetTagList<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetTagListBuilder<S, get_tag_list_state::Empty> {
         GetTagListBuilder::new()
     }
 }
 
-impl<'a> GetTagListBuilder<'a, get_tag_list_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetTagListBuilder<S, get_tag_list_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetTagListBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: get_tag_list_state::State> GetTagListBuilder<'a, S> {
+impl<S: BosStr, St: get_tag_list_state::State> GetTagListBuilder<S, St> {
     /// Set the `actor` field (optional)
     pub fn actor(mut self, value: impl Into<Option<AtIdentifier<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -132,12 +128,12 @@ impl<'a, S: get_tag_list_state::State> GetTagListBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GetTagListBuilder<'a, S>
+impl<S: BosStr, St> GetTagListBuilder<S, St>
 where
-    S: get_tag_list_state::State,
+    St: get_tag_list_state::State,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetTagList<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetTagList<S> {
         GetTagList {
             actor: self._fields.0,
         }

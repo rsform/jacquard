@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
 
 #[allow(unused_imports)]
@@ -31,11 +31,11 @@ use serde::{Serialize, Deserialize};
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Attestation<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Attestation<S: BosStr = DefaultStr> {
     ///Timestamp when the attestation was created (optional)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub attested_at: Option<Datetime>,
@@ -48,7 +48,7 @@ pub struct Attestation<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Attestation<S> {
+impl<S: BosStr> LexiconSchema for Attestation<S> {
     fn nsid() -> &'static str {
         "blue.atplay.score.defs"
     }
@@ -84,66 +84,66 @@ pub mod attestation_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Key;
         type Signature;
+        type Key;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Key = Unset;
         type Signature = Unset;
-    }
-    ///State transition - sets the `key` field to Set
-    pub struct SetKey<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetKey<S> {}
-    impl<S: State> State for SetKey<S> {
-        type Key = Set<members::key>;
-        type Signature = S::Signature;
+        type Key = Unset;
     }
     ///State transition - sets the `signature` field to Set
-    pub struct SetSignature<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSignature<S> {}
-    impl<S: State> State for SetSignature<S> {
-        type Key = S::Key;
+    pub struct SetSignature<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSignature<St> {}
+    impl<St: State> State for SetSignature<St> {
         type Signature = Set<members::signature>;
+        type Key = St::Key;
+    }
+    ///State transition - sets the `key` field to Set
+    pub struct SetKey<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetKey<St> {}
+    impl<St: State> State for SetKey<St> {
+        type Signature = St::Signature;
+        type Key = Set<members::key>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `key` field
-        pub struct key(());
         ///Marker type for the `signature` field
         pub struct signature(());
+        ///Marker type for the `key` field
+        pub struct key(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct AttestationBuilder<'a, S: attestation_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct AttestationBuilder<S: BosStr, St: attestation_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<S>, Option<Bytes>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Attestation<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> AttestationBuilder<'a, attestation_state::Empty> {
+impl<S: BosStr> Attestation<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> AttestationBuilder<S, attestation_state::Empty> {
         AttestationBuilder::new()
     }
 }
 
-impl<'a> AttestationBuilder<'a, attestation_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> AttestationBuilder<S, attestation_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         AttestationBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: attestation_state::State> AttestationBuilder<'a, S> {
+impl<S: BosStr, St: attestation_state::State> AttestationBuilder<S, St> {
     /// Set the `attestedAt` field (optional)
     pub fn attested_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.0 = value.into();
@@ -156,52 +156,52 @@ impl<'a, S: attestation_state::State> AttestationBuilder<'a, S> {
     }
 }
 
-impl<'a, S> AttestationBuilder<'a, S>
+impl<S: BosStr, St> AttestationBuilder<S, St>
 where
-    S: attestation_state::State,
-    S::Key: attestation_state::IsUnset,
+    St: attestation_state::State,
+    St::Key: attestation_state::IsUnset,
 {
     /// Set the `key` field (required)
     pub fn key(
         mut self,
         value: impl Into<S>,
-    ) -> AttestationBuilder<'a, attestation_state::SetKey<S>> {
+    ) -> AttestationBuilder<S, attestation_state::SetKey<St>> {
         self._fields.1 = Option::Some(value.into());
         AttestationBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AttestationBuilder<'a, S>
+impl<S: BosStr, St> AttestationBuilder<S, St>
 where
-    S: attestation_state::State,
-    S::Signature: attestation_state::IsUnset,
+    St: attestation_state::State,
+    St::Signature: attestation_state::IsUnset,
 {
     /// Set the `signature` field (required)
     pub fn signature(
         mut self,
         value: impl Into<Bytes>,
-    ) -> AttestationBuilder<'a, attestation_state::SetSignature<S>> {
+    ) -> AttestationBuilder<S, attestation_state::SetSignature<St>> {
         self._fields.2 = Option::Some(value.into());
         AttestationBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AttestationBuilder<'a, S>
+impl<S: BosStr, St> AttestationBuilder<S, St>
 where
-    S: attestation_state::State,
-    S::Key: attestation_state::IsSet,
-    S::Signature: attestation_state::IsSet,
+    St: attestation_state::State,
+    St::Signature: attestation_state::IsSet,
+    St::Key: attestation_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Attestation<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Attestation<S> {
         Attestation {
             attested_at: self._fields.0,
             key: self._fields.1.unwrap(),
@@ -209,11 +209,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Attestation<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Attestation<S> {
         Attestation {
             attested_at: self._fields.0,
             key: self._fields.1.unwrap(),

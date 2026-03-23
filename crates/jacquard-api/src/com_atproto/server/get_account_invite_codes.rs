@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
@@ -32,18 +32,16 @@ pub struct GetAccountInviteCodes {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetAccountInviteCodesOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetAccountInviteCodesOutput<S: BosStr = DefaultStr> {
     pub codes: Vec<InviteCode<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -94,7 +92,7 @@ pub struct GetAccountInviteCodesResponse;
 impl jacquard_common::xrpc::XrpcResp for GetAccountInviteCodesResponse {
     const NSID: &'static str = "com.atproto.server.getAccountInviteCodes";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetAccountInviteCodesOutput<S>;
+    type Output<S: BosStr> = GetAccountInviteCodesOutput<S>;
     type Err = GetAccountInviteCodesError;
 }
 
@@ -109,7 +107,7 @@ pub struct GetAccountInviteCodesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetAccountInviteCodesRequest {
     const PATH: &'static str = "/xrpc/com.atproto.server.getAccountInviteCodes";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetAccountInviteCodes;
+    type Request<S: BosStr> = GetAccountInviteCodes;
     type Response = GetAccountInviteCodesResponse;
 }
 
@@ -140,21 +138,21 @@ pub mod get_account_invite_codes_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetAccountInviteCodesBuilder<S: get_account_invite_codes_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetAccountInviteCodesBuilder<St: get_account_invite_codes_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<bool>, Option<bool>),
 }
 
 impl GetAccountInviteCodes {
-    /// Create a new builder for this type
+    /// Create a new builder for this type.
     pub fn new() -> GetAccountInviteCodesBuilder<get_account_invite_codes_state::Empty> {
         GetAccountInviteCodesBuilder::new()
     }
 }
 
 impl GetAccountInviteCodesBuilder<get_account_invite_codes_state::Empty> {
-    /// Create a new builder with all fields unset
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetAccountInviteCodesBuilder {
             _state: PhantomData,
@@ -163,7 +161,7 @@ impl GetAccountInviteCodesBuilder<get_account_invite_codes_state::Empty> {
     }
 }
 
-impl<S: get_account_invite_codes_state::State> GetAccountInviteCodesBuilder<S> {
+impl<St: get_account_invite_codes_state::State> GetAccountInviteCodesBuilder<St> {
     /// Set the `createAvailable` field (optional)
     pub fn create_available(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.0 = value.into();
@@ -176,7 +174,7 @@ impl<S: get_account_invite_codes_state::State> GetAccountInviteCodesBuilder<S> {
     }
 }
 
-impl<S: get_account_invite_codes_state::State> GetAccountInviteCodesBuilder<S> {
+impl<St: get_account_invite_codes_state::State> GetAccountInviteCodesBuilder<St> {
     /// Set the `includeUsed` field (optional)
     pub fn include_used(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.1 = value.into();
@@ -189,11 +187,11 @@ impl<S: get_account_invite_codes_state::State> GetAccountInviteCodesBuilder<S> {
     }
 }
 
-impl<S> GetAccountInviteCodesBuilder<S>
+impl<St> GetAccountInviteCodesBuilder<St>
 where
-    S: get_account_invite_codes_state::State,
+    St: get_account_invite_codes_state::State,
 {
-    /// Build the final struct
+    /// Build the final struct.
     pub fn build(self) -> GetAccountInviteCodes {
         GetAccountInviteCodes {
             create_available: self._fields.0,

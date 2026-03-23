@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -37,11 +37,11 @@ use crate::com_whtwnd::blog::Ogp;
     rename = "com.whtwnd.blog.entry",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Entry<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Entry<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub blobs: Option<Vec<BlobMetadata<S>>>,
     pub content: S,
@@ -72,18 +72,18 @@ pub struct Entry<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct EntryGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct EntryGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Entry<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Entry<S> {
+impl<S: BosStr> Entry<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, EntryRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -96,17 +96,17 @@ pub struct EntryRecord;
 impl XrpcResp for EntryRecord {
     const NSID: &'static str = "com.whtwnd.blog.entry";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = EntryGetRecordOutput<S>;
+    type Output<S: BosStr> = EntryGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<EntryGetRecordOutput<S>> for Entry<S> {
+impl<S: BosStr> From<EntryGetRecordOutput<S>> for Entry<S> {
     fn from(output: EntryGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Entry<S> {
+impl<S: BosStr> Collection for Entry<S> {
     const NSID: &'static str = "com.whtwnd.blog.entry";
     type Record = EntryRecord;
 }
@@ -116,7 +116,7 @@ impl Collection for EntryRecord {
     type Record = EntryRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Entry<S> {
+impl<S: BosStr> LexiconSchema for Entry<S> {
     fn nsid() -> &'static str {
         "com.whtwnd.blog.entry"
     }
@@ -162,8 +162,8 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Entry<S> {
     }
 }
 
-fn _default_entry_visibility<S: From<&'static str>>() -> ::core::option::Option<S> {
-    Some(S::from("public"))
+fn _default_entry_visibility<S: FromStaticStr>() -> ::core::option::Option<S> {
+    Some(S::from_static("public"))
 }
 
 pub mod entry_state {
@@ -185,9 +185,9 @@ pub mod entry_state {
         type Content = Unset;
     }
     ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
+    pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetContent<St> {}
+    impl<St: State> State for SetContent<St> {
         type Content = Set<members::content>;
     }
     /// Marker types for field names
@@ -198,9 +198,9 @@ pub mod entry_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct EntryBuilder<'a, S: entry_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct EntryBuilder<S: BosStr, St: entry_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<BlobMetadata<S>>>,
         Option<S>,
@@ -212,28 +212,28 @@ pub struct EntryBuilder<'a, S: entry_state::State> {
         Option<S>,
         Option<S>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Entry<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> EntryBuilder<'a, entry_state::Empty> {
+impl<S: BosStr> Entry<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> EntryBuilder<S, entry_state::Empty> {
         EntryBuilder::new()
     }
 }
 
-impl<'a> EntryBuilder<'a, entry_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> EntryBuilder<S, entry_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         EntryBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
+impl<S: BosStr, St: entry_state::State> EntryBuilder<S, St> {
     /// Set the `blobs` field (optional)
     pub fn blobs(mut self, value: impl Into<Option<Vec<BlobMetadata<S>>>>) -> Self {
         self._fields.0 = value.into();
@@ -246,26 +246,26 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     }
 }
 
-impl<'a, S> EntryBuilder<'a, S>
+impl<S: BosStr, St> EntryBuilder<S, St>
 where
-    S: entry_state::State,
-    S::Content: entry_state::IsUnset,
+    St: entry_state::State,
+    St::Content: entry_state::IsUnset,
 {
     /// Set the `content` field (required)
     pub fn content(
         mut self,
         value: impl Into<S>,
-    ) -> EntryBuilder<'a, entry_state::SetContent<S>> {
+    ) -> EntryBuilder<S, entry_state::SetContent<St>> {
         self._fields.1 = Option::Some(value.into());
         EntryBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
+impl<S: BosStr, St: entry_state::State> EntryBuilder<S, St> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.2 = value.into();
@@ -278,7 +278,7 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     }
 }
 
-impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
+impl<S: BosStr, St: entry_state::State> EntryBuilder<S, St> {
     /// Set the `isDraft` field (optional)
     pub fn is_draft(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.3 = value.into();
@@ -291,7 +291,7 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     }
 }
 
-impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
+impl<S: BosStr, St: entry_state::State> EntryBuilder<S, St> {
     /// Set the `ogp` field (optional)
     pub fn ogp(mut self, value: impl Into<Option<Ogp<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -304,7 +304,7 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     }
 }
 
-impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
+impl<S: BosStr, St: entry_state::State> EntryBuilder<S, St> {
     /// Set the `subtitle` field (optional)
     pub fn subtitle(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
@@ -317,7 +317,7 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     }
 }
 
-impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
+impl<S: BosStr, St: entry_state::State> EntryBuilder<S, St> {
     /// Set the `theme` field (optional)
     pub fn theme(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.6 = value.into();
@@ -330,7 +330,7 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     }
 }
 
-impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
+impl<S: BosStr, St: entry_state::State> EntryBuilder<S, St> {
     /// Set the `title` field (optional)
     pub fn title(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.7 = value.into();
@@ -343,7 +343,7 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     }
 }
 
-impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
+impl<S: BosStr, St: entry_state::State> EntryBuilder<S, St> {
     /// Set the `visibility` field (optional)
     pub fn visibility(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.8 = value.into();
@@ -356,13 +356,13 @@ impl<'a, S: entry_state::State> EntryBuilder<'a, S> {
     }
 }
 
-impl<'a, S> EntryBuilder<'a, S>
+impl<S: BosStr, St> EntryBuilder<S, St>
 where
-    S: entry_state::State,
-    S::Content: entry_state::IsSet,
+    St: entry_state::State,
+    St::Content: entry_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Entry<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Entry<S> {
         Entry {
             blobs: self._fields.0,
             content: self._fields.1.unwrap(),
@@ -372,12 +372,12 @@ where
             subtitle: self._fields.5,
             theme: self._fields.6,
             title: self._fields.7,
-            visibility: self._fields.8.or_else(|| Some(CowStr::from("public"))),
+            visibility: self._fields.8.or_else(|| Some(SmolStr::from("public"))),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Entry<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Entry<S> {
         Entry {
             blobs: self._fields.0,
             content: self._fields.1.unwrap(),
@@ -387,7 +387,7 @@ where
             subtitle: self._fields.5,
             theme: self._fields.6,
             title: self._fields.7,
-            visibility: self._fields.8.or_else(|| Some(CowStr::from("public"))),
+            visibility: self._fields.8.or_else(|| Some(SmolStr::from("public"))),
             extra_data: Some(extra_data),
         }
     }

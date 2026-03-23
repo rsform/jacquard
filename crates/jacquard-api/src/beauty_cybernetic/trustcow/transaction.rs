@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "beauty.cybernetic.trustcow.transaction",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Transaction<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Transaction<S: BosStr = DefaultStr> {
     ///Transaction amount (optional, in whatever currency applies)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub amount: Option<S>,
@@ -67,18 +67,18 @@ pub struct Transaction<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct TransactionGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct TransactionGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Transaction<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Transaction<S> {
+impl<S: BosStr> Transaction<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, TransactionRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -91,17 +91,17 @@ pub struct TransactionRecord;
 impl XrpcResp for TransactionRecord {
     const NSID: &'static str = "beauty.cybernetic.trustcow.transaction";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = TransactionGetRecordOutput<S>;
+    type Output<S: BosStr> = TransactionGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<TransactionGetRecordOutput<S>> for Transaction<S> {
+impl<S: BosStr> From<TransactionGetRecordOutput<S>> for Transaction<S> {
     fn from(output: TransactionGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Transaction<S> {
+impl<S: BosStr> Collection for Transaction<S> {
     const NSID: &'static str = "beauty.cybernetic.trustcow.transaction";
     type Record = TransactionRecord;
 }
@@ -111,7 +111,7 @@ impl Collection for TransactionRecord {
     type Record = TransactionRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Transaction<S> {
+impl<S: BosStr> LexiconSchema for Transaction<S> {
     fn nsid() -> &'static str {
         "beauty.cybernetic.trustcow.transaction"
     }
@@ -168,72 +168,72 @@ pub mod transaction_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type ServiceProvider;
-        type ServiceConsumer;
-        type TransactionId;
         type CreatedAt;
+        type TransactionId;
+        type ServiceConsumer;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type ServiceProvider = Unset;
-        type ServiceConsumer = Unset;
-        type TransactionId = Unset;
         type CreatedAt = Unset;
+        type TransactionId = Unset;
+        type ServiceConsumer = Unset;
     }
     ///State transition - sets the `service_provider` field to Set
-    pub struct SetServiceProvider<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetServiceProvider<S> {}
-    impl<S: State> State for SetServiceProvider<S> {
+    pub struct SetServiceProvider<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetServiceProvider<St> {}
+    impl<St: State> State for SetServiceProvider<St> {
         type ServiceProvider = Set<members::service_provider>;
-        type ServiceConsumer = S::ServiceConsumer;
-        type TransactionId = S::TransactionId;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `service_consumer` field to Set
-    pub struct SetServiceConsumer<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetServiceConsumer<S> {}
-    impl<S: State> State for SetServiceConsumer<S> {
-        type ServiceProvider = S::ServiceProvider;
-        type ServiceConsumer = Set<members::service_consumer>;
-        type TransactionId = S::TransactionId;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `transaction_id` field to Set
-    pub struct SetTransactionId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTransactionId<S> {}
-    impl<S: State> State for SetTransactionId<S> {
-        type ServiceProvider = S::ServiceProvider;
-        type ServiceConsumer = S::ServiceConsumer;
-        type TransactionId = Set<members::transaction_id>;
-        type CreatedAt = S::CreatedAt;
+        type CreatedAt = St::CreatedAt;
+        type TransactionId = St::TransactionId;
+        type ServiceConsumer = St::ServiceConsumer;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type ServiceProvider = S::ServiceProvider;
-        type ServiceConsumer = S::ServiceConsumer;
-        type TransactionId = S::TransactionId;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type ServiceProvider = St::ServiceProvider;
         type CreatedAt = Set<members::created_at>;
+        type TransactionId = St::TransactionId;
+        type ServiceConsumer = St::ServiceConsumer;
+    }
+    ///State transition - sets the `transaction_id` field to Set
+    pub struct SetTransactionId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTransactionId<St> {}
+    impl<St: State> State for SetTransactionId<St> {
+        type ServiceProvider = St::ServiceProvider;
+        type CreatedAt = St::CreatedAt;
+        type TransactionId = Set<members::transaction_id>;
+        type ServiceConsumer = St::ServiceConsumer;
+    }
+    ///State transition - sets the `service_consumer` field to Set
+    pub struct SetServiceConsumer<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetServiceConsumer<St> {}
+    impl<St: State> State for SetServiceConsumer<St> {
+        type ServiceProvider = St::ServiceProvider;
+        type CreatedAt = St::CreatedAt;
+        type TransactionId = St::TransactionId;
+        type ServiceConsumer = Set<members::service_consumer>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `service_provider` field
         pub struct service_provider(());
-        ///Marker type for the `service_consumer` field
-        pub struct service_consumer(());
-        ///Marker type for the `transaction_id` field
-        pub struct transaction_id(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `transaction_id` field
+        pub struct transaction_id(());
+        ///Marker type for the `service_consumer` field
+        pub struct service_consumer(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct TransactionBuilder<'a, S: transaction_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct TransactionBuilder<S: BosStr, St: transaction_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
         Option<Datetime>,
@@ -243,28 +243,28 @@ pub struct TransactionBuilder<'a, S: transaction_state::State> {
         Option<S>,
         Option<S>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Transaction<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> TransactionBuilder<'a, transaction_state::Empty> {
+impl<S: BosStr> Transaction<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> TransactionBuilder<S, transaction_state::Empty> {
         TransactionBuilder::new()
     }
 }
 
-impl<'a> TransactionBuilder<'a, transaction_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> TransactionBuilder<S, transaction_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         TransactionBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: transaction_state::State> TransactionBuilder<'a, S> {
+impl<S: BosStr, St: transaction_state::State> TransactionBuilder<S, St> {
     /// Set the `amount` field (optional)
     pub fn amount(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -277,26 +277,26 @@ impl<'a, S: transaction_state::State> TransactionBuilder<'a, S> {
     }
 }
 
-impl<'a, S> TransactionBuilder<'a, S>
+impl<S: BosStr, St> TransactionBuilder<S, St>
 where
-    S: transaction_state::State,
-    S::CreatedAt: transaction_state::IsUnset,
+    St: transaction_state::State,
+    St::CreatedAt: transaction_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> TransactionBuilder<'a, transaction_state::SetCreatedAt<S>> {
+    ) -> TransactionBuilder<S, transaction_state::SetCreatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         TransactionBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: transaction_state::State> TransactionBuilder<'a, S> {
+impl<S: BosStr, St: transaction_state::State> TransactionBuilder<S, St> {
     /// Set the `currency` field (optional)
     pub fn currency(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -309,7 +309,7 @@ impl<'a, S: transaction_state::State> TransactionBuilder<'a, S> {
     }
 }
 
-impl<'a, S: transaction_state::State> TransactionBuilder<'a, S> {
+impl<S: BosStr, St: transaction_state::State> TransactionBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -322,73 +322,73 @@ impl<'a, S: transaction_state::State> TransactionBuilder<'a, S> {
     }
 }
 
-impl<'a, S> TransactionBuilder<'a, S>
+impl<S: BosStr, St> TransactionBuilder<S, St>
 where
-    S: transaction_state::State,
-    S::ServiceConsumer: transaction_state::IsUnset,
+    St: transaction_state::State,
+    St::ServiceConsumer: transaction_state::IsUnset,
 {
     /// Set the `serviceConsumer` field (required)
     pub fn service_consumer(
         mut self,
         value: impl Into<S>,
-    ) -> TransactionBuilder<'a, transaction_state::SetServiceConsumer<S>> {
+    ) -> TransactionBuilder<S, transaction_state::SetServiceConsumer<St>> {
         self._fields.4 = Option::Some(value.into());
         TransactionBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> TransactionBuilder<'a, S>
+impl<S: BosStr, St> TransactionBuilder<S, St>
 where
-    S: transaction_state::State,
-    S::ServiceProvider: transaction_state::IsUnset,
+    St: transaction_state::State,
+    St::ServiceProvider: transaction_state::IsUnset,
 {
     /// Set the `serviceProvider` field (required)
     pub fn service_provider(
         mut self,
         value: impl Into<S>,
-    ) -> TransactionBuilder<'a, transaction_state::SetServiceProvider<S>> {
+    ) -> TransactionBuilder<S, transaction_state::SetServiceProvider<St>> {
         self._fields.5 = Option::Some(value.into());
         TransactionBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> TransactionBuilder<'a, S>
+impl<S: BosStr, St> TransactionBuilder<S, St>
 where
-    S: transaction_state::State,
-    S::TransactionId: transaction_state::IsUnset,
+    St: transaction_state::State,
+    St::TransactionId: transaction_state::IsUnset,
 {
     /// Set the `transactionId` field (required)
     pub fn transaction_id(
         mut self,
         value: impl Into<S>,
-    ) -> TransactionBuilder<'a, transaction_state::SetTransactionId<S>> {
+    ) -> TransactionBuilder<S, transaction_state::SetTransactionId<St>> {
         self._fields.6 = Option::Some(value.into());
         TransactionBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> TransactionBuilder<'a, S>
+impl<S: BosStr, St> TransactionBuilder<S, St>
 where
-    S: transaction_state::State,
-    S::ServiceProvider: transaction_state::IsSet,
-    S::ServiceConsumer: transaction_state::IsSet,
-    S::TransactionId: transaction_state::IsSet,
-    S::CreatedAt: transaction_state::IsSet,
+    St: transaction_state::State,
+    St::ServiceProvider: transaction_state::IsSet,
+    St::CreatedAt: transaction_state::IsSet,
+    St::TransactionId: transaction_state::IsSet,
+    St::ServiceConsumer: transaction_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Transaction<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Transaction<S> {
         Transaction {
             amount: self._fields.0,
             created_at: self._fields.1.unwrap(),
@@ -400,11 +400,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Transaction<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Transaction<S> {
         Transaction {
             amount: self._fields.0,
             created_at: self._fields.1.unwrap(),

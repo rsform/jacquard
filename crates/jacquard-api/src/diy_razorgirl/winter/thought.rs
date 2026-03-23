@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,11 +34,11 @@ use serde::{Serialize, Deserialize};
     rename = "diy.razorgirl.winter.thought",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Thought<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Thought<S: BosStr = DefaultStr> {
     pub content: S,
     pub created_at: Datetime,
     ///Duration for tool_call thoughts
@@ -56,7 +56,7 @@ pub struct Thought<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ThoughtKind<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ThoughtKind<S: BosStr = DefaultStr> {
     Insight,
     Question,
     Plan,
@@ -67,7 +67,7 @@ pub enum ThoughtKind<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> ThoughtKind<S> {
+impl<S: BosStr> ThoughtKind<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Insight => "insight",
@@ -95,19 +95,19 @@ impl<S: Bos<str> + AsRef<str>> ThoughtKind<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ThoughtKind<S> {
+impl<S: BosStr> core::fmt::Display for ThoughtKind<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for ThoughtKind<S> {
+impl<S: BosStr> AsRef<str> for ThoughtKind<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for ThoughtKind<S> {
+impl<S: BosStr> Serialize for ThoughtKind<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -116,8 +116,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for ThoughtKind<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for ThoughtKind<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ThoughtKind<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -127,14 +126,18 @@ for ThoughtKind<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for ThoughtKind<S> {
+impl<S: BosStr + Default> Default for ThoughtKind<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for ThoughtKind<S> {
-    type Output = ThoughtKind<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for ThoughtKind<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ThoughtKind<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             ThoughtKind::Insight => ThoughtKind::Insight,
@@ -155,18 +158,18 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for ThoughtKind<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ThoughtGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ThoughtGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Thought<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Thought<S> {
+impl<S: BosStr> Thought<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, ThoughtRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -179,17 +182,17 @@ pub struct ThoughtRecord;
 impl XrpcResp for ThoughtRecord {
     const NSID: &'static str = "diy.razorgirl.winter.thought";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ThoughtGetRecordOutput<S>;
+    type Output<S: BosStr> = ThoughtGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<ThoughtGetRecordOutput<S>> for Thought<S> {
+impl<S: BosStr> From<ThoughtGetRecordOutput<S>> for Thought<S> {
     fn from(output: ThoughtGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Thought<S> {
+impl<S: BosStr> Collection for Thought<S> {
     const NSID: &'static str = "diy.razorgirl.winter.thought";
     type Record = ThoughtRecord;
 }
@@ -199,7 +202,7 @@ impl Collection for ThoughtRecord {
     type Record = ThoughtRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Thought<S> {
+impl<S: BosStr> LexiconSchema for Thought<S> {
     fn nsid() -> &'static str {
         "diy.razorgirl.winter.thought"
     }
@@ -246,56 +249,56 @@ pub mod thought_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CreatedAt;
-        type Kind;
         type Content;
+        type Kind;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CreatedAt = Unset;
-        type Kind = Unset;
         type Content = Unset;
+        type Kind = Unset;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
-        type Kind = S::Kind;
-        type Content = S::Content;
-    }
-    ///State transition - sets the `kind` field to Set
-    pub struct SetKind<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetKind<S> {}
-    impl<S: State> State for SetKind<S> {
-        type CreatedAt = S::CreatedAt;
-        type Kind = Set<members::kind>;
-        type Content = S::Content;
+        type Content = St::Content;
+        type Kind = St::Kind;
     }
     ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type CreatedAt = S::CreatedAt;
-        type Kind = S::Kind;
+    pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetContent<St> {}
+    impl<St: State> State for SetContent<St> {
+        type CreatedAt = St::CreatedAt;
         type Content = Set<members::content>;
+        type Kind = St::Kind;
+    }
+    ///State transition - sets the `kind` field to Set
+    pub struct SetKind<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetKind<St> {}
+    impl<St: State> State for SetKind<St> {
+        type CreatedAt = St::CreatedAt;
+        type Content = St::Content;
+        type Kind = Set<members::kind>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `kind` field
-        pub struct kind(());
         ///Marker type for the `content` field
         pub struct content(());
+        ///Marker type for the `kind` field
+        pub struct kind(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ThoughtBuilder<'a, S: thought_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ThoughtBuilder<S: BosStr, St: thought_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
         Option<Datetime>,
@@ -304,66 +307,66 @@ pub struct ThoughtBuilder<'a, S: thought_state::State> {
         Option<Vec<S>>,
         Option<S>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Thought<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ThoughtBuilder<'a, thought_state::Empty> {
+impl<S: BosStr> Thought<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ThoughtBuilder<S, thought_state::Empty> {
         ThoughtBuilder::new()
     }
 }
 
-impl<'a> ThoughtBuilder<'a, thought_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ThoughtBuilder<S, thought_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ThoughtBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ThoughtBuilder<'a, S>
+impl<S: BosStr, St> ThoughtBuilder<S, St>
 where
-    S: thought_state::State,
-    S::Content: thought_state::IsUnset,
+    St: thought_state::State,
+    St::Content: thought_state::IsUnset,
 {
     /// Set the `content` field (required)
     pub fn content(
         mut self,
         value: impl Into<S>,
-    ) -> ThoughtBuilder<'a, thought_state::SetContent<S>> {
+    ) -> ThoughtBuilder<S, thought_state::SetContent<St>> {
         self._fields.0 = Option::Some(value.into());
         ThoughtBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ThoughtBuilder<'a, S>
+impl<S: BosStr, St> ThoughtBuilder<S, St>
 where
-    S: thought_state::State,
-    S::CreatedAt: thought_state::IsUnset,
+    St: thought_state::State,
+    St::CreatedAt: thought_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ThoughtBuilder<'a, thought_state::SetCreatedAt<S>> {
+    ) -> ThoughtBuilder<S, thought_state::SetCreatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         ThoughtBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: thought_state::State> ThoughtBuilder<'a, S> {
+impl<S: BosStr, St: thought_state::State> ThoughtBuilder<S, St> {
     /// Set the `durationMs` field (optional)
     pub fn duration_ms(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -376,26 +379,26 @@ impl<'a, S: thought_state::State> ThoughtBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ThoughtBuilder<'a, S>
+impl<S: BosStr, St> ThoughtBuilder<S, St>
 where
-    S: thought_state::State,
-    S::Kind: thought_state::IsUnset,
+    St: thought_state::State,
+    St::Kind: thought_state::IsUnset,
 {
     /// Set the `kind` field (required)
     pub fn kind(
         mut self,
         value: impl Into<ThoughtKind<S>>,
-    ) -> ThoughtBuilder<'a, thought_state::SetKind<S>> {
+    ) -> ThoughtBuilder<S, thought_state::SetKind<St>> {
         self._fields.3 = Option::Some(value.into());
         ThoughtBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: thought_state::State> ThoughtBuilder<'a, S> {
+impl<S: BosStr, St: thought_state::State> ThoughtBuilder<S, St> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -408,7 +411,7 @@ impl<'a, S: thought_state::State> ThoughtBuilder<'a, S> {
     }
 }
 
-impl<'a, S: thought_state::State> ThoughtBuilder<'a, S> {
+impl<S: BosStr, St: thought_state::State> ThoughtBuilder<S, St> {
     /// Set the `trigger` field (optional)
     pub fn trigger(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
@@ -421,15 +424,15 @@ impl<'a, S: thought_state::State> ThoughtBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ThoughtBuilder<'a, S>
+impl<S: BosStr, St> ThoughtBuilder<S, St>
 where
-    S: thought_state::State,
-    S::CreatedAt: thought_state::IsSet,
-    S::Kind: thought_state::IsSet,
-    S::Content: thought_state::IsSet,
+    St: thought_state::State,
+    St::CreatedAt: thought_state::IsSet,
+    St::Content: thought_state::IsSet,
+    St::Kind: thought_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Thought<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Thought<S> {
         Thought {
             content: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
@@ -440,11 +443,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Thought<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Thought<S> {
         Thought {
             content: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),

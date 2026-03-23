@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use crate::io_atcr::manifest;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct BlobReference<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct BlobReference<S: BosStr = DefaultStr> {
     ///Optional OCI annotation metadata. Map of string keys to string values.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub annotations: Option<Data<S>>,
@@ -64,11 +64,11 @@ pub struct BlobReference<S: Bos<str> + AsRef<str> = DefaultStr> {
     rename = "io.atcr.manifest",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Manifest<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Manifest<S: BosStr = DefaultStr> {
     ///Optional OCI annotation metadata. Map of string keys to string values (e.g., org.opencontainers.image.title → 'My App').
     #[serde(skip_serializing_if = "Option::is_none")]
     pub annotations: Option<Data<S>>,
@@ -110,7 +110,7 @@ pub struct Manifest<S: Bos<str> + AsRef<str> = DefaultStr> {
 /// OCI media type
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ManifestMediaType<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ManifestMediaType<S: BosStr = DefaultStr> {
     ApplicationVndOciImageManifestV1Json,
     ApplicationVndDockerDistributionManifestV2Json,
     ApplicationVndOciImageIndexV1Json,
@@ -118,7 +118,7 @@ pub enum ManifestMediaType<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> ManifestMediaType<S> {
+impl<S: BosStr> ManifestMediaType<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::ApplicationVndOciImageManifestV1Json => {
@@ -156,19 +156,19 @@ impl<S: Bos<str> + AsRef<str>> ManifestMediaType<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ManifestMediaType<S> {
+impl<S: BosStr> core::fmt::Display for ManifestMediaType<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for ManifestMediaType<S> {
+impl<S: BosStr> AsRef<str> for ManifestMediaType<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for ManifestMediaType<S> {
+impl<S: BosStr> Serialize for ManifestMediaType<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -177,8 +177,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for ManifestMediaType<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for ManifestMediaType<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ManifestMediaType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -188,14 +187,18 @@ for ManifestMediaType<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for ManifestMediaType<S> {
+impl<S: BosStr + Default> Default for ManifestMediaType<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for ManifestMediaType<S> {
-    type Output = ManifestMediaType<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for ManifestMediaType<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ManifestMediaType<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             ManifestMediaType::ApplicationVndOciImageManifestV1Json => {
@@ -221,11 +224,11 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for ManifestMediaType<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ManifestGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ManifestGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
@@ -238,11 +241,11 @@ pub struct ManifestGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ManifestReference<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ManifestReference<S: BosStr = DefaultStr> {
     ///Optional OCI annotation metadata. Map of string keys to string values.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub annotations: Option<Data<S>>,
@@ -265,11 +268,11 @@ pub struct ManifestReference<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Platform<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Platform<S: BosStr = DefaultStr> {
     ///CPU architecture (e.g., 'amd64', 'arm64', 'arm')
     pub architecture: S,
     ///Operating system (e.g., 'linux', 'windows', 'darwin')
@@ -287,13 +290,13 @@ pub struct Platform<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Manifest<S> {
+impl<S: BosStr> Manifest<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, ManifestRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for BlobReference<S> {
+impl<S: BosStr> LexiconSchema for BlobReference<S> {
     fn nsid() -> &'static str {
         "io.atcr.manifest"
     }
@@ -337,17 +340,17 @@ pub struct ManifestRecord;
 impl XrpcResp for ManifestRecord {
     const NSID: &'static str = "io.atcr.manifest";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ManifestGetRecordOutput<S>;
+    type Output<S: BosStr> = ManifestGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<ManifestGetRecordOutput<S>> for Manifest<S> {
+impl<S: BosStr> From<ManifestGetRecordOutput<S>> for Manifest<S> {
     fn from(output: ManifestGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Manifest<S> {
+impl<S: BosStr> Collection for Manifest<S> {
     const NSID: &'static str = "io.atcr.manifest";
     type Record = ManifestRecord;
 }
@@ -357,7 +360,7 @@ impl Collection for ManifestRecord {
     type Record = ManifestRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Manifest<S> {
+impl<S: BosStr> LexiconSchema for Manifest<S> {
     fn nsid() -> &'static str {
         "io.atcr.manifest"
     }
@@ -405,7 +408,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Manifest<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ManifestReference<S> {
+impl<S: BosStr> LexiconSchema for ManifestReference<S> {
     fn nsid() -> &'static str {
         "io.atcr.manifest"
     }
@@ -442,7 +445,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for ManifestReference<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Platform<S> {
+impl<S: BosStr> LexiconSchema for Platform<S> {
     fn nsid() -> &'static str {
         "io.atcr.manifest"
     }
@@ -509,57 +512,57 @@ pub mod blob_reference_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type MediaType;
         type Size;
+        type MediaType;
         type Digest;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type MediaType = Unset;
         type Size = Unset;
+        type MediaType = Unset;
         type Digest = Unset;
     }
-    ///State transition - sets the `media_type` field to Set
-    pub struct SetMediaType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMediaType<S> {}
-    impl<S: State> State for SetMediaType<S> {
-        type MediaType = Set<members::media_type>;
-        type Size = S::Size;
-        type Digest = S::Digest;
-    }
     ///State transition - sets the `size` field to Set
-    pub struct SetSize<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSize<S> {}
-    impl<S: State> State for SetSize<S> {
-        type MediaType = S::MediaType;
+    pub struct SetSize<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSize<St> {}
+    impl<St: State> State for SetSize<St> {
         type Size = Set<members::size>;
-        type Digest = S::Digest;
+        type MediaType = St::MediaType;
+        type Digest = St::Digest;
+    }
+    ///State transition - sets the `media_type` field to Set
+    pub struct SetMediaType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMediaType<St> {}
+    impl<St: State> State for SetMediaType<St> {
+        type Size = St::Size;
+        type MediaType = Set<members::media_type>;
+        type Digest = St::Digest;
     }
     ///State transition - sets the `digest` field to Set
-    pub struct SetDigest<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDigest<S> {}
-    impl<S: State> State for SetDigest<S> {
-        type MediaType = S::MediaType;
-        type Size = S::Size;
+    pub struct SetDigest<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDigest<St> {}
+    impl<St: State> State for SetDigest<St> {
+        type Size = St::Size;
+        type MediaType = St::MediaType;
         type Digest = Set<members::digest>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `media_type` field
-        pub struct media_type(());
         ///Marker type for the `size` field
         pub struct size(());
+        ///Marker type for the `media_type` field
+        pub struct media_type(());
         ///Marker type for the `digest` field
         pub struct digest(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct BlobReferenceBuilder<'a, S: blob_reference_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct BlobReferenceBuilder<S: BosStr, St: blob_reference_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Data<S>>,
         Option<S>,
@@ -567,28 +570,28 @@ pub struct BlobReferenceBuilder<'a, S: blob_reference_state::State> {
         Option<i64>,
         Option<Vec<UriValue<S>>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> BlobReference<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> BlobReferenceBuilder<'a, blob_reference_state::Empty> {
+impl<S: BosStr> BlobReference<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> BlobReferenceBuilder<S, blob_reference_state::Empty> {
         BlobReferenceBuilder::new()
     }
 }
 
-impl<'a> BlobReferenceBuilder<'a, blob_reference_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> BlobReferenceBuilder<S, blob_reference_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         BlobReferenceBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: blob_reference_state::State> BlobReferenceBuilder<'a, S> {
+impl<S: BosStr, St: blob_reference_state::State> BlobReferenceBuilder<S, St> {
     /// Set the `annotations` field (optional)
     pub fn annotations(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -601,64 +604,64 @@ impl<'a, S: blob_reference_state::State> BlobReferenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S> BlobReferenceBuilder<'a, S>
+impl<S: BosStr, St> BlobReferenceBuilder<S, St>
 where
-    S: blob_reference_state::State,
-    S::Digest: blob_reference_state::IsUnset,
+    St: blob_reference_state::State,
+    St::Digest: blob_reference_state::IsUnset,
 {
     /// Set the `digest` field (required)
     pub fn digest(
         mut self,
         value: impl Into<S>,
-    ) -> BlobReferenceBuilder<'a, blob_reference_state::SetDigest<S>> {
+    ) -> BlobReferenceBuilder<S, blob_reference_state::SetDigest<St>> {
         self._fields.1 = Option::Some(value.into());
         BlobReferenceBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BlobReferenceBuilder<'a, S>
+impl<S: BosStr, St> BlobReferenceBuilder<S, St>
 where
-    S: blob_reference_state::State,
-    S::MediaType: blob_reference_state::IsUnset,
+    St: blob_reference_state::State,
+    St::MediaType: blob_reference_state::IsUnset,
 {
     /// Set the `mediaType` field (required)
     pub fn media_type(
         mut self,
         value: impl Into<S>,
-    ) -> BlobReferenceBuilder<'a, blob_reference_state::SetMediaType<S>> {
+    ) -> BlobReferenceBuilder<S, blob_reference_state::SetMediaType<St>> {
         self._fields.2 = Option::Some(value.into());
         BlobReferenceBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BlobReferenceBuilder<'a, S>
+impl<S: BosStr, St> BlobReferenceBuilder<S, St>
 where
-    S: blob_reference_state::State,
-    S::Size: blob_reference_state::IsUnset,
+    St: blob_reference_state::State,
+    St::Size: blob_reference_state::IsUnset,
 {
     /// Set the `size` field (required)
     pub fn size(
         mut self,
         value: impl Into<i64>,
-    ) -> BlobReferenceBuilder<'a, blob_reference_state::SetSize<S>> {
+    ) -> BlobReferenceBuilder<S, blob_reference_state::SetSize<St>> {
         self._fields.3 = Option::Some(value.into());
         BlobReferenceBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: blob_reference_state::State> BlobReferenceBuilder<'a, S> {
+impl<S: BosStr, St: blob_reference_state::State> BlobReferenceBuilder<S, St> {
     /// Set the `urls` field (optional)
     pub fn urls(mut self, value: impl Into<Option<Vec<UriValue<S>>>>) -> Self {
         self._fields.4 = value.into();
@@ -671,15 +674,15 @@ impl<'a, S: blob_reference_state::State> BlobReferenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S> BlobReferenceBuilder<'a, S>
+impl<S: BosStr, St> BlobReferenceBuilder<S, St>
 where
-    S: blob_reference_state::State,
-    S::MediaType: blob_reference_state::IsSet,
-    S::Size: blob_reference_state::IsSet,
-    S::Digest: blob_reference_state::IsSet,
+    St: blob_reference_state::State,
+    St::Size: blob_reference_state::IsSet,
+    St::MediaType: blob_reference_state::IsSet,
+    St::Digest: blob_reference_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> BlobReference<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> BlobReference<S> {
         BlobReference {
             annotations: self._fields.0,
             digest: self._fields.1.unwrap(),
@@ -689,11 +692,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> BlobReference<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> BlobReference<S> {
         BlobReference {
             annotations: self._fields.0,
             digest: self._fields.1.unwrap(),
@@ -1097,91 +1100,91 @@ pub mod manifest_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Digest;
-        type MediaType;
-        type Repository;
         type SchemaVersion;
+        type MediaType;
+        type Digest;
+        type Repository;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Digest = Unset;
-        type MediaType = Unset;
-        type Repository = Unset;
         type SchemaVersion = Unset;
+        type MediaType = Unset;
+        type Digest = Unset;
+        type Repository = Unset;
         type CreatedAt = Unset;
     }
-    ///State transition - sets the `digest` field to Set
-    pub struct SetDigest<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDigest<S> {}
-    impl<S: State> State for SetDigest<S> {
-        type Digest = Set<members::digest>;
-        type MediaType = S::MediaType;
-        type Repository = S::Repository;
-        type SchemaVersion = S::SchemaVersion;
-        type CreatedAt = S::CreatedAt;
+    ///State transition - sets the `schema_version` field to Set
+    pub struct SetSchemaVersion<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSchemaVersion<St> {}
+    impl<St: State> State for SetSchemaVersion<St> {
+        type SchemaVersion = Set<members::schema_version>;
+        type MediaType = St::MediaType;
+        type Digest = St::Digest;
+        type Repository = St::Repository;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `media_type` field to Set
-    pub struct SetMediaType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMediaType<S> {}
-    impl<S: State> State for SetMediaType<S> {
-        type Digest = S::Digest;
+    pub struct SetMediaType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMediaType<St> {}
+    impl<St: State> State for SetMediaType<St> {
+        type SchemaVersion = St::SchemaVersion;
         type MediaType = Set<members::media_type>;
-        type Repository = S::Repository;
-        type SchemaVersion = S::SchemaVersion;
-        type CreatedAt = S::CreatedAt;
+        type Digest = St::Digest;
+        type Repository = St::Repository;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `digest` field to Set
+    pub struct SetDigest<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDigest<St> {}
+    impl<St: State> State for SetDigest<St> {
+        type SchemaVersion = St::SchemaVersion;
+        type MediaType = St::MediaType;
+        type Digest = Set<members::digest>;
+        type Repository = St::Repository;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `repository` field to Set
-    pub struct SetRepository<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepository<S> {}
-    impl<S: State> State for SetRepository<S> {
-        type Digest = S::Digest;
-        type MediaType = S::MediaType;
+    pub struct SetRepository<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRepository<St> {}
+    impl<St: State> State for SetRepository<St> {
+        type SchemaVersion = St::SchemaVersion;
+        type MediaType = St::MediaType;
+        type Digest = St::Digest;
         type Repository = Set<members::repository>;
-        type SchemaVersion = S::SchemaVersion;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `schema_version` field to Set
-    pub struct SetSchemaVersion<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSchemaVersion<S> {}
-    impl<S: State> State for SetSchemaVersion<S> {
-        type Digest = S::Digest;
-        type MediaType = S::MediaType;
-        type Repository = S::Repository;
-        type SchemaVersion = Set<members::schema_version>;
-        type CreatedAt = S::CreatedAt;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Digest = S::Digest;
-        type MediaType = S::MediaType;
-        type Repository = S::Repository;
-        type SchemaVersion = S::SchemaVersion;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type SchemaVersion = St::SchemaVersion;
+        type MediaType = St::MediaType;
+        type Digest = St::Digest;
+        type Repository = St::Repository;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `digest` field
-        pub struct digest(());
-        ///Marker type for the `media_type` field
-        pub struct media_type(());
-        ///Marker type for the `repository` field
-        pub struct repository(());
         ///Marker type for the `schema_version` field
         pub struct schema_version(());
+        ///Marker type for the `media_type` field
+        pub struct media_type(());
+        ///Marker type for the `digest` field
+        pub struct digest(());
+        ///Marker type for the `repository` field
+        pub struct repository(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ManifestBuilder<'a, S: manifest_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ManifestBuilder<S: BosStr, St: manifest_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Data<S>>,
         Option<manifest::BlobReference<S>>,
@@ -1197,18 +1200,18 @@ pub struct ManifestBuilder<'a, S: manifest_state::State> {
         Option<i64>,
         Option<manifest::BlobReference<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Manifest<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ManifestBuilder<'a, manifest_state::Empty> {
+impl<S: BosStr> Manifest<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ManifestBuilder<S, manifest_state::Empty> {
         ManifestBuilder::new()
     }
 }
 
-impl<'a> ManifestBuilder<'a, manifest_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ManifestBuilder<S, manifest_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ManifestBuilder {
             _state: PhantomData,
@@ -1227,12 +1230,12 @@ impl<'a> ManifestBuilder<'a, manifest_state::Empty> {
                 None,
                 None,
             ),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: manifest_state::State> ManifestBuilder<'a, S> {
+impl<S: BosStr, St: manifest_state::State> ManifestBuilder<S, St> {
     /// Set the `annotations` field (optional)
     pub fn annotations(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -1245,7 +1248,7 @@ impl<'a, S: manifest_state::State> ManifestBuilder<'a, S> {
     }
 }
 
-impl<'a, S: manifest_state::State> ManifestBuilder<'a, S> {
+impl<S: BosStr, St: manifest_state::State> ManifestBuilder<S, St> {
     /// Set the `config` field (optional)
     pub fn config(
         mut self,
@@ -1261,45 +1264,45 @@ impl<'a, S: manifest_state::State> ManifestBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ManifestBuilder<'a, S>
+impl<S: BosStr, St> ManifestBuilder<S, St>
 where
-    S: manifest_state::State,
-    S::CreatedAt: manifest_state::IsUnset,
+    St: manifest_state::State,
+    St::CreatedAt: manifest_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ManifestBuilder<'a, manifest_state::SetCreatedAt<S>> {
+    ) -> ManifestBuilder<S, manifest_state::SetCreatedAt<St>> {
         self._fields.2 = Option::Some(value.into());
         ManifestBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ManifestBuilder<'a, S>
+impl<S: BosStr, St> ManifestBuilder<S, St>
 where
-    S: manifest_state::State,
-    S::Digest: manifest_state::IsUnset,
+    St: manifest_state::State,
+    St::Digest: manifest_state::IsUnset,
 {
     /// Set the `digest` field (required)
     pub fn digest(
         mut self,
         value: impl Into<S>,
-    ) -> ManifestBuilder<'a, manifest_state::SetDigest<S>> {
+    ) -> ManifestBuilder<S, manifest_state::SetDigest<St>> {
         self._fields.3 = Option::Some(value.into());
         ManifestBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: manifest_state::State> ManifestBuilder<'a, S> {
+impl<S: BosStr, St: manifest_state::State> ManifestBuilder<S, St> {
     /// Set the `holdDid` field (optional)
     pub fn hold_did(mut self, value: impl Into<Option<Did<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -1312,7 +1315,7 @@ impl<'a, S: manifest_state::State> ManifestBuilder<'a, S> {
     }
 }
 
-impl<'a, S: manifest_state::State> ManifestBuilder<'a, S> {
+impl<S: BosStr, St: manifest_state::State> ManifestBuilder<S, St> {
     /// Set the `holdEndpoint` field (optional)
     pub fn hold_endpoint(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -1325,7 +1328,7 @@ impl<'a, S: manifest_state::State> ManifestBuilder<'a, S> {
     }
 }
 
-impl<'a, S: manifest_state::State> ManifestBuilder<'a, S> {
+impl<S: BosStr, St: manifest_state::State> ManifestBuilder<S, St> {
     /// Set the `layers` field (optional)
     pub fn layers(
         mut self,
@@ -1344,7 +1347,7 @@ impl<'a, S: manifest_state::State> ManifestBuilder<'a, S> {
     }
 }
 
-impl<'a, S: manifest_state::State> ManifestBuilder<'a, S> {
+impl<S: BosStr, St: manifest_state::State> ManifestBuilder<S, St> {
     /// Set the `manifestBlob` field (optional)
     pub fn manifest_blob(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.7 = value.into();
@@ -1357,7 +1360,7 @@ impl<'a, S: manifest_state::State> ManifestBuilder<'a, S> {
     }
 }
 
-impl<'a, S: manifest_state::State> ManifestBuilder<'a, S> {
+impl<S: BosStr, St: manifest_state::State> ManifestBuilder<S, St> {
     /// Set the `manifests` field (optional)
     pub fn manifests(
         mut self,
@@ -1376,64 +1379,64 @@ impl<'a, S: manifest_state::State> ManifestBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ManifestBuilder<'a, S>
+impl<S: BosStr, St> ManifestBuilder<S, St>
 where
-    S: manifest_state::State,
-    S::MediaType: manifest_state::IsUnset,
+    St: manifest_state::State,
+    St::MediaType: manifest_state::IsUnset,
 {
     /// Set the `mediaType` field (required)
     pub fn media_type(
         mut self,
         value: impl Into<ManifestMediaType<S>>,
-    ) -> ManifestBuilder<'a, manifest_state::SetMediaType<S>> {
+    ) -> ManifestBuilder<S, manifest_state::SetMediaType<St>> {
         self._fields.9 = Option::Some(value.into());
         ManifestBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ManifestBuilder<'a, S>
+impl<S: BosStr, St> ManifestBuilder<S, St>
 where
-    S: manifest_state::State,
-    S::Repository: manifest_state::IsUnset,
+    St: manifest_state::State,
+    St::Repository: manifest_state::IsUnset,
 {
     /// Set the `repository` field (required)
     pub fn repository(
         mut self,
         value: impl Into<S>,
-    ) -> ManifestBuilder<'a, manifest_state::SetRepository<S>> {
+    ) -> ManifestBuilder<S, manifest_state::SetRepository<St>> {
         self._fields.10 = Option::Some(value.into());
         ManifestBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ManifestBuilder<'a, S>
+impl<S: BosStr, St> ManifestBuilder<S, St>
 where
-    S: manifest_state::State,
-    S::SchemaVersion: manifest_state::IsUnset,
+    St: manifest_state::State,
+    St::SchemaVersion: manifest_state::IsUnset,
 {
     /// Set the `schemaVersion` field (required)
     pub fn schema_version(
         mut self,
         value: impl Into<i64>,
-    ) -> ManifestBuilder<'a, manifest_state::SetSchemaVersion<S>> {
+    ) -> ManifestBuilder<S, manifest_state::SetSchemaVersion<St>> {
         self._fields.11 = Option::Some(value.into());
         ManifestBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: manifest_state::State> ManifestBuilder<'a, S> {
+impl<S: BosStr, St: manifest_state::State> ManifestBuilder<S, St> {
     /// Set the `subject` field (optional)
     pub fn subject(
         mut self,
@@ -1449,17 +1452,17 @@ impl<'a, S: manifest_state::State> ManifestBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ManifestBuilder<'a, S>
+impl<S: BosStr, St> ManifestBuilder<S, St>
 where
-    S: manifest_state::State,
-    S::Digest: manifest_state::IsSet,
-    S::MediaType: manifest_state::IsSet,
-    S::Repository: manifest_state::IsSet,
-    S::SchemaVersion: manifest_state::IsSet,
-    S::CreatedAt: manifest_state::IsSet,
+    St: manifest_state::State,
+    St::SchemaVersion: manifest_state::IsSet,
+    St::MediaType: manifest_state::IsSet,
+    St::Digest: manifest_state::IsSet,
+    St::Repository: manifest_state::IsSet,
+    St::CreatedAt: manifest_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Manifest<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Manifest<S> {
         Manifest {
             annotations: self._fields.0,
             config: self._fields.1,
@@ -1477,11 +1480,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Manifest<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Manifest<S> {
         Manifest {
             annotations: self._fields.0,
             config: self._fields.1,
@@ -1511,57 +1511,57 @@ pub mod manifest_reference_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type MediaType;
         type Size;
         type Digest;
-        type MediaType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type MediaType = Unset;
         type Size = Unset;
         type Digest = Unset;
-        type MediaType = Unset;
-    }
-    ///State transition - sets the `size` field to Set
-    pub struct SetSize<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSize<S> {}
-    impl<S: State> State for SetSize<S> {
-        type Size = Set<members::size>;
-        type Digest = S::Digest;
-        type MediaType = S::MediaType;
-    }
-    ///State transition - sets the `digest` field to Set
-    pub struct SetDigest<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDigest<S> {}
-    impl<S: State> State for SetDigest<S> {
-        type Size = S::Size;
-        type Digest = Set<members::digest>;
-        type MediaType = S::MediaType;
     }
     ///State transition - sets the `media_type` field to Set
-    pub struct SetMediaType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMediaType<S> {}
-    impl<S: State> State for SetMediaType<S> {
-        type Size = S::Size;
-        type Digest = S::Digest;
+    pub struct SetMediaType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMediaType<St> {}
+    impl<St: State> State for SetMediaType<St> {
         type MediaType = Set<members::media_type>;
+        type Size = St::Size;
+        type Digest = St::Digest;
+    }
+    ///State transition - sets the `size` field to Set
+    pub struct SetSize<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSize<St> {}
+    impl<St: State> State for SetSize<St> {
+        type MediaType = St::MediaType;
+        type Size = Set<members::size>;
+        type Digest = St::Digest;
+    }
+    ///State transition - sets the `digest` field to Set
+    pub struct SetDigest<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDigest<St> {}
+    impl<St: State> State for SetDigest<St> {
+        type MediaType = St::MediaType;
+        type Size = St::Size;
+        type Digest = Set<members::digest>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `media_type` field
+        pub struct media_type(());
         ///Marker type for the `size` field
         pub struct size(());
         ///Marker type for the `digest` field
         pub struct digest(());
-        ///Marker type for the `media_type` field
-        pub struct media_type(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ManifestReferenceBuilder<'a, S: manifest_reference_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ManifestReferenceBuilder<S: BosStr, St: manifest_reference_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Data<S>>,
         Option<S>,
@@ -1569,28 +1569,28 @@ pub struct ManifestReferenceBuilder<'a, S: manifest_reference_state::State> {
         Option<manifest::Platform<S>>,
         Option<i64>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ManifestReference<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ManifestReferenceBuilder<'a, manifest_reference_state::Empty> {
+impl<S: BosStr> ManifestReference<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ManifestReferenceBuilder<S, manifest_reference_state::Empty> {
         ManifestReferenceBuilder::new()
     }
 }
 
-impl<'a> ManifestReferenceBuilder<'a, manifest_reference_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ManifestReferenceBuilder<S, manifest_reference_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ManifestReferenceBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: manifest_reference_state::State> ManifestReferenceBuilder<'a, S> {
+impl<S: BosStr, St: manifest_reference_state::State> ManifestReferenceBuilder<S, St> {
     /// Set the `annotations` field (optional)
     pub fn annotations(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -1603,45 +1603,45 @@ impl<'a, S: manifest_reference_state::State> ManifestReferenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ManifestReferenceBuilder<'a, S>
+impl<S: BosStr, St> ManifestReferenceBuilder<S, St>
 where
-    S: manifest_reference_state::State,
-    S::Digest: manifest_reference_state::IsUnset,
+    St: manifest_reference_state::State,
+    St::Digest: manifest_reference_state::IsUnset,
 {
     /// Set the `digest` field (required)
     pub fn digest(
         mut self,
         value: impl Into<S>,
-    ) -> ManifestReferenceBuilder<'a, manifest_reference_state::SetDigest<S>> {
+    ) -> ManifestReferenceBuilder<S, manifest_reference_state::SetDigest<St>> {
         self._fields.1 = Option::Some(value.into());
         ManifestReferenceBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ManifestReferenceBuilder<'a, S>
+impl<S: BosStr, St> ManifestReferenceBuilder<S, St>
 where
-    S: manifest_reference_state::State,
-    S::MediaType: manifest_reference_state::IsUnset,
+    St: manifest_reference_state::State,
+    St::MediaType: manifest_reference_state::IsUnset,
 {
     /// Set the `mediaType` field (required)
     pub fn media_type(
         mut self,
         value: impl Into<S>,
-    ) -> ManifestReferenceBuilder<'a, manifest_reference_state::SetMediaType<S>> {
+    ) -> ManifestReferenceBuilder<S, manifest_reference_state::SetMediaType<St>> {
         self._fields.2 = Option::Some(value.into());
         ManifestReferenceBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: manifest_reference_state::State> ManifestReferenceBuilder<'a, S> {
+impl<S: BosStr, St: manifest_reference_state::State> ManifestReferenceBuilder<S, St> {
     /// Set the `platform` field (optional)
     pub fn platform(mut self, value: impl Into<Option<manifest::Platform<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -1654,34 +1654,34 @@ impl<'a, S: manifest_reference_state::State> ManifestReferenceBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ManifestReferenceBuilder<'a, S>
+impl<S: BosStr, St> ManifestReferenceBuilder<S, St>
 where
-    S: manifest_reference_state::State,
-    S::Size: manifest_reference_state::IsUnset,
+    St: manifest_reference_state::State,
+    St::Size: manifest_reference_state::IsUnset,
 {
     /// Set the `size` field (required)
     pub fn size(
         mut self,
         value: impl Into<i64>,
-    ) -> ManifestReferenceBuilder<'a, manifest_reference_state::SetSize<S>> {
+    ) -> ManifestReferenceBuilder<S, manifest_reference_state::SetSize<St>> {
         self._fields.4 = Option::Some(value.into());
         ManifestReferenceBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ManifestReferenceBuilder<'a, S>
+impl<S: BosStr, St> ManifestReferenceBuilder<S, St>
 where
-    S: manifest_reference_state::State,
-    S::Size: manifest_reference_state::IsSet,
-    S::Digest: manifest_reference_state::IsSet,
-    S::MediaType: manifest_reference_state::IsSet,
+    St: manifest_reference_state::State,
+    St::MediaType: manifest_reference_state::IsSet,
+    St::Size: manifest_reference_state::IsSet,
+    St::Digest: manifest_reference_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ManifestReference<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ManifestReference<S> {
         ManifestReference {
             annotations: self._fields.0,
             digest: self._fields.1.unwrap(),
@@ -1691,11 +1691,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> ManifestReference<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ManifestReference<S> {
         ManifestReference {
             annotations: self._fields.0,
             digest: self._fields.1.unwrap(),

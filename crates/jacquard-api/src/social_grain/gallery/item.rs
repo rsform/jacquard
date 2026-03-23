@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,11 +34,11 @@ use serde::{Serialize, Deserialize};
     rename = "social.grain.gallery.item",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Item<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Item<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     pub gallery: AtUri<S>,
     pub item: AtUri<S>,
@@ -56,18 +56,18 @@ pub struct Item<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ItemGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ItemGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Item<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Item<S> {
+impl<S: BosStr> Item<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, ItemRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -80,17 +80,17 @@ pub struct ItemRecord;
 impl XrpcResp for ItemRecord {
     const NSID: &'static str = "social.grain.gallery.item";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ItemGetRecordOutput<S>;
+    type Output<S: BosStr> = ItemGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<ItemGetRecordOutput<S>> for Item<S> {
+impl<S: BosStr> From<ItemGetRecordOutput<S>> for Item<S> {
     fn from(output: ItemGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Item<S> {
+impl<S: BosStr> Collection for Item<S> {
     const NSID: &'static str = "social.grain.gallery.item";
     type Record = ItemRecord;
 }
@@ -100,7 +100,7 @@ impl Collection for ItemRecord {
     type Record = ItemRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Item<S> {
+impl<S: BosStr> LexiconSchema for Item<S> {
     fn nsid() -> &'static str {
         "social.grain.gallery.item"
     }
@@ -129,137 +129,137 @@ pub mod item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Gallery;
         type Item;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Gallery = Unset;
         type Item = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Gallery = S::Gallery;
-        type Item = S::Item;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `gallery` field to Set
-    pub struct SetGallery<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGallery<S> {}
-    impl<S: State> State for SetGallery<S> {
-        type CreatedAt = S::CreatedAt;
+    pub struct SetGallery<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetGallery<St> {}
+    impl<St: State> State for SetGallery<St> {
         type Gallery = Set<members::gallery>;
-        type Item = S::Item;
+        type Item = St::Item;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `item` field to Set
-    pub struct SetItem<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetItem<S> {}
-    impl<S: State> State for SetItem<S> {
-        type CreatedAt = S::CreatedAt;
-        type Gallery = S::Gallery;
+    pub struct SetItem<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetItem<St> {}
+    impl<St: State> State for SetItem<St> {
+        type Gallery = St::Gallery;
         type Item = Set<members::item>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Gallery = St::Gallery;
+        type Item = St::Item;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `gallery` field
         pub struct gallery(());
         ///Marker type for the `item` field
         pub struct item(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ItemBuilder<'a, S: item_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ItemBuilder<S: BosStr, St: item_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<AtUri<S>>, Option<AtUri<S>>, Option<i64>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Item<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ItemBuilder<'a, item_state::Empty> {
+impl<S: BosStr> Item<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ItemBuilder<S, item_state::Empty> {
         ItemBuilder::new()
     }
 }
 
-impl<'a> ItemBuilder<'a, item_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ItemBuilder<S, item_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ItemBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ItemBuilder<'a, S>
+impl<S: BosStr, St> ItemBuilder<S, St>
 where
-    S: item_state::State,
-    S::CreatedAt: item_state::IsUnset,
+    St: item_state::State,
+    St::CreatedAt: item_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ItemBuilder<'a, item_state::SetCreatedAt<S>> {
+    ) -> ItemBuilder<S, item_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         ItemBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ItemBuilder<'a, S>
+impl<S: BosStr, St> ItemBuilder<S, St>
 where
-    S: item_state::State,
-    S::Gallery: item_state::IsUnset,
+    St: item_state::State,
+    St::Gallery: item_state::IsUnset,
 {
     /// Set the `gallery` field (required)
     pub fn gallery(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> ItemBuilder<'a, item_state::SetGallery<S>> {
+    ) -> ItemBuilder<S, item_state::SetGallery<St>> {
         self._fields.1 = Option::Some(value.into());
         ItemBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ItemBuilder<'a, S>
+impl<S: BosStr, St> ItemBuilder<S, St>
 where
-    S: item_state::State,
-    S::Item: item_state::IsUnset,
+    St: item_state::State,
+    St::Item: item_state::IsUnset,
 {
     /// Set the `item` field (required)
     pub fn item(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> ItemBuilder<'a, item_state::SetItem<S>> {
+    ) -> ItemBuilder<S, item_state::SetItem<St>> {
         self._fields.2 = Option::Some(value.into());
         ItemBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: item_state::State> ItemBuilder<'a, S> {
+impl<S: BosStr, St: item_state::State> ItemBuilder<S, St> {
     /// Set the `position` field (optional)
     pub fn position(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.3 = value.into();
@@ -272,15 +272,15 @@ impl<'a, S: item_state::State> ItemBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ItemBuilder<'a, S>
+impl<S: BosStr, St> ItemBuilder<S, St>
 where
-    S: item_state::State,
-    S::CreatedAt: item_state::IsSet,
-    S::Gallery: item_state::IsSet,
-    S::Item: item_state::IsSet,
+    St: item_state::State,
+    St::Gallery: item_state::IsSet,
+    St::Item: item_state::IsSet,
+    St::CreatedAt: item_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Item<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Item<S> {
         Item {
             created_at: self._fields.0.unwrap(),
             gallery: self._fields.1.unwrap(),
@@ -289,8 +289,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Item<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Item<S> {
         Item {
             created_at: self._fields.0.unwrap(),
             gallery: self._fields.1.unwrap(),

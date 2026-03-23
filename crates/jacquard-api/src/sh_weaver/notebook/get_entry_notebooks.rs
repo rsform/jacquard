@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -28,32 +28,29 @@ use crate::sh_weaver::actor::ProfileViewBasic;
 use crate::sh_weaver::notebook::get_entry_notebooks;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetEntryNotebooks<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct GetEntryNotebooks<S: BosStr = DefaultStr> {
     pub entry: AtUri<S>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetEntryNotebooksOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetEntryNotebooksOutput<S: BosStr = DefaultStr> {
     pub notebooks: Vec<get_entry_notebooks::NotebookRef<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -63,11 +60,11 @@ pub struct GetEntryNotebooksOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct NotebookRef<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct NotebookRef<S: BosStr = DefaultStr> {
     pub cid: Cid<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub owner: Option<ProfileViewBasic<S>>,
@@ -83,12 +80,11 @@ pub struct GetEntryNotebooksResponse;
 impl jacquard_common::xrpc::XrpcResp for GetEntryNotebooksResponse {
     const NSID: &'static str = "sh.weaver.notebook.getEntryNotebooks";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetEntryNotebooksOutput<S>;
+    type Output<S: BosStr> = GetEntryNotebooksOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetEntryNotebooks<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetEntryNotebooks<S> {
     const NSID: &'static str = "sh.weaver.notebook.getEntryNotebooks";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetEntryNotebooksResponse;
@@ -99,11 +95,11 @@ pub struct GetEntryNotebooksRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetEntryNotebooksRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.notebook.getEntryNotebooks";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetEntryNotebooks<S>;
+    type Request<S: BosStr> = GetEntryNotebooks<S>;
     type Response = GetEntryNotebooksResponse;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for NotebookRef<S> {
+impl<S: BosStr> LexiconSchema for NotebookRef<S> {
     fn nsid() -> &'static str {
         "sh.weaver.notebook.getEntryNotebooks"
     }
@@ -137,9 +133,9 @@ pub mod get_entry_notebooks_state {
         type Entry = Unset;
     }
     ///State transition - sets the `entry` field to Set
-    pub struct SetEntry<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEntry<S> {}
-    impl<S: State> State for SetEntry<S> {
+    pub struct SetEntry<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetEntry<St> {}
+    impl<St: State> State for SetEntry<St> {
         type Entry = Set<members::entry>;
     }
     /// Marker types for field names
@@ -150,57 +146,57 @@ pub mod get_entry_notebooks_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetEntryNotebooksBuilder<'a, S: get_entry_notebooks_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetEntryNotebooksBuilder<S: BosStr, St: get_entry_notebooks_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetEntryNotebooks<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetEntryNotebooksBuilder<'a, get_entry_notebooks_state::Empty> {
+impl<S: BosStr> GetEntryNotebooks<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetEntryNotebooksBuilder<S, get_entry_notebooks_state::Empty> {
         GetEntryNotebooksBuilder::new()
     }
 }
 
-impl<'a> GetEntryNotebooksBuilder<'a, get_entry_notebooks_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetEntryNotebooksBuilder<S, get_entry_notebooks_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetEntryNotebooksBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetEntryNotebooksBuilder<'a, S>
+impl<S: BosStr, St> GetEntryNotebooksBuilder<S, St>
 where
-    S: get_entry_notebooks_state::State,
-    S::Entry: get_entry_notebooks_state::IsUnset,
+    St: get_entry_notebooks_state::State,
+    St::Entry: get_entry_notebooks_state::IsUnset,
 {
     /// Set the `entry` field (required)
     pub fn entry(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> GetEntryNotebooksBuilder<'a, get_entry_notebooks_state::SetEntry<S>> {
+    ) -> GetEntryNotebooksBuilder<S, get_entry_notebooks_state::SetEntry<St>> {
         self._fields.0 = Option::Some(value.into());
         GetEntryNotebooksBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetEntryNotebooksBuilder<'a, S>
+impl<S: BosStr, St> GetEntryNotebooksBuilder<S, St>
 where
-    S: get_entry_notebooks_state::State,
-    S::Entry: get_entry_notebooks_state::IsSet,
+    St: get_entry_notebooks_state::State,
+    St::Entry: get_entry_notebooks_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetEntryNotebooks<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetEntryNotebooks<S> {
         GetEntryNotebooks {
             entry: self._fields.0.unwrap(),
         }
@@ -228,17 +224,17 @@ pub mod notebook_ref_state {
         type Cid = Unset;
     }
     ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
         type Uri = Set<members::uri>;
-        type Cid = S::Cid;
+        type Cid = St::Cid;
     }
     ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Uri = S::Uri;
+    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCid<St> {}
+    impl<St: State> State for SetCid<St> {
+        type Uri = St::Uri;
         type Cid = Set<members::cid>;
     }
     /// Marker types for field names
@@ -251,51 +247,51 @@ pub mod notebook_ref_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct NotebookRefBuilder<'a, S: notebook_ref_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct NotebookRefBuilder<S: BosStr, St: notebook_ref_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Cid<S>>, Option<ProfileViewBasic<S>>, Option<S>, Option<AtUri<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> NotebookRef<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> NotebookRefBuilder<'a, notebook_ref_state::Empty> {
+impl<S: BosStr> NotebookRef<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> NotebookRefBuilder<S, notebook_ref_state::Empty> {
         NotebookRefBuilder::new()
     }
 }
 
-impl<'a> NotebookRefBuilder<'a, notebook_ref_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> NotebookRefBuilder<S, notebook_ref_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         NotebookRefBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> NotebookRefBuilder<'a, S>
+impl<S: BosStr, St> NotebookRefBuilder<S, St>
 where
-    S: notebook_ref_state::State,
-    S::Cid: notebook_ref_state::IsUnset,
+    St: notebook_ref_state::State,
+    St::Cid: notebook_ref_state::IsUnset,
 {
     /// Set the `cid` field (required)
     pub fn cid(
         mut self,
         value: impl Into<Cid<S>>,
-    ) -> NotebookRefBuilder<'a, notebook_ref_state::SetCid<S>> {
+    ) -> NotebookRefBuilder<S, notebook_ref_state::SetCid<St>> {
         self._fields.0 = Option::Some(value.into());
         NotebookRefBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: notebook_ref_state::State> NotebookRefBuilder<'a, S> {
+impl<S: BosStr, St: notebook_ref_state::State> NotebookRefBuilder<S, St> {
     /// Set the `owner` field (optional)
     pub fn owner(mut self, value: impl Into<Option<ProfileViewBasic<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -308,7 +304,7 @@ impl<'a, S: notebook_ref_state::State> NotebookRefBuilder<'a, S> {
     }
 }
 
-impl<'a, S: notebook_ref_state::State> NotebookRefBuilder<'a, S> {
+impl<S: BosStr, St: notebook_ref_state::State> NotebookRefBuilder<S, St> {
     /// Set the `title` field (optional)
     pub fn title(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -321,33 +317,33 @@ impl<'a, S: notebook_ref_state::State> NotebookRefBuilder<'a, S> {
     }
 }
 
-impl<'a, S> NotebookRefBuilder<'a, S>
+impl<S: BosStr, St> NotebookRefBuilder<S, St>
 where
-    S: notebook_ref_state::State,
-    S::Uri: notebook_ref_state::IsUnset,
+    St: notebook_ref_state::State,
+    St::Uri: notebook_ref_state::IsUnset,
 {
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> NotebookRefBuilder<'a, notebook_ref_state::SetUri<S>> {
+    ) -> NotebookRefBuilder<S, notebook_ref_state::SetUri<St>> {
         self._fields.3 = Option::Some(value.into());
         NotebookRefBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> NotebookRefBuilder<'a, S>
+impl<S: BosStr, St> NotebookRefBuilder<S, St>
 where
-    S: notebook_ref_state::State,
-    S::Uri: notebook_ref_state::IsSet,
-    S::Cid: notebook_ref_state::IsSet,
+    St: notebook_ref_state::State,
+    St::Uri: notebook_ref_state::IsSet,
+    St::Cid: notebook_ref_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> NotebookRef<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> NotebookRef<S> {
         NotebookRef {
             cid: self._fields.0.unwrap(),
             owner: self._fields.1,
@@ -356,11 +352,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> NotebookRef<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> NotebookRef<S> {
         NotebookRef {
             cid: self._fields.0.unwrap(),
             owner: self._fields.1,

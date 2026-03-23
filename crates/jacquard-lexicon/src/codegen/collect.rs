@@ -157,7 +157,6 @@ impl<'c> CodeGenerator<'c> {
                 imports.common.insert(CommonType::CowStr);
             }
         }
-        imports.external.insert(ExternalImport::Bos);
         imports.external.insert(ExternalImport::DefaultStr);
         imports
     }
@@ -243,7 +242,7 @@ impl<'c> CodeGenerator<'c> {
         imports.external.insert(ExternalImport::IntoStatic);
         imports.external.insert(ExternalImport::LexiconAttr);
         imports.external.insert(ExternalImport::PhantomData);
-        imports.external.insert(ExternalImport::BTreeMap);
+
 
         // Records generate LexiconSchema trait impls with validation.
         imports.external.insert(ExternalImport::LexiconSchema);
@@ -257,7 +256,7 @@ impl<'c> CodeGenerator<'c> {
         imports.common.insert(CommonType::AtUri);
 
         // All parameterised types need Bos, DefaultStr, SmolStr, and Data for extra_data field.
-        imports.external.insert(ExternalImport::Bos);
+        imports.external.insert(ExternalImport::BTreeMap);
         imports.external.insert(ExternalImport::DefaultStr);
         imports.common.insert(CommonType::SmolStr);
         imports.common.insert(CommonType::Data);
@@ -314,7 +313,6 @@ impl<'c> CodeGenerator<'c> {
         imports.external.insert(ExternalImport::IntoStatic);
 
         // All parameterised types need Bos, DefaultStr, SmolStr, Data, and BTreeMap for extra_data.
-        imports.external.insert(ExternalImport::Bos);
         imports.external.insert(ExternalImport::DefaultStr);
         imports.common.insert(CommonType::SmolStr);
         imports.common.insert(CommonType::Data);
@@ -356,6 +354,10 @@ impl<'c> CodeGenerator<'c> {
         imports.external.insert(ExternalImport::Deserialize);
         imports.external.insert(ExternalImport::IntoStatic);
         imports.external.insert(ExternalImport::PhantomData);
+        imports.external.insert(ExternalImport::BTreeMap);
+        imports.external.insert(ExternalImport::DefaultStr);
+        imports.common.insert(CommonType::SmolStr);
+        imports.common.insert(CommonType::Data);
 
         // Collect from parameters.
         if let Some(params) = &query.parameters {
@@ -395,6 +397,10 @@ impl<'c> CodeGenerator<'c> {
         imports.external.insert(ExternalImport::Deserialize);
         imports.external.insert(ExternalImport::IntoStatic);
         imports.external.insert(ExternalImport::PhantomData);
+        imports.external.insert(ExternalImport::BTreeMap);
+        imports.external.insert(ExternalImport::DefaultStr);
+        imports.common.insert(CommonType::SmolStr);
+        imports.common.insert(CommonType::Data);
 
         // Collect from parameters.
         if let Some(params) = &proc.parameters {
@@ -514,7 +520,6 @@ impl<'c> CodeGenerator<'c> {
                 }
             }
         }
-        imports.external.insert(ExternalImport::Bos);
         imports.external.insert(ExternalImport::DefaultStr);
         imports
     }
@@ -594,7 +599,6 @@ impl<'c> CodeGenerator<'c> {
                 }
             }
         }
-        imports.external.insert(ExternalImport::Bos);
         imports.external.insert(ExternalImport::DefaultStr);
         imports
     }
@@ -606,7 +610,13 @@ impl<'c> CodeGenerator<'c> {
         _def_name: &str,
         def: &LexUserType<'static>,
     ) -> ImportSet {
-        match def {
+        // All BOS-parameterised types need Bos, BosStr, DefaultStr, and FromStaticStr.
+        let mut base = ImportSet::default();
+        base.external.insert(ExternalImport::BosStr);
+        base.external.insert(ExternalImport::DefaultStr);
+        base.external.insert(ExternalImport::FromStaticStr);
+
+        let mut result = match def {
             LexUserType::Record(r) => self.collect_record(nsid, r),
             LexUserType::Object(o) => {
                 let type_name = self.def_to_type_name(nsid, _def_name);
@@ -632,11 +642,12 @@ impl<'c> CodeGenerator<'c> {
                 i
             }
             // String with known_values: generates an enum with custom Serialize,
-            // Deserialize, and IntoStatic impls (NOT derives). Only needs CowStr
-            // for the catch-all Other variant.
+            // Deserialize, and IntoStatic impls (NOT derives). Needs CowStr
+            // for the catch-all Other variant, plus Bos/DefaultStr for the type param.
             LexUserType::String(s) if s.known_values.is_some() => {
                 let mut i = ImportSet::default();
                 i.common.insert(CommonType::CowStr);
+                i.external.insert(ExternalImport::DefaultStr);
                 i
             }
             // Plain string: type alias, only needs the string type.
@@ -658,6 +669,7 @@ impl<'c> CodeGenerator<'c> {
                     imports.external.insert(ExternalImport::Serialize);
                     imports.external.insert(ExternalImport::Deserialize);
                     imports.external.insert(ExternalImport::IntoStatic);
+                                imports.external.insert(ExternalImport::DefaultStr);
                     if union.closed != Some(true) {
                         imports.external.insert(ExternalImport::OpenUnion);
                     }
@@ -680,6 +692,7 @@ impl<'c> CodeGenerator<'c> {
                 imports.external.insert(ExternalImport::Serialize);
                 imports.external.insert(ExternalImport::Deserialize);
                 imports.external.insert(ExternalImport::IntoStatic);
+                        imports.external.insert(ExternalImport::DefaultStr);
                 if union.closed != Some(true) {
                     imports.external.insert(ExternalImport::OpenUnion);
                 }
@@ -713,7 +726,9 @@ impl<'c> CodeGenerator<'c> {
             }
             // Boolean, plain Integer, Blob: type aliases with no special imports.
             _ => ImportSet::default(),
-        }
+        };
+        result.merge(base);
+        result
     }
 }
 

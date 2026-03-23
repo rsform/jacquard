@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use crate::net_anisota::beta::game::inventory;
     rename = "net.anisota.beta.game.inventory",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Inventory<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Inventory<S: BosStr = DefaultStr> {
     ///When the item was acquired
     pub acquired_at: Datetime,
     ///When the record was created
@@ -91,11 +91,11 @@ pub struct Inventory<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct InventoryGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct InventoryGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
@@ -108,11 +108,11 @@ pub struct InventoryGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SourceDetails<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SourceDetails<S: BosStr = DefaultStr> {
     ///URI of the game card that provided this item
     #[serde(skip_serializing_if = "Option::is_none")]
     pub game_card_uri: Option<S>,
@@ -126,7 +126,7 @@ pub struct SourceDetails<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Inventory<S> {
+impl<S: BosStr> Inventory<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, InventoryRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -139,17 +139,17 @@ pub struct InventoryRecord;
 impl XrpcResp for InventoryRecord {
     const NSID: &'static str = "net.anisota.beta.game.inventory";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = InventoryGetRecordOutput<S>;
+    type Output<S: BosStr> = InventoryGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<InventoryGetRecordOutput<S>> for Inventory<S> {
+impl<S: BosStr> From<InventoryGetRecordOutput<S>> for Inventory<S> {
     fn from(output: InventoryGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Inventory<S> {
+impl<S: BosStr> Collection for Inventory<S> {
     const NSID: &'static str = "net.anisota.beta.game.inventory";
     type Record = InventoryRecord;
 }
@@ -159,7 +159,7 @@ impl Collection for InventoryRecord {
     type Record = InventoryRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Inventory<S> {
+impl<S: BosStr> LexiconSchema for Inventory<S> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.inventory"
     }
@@ -233,7 +233,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Inventory<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for SourceDetails<S> {
+impl<S: BosStr> LexiconSchema for SourceDetails<S> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.inventory"
     }
@@ -273,39 +273,39 @@ pub mod inventory_state {
         type CreatedAt = Unset;
     }
     ///State transition - sets the `item_id` field to Set
-    pub struct SetItemId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetItemId<S> {}
-    impl<S: State> State for SetItemId<S> {
+    pub struct SetItemId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetItemId<St> {}
+    impl<St: State> State for SetItemId<St> {
         type ItemId = Set<members::item_id>;
-        type Quantity = S::Quantity;
-        type AcquiredAt = S::AcquiredAt;
-        type CreatedAt = S::CreatedAt;
+        type Quantity = St::Quantity;
+        type AcquiredAt = St::AcquiredAt;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `quantity` field to Set
-    pub struct SetQuantity<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetQuantity<S> {}
-    impl<S: State> State for SetQuantity<S> {
-        type ItemId = S::ItemId;
+    pub struct SetQuantity<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetQuantity<St> {}
+    impl<St: State> State for SetQuantity<St> {
+        type ItemId = St::ItemId;
         type Quantity = Set<members::quantity>;
-        type AcquiredAt = S::AcquiredAt;
-        type CreatedAt = S::CreatedAt;
+        type AcquiredAt = St::AcquiredAt;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `acquired_at` field to Set
-    pub struct SetAcquiredAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAcquiredAt<S> {}
-    impl<S: State> State for SetAcquiredAt<S> {
-        type ItemId = S::ItemId;
-        type Quantity = S::Quantity;
+    pub struct SetAcquiredAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAcquiredAt<St> {}
+    impl<St: State> State for SetAcquiredAt<St> {
+        type ItemId = St::ItemId;
+        type Quantity = St::Quantity;
         type AcquiredAt = Set<members::acquired_at>;
-        type CreatedAt = S::CreatedAt;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type ItemId = S::ItemId;
-        type Quantity = S::Quantity;
-        type AcquiredAt = S::AcquiredAt;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type ItemId = St::ItemId;
+        type Quantity = St::Quantity;
+        type AcquiredAt = St::AcquiredAt;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
@@ -322,9 +322,9 @@ pub mod inventory_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct InventoryBuilder<'a, S: inventory_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct InventoryBuilder<S: BosStr, St: inventory_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
         Option<Datetime>,
@@ -342,18 +342,18 @@ pub struct InventoryBuilder<'a, S: inventory_state::State> {
         Option<inventory::SourceDetails<S>>,
         Option<bool>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Inventory<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> InventoryBuilder<'a, inventory_state::Empty> {
+impl<S: BosStr> Inventory<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> InventoryBuilder<S, inventory_state::Empty> {
         InventoryBuilder::new()
     }
 }
 
-impl<'a> InventoryBuilder<'a, inventory_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> InventoryBuilder<S, inventory_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         InventoryBuilder {
             _state: PhantomData,
@@ -374,69 +374,69 @@ impl<'a> InventoryBuilder<'a, inventory_state::Empty> {
                 None,
                 None,
             ),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> InventoryBuilder<'a, S>
+impl<S: BosStr, St> InventoryBuilder<S, St>
 where
-    S: inventory_state::State,
-    S::AcquiredAt: inventory_state::IsUnset,
+    St: inventory_state::State,
+    St::AcquiredAt: inventory_state::IsUnset,
 {
     /// Set the `acquiredAt` field (required)
     pub fn acquired_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> InventoryBuilder<'a, inventory_state::SetAcquiredAt<S>> {
+    ) -> InventoryBuilder<S, inventory_state::SetAcquiredAt<St>> {
         self._fields.0 = Option::Some(value.into());
         InventoryBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> InventoryBuilder<'a, S>
+impl<S: BosStr, St> InventoryBuilder<S, St>
 where
-    S: inventory_state::State,
-    S::CreatedAt: inventory_state::IsUnset,
+    St: inventory_state::State,
+    St::CreatedAt: inventory_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> InventoryBuilder<'a, inventory_state::SetCreatedAt<S>> {
+    ) -> InventoryBuilder<S, inventory_state::SetCreatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         InventoryBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> InventoryBuilder<'a, S>
+impl<S: BosStr, St> InventoryBuilder<S, St>
 where
-    S: inventory_state::State,
-    S::ItemId: inventory_state::IsUnset,
+    St: inventory_state::State,
+    St::ItemId: inventory_state::IsUnset,
 {
     /// Set the `itemId` field (required)
     pub fn item_id(
         mut self,
         value: impl Into<S>,
-    ) -> InventoryBuilder<'a, inventory_state::SetItemId<S>> {
+    ) -> InventoryBuilder<S, inventory_state::SetItemId<St>> {
         self._fields.2 = Option::Some(value.into());
         InventoryBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: inventory_state::State> InventoryBuilder<'a, S> {
+impl<S: BosStr, St: inventory_state::State> InventoryBuilder<S, St> {
     /// Set the `itemName` field (optional)
     pub fn item_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -449,7 +449,7 @@ impl<'a, S: inventory_state::State> InventoryBuilder<'a, S> {
     }
 }
 
-impl<'a, S: inventory_state::State> InventoryBuilder<'a, S> {
+impl<S: BosStr, St: inventory_state::State> InventoryBuilder<S, St> {
     /// Set the `itemType` field (optional)
     pub fn item_type(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
@@ -462,7 +462,7 @@ impl<'a, S: inventory_state::State> InventoryBuilder<'a, S> {
     }
 }
 
-impl<'a, S: inventory_state::State> InventoryBuilder<'a, S> {
+impl<S: BosStr, St: inventory_state::State> InventoryBuilder<S, St> {
     /// Set the `itemValue` field (optional)
     pub fn item_value(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.5 = value.into();
@@ -475,7 +475,7 @@ impl<'a, S: inventory_state::State> InventoryBuilder<'a, S> {
     }
 }
 
-impl<'a, S: inventory_state::State> InventoryBuilder<'a, S> {
+impl<S: BosStr, St: inventory_state::State> InventoryBuilder<S, St> {
     /// Set the `lastModified` field (optional)
     pub fn last_modified(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.6 = value.into();
@@ -488,7 +488,7 @@ impl<'a, S: inventory_state::State> InventoryBuilder<'a, S> {
     }
 }
 
-impl<'a, S: inventory_state::State> InventoryBuilder<'a, S> {
+impl<S: BosStr, St: inventory_state::State> InventoryBuilder<S, St> {
     /// Set the `logRecordUri` field (optional)
     pub fn log_record_uri(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.7 = value.into();
@@ -501,7 +501,7 @@ impl<'a, S: inventory_state::State> InventoryBuilder<'a, S> {
     }
 }
 
-impl<'a, S: inventory_state::State> InventoryBuilder<'a, S> {
+impl<S: BosStr, St: inventory_state::State> InventoryBuilder<S, St> {
     /// Set the `maxStack` field (optional)
     pub fn max_stack(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.8 = value.into();
@@ -514,7 +514,7 @@ impl<'a, S: inventory_state::State> InventoryBuilder<'a, S> {
     }
 }
 
-impl<'a, S: inventory_state::State> InventoryBuilder<'a, S> {
+impl<S: BosStr, St: inventory_state::State> InventoryBuilder<S, St> {
     /// Set the `metadata` field (optional)
     pub fn metadata(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.9 = value.into();
@@ -527,26 +527,26 @@ impl<'a, S: inventory_state::State> InventoryBuilder<'a, S> {
     }
 }
 
-impl<'a, S> InventoryBuilder<'a, S>
+impl<S: BosStr, St> InventoryBuilder<S, St>
 where
-    S: inventory_state::State,
-    S::Quantity: inventory_state::IsUnset,
+    St: inventory_state::State,
+    St::Quantity: inventory_state::IsUnset,
 {
     /// Set the `quantity` field (required)
     pub fn quantity(
         mut self,
         value: impl Into<i64>,
-    ) -> InventoryBuilder<'a, inventory_state::SetQuantity<S>> {
+    ) -> InventoryBuilder<S, inventory_state::SetQuantity<St>> {
         self._fields.10 = Option::Some(value.into());
         InventoryBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: inventory_state::State> InventoryBuilder<'a, S> {
+impl<S: BosStr, St: inventory_state::State> InventoryBuilder<S, St> {
     /// Set the `rarity` field (optional)
     pub fn rarity(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.11 = value.into();
@@ -559,7 +559,7 @@ impl<'a, S: inventory_state::State> InventoryBuilder<'a, S> {
     }
 }
 
-impl<'a, S: inventory_state::State> InventoryBuilder<'a, S> {
+impl<S: BosStr, St: inventory_state::State> InventoryBuilder<S, St> {
     /// Set the `source` field (optional)
     pub fn source(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.12 = value.into();
@@ -572,7 +572,7 @@ impl<'a, S: inventory_state::State> InventoryBuilder<'a, S> {
     }
 }
 
-impl<'a, S: inventory_state::State> InventoryBuilder<'a, S> {
+impl<S: BosStr, St: inventory_state::State> InventoryBuilder<S, St> {
     /// Set the `sourceDetails` field (optional)
     pub fn source_details(
         mut self,
@@ -591,7 +591,7 @@ impl<'a, S: inventory_state::State> InventoryBuilder<'a, S> {
     }
 }
 
-impl<'a, S: inventory_state::State> InventoryBuilder<'a, S> {
+impl<S: BosStr, St: inventory_state::State> InventoryBuilder<S, St> {
     /// Set the `stackable` field (optional)
     pub fn stackable(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.14 = value.into();
@@ -604,16 +604,16 @@ impl<'a, S: inventory_state::State> InventoryBuilder<'a, S> {
     }
 }
 
-impl<'a, S> InventoryBuilder<'a, S>
+impl<S: BosStr, St> InventoryBuilder<S, St>
 where
-    S: inventory_state::State,
-    S::ItemId: inventory_state::IsSet,
-    S::Quantity: inventory_state::IsSet,
-    S::AcquiredAt: inventory_state::IsSet,
-    S::CreatedAt: inventory_state::IsSet,
+    St: inventory_state::State,
+    St::ItemId: inventory_state::IsSet,
+    St::Quantity: inventory_state::IsSet,
+    St::AcquiredAt: inventory_state::IsSet,
+    St::CreatedAt: inventory_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Inventory<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Inventory<S> {
         Inventory {
             acquired_at: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
@@ -633,11 +633,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Inventory<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Inventory<S> {
         Inventory {
             acquired_at: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),

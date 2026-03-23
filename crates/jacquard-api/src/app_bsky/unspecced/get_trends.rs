@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
@@ -28,18 +28,16 @@ pub struct GetTrends {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetTrendsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetTrendsOutput<S: BosStr = DefaultStr> {
     pub trends: Vec<TrendView<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -48,7 +46,7 @@ pub struct GetTrendsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetTrendsResponse {
     const NSID: &'static str = "app.bsky.unspecced.getTrends";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetTrendsOutput<S>;
+    type Output<S: BosStr> = GetTrendsOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
@@ -63,7 +61,7 @@ pub struct GetTrendsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetTrendsRequest {
     const PATH: &'static str = "/xrpc/app.bsky.unspecced.getTrends";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetTrends;
+    type Request<S: BosStr> = GetTrends;
     type Response = GetTrendsResponse;
 }
 
@@ -90,21 +88,21 @@ pub mod get_trends_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetTrendsBuilder<S: get_trends_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetTrendsBuilder<St: get_trends_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>,),
 }
 
 impl GetTrends {
-    /// Create a new builder for this type
+    /// Create a new builder for this type.
     pub fn new() -> GetTrendsBuilder<get_trends_state::Empty> {
         GetTrendsBuilder::new()
     }
 }
 
 impl GetTrendsBuilder<get_trends_state::Empty> {
-    /// Create a new builder with all fields unset
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetTrendsBuilder {
             _state: PhantomData,
@@ -113,7 +111,7 @@ impl GetTrendsBuilder<get_trends_state::Empty> {
     }
 }
 
-impl<S: get_trends_state::State> GetTrendsBuilder<S> {
+impl<St: get_trends_state::State> GetTrendsBuilder<St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
@@ -126,11 +124,11 @@ impl<S: get_trends_state::State> GetTrendsBuilder<S> {
     }
 }
 
-impl<S> GetTrendsBuilder<S>
+impl<St> GetTrendsBuilder<St>
 where
-    S: get_trends_state::State,
+    St: get_trends_state::State,
 {
-    /// Build the final struct
+    /// Build the final struct.
     pub fn build(self) -> GetTrends {
         GetTrends { limit: self._fields.0 }
     }

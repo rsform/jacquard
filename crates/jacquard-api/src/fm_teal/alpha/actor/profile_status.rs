@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "fm.teal.alpha.actor.profileStatus",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ProfileStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ProfileStatus<S: BosStr = DefaultStr> {
     ///The onboarding completion status
     pub completed_onboarding: ProfileStatusCompletedOnboarding<S>,
     ///The timestamp when this status was created
@@ -55,7 +55,7 @@ pub struct ProfileStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
 /// The onboarding completion status
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ProfileStatusCompletedOnboarding<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ProfileStatusCompletedOnboarding<S: BosStr = DefaultStr> {
     None,
     ProfileOnboarding,
     PlayOnboarding,
@@ -63,7 +63,7 @@ pub enum ProfileStatusCompletedOnboarding<S: Bos<str> + AsRef<str> = DefaultStr>
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> ProfileStatusCompletedOnboarding<S> {
+impl<S: BosStr> ProfileStatusCompletedOnboarding<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::None => "none",
@@ -85,20 +85,19 @@ impl<S: Bos<str> + AsRef<str>> ProfileStatusCompletedOnboarding<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display
-for ProfileStatusCompletedOnboarding<S> {
+impl<S: BosStr> core::fmt::Display for ProfileStatusCompletedOnboarding<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for ProfileStatusCompletedOnboarding<S> {
+impl<S: BosStr> AsRef<str> for ProfileStatusCompletedOnboarding<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for ProfileStatusCompletedOnboarding<S> {
+impl<S: BosStr> Serialize for ProfileStatusCompletedOnboarding<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -107,7 +106,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for ProfileStatusCompletedOnboarding<S>
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
 for ProfileStatusCompletedOnboarding<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
@@ -118,15 +117,18 @@ for ProfileStatusCompletedOnboarding<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default
-for ProfileStatusCompletedOnboarding<S> {
+impl<S: BosStr + Default> Default for ProfileStatusCompletedOnboarding<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for ProfileStatusCompletedOnboarding<S> {
-    type Output = ProfileStatusCompletedOnboarding<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for ProfileStatusCompletedOnboarding<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ProfileStatusCompletedOnboarding<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             ProfileStatusCompletedOnboarding::None => {
@@ -154,18 +156,18 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for ProfileStatusCompletedOnboarding<S
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ProfileStatusGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ProfileStatusGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: ProfileStatus<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> ProfileStatus<S> {
+impl<S: BosStr> ProfileStatus<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, ProfileStatusRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -178,18 +180,17 @@ pub struct ProfileStatusRecord;
 impl XrpcResp for ProfileStatusRecord {
     const NSID: &'static str = "fm.teal.alpha.actor.profileStatus";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ProfileStatusGetRecordOutput<S>;
+    type Output<S: BosStr> = ProfileStatusGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<ProfileStatusGetRecordOutput<S>>
-for ProfileStatus<S> {
+impl<S: BosStr> From<ProfileStatusGetRecordOutput<S>> for ProfileStatus<S> {
     fn from(output: ProfileStatusGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for ProfileStatus<S> {
+impl<S: BosStr> Collection for ProfileStatus<S> {
     const NSID: &'static str = "fm.teal.alpha.actor.profileStatus";
     type Record = ProfileStatusRecord;
 }
@@ -199,7 +200,7 @@ impl Collection for ProfileStatusRecord {
     type Record = ProfileStatusRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ProfileStatus<S> {
+impl<S: BosStr> LexiconSchema for ProfileStatus<S> {
     fn nsid() -> &'static str {
         "fm.teal.alpha.actor.profileStatus"
     }
@@ -233,9 +234,9 @@ pub mod profile_status_state {
         type CompletedOnboarding = Unset;
     }
     ///State transition - sets the `completed_onboarding` field to Set
-    pub struct SetCompletedOnboarding<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCompletedOnboarding<S> {}
-    impl<S: State> State for SetCompletedOnboarding<S> {
+    pub struct SetCompletedOnboarding<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCompletedOnboarding<St> {}
+    impl<St: State> State for SetCompletedOnboarding<St> {
         type CompletedOnboarding = Set<members::completed_onboarding>;
     }
     /// Marker types for field names
@@ -246,55 +247,55 @@ pub mod profile_status_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ProfileStatusBuilder<'a, S: profile_status_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ProfileStatusBuilder<S: BosStr, St: profile_status_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<ProfileStatusCompletedOnboarding<S>>,
         Option<Datetime>,
         Option<Datetime>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ProfileStatus<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ProfileStatusBuilder<'a, profile_status_state::Empty> {
+impl<S: BosStr> ProfileStatus<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ProfileStatusBuilder<S, profile_status_state::Empty> {
         ProfileStatusBuilder::new()
     }
 }
 
-impl<'a> ProfileStatusBuilder<'a, profile_status_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ProfileStatusBuilder<S, profile_status_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ProfileStatusBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ProfileStatusBuilder<'a, S>
+impl<S: BosStr, St> ProfileStatusBuilder<S, St>
 where
-    S: profile_status_state::State,
-    S::CompletedOnboarding: profile_status_state::IsUnset,
+    St: profile_status_state::State,
+    St::CompletedOnboarding: profile_status_state::IsUnset,
 {
     /// Set the `completedOnboarding` field (required)
     pub fn completed_onboarding(
         mut self,
         value: impl Into<ProfileStatusCompletedOnboarding<S>>,
-    ) -> ProfileStatusBuilder<'a, profile_status_state::SetCompletedOnboarding<S>> {
+    ) -> ProfileStatusBuilder<S, profile_status_state::SetCompletedOnboarding<St>> {
         self._fields.0 = Option::Some(value.into());
         ProfileStatusBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: profile_status_state::State> ProfileStatusBuilder<'a, S> {
+impl<S: BosStr, St: profile_status_state::State> ProfileStatusBuilder<S, St> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.1 = value.into();
@@ -307,7 +308,7 @@ impl<'a, S: profile_status_state::State> ProfileStatusBuilder<'a, S> {
     }
 }
 
-impl<'a, S: profile_status_state::State> ProfileStatusBuilder<'a, S> {
+impl<S: BosStr, St: profile_status_state::State> ProfileStatusBuilder<S, St> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.2 = value.into();
@@ -320,13 +321,13 @@ impl<'a, S: profile_status_state::State> ProfileStatusBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ProfileStatusBuilder<'a, S>
+impl<S: BosStr, St> ProfileStatusBuilder<S, St>
 where
-    S: profile_status_state::State,
-    S::CompletedOnboarding: profile_status_state::IsSet,
+    St: profile_status_state::State,
+    St::CompletedOnboarding: profile_status_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ProfileStatus<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ProfileStatus<S> {
         ProfileStatus {
             completed_onboarding: self._fields.0.unwrap(),
             created_at: self._fields.1,
@@ -334,11 +335,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> ProfileStatus<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ProfileStatus<S> {
         ProfileStatus {
             completed_onboarding: self._fields.0.unwrap(),
             created_at: self._fields.1,

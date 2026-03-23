@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -30,11 +30,11 @@ use crate::com_atproto::label::subscribe_labels;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Info<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Info<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub message: Option<S>,
     pub name: InfoName<S>,
@@ -44,12 +44,12 @@ pub struct Info<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum InfoName<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum InfoName<S: BosStr = DefaultStr> {
     OutdatedCursor,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> InfoName<S> {
+impl<S: BosStr> InfoName<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::OutdatedCursor => "OutdatedCursor",
@@ -65,19 +65,19 @@ impl<S: Bos<str> + AsRef<str>> InfoName<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for InfoName<S> {
+impl<S: BosStr> core::fmt::Display for InfoName<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for InfoName<S> {
+impl<S: BosStr> AsRef<str> for InfoName<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for InfoName<S> {
+impl<S: BosStr> Serialize for InfoName<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -86,7 +86,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for InfoName<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de> for InfoName<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for InfoName<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -96,14 +96,18 @@ impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de> for Info
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for InfoName<S> {
+impl<S: BosStr + Default> Default for InfoName<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for InfoName<S> {
-    type Output = InfoName<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for InfoName<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = InfoName<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             InfoName::OutdatedCursor => InfoName::OutdatedCursor,
@@ -117,11 +121,11 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for InfoName<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Labels<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Labels<S: BosStr = DefaultStr> {
     pub labels: Vec<Label<S>>,
     pub seq: i64,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -220,7 +224,7 @@ impl core::fmt::Display for SubscribeLabelsError {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Info<S> {
+impl<S: BosStr> LexiconSchema for Info<S> {
     fn nsid() -> &'static str {
         "com.atproto.label.subscribeLabels"
     }
@@ -235,7 +239,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Info<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Labels<S> {
+impl<S: BosStr> LexiconSchema for Labels<S> {
     fn nsid() -> &'static str {
         "com.atproto.label.subscribeLabels"
     }
@@ -377,119 +381,119 @@ pub mod labels_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Seq;
         type Labels;
+        type Seq;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Seq = Unset;
         type Labels = Unset;
-    }
-    ///State transition - sets the `seq` field to Set
-    pub struct SetSeq<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSeq<S> {}
-    impl<S: State> State for SetSeq<S> {
-        type Seq = Set<members::seq>;
-        type Labels = S::Labels;
+        type Seq = Unset;
     }
     ///State transition - sets the `labels` field to Set
-    pub struct SetLabels<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLabels<S> {}
-    impl<S: State> State for SetLabels<S> {
-        type Seq = S::Seq;
+    pub struct SetLabels<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLabels<St> {}
+    impl<St: State> State for SetLabels<St> {
         type Labels = Set<members::labels>;
+        type Seq = St::Seq;
+    }
+    ///State transition - sets the `seq` field to Set
+    pub struct SetSeq<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSeq<St> {}
+    impl<St: State> State for SetSeq<St> {
+        type Labels = St::Labels;
+        type Seq = Set<members::seq>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `seq` field
-        pub struct seq(());
         ///Marker type for the `labels` field
         pub struct labels(());
+        ///Marker type for the `seq` field
+        pub struct seq(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct LabelsBuilder<'a, S: labels_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct LabelsBuilder<S: BosStr, St: labels_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<Label<S>>>, Option<i64>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Labels<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> LabelsBuilder<'a, labels_state::Empty> {
+impl<S: BosStr> Labels<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> LabelsBuilder<S, labels_state::Empty> {
         LabelsBuilder::new()
     }
 }
 
-impl<'a> LabelsBuilder<'a, labels_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> LabelsBuilder<S, labels_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         LabelsBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LabelsBuilder<'a, S>
+impl<S: BosStr, St> LabelsBuilder<S, St>
 where
-    S: labels_state::State,
-    S::Labels: labels_state::IsUnset,
+    St: labels_state::State,
+    St::Labels: labels_state::IsUnset,
 {
     /// Set the `labels` field (required)
     pub fn labels(
         mut self,
         value: impl Into<Vec<Label<S>>>,
-    ) -> LabelsBuilder<'a, labels_state::SetLabels<S>> {
+    ) -> LabelsBuilder<S, labels_state::SetLabels<St>> {
         self._fields.0 = Option::Some(value.into());
         LabelsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LabelsBuilder<'a, S>
+impl<S: BosStr, St> LabelsBuilder<S, St>
 where
-    S: labels_state::State,
-    S::Seq: labels_state::IsUnset,
+    St: labels_state::State,
+    St::Seq: labels_state::IsUnset,
 {
     /// Set the `seq` field (required)
     pub fn seq(
         mut self,
         value: impl Into<i64>,
-    ) -> LabelsBuilder<'a, labels_state::SetSeq<S>> {
+    ) -> LabelsBuilder<S, labels_state::SetSeq<St>> {
         self._fields.1 = Option::Some(value.into());
         LabelsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LabelsBuilder<'a, S>
+impl<S: BosStr, St> LabelsBuilder<S, St>
 where
-    S: labels_state::State,
-    S::Seq: labels_state::IsSet,
-    S::Labels: labels_state::IsSet,
+    St: labels_state::State,
+    St::Labels: labels_state::IsSet,
+    St::Seq: labels_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Labels<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Labels<S> {
         Labels {
             labels: self._fields.0.unwrap(),
             seq: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Labels<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Labels<S> {
         Labels {
             labels: self._fields.0.unwrap(),
             seq: self._fields.1.unwrap(),
@@ -517,21 +521,21 @@ pub mod subscribe_labels_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct SubscribeLabelsBuilder<S: subscribe_labels_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct SubscribeLabelsBuilder<St: subscribe_labels_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>,),
 }
 
 impl SubscribeLabels {
-    /// Create a new builder for this type
+    /// Create a new builder for this type.
     pub fn new() -> SubscribeLabelsBuilder<subscribe_labels_state::Empty> {
         SubscribeLabelsBuilder::new()
     }
 }
 
 impl SubscribeLabelsBuilder<subscribe_labels_state::Empty> {
-    /// Create a new builder with all fields unset
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SubscribeLabelsBuilder {
             _state: PhantomData,
@@ -540,7 +544,7 @@ impl SubscribeLabelsBuilder<subscribe_labels_state::Empty> {
     }
 }
 
-impl<S: subscribe_labels_state::State> SubscribeLabelsBuilder<S> {
+impl<St: subscribe_labels_state::State> SubscribeLabelsBuilder<St> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
@@ -553,11 +557,11 @@ impl<S: subscribe_labels_state::State> SubscribeLabelsBuilder<S> {
     }
 }
 
-impl<S> SubscribeLabelsBuilder<S>
+impl<St> SubscribeLabelsBuilder<St>
 where
-    S: subscribe_labels_state::State,
+    St: subscribe_labels_state::State,
 {
-    /// Build the final struct
+    /// Build the final struct.
     pub fn build(self) -> SubscribeLabels {
         SubscribeLabels {
             cursor: self._fields.0,

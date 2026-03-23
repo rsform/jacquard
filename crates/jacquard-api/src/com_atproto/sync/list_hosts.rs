@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -30,11 +30,11 @@ use crate::com_atproto::sync::list_hosts;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Host<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Host<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub account_count: Option<i64>,
     ///hostname of server; not a URL (no scheme)
@@ -50,16 +50,15 @@ pub struct Host<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ListHosts<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ListHosts<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub cursor: Option<S>,
     ///Defaults to `200`. Min: 1. Max: 1000.
     #[serde(default = "_default_limit")]
@@ -69,25 +68,23 @@ pub struct ListHosts<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ListHostsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ListHostsOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
     ///Sort order is not formally specified. Recommended order is by time host was first seen by the server, with oldest first.
     pub hosts: Vec<list_hosts::Host<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Host<S> {
+impl<S: BosStr> LexiconSchema for Host<S> {
     fn nsid() -> &'static str {
         "com.atproto.sync.listHosts"
     }
@@ -107,12 +104,11 @@ pub struct ListHostsResponse;
 impl jacquard_common::xrpc::XrpcResp for ListHostsResponse {
     const NSID: &'static str = "com.atproto.sync.listHosts";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ListHostsOutput<S>;
+    type Output<S: BosStr> = ListHostsOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for ListHosts<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ListHosts<S> {
     const NSID: &'static str = "com.atproto.sync.listHosts";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ListHostsResponse;
@@ -123,7 +119,7 @@ pub struct ListHostsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListHostsRequest {
     const PATH: &'static str = "/xrpc/com.atproto.sync.listHosts";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = ListHosts<S>;
+    type Request<S: BosStr> = ListHosts<S>;
     type Response = ListHostsResponse;
 }
 
@@ -238,32 +234,32 @@ pub mod list_hosts_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct ListHostsBuilder<'a, S: list_hosts_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ListHostsBuilder<S: BosStr, St: list_hosts_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ListHosts<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ListHostsBuilder<'a, list_hosts_state::Empty> {
+impl<S: BosStr> ListHosts<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ListHostsBuilder<S, list_hosts_state::Empty> {
         ListHostsBuilder::new()
     }
 }
 
-impl<'a> ListHostsBuilder<'a, list_hosts_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ListHostsBuilder<S, list_hosts_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ListHostsBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: list_hosts_state::State> ListHostsBuilder<'a, S> {
+impl<S: BosStr, St: list_hosts_state::State> ListHostsBuilder<S, St> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -276,7 +272,7 @@ impl<'a, S: list_hosts_state::State> ListHostsBuilder<'a, S> {
     }
 }
 
-impl<'a, S: list_hosts_state::State> ListHostsBuilder<'a, S> {
+impl<S: BosStr, St: list_hosts_state::State> ListHostsBuilder<S, St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -289,12 +285,12 @@ impl<'a, S: list_hosts_state::State> ListHostsBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ListHostsBuilder<'a, S>
+impl<S: BosStr, St> ListHostsBuilder<S, St>
 where
-    S: list_hosts_state::State,
+    St: list_hosts_state::State,
 {
-    /// Build the final struct
-    pub fn build(self) -> ListHosts<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ListHosts<S> {
         ListHosts {
             cursor: self._fields.0,
             limit: self._fields.1,

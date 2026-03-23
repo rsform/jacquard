@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -31,11 +31,11 @@ use crate::network_slices::tools::richtext::facet;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Bold<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Bold<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
@@ -46,11 +46,11 @@ pub struct Bold<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ByteSlice<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ByteSlice<S: BosStr = DefaultStr> {
     pub byte_end: i64,
     pub byte_start: i64,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -63,11 +63,11 @@ pub struct ByteSlice<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Code<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Code<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
@@ -78,11 +78,11 @@ pub struct Code<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CodeBlock<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CodeBlock<S: BosStr = DefaultStr> {
     ///Optional language identifier for syntax highlighting.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub lang: Option<S>,
@@ -96,11 +96,11 @@ pub struct CodeBlock<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Italic<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Italic<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
@@ -111,11 +111,11 @@ pub struct Italic<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Link<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Link<S: BosStr = DefaultStr> {
     pub uri: UriValue<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -127,11 +127,11 @@ pub struct Link<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Facet<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Facet<S: BosStr = DefaultStr> {
     pub features: Vec<FacetFeaturesItem<S>>,
     pub index: facet::ByteSlice<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -144,11 +144,11 @@ pub struct Facet<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum FacetFeaturesItem<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum FacetFeaturesItem<S: BosStr = DefaultStr> {
     #[serde(rename = "network.slices.tools.richtext.facet#link")]
     Link(Box<facet::Link<S>>),
     #[serde(rename = "network.slices.tools.richtext.facet#bold")]
@@ -161,7 +161,7 @@ pub enum FacetFeaturesItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     CodeBlock(Box<facet::CodeBlock<S>>),
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Bold<S> {
+impl<S: BosStr> LexiconSchema for Bold<S> {
     fn nsid() -> &'static str {
         "network.slices.tools.richtext.facet"
     }
@@ -176,7 +176,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Bold<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ByteSlice<S> {
+impl<S: BosStr> LexiconSchema for ByteSlice<S> {
     fn nsid() -> &'static str {
         "network.slices.tools.richtext.facet"
     }
@@ -211,7 +211,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for ByteSlice<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Code<S> {
+impl<S: BosStr> LexiconSchema for Code<S> {
     fn nsid() -> &'static str {
         "network.slices.tools.richtext.facet"
     }
@@ -226,7 +226,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Code<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for CodeBlock<S> {
+impl<S: BosStr> LexiconSchema for CodeBlock<S> {
     fn nsid() -> &'static str {
         "network.slices.tools.richtext.facet"
     }
@@ -241,7 +241,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for CodeBlock<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Italic<S> {
+impl<S: BosStr> LexiconSchema for Italic<S> {
     fn nsid() -> &'static str {
         "network.slices.tools.richtext.facet"
     }
@@ -256,7 +256,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Italic<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Link<S> {
+impl<S: BosStr> LexiconSchema for Link<S> {
     fn nsid() -> &'static str {
         "network.slices.tools.richtext.facet"
     }
@@ -271,7 +271,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Link<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Facet<S> {
+impl<S: BosStr> LexiconSchema for Facet<S> {
     fn nsid() -> &'static str {
         "network.slices.tools.richtext.facet"
     }
@@ -492,17 +492,17 @@ pub mod byte_slice_state {
         type ByteEnd = Unset;
     }
     ///State transition - sets the `byte_start` field to Set
-    pub struct SetByteStart<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetByteStart<S> {}
-    impl<S: State> State for SetByteStart<S> {
+    pub struct SetByteStart<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetByteStart<St> {}
+    impl<St: State> State for SetByteStart<St> {
         type ByteStart = Set<members::byte_start>;
-        type ByteEnd = S::ByteEnd;
+        type ByteEnd = St::ByteEnd;
     }
     ///State transition - sets the `byte_end` field to Set
-    pub struct SetByteEnd<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetByteEnd<S> {}
-    impl<S: State> State for SetByteEnd<S> {
-        type ByteStart = S::ByteStart;
+    pub struct SetByteEnd<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetByteEnd<St> {}
+    impl<St: State> State for SetByteEnd<St> {
+        type ByteStart = St::ByteStart;
         type ByteEnd = Set<members::byte_end>;
     }
     /// Marker types for field names
@@ -515,88 +515,88 @@ pub mod byte_slice_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ByteSliceBuilder<'a, S: byte_slice_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ByteSliceBuilder<S: BosStr, St: byte_slice_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<i64>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ByteSlice<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ByteSliceBuilder<'a, byte_slice_state::Empty> {
+impl<S: BosStr> ByteSlice<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ByteSliceBuilder<S, byte_slice_state::Empty> {
         ByteSliceBuilder::new()
     }
 }
 
-impl<'a> ByteSliceBuilder<'a, byte_slice_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ByteSliceBuilder<S, byte_slice_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ByteSliceBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ByteSliceBuilder<'a, S>
+impl<S: BosStr, St> ByteSliceBuilder<S, St>
 where
-    S: byte_slice_state::State,
-    S::ByteEnd: byte_slice_state::IsUnset,
+    St: byte_slice_state::State,
+    St::ByteEnd: byte_slice_state::IsUnset,
 {
     /// Set the `byteEnd` field (required)
     pub fn byte_end(
         mut self,
         value: impl Into<i64>,
-    ) -> ByteSliceBuilder<'a, byte_slice_state::SetByteEnd<S>> {
+    ) -> ByteSliceBuilder<S, byte_slice_state::SetByteEnd<St>> {
         self._fields.0 = Option::Some(value.into());
         ByteSliceBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ByteSliceBuilder<'a, S>
+impl<S: BosStr, St> ByteSliceBuilder<S, St>
 where
-    S: byte_slice_state::State,
-    S::ByteStart: byte_slice_state::IsUnset,
+    St: byte_slice_state::State,
+    St::ByteStart: byte_slice_state::IsUnset,
 {
     /// Set the `byteStart` field (required)
     pub fn byte_start(
         mut self,
         value: impl Into<i64>,
-    ) -> ByteSliceBuilder<'a, byte_slice_state::SetByteStart<S>> {
+    ) -> ByteSliceBuilder<S, byte_slice_state::SetByteStart<St>> {
         self._fields.1 = Option::Some(value.into());
         ByteSliceBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ByteSliceBuilder<'a, S>
+impl<S: BosStr, St> ByteSliceBuilder<S, St>
 where
-    S: byte_slice_state::State,
-    S::ByteStart: byte_slice_state::IsSet,
-    S::ByteEnd: byte_slice_state::IsSet,
+    St: byte_slice_state::State,
+    St::ByteStart: byte_slice_state::IsSet,
+    St::ByteEnd: byte_slice_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ByteSlice<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ByteSlice<S> {
         ByteSlice {
             byte_end: self._fields.0.unwrap(),
             byte_start: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> ByteSlice<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ByteSlice<S> {
         ByteSlice {
             byte_end: self._fields.0.unwrap(),
             byte_start: self._fields.1.unwrap(),
@@ -624,9 +624,9 @@ pub mod link_state {
         type Uri = Unset;
     }
     ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
         type Uri = Set<members::uri>;
     }
     /// Marker types for field names
@@ -637,64 +637,64 @@ pub mod link_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct LinkBuilder<'a, S: link_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct LinkBuilder<S: BosStr, St: link_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<UriValue<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Link<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> LinkBuilder<'a, link_state::Empty> {
+impl<S: BosStr> Link<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> LinkBuilder<S, link_state::Empty> {
         LinkBuilder::new()
     }
 }
 
-impl<'a> LinkBuilder<'a, link_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> LinkBuilder<S, link_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         LinkBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LinkBuilder<'a, S>
+impl<S: BosStr, St> LinkBuilder<S, St>
 where
-    S: link_state::State,
-    S::Uri: link_state::IsUnset,
+    St: link_state::State,
+    St::Uri: link_state::IsUnset,
 {
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> LinkBuilder<'a, link_state::SetUri<S>> {
+    ) -> LinkBuilder<S, link_state::SetUri<St>> {
         self._fields.0 = Option::Some(value.into());
         LinkBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LinkBuilder<'a, S>
+impl<S: BosStr, St> LinkBuilder<S, St>
 where
-    S: link_state::State,
-    S::Uri: link_state::IsSet,
+    St: link_state::State,
+    St::Uri: link_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Link<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Link<S> {
         Link {
             uri: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Link<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Link<S> {
         Link {
             uri: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -712,119 +712,119 @@ pub mod facet_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Features;
         type Index;
+        type Features;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Features = Unset;
         type Index = Unset;
-    }
-    ///State transition - sets the `features` field to Set
-    pub struct SetFeatures<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFeatures<S> {}
-    impl<S: State> State for SetFeatures<S> {
-        type Features = Set<members::features>;
-        type Index = S::Index;
+        type Features = Unset;
     }
     ///State transition - sets the `index` field to Set
-    pub struct SetIndex<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIndex<S> {}
-    impl<S: State> State for SetIndex<S> {
-        type Features = S::Features;
+    pub struct SetIndex<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIndex<St> {}
+    impl<St: State> State for SetIndex<St> {
         type Index = Set<members::index>;
+        type Features = St::Features;
+    }
+    ///State transition - sets the `features` field to Set
+    pub struct SetFeatures<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetFeatures<St> {}
+    impl<St: State> State for SetFeatures<St> {
+        type Index = St::Index;
+        type Features = Set<members::features>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `features` field
-        pub struct features(());
         ///Marker type for the `index` field
         pub struct index(());
+        ///Marker type for the `features` field
+        pub struct features(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct FacetBuilder<'a, S: facet_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct FacetBuilder<S: BosStr, St: facet_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<FacetFeaturesItem<S>>>, Option<facet::ByteSlice<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Facet<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> FacetBuilder<'a, facet_state::Empty> {
+impl<S: BosStr> Facet<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> FacetBuilder<S, facet_state::Empty> {
         FacetBuilder::new()
     }
 }
 
-impl<'a> FacetBuilder<'a, facet_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> FacetBuilder<S, facet_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         FacetBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> FacetBuilder<'a, S>
+impl<S: BosStr, St> FacetBuilder<S, St>
 where
-    S: facet_state::State,
-    S::Features: facet_state::IsUnset,
+    St: facet_state::State,
+    St::Features: facet_state::IsUnset,
 {
     /// Set the `features` field (required)
     pub fn features(
         mut self,
         value: impl Into<Vec<FacetFeaturesItem<S>>>,
-    ) -> FacetBuilder<'a, facet_state::SetFeatures<S>> {
+    ) -> FacetBuilder<S, facet_state::SetFeatures<St>> {
         self._fields.0 = Option::Some(value.into());
         FacetBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> FacetBuilder<'a, S>
+impl<S: BosStr, St> FacetBuilder<S, St>
 where
-    S: facet_state::State,
-    S::Index: facet_state::IsUnset,
+    St: facet_state::State,
+    St::Index: facet_state::IsUnset,
 {
     /// Set the `index` field (required)
     pub fn index(
         mut self,
         value: impl Into<facet::ByteSlice<S>>,
-    ) -> FacetBuilder<'a, facet_state::SetIndex<S>> {
+    ) -> FacetBuilder<S, facet_state::SetIndex<St>> {
         self._fields.1 = Option::Some(value.into());
         FacetBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> FacetBuilder<'a, S>
+impl<S: BosStr, St> FacetBuilder<S, St>
 where
-    S: facet_state::State,
-    S::Features: facet_state::IsSet,
-    S::Index: facet_state::IsSet,
+    St: facet_state::State,
+    St::Index: facet_state::IsSet,
+    St::Features: facet_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Facet<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Facet<S> {
         Facet {
             features: self._fields.0.unwrap(),
             index: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Facet<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Facet<S> {
         Facet {
             features: self._fields.0.unwrap(),
             index: self._fields.1.unwrap(),

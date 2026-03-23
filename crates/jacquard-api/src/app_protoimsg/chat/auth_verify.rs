@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "app.protoimsg.chat.authVerify",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct AuthVerify<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct AuthVerify<S: BosStr = DefaultStr> {
     ///When this verification record was created.
     pub created_at: Datetime,
     ///Server-issued challenge nonce to prove write access.
@@ -54,18 +54,18 @@ pub struct AuthVerify<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct AuthVerifyGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct AuthVerifyGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: AuthVerify<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> AuthVerify<S> {
+impl<S: BosStr> AuthVerify<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, AuthVerifyRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -78,17 +78,17 @@ pub struct AuthVerifyRecord;
 impl XrpcResp for AuthVerifyRecord {
     const NSID: &'static str = "app.protoimsg.chat.authVerify";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = AuthVerifyGetRecordOutput<S>;
+    type Output<S: BosStr> = AuthVerifyGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<AuthVerifyGetRecordOutput<S>> for AuthVerify<S> {
+impl<S: BosStr> From<AuthVerifyGetRecordOutput<S>> for AuthVerify<S> {
     fn from(output: AuthVerifyGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for AuthVerify<S> {
+impl<S: BosStr> Collection for AuthVerify<S> {
     const NSID: &'static str = "app.protoimsg.chat.authVerify";
     type Record = AuthVerifyRecord;
 }
@@ -98,7 +98,7 @@ impl Collection for AuthVerifyRecord {
     type Record = AuthVerifyRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for AuthVerify<S> {
+impl<S: BosStr> LexiconSchema for AuthVerify<S> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.authVerify"
     }
@@ -123,122 +123,122 @@ pub mod auth_verify_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Nonce;
         type CreatedAt;
+        type Nonce;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Nonce = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `nonce` field to Set
-    pub struct SetNonce<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNonce<S> {}
-    impl<S: State> State for SetNonce<S> {
-        type Nonce = Set<members::nonce>;
-        type CreatedAt = S::CreatedAt;
+        type Nonce = Unset;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Nonce = S::Nonce;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
+        type Nonce = St::Nonce;
+    }
+    ///State transition - sets the `nonce` field to Set
+    pub struct SetNonce<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetNonce<St> {}
+    impl<St: State> State for SetNonce<St> {
+        type CreatedAt = St::CreatedAt;
+        type Nonce = Set<members::nonce>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `nonce` field
-        pub struct nonce(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `nonce` field
+        pub struct nonce(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct AuthVerifyBuilder<'a, S: auth_verify_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct AuthVerifyBuilder<S: BosStr, St: auth_verify_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> AuthVerify<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> AuthVerifyBuilder<'a, auth_verify_state::Empty> {
+impl<S: BosStr> AuthVerify<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> AuthVerifyBuilder<S, auth_verify_state::Empty> {
         AuthVerifyBuilder::new()
     }
 }
 
-impl<'a> AuthVerifyBuilder<'a, auth_verify_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> AuthVerifyBuilder<S, auth_verify_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         AuthVerifyBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AuthVerifyBuilder<'a, S>
+impl<S: BosStr, St> AuthVerifyBuilder<S, St>
 where
-    S: auth_verify_state::State,
-    S::CreatedAt: auth_verify_state::IsUnset,
+    St: auth_verify_state::State,
+    St::CreatedAt: auth_verify_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> AuthVerifyBuilder<'a, auth_verify_state::SetCreatedAt<S>> {
+    ) -> AuthVerifyBuilder<S, auth_verify_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         AuthVerifyBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AuthVerifyBuilder<'a, S>
+impl<S: BosStr, St> AuthVerifyBuilder<S, St>
 where
-    S: auth_verify_state::State,
-    S::Nonce: auth_verify_state::IsUnset,
+    St: auth_verify_state::State,
+    St::Nonce: auth_verify_state::IsUnset,
 {
     /// Set the `nonce` field (required)
     pub fn nonce(
         mut self,
         value: impl Into<S>,
-    ) -> AuthVerifyBuilder<'a, auth_verify_state::SetNonce<S>> {
+    ) -> AuthVerifyBuilder<S, auth_verify_state::SetNonce<St>> {
         self._fields.1 = Option::Some(value.into());
         AuthVerifyBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AuthVerifyBuilder<'a, S>
+impl<S: BosStr, St> AuthVerifyBuilder<S, St>
 where
-    S: auth_verify_state::State,
-    S::Nonce: auth_verify_state::IsSet,
-    S::CreatedAt: auth_verify_state::IsSet,
+    St: auth_verify_state::State,
+    St::CreatedAt: auth_verify_state::IsSet,
+    St::Nonce: auth_verify_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> AuthVerify<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> AuthVerify<S> {
         AuthVerify {
             created_at: self._fields.0.unwrap(),
             nonce: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> AuthVerify<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> AuthVerify<S> {
         AuthVerify {
             created_at: self._fields.0.unwrap(),
             nonce: self._fields.1.unwrap(),

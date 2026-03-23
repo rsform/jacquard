@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,11 +34,11 @@ use crate::space_remanso::note;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Image<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Image<S: BosStr = DefaultStr> {
     ///Alt text for the image.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub alt: Option<S>,
@@ -55,11 +55,11 @@ pub struct Image<S: Bos<str> + AsRef<str> = DefaultStr> {
     rename = "space.remanso.note",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Note<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Note<S: BosStr = DefaultStr> {
     ///Markdown content. Local image paths are replaced with blob CIDs at publish time.
     pub content: S,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -92,7 +92,7 @@ pub struct Note<S: Bos<str> + AsRef<str> = DefaultStr> {
 /// Most used language in the note. In ISO 639-3 code.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum NoteLanguage<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum NoteLanguage<S: BosStr = DefaultStr> {
     Afr,
     Ara,
     Aze,
@@ -146,7 +146,7 @@ pub enum NoteLanguage<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> NoteLanguage<S> {
+impl<S: BosStr> NoteLanguage<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Afr => "afr",
@@ -260,19 +260,19 @@ impl<S: Bos<str> + AsRef<str>> NoteLanguage<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for NoteLanguage<S> {
+impl<S: BosStr> core::fmt::Display for NoteLanguage<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for NoteLanguage<S> {
+impl<S: BosStr> AsRef<str> for NoteLanguage<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for NoteLanguage<S> {
+impl<S: BosStr> Serialize for NoteLanguage<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -281,8 +281,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for NoteLanguage<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for NoteLanguage<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for NoteLanguage<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -292,14 +291,18 @@ for NoteLanguage<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for NoteLanguage<S> {
+impl<S: BosStr + Default> Default for NoteLanguage<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for NoteLanguage<S> {
-    type Output = NoteLanguage<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for NoteLanguage<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = NoteLanguage<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             NoteLanguage::Afr => NoteLanguage::Afr,
@@ -360,13 +363,13 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for NoteLanguage<S> {
 /// Display theme for the note.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum NoteTheme<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum NoteTheme<S: BosStr = DefaultStr> {
     Light,
     Dark,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> NoteTheme<S> {
+impl<S: BosStr> NoteTheme<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Light => "light",
@@ -384,19 +387,19 @@ impl<S: Bos<str> + AsRef<str>> NoteTheme<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for NoteTheme<S> {
+impl<S: BosStr> core::fmt::Display for NoteTheme<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for NoteTheme<S> {
+impl<S: BosStr> AsRef<str> for NoteTheme<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for NoteTheme<S> {
+impl<S: BosStr> Serialize for NoteTheme<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -405,8 +408,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for NoteTheme<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for NoteTheme<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for NoteTheme<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -416,14 +418,18 @@ for NoteTheme<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for NoteTheme<S> {
+impl<S: BosStr + Default> Default for NoteTheme<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for NoteTheme<S> {
-    type Output = NoteTheme<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for NoteTheme<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = NoteTheme<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             NoteTheme::Light => NoteTheme::Light,
@@ -439,24 +445,24 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for NoteTheme<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct NoteGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct NoteGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Note<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Note<S> {
+impl<S: BosStr> Note<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, NoteRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Image<S> {
+impl<S: BosStr> LexiconSchema for Image<S> {
     fn nsid() -> &'static str {
         "space.remanso.note"
     }
@@ -528,17 +534,17 @@ pub struct NoteRecord;
 impl XrpcResp for NoteRecord {
     const NSID: &'static str = "space.remanso.note";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = NoteGetRecordOutput<S>;
+    type Output<S: BosStr> = NoteGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<NoteGetRecordOutput<S>> for Note<S> {
+impl<S: BosStr> From<NoteGetRecordOutput<S>> for Note<S> {
     fn from(output: NoteGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Note<S> {
+impl<S: BosStr> Collection for Note<S> {
     const NSID: &'static str = "space.remanso.note";
     type Record = NoteRecord;
 }
@@ -548,7 +554,7 @@ impl Collection for NoteRecord {
     type Record = NoteRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Note<S> {
+impl<S: BosStr> LexiconSchema for Note<S> {
     fn nsid() -> &'static str {
         "space.remanso.note"
     }
@@ -634,9 +640,9 @@ pub mod image_state {
         type Image = Unset;
     }
     ///State transition - sets the `image` field to Set
-    pub struct SetImage<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetImage<S> {}
-    impl<S: State> State for SetImage<S> {
+    pub struct SetImage<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetImage<St> {}
+    impl<St: State> State for SetImage<St> {
         type Image = Set<members::image>;
     }
     /// Marker types for field names
@@ -647,32 +653,32 @@ pub mod image_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ImageBuilder<'a, S: image_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ImageBuilder<S: BosStr, St: image_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<BlobRef<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Image<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ImageBuilder<'a, image_state::Empty> {
+impl<S: BosStr> Image<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ImageBuilder<S, image_state::Empty> {
         ImageBuilder::new()
     }
 }
 
-impl<'a> ImageBuilder<'a, image_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ImageBuilder<S, image_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ImageBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: image_state::State> ImageBuilder<'a, S> {
+impl<S: BosStr, St: image_state::State> ImageBuilder<S, St> {
     /// Set the `alt` field (optional)
     pub fn alt(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -685,40 +691,40 @@ impl<'a, S: image_state::State> ImageBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ImageBuilder<'a, S>
+impl<S: BosStr, St> ImageBuilder<S, St>
 where
-    S: image_state::State,
-    S::Image: image_state::IsUnset,
+    St: image_state::State,
+    St::Image: image_state::IsUnset,
 {
     /// Set the `image` field (required)
     pub fn image(
         mut self,
         value: impl Into<BlobRef<S>>,
-    ) -> ImageBuilder<'a, image_state::SetImage<S>> {
+    ) -> ImageBuilder<S, image_state::SetImage<St>> {
         self._fields.1 = Option::Some(value.into());
         ImageBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ImageBuilder<'a, S>
+impl<S: BosStr, St> ImageBuilder<S, St>
 where
-    S: image_state::State,
-    S::Image: image_state::IsSet,
+    St: image_state::State,
+    St::Image: image_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Image<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Image<S> {
         Image {
             alt: self._fields.0,
             image: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Image<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Image<S> {
         Image {
             alt: self._fields.0,
             image: self._fields.1.unwrap(),
@@ -909,17 +915,17 @@ pub mod note_state {
         type Title = Unset;
     }
     ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
+    pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetContent<St> {}
+    impl<St: State> State for SetContent<St> {
         type Content = Set<members::content>;
-        type Title = S::Title;
+        type Title = St::Title;
     }
     ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Content = S::Content;
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
+        type Content = St::Content;
         type Title = Set<members::title>;
     }
     /// Marker types for field names
@@ -932,9 +938,9 @@ pub mod note_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct NoteBuilder<'a, S: note_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct NoteBuilder<S: BosStr, St: note_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
         Option<Datetime>,
@@ -947,47 +953,47 @@ pub struct NoteBuilder<'a, S: note_state::State> {
         Option<NoteTheme<S>>,
         Option<S>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Note<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> NoteBuilder<'a, note_state::Empty> {
+impl<S: BosStr> Note<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> NoteBuilder<S, note_state::Empty> {
         NoteBuilder::new()
     }
 }
 
-impl<'a> NoteBuilder<'a, note_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> NoteBuilder<S, note_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         NoteBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> NoteBuilder<'a, S>
+impl<S: BosStr, St> NoteBuilder<S, St>
 where
-    S: note_state::State,
-    S::Content: note_state::IsUnset,
+    St: note_state::State,
+    St::Content: note_state::IsUnset,
 {
     /// Set the `content` field (required)
     pub fn content(
         mut self,
         value: impl Into<S>,
-    ) -> NoteBuilder<'a, note_state::SetContent<S>> {
+    ) -> NoteBuilder<S, note_state::SetContent<St>> {
         self._fields.0 = Option::Some(value.into());
         NoteBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: note_state::State> NoteBuilder<'a, S> {
+impl<S: BosStr, St: note_state::State> NoteBuilder<S, St> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.1 = value.into();
@@ -1000,7 +1006,7 @@ impl<'a, S: note_state::State> NoteBuilder<'a, S> {
     }
 }
 
-impl<'a, S: note_state::State> NoteBuilder<'a, S> {
+impl<S: BosStr, St: note_state::State> NoteBuilder<S, St> {
     /// Set the `discoverable` field (optional)
     pub fn discoverable(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.2 = value.into();
@@ -1013,7 +1019,7 @@ impl<'a, S: note_state::State> NoteBuilder<'a, S> {
     }
 }
 
-impl<'a, S: note_state::State> NoteBuilder<'a, S> {
+impl<S: BosStr, St: note_state::State> NoteBuilder<S, St> {
     /// Set the `fontFamily` field (optional)
     pub fn font_family(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -1026,7 +1032,7 @@ impl<'a, S: note_state::State> NoteBuilder<'a, S> {
     }
 }
 
-impl<'a, S: note_state::State> NoteBuilder<'a, S> {
+impl<S: BosStr, St: note_state::State> NoteBuilder<S, St> {
     /// Set the `fontSize` field (optional)
     pub fn font_size(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.4 = value.into();
@@ -1039,7 +1045,7 @@ impl<'a, S: note_state::State> NoteBuilder<'a, S> {
     }
 }
 
-impl<'a, S: note_state::State> NoteBuilder<'a, S> {
+impl<S: BosStr, St: note_state::State> NoteBuilder<S, St> {
     /// Set the `images` field (optional)
     pub fn images(mut self, value: impl Into<Option<Vec<note::Image<S>>>>) -> Self {
         self._fields.5 = value.into();
@@ -1052,7 +1058,7 @@ impl<'a, S: note_state::State> NoteBuilder<'a, S> {
     }
 }
 
-impl<'a, S: note_state::State> NoteBuilder<'a, S> {
+impl<S: BosStr, St: note_state::State> NoteBuilder<S, St> {
     /// Set the `language` field (optional)
     pub fn language(mut self, value: impl Into<Option<NoteLanguage<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -1065,7 +1071,7 @@ impl<'a, S: note_state::State> NoteBuilder<'a, S> {
     }
 }
 
-impl<'a, S: note_state::State> NoteBuilder<'a, S> {
+impl<S: BosStr, St: note_state::State> NoteBuilder<S, St> {
     /// Set the `publishedAt` field (optional)
     pub fn published_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.7 = value.into();
@@ -1078,7 +1084,7 @@ impl<'a, S: note_state::State> NoteBuilder<'a, S> {
     }
 }
 
-impl<'a, S: note_state::State> NoteBuilder<'a, S> {
+impl<S: BosStr, St: note_state::State> NoteBuilder<S, St> {
     /// Set the `theme` field (optional)
     pub fn theme(mut self, value: impl Into<Option<NoteTheme<S>>>) -> Self {
         self._fields.8 = value.into();
@@ -1091,33 +1097,33 @@ impl<'a, S: note_state::State> NoteBuilder<'a, S> {
     }
 }
 
-impl<'a, S> NoteBuilder<'a, S>
+impl<S: BosStr, St> NoteBuilder<S, St>
 where
-    S: note_state::State,
-    S::Title: note_state::IsUnset,
+    St: note_state::State,
+    St::Title: note_state::IsUnset,
 {
     /// Set the `title` field (required)
     pub fn title(
         mut self,
         value: impl Into<S>,
-    ) -> NoteBuilder<'a, note_state::SetTitle<S>> {
+    ) -> NoteBuilder<S, note_state::SetTitle<St>> {
         self._fields.9 = Option::Some(value.into());
         NoteBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> NoteBuilder<'a, S>
+impl<S: BosStr, St> NoteBuilder<S, St>
 where
-    S: note_state::State,
-    S::Content: note_state::IsSet,
-    S::Title: note_state::IsSet,
+    St: note_state::State,
+    St::Content: note_state::IsSet,
+    St::Title: note_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Note<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Note<S> {
         Note {
             content: self._fields.0.unwrap(),
             created_at: self._fields.1,
@@ -1132,8 +1138,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Note<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Note<S> {
         Note {
             content: self._fields.0.unwrap(),
             created_at: self._fields.1,

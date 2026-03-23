@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -30,18 +30,18 @@ use serde::{Serialize, Deserialize};
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct StorageExternal<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct StorageExternal<S: BosStr = DefaultStr> {
     ///WebDataset URLs with optional brace notation for sharded tar files
     pub urls: Vec<UriValue<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for StorageExternal<S> {
+impl<S: BosStr> LexiconSchema for StorageExternal<S> {
     fn nsid() -> &'static str {
         "science.alt.dataset.storageExternal"
     }
@@ -86,9 +86,9 @@ pub mod storage_external_state {
         type Urls = Unset;
     }
     ///State transition - sets the `urls` field to Set
-    pub struct SetUrls<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrls<S> {}
-    impl<S: State> State for SetUrls<S> {
+    pub struct SetUrls<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUrls<St> {}
+    impl<St: State> State for SetUrls<St> {
         type Urls = Set<members::urls>;
     }
     /// Marker types for field names
@@ -99,67 +99,67 @@ pub mod storage_external_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct StorageExternalBuilder<'a, S: storage_external_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct StorageExternalBuilder<S: BosStr, St: storage_external_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<UriValue<S>>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> StorageExternal<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> StorageExternalBuilder<'a, storage_external_state::Empty> {
+impl<S: BosStr> StorageExternal<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> StorageExternalBuilder<S, storage_external_state::Empty> {
         StorageExternalBuilder::new()
     }
 }
 
-impl<'a> StorageExternalBuilder<'a, storage_external_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> StorageExternalBuilder<S, storage_external_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         StorageExternalBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> StorageExternalBuilder<'a, S>
+impl<S: BosStr, St> StorageExternalBuilder<S, St>
 where
-    S: storage_external_state::State,
-    S::Urls: storage_external_state::IsUnset,
+    St: storage_external_state::State,
+    St::Urls: storage_external_state::IsUnset,
 {
     /// Set the `urls` field (required)
     pub fn urls(
         mut self,
         value: impl Into<Vec<UriValue<S>>>,
-    ) -> StorageExternalBuilder<'a, storage_external_state::SetUrls<S>> {
+    ) -> StorageExternalBuilder<S, storage_external_state::SetUrls<St>> {
         self._fields.0 = Option::Some(value.into());
         StorageExternalBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> StorageExternalBuilder<'a, S>
+impl<S: BosStr, St> StorageExternalBuilder<S, St>
 where
-    S: storage_external_state::State,
-    S::Urls: storage_external_state::IsSet,
+    St: storage_external_state::State,
+    St::Urls: storage_external_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> StorageExternal<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> StorageExternal<S> {
         StorageExternal {
             urls: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> StorageExternal<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> StorageExternal<S> {
         StorageExternal {
             urls: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

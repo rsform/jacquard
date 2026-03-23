@@ -10,37 +10,35 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DeleteUserData<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+pub struct DeleteUserData<S: BosStr = DefaultStr> {
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DeleteUserDataOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DeleteUserDataOutput<S: BosStr = DefaultStr> {
     ///Whether the user's crew record was deleted (false if user is captain)
     pub crew_deleted: bool,
     ///Number of layer records deleted
@@ -49,9 +47,7 @@ pub struct DeleteUserDataOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub stats_deleted: i64,
     ///Whether the deletion completed successfully
     pub success: bool,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -111,12 +107,11 @@ pub struct DeleteUserDataResponse;
 impl jacquard_common::xrpc::XrpcResp for DeleteUserDataResponse {
     const NSID: &'static str = "io.atcr.hold.deleteUserData";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = DeleteUserDataOutput<S>;
+    type Output<S: BosStr> = DeleteUserDataOutput<S>;
     type Err = DeleteUserDataError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for DeleteUserData<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for DeleteUserData<S> {
     const NSID: &'static str = "io.atcr.hold.deleteUserData";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -131,6 +126,6 @@ impl jacquard_common::xrpc::XrpcEndpoint for DeleteUserDataRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = DeleteUserData<S>;
+    type Request<S: BosStr> = DeleteUserData<S>;
     type Response = DeleteUserDataResponse;
 }

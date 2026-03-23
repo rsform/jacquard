@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
@@ -19,41 +19,37 @@ use serde::{Serialize, Deserialize};
 use crate::games_gamesgamesgamesgames::GameSummaryView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ListOrgGames<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ListOrgGames<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub cursor: Option<S>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
-    #[serde(borrow)]
     pub org: AtUri<S>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ListOrgGamesOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ListOrgGamesOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
     pub games: Vec<GameSummaryView<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -62,12 +58,11 @@ pub struct ListOrgGamesResponse;
 impl jacquard_common::xrpc::XrpcResp for ListOrgGamesResponse {
     const NSID: &'static str = "games.gamesgamesgamesgames.listOrgGames";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ListOrgGamesOutput<S>;
+    type Output<S: BosStr> = ListOrgGamesOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for ListOrgGames<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ListOrgGames<S> {
     const NSID: &'static str = "games.gamesgamesgamesgames.listOrgGames";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ListOrgGamesResponse;
@@ -78,7 +73,7 @@ pub struct ListOrgGamesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListOrgGamesRequest {
     const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.listOrgGames";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = ListOrgGames<S>;
+    type Request<S: BosStr> = ListOrgGames<S>;
     type Response = ListOrgGamesResponse;
 }
 
@@ -105,9 +100,9 @@ pub mod list_org_games_state {
         type Org = Unset;
     }
     ///State transition - sets the `org` field to Set
-    pub struct SetOrg<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetOrg<S> {}
-    impl<S: State> State for SetOrg<S> {
+    pub struct SetOrg<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetOrg<St> {}
+    impl<St: State> State for SetOrg<St> {
         type Org = Set<members::org>;
     }
     /// Marker types for field names
@@ -118,32 +113,32 @@ pub mod list_org_games_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ListOrgGamesBuilder<'a, S: list_org_games_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ListOrgGamesBuilder<S: BosStr, St: list_org_games_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>, Option<AtUri<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ListOrgGames<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ListOrgGamesBuilder<'a, list_org_games_state::Empty> {
+impl<S: BosStr> ListOrgGames<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ListOrgGamesBuilder<S, list_org_games_state::Empty> {
         ListOrgGamesBuilder::new()
     }
 }
 
-impl<'a> ListOrgGamesBuilder<'a, list_org_games_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ListOrgGamesBuilder<S, list_org_games_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ListOrgGamesBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: list_org_games_state::State> ListOrgGamesBuilder<'a, S> {
+impl<S: BosStr, St: list_org_games_state::State> ListOrgGamesBuilder<S, St> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -156,7 +151,7 @@ impl<'a, S: list_org_games_state::State> ListOrgGamesBuilder<'a, S> {
     }
 }
 
-impl<'a, S: list_org_games_state::State> ListOrgGamesBuilder<'a, S> {
+impl<S: BosStr, St: list_org_games_state::State> ListOrgGamesBuilder<S, St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -169,32 +164,32 @@ impl<'a, S: list_org_games_state::State> ListOrgGamesBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ListOrgGamesBuilder<'a, S>
+impl<S: BosStr, St> ListOrgGamesBuilder<S, St>
 where
-    S: list_org_games_state::State,
-    S::Org: list_org_games_state::IsUnset,
+    St: list_org_games_state::State,
+    St::Org: list_org_games_state::IsUnset,
 {
     /// Set the `org` field (required)
     pub fn org(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> ListOrgGamesBuilder<'a, list_org_games_state::SetOrg<S>> {
+    ) -> ListOrgGamesBuilder<S, list_org_games_state::SetOrg<St>> {
         self._fields.2 = Option::Some(value.into());
         ListOrgGamesBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ListOrgGamesBuilder<'a, S>
+impl<S: BosStr, St> ListOrgGamesBuilder<S, St>
 where
-    S: list_org_games_state::State,
-    S::Org: list_org_games_state::IsSet,
+    St: list_org_games_state::State,
+    St::Org: list_org_games_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ListOrgGames<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ListOrgGames<S> {
         ListOrgGames {
             cursor: self._fields.0,
             limit: self._fields.1,

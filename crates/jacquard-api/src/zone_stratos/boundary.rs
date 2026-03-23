@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -30,11 +30,11 @@ use crate::zone_stratos::boundary;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Domain<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Domain<S: BosStr = DefaultStr> {
     ///Domain identifier for boundary. Must be a valid domain name.
     pub value: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -47,18 +47,18 @@ pub struct Domain<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Domains<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Domains<S: BosStr = DefaultStr> {
     ///List of domains that can access this record.
     pub values: Vec<boundary::Domain<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Domain<S> {
+impl<S: BosStr> LexiconSchema for Domain<S> {
     fn nsid() -> &'static str {
         "zone.stratos.boundary.defs"
     }
@@ -84,7 +84,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Domain<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Domains<S> {
+impl<S: BosStr> LexiconSchema for Domains<S> {
     fn nsid() -> &'static str {
         "zone.stratos.boundary.defs"
     }
@@ -207,9 +207,9 @@ pub mod domains_state {
         type Values = Unset;
     }
     ///State transition - sets the `values` field to Set
-    pub struct SetValues<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValues<S> {}
-    impl<S: State> State for SetValues<S> {
+    pub struct SetValues<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetValues<St> {}
+    impl<St: State> State for SetValues<St> {
         type Values = Set<members::values>;
     }
     /// Marker types for field names
@@ -220,67 +220,64 @@ pub mod domains_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct DomainsBuilder<'a, S: domains_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct DomainsBuilder<S: BosStr, St: domains_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<boundary::Domain<S>>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Domains<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> DomainsBuilder<'a, domains_state::Empty> {
+impl<S: BosStr> Domains<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> DomainsBuilder<S, domains_state::Empty> {
         DomainsBuilder::new()
     }
 }
 
-impl<'a> DomainsBuilder<'a, domains_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> DomainsBuilder<S, domains_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         DomainsBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DomainsBuilder<'a, S>
+impl<S: BosStr, St> DomainsBuilder<S, St>
 where
-    S: domains_state::State,
-    S::Values: domains_state::IsUnset,
+    St: domains_state::State,
+    St::Values: domains_state::IsUnset,
 {
     /// Set the `values` field (required)
     pub fn values(
         mut self,
         value: impl Into<Vec<boundary::Domain<S>>>,
-    ) -> DomainsBuilder<'a, domains_state::SetValues<S>> {
+    ) -> DomainsBuilder<S, domains_state::SetValues<St>> {
         self._fields.0 = Option::Some(value.into());
         DomainsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DomainsBuilder<'a, S>
+impl<S: BosStr, St> DomainsBuilder<S, St>
 where
-    S: domains_state::State,
-    S::Values: domains_state::IsSet,
+    St: domains_state::State,
+    St::Values: domains_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Domains<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Domains<S> {
         Domains {
             values: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Domains<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Domains<S> {
         Domains {
             values: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

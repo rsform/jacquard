@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use crate::net_asadaame5121::at_circle::RingRef;
     rename = "net.asadaame5121.at-circle.request",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Request<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Request<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     ///Introduction message
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -63,18 +63,18 @@ pub struct Request<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct RequestGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct RequestGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Request<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Request<S> {
+impl<S: BosStr> Request<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, RequestRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -87,17 +87,17 @@ pub struct RequestRecord;
 impl XrpcResp for RequestRecord {
     const NSID: &'static str = "net.asadaame5121.at-circle.request";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = RequestGetRecordOutput<S>;
+    type Output<S: BosStr> = RequestGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<RequestGetRecordOutput<S>> for Request<S> {
+impl<S: BosStr> From<RequestGetRecordOutput<S>> for Request<S> {
     fn from(output: RequestGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Request<S> {
+impl<S: BosStr> Collection for Request<S> {
     const NSID: &'static str = "net.asadaame5121.at-circle.request";
     type Record = RequestRecord;
 }
@@ -107,7 +107,7 @@ impl Collection for RequestRecord {
     type Record = RequestRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Request<S> {
+impl<S: BosStr> LexiconSchema for Request<S> {
     fn nsid() -> &'static str {
         "net.asadaame5121.at-circle.request"
     }
@@ -178,8 +178,8 @@ pub mod request_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type SiteUrl;
+        type CreatedAt;
         type SiteTitle;
         type Ring;
     }
@@ -187,54 +187,54 @@ pub mod request_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type SiteUrl = Unset;
+        type CreatedAt = Unset;
         type SiteTitle = Unset;
         type Ring = Unset;
     }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type SiteUrl = S::SiteUrl;
-        type SiteTitle = S::SiteTitle;
-        type Ring = S::Ring;
-    }
     ///State transition - sets the `site_url` field to Set
-    pub struct SetSiteUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSiteUrl<S> {}
-    impl<S: State> State for SetSiteUrl<S> {
-        type CreatedAt = S::CreatedAt;
+    pub struct SetSiteUrl<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSiteUrl<St> {}
+    impl<St: State> State for SetSiteUrl<St> {
         type SiteUrl = Set<members::site_url>;
-        type SiteTitle = S::SiteTitle;
-        type Ring = S::Ring;
+        type CreatedAt = St::CreatedAt;
+        type SiteTitle = St::SiteTitle;
+        type Ring = St::Ring;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type SiteUrl = St::SiteUrl;
+        type CreatedAt = Set<members::created_at>;
+        type SiteTitle = St::SiteTitle;
+        type Ring = St::Ring;
     }
     ///State transition - sets the `site_title` field to Set
-    pub struct SetSiteTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSiteTitle<S> {}
-    impl<S: State> State for SetSiteTitle<S> {
-        type CreatedAt = S::CreatedAt;
-        type SiteUrl = S::SiteUrl;
+    pub struct SetSiteTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSiteTitle<St> {}
+    impl<St: State> State for SetSiteTitle<St> {
+        type SiteUrl = St::SiteUrl;
+        type CreatedAt = St::CreatedAt;
         type SiteTitle = Set<members::site_title>;
-        type Ring = S::Ring;
+        type Ring = St::Ring;
     }
     ///State transition - sets the `ring` field to Set
-    pub struct SetRing<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRing<S> {}
-    impl<S: State> State for SetRing<S> {
-        type CreatedAt = S::CreatedAt;
-        type SiteUrl = S::SiteUrl;
-        type SiteTitle = S::SiteTitle;
+    pub struct SetRing<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRing<St> {}
+    impl<St: State> State for SetRing<St> {
+        type SiteUrl = St::SiteUrl;
+        type CreatedAt = St::CreatedAt;
+        type SiteTitle = St::SiteTitle;
         type Ring = Set<members::ring>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `site_url` field
         pub struct site_url(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `site_title` field
         pub struct site_title(());
         ///Marker type for the `ring` field
@@ -242,9 +242,9 @@ pub mod request_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct RequestBuilder<'a, S: request_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct RequestBuilder<S: BosStr, St: request_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
         Option<S>,
@@ -253,47 +253,47 @@ pub struct RequestBuilder<'a, S: request_state::State> {
         Option<S>,
         Option<UriValue<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Request<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> RequestBuilder<'a, request_state::Empty> {
+impl<S: BosStr> Request<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> RequestBuilder<S, request_state::Empty> {
         RequestBuilder::new()
     }
 }
 
-impl<'a> RequestBuilder<'a, request_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> RequestBuilder<S, request_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         RequestBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RequestBuilder<'a, S>
+impl<S: BosStr, St> RequestBuilder<S, St>
 where
-    S: request_state::State,
-    S::CreatedAt: request_state::IsUnset,
+    St: request_state::State,
+    St::CreatedAt: request_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> RequestBuilder<'a, request_state::SetCreatedAt<S>> {
+    ) -> RequestBuilder<S, request_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         RequestBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: request_state::State> RequestBuilder<'a, S> {
+impl<S: BosStr, St: request_state::State> RequestBuilder<S, St> {
     /// Set the `message` field (optional)
     pub fn message(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -306,26 +306,26 @@ impl<'a, S: request_state::State> RequestBuilder<'a, S> {
     }
 }
 
-impl<'a, S> RequestBuilder<'a, S>
+impl<S: BosStr, St> RequestBuilder<S, St>
 where
-    S: request_state::State,
-    S::Ring: request_state::IsUnset,
+    St: request_state::State,
+    St::Ring: request_state::IsUnset,
 {
     /// Set the `ring` field (required)
     pub fn ring(
         mut self,
         value: impl Into<RingRef<S>>,
-    ) -> RequestBuilder<'a, request_state::SetRing<S>> {
+    ) -> RequestBuilder<S, request_state::SetRing<St>> {
         self._fields.2 = Option::Some(value.into());
         RequestBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: request_state::State> RequestBuilder<'a, S> {
+impl<S: BosStr, St: request_state::State> RequestBuilder<S, St> {
     /// Set the `rssUrl` field (optional)
     pub fn rss_url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -338,54 +338,54 @@ impl<'a, S: request_state::State> RequestBuilder<'a, S> {
     }
 }
 
-impl<'a, S> RequestBuilder<'a, S>
+impl<S: BosStr, St> RequestBuilder<S, St>
 where
-    S: request_state::State,
-    S::SiteTitle: request_state::IsUnset,
+    St: request_state::State,
+    St::SiteTitle: request_state::IsUnset,
 {
     /// Set the `siteTitle` field (required)
     pub fn site_title(
         mut self,
         value: impl Into<S>,
-    ) -> RequestBuilder<'a, request_state::SetSiteTitle<S>> {
+    ) -> RequestBuilder<S, request_state::SetSiteTitle<St>> {
         self._fields.4 = Option::Some(value.into());
         RequestBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RequestBuilder<'a, S>
+impl<S: BosStr, St> RequestBuilder<S, St>
 where
-    S: request_state::State,
-    S::SiteUrl: request_state::IsUnset,
+    St: request_state::State,
+    St::SiteUrl: request_state::IsUnset,
 {
     /// Set the `siteUrl` field (required)
     pub fn site_url(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> RequestBuilder<'a, request_state::SetSiteUrl<S>> {
+    ) -> RequestBuilder<S, request_state::SetSiteUrl<St>> {
         self._fields.5 = Option::Some(value.into());
         RequestBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RequestBuilder<'a, S>
+impl<S: BosStr, St> RequestBuilder<S, St>
 where
-    S: request_state::State,
-    S::CreatedAt: request_state::IsSet,
-    S::SiteUrl: request_state::IsSet,
-    S::SiteTitle: request_state::IsSet,
-    S::Ring: request_state::IsSet,
+    St: request_state::State,
+    St::SiteUrl: request_state::IsSet,
+    St::CreatedAt: request_state::IsSet,
+    St::SiteTitle: request_state::IsSet,
+    St::Ring: request_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Request<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Request<S> {
         Request {
             created_at: self._fields.0.unwrap(),
             message: self._fields.1,
@@ -396,11 +396,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Request<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Request<S> {
         Request {
             created_at: self._fields.0.unwrap(),
             message: self._fields.1,

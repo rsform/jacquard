@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use serde::{Serialize, Deserialize};
     rename = "sh.weaver.publish.blob",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Blob<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Blob<S: BosStr = DefaultStr> {
     ///relative path to the blob
     pub path: S,
     ///Reference to the uploaded file
@@ -55,18 +55,18 @@ pub struct Blob<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct BlobGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct BlobGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Blob<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Blob<S> {
+impl<S: BosStr> Blob<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, BlobRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -79,17 +79,17 @@ pub struct BlobRecord;
 impl XrpcResp for BlobRecord {
     const NSID: &'static str = "sh.weaver.publish.blob";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = BlobGetRecordOutput<S>;
+    type Output<S: BosStr> = BlobGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<BlobGetRecordOutput<S>> for Blob<S> {
+impl<S: BosStr> From<BlobGetRecordOutput<S>> for Blob<S> {
     fn from(output: BlobGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Blob<S> {
+impl<S: BosStr> Collection for Blob<S> {
     const NSID: &'static str = "sh.weaver.publish.blob";
     type Record = BlobRecord;
 }
@@ -99,7 +99,7 @@ impl Collection for BlobRecord {
     type Record = BlobRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Blob<S> {
+impl<S: BosStr> LexiconSchema for Blob<S> {
     fn nsid() -> &'static str {
         "sh.weaver.publish.blob"
     }
@@ -186,17 +186,17 @@ pub mod blob_state {
         type Upload = Unset;
     }
     ///State transition - sets the `path` field to Set
-    pub struct SetPath<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPath<S> {}
-    impl<S: State> State for SetPath<S> {
+    pub struct SetPath<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPath<St> {}
+    impl<St: State> State for SetPath<St> {
         type Path = Set<members::path>;
-        type Upload = S::Upload;
+        type Upload = St::Upload;
     }
     ///State transition - sets the `upload` field to Set
-    pub struct SetUpload<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUpload<S> {}
-    impl<S: State> State for SetUpload<S> {
-        type Path = S::Path;
+    pub struct SetUpload<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUpload<St> {}
+    impl<St: State> State for SetUpload<St> {
+        type Path = St::Path;
         type Upload = Set<members::upload>;
     }
     /// Marker types for field names
@@ -209,85 +209,85 @@ pub mod blob_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct BlobBuilder<'a, S: blob_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct BlobBuilder<S: BosStr, St: blob_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<BlobRef<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Blob<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> BlobBuilder<'a, blob_state::Empty> {
+impl<S: BosStr> Blob<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> BlobBuilder<S, blob_state::Empty> {
         BlobBuilder::new()
     }
 }
 
-impl<'a> BlobBuilder<'a, blob_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> BlobBuilder<S, blob_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         BlobBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BlobBuilder<'a, S>
+impl<S: BosStr, St> BlobBuilder<S, St>
 where
-    S: blob_state::State,
-    S::Path: blob_state::IsUnset,
+    St: blob_state::State,
+    St::Path: blob_state::IsUnset,
 {
     /// Set the `path` field (required)
     pub fn path(
         mut self,
         value: impl Into<S>,
-    ) -> BlobBuilder<'a, blob_state::SetPath<S>> {
+    ) -> BlobBuilder<S, blob_state::SetPath<St>> {
         self._fields.0 = Option::Some(value.into());
         BlobBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BlobBuilder<'a, S>
+impl<S: BosStr, St> BlobBuilder<S, St>
 where
-    S: blob_state::State,
-    S::Upload: blob_state::IsUnset,
+    St: blob_state::State,
+    St::Upload: blob_state::IsUnset,
 {
     /// Set the `upload` field (required)
     pub fn upload(
         mut self,
         value: impl Into<BlobRef<S>>,
-    ) -> BlobBuilder<'a, blob_state::SetUpload<S>> {
+    ) -> BlobBuilder<S, blob_state::SetUpload<St>> {
         self._fields.1 = Option::Some(value.into());
         BlobBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BlobBuilder<'a, S>
+impl<S: BosStr, St> BlobBuilder<S, St>
 where
-    S: blob_state::State,
-    S::Path: blob_state::IsSet,
-    S::Upload: blob_state::IsSet,
+    St: blob_state::State,
+    St::Path: blob_state::IsSet,
+    St::Upload: blob_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Blob<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Blob<S> {
         Blob {
             path: self._fields.0.unwrap(),
             upload: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Blob<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Blob<S> {
         Blob {
             path: self._fields.0.unwrap(),
             upload: self._fields.1.unwrap(),

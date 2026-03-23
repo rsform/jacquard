@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -33,11 +33,11 @@ use crate::sh_weaver::edit::list_drafts;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DraftView<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DraftView<S: BosStr = DefaultStr> {
     pub cid: Cid<S>,
     pub created_at: Datetime,
     ///Associated edit root if one exists
@@ -55,18 +55,16 @@ pub struct DraftView<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ListDrafts<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct ListDrafts<S: BosStr = DefaultStr> {
     pub actor: AtIdentifier<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub cursor: Option<S>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
@@ -76,24 +74,22 @@ pub struct ListDrafts<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ListDraftsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ListDraftsOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
     pub drafts: Vec<list_drafts::DraftView<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for DraftView<S> {
+impl<S: BosStr> LexiconSchema for DraftView<S> {
     fn nsid() -> &'static str {
         "sh.weaver.edit.listDrafts"
     }
@@ -113,12 +109,11 @@ pub struct ListDraftsResponse;
 impl jacquard_common::xrpc::XrpcResp for ListDraftsResponse {
     const NSID: &'static str = "sh.weaver.edit.listDrafts";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ListDraftsOutput<S>;
+    type Output<S: BosStr> = ListDraftsOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for ListDrafts<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ListDrafts<S> {
     const NSID: &'static str = "sh.weaver.edit.listDrafts";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ListDraftsResponse;
@@ -129,7 +124,7 @@ pub struct ListDraftsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListDraftsRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.edit.listDrafts";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = ListDrafts<S>;
+    type Request<S: BosStr> = ListDrafts<S>;
     type Response = ListDraftsResponse;
 }
 
@@ -143,57 +138,57 @@ pub mod draft_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Uri;
         type Cid;
         type CreatedAt;
-        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Uri = Unset;
         type Cid = Unset;
         type CreatedAt = Unset;
-        type Uri = Unset;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Cid = Set<members::cid>;
-        type CreatedAt = S::CreatedAt;
-        type Uri = S::Uri;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Cid = S::Cid;
-        type CreatedAt = Set<members::created_at>;
-        type Uri = S::Uri;
     }
     ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Cid = S::Cid;
-        type CreatedAt = S::CreatedAt;
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
         type Uri = Set<members::uri>;
+        type Cid = St::Cid;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCid<St> {}
+    impl<St: State> State for SetCid<St> {
+        type Uri = St::Uri;
+        type Cid = Set<members::cid>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Uri = St::Uri;
+        type Cid = St::Cid;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `uri` field
+        pub struct uri(());
         ///Marker type for the `cid` field
         pub struct cid(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct DraftViewBuilder<'a, S: draft_view_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct DraftViewBuilder<S: BosStr, St: draft_view_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Cid<S>>,
         Option<Datetime>,
@@ -202,66 +197,66 @@ pub struct DraftViewBuilder<'a, S: draft_view_state::State> {
         Option<S>,
         Option<AtUri<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> DraftView<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> DraftViewBuilder<'a, draft_view_state::Empty> {
+impl<S: BosStr> DraftView<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> DraftViewBuilder<S, draft_view_state::Empty> {
         DraftViewBuilder::new()
     }
 }
 
-impl<'a> DraftViewBuilder<'a, draft_view_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> DraftViewBuilder<S, draft_view_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         DraftViewBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DraftViewBuilder<'a, S>
+impl<S: BosStr, St> DraftViewBuilder<S, St>
 where
-    S: draft_view_state::State,
-    S::Cid: draft_view_state::IsUnset,
+    St: draft_view_state::State,
+    St::Cid: draft_view_state::IsUnset,
 {
     /// Set the `cid` field (required)
     pub fn cid(
         mut self,
         value: impl Into<Cid<S>>,
-    ) -> DraftViewBuilder<'a, draft_view_state::SetCid<S>> {
+    ) -> DraftViewBuilder<S, draft_view_state::SetCid<St>> {
         self._fields.0 = Option::Some(value.into());
         DraftViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DraftViewBuilder<'a, S>
+impl<S: BosStr, St> DraftViewBuilder<S, St>
 where
-    S: draft_view_state::State,
-    S::CreatedAt: draft_view_state::IsUnset,
+    St: draft_view_state::State,
+    St::CreatedAt: draft_view_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> DraftViewBuilder<'a, draft_view_state::SetCreatedAt<S>> {
+    ) -> DraftViewBuilder<S, draft_view_state::SetCreatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         DraftViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: draft_view_state::State> DraftViewBuilder<'a, S> {
+impl<S: BosStr, St: draft_view_state::State> DraftViewBuilder<S, St> {
     /// Set the `editRoot` field (optional)
     pub fn edit_root(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -274,7 +269,7 @@ impl<'a, S: draft_view_state::State> DraftViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: draft_view_state::State> DraftViewBuilder<'a, S> {
+impl<S: BosStr, St: draft_view_state::State> DraftViewBuilder<S, St> {
     /// Set the `lastEditAt` field (optional)
     pub fn last_edit_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.3 = value.into();
@@ -287,7 +282,7 @@ impl<'a, S: draft_view_state::State> DraftViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S: draft_view_state::State> DraftViewBuilder<'a, S> {
+impl<S: BosStr, St: draft_view_state::State> DraftViewBuilder<S, St> {
     /// Set the `title` field (optional)
     pub fn title(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
@@ -300,34 +295,34 @@ impl<'a, S: draft_view_state::State> DraftViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S> DraftViewBuilder<'a, S>
+impl<S: BosStr, St> DraftViewBuilder<S, St>
 where
-    S: draft_view_state::State,
-    S::Uri: draft_view_state::IsUnset,
+    St: draft_view_state::State,
+    St::Uri: draft_view_state::IsUnset,
 {
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> DraftViewBuilder<'a, draft_view_state::SetUri<S>> {
+    ) -> DraftViewBuilder<S, draft_view_state::SetUri<St>> {
         self._fields.5 = Option::Some(value.into());
         DraftViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DraftViewBuilder<'a, S>
+impl<S: BosStr, St> DraftViewBuilder<S, St>
 where
-    S: draft_view_state::State,
-    S::Cid: draft_view_state::IsSet,
-    S::CreatedAt: draft_view_state::IsSet,
-    S::Uri: draft_view_state::IsSet,
+    St: draft_view_state::State,
+    St::Uri: draft_view_state::IsSet,
+    St::Cid: draft_view_state::IsSet,
+    St::CreatedAt: draft_view_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> DraftView<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> DraftView<S> {
         DraftView {
             cid: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
@@ -338,11 +333,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> DraftView<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> DraftView<S> {
         DraftView {
             cid: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
@@ -499,9 +494,9 @@ pub mod list_drafts_state {
         type Actor = Unset;
     }
     ///State transition - sets the `actor` field to Set
-    pub struct SetActor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetActor<S> {}
-    impl<S: State> State for SetActor<S> {
+    pub struct SetActor<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetActor<St> {}
+    impl<St: State> State for SetActor<St> {
         type Actor = Set<members::actor>;
     }
     /// Marker types for field names
@@ -512,51 +507,51 @@ pub mod list_drafts_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ListDraftsBuilder<'a, S: list_drafts_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ListDraftsBuilder<S: BosStr, St: list_drafts_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtIdentifier<S>>, Option<S>, Option<i64>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ListDrafts<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ListDraftsBuilder<'a, list_drafts_state::Empty> {
+impl<S: BosStr> ListDrafts<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ListDraftsBuilder<S, list_drafts_state::Empty> {
         ListDraftsBuilder::new()
     }
 }
 
-impl<'a> ListDraftsBuilder<'a, list_drafts_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ListDraftsBuilder<S, list_drafts_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ListDraftsBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ListDraftsBuilder<'a, S>
+impl<S: BosStr, St> ListDraftsBuilder<S, St>
 where
-    S: list_drafts_state::State,
-    S::Actor: list_drafts_state::IsUnset,
+    St: list_drafts_state::State,
+    St::Actor: list_drafts_state::IsUnset,
 {
     /// Set the `actor` field (required)
     pub fn actor(
         mut self,
         value: impl Into<AtIdentifier<S>>,
-    ) -> ListDraftsBuilder<'a, list_drafts_state::SetActor<S>> {
+    ) -> ListDraftsBuilder<S, list_drafts_state::SetActor<St>> {
         self._fields.0 = Option::Some(value.into());
         ListDraftsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: list_drafts_state::State> ListDraftsBuilder<'a, S> {
+impl<S: BosStr, St: list_drafts_state::State> ListDraftsBuilder<S, St> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -569,7 +564,7 @@ impl<'a, S: list_drafts_state::State> ListDraftsBuilder<'a, S> {
     }
 }
 
-impl<'a, S: list_drafts_state::State> ListDraftsBuilder<'a, S> {
+impl<S: BosStr, St: list_drafts_state::State> ListDraftsBuilder<S, St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -582,13 +577,13 @@ impl<'a, S: list_drafts_state::State> ListDraftsBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ListDraftsBuilder<'a, S>
+impl<S: BosStr, St> ListDraftsBuilder<S, St>
 where
-    S: list_drafts_state::State,
-    S::Actor: list_drafts_state::IsSet,
+    St: list_drafts_state::State,
+    St::Actor: list_drafts_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ListDrafts<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ListDrafts<S> {
         ListDrafts {
             actor: self._fields.0.unwrap(),
             cursor: self._fields.1,

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -33,11 +33,11 @@ use crate::social_lexical::works::identifiers;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Identifier<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Identifier<S: BosStr = DefaultStr> {
     ///
     pub provider: IdentifierProvider<S>,
     ///
@@ -52,14 +52,14 @@ pub struct Identifier<S: Bos<str> + AsRef<str> = DefaultStr> {
 ///
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum IdentifierProvider<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum IdentifierProvider<S: BosStr = DefaultStr> {
     Tmdb,
     Imdb,
     Wikidata,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> IdentifierProvider<S> {
+impl<S: BosStr> IdentifierProvider<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Tmdb => "tmdb",
@@ -79,19 +79,19 @@ impl<S: Bos<str> + AsRef<str>> IdentifierProvider<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for IdentifierProvider<S> {
+impl<S: BosStr> core::fmt::Display for IdentifierProvider<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for IdentifierProvider<S> {
+impl<S: BosStr> AsRef<str> for IdentifierProvider<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for IdentifierProvider<S> {
+impl<S: BosStr> Serialize for IdentifierProvider<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -100,8 +100,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for IdentifierProvider<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for IdentifierProvider<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for IdentifierProvider<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -111,14 +110,18 @@ for IdentifierProvider<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for IdentifierProvider<S> {
+impl<S: BosStr + Default> Default for IdentifierProvider<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for IdentifierProvider<S> {
-    type Output = IdentifierProvider<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for IdentifierProvider<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = IdentifierProvider<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             IdentifierProvider::Tmdb => IdentifierProvider::Tmdb,
@@ -136,11 +139,11 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for IdentifierProvider<S> {
     rename = "social.lexical.works.identifiers",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Identifiers<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Identifiers<S: BosStr = DefaultStr> {
     pub identifiers: Vec<identifiers::Identifier<S>>,
     ///
     pub work: AtUri<S>,
@@ -154,24 +157,24 @@ pub struct Identifiers<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct IdentifiersGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct IdentifiersGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Identifiers<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Identifiers<S> {
+impl<S: BosStr> Identifiers<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, IdentifiersRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Identifier<S> {
+impl<S: BosStr> LexiconSchema for Identifier<S> {
     fn nsid() -> &'static str {
         "social.lexical.works.identifiers"
     }
@@ -193,17 +196,17 @@ pub struct IdentifiersRecord;
 impl XrpcResp for IdentifiersRecord {
     const NSID: &'static str = "social.lexical.works.identifiers";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = IdentifiersGetRecordOutput<S>;
+    type Output<S: BosStr> = IdentifiersGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<IdentifiersGetRecordOutput<S>> for Identifiers<S> {
+impl<S: BosStr> From<IdentifiersGetRecordOutput<S>> for Identifiers<S> {
     fn from(output: IdentifiersGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Identifiers<S> {
+impl<S: BosStr> Collection for Identifiers<S> {
     const NSID: &'static str = "social.lexical.works.identifiers";
     type Record = IdentifiersRecord;
 }
@@ -213,7 +216,7 @@ impl Collection for IdentifiersRecord {
     type Record = IdentifiersRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Identifiers<S> {
+impl<S: BosStr> LexiconSchema for Identifiers<S> {
     fn nsid() -> &'static str {
         "social.lexical.works.identifiers"
     }
@@ -345,122 +348,122 @@ pub mod identifiers_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Identifiers;
         type Work;
+        type Identifiers;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Identifiers = Unset;
         type Work = Unset;
-    }
-    ///State transition - sets the `identifiers` field to Set
-    pub struct SetIdentifiers<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIdentifiers<S> {}
-    impl<S: State> State for SetIdentifiers<S> {
-        type Identifiers = Set<members::identifiers>;
-        type Work = S::Work;
+        type Identifiers = Unset;
     }
     ///State transition - sets the `work` field to Set
-    pub struct SetWork<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWork<S> {}
-    impl<S: State> State for SetWork<S> {
-        type Identifiers = S::Identifiers;
+    pub struct SetWork<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetWork<St> {}
+    impl<St: State> State for SetWork<St> {
         type Work = Set<members::work>;
+        type Identifiers = St::Identifiers;
+    }
+    ///State transition - sets the `identifiers` field to Set
+    pub struct SetIdentifiers<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIdentifiers<St> {}
+    impl<St: State> State for SetIdentifiers<St> {
+        type Work = St::Work;
+        type Identifiers = Set<members::identifiers>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `identifiers` field
-        pub struct identifiers(());
         ///Marker type for the `work` field
         pub struct work(());
+        ///Marker type for the `identifiers` field
+        pub struct identifiers(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct IdentifiersBuilder<'a, S: identifiers_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct IdentifiersBuilder<S: BosStr, St: identifiers_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<identifiers::Identifier<S>>>, Option<AtUri<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Identifiers<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> IdentifiersBuilder<'a, identifiers_state::Empty> {
+impl<S: BosStr> Identifiers<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> IdentifiersBuilder<S, identifiers_state::Empty> {
         IdentifiersBuilder::new()
     }
 }
 
-impl<'a> IdentifiersBuilder<'a, identifiers_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> IdentifiersBuilder<S, identifiers_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         IdentifiersBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> IdentifiersBuilder<'a, S>
+impl<S: BosStr, St> IdentifiersBuilder<S, St>
 where
-    S: identifiers_state::State,
-    S::Identifiers: identifiers_state::IsUnset,
+    St: identifiers_state::State,
+    St::Identifiers: identifiers_state::IsUnset,
 {
     /// Set the `identifiers` field (required)
     pub fn identifiers(
         mut self,
         value: impl Into<Vec<identifiers::Identifier<S>>>,
-    ) -> IdentifiersBuilder<'a, identifiers_state::SetIdentifiers<S>> {
+    ) -> IdentifiersBuilder<S, identifiers_state::SetIdentifiers<St>> {
         self._fields.0 = Option::Some(value.into());
         IdentifiersBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> IdentifiersBuilder<'a, S>
+impl<S: BosStr, St> IdentifiersBuilder<S, St>
 where
-    S: identifiers_state::State,
-    S::Work: identifiers_state::IsUnset,
+    St: identifiers_state::State,
+    St::Work: identifiers_state::IsUnset,
 {
     /// Set the `work` field (required)
     pub fn work(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> IdentifiersBuilder<'a, identifiers_state::SetWork<S>> {
+    ) -> IdentifiersBuilder<S, identifiers_state::SetWork<St>> {
         self._fields.1 = Option::Some(value.into());
         IdentifiersBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> IdentifiersBuilder<'a, S>
+impl<S: BosStr, St> IdentifiersBuilder<S, St>
 where
-    S: identifiers_state::State,
-    S::Identifiers: identifiers_state::IsSet,
-    S::Work: identifiers_state::IsSet,
+    St: identifiers_state::State,
+    St::Work: identifiers_state::IsSet,
+    St::Identifiers: identifiers_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Identifiers<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Identifiers<S> {
         Identifiers {
             identifiers: self._fields.0.unwrap(),
             work: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Identifiers<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Identifiers<S> {
         Identifiers {
             identifiers: self._fields.0.unwrap(),
             work: self._fields.1.unwrap(),

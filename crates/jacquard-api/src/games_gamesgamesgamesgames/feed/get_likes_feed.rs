@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
@@ -18,18 +18,16 @@ use serde::{Serialize, Deserialize};
 use crate::games_gamesgamesgamesgames::GameFeedViewItem;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetLikesFeed<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetLikesFeed<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub cursor: Option<S>,
-    #[serde(borrow)]
     pub did: S,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
@@ -39,20 +37,18 @@ pub struct GetLikesFeed<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetLikesFeedOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetLikesFeedOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
     pub feed: Vec<GameFeedViewItem<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -61,12 +57,11 @@ pub struct GetLikesFeedResponse;
 impl jacquard_common::xrpc::XrpcResp for GetLikesFeedResponse {
     const NSID: &'static str = "games.gamesgamesgamesgames.feed.getLikesFeed";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetLikesFeedOutput<S>;
+    type Output<S: BosStr> = GetLikesFeedOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetLikesFeed<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetLikesFeed<S> {
     const NSID: &'static str = "games.gamesgamesgamesgames.feed.getLikesFeed";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetLikesFeedResponse;
@@ -77,7 +72,7 @@ pub struct GetLikesFeedRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetLikesFeedRequest {
     const PATH: &'static str = "/xrpc/games.gamesgamesgamesgames.feed.getLikesFeed";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetLikesFeed<S>;
+    type Request<S: BosStr> = GetLikesFeed<S>;
     type Response = GetLikesFeedResponse;
 }
 
@@ -104,9 +99,9 @@ pub mod get_likes_feed_state {
         type Did = Unset;
     }
     ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
         type Did = Set<members::did>;
     }
     /// Marker types for field names
@@ -117,32 +112,32 @@ pub mod get_likes_feed_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetLikesFeedBuilder<'a, S: get_likes_feed_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetLikesFeedBuilder<S: BosStr, St: get_likes_feed_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>, Option<i64>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetLikesFeed<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetLikesFeedBuilder<'a, get_likes_feed_state::Empty> {
+impl<S: BosStr> GetLikesFeed<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetLikesFeedBuilder<S, get_likes_feed_state::Empty> {
         GetLikesFeedBuilder::new()
     }
 }
 
-impl<'a> GetLikesFeedBuilder<'a, get_likes_feed_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetLikesFeedBuilder<S, get_likes_feed_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetLikesFeedBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: get_likes_feed_state::State> GetLikesFeedBuilder<'a, S> {
+impl<S: BosStr, St: get_likes_feed_state::State> GetLikesFeedBuilder<S, St> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -155,26 +150,26 @@ impl<'a, S: get_likes_feed_state::State> GetLikesFeedBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GetLikesFeedBuilder<'a, S>
+impl<S: BosStr, St> GetLikesFeedBuilder<S, St>
 where
-    S: get_likes_feed_state::State,
-    S::Did: get_likes_feed_state::IsUnset,
+    St: get_likes_feed_state::State,
+    St::Did: get_likes_feed_state::IsUnset,
 {
     /// Set the `did` field (required)
     pub fn did(
         mut self,
         value: impl Into<S>,
-    ) -> GetLikesFeedBuilder<'a, get_likes_feed_state::SetDid<S>> {
+    ) -> GetLikesFeedBuilder<S, get_likes_feed_state::SetDid<St>> {
         self._fields.1 = Option::Some(value.into());
         GetLikesFeedBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: get_likes_feed_state::State> GetLikesFeedBuilder<'a, S> {
+impl<S: BosStr, St: get_likes_feed_state::State> GetLikesFeedBuilder<S, St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -187,13 +182,13 @@ impl<'a, S: get_likes_feed_state::State> GetLikesFeedBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GetLikesFeedBuilder<'a, S>
+impl<S: BosStr, St> GetLikesFeedBuilder<S, St>
 where
-    S: get_likes_feed_state::State,
-    S::Did: get_likes_feed_state::IsSet,
+    St: get_likes_feed_state::State,
+    St::Did: get_likes_feed_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetLikesFeed<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetLikesFeed<S> {
         GetLikesFeed {
             cursor: self._fields.0,
             did: self._fields.1.unwrap(),

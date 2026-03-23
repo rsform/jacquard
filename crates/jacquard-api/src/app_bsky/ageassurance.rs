@@ -15,7 +15,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -33,7 +33,7 @@ use crate::app_bsky::ageassurance;
 /// The access level granted based on Age Assurance data we've processed.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum Access<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum Access<S: BosStr = DefaultStr> {
     Unknown,
     None,
     Safe,
@@ -41,7 +41,7 @@ pub enum Access<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> Access<S> {
+impl<S: BosStr> Access<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Unknown => "unknown",
@@ -63,19 +63,19 @@ impl<S: Bos<str> + AsRef<str>> Access<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for Access<S> {
+impl<S: BosStr> AsRef<str> for Access<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for Access<S> {
+impl<S: BosStr> core::fmt::Display for Access<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for Access<S> {
+impl<S: BosStr> Serialize for Access<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -84,7 +84,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for Access<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de> for Access<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for Access<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -94,8 +94,12 @@ impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de> for Acce
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for Access<S> {
-    type Output = Access<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for Access<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = Access<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             Access::Unknown => Access::Unknown,
@@ -113,11 +117,11 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for Access<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Config<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Config<S: BosStr = DefaultStr> {
     ///The per-region Age Assurance configuration.
     pub regions: Vec<ageassurance::ConfigRegion<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -130,11 +134,11 @@ pub struct Config<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ConfigRegion<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ConfigRegion<S: BosStr = DefaultStr> {
     ///The ISO 3166-1 alpha-2 country code this configuration applies to.
     pub country_code: S,
     ///The minimum age (as a whole integer) required to use Bluesky in this region.
@@ -154,11 +158,11 @@ pub struct ConfigRegion<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ConfigRegionRulesItem<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ConfigRegionRulesItem<S: BosStr = DefaultStr> {
     #[serde(rename = "app.bsky.ageassurance.defs#configRegionRuleDefault")]
     ConfigRegionRuleDefault(Box<ageassurance::ConfigRegionRuleDefault<S>>),
     #[serde(rename = "app.bsky.ageassurance.defs#configRegionRuleIfDeclaredOverAge")]
@@ -193,11 +197,11 @@ pub enum ConfigRegionRulesItem<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ConfigRegionRuleDefault<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ConfigRegionRuleDefault<S: BosStr = DefaultStr> {
     pub access: ageassurance::Access<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -209,11 +213,11 @@ pub struct ConfigRegionRuleDefault<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ConfigRegionRuleIfAccountNewerThan<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ConfigRegionRuleIfAccountNewerThan<S: BosStr = DefaultStr> {
     pub access: ageassurance::Access<S>,
     ///The date threshold as a datetime string.
     pub date: Datetime,
@@ -227,11 +231,11 @@ pub struct ConfigRegionRuleIfAccountNewerThan<S: Bos<str> + AsRef<str> = Default
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ConfigRegionRuleIfAccountOlderThan<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ConfigRegionRuleIfAccountOlderThan<S: BosStr = DefaultStr> {
     pub access: ageassurance::Access<S>,
     ///The date threshold as a datetime string.
     pub date: Datetime,
@@ -245,11 +249,11 @@ pub struct ConfigRegionRuleIfAccountOlderThan<S: Bos<str> + AsRef<str> = Default
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ConfigRegionRuleIfAssuredOverAge<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ConfigRegionRuleIfAssuredOverAge<S: BosStr = DefaultStr> {
     pub access: ageassurance::Access<S>,
     ///The age threshold as a whole integer.
     pub age: i64,
@@ -263,11 +267,11 @@ pub struct ConfigRegionRuleIfAssuredOverAge<S: Bos<str> + AsRef<str> = DefaultSt
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ConfigRegionRuleIfAssuredUnderAge<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ConfigRegionRuleIfAssuredUnderAge<S: BosStr = DefaultStr> {
     pub access: ageassurance::Access<S>,
     ///The age threshold as a whole integer.
     pub age: i64,
@@ -281,11 +285,11 @@ pub struct ConfigRegionRuleIfAssuredUnderAge<S: Bos<str> + AsRef<str> = DefaultS
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ConfigRegionRuleIfDeclaredOverAge<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ConfigRegionRuleIfDeclaredOverAge<S: BosStr = DefaultStr> {
     pub access: ageassurance::Access<S>,
     ///The age threshold as a whole integer.
     pub age: i64,
@@ -299,11 +303,11 @@ pub struct ConfigRegionRuleIfDeclaredOverAge<S: Bos<str> + AsRef<str> = DefaultS
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ConfigRegionRuleIfDeclaredUnderAge<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ConfigRegionRuleIfDeclaredUnderAge<S: BosStr = DefaultStr> {
     pub access: ageassurance::Access<S>,
     ///The age threshold as a whole integer.
     pub age: i64,
@@ -317,11 +321,11 @@ pub struct ConfigRegionRuleIfDeclaredUnderAge<S: Bos<str> + AsRef<str> = Default
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Event<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Event<S: BosStr = DefaultStr> {
     ///The access level granted based on Age Assurance data we've processed.
     pub access: EventAccess<S>,
     ///The unique identifier for this instance of the Age Assurance flow, in UUID format.
@@ -357,7 +361,7 @@ pub struct Event<S: Bos<str> + AsRef<str> = DefaultStr> {
 /// The access level granted based on Age Assurance data we've processed.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum EventAccess<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum EventAccess<S: BosStr = DefaultStr> {
     Unknown,
     None,
     Safe,
@@ -365,7 +369,7 @@ pub enum EventAccess<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> EventAccess<S> {
+impl<S: BosStr> EventAccess<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Unknown => "unknown",
@@ -387,19 +391,19 @@ impl<S: Bos<str> + AsRef<str>> EventAccess<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for EventAccess<S> {
+impl<S: BosStr> core::fmt::Display for EventAccess<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for EventAccess<S> {
+impl<S: BosStr> AsRef<str> for EventAccess<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for EventAccess<S> {
+impl<S: BosStr> Serialize for EventAccess<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -408,8 +412,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for EventAccess<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for EventAccess<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for EventAccess<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -419,14 +422,18 @@ for EventAccess<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for EventAccess<S> {
+impl<S: BosStr + Default> Default for EventAccess<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for EventAccess<S> {
-    type Output = EventAccess<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for EventAccess<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = EventAccess<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             EventAccess::Unknown => EventAccess::Unknown,
@@ -441,7 +448,7 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for EventAccess<S> {
 /// The status of the Age Assurance process.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum EventStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum EventStatus<S: BosStr = DefaultStr> {
     Unknown,
     Pending,
     Assured,
@@ -449,7 +456,7 @@ pub enum EventStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> EventStatus<S> {
+impl<S: BosStr> EventStatus<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Unknown => "unknown",
@@ -471,19 +478,19 @@ impl<S: Bos<str> + AsRef<str>> EventStatus<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for EventStatus<S> {
+impl<S: BosStr> core::fmt::Display for EventStatus<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for EventStatus<S> {
+impl<S: BosStr> AsRef<str> for EventStatus<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for EventStatus<S> {
+impl<S: BosStr> Serialize for EventStatus<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -492,8 +499,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for EventStatus<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for EventStatus<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for EventStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -503,14 +509,18 @@ for EventStatus<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for EventStatus<S> {
+impl<S: BosStr + Default> Default for EventStatus<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for EventStatus<S> {
-    type Output = EventStatus<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for EventStatus<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = EventStatus<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             EventStatus::Unknown => EventStatus::Unknown,
@@ -528,11 +538,11 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for EventStatus<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct State<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct State<S: BosStr = DefaultStr> {
     pub access: ageassurance::Access<S>,
     ///The timestamp when this state was last updated.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -548,11 +558,11 @@ pub struct State<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct StateMetadata<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct StateMetadata<S: BosStr = DefaultStr> {
     ///The account creation timestamp.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub account_created_at: Option<Datetime>,
@@ -563,7 +573,7 @@ pub struct StateMetadata<S: Bos<str> + AsRef<str> = DefaultStr> {
 /// The status of the Age Assurance process.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum Status<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum Status<S: BosStr = DefaultStr> {
     Unknown,
     Pending,
     Assured,
@@ -571,7 +581,7 @@ pub enum Status<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> Status<S> {
+impl<S: BosStr> Status<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Unknown => "unknown",
@@ -593,19 +603,19 @@ impl<S: Bos<str> + AsRef<str>> Status<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for Status<S> {
+impl<S: BosStr> AsRef<str> for Status<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for Status<S> {
+impl<S: BosStr> core::fmt::Display for Status<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for Status<S> {
+impl<S: BosStr> Serialize for Status<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -614,7 +624,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for Status<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de> for Status<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for Status<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -624,8 +634,12 @@ impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de> for Stat
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for Status<S> {
-    type Output = Status<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for Status<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = Status<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             Status::Unknown => Status::Unknown,
@@ -637,7 +651,7 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for Status<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Config<S> {
+impl<S: BosStr> LexiconSchema for Config<S> {
     fn nsid() -> &'static str {
         "app.bsky.ageassurance.defs"
     }
@@ -652,7 +666,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Config<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ConfigRegion<S> {
+impl<S: BosStr> LexiconSchema for ConfigRegion<S> {
     fn nsid() -> &'static str {
         "app.bsky.ageassurance.defs"
     }
@@ -667,7 +681,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for ConfigRegion<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ConfigRegionRuleDefault<S> {
+impl<S: BosStr> LexiconSchema for ConfigRegionRuleDefault<S> {
     fn nsid() -> &'static str {
         "app.bsky.ageassurance.defs"
     }
@@ -682,7 +696,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for ConfigRegionRuleDefault<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ConfigRegionRuleIfAccountNewerThan<S> {
+impl<S: BosStr> LexiconSchema for ConfigRegionRuleIfAccountNewerThan<S> {
     fn nsid() -> &'static str {
         "app.bsky.ageassurance.defs"
     }
@@ -697,7 +711,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for ConfigRegionRuleIfAccountNewerT
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ConfigRegionRuleIfAccountOlderThan<S> {
+impl<S: BosStr> LexiconSchema for ConfigRegionRuleIfAccountOlderThan<S> {
     fn nsid() -> &'static str {
         "app.bsky.ageassurance.defs"
     }
@@ -712,7 +726,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for ConfigRegionRuleIfAccountOlderT
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ConfigRegionRuleIfAssuredOverAge<S> {
+impl<S: BosStr> LexiconSchema for ConfigRegionRuleIfAssuredOverAge<S> {
     fn nsid() -> &'static str {
         "app.bsky.ageassurance.defs"
     }
@@ -727,7 +741,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for ConfigRegionRuleIfAssuredOverAg
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ConfigRegionRuleIfAssuredUnderAge<S> {
+impl<S: BosStr> LexiconSchema for ConfigRegionRuleIfAssuredUnderAge<S> {
     fn nsid() -> &'static str {
         "app.bsky.ageassurance.defs"
     }
@@ -742,7 +756,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for ConfigRegionRuleIfAssuredUnderA
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ConfigRegionRuleIfDeclaredOverAge<S> {
+impl<S: BosStr> LexiconSchema for ConfigRegionRuleIfDeclaredOverAge<S> {
     fn nsid() -> &'static str {
         "app.bsky.ageassurance.defs"
     }
@@ -757,7 +771,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for ConfigRegionRuleIfDeclaredOverA
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ConfigRegionRuleIfDeclaredUnderAge<S> {
+impl<S: BosStr> LexiconSchema for ConfigRegionRuleIfDeclaredUnderAge<S> {
     fn nsid() -> &'static str {
         "app.bsky.ageassurance.defs"
     }
@@ -772,7 +786,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for ConfigRegionRuleIfDeclaredUnder
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Event<S> {
+impl<S: BosStr> LexiconSchema for Event<S> {
     fn nsid() -> &'static str {
         "app.bsky.ageassurance.defs"
     }
@@ -787,7 +801,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Event<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for State<S> {
+impl<S: BosStr> LexiconSchema for State<S> {
     fn nsid() -> &'static str {
         "app.bsky.ageassurance.defs"
     }
@@ -802,7 +816,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for State<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for StateMetadata<S> {
+impl<S: BosStr> LexiconSchema for StateMetadata<S> {
     fn nsid() -> &'static str {
         "app.bsky.ageassurance.defs"
     }
@@ -836,9 +850,9 @@ pub mod config_state {
         type Regions = Unset;
     }
     ///State transition - sets the `regions` field to Set
-    pub struct SetRegions<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRegions<S> {}
-    impl<S: State> State for SetRegions<S> {
+    pub struct SetRegions<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRegions<St> {}
+    impl<St: State> State for SetRegions<St> {
         type Regions = Set<members::regions>;
     }
     /// Marker types for field names
@@ -849,64 +863,64 @@ pub mod config_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ConfigBuilder<'a, S: config_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ConfigBuilder<S: BosStr, St: config_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<ageassurance::ConfigRegion<S>>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Config<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ConfigBuilder<'a, config_state::Empty> {
+impl<S: BosStr> Config<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ConfigBuilder<S, config_state::Empty> {
         ConfigBuilder::new()
     }
 }
 
-impl<'a> ConfigBuilder<'a, config_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ConfigBuilder<S, config_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ConfigBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ConfigBuilder<'a, S>
+impl<S: BosStr, St> ConfigBuilder<S, St>
 where
-    S: config_state::State,
-    S::Regions: config_state::IsUnset,
+    St: config_state::State,
+    St::Regions: config_state::IsUnset,
 {
     /// Set the `regions` field (required)
     pub fn regions(
         mut self,
         value: impl Into<Vec<ageassurance::ConfigRegion<S>>>,
-    ) -> ConfigBuilder<'a, config_state::SetRegions<S>> {
+    ) -> ConfigBuilder<S, config_state::SetRegions<St>> {
         self._fields.0 = Option::Some(value.into());
         ConfigBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ConfigBuilder<'a, S>
+impl<S: BosStr, St> ConfigBuilder<S, St>
 where
-    S: config_state::State,
-    S::Regions: config_state::IsSet,
+    St: config_state::State,
+    St::Regions: config_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Config<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Config<S> {
         Config {
             regions: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Config<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Config<S> {
         Config {
             regions: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -1525,117 +1539,117 @@ pub mod config_region_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Rules;
-        type MinAccessAge;
         type CountryCode;
+        type MinAccessAge;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Rules = Unset;
-        type MinAccessAge = Unset;
         type CountryCode = Unset;
+        type MinAccessAge = Unset;
     }
     ///State transition - sets the `rules` field to Set
-    pub struct SetRules<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRules<S> {}
-    impl<S: State> State for SetRules<S> {
+    pub struct SetRules<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRules<St> {}
+    impl<St: State> State for SetRules<St> {
         type Rules = Set<members::rules>;
-        type MinAccessAge = S::MinAccessAge;
-        type CountryCode = S::CountryCode;
-    }
-    ///State transition - sets the `min_access_age` field to Set
-    pub struct SetMinAccessAge<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMinAccessAge<S> {}
-    impl<S: State> State for SetMinAccessAge<S> {
-        type Rules = S::Rules;
-        type MinAccessAge = Set<members::min_access_age>;
-        type CountryCode = S::CountryCode;
+        type CountryCode = St::CountryCode;
+        type MinAccessAge = St::MinAccessAge;
     }
     ///State transition - sets the `country_code` field to Set
-    pub struct SetCountryCode<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCountryCode<S> {}
-    impl<S: State> State for SetCountryCode<S> {
-        type Rules = S::Rules;
-        type MinAccessAge = S::MinAccessAge;
+    pub struct SetCountryCode<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCountryCode<St> {}
+    impl<St: State> State for SetCountryCode<St> {
+        type Rules = St::Rules;
         type CountryCode = Set<members::country_code>;
+        type MinAccessAge = St::MinAccessAge;
+    }
+    ///State transition - sets the `min_access_age` field to Set
+    pub struct SetMinAccessAge<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMinAccessAge<St> {}
+    impl<St: State> State for SetMinAccessAge<St> {
+        type Rules = St::Rules;
+        type CountryCode = St::CountryCode;
+        type MinAccessAge = Set<members::min_access_age>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `rules` field
         pub struct rules(());
-        ///Marker type for the `min_access_age` field
-        pub struct min_access_age(());
         ///Marker type for the `country_code` field
         pub struct country_code(());
+        ///Marker type for the `min_access_age` field
+        pub struct min_access_age(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ConfigRegionBuilder<'a, S: config_region_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ConfigRegionBuilder<S: BosStr, St: config_region_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>, Option<S>, Option<Vec<ConfigRegionRulesItem<S>>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ConfigRegion<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ConfigRegionBuilder<'a, config_region_state::Empty> {
+impl<S: BosStr> ConfigRegion<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ConfigRegionBuilder<S, config_region_state::Empty> {
         ConfigRegionBuilder::new()
     }
 }
 
-impl<'a> ConfigRegionBuilder<'a, config_region_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ConfigRegionBuilder<S, config_region_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ConfigRegionBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ConfigRegionBuilder<'a, S>
+impl<S: BosStr, St> ConfigRegionBuilder<S, St>
 where
-    S: config_region_state::State,
-    S::CountryCode: config_region_state::IsUnset,
+    St: config_region_state::State,
+    St::CountryCode: config_region_state::IsUnset,
 {
     /// Set the `countryCode` field (required)
     pub fn country_code(
         mut self,
         value: impl Into<S>,
-    ) -> ConfigRegionBuilder<'a, config_region_state::SetCountryCode<S>> {
+    ) -> ConfigRegionBuilder<S, config_region_state::SetCountryCode<St>> {
         self._fields.0 = Option::Some(value.into());
         ConfigRegionBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ConfigRegionBuilder<'a, S>
+impl<S: BosStr, St> ConfigRegionBuilder<S, St>
 where
-    S: config_region_state::State,
-    S::MinAccessAge: config_region_state::IsUnset,
+    St: config_region_state::State,
+    St::MinAccessAge: config_region_state::IsUnset,
 {
     /// Set the `minAccessAge` field (required)
     pub fn min_access_age(
         mut self,
         value: impl Into<i64>,
-    ) -> ConfigRegionBuilder<'a, config_region_state::SetMinAccessAge<S>> {
+    ) -> ConfigRegionBuilder<S, config_region_state::SetMinAccessAge<St>> {
         self._fields.1 = Option::Some(value.into());
         ConfigRegionBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: config_region_state::State> ConfigRegionBuilder<'a, S> {
+impl<S: BosStr, St: config_region_state::State> ConfigRegionBuilder<S, St> {
     /// Set the `regionCode` field (optional)
     pub fn region_code(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -1648,34 +1662,34 @@ impl<'a, S: config_region_state::State> ConfigRegionBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ConfigRegionBuilder<'a, S>
+impl<S: BosStr, St> ConfigRegionBuilder<S, St>
 where
-    S: config_region_state::State,
-    S::Rules: config_region_state::IsUnset,
+    St: config_region_state::State,
+    St::Rules: config_region_state::IsUnset,
 {
     /// Set the `rules` field (required)
     pub fn rules(
         mut self,
         value: impl Into<Vec<ConfigRegionRulesItem<S>>>,
-    ) -> ConfigRegionBuilder<'a, config_region_state::SetRules<S>> {
+    ) -> ConfigRegionBuilder<S, config_region_state::SetRules<St>> {
         self._fields.3 = Option::Some(value.into());
         ConfigRegionBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ConfigRegionBuilder<'a, S>
+impl<S: BosStr, St> ConfigRegionBuilder<S, St>
 where
-    S: config_region_state::State,
-    S::Rules: config_region_state::IsSet,
-    S::MinAccessAge: config_region_state::IsSet,
-    S::CountryCode: config_region_state::IsSet,
+    St: config_region_state::State,
+    St::Rules: config_region_state::IsSet,
+    St::CountryCode: config_region_state::IsSet,
+    St::MinAccessAge: config_region_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ConfigRegion<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ConfigRegion<S> {
         ConfigRegion {
             country_code: self._fields.0.unwrap(),
             min_access_age: self._fields.1.unwrap(),
@@ -1684,11 +1698,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> ConfigRegion<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ConfigRegion<S> {
         ConfigRegion {
             country_code: self._fields.0.unwrap(),
             min_access_age: self._fields.1.unwrap(),
@@ -1718,9 +1732,9 @@ pub mod config_region_rule_default_state {
         type Access = Unset;
     }
     ///State transition - sets the `access` field to Set
-    pub struct SetAccess<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAccess<S> {}
-    impl<S: State> State for SetAccess<S> {
+    pub struct SetAccess<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAccess<St> {}
+    impl<St: State> State for SetAccess<St> {
         type Access = Set<members::access>;
     }
     /// Marker types for field names
@@ -1731,76 +1745,78 @@ pub mod config_region_rule_default_state {
     }
 }
 
-/// Builder for constructing an instance of this type
+/// Builder for constructing an instance of this type.
 pub struct ConfigRegionRuleDefaultBuilder<
-    'a,
-    S: config_region_rule_default_state::State,
+    S: BosStr,
+    St: config_region_rule_default_state::State,
 > {
-    _state: PhantomData<fn() -> S>,
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<ageassurance::Access<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ConfigRegionRuleDefault<'a> {
-    /// Create a new builder for this type
+impl<S: BosStr> ConfigRegionRuleDefault<S> {
+    /// Create a new builder for this type.
     pub fn new() -> ConfigRegionRuleDefaultBuilder<
-        'a,
+        S,
         config_region_rule_default_state::Empty,
     > {
         ConfigRegionRuleDefaultBuilder::new()
     }
 }
 
-impl<'a> ConfigRegionRuleDefaultBuilder<'a, config_region_rule_default_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<
+    S: BosStr,
+> ConfigRegionRuleDefaultBuilder<S, config_region_rule_default_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ConfigRegionRuleDefaultBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ConfigRegionRuleDefaultBuilder<'a, S>
+impl<S: BosStr, St> ConfigRegionRuleDefaultBuilder<S, St>
 where
-    S: config_region_rule_default_state::State,
-    S::Access: config_region_rule_default_state::IsUnset,
+    St: config_region_rule_default_state::State,
+    St::Access: config_region_rule_default_state::IsUnset,
 {
     /// Set the `access` field (required)
     pub fn access(
         mut self,
         value: impl Into<ageassurance::Access<S>>,
     ) -> ConfigRegionRuleDefaultBuilder<
-        'a,
-        config_region_rule_default_state::SetAccess<S>,
+        S,
+        config_region_rule_default_state::SetAccess<St>,
     > {
         self._fields.0 = Option::Some(value.into());
         ConfigRegionRuleDefaultBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ConfigRegionRuleDefaultBuilder<'a, S>
+impl<S: BosStr, St> ConfigRegionRuleDefaultBuilder<S, St>
 where
-    S: config_region_rule_default_state::State,
-    S::Access: config_region_rule_default_state::IsSet,
+    St: config_region_rule_default_state::State,
+    St::Access: config_region_rule_default_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ConfigRegionRuleDefault<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ConfigRegionRuleDefault<S> {
         ConfigRegionRuleDefault {
             access: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> ConfigRegionRuleDefault<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ConfigRegionRuleDefault<S> {
         ConfigRegionRuleDefault {
             access: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -1829,17 +1845,17 @@ pub mod config_region_rule_if_account_newer_than_state {
         type Access = Unset;
     }
     ///State transition - sets the `date` field to Set
-    pub struct SetDate<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDate<S> {}
-    impl<S: State> State for SetDate<S> {
+    pub struct SetDate<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDate<St> {}
+    impl<St: State> State for SetDate<St> {
         type Date = Set<members::date>;
-        type Access = S::Access;
+        type Access = St::Access;
     }
     ///State transition - sets the `access` field to Set
-    pub struct SetAccess<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAccess<S> {}
-    impl<S: State> State for SetAccess<S> {
-        type Date = S::Date;
+    pub struct SetAccess<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAccess<St> {}
+    impl<St: State> State for SetAccess<St> {
+        type Date = St::Date;
         type Access = Set<members::access>;
     }
     /// Marker types for field names
@@ -1852,20 +1868,20 @@ pub mod config_region_rule_if_account_newer_than_state {
     }
 }
 
-/// Builder for constructing an instance of this type
+/// Builder for constructing an instance of this type.
 pub struct ConfigRegionRuleIfAccountNewerThanBuilder<
-    'a,
-    S: config_region_rule_if_account_newer_than_state::State,
+    S: BosStr,
+    St: config_region_rule_if_account_newer_than_state::State,
 > {
-    _state: PhantomData<fn() -> S>,
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<ageassurance::Access<S>>, Option<Datetime>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ConfigRegionRuleIfAccountNewerThan<'a> {
-    /// Create a new builder for this type
+impl<S: BosStr> ConfigRegionRuleIfAccountNewerThan<S> {
+    /// Create a new builder for this type.
     pub fn new() -> ConfigRegionRuleIfAccountNewerThanBuilder<
-        'a,
+        S,
         config_region_rule_if_account_newer_than_state::Empty,
     > {
         ConfigRegionRuleIfAccountNewerThanBuilder::new()
@@ -1873,84 +1889,84 @@ impl<'a> ConfigRegionRuleIfAccountNewerThan<'a> {
 }
 
 impl<
-    'a,
+    S: BosStr,
 > ConfigRegionRuleIfAccountNewerThanBuilder<
-    'a,
+    S,
     config_region_rule_if_account_newer_than_state::Empty,
 > {
-    /// Create a new builder with all fields unset
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ConfigRegionRuleIfAccountNewerThanBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ConfigRegionRuleIfAccountNewerThanBuilder<'a, S>
+impl<S: BosStr, St> ConfigRegionRuleIfAccountNewerThanBuilder<S, St>
 where
-    S: config_region_rule_if_account_newer_than_state::State,
-    S::Access: config_region_rule_if_account_newer_than_state::IsUnset,
+    St: config_region_rule_if_account_newer_than_state::State,
+    St::Access: config_region_rule_if_account_newer_than_state::IsUnset,
 {
     /// Set the `access` field (required)
     pub fn access(
         mut self,
         value: impl Into<ageassurance::Access<S>>,
     ) -> ConfigRegionRuleIfAccountNewerThanBuilder<
-        'a,
-        config_region_rule_if_account_newer_than_state::SetAccess<S>,
+        S,
+        config_region_rule_if_account_newer_than_state::SetAccess<St>,
     > {
         self._fields.0 = Option::Some(value.into());
         ConfigRegionRuleIfAccountNewerThanBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ConfigRegionRuleIfAccountNewerThanBuilder<'a, S>
+impl<S: BosStr, St> ConfigRegionRuleIfAccountNewerThanBuilder<S, St>
 where
-    S: config_region_rule_if_account_newer_than_state::State,
-    S::Date: config_region_rule_if_account_newer_than_state::IsUnset,
+    St: config_region_rule_if_account_newer_than_state::State,
+    St::Date: config_region_rule_if_account_newer_than_state::IsUnset,
 {
     /// Set the `date` field (required)
     pub fn date(
         mut self,
         value: impl Into<Datetime>,
     ) -> ConfigRegionRuleIfAccountNewerThanBuilder<
-        'a,
-        config_region_rule_if_account_newer_than_state::SetDate<S>,
+        S,
+        config_region_rule_if_account_newer_than_state::SetDate<St>,
     > {
         self._fields.1 = Option::Some(value.into());
         ConfigRegionRuleIfAccountNewerThanBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ConfigRegionRuleIfAccountNewerThanBuilder<'a, S>
+impl<S: BosStr, St> ConfigRegionRuleIfAccountNewerThanBuilder<S, St>
 where
-    S: config_region_rule_if_account_newer_than_state::State,
-    S::Date: config_region_rule_if_account_newer_than_state::IsSet,
-    S::Access: config_region_rule_if_account_newer_than_state::IsSet,
+    St: config_region_rule_if_account_newer_than_state::State,
+    St::Date: config_region_rule_if_account_newer_than_state::IsSet,
+    St::Access: config_region_rule_if_account_newer_than_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ConfigRegionRuleIfAccountNewerThan<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ConfigRegionRuleIfAccountNewerThan<S> {
         ConfigRegionRuleIfAccountNewerThan {
             access: self._fields.0.unwrap(),
             date: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> ConfigRegionRuleIfAccountNewerThan<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ConfigRegionRuleIfAccountNewerThan<S> {
         ConfigRegionRuleIfAccountNewerThan {
             access: self._fields.0.unwrap(),
             date: self._fields.1.unwrap(),
@@ -1980,17 +1996,17 @@ pub mod config_region_rule_if_account_older_than_state {
         type Access = Unset;
     }
     ///State transition - sets the `date` field to Set
-    pub struct SetDate<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDate<S> {}
-    impl<S: State> State for SetDate<S> {
+    pub struct SetDate<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDate<St> {}
+    impl<St: State> State for SetDate<St> {
         type Date = Set<members::date>;
-        type Access = S::Access;
+        type Access = St::Access;
     }
     ///State transition - sets the `access` field to Set
-    pub struct SetAccess<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAccess<S> {}
-    impl<S: State> State for SetAccess<S> {
-        type Date = S::Date;
+    pub struct SetAccess<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAccess<St> {}
+    impl<St: State> State for SetAccess<St> {
+        type Date = St::Date;
         type Access = Set<members::access>;
     }
     /// Marker types for field names
@@ -2003,20 +2019,20 @@ pub mod config_region_rule_if_account_older_than_state {
     }
 }
 
-/// Builder for constructing an instance of this type
+/// Builder for constructing an instance of this type.
 pub struct ConfigRegionRuleIfAccountOlderThanBuilder<
-    'a,
-    S: config_region_rule_if_account_older_than_state::State,
+    S: BosStr,
+    St: config_region_rule_if_account_older_than_state::State,
 > {
-    _state: PhantomData<fn() -> S>,
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<ageassurance::Access<S>>, Option<Datetime>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ConfigRegionRuleIfAccountOlderThan<'a> {
-    /// Create a new builder for this type
+impl<S: BosStr> ConfigRegionRuleIfAccountOlderThan<S> {
+    /// Create a new builder for this type.
     pub fn new() -> ConfigRegionRuleIfAccountOlderThanBuilder<
-        'a,
+        S,
         config_region_rule_if_account_older_than_state::Empty,
     > {
         ConfigRegionRuleIfAccountOlderThanBuilder::new()
@@ -2024,84 +2040,84 @@ impl<'a> ConfigRegionRuleIfAccountOlderThan<'a> {
 }
 
 impl<
-    'a,
+    S: BosStr,
 > ConfigRegionRuleIfAccountOlderThanBuilder<
-    'a,
+    S,
     config_region_rule_if_account_older_than_state::Empty,
 > {
-    /// Create a new builder with all fields unset
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ConfigRegionRuleIfAccountOlderThanBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ConfigRegionRuleIfAccountOlderThanBuilder<'a, S>
+impl<S: BosStr, St> ConfigRegionRuleIfAccountOlderThanBuilder<S, St>
 where
-    S: config_region_rule_if_account_older_than_state::State,
-    S::Access: config_region_rule_if_account_older_than_state::IsUnset,
+    St: config_region_rule_if_account_older_than_state::State,
+    St::Access: config_region_rule_if_account_older_than_state::IsUnset,
 {
     /// Set the `access` field (required)
     pub fn access(
         mut self,
         value: impl Into<ageassurance::Access<S>>,
     ) -> ConfigRegionRuleIfAccountOlderThanBuilder<
-        'a,
-        config_region_rule_if_account_older_than_state::SetAccess<S>,
+        S,
+        config_region_rule_if_account_older_than_state::SetAccess<St>,
     > {
         self._fields.0 = Option::Some(value.into());
         ConfigRegionRuleIfAccountOlderThanBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ConfigRegionRuleIfAccountOlderThanBuilder<'a, S>
+impl<S: BosStr, St> ConfigRegionRuleIfAccountOlderThanBuilder<S, St>
 where
-    S: config_region_rule_if_account_older_than_state::State,
-    S::Date: config_region_rule_if_account_older_than_state::IsUnset,
+    St: config_region_rule_if_account_older_than_state::State,
+    St::Date: config_region_rule_if_account_older_than_state::IsUnset,
 {
     /// Set the `date` field (required)
     pub fn date(
         mut self,
         value: impl Into<Datetime>,
     ) -> ConfigRegionRuleIfAccountOlderThanBuilder<
-        'a,
-        config_region_rule_if_account_older_than_state::SetDate<S>,
+        S,
+        config_region_rule_if_account_older_than_state::SetDate<St>,
     > {
         self._fields.1 = Option::Some(value.into());
         ConfigRegionRuleIfAccountOlderThanBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ConfigRegionRuleIfAccountOlderThanBuilder<'a, S>
+impl<S: BosStr, St> ConfigRegionRuleIfAccountOlderThanBuilder<S, St>
 where
-    S: config_region_rule_if_account_older_than_state::State,
-    S::Date: config_region_rule_if_account_older_than_state::IsSet,
-    S::Access: config_region_rule_if_account_older_than_state::IsSet,
+    St: config_region_rule_if_account_older_than_state::State,
+    St::Date: config_region_rule_if_account_older_than_state::IsSet,
+    St::Access: config_region_rule_if_account_older_than_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ConfigRegionRuleIfAccountOlderThan<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ConfigRegionRuleIfAccountOlderThan<S> {
         ConfigRegionRuleIfAccountOlderThan {
             access: self._fields.0.unwrap(),
             date: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> ConfigRegionRuleIfAccountOlderThan<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ConfigRegionRuleIfAccountOlderThan<S> {
         ConfigRegionRuleIfAccountOlderThan {
             access: self._fields.0.unwrap(),
             date: self._fields.1.unwrap(),
@@ -2131,17 +2147,17 @@ pub mod config_region_rule_if_assured_over_age_state {
         type Access = Unset;
     }
     ///State transition - sets the `age` field to Set
-    pub struct SetAge<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAge<S> {}
-    impl<S: State> State for SetAge<S> {
+    pub struct SetAge<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAge<St> {}
+    impl<St: State> State for SetAge<St> {
         type Age = Set<members::age>;
-        type Access = S::Access;
+        type Access = St::Access;
     }
     ///State transition - sets the `access` field to Set
-    pub struct SetAccess<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAccess<S> {}
-    impl<S: State> State for SetAccess<S> {
-        type Age = S::Age;
+    pub struct SetAccess<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAccess<St> {}
+    impl<St: State> State for SetAccess<St> {
+        type Age = St::Age;
         type Access = Set<members::access>;
     }
     /// Marker types for field names
@@ -2154,20 +2170,20 @@ pub mod config_region_rule_if_assured_over_age_state {
     }
 }
 
-/// Builder for constructing an instance of this type
+/// Builder for constructing an instance of this type.
 pub struct ConfigRegionRuleIfAssuredOverAgeBuilder<
-    'a,
-    S: config_region_rule_if_assured_over_age_state::State,
+    S: BosStr,
+    St: config_region_rule_if_assured_over_age_state::State,
 > {
-    _state: PhantomData<fn() -> S>,
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<ageassurance::Access<S>>, Option<i64>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ConfigRegionRuleIfAssuredOverAge<'a> {
-    /// Create a new builder for this type
+impl<S: BosStr> ConfigRegionRuleIfAssuredOverAge<S> {
+    /// Create a new builder for this type.
     pub fn new() -> ConfigRegionRuleIfAssuredOverAgeBuilder<
-        'a,
+        S,
         config_region_rule_if_assured_over_age_state::Empty,
     > {
         ConfigRegionRuleIfAssuredOverAgeBuilder::new()
@@ -2175,84 +2191,84 @@ impl<'a> ConfigRegionRuleIfAssuredOverAge<'a> {
 }
 
 impl<
-    'a,
+    S: BosStr,
 > ConfigRegionRuleIfAssuredOverAgeBuilder<
-    'a,
+    S,
     config_region_rule_if_assured_over_age_state::Empty,
 > {
-    /// Create a new builder with all fields unset
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ConfigRegionRuleIfAssuredOverAgeBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ConfigRegionRuleIfAssuredOverAgeBuilder<'a, S>
+impl<S: BosStr, St> ConfigRegionRuleIfAssuredOverAgeBuilder<S, St>
 where
-    S: config_region_rule_if_assured_over_age_state::State,
-    S::Access: config_region_rule_if_assured_over_age_state::IsUnset,
+    St: config_region_rule_if_assured_over_age_state::State,
+    St::Access: config_region_rule_if_assured_over_age_state::IsUnset,
 {
     /// Set the `access` field (required)
     pub fn access(
         mut self,
         value: impl Into<ageassurance::Access<S>>,
     ) -> ConfigRegionRuleIfAssuredOverAgeBuilder<
-        'a,
-        config_region_rule_if_assured_over_age_state::SetAccess<S>,
+        S,
+        config_region_rule_if_assured_over_age_state::SetAccess<St>,
     > {
         self._fields.0 = Option::Some(value.into());
         ConfigRegionRuleIfAssuredOverAgeBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ConfigRegionRuleIfAssuredOverAgeBuilder<'a, S>
+impl<S: BosStr, St> ConfigRegionRuleIfAssuredOverAgeBuilder<S, St>
 where
-    S: config_region_rule_if_assured_over_age_state::State,
-    S::Age: config_region_rule_if_assured_over_age_state::IsUnset,
+    St: config_region_rule_if_assured_over_age_state::State,
+    St::Age: config_region_rule_if_assured_over_age_state::IsUnset,
 {
     /// Set the `age` field (required)
     pub fn age(
         mut self,
         value: impl Into<i64>,
     ) -> ConfigRegionRuleIfAssuredOverAgeBuilder<
-        'a,
-        config_region_rule_if_assured_over_age_state::SetAge<S>,
+        S,
+        config_region_rule_if_assured_over_age_state::SetAge<St>,
     > {
         self._fields.1 = Option::Some(value.into());
         ConfigRegionRuleIfAssuredOverAgeBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ConfigRegionRuleIfAssuredOverAgeBuilder<'a, S>
+impl<S: BosStr, St> ConfigRegionRuleIfAssuredOverAgeBuilder<S, St>
 where
-    S: config_region_rule_if_assured_over_age_state::State,
-    S::Age: config_region_rule_if_assured_over_age_state::IsSet,
-    S::Access: config_region_rule_if_assured_over_age_state::IsSet,
+    St: config_region_rule_if_assured_over_age_state::State,
+    St::Age: config_region_rule_if_assured_over_age_state::IsSet,
+    St::Access: config_region_rule_if_assured_over_age_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ConfigRegionRuleIfAssuredOverAge<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ConfigRegionRuleIfAssuredOverAge<S> {
         ConfigRegionRuleIfAssuredOverAge {
             access: self._fields.0.unwrap(),
             age: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> ConfigRegionRuleIfAssuredOverAge<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ConfigRegionRuleIfAssuredOverAge<S> {
         ConfigRegionRuleIfAssuredOverAge {
             access: self._fields.0.unwrap(),
             age: self._fields.1.unwrap(),
@@ -2282,17 +2298,17 @@ pub mod config_region_rule_if_assured_under_age_state {
         type Age = Unset;
     }
     ///State transition - sets the `access` field to Set
-    pub struct SetAccess<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAccess<S> {}
-    impl<S: State> State for SetAccess<S> {
+    pub struct SetAccess<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAccess<St> {}
+    impl<St: State> State for SetAccess<St> {
         type Access = Set<members::access>;
-        type Age = S::Age;
+        type Age = St::Age;
     }
     ///State transition - sets the `age` field to Set
-    pub struct SetAge<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAge<S> {}
-    impl<S: State> State for SetAge<S> {
-        type Access = S::Access;
+    pub struct SetAge<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAge<St> {}
+    impl<St: State> State for SetAge<St> {
+        type Access = St::Access;
         type Age = Set<members::age>;
     }
     /// Marker types for field names
@@ -2305,20 +2321,20 @@ pub mod config_region_rule_if_assured_under_age_state {
     }
 }
 
-/// Builder for constructing an instance of this type
+/// Builder for constructing an instance of this type.
 pub struct ConfigRegionRuleIfAssuredUnderAgeBuilder<
-    'a,
-    S: config_region_rule_if_assured_under_age_state::State,
+    S: BosStr,
+    St: config_region_rule_if_assured_under_age_state::State,
 > {
-    _state: PhantomData<fn() -> S>,
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<ageassurance::Access<S>>, Option<i64>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ConfigRegionRuleIfAssuredUnderAge<'a> {
-    /// Create a new builder for this type
+impl<S: BosStr> ConfigRegionRuleIfAssuredUnderAge<S> {
+    /// Create a new builder for this type.
     pub fn new() -> ConfigRegionRuleIfAssuredUnderAgeBuilder<
-        'a,
+        S,
         config_region_rule_if_assured_under_age_state::Empty,
     > {
         ConfigRegionRuleIfAssuredUnderAgeBuilder::new()
@@ -2326,84 +2342,84 @@ impl<'a> ConfigRegionRuleIfAssuredUnderAge<'a> {
 }
 
 impl<
-    'a,
+    S: BosStr,
 > ConfigRegionRuleIfAssuredUnderAgeBuilder<
-    'a,
+    S,
     config_region_rule_if_assured_under_age_state::Empty,
 > {
-    /// Create a new builder with all fields unset
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ConfigRegionRuleIfAssuredUnderAgeBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ConfigRegionRuleIfAssuredUnderAgeBuilder<'a, S>
+impl<S: BosStr, St> ConfigRegionRuleIfAssuredUnderAgeBuilder<S, St>
 where
-    S: config_region_rule_if_assured_under_age_state::State,
-    S::Access: config_region_rule_if_assured_under_age_state::IsUnset,
+    St: config_region_rule_if_assured_under_age_state::State,
+    St::Access: config_region_rule_if_assured_under_age_state::IsUnset,
 {
     /// Set the `access` field (required)
     pub fn access(
         mut self,
         value: impl Into<ageassurance::Access<S>>,
     ) -> ConfigRegionRuleIfAssuredUnderAgeBuilder<
-        'a,
-        config_region_rule_if_assured_under_age_state::SetAccess<S>,
+        S,
+        config_region_rule_if_assured_under_age_state::SetAccess<St>,
     > {
         self._fields.0 = Option::Some(value.into());
         ConfigRegionRuleIfAssuredUnderAgeBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ConfigRegionRuleIfAssuredUnderAgeBuilder<'a, S>
+impl<S: BosStr, St> ConfigRegionRuleIfAssuredUnderAgeBuilder<S, St>
 where
-    S: config_region_rule_if_assured_under_age_state::State,
-    S::Age: config_region_rule_if_assured_under_age_state::IsUnset,
+    St: config_region_rule_if_assured_under_age_state::State,
+    St::Age: config_region_rule_if_assured_under_age_state::IsUnset,
 {
     /// Set the `age` field (required)
     pub fn age(
         mut self,
         value: impl Into<i64>,
     ) -> ConfigRegionRuleIfAssuredUnderAgeBuilder<
-        'a,
-        config_region_rule_if_assured_under_age_state::SetAge<S>,
+        S,
+        config_region_rule_if_assured_under_age_state::SetAge<St>,
     > {
         self._fields.1 = Option::Some(value.into());
         ConfigRegionRuleIfAssuredUnderAgeBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ConfigRegionRuleIfAssuredUnderAgeBuilder<'a, S>
+impl<S: BosStr, St> ConfigRegionRuleIfAssuredUnderAgeBuilder<S, St>
 where
-    S: config_region_rule_if_assured_under_age_state::State,
-    S::Access: config_region_rule_if_assured_under_age_state::IsSet,
-    S::Age: config_region_rule_if_assured_under_age_state::IsSet,
+    St: config_region_rule_if_assured_under_age_state::State,
+    St::Access: config_region_rule_if_assured_under_age_state::IsSet,
+    St::Age: config_region_rule_if_assured_under_age_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ConfigRegionRuleIfAssuredUnderAge<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ConfigRegionRuleIfAssuredUnderAge<S> {
         ConfigRegionRuleIfAssuredUnderAge {
             access: self._fields.0.unwrap(),
             age: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> ConfigRegionRuleIfAssuredUnderAge<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ConfigRegionRuleIfAssuredUnderAge<S> {
         ConfigRegionRuleIfAssuredUnderAge {
             access: self._fields.0.unwrap(),
             age: self._fields.1.unwrap(),
@@ -2422,54 +2438,54 @@ pub mod config_region_rule_if_declared_over_age_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Age;
         type Access;
+        type Age;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Age = Unset;
         type Access = Unset;
-    }
-    ///State transition - sets the `age` field to Set
-    pub struct SetAge<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAge<S> {}
-    impl<S: State> State for SetAge<S> {
-        type Age = Set<members::age>;
-        type Access = S::Access;
+        type Age = Unset;
     }
     ///State transition - sets the `access` field to Set
-    pub struct SetAccess<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAccess<S> {}
-    impl<S: State> State for SetAccess<S> {
-        type Age = S::Age;
+    pub struct SetAccess<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAccess<St> {}
+    impl<St: State> State for SetAccess<St> {
         type Access = Set<members::access>;
+        type Age = St::Age;
+    }
+    ///State transition - sets the `age` field to Set
+    pub struct SetAge<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAge<St> {}
+    impl<St: State> State for SetAge<St> {
+        type Access = St::Access;
+        type Age = Set<members::age>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `age` field
-        pub struct age(());
         ///Marker type for the `access` field
         pub struct access(());
+        ///Marker type for the `age` field
+        pub struct age(());
     }
 }
 
-/// Builder for constructing an instance of this type
+/// Builder for constructing an instance of this type.
 pub struct ConfigRegionRuleIfDeclaredOverAgeBuilder<
-    'a,
-    S: config_region_rule_if_declared_over_age_state::State,
+    S: BosStr,
+    St: config_region_rule_if_declared_over_age_state::State,
 > {
-    _state: PhantomData<fn() -> S>,
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<ageassurance::Access<S>>, Option<i64>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ConfigRegionRuleIfDeclaredOverAge<'a> {
-    /// Create a new builder for this type
+impl<S: BosStr> ConfigRegionRuleIfDeclaredOverAge<S> {
+    /// Create a new builder for this type.
     pub fn new() -> ConfigRegionRuleIfDeclaredOverAgeBuilder<
-        'a,
+        S,
         config_region_rule_if_declared_over_age_state::Empty,
     > {
         ConfigRegionRuleIfDeclaredOverAgeBuilder::new()
@@ -2477,84 +2493,84 @@ impl<'a> ConfigRegionRuleIfDeclaredOverAge<'a> {
 }
 
 impl<
-    'a,
+    S: BosStr,
 > ConfigRegionRuleIfDeclaredOverAgeBuilder<
-    'a,
+    S,
     config_region_rule_if_declared_over_age_state::Empty,
 > {
-    /// Create a new builder with all fields unset
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ConfigRegionRuleIfDeclaredOverAgeBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ConfigRegionRuleIfDeclaredOverAgeBuilder<'a, S>
+impl<S: BosStr, St> ConfigRegionRuleIfDeclaredOverAgeBuilder<S, St>
 where
-    S: config_region_rule_if_declared_over_age_state::State,
-    S::Access: config_region_rule_if_declared_over_age_state::IsUnset,
+    St: config_region_rule_if_declared_over_age_state::State,
+    St::Access: config_region_rule_if_declared_over_age_state::IsUnset,
 {
     /// Set the `access` field (required)
     pub fn access(
         mut self,
         value: impl Into<ageassurance::Access<S>>,
     ) -> ConfigRegionRuleIfDeclaredOverAgeBuilder<
-        'a,
-        config_region_rule_if_declared_over_age_state::SetAccess<S>,
+        S,
+        config_region_rule_if_declared_over_age_state::SetAccess<St>,
     > {
         self._fields.0 = Option::Some(value.into());
         ConfigRegionRuleIfDeclaredOverAgeBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ConfigRegionRuleIfDeclaredOverAgeBuilder<'a, S>
+impl<S: BosStr, St> ConfigRegionRuleIfDeclaredOverAgeBuilder<S, St>
 where
-    S: config_region_rule_if_declared_over_age_state::State,
-    S::Age: config_region_rule_if_declared_over_age_state::IsUnset,
+    St: config_region_rule_if_declared_over_age_state::State,
+    St::Age: config_region_rule_if_declared_over_age_state::IsUnset,
 {
     /// Set the `age` field (required)
     pub fn age(
         mut self,
         value: impl Into<i64>,
     ) -> ConfigRegionRuleIfDeclaredOverAgeBuilder<
-        'a,
-        config_region_rule_if_declared_over_age_state::SetAge<S>,
+        S,
+        config_region_rule_if_declared_over_age_state::SetAge<St>,
     > {
         self._fields.1 = Option::Some(value.into());
         ConfigRegionRuleIfDeclaredOverAgeBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ConfigRegionRuleIfDeclaredOverAgeBuilder<'a, S>
+impl<S: BosStr, St> ConfigRegionRuleIfDeclaredOverAgeBuilder<S, St>
 where
-    S: config_region_rule_if_declared_over_age_state::State,
-    S::Age: config_region_rule_if_declared_over_age_state::IsSet,
-    S::Access: config_region_rule_if_declared_over_age_state::IsSet,
+    St: config_region_rule_if_declared_over_age_state::State,
+    St::Access: config_region_rule_if_declared_over_age_state::IsSet,
+    St::Age: config_region_rule_if_declared_over_age_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ConfigRegionRuleIfDeclaredOverAge<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ConfigRegionRuleIfDeclaredOverAge<S> {
         ConfigRegionRuleIfDeclaredOverAge {
             access: self._fields.0.unwrap(),
             age: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> ConfigRegionRuleIfDeclaredOverAge<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ConfigRegionRuleIfDeclaredOverAge<S> {
         ConfigRegionRuleIfDeclaredOverAge {
             access: self._fields.0.unwrap(),
             age: self._fields.1.unwrap(),
@@ -2584,17 +2600,17 @@ pub mod config_region_rule_if_declared_under_age_state {
         type Age = Unset;
     }
     ///State transition - sets the `access` field to Set
-    pub struct SetAccess<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAccess<S> {}
-    impl<S: State> State for SetAccess<S> {
+    pub struct SetAccess<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAccess<St> {}
+    impl<St: State> State for SetAccess<St> {
         type Access = Set<members::access>;
-        type Age = S::Age;
+        type Age = St::Age;
     }
     ///State transition - sets the `age` field to Set
-    pub struct SetAge<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAge<S> {}
-    impl<S: State> State for SetAge<S> {
-        type Access = S::Access;
+    pub struct SetAge<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAge<St> {}
+    impl<St: State> State for SetAge<St> {
+        type Access = St::Access;
         type Age = Set<members::age>;
     }
     /// Marker types for field names
@@ -2607,20 +2623,20 @@ pub mod config_region_rule_if_declared_under_age_state {
     }
 }
 
-/// Builder for constructing an instance of this type
+/// Builder for constructing an instance of this type.
 pub struct ConfigRegionRuleIfDeclaredUnderAgeBuilder<
-    'a,
-    S: config_region_rule_if_declared_under_age_state::State,
+    S: BosStr,
+    St: config_region_rule_if_declared_under_age_state::State,
 > {
-    _state: PhantomData<fn() -> S>,
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<ageassurance::Access<S>>, Option<i64>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ConfigRegionRuleIfDeclaredUnderAge<'a> {
-    /// Create a new builder for this type
+impl<S: BosStr> ConfigRegionRuleIfDeclaredUnderAge<S> {
+    /// Create a new builder for this type.
     pub fn new() -> ConfigRegionRuleIfDeclaredUnderAgeBuilder<
-        'a,
+        S,
         config_region_rule_if_declared_under_age_state::Empty,
     > {
         ConfigRegionRuleIfDeclaredUnderAgeBuilder::new()
@@ -2628,84 +2644,84 @@ impl<'a> ConfigRegionRuleIfDeclaredUnderAge<'a> {
 }
 
 impl<
-    'a,
+    S: BosStr,
 > ConfigRegionRuleIfDeclaredUnderAgeBuilder<
-    'a,
+    S,
     config_region_rule_if_declared_under_age_state::Empty,
 > {
-    /// Create a new builder with all fields unset
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ConfigRegionRuleIfDeclaredUnderAgeBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ConfigRegionRuleIfDeclaredUnderAgeBuilder<'a, S>
+impl<S: BosStr, St> ConfigRegionRuleIfDeclaredUnderAgeBuilder<S, St>
 where
-    S: config_region_rule_if_declared_under_age_state::State,
-    S::Access: config_region_rule_if_declared_under_age_state::IsUnset,
+    St: config_region_rule_if_declared_under_age_state::State,
+    St::Access: config_region_rule_if_declared_under_age_state::IsUnset,
 {
     /// Set the `access` field (required)
     pub fn access(
         mut self,
         value: impl Into<ageassurance::Access<S>>,
     ) -> ConfigRegionRuleIfDeclaredUnderAgeBuilder<
-        'a,
-        config_region_rule_if_declared_under_age_state::SetAccess<S>,
+        S,
+        config_region_rule_if_declared_under_age_state::SetAccess<St>,
     > {
         self._fields.0 = Option::Some(value.into());
         ConfigRegionRuleIfDeclaredUnderAgeBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ConfigRegionRuleIfDeclaredUnderAgeBuilder<'a, S>
+impl<S: BosStr, St> ConfigRegionRuleIfDeclaredUnderAgeBuilder<S, St>
 where
-    S: config_region_rule_if_declared_under_age_state::State,
-    S::Age: config_region_rule_if_declared_under_age_state::IsUnset,
+    St: config_region_rule_if_declared_under_age_state::State,
+    St::Age: config_region_rule_if_declared_under_age_state::IsUnset,
 {
     /// Set the `age` field (required)
     pub fn age(
         mut self,
         value: impl Into<i64>,
     ) -> ConfigRegionRuleIfDeclaredUnderAgeBuilder<
-        'a,
-        config_region_rule_if_declared_under_age_state::SetAge<S>,
+        S,
+        config_region_rule_if_declared_under_age_state::SetAge<St>,
     > {
         self._fields.1 = Option::Some(value.into());
         ConfigRegionRuleIfDeclaredUnderAgeBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ConfigRegionRuleIfDeclaredUnderAgeBuilder<'a, S>
+impl<S: BosStr, St> ConfigRegionRuleIfDeclaredUnderAgeBuilder<S, St>
 where
-    S: config_region_rule_if_declared_under_age_state::State,
-    S::Access: config_region_rule_if_declared_under_age_state::IsSet,
-    S::Age: config_region_rule_if_declared_under_age_state::IsSet,
+    St: config_region_rule_if_declared_under_age_state::State,
+    St::Access: config_region_rule_if_declared_under_age_state::IsSet,
+    St::Age: config_region_rule_if_declared_under_age_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ConfigRegionRuleIfDeclaredUnderAge<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ConfigRegionRuleIfDeclaredUnderAge<S> {
         ConfigRegionRuleIfDeclaredUnderAge {
             access: self._fields.0.unwrap(),
             age: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> ConfigRegionRuleIfDeclaredUnderAge<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ConfigRegionRuleIfDeclaredUnderAge<S> {
         ConfigRegionRuleIfDeclaredUnderAge {
             access: self._fields.0.unwrap(),
             age: self._fields.1.unwrap(),
@@ -2725,90 +2741,90 @@ pub mod event_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type AttemptId;
-        type CountryCode;
         type CreatedAt;
         type Status;
         type Access;
+        type CountryCode;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type AttemptId = Unset;
-        type CountryCode = Unset;
         type CreatedAt = Unset;
         type Status = Unset;
         type Access = Unset;
+        type CountryCode = Unset;
     }
     ///State transition - sets the `attempt_id` field to Set
-    pub struct SetAttemptId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAttemptId<S> {}
-    impl<S: State> State for SetAttemptId<S> {
+    pub struct SetAttemptId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAttemptId<St> {}
+    impl<St: State> State for SetAttemptId<St> {
         type AttemptId = Set<members::attempt_id>;
-        type CountryCode = S::CountryCode;
-        type CreatedAt = S::CreatedAt;
-        type Status = S::Status;
-        type Access = S::Access;
-    }
-    ///State transition - sets the `country_code` field to Set
-    pub struct SetCountryCode<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCountryCode<S> {}
-    impl<S: State> State for SetCountryCode<S> {
-        type AttemptId = S::AttemptId;
-        type CountryCode = Set<members::country_code>;
-        type CreatedAt = S::CreatedAt;
-        type Status = S::Status;
-        type Access = S::Access;
+        type CreatedAt = St::CreatedAt;
+        type Status = St::Status;
+        type Access = St::Access;
+        type CountryCode = St::CountryCode;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type AttemptId = S::AttemptId;
-        type CountryCode = S::CountryCode;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type AttemptId = St::AttemptId;
         type CreatedAt = Set<members::created_at>;
-        type Status = S::Status;
-        type Access = S::Access;
+        type Status = St::Status;
+        type Access = St::Access;
+        type CountryCode = St::CountryCode;
     }
     ///State transition - sets the `status` field to Set
-    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStatus<S> {}
-    impl<S: State> State for SetStatus<S> {
-        type AttemptId = S::AttemptId;
-        type CountryCode = S::CountryCode;
-        type CreatedAt = S::CreatedAt;
+    pub struct SetStatus<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStatus<St> {}
+    impl<St: State> State for SetStatus<St> {
+        type AttemptId = St::AttemptId;
+        type CreatedAt = St::CreatedAt;
         type Status = Set<members::status>;
-        type Access = S::Access;
+        type Access = St::Access;
+        type CountryCode = St::CountryCode;
     }
     ///State transition - sets the `access` field to Set
-    pub struct SetAccess<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAccess<S> {}
-    impl<S: State> State for SetAccess<S> {
-        type AttemptId = S::AttemptId;
-        type CountryCode = S::CountryCode;
-        type CreatedAt = S::CreatedAt;
-        type Status = S::Status;
+    pub struct SetAccess<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAccess<St> {}
+    impl<St: State> State for SetAccess<St> {
+        type AttemptId = St::AttemptId;
+        type CreatedAt = St::CreatedAt;
+        type Status = St::Status;
         type Access = Set<members::access>;
+        type CountryCode = St::CountryCode;
+    }
+    ///State transition - sets the `country_code` field to Set
+    pub struct SetCountryCode<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCountryCode<St> {}
+    impl<St: State> State for SetCountryCode<St> {
+        type AttemptId = St::AttemptId;
+        type CreatedAt = St::CreatedAt;
+        type Status = St::Status;
+        type Access = St::Access;
+        type CountryCode = Set<members::country_code>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `attempt_id` field
         pub struct attempt_id(());
-        ///Marker type for the `country_code` field
-        pub struct country_code(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `status` field
         pub struct status(());
         ///Marker type for the `access` field
         pub struct access(());
+        ///Marker type for the `country_code` field
+        pub struct country_code(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct EventBuilder<'a, S: event_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct EventBuilder<S: BosStr, St: event_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<EventAccess<S>>,
         Option<S>,
@@ -2822,66 +2838,66 @@ pub struct EventBuilder<'a, S: event_state::State> {
         Option<S>,
         Option<EventStatus<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Event<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> EventBuilder<'a, event_state::Empty> {
+impl<S: BosStr> Event<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> EventBuilder<S, event_state::Empty> {
         EventBuilder::new()
     }
 }
 
-impl<'a> EventBuilder<'a, event_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> EventBuilder<S, event_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         EventBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> EventBuilder<'a, S>
+impl<S: BosStr, St> EventBuilder<S, St>
 where
-    S: event_state::State,
-    S::Access: event_state::IsUnset,
+    St: event_state::State,
+    St::Access: event_state::IsUnset,
 {
     /// Set the `access` field (required)
     pub fn access(
         mut self,
         value: impl Into<EventAccess<S>>,
-    ) -> EventBuilder<'a, event_state::SetAccess<S>> {
+    ) -> EventBuilder<S, event_state::SetAccess<St>> {
         self._fields.0 = Option::Some(value.into());
         EventBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> EventBuilder<'a, S>
+impl<S: BosStr, St> EventBuilder<S, St>
 where
-    S: event_state::State,
-    S::AttemptId: event_state::IsUnset,
+    St: event_state::State,
+    St::AttemptId: event_state::IsUnset,
 {
     /// Set the `attemptId` field (required)
     pub fn attempt_id(
         mut self,
         value: impl Into<S>,
-    ) -> EventBuilder<'a, event_state::SetAttemptId<S>> {
+    ) -> EventBuilder<S, event_state::SetAttemptId<St>> {
         self._fields.1 = Option::Some(value.into());
         EventBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: event_state::State> EventBuilder<'a, S> {
+impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     /// Set the `completeIp` field (optional)
     pub fn complete_ip(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -2894,7 +2910,7 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
     }
 }
 
-impl<'a, S: event_state::State> EventBuilder<'a, S> {
+impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     /// Set the `completeUa` field (optional)
     pub fn complete_ua(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -2907,45 +2923,45 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
     }
 }
 
-impl<'a, S> EventBuilder<'a, S>
+impl<S: BosStr, St> EventBuilder<S, St>
 where
-    S: event_state::State,
-    S::CountryCode: event_state::IsUnset,
+    St: event_state::State,
+    St::CountryCode: event_state::IsUnset,
 {
     /// Set the `countryCode` field (required)
     pub fn country_code(
         mut self,
         value: impl Into<S>,
-    ) -> EventBuilder<'a, event_state::SetCountryCode<S>> {
+    ) -> EventBuilder<S, event_state::SetCountryCode<St>> {
         self._fields.4 = Option::Some(value.into());
         EventBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> EventBuilder<'a, S>
+impl<S: BosStr, St> EventBuilder<S, St>
 where
-    S: event_state::State,
-    S::CreatedAt: event_state::IsUnset,
+    St: event_state::State,
+    St::CreatedAt: event_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> EventBuilder<'a, event_state::SetCreatedAt<S>> {
+    ) -> EventBuilder<S, event_state::SetCreatedAt<St>> {
         self._fields.5 = Option::Some(value.into());
         EventBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: event_state::State> EventBuilder<'a, S> {
+impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     /// Set the `email` field (optional)
     pub fn email(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.6 = value.into();
@@ -2958,7 +2974,7 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
     }
 }
 
-impl<'a, S: event_state::State> EventBuilder<'a, S> {
+impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     /// Set the `initIp` field (optional)
     pub fn init_ip(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.7 = value.into();
@@ -2971,7 +2987,7 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
     }
 }
 
-impl<'a, S: event_state::State> EventBuilder<'a, S> {
+impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     /// Set the `initUa` field (optional)
     pub fn init_ua(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.8 = value.into();
@@ -2984,7 +3000,7 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
     }
 }
 
-impl<'a, S: event_state::State> EventBuilder<'a, S> {
+impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     /// Set the `regionCode` field (optional)
     pub fn region_code(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.9 = value.into();
@@ -2997,36 +3013,36 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
     }
 }
 
-impl<'a, S> EventBuilder<'a, S>
+impl<S: BosStr, St> EventBuilder<S, St>
 where
-    S: event_state::State,
-    S::Status: event_state::IsUnset,
+    St: event_state::State,
+    St::Status: event_state::IsUnset,
 {
     /// Set the `status` field (required)
     pub fn status(
         mut self,
         value: impl Into<EventStatus<S>>,
-    ) -> EventBuilder<'a, event_state::SetStatus<S>> {
+    ) -> EventBuilder<S, event_state::SetStatus<St>> {
         self._fields.10 = Option::Some(value.into());
         EventBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> EventBuilder<'a, S>
+impl<S: BosStr, St> EventBuilder<S, St>
 where
-    S: event_state::State,
-    S::AttemptId: event_state::IsSet,
-    S::CountryCode: event_state::IsSet,
-    S::CreatedAt: event_state::IsSet,
-    S::Status: event_state::IsSet,
-    S::Access: event_state::IsSet,
+    St: event_state::State,
+    St::AttemptId: event_state::IsSet,
+    St::CreatedAt: event_state::IsSet,
+    St::Status: event_state::IsSet,
+    St::Access: event_state::IsSet,
+    St::CountryCode: event_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Event<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Event<S> {
         Event {
             access: self._fields.0.unwrap(),
             attempt_id: self._fields.1.unwrap(),
@@ -3042,8 +3058,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Event<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Event<S> {
         Event {
             access: self._fields.0.unwrap(),
             attempt_id: self._fields.1.unwrap(),
@@ -3082,17 +3098,17 @@ pub mod state_state {
         type Access = Unset;
     }
     ///State transition - sets the `status` field to Set
-    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStatus<S> {}
-    impl<S: State> State for SetStatus<S> {
+    pub struct SetStatus<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStatus<St> {}
+    impl<St: State> State for SetStatus<St> {
         type Status = Set<members::status>;
-        type Access = S::Access;
+        type Access = St::Access;
     }
     ///State transition - sets the `access` field to Set
-    pub struct SetAccess<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAccess<S> {}
-    impl<S: State> State for SetAccess<S> {
-        type Status = S::Status;
+    pub struct SetAccess<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAccess<St> {}
+    impl<St: State> State for SetAccess<St> {
+        type Status = St::Status;
         type Access = Set<members::access>;
     }
     /// Marker types for field names
@@ -3105,55 +3121,55 @@ pub mod state_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct StateBuilder<'a, S: state_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct StateBuilder<S: BosStr, St: state_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<ageassurance::Access<S>>,
         Option<Datetime>,
         Option<ageassurance::Status<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> State<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> StateBuilder<'a, state_state::Empty> {
+impl<S: BosStr> State<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> StateBuilder<S, state_state::Empty> {
         StateBuilder::new()
     }
 }
 
-impl<'a> StateBuilder<'a, state_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> StateBuilder<S, state_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         StateBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> StateBuilder<'a, S>
+impl<S: BosStr, St> StateBuilder<S, St>
 where
-    S: state_state::State,
-    S::Access: state_state::IsUnset,
+    St: state_state::State,
+    St::Access: state_state::IsUnset,
 {
     /// Set the `access` field (required)
     pub fn access(
         mut self,
         value: impl Into<ageassurance::Access<S>>,
-    ) -> StateBuilder<'a, state_state::SetAccess<S>> {
+    ) -> StateBuilder<S, state_state::SetAccess<St>> {
         self._fields.0 = Option::Some(value.into());
         StateBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: state_state::State> StateBuilder<'a, S> {
+impl<S: BosStr, St: state_state::State> StateBuilder<S, St> {
     /// Set the `lastInitiatedAt` field (optional)
     pub fn last_initiated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.1 = value.into();
@@ -3166,33 +3182,33 @@ impl<'a, S: state_state::State> StateBuilder<'a, S> {
     }
 }
 
-impl<'a, S> StateBuilder<'a, S>
+impl<S: BosStr, St> StateBuilder<S, St>
 where
-    S: state_state::State,
-    S::Status: state_state::IsUnset,
+    St: state_state::State,
+    St::Status: state_state::IsUnset,
 {
     /// Set the `status` field (required)
     pub fn status(
         mut self,
         value: impl Into<ageassurance::Status<S>>,
-    ) -> StateBuilder<'a, state_state::SetStatus<S>> {
+    ) -> StateBuilder<S, state_state::SetStatus<St>> {
         self._fields.2 = Option::Some(value.into());
         StateBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> StateBuilder<'a, S>
+impl<S: BosStr, St> StateBuilder<S, St>
 where
-    S: state_state::State,
-    S::Status: state_state::IsSet,
-    S::Access: state_state::IsSet,
+    St: state_state::State,
+    St::Status: state_state::IsSet,
+    St::Access: state_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> State<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> State<S> {
         State {
             access: self._fields.0.unwrap(),
             last_initiated_at: self._fields.1,
@@ -3200,8 +3216,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> State<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> State<S> {
         State {
             access: self._fields.0.unwrap(),
             last_initiated_at: self._fields.1,

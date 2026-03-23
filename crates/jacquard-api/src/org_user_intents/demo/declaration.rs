@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -33,11 +33,11 @@ use crate::org_user_intents::demo::declaration;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Intent<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Intent<S: BosStr = DefaultStr> {
     ///indicates user intent for reuse. Note that this field is optional, and thus tri-state (true, false, undefined)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub allow: Option<bool>,
@@ -55,11 +55,11 @@ pub struct Intent<S: Bos<str> + AsRef<str> = DefaultStr> {
     rename = "org.user-intents.demo.declaration",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Declaration<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Declaration<S: BosStr = DefaultStr> {
     ///Inclusion of account data in bulk 'snapshot' datasets which are publicly redistributed, even if only for a fixed time period
     #[serde(skip_serializing_if = "Option::is_none")]
     pub bulk_dataset: Option<declaration::Intent<S>>,
@@ -85,24 +85,24 @@ pub struct Declaration<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DeclarationGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DeclarationGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Declaration<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Declaration<S> {
+impl<S: BosStr> Declaration<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, DeclarationRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Intent<S> {
+impl<S: BosStr> LexiconSchema for Intent<S> {
     fn nsid() -> &'static str {
         "org.user-intents.demo.declaration"
     }
@@ -124,17 +124,17 @@ pub struct DeclarationRecord;
 impl XrpcResp for DeclarationRecord {
     const NSID: &'static str = "org.user-intents.demo.declaration";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = DeclarationGetRecordOutput<S>;
+    type Output<S: BosStr> = DeclarationGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<DeclarationGetRecordOutput<S>> for Declaration<S> {
+impl<S: BosStr> From<DeclarationGetRecordOutput<S>> for Declaration<S> {
     fn from(output: DeclarationGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Declaration<S> {
+impl<S: BosStr> Collection for Declaration<S> {
     const NSID: &'static str = "org.user-intents.demo.declaration";
     type Record = DeclarationRecord;
 }
@@ -144,7 +144,7 @@ impl Collection for DeclarationRecord {
     type Record = DeclarationRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Declaration<S> {
+impl<S: BosStr> LexiconSchema for Declaration<S> {
     fn nsid() -> &'static str {
         "org.user-intents.demo.declaration"
     }
@@ -178,9 +178,9 @@ pub mod intent_state {
         type UpdatedAt = Unset;
     }
     ///State transition - sets the `updated_at` field to Set
-    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
-    impl<S: State> State for SetUpdatedAt<S> {
+    pub struct SetUpdatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUpdatedAt<St> {}
+    impl<St: State> State for SetUpdatedAt<St> {
         type UpdatedAt = Set<members::updated_at>;
     }
     /// Marker types for field names
@@ -191,32 +191,32 @@ pub mod intent_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct IntentBuilder<'a, S: intent_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct IntentBuilder<S: BosStr, St: intent_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<bool>, Option<Datetime>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Intent<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> IntentBuilder<'a, intent_state::Empty> {
+impl<S: BosStr> Intent<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> IntentBuilder<S, intent_state::Empty> {
         IntentBuilder::new()
     }
 }
 
-impl<'a> IntentBuilder<'a, intent_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> IntentBuilder<S, intent_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         IntentBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: intent_state::State> IntentBuilder<'a, S> {
+impl<S: BosStr, St: intent_state::State> IntentBuilder<S, St> {
     /// Set the `allow` field (optional)
     pub fn allow(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.0 = value.into();
@@ -229,40 +229,40 @@ impl<'a, S: intent_state::State> IntentBuilder<'a, S> {
     }
 }
 
-impl<'a, S> IntentBuilder<'a, S>
+impl<S: BosStr, St> IntentBuilder<S, St>
 where
-    S: intent_state::State,
-    S::UpdatedAt: intent_state::IsUnset,
+    St: intent_state::State,
+    St::UpdatedAt: intent_state::IsUnset,
 {
     /// Set the `updatedAt` field (required)
     pub fn updated_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> IntentBuilder<'a, intent_state::SetUpdatedAt<S>> {
+    ) -> IntentBuilder<S, intent_state::SetUpdatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         IntentBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> IntentBuilder<'a, S>
+impl<S: BosStr, St> IntentBuilder<S, St>
 where
-    S: intent_state::State,
-    S::UpdatedAt: intent_state::IsSet,
+    St: intent_state::State,
+    St::UpdatedAt: intent_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Intent<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Intent<S> {
         Intent {
             allow: self._fields.0,
             updated_at: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Intent<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Intent<S> {
         Intent {
             allow: self._fields.0,
             updated_at: self._fields.1.unwrap(),
@@ -384,9 +384,9 @@ pub mod declaration_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct DeclarationBuilder<'a, S: declaration_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct DeclarationBuilder<S: BosStr, St: declaration_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<declaration::Intent<S>>,
         Option<declaration::Intent<S>>,
@@ -394,28 +394,28 @@ pub struct DeclarationBuilder<'a, S: declaration_state::State> {
         Option<declaration::Intent<S>>,
         Option<Datetime>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Declaration<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> DeclarationBuilder<'a, declaration_state::Empty> {
+impl<S: BosStr> Declaration<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> DeclarationBuilder<S, declaration_state::Empty> {
         DeclarationBuilder::new()
     }
 }
 
-impl<'a> DeclarationBuilder<'a, declaration_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> DeclarationBuilder<S, declaration_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         DeclarationBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: declaration_state::State> DeclarationBuilder<'a, S> {
+impl<S: BosStr, St: declaration_state::State> DeclarationBuilder<S, St> {
     /// Set the `bulkDataset` field (optional)
     pub fn bulk_dataset(
         mut self,
@@ -431,7 +431,7 @@ impl<'a, S: declaration_state::State> DeclarationBuilder<'a, S> {
     }
 }
 
-impl<'a, S: declaration_state::State> DeclarationBuilder<'a, S> {
+impl<S: BosStr, St: declaration_state::State> DeclarationBuilder<S, St> {
     /// Set the `protocolBridging` field (optional)
     pub fn protocol_bridging(
         mut self,
@@ -450,7 +450,7 @@ impl<'a, S: declaration_state::State> DeclarationBuilder<'a, S> {
     }
 }
 
-impl<'a, S: declaration_state::State> DeclarationBuilder<'a, S> {
+impl<S: BosStr, St: declaration_state::State> DeclarationBuilder<S, St> {
     /// Set the `publicAccessArchive` field (optional)
     pub fn public_access_archive(
         mut self,
@@ -469,7 +469,7 @@ impl<'a, S: declaration_state::State> DeclarationBuilder<'a, S> {
     }
 }
 
-impl<'a, S: declaration_state::State> DeclarationBuilder<'a, S> {
+impl<S: BosStr, St: declaration_state::State> DeclarationBuilder<S, St> {
     /// Set the `syntheticContentGeneration` field (optional)
     pub fn synthetic_content_generation(
         mut self,
@@ -488,7 +488,7 @@ impl<'a, S: declaration_state::State> DeclarationBuilder<'a, S> {
     }
 }
 
-impl<'a, S: declaration_state::State> DeclarationBuilder<'a, S> {
+impl<S: BosStr, St: declaration_state::State> DeclarationBuilder<S, St> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.4 = value.into();
@@ -501,12 +501,12 @@ impl<'a, S: declaration_state::State> DeclarationBuilder<'a, S> {
     }
 }
 
-impl<'a, S> DeclarationBuilder<'a, S>
+impl<S: BosStr, St> DeclarationBuilder<S, St>
 where
-    S: declaration_state::State,
+    St: declaration_state::State,
 {
-    /// Build the final struct
-    pub fn build(self) -> Declaration<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Declaration<S> {
         Declaration {
             bulk_dataset: self._fields.0,
             protocol_bridging: self._fields.1,
@@ -516,11 +516,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Declaration<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Declaration<S> {
         Declaration {
             bulk_dataset: self._fields.0,
             protocol_bridging: self._fields.1,

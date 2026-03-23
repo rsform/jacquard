@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "at.margin.apikey",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Apikey<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Apikey<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     ///SHA256 hash of the API key.
     pub key_hash: S,
@@ -55,18 +55,18 @@ pub struct Apikey<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ApikeyGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ApikeyGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Apikey<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Apikey<S> {
+impl<S: BosStr> Apikey<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, ApikeyRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -79,17 +79,17 @@ pub struct ApikeyRecord;
 impl XrpcResp for ApikeyRecord {
     const NSID: &'static str = "at.margin.apikey";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ApikeyGetRecordOutput<S>;
+    type Output<S: BosStr> = ApikeyGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<ApikeyGetRecordOutput<S>> for Apikey<S> {
+impl<S: BosStr> From<ApikeyGetRecordOutput<S>> for Apikey<S> {
     fn from(output: ApikeyGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Apikey<S> {
+impl<S: BosStr> Collection for Apikey<S> {
     const NSID: &'static str = "at.margin.apikey";
     type Record = ApikeyRecord;
 }
@@ -99,7 +99,7 @@ impl Collection for ApikeyRecord {
     type Record = ApikeyRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Apikey<S> {
+impl<S: BosStr> LexiconSchema for Apikey<S> {
     fn nsid() -> &'static str {
         "at.margin.apikey"
     }
@@ -135,145 +135,145 @@ pub mod apikey_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type KeyHash;
-        type CreatedAt;
         type Name;
+        type CreatedAt;
+        type KeyHash;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type KeyHash = Unset;
-        type CreatedAt = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `key_hash` field to Set
-    pub struct SetKeyHash<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetKeyHash<S> {}
-    impl<S: State> State for SetKeyHash<S> {
-        type KeyHash = Set<members::key_hash>;
-        type CreatedAt = S::CreatedAt;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type KeyHash = S::KeyHash;
-        type CreatedAt = Set<members::created_at>;
-        type Name = S::Name;
+        type CreatedAt = Unset;
+        type KeyHash = Unset;
     }
     ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type KeyHash = S::KeyHash;
-        type CreatedAt = S::CreatedAt;
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
         type Name = Set<members::name>;
+        type CreatedAt = St::CreatedAt;
+        type KeyHash = St::KeyHash;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Name = St::Name;
+        type CreatedAt = Set<members::created_at>;
+        type KeyHash = St::KeyHash;
+    }
+    ///State transition - sets the `key_hash` field to Set
+    pub struct SetKeyHash<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetKeyHash<St> {}
+    impl<St: State> State for SetKeyHash<St> {
+        type Name = St::Name;
+        type CreatedAt = St::CreatedAt;
+        type KeyHash = Set<members::key_hash>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `key_hash` field
-        pub struct key_hash(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `key_hash` field
+        pub struct key_hash(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ApikeyBuilder<'a, S: apikey_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ApikeyBuilder<S: BosStr, St: apikey_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<S>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Apikey<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ApikeyBuilder<'a, apikey_state::Empty> {
+impl<S: BosStr> Apikey<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ApikeyBuilder<S, apikey_state::Empty> {
         ApikeyBuilder::new()
     }
 }
 
-impl<'a> ApikeyBuilder<'a, apikey_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ApikeyBuilder<S, apikey_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ApikeyBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ApikeyBuilder<'a, S>
+impl<S: BosStr, St> ApikeyBuilder<S, St>
 where
-    S: apikey_state::State,
-    S::CreatedAt: apikey_state::IsUnset,
+    St: apikey_state::State,
+    St::CreatedAt: apikey_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ApikeyBuilder<'a, apikey_state::SetCreatedAt<S>> {
+    ) -> ApikeyBuilder<S, apikey_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         ApikeyBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ApikeyBuilder<'a, S>
+impl<S: BosStr, St> ApikeyBuilder<S, St>
 where
-    S: apikey_state::State,
-    S::KeyHash: apikey_state::IsUnset,
+    St: apikey_state::State,
+    St::KeyHash: apikey_state::IsUnset,
 {
     /// Set the `keyHash` field (required)
     pub fn key_hash(
         mut self,
         value: impl Into<S>,
-    ) -> ApikeyBuilder<'a, apikey_state::SetKeyHash<S>> {
+    ) -> ApikeyBuilder<S, apikey_state::SetKeyHash<St>> {
         self._fields.1 = Option::Some(value.into());
         ApikeyBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ApikeyBuilder<'a, S>
+impl<S: BosStr, St> ApikeyBuilder<S, St>
 where
-    S: apikey_state::State,
-    S::Name: apikey_state::IsUnset,
+    St: apikey_state::State,
+    St::Name: apikey_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> ApikeyBuilder<'a, apikey_state::SetName<S>> {
+    ) -> ApikeyBuilder<S, apikey_state::SetName<St>> {
         self._fields.2 = Option::Some(value.into());
         ApikeyBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ApikeyBuilder<'a, S>
+impl<S: BosStr, St> ApikeyBuilder<S, St>
 where
-    S: apikey_state::State,
-    S::KeyHash: apikey_state::IsSet,
-    S::CreatedAt: apikey_state::IsSet,
-    S::Name: apikey_state::IsSet,
+    St: apikey_state::State,
+    St::Name: apikey_state::IsSet,
+    St::CreatedAt: apikey_state::IsSet,
+    St::KeyHash: apikey_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Apikey<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Apikey<S> {
         Apikey {
             created_at: self._fields.0.unwrap(),
             key_hash: self._fields.1.unwrap(),
@@ -281,8 +281,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Apikey<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Apikey<S> {
         Apikey {
             created_at: self._fields.0.unwrap(),
             key_hash: self._fields.1.unwrap(),

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -29,18 +29,18 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct BlueskyEmbed<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct BlueskyEmbed<S: BosStr = DefaultStr> {
     ///Strong reference to the Bluesky post
     pub post_ref: StrongRef<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for BlueskyEmbed<S> {
+impl<S: BosStr> LexiconSchema for BlueskyEmbed<S> {
     fn nsid() -> &'static str {
         "blog.pckt.block.blueskyEmbed"
     }
@@ -74,9 +74,9 @@ pub mod bluesky_embed_state {
         type PostRef = Unset;
     }
     ///State transition - sets the `post_ref` field to Set
-    pub struct SetPostRef<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPostRef<S> {}
-    impl<S: State> State for SetPostRef<S> {
+    pub struct SetPostRef<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPostRef<St> {}
+    impl<St: State> State for SetPostRef<St> {
         type PostRef = Set<members::post_ref>;
     }
     /// Marker types for field names
@@ -87,67 +87,67 @@ pub mod bluesky_embed_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct BlueskyEmbedBuilder<'a, S: bluesky_embed_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct BlueskyEmbedBuilder<S: BosStr, St: bluesky_embed_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<StrongRef<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> BlueskyEmbed<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> BlueskyEmbedBuilder<'a, bluesky_embed_state::Empty> {
+impl<S: BosStr> BlueskyEmbed<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> BlueskyEmbedBuilder<S, bluesky_embed_state::Empty> {
         BlueskyEmbedBuilder::new()
     }
 }
 
-impl<'a> BlueskyEmbedBuilder<'a, bluesky_embed_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> BlueskyEmbedBuilder<S, bluesky_embed_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         BlueskyEmbedBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BlueskyEmbedBuilder<'a, S>
+impl<S: BosStr, St> BlueskyEmbedBuilder<S, St>
 where
-    S: bluesky_embed_state::State,
-    S::PostRef: bluesky_embed_state::IsUnset,
+    St: bluesky_embed_state::State,
+    St::PostRef: bluesky_embed_state::IsUnset,
 {
     /// Set the `postRef` field (required)
     pub fn post_ref(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> BlueskyEmbedBuilder<'a, bluesky_embed_state::SetPostRef<S>> {
+    ) -> BlueskyEmbedBuilder<S, bluesky_embed_state::SetPostRef<St>> {
         self._fields.0 = Option::Some(value.into());
         BlueskyEmbedBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BlueskyEmbedBuilder<'a, S>
+impl<S: BosStr, St> BlueskyEmbedBuilder<S, St>
 where
-    S: bluesky_embed_state::State,
-    S::PostRef: bluesky_embed_state::IsSet,
+    St: bluesky_embed_state::State,
+    St::PostRef: bluesky_embed_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> BlueskyEmbed<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> BlueskyEmbed<S> {
         BlueskyEmbed {
             post_ref: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> BlueskyEmbed<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> BlueskyEmbed<S> {
         BlueskyEmbed {
             post_ref: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

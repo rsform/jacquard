@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -29,16 +29,15 @@ use crate::sh_weaver::notebook::ReadingProgress;
 use crate::sh_weaver::notebook::get_reading_history;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetReadingHistory<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetReadingHistory<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub cursor: Option<S>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
@@ -47,26 +46,23 @@ pub struct GetReadingHistory<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Defaults to `"all"`.
     #[serde(default = "_default_status")]
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub status: Option<S>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetReadingHistoryOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetReadingHistoryOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
     pub history: Vec<get_reading_history::ReadingHistoryItem<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -75,11 +71,11 @@ pub struct GetReadingHistoryOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ReadingHistoryItem<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ReadingHistoryItem<S: BosStr = DefaultStr> {
     ///The entry the user was last reading.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub current_entry: Option<EntryView<S>>,
@@ -94,12 +90,11 @@ pub struct GetReadingHistoryResponse;
 impl jacquard_common::xrpc::XrpcResp for GetReadingHistoryResponse {
     const NSID: &'static str = "sh.weaver.notebook.getReadingHistory";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetReadingHistoryOutput<S>;
+    type Output<S: BosStr> = GetReadingHistoryOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetReadingHistory<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetReadingHistory<S> {
     const NSID: &'static str = "sh.weaver.notebook.getReadingHistory";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetReadingHistoryResponse;
@@ -110,11 +105,11 @@ pub struct GetReadingHistoryRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetReadingHistoryRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.notebook.getReadingHistory";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetReadingHistory<S>;
+    type Request<S: BosStr> = GetReadingHistory<S>;
     type Response = GetReadingHistoryResponse;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ReadingHistoryItem<S> {
+impl<S: BosStr> LexiconSchema for ReadingHistoryItem<S> {
     fn nsid() -> &'static str {
         "sh.weaver.notebook.getReadingHistory"
     }
@@ -133,8 +128,8 @@ fn _default_limit() -> Option<i64> {
     Some(50i64)
 }
 
-fn _default_status() -> Option<CowStr<'static>> {
-    Some(CowStr::from("all"))
+fn _default_status<S: jacquard_common::FromStaticStr>() -> Option<S> {
+    Some(S::from_static("all"))
 }
 
 pub mod get_reading_history_state {
@@ -156,32 +151,32 @@ pub mod get_reading_history_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetReadingHistoryBuilder<'a, S: get_reading_history_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetReadingHistoryBuilder<S: BosStr, St: get_reading_history_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetReadingHistory<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetReadingHistoryBuilder<'a, get_reading_history_state::Empty> {
+impl<S: BosStr> GetReadingHistory<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetReadingHistoryBuilder<S, get_reading_history_state::Empty> {
         GetReadingHistoryBuilder::new()
     }
 }
 
-impl<'a> GetReadingHistoryBuilder<'a, get_reading_history_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetReadingHistoryBuilder<S, get_reading_history_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetReadingHistoryBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: get_reading_history_state::State> GetReadingHistoryBuilder<'a, S> {
+impl<S: BosStr, St: get_reading_history_state::State> GetReadingHistoryBuilder<S, St> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -194,7 +189,7 @@ impl<'a, S: get_reading_history_state::State> GetReadingHistoryBuilder<'a, S> {
     }
 }
 
-impl<'a, S: get_reading_history_state::State> GetReadingHistoryBuilder<'a, S> {
+impl<S: BosStr, St: get_reading_history_state::State> GetReadingHistoryBuilder<S, St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -207,7 +202,7 @@ impl<'a, S: get_reading_history_state::State> GetReadingHistoryBuilder<'a, S> {
     }
 }
 
-impl<'a, S: get_reading_history_state::State> GetReadingHistoryBuilder<'a, S> {
+impl<S: BosStr, St: get_reading_history_state::State> GetReadingHistoryBuilder<S, St> {
     /// Set the `status` field (optional)
     pub fn status(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -220,12 +215,12 @@ impl<'a, S: get_reading_history_state::State> GetReadingHistoryBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GetReadingHistoryBuilder<'a, S>
+impl<S: BosStr, St> GetReadingHistoryBuilder<S, St>
 where
-    S: get_reading_history_state::State,
+    St: get_reading_history_state::State,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetReadingHistory<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetReadingHistory<S> {
         GetReadingHistory {
             cursor: self._fields.0,
             limit: self._fields.1,
@@ -244,66 +239,66 @@ pub mod reading_history_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Notebook;
         type Progress;
+        type Notebook;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Notebook = Unset;
         type Progress = Unset;
-    }
-    ///State transition - sets the `notebook` field to Set
-    pub struct SetNotebook<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNotebook<S> {}
-    impl<S: State> State for SetNotebook<S> {
-        type Notebook = Set<members::notebook>;
-        type Progress = S::Progress;
+        type Notebook = Unset;
     }
     ///State transition - sets the `progress` field to Set
-    pub struct SetProgress<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetProgress<S> {}
-    impl<S: State> State for SetProgress<S> {
-        type Notebook = S::Notebook;
+    pub struct SetProgress<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetProgress<St> {}
+    impl<St: State> State for SetProgress<St> {
         type Progress = Set<members::progress>;
+        type Notebook = St::Notebook;
+    }
+    ///State transition - sets the `notebook` field to Set
+    pub struct SetNotebook<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetNotebook<St> {}
+    impl<St: State> State for SetNotebook<St> {
+        type Progress = St::Progress;
+        type Notebook = Set<members::notebook>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `notebook` field
-        pub struct notebook(());
         ///Marker type for the `progress` field
         pub struct progress(());
+        ///Marker type for the `notebook` field
+        pub struct notebook(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ReadingHistoryItemBuilder<'a, S: reading_history_item_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ReadingHistoryItemBuilder<S: BosStr, St: reading_history_item_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<EntryView<S>>, Option<NotebookView<S>>, Option<ReadingProgress<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ReadingHistoryItem<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ReadingHistoryItemBuilder<'a, reading_history_item_state::Empty> {
+impl<S: BosStr> ReadingHistoryItem<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ReadingHistoryItemBuilder<S, reading_history_item_state::Empty> {
         ReadingHistoryItemBuilder::new()
     }
 }
 
-impl<'a> ReadingHistoryItemBuilder<'a, reading_history_item_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ReadingHistoryItemBuilder<S, reading_history_item_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ReadingHistoryItemBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: reading_history_item_state::State> ReadingHistoryItemBuilder<'a, S> {
+impl<S: BosStr, St: reading_history_item_state::State> ReadingHistoryItemBuilder<S, St> {
     /// Set the `currentEntry` field (optional)
     pub fn current_entry(mut self, value: impl Into<Option<EntryView<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -316,52 +311,52 @@ impl<'a, S: reading_history_item_state::State> ReadingHistoryItemBuilder<'a, S> 
     }
 }
 
-impl<'a, S> ReadingHistoryItemBuilder<'a, S>
+impl<S: BosStr, St> ReadingHistoryItemBuilder<S, St>
 where
-    S: reading_history_item_state::State,
-    S::Notebook: reading_history_item_state::IsUnset,
+    St: reading_history_item_state::State,
+    St::Notebook: reading_history_item_state::IsUnset,
 {
     /// Set the `notebook` field (required)
     pub fn notebook(
         mut self,
         value: impl Into<NotebookView<S>>,
-    ) -> ReadingHistoryItemBuilder<'a, reading_history_item_state::SetNotebook<S>> {
+    ) -> ReadingHistoryItemBuilder<S, reading_history_item_state::SetNotebook<St>> {
         self._fields.1 = Option::Some(value.into());
         ReadingHistoryItemBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ReadingHistoryItemBuilder<'a, S>
+impl<S: BosStr, St> ReadingHistoryItemBuilder<S, St>
 where
-    S: reading_history_item_state::State,
-    S::Progress: reading_history_item_state::IsUnset,
+    St: reading_history_item_state::State,
+    St::Progress: reading_history_item_state::IsUnset,
 {
     /// Set the `progress` field (required)
     pub fn progress(
         mut self,
         value: impl Into<ReadingProgress<S>>,
-    ) -> ReadingHistoryItemBuilder<'a, reading_history_item_state::SetProgress<S>> {
+    ) -> ReadingHistoryItemBuilder<S, reading_history_item_state::SetProgress<St>> {
         self._fields.2 = Option::Some(value.into());
         ReadingHistoryItemBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ReadingHistoryItemBuilder<'a, S>
+impl<S: BosStr, St> ReadingHistoryItemBuilder<S, St>
 where
-    S: reading_history_item_state::State,
-    S::Notebook: reading_history_item_state::IsSet,
-    S::Progress: reading_history_item_state::IsSet,
+    St: reading_history_item_state::State,
+    St::Progress: reading_history_item_state::IsSet,
+    St::Notebook: reading_history_item_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ReadingHistoryItem<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ReadingHistoryItem<S> {
         ReadingHistoryItem {
             current_entry: self._fields.0,
             notebook: self._fields.1.unwrap(),
@@ -369,11 +364,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> ReadingHistoryItem<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ReadingHistoryItem<S> {
         ReadingHistoryItem {
             current_entry: self._fields.0,
             notebook: self._fields.1.unwrap(),

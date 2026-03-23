@@ -6,22 +6,26 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[allow(unused_imports)]
+use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DownloadFile<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct DownloadFile<S: BosStr = DefaultStr> {
     pub file_id: S,
 }
 
@@ -37,9 +41,9 @@ pub struct DownloadFileResponse;
 impl jacquard_common::xrpc::XrpcResp for DownloadFileResponse {
     const NSID: &'static str = "app.rocksky.dropbox.downloadFile";
     const ENCODING: &'static str = "application/octet-stream";
-    type Output<S: Bos<str> + AsRef<str>> = DownloadFileOutput;
+    type Output<S: BosStr> = DownloadFileOutput;
     type Err = jacquard_common::xrpc::GenericError;
-    fn encode_output<S: Bos<str> + AsRef<str>>(
+    fn encode_output<S: BosStr>(
         output: &Self::Output<S>,
     ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError>
     where
@@ -51,7 +55,7 @@ impl jacquard_common::xrpc::XrpcResp for DownloadFileResponse {
         body: &'de [u8],
     ) -> Result<Self::Output<S>, jacquard_common::error::DecodeError>
     where
-        S: Bos<str> + AsRef<str> + Deserialize<'de>,
+        S: BosStr + Deserialize<'de>,
         Self::Output<S>: Deserialize<'de>,
     {
         Ok(DownloadFileOutput {
@@ -60,8 +64,7 @@ impl jacquard_common::xrpc::XrpcResp for DownloadFileResponse {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for DownloadFile<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for DownloadFile<S> {
     const NSID: &'static str = "app.rocksky.dropbox.downloadFile";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = DownloadFileResponse;
@@ -72,7 +75,7 @@ pub struct DownloadFileRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for DownloadFileRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.dropbox.downloadFile";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = DownloadFile<S>;
+    type Request<S: BosStr> = DownloadFile<S>;
     type Response = DownloadFileResponse;
 }
 
@@ -95,9 +98,9 @@ pub mod download_file_state {
         type FileId = Unset;
     }
     ///State transition - sets the `file_id` field to Set
-    pub struct SetFileId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFileId<S> {}
-    impl<S: State> State for SetFileId<S> {
+    pub struct SetFileId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetFileId<St> {}
+    impl<St: State> State for SetFileId<St> {
         type FileId = Set<members::file_id>;
     }
     /// Marker types for field names
@@ -108,57 +111,57 @@ pub mod download_file_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct DownloadFileBuilder<'a, S: download_file_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct DownloadFileBuilder<S: BosStr, St: download_file_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> DownloadFile<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> DownloadFileBuilder<'a, download_file_state::Empty> {
+impl<S: BosStr> DownloadFile<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> DownloadFileBuilder<S, download_file_state::Empty> {
         DownloadFileBuilder::new()
     }
 }
 
-impl<'a> DownloadFileBuilder<'a, download_file_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> DownloadFileBuilder<S, download_file_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         DownloadFileBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DownloadFileBuilder<'a, S>
+impl<S: BosStr, St> DownloadFileBuilder<S, St>
 where
-    S: download_file_state::State,
-    S::FileId: download_file_state::IsUnset,
+    St: download_file_state::State,
+    St::FileId: download_file_state::IsUnset,
 {
     /// Set the `fileId` field (required)
     pub fn file_id(
         mut self,
         value: impl Into<S>,
-    ) -> DownloadFileBuilder<'a, download_file_state::SetFileId<S>> {
+    ) -> DownloadFileBuilder<S, download_file_state::SetFileId<St>> {
         self._fields.0 = Option::Some(value.into());
         DownloadFileBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DownloadFileBuilder<'a, S>
+impl<S: BosStr, St> DownloadFileBuilder<S, St>
 where
-    S: download_file_state::State,
-    S::FileId: download_file_state::IsSet,
+    St: download_file_state::State,
+    St::FileId: download_file_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> DownloadFile<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> DownloadFile<S> {
         DownloadFile {
             file_id: self._fields.0.unwrap(),
         }

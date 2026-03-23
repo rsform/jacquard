@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use serde::{Serialize, Deserialize};
     rename = "dev.ocbwoy3.crack.alterego",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Alterego<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Alterego<S: BosStr = DefaultStr> {
     ///New profile picture
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avatar: Option<BlobRef<S>>,
@@ -66,18 +66,18 @@ pub struct Alterego<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct AlteregoGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct AlteregoGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Alterego<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Alterego<S> {
+impl<S: BosStr> Alterego<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, AlteregoRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -90,17 +90,17 @@ pub struct AlteregoRecord;
 impl XrpcResp for AlteregoRecord {
     const NSID: &'static str = "dev.ocbwoy3.crack.alterego";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = AlteregoGetRecordOutput<S>;
+    type Output<S: BosStr> = AlteregoGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<AlteregoGetRecordOutput<S>> for Alterego<S> {
+impl<S: BosStr> From<AlteregoGetRecordOutput<S>> for Alterego<S> {
     fn from(output: AlteregoGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Alterego<S> {
+impl<S: BosStr> Collection for Alterego<S> {
     const NSID: &'static str = "dev.ocbwoy3.crack.alterego";
     type Record = AlteregoRecord;
 }
@@ -110,7 +110,7 @@ impl Collection for AlteregoRecord {
     type Record = AlteregoRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Alterego<S> {
+impl<S: BosStr> LexiconSchema for Alterego<S> {
     fn nsid() -> &'static str {
         "dev.ocbwoy3.crack.alterego"
     }
@@ -274,32 +274,32 @@ pub mod alterego_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct AlteregoBuilder<'a, S: alterego_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct AlteregoBuilder<S: BosStr, St: alterego_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<BlobRef<S>>, Option<BlobRef<S>>, Option<S>, Option<S>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Alterego<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> AlteregoBuilder<'a, alterego_state::Empty> {
+impl<S: BosStr> Alterego<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> AlteregoBuilder<S, alterego_state::Empty> {
         AlteregoBuilder::new()
     }
 }
 
-impl<'a> AlteregoBuilder<'a, alterego_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> AlteregoBuilder<S, alterego_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         AlteregoBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: alterego_state::State> AlteregoBuilder<'a, S> {
+impl<S: BosStr, St: alterego_state::State> AlteregoBuilder<S, St> {
     /// Set the `avatar` field (optional)
     pub fn avatar(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -312,7 +312,7 @@ impl<'a, S: alterego_state::State> AlteregoBuilder<'a, S> {
     }
 }
 
-impl<'a, S: alterego_state::State> AlteregoBuilder<'a, S> {
+impl<S: BosStr, St: alterego_state::State> AlteregoBuilder<S, St> {
     /// Set the `banner` field (optional)
     pub fn banner(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -325,7 +325,7 @@ impl<'a, S: alterego_state::State> AlteregoBuilder<'a, S> {
     }
 }
 
-impl<'a, S: alterego_state::State> AlteregoBuilder<'a, S> {
+impl<S: BosStr, St: alterego_state::State> AlteregoBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -338,7 +338,7 @@ impl<'a, S: alterego_state::State> AlteregoBuilder<'a, S> {
     }
 }
 
-impl<'a, S: alterego_state::State> AlteregoBuilder<'a, S> {
+impl<S: BosStr, St: alterego_state::State> AlteregoBuilder<S, St> {
     /// Set the `displayName` field (optional)
     pub fn display_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -351,7 +351,7 @@ impl<'a, S: alterego_state::State> AlteregoBuilder<'a, S> {
     }
 }
 
-impl<'a, S: alterego_state::State> AlteregoBuilder<'a, S> {
+impl<S: BosStr, St: alterego_state::State> AlteregoBuilder<S, St> {
     /// Set the `handle` field (optional)
     pub fn handle(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
@@ -364,12 +364,12 @@ impl<'a, S: alterego_state::State> AlteregoBuilder<'a, S> {
     }
 }
 
-impl<'a, S> AlteregoBuilder<'a, S>
+impl<S: BosStr, St> AlteregoBuilder<S, St>
 where
-    S: alterego_state::State,
+    St: alterego_state::State,
 {
-    /// Build the final struct
-    pub fn build(self) -> Alterego<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Alterego<S> {
         Alterego {
             avatar: self._fields.0,
             banner: self._fields.1,
@@ -379,11 +379,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Alterego<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Alterego<S> {
         Alterego {
             avatar: self._fields.0,
             banner: self._fields.1,

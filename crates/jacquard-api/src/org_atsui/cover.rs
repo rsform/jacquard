@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
@@ -19,41 +19,36 @@ use serde::{Serialize, Deserialize};
 use crate::at_inlay::Response;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Cover<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Cover<S: BosStr = DefaultStr> {
     ///DID of the blob owner. Used to resolve blob URLs.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub did: Option<Did<S>>,
     ///Blob ref for the background image.
     pub src: Data<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CoverOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CoverOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
-    #[serde(borrow)]
     pub value: Response<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -62,12 +57,11 @@ pub struct CoverResponse;
 impl jacquard_common::xrpc::XrpcResp for CoverResponse {
     const NSID: &'static str = "org.atsui.Cover";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = CoverOutput<S>;
+    type Output<S: BosStr> = CoverOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for Cover<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Cover<S> {
     const NSID: &'static str = "org.atsui.Cover";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -82,7 +76,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for CoverRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = Cover<S>;
+    type Request<S: BosStr> = Cover<S>;
     type Response = CoverResponse;
 }
 
@@ -105,9 +99,9 @@ pub mod cover_state {
         type Src = Unset;
     }
     ///State transition - sets the `src` field to Set
-    pub struct SetSrc<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSrc<S> {}
-    impl<S: State> State for SetSrc<S> {
+    pub struct SetSrc<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSrc<St> {}
+    impl<St: State> State for SetSrc<St> {
         type Src = Set<members::src>;
     }
     /// Marker types for field names
@@ -118,32 +112,32 @@ pub mod cover_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct CoverBuilder<'a, S: cover_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct CoverBuilder<S: BosStr, St: cover_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>, Option<Data<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Cover<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> CoverBuilder<'a, cover_state::Empty> {
+impl<S: BosStr> Cover<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> CoverBuilder<S, cover_state::Empty> {
         CoverBuilder::new()
     }
 }
 
-impl<'a> CoverBuilder<'a, cover_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> CoverBuilder<S, cover_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         CoverBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: cover_state::State> CoverBuilder<'a, S> {
+impl<S: BosStr, St: cover_state::State> CoverBuilder<S, St> {
     /// Set the `did` field (optional)
     pub fn did(mut self, value: impl Into<Option<Did<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -156,40 +150,40 @@ impl<'a, S: cover_state::State> CoverBuilder<'a, S> {
     }
 }
 
-impl<'a, S> CoverBuilder<'a, S>
+impl<S: BosStr, St> CoverBuilder<S, St>
 where
-    S: cover_state::State,
-    S::Src: cover_state::IsUnset,
+    St: cover_state::State,
+    St::Src: cover_state::IsUnset,
 {
     /// Set the `src` field (required)
     pub fn src(
         mut self,
         value: impl Into<Data<S>>,
-    ) -> CoverBuilder<'a, cover_state::SetSrc<S>> {
+    ) -> CoverBuilder<S, cover_state::SetSrc<St>> {
         self._fields.1 = Option::Some(value.into());
         CoverBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CoverBuilder<'a, S>
+impl<S: BosStr, St> CoverBuilder<S, St>
 where
-    S: cover_state::State,
-    S::Src: cover_state::IsSet,
+    St: cover_state::State,
+    St::Src: cover_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Cover<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Cover<S> {
         Cover {
             did: self._fields.0,
             src: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Cover<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Cover<S> {
         Cover {
             did: self._fields.0,
             src: self._fields.1.unwrap(),

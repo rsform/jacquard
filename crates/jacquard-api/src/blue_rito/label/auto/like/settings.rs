@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use crate::blue_rito::label::auto::like::settings;
     rename = "blue.rito.label.auto.like.settings",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Settings<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Settings<S: BosStr = DefaultStr> {
     ///The post to apply the label to
     pub apply: settings::PostRef<S>,
     pub created_at: Datetime,
@@ -57,11 +57,11 @@ pub struct Settings<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SettingsGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SettingsGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
@@ -73,11 +73,11 @@ pub struct SettingsGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct PostRef<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct PostRef<S: BosStr = DefaultStr> {
     ///CID of the post
     pub cid: S,
     ///URI of the post
@@ -86,7 +86,7 @@ pub struct PostRef<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Settings<S> {
+impl<S: BosStr> Settings<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, SettingsRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -99,17 +99,17 @@ pub struct SettingsRecord;
 impl XrpcResp for SettingsRecord {
     const NSID: &'static str = "blue.rito.label.auto.like.settings";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = SettingsGetRecordOutput<S>;
+    type Output<S: BosStr> = SettingsGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<SettingsGetRecordOutput<S>> for Settings<S> {
+impl<S: BosStr> From<SettingsGetRecordOutput<S>> for Settings<S> {
     fn from(output: SettingsGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Settings<S> {
+impl<S: BosStr> Collection for Settings<S> {
     const NSID: &'static str = "blue.rito.label.auto.like.settings";
     type Record = SettingsRecord;
 }
@@ -119,7 +119,7 @@ impl Collection for SettingsRecord {
     type Record = SettingsRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Settings<S> {
+impl<S: BosStr> LexiconSchema for Settings<S> {
     fn nsid() -> &'static str {
         "blue.rito.label.auto.like.settings"
     }
@@ -134,7 +134,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Settings<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for PostRef<S> {
+impl<S: BosStr> LexiconSchema for PostRef<S> {
     fn nsid() -> &'static str {
         "blue.rito.label.auto.like.settings"
     }
@@ -170,17 +170,17 @@ pub mod settings_state {
         type Apply = Unset;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
-        type Apply = S::Apply;
+        type Apply = St::Apply;
     }
     ///State transition - sets the `apply` field to Set
-    pub struct SetApply<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetApply<S> {}
-    impl<S: State> State for SetApply<S> {
-        type CreatedAt = S::CreatedAt;
+    pub struct SetApply<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetApply<St> {}
+    impl<St: State> State for SetApply<St> {
+        type CreatedAt = St::CreatedAt;
         type Apply = Set<members::apply>;
     }
     /// Marker types for field names
@@ -193,74 +193,74 @@ pub mod settings_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct SettingsBuilder<'a, S: settings_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct SettingsBuilder<S: BosStr, St: settings_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<settings::PostRef<S>>,
         Option<Datetime>,
         Option<settings::PostRef<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Settings<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> SettingsBuilder<'a, settings_state::Empty> {
+impl<S: BosStr> Settings<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> SettingsBuilder<S, settings_state::Empty> {
         SettingsBuilder::new()
     }
 }
 
-impl<'a> SettingsBuilder<'a, settings_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> SettingsBuilder<S, settings_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SettingsBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SettingsBuilder<'a, S>
+impl<S: BosStr, St> SettingsBuilder<S, St>
 where
-    S: settings_state::State,
-    S::Apply: settings_state::IsUnset,
+    St: settings_state::State,
+    St::Apply: settings_state::IsUnset,
 {
     /// Set the `apply` field (required)
     pub fn apply(
         mut self,
         value: impl Into<settings::PostRef<S>>,
-    ) -> SettingsBuilder<'a, settings_state::SetApply<S>> {
+    ) -> SettingsBuilder<S, settings_state::SetApply<St>> {
         self._fields.0 = Option::Some(value.into());
         SettingsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SettingsBuilder<'a, S>
+impl<S: BosStr, St> SettingsBuilder<S, St>
 where
-    S: settings_state::State,
-    S::CreatedAt: settings_state::IsUnset,
+    St: settings_state::State,
+    St::CreatedAt: settings_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> SettingsBuilder<'a, settings_state::SetCreatedAt<S>> {
+    ) -> SettingsBuilder<S, settings_state::SetCreatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         SettingsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
+impl<S: BosStr, St: settings_state::State> SettingsBuilder<S, St> {
     /// Set the `delete` field (optional)
     pub fn delete(mut self, value: impl Into<Option<settings::PostRef<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -273,14 +273,14 @@ impl<'a, S: settings_state::State> SettingsBuilder<'a, S> {
     }
 }
 
-impl<'a, S> SettingsBuilder<'a, S>
+impl<S: BosStr, St> SettingsBuilder<S, St>
 where
-    S: settings_state::State,
-    S::CreatedAt: settings_state::IsSet,
-    S::Apply: settings_state::IsSet,
+    St: settings_state::State,
+    St::CreatedAt: settings_state::IsSet,
+    St::Apply: settings_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Settings<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Settings<S> {
         Settings {
             apply: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
@@ -288,11 +288,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Settings<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Settings<S> {
         Settings {
             apply: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
@@ -412,122 +409,119 @@ pub mod post_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
         type Cid;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
         type Cid = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Uri = Set<members::uri>;
-        type Cid = S::Cid;
+        type Uri = Unset;
     }
     ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Uri = S::Uri;
+    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCid<St> {}
+    impl<St: State> State for SetCid<St> {
         type Cid = Set<members::cid>;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Cid = St::Cid;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `cid` field
         pub struct cid(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct PostRefBuilder<'a, S: post_ref_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct PostRefBuilder<S: BosStr, St: post_ref_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<UriValue<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> PostRef<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> PostRefBuilder<'a, post_ref_state::Empty> {
+impl<S: BosStr> PostRef<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> PostRefBuilder<S, post_ref_state::Empty> {
         PostRefBuilder::new()
     }
 }
 
-impl<'a> PostRefBuilder<'a, post_ref_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> PostRefBuilder<S, post_ref_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         PostRefBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PostRefBuilder<'a, S>
+impl<S: BosStr, St> PostRefBuilder<S, St>
 where
-    S: post_ref_state::State,
-    S::Cid: post_ref_state::IsUnset,
+    St: post_ref_state::State,
+    St::Cid: post_ref_state::IsUnset,
 {
     /// Set the `cid` field (required)
     pub fn cid(
         mut self,
         value: impl Into<S>,
-    ) -> PostRefBuilder<'a, post_ref_state::SetCid<S>> {
+    ) -> PostRefBuilder<S, post_ref_state::SetCid<St>> {
         self._fields.0 = Option::Some(value.into());
         PostRefBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PostRefBuilder<'a, S>
+impl<S: BosStr, St> PostRefBuilder<S, St>
 where
-    S: post_ref_state::State,
-    S::Uri: post_ref_state::IsUnset,
+    St: post_ref_state::State,
+    St::Uri: post_ref_state::IsUnset,
 {
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> PostRefBuilder<'a, post_ref_state::SetUri<S>> {
+    ) -> PostRefBuilder<S, post_ref_state::SetUri<St>> {
         self._fields.1 = Option::Some(value.into());
         PostRefBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PostRefBuilder<'a, S>
+impl<S: BosStr, St> PostRefBuilder<S, St>
 where
-    S: post_ref_state::State,
-    S::Uri: post_ref_state::IsSet,
-    S::Cid: post_ref_state::IsSet,
+    St: post_ref_state::State,
+    St::Cid: post_ref_state::IsSet,
+    St::Uri: post_ref_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> PostRef<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> PostRef<S> {
         PostRef {
             cid: self._fields.0.unwrap(),
             uri: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> PostRef<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> PostRef<S> {
         PostRef {
             cid: self._fields.0.unwrap(),
             uri: self._fields.1.unwrap(),

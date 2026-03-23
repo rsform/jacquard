@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -28,14 +28,14 @@ use crate::at_inlay::Element;
 use crate::at_inlay::Response;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct List<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct List<S: BosStr = DefaultStr> {
     ///DID of the service that implements the query.
     pub did: Did<S>,
     ///Parameters to pass to the query.
@@ -43,28 +43,23 @@ pub struct List<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub input: Option<Data<S>>,
     ///XRPC query to call for pages of items.
     pub query: Nsid<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ListOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ListOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
-    #[serde(borrow)]
     pub value: Response<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -74,11 +69,11 @@ pub struct ListOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Page<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Page<S: BosStr = DefaultStr> {
     ///Opaque pagination token. Absent means no more items.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -93,12 +88,11 @@ pub struct ListResponse;
 impl jacquard_common::xrpc::XrpcResp for ListResponse {
     const NSID: &'static str = "org.atsui.List";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ListOutput<S>;
+    type Output<S: BosStr> = ListOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for List<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for List<S> {
     const NSID: &'static str = "org.atsui.List";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -113,11 +107,11 @@ impl jacquard_common::xrpc::XrpcEndpoint for ListRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = List<S>;
+    type Request<S: BosStr> = List<S>;
     type Response = ListResponse;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Page<S> {
+impl<S: BosStr> LexiconSchema for Page<S> {
     fn nsid() -> &'static str {
         "org.atsui.List"
     }
@@ -152,85 +146,85 @@ pub mod list_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
         type Query;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
         type Query = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Did = Set<members::did>;
-        type Query = S::Query;
+        type Did = Unset;
     }
     ///State transition - sets the `query` field to Set
-    pub struct SetQuery<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetQuery<S> {}
-    impl<S: State> State for SetQuery<S> {
-        type Did = S::Did;
+    pub struct SetQuery<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetQuery<St> {}
+    impl<St: State> State for SetQuery<St> {
         type Query = Set<members::query>;
+        type Did = St::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
+        type Query = St::Query;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `query` field
         pub struct query(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ListBuilder<'a, S: list_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ListBuilder<S: BosStr, St: list_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>, Option<Data<S>>, Option<Nsid<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> List<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ListBuilder<'a, list_state::Empty> {
+impl<S: BosStr> List<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ListBuilder<S, list_state::Empty> {
         ListBuilder::new()
     }
 }
 
-impl<'a> ListBuilder<'a, list_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ListBuilder<S, list_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ListBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ListBuilder<'a, S>
+impl<S: BosStr, St> ListBuilder<S, St>
 where
-    S: list_state::State,
-    S::Did: list_state::IsUnset,
+    St: list_state::State,
+    St::Did: list_state::IsUnset,
 {
     /// Set the `did` field (required)
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> ListBuilder<'a, list_state::SetDid<S>> {
+    ) -> ListBuilder<S, list_state::SetDid<St>> {
         self._fields.0 = Option::Some(value.into());
         ListBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: list_state::State> ListBuilder<'a, S> {
+impl<S: BosStr, St: list_state::State> ListBuilder<S, St> {
     /// Set the `input` field (optional)
     pub fn input(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -243,33 +237,33 @@ impl<'a, S: list_state::State> ListBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ListBuilder<'a, S>
+impl<S: BosStr, St> ListBuilder<S, St>
 where
-    S: list_state::State,
-    S::Query: list_state::IsUnset,
+    St: list_state::State,
+    St::Query: list_state::IsUnset,
 {
     /// Set the `query` field (required)
     pub fn query(
         mut self,
         value: impl Into<Nsid<S>>,
-    ) -> ListBuilder<'a, list_state::SetQuery<S>> {
+    ) -> ListBuilder<S, list_state::SetQuery<St>> {
         self._fields.2 = Option::Some(value.into());
         ListBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ListBuilder<'a, S>
+impl<S: BosStr, St> ListBuilder<S, St>
 where
-    S: list_state::State,
-    S::Did: list_state::IsSet,
-    S::Query: list_state::IsSet,
+    St: list_state::State,
+    St::Query: list_state::IsSet,
+    St::Did: list_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> List<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> List<S> {
         List {
             did: self._fields.0.unwrap(),
             input: self._fields.1,
@@ -277,8 +271,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> List<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> List<S> {
         List {
             did: self._fields.0.unwrap(),
             input: self._fields.1,
@@ -307,9 +301,9 @@ pub mod page_state {
         type Items = Unset;
     }
     ///State transition - sets the `items` field to Set
-    pub struct SetItems<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetItems<S> {}
-    impl<S: State> State for SetItems<S> {
+    pub struct SetItems<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetItems<St> {}
+    impl<St: State> State for SetItems<St> {
         type Items = Set<members::items>;
     }
     /// Marker types for field names
@@ -320,32 +314,32 @@ pub mod page_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct PageBuilder<'a, S: page_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct PageBuilder<S: BosStr, St: page_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<Vec<Element<S>>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Page<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> PageBuilder<'a, page_state::Empty> {
+impl<S: BosStr> Page<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> PageBuilder<S, page_state::Empty> {
         PageBuilder::new()
     }
 }
 
-impl<'a> PageBuilder<'a, page_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> PageBuilder<S, page_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         PageBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: page_state::State> PageBuilder<'a, S> {
+impl<S: BosStr, St: page_state::State> PageBuilder<S, St> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -358,40 +352,40 @@ impl<'a, S: page_state::State> PageBuilder<'a, S> {
     }
 }
 
-impl<'a, S> PageBuilder<'a, S>
+impl<S: BosStr, St> PageBuilder<S, St>
 where
-    S: page_state::State,
-    S::Items: page_state::IsUnset,
+    St: page_state::State,
+    St::Items: page_state::IsUnset,
 {
     /// Set the `items` field (required)
     pub fn items(
         mut self,
         value: impl Into<Vec<Element<S>>>,
-    ) -> PageBuilder<'a, page_state::SetItems<S>> {
+    ) -> PageBuilder<S, page_state::SetItems<St>> {
         self._fields.1 = Option::Some(value.into());
         PageBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PageBuilder<'a, S>
+impl<S: BosStr, St> PageBuilder<S, St>
 where
-    S: page_state::State,
-    S::Items: page_state::IsSet,
+    St: page_state::State,
+    St::Items: page_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Page<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Page<S> {
         Page {
             cursor: self._fields.0,
             items: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Page<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Page<S> {
         Page {
             cursor: self._fields.0,
             items: self._fields.1.unwrap(),

@@ -4,9 +4,10 @@ use proc_macro2::TokenStream;
 use quote::quote;
 use syn::{Data, DeriveInput, Fields, parse2};
 
-use super::helpers::{conflicts_with_builder_macro, has_derive_builder};
-
-/// Implementation for the lexicon attribute macro
+/// Implementation for the lexicon attribute macro.
+///
+/// Detects whether the struct uses a type parameter `S` (BOS pattern) or a lifetime `'a`,
+/// and emits the appropriate `extra_data` field.
 pub fn impl_lexicon(_attr: TokenStream, item: TokenStream) -> TokenStream {
     let mut input = match parse2::<DeriveInput>(item) {
         Ok(input) => input,
@@ -23,40 +24,35 @@ pub fn impl_lexicon(_attr: TokenStream, item: TokenStream) -> TokenStream {
                     .any(|f| f.ident.as_ref().map(|i| i == "extra_data").unwrap_or(false));
 
                 if !has_extra_data {
-                    // Check if the struct derives bon::Builder and doesn't conflict with builder macro
-                    let has_bon_builder = has_derive_builder(&input.attrs)
-                        && !conflicts_with_builder_macro(&input.ident);
+                    // Check for a type parameter first (BOS pattern), then fall back to lifetime.
+                    let has_type_param = input.generics.type_params().next().is_some();
 
-                    // Determine the lifetime parameter to use
-                    let lifetime = if let Some(lt) = input.generics.lifetimes().next() {
+                    let data_param = if has_type_param {
+                        // Use the first type parameter (typically S).
+                        let tp = input.generics.type_params().next().unwrap().ident.clone();
+                        quote! { #tp }
+                    } else if let Some(lt) = input.generics.lifetimes().next() {
                         quote! { #lt }
                     } else {
                         quote! { 'static }
                     };
 
-                    // Add the extra_data field with serde(borrow) if there's a lifetime
-                    let new_field: syn::Field = if has_bon_builder {
-                        syn::parse_quote! {
-                            #[serde(flatten)]
-                            #[serde(borrow)]
-                            #[serde(skip_serializing_if = "Option::is_none")]
-                            #[serde(default)]
-                            pub extra_data: ::core::option::Option<::alloc::collections::BTreeMap<
-                                ::jacquard_common::deps::smol_str::SmolStr,
-                                ::jacquard_common::types::value::Data<#lifetime>
-                            >>
-                        }
+                    // Only add serde(borrow) for lifetime-parameterised types, not type-parameterised.
+                    let borrow_attr = if has_type_param {
+                        quote! {}
                     } else {
-                        syn::parse_quote! {
-                            #[serde(flatten)]
-                            #[serde(borrow)]
-                            #[serde(skip_serializing_if = "Option::is_none")]
-                            #[serde(default)]
-                            pub extra_data: ::core::option::Option<::alloc::collections::BTreeMap<
-                                ::jacquard_common::deps::smol_str::SmolStr,
-                                ::jacquard_common::types::value::Data<#lifetime>
-                            >>
-                        }
+                        quote! { #[serde(borrow)] }
+                    };
+
+                    let new_field: syn::Field = syn::parse_quote! {
+                        #[serde(flatten)]
+                        #borrow_attr
+                        #[serde(skip_serializing_if = "Option::is_none")]
+                        #[serde(default)]
+                        pub extra_data: ::core::option::Option<::alloc::collections::BTreeMap<
+                            ::jacquard_common::deps::smol_str::SmolStr,
+                            ::jacquard_common::types::value::Data<#data_param>
+                        >>
                     };
                     fields.named.push(new_field);
                 }

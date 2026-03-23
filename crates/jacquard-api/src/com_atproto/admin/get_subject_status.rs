@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, AtUri, Cid};
 use jacquard_common::types::value::Data;
@@ -22,43 +22,38 @@ use crate::com_atproto::admin::StatusAttr;
 use crate::com_atproto::repo::strong_ref::StrongRef;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetSubjectStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetSubjectStatus<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub blob: Option<Cid<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub did: Option<Did<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub uri: Option<AtUri<S>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetSubjectStatusOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetSubjectStatusOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub deactivated: Option<StatusAttr<S>>,
     pub subject: GetSubjectStatusOutputSubject<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub takedown: Option<StatusAttr<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -68,11 +63,11 @@ pub struct GetSubjectStatusOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum GetSubjectStatusOutputSubject<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum GetSubjectStatusOutputSubject<S: BosStr = DefaultStr> {
     #[serde(rename = "com.atproto.admin.defs#repoRef")]
     RepoRef(Box<RepoRef<S>>),
     #[serde(rename = "com.atproto.repo.strongRef")]
@@ -86,12 +81,11 @@ pub struct GetSubjectStatusResponse;
 impl jacquard_common::xrpc::XrpcResp for GetSubjectStatusResponse {
     const NSID: &'static str = "com.atproto.admin.getSubjectStatus";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetSubjectStatusOutput<S>;
+    type Output<S: BosStr> = GetSubjectStatusOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetSubjectStatus<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetSubjectStatus<S> {
     const NSID: &'static str = "com.atproto.admin.getSubjectStatus";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetSubjectStatusResponse;
@@ -102,7 +96,7 @@ pub struct GetSubjectStatusRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetSubjectStatusRequest {
     const PATH: &'static str = "/xrpc/com.atproto.admin.getSubjectStatus";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetSubjectStatus<S>;
+    type Request<S: BosStr> = GetSubjectStatus<S>;
     type Response = GetSubjectStatusResponse;
 }
 
@@ -125,32 +119,32 @@ pub mod get_subject_status_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetSubjectStatusBuilder<'a, S: get_subject_status_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetSubjectStatusBuilder<S: BosStr, St: get_subject_status_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Cid<S>>, Option<Did<S>>, Option<AtUri<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetSubjectStatus<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetSubjectStatusBuilder<'a, get_subject_status_state::Empty> {
+impl<S: BosStr> GetSubjectStatus<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetSubjectStatusBuilder<S, get_subject_status_state::Empty> {
         GetSubjectStatusBuilder::new()
     }
 }
 
-impl<'a> GetSubjectStatusBuilder<'a, get_subject_status_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetSubjectStatusBuilder<S, get_subject_status_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetSubjectStatusBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: get_subject_status_state::State> GetSubjectStatusBuilder<'a, S> {
+impl<S: BosStr, St: get_subject_status_state::State> GetSubjectStatusBuilder<S, St> {
     /// Set the `blob` field (optional)
     pub fn blob(mut self, value: impl Into<Option<Cid<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -163,7 +157,7 @@ impl<'a, S: get_subject_status_state::State> GetSubjectStatusBuilder<'a, S> {
     }
 }
 
-impl<'a, S: get_subject_status_state::State> GetSubjectStatusBuilder<'a, S> {
+impl<S: BosStr, St: get_subject_status_state::State> GetSubjectStatusBuilder<S, St> {
     /// Set the `did` field (optional)
     pub fn did(mut self, value: impl Into<Option<Did<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -176,7 +170,7 @@ impl<'a, S: get_subject_status_state::State> GetSubjectStatusBuilder<'a, S> {
     }
 }
 
-impl<'a, S: get_subject_status_state::State> GetSubjectStatusBuilder<'a, S> {
+impl<S: BosStr, St: get_subject_status_state::State> GetSubjectStatusBuilder<S, St> {
     /// Set the `uri` field (optional)
     pub fn uri(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -189,12 +183,12 @@ impl<'a, S: get_subject_status_state::State> GetSubjectStatusBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GetSubjectStatusBuilder<'a, S>
+impl<S: BosStr, St> GetSubjectStatusBuilder<S, St>
 where
-    S: get_subject_status_state::State,
+    St: get_subject_status_state::State,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetSubjectStatus<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetSubjectStatus<S> {
         GetSubjectStatus {
             blob: self._fields.0,
             did: self._fields.1,

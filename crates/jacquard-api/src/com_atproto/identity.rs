@@ -21,7 +21,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -40,11 +40,11 @@ use serde::{Serialize, Deserialize};
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct IdentityInfo<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct IdentityInfo<S: BosStr = DefaultStr> {
     pub did: Did<S>,
     ///The complete DID document for the identity.
     pub did_doc: Data<S>,
@@ -54,7 +54,7 @@ pub struct IdentityInfo<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for IdentityInfo<S> {
+impl<S: BosStr> LexiconSchema for IdentityInfo<S> {
     fn nsid() -> &'static str {
         "com.atproto.identity.defs"
     }
@@ -79,145 +79,145 @@ pub mod identity_info_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type DidDoc;
         type Did;
         type Handle;
+        type DidDoc;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type DidDoc = Unset;
         type Did = Unset;
         type Handle = Unset;
-    }
-    ///State transition - sets the `did_doc` field to Set
-    pub struct SetDidDoc<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDidDoc<S> {}
-    impl<S: State> State for SetDidDoc<S> {
-        type DidDoc = Set<members::did_doc>;
-        type Did = S::Did;
-        type Handle = S::Handle;
+        type DidDoc = Unset;
     }
     ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type DidDoc = S::DidDoc;
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
         type Did = Set<members::did>;
-        type Handle = S::Handle;
+        type Handle = St::Handle;
+        type DidDoc = St::DidDoc;
     }
     ///State transition - sets the `handle` field to Set
-    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHandle<S> {}
-    impl<S: State> State for SetHandle<S> {
-        type DidDoc = S::DidDoc;
-        type Did = S::Did;
+    pub struct SetHandle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHandle<St> {}
+    impl<St: State> State for SetHandle<St> {
+        type Did = St::Did;
         type Handle = Set<members::handle>;
+        type DidDoc = St::DidDoc;
+    }
+    ///State transition - sets the `did_doc` field to Set
+    pub struct SetDidDoc<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDidDoc<St> {}
+    impl<St: State> State for SetDidDoc<St> {
+        type Did = St::Did;
+        type Handle = St::Handle;
+        type DidDoc = Set<members::did_doc>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did_doc` field
-        pub struct did_doc(());
         ///Marker type for the `did` field
         pub struct did(());
         ///Marker type for the `handle` field
         pub struct handle(());
+        ///Marker type for the `did_doc` field
+        pub struct did_doc(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct IdentityInfoBuilder<'a, S: identity_info_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct IdentityInfoBuilder<S: BosStr, St: identity_info_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>, Option<Data<S>>, Option<Handle<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> IdentityInfo<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> IdentityInfoBuilder<'a, identity_info_state::Empty> {
+impl<S: BosStr> IdentityInfo<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> IdentityInfoBuilder<S, identity_info_state::Empty> {
         IdentityInfoBuilder::new()
     }
 }
 
-impl<'a> IdentityInfoBuilder<'a, identity_info_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> IdentityInfoBuilder<S, identity_info_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         IdentityInfoBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> IdentityInfoBuilder<'a, S>
+impl<S: BosStr, St> IdentityInfoBuilder<S, St>
 where
-    S: identity_info_state::State,
-    S::Did: identity_info_state::IsUnset,
+    St: identity_info_state::State,
+    St::Did: identity_info_state::IsUnset,
 {
     /// Set the `did` field (required)
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> IdentityInfoBuilder<'a, identity_info_state::SetDid<S>> {
+    ) -> IdentityInfoBuilder<S, identity_info_state::SetDid<St>> {
         self._fields.0 = Option::Some(value.into());
         IdentityInfoBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> IdentityInfoBuilder<'a, S>
+impl<S: BosStr, St> IdentityInfoBuilder<S, St>
 where
-    S: identity_info_state::State,
-    S::DidDoc: identity_info_state::IsUnset,
+    St: identity_info_state::State,
+    St::DidDoc: identity_info_state::IsUnset,
 {
     /// Set the `didDoc` field (required)
     pub fn did_doc(
         mut self,
         value: impl Into<Data<S>>,
-    ) -> IdentityInfoBuilder<'a, identity_info_state::SetDidDoc<S>> {
+    ) -> IdentityInfoBuilder<S, identity_info_state::SetDidDoc<St>> {
         self._fields.1 = Option::Some(value.into());
         IdentityInfoBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> IdentityInfoBuilder<'a, S>
+impl<S: BosStr, St> IdentityInfoBuilder<S, St>
 where
-    S: identity_info_state::State,
-    S::Handle: identity_info_state::IsUnset,
+    St: identity_info_state::State,
+    St::Handle: identity_info_state::IsUnset,
 {
     /// Set the `handle` field (required)
     pub fn handle(
         mut self,
         value: impl Into<Handle<S>>,
-    ) -> IdentityInfoBuilder<'a, identity_info_state::SetHandle<S>> {
+    ) -> IdentityInfoBuilder<S, identity_info_state::SetHandle<St>> {
         self._fields.2 = Option::Some(value.into());
         IdentityInfoBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> IdentityInfoBuilder<'a, S>
+impl<S: BosStr, St> IdentityInfoBuilder<S, St>
 where
-    S: identity_info_state::State,
-    S::DidDoc: identity_info_state::IsSet,
-    S::Did: identity_info_state::IsSet,
-    S::Handle: identity_info_state::IsSet,
+    St: identity_info_state::State,
+    St::Did: identity_info_state::IsSet,
+    St::Handle: identity_info_state::IsSet,
+    St::DidDoc: identity_info_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> IdentityInfo<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> IdentityInfo<S> {
         IdentityInfo {
             did: self._fields.0.unwrap(),
             did_doc: self._fields.1.unwrap(),
@@ -225,11 +225,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> IdentityInfo<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> IdentityInfo<S> {
         IdentityInfo {
             did: self._fields.0.unwrap(),
             did_doc: self._fields.1.unwrap(),

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "place.stream.multistream.target",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Target<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Target<S: BosStr = DefaultStr> {
     ///Whether this target is currently active.
     pub active: bool,
     ///When this target was created.
@@ -59,18 +59,18 @@ pub struct Target<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct TargetGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct TargetGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Target<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Target<S> {
+impl<S: BosStr> Target<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, TargetRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -83,17 +83,17 @@ pub struct TargetRecord;
 impl XrpcResp for TargetRecord {
     const NSID: &'static str = "place.stream.multistream.target";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = TargetGetRecordOutput<S>;
+    type Output<S: BosStr> = TargetGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<TargetGetRecordOutput<S>> for Target<S> {
+impl<S: BosStr> From<TargetGetRecordOutput<S>> for Target<S> {
     fn from(output: TargetGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Target<S> {
+impl<S: BosStr> Collection for Target<S> {
     const NSID: &'static str = "place.stream.multistream.target";
     type Record = TargetRecord;
 }
@@ -103,7 +103,7 @@ impl Collection for TargetRecord {
     type Record = TargetRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Target<S> {
+impl<S: BosStr> LexiconSchema for Target<S> {
     fn nsid() -> &'static str {
         "place.stream.multistream.target"
     }
@@ -138,118 +138,118 @@ pub mod target_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
         type Active;
         type Url;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
         type Active = Unset;
         type Url = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `active` field to Set
-    pub struct SetActive<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetActive<S> {}
-    impl<S: State> State for SetActive<S> {
-        type Active = Set<members::active>;
-        type Url = S::Url;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrl<S> {}
-    impl<S: State> State for SetUrl<S> {
-        type Active = S::Active;
-        type Url = Set<members::url>;
-        type CreatedAt = S::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Active = S::Active;
-        type Url = S::Url;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
+        type Active = St::Active;
+        type Url = St::Url;
+    }
+    ///State transition - sets the `active` field to Set
+    pub struct SetActive<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetActive<St> {}
+    impl<St: State> State for SetActive<St> {
+        type CreatedAt = St::CreatedAt;
+        type Active = Set<members::active>;
+        type Url = St::Url;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUrl<St> {}
+    impl<St: State> State for SetUrl<St> {
+        type CreatedAt = St::CreatedAt;
+        type Active = St::Active;
+        type Url = Set<members::url>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `active` field
         pub struct active(());
         ///Marker type for the `url` field
         pub struct url(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct TargetBuilder<'a, S: target_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct TargetBuilder<S: BosStr, St: target_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<bool>, Option<Datetime>, Option<S>, Option<UriValue<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Target<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> TargetBuilder<'a, target_state::Empty> {
+impl<S: BosStr> Target<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> TargetBuilder<S, target_state::Empty> {
         TargetBuilder::new()
     }
 }
 
-impl<'a> TargetBuilder<'a, target_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> TargetBuilder<S, target_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         TargetBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> TargetBuilder<'a, S>
+impl<S: BosStr, St> TargetBuilder<S, St>
 where
-    S: target_state::State,
-    S::Active: target_state::IsUnset,
+    St: target_state::State,
+    St::Active: target_state::IsUnset,
 {
     /// Set the `active` field (required)
     pub fn active(
         mut self,
         value: impl Into<bool>,
-    ) -> TargetBuilder<'a, target_state::SetActive<S>> {
+    ) -> TargetBuilder<S, target_state::SetActive<St>> {
         self._fields.0 = Option::Some(value.into());
         TargetBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> TargetBuilder<'a, S>
+impl<S: BosStr, St> TargetBuilder<S, St>
 where
-    S: target_state::State,
-    S::CreatedAt: target_state::IsUnset,
+    St: target_state::State,
+    St::CreatedAt: target_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> TargetBuilder<'a, target_state::SetCreatedAt<S>> {
+    ) -> TargetBuilder<S, target_state::SetCreatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         TargetBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: target_state::State> TargetBuilder<'a, S> {
+impl<S: BosStr, St: target_state::State> TargetBuilder<S, St> {
     /// Set the `name` field (optional)
     pub fn name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -262,34 +262,34 @@ impl<'a, S: target_state::State> TargetBuilder<'a, S> {
     }
 }
 
-impl<'a, S> TargetBuilder<'a, S>
+impl<S: BosStr, St> TargetBuilder<S, St>
 where
-    S: target_state::State,
-    S::Url: target_state::IsUnset,
+    St: target_state::State,
+    St::Url: target_state::IsUnset,
 {
     /// Set the `url` field (required)
     pub fn url(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> TargetBuilder<'a, target_state::SetUrl<S>> {
+    ) -> TargetBuilder<S, target_state::SetUrl<St>> {
         self._fields.3 = Option::Some(value.into());
         TargetBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> TargetBuilder<'a, S>
+impl<S: BosStr, St> TargetBuilder<S, St>
 where
-    S: target_state::State,
-    S::Active: target_state::IsSet,
-    S::Url: target_state::IsSet,
-    S::CreatedAt: target_state::IsSet,
+    St: target_state::State,
+    St::CreatedAt: target_state::IsSet,
+    St::Active: target_state::IsSet,
+    St::Url: target_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Target<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Target<S> {
         Target {
             active: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
@@ -298,8 +298,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Target<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Target<S> {
         Target {
             active: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),

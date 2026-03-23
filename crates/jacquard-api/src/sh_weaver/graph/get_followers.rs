@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::value::Data;
@@ -19,18 +19,16 @@ use serde::{Serialize, Deserialize};
 use crate::sh_weaver::actor::ProfileViewBasic;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetFollowers<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct GetFollowers<S: BosStr = DefaultStr> {
     pub actor: AtIdentifier<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub cursor: Option<S>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
@@ -40,21 +38,19 @@ pub struct GetFollowers<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetFollowersOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetFollowersOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
     pub followers: Vec<ProfileViewBasic<S>>,
     pub subject: ProfileViewBasic<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -63,12 +59,11 @@ pub struct GetFollowersResponse;
 impl jacquard_common::xrpc::XrpcResp for GetFollowersResponse {
     const NSID: &'static str = "sh.weaver.graph.getFollowers";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetFollowersOutput<S>;
+    type Output<S: BosStr> = GetFollowersOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetFollowers<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetFollowers<S> {
     const NSID: &'static str = "sh.weaver.graph.getFollowers";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetFollowersResponse;
@@ -79,7 +74,7 @@ pub struct GetFollowersRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetFollowersRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.graph.getFollowers";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetFollowers<S>;
+    type Request<S: BosStr> = GetFollowers<S>;
     type Response = GetFollowersResponse;
 }
 
@@ -106,9 +101,9 @@ pub mod get_followers_state {
         type Actor = Unset;
     }
     ///State transition - sets the `actor` field to Set
-    pub struct SetActor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetActor<S> {}
-    impl<S: State> State for SetActor<S> {
+    pub struct SetActor<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetActor<St> {}
+    impl<St: State> State for SetActor<St> {
         type Actor = Set<members::actor>;
     }
     /// Marker types for field names
@@ -119,51 +114,51 @@ pub mod get_followers_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetFollowersBuilder<'a, S: get_followers_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetFollowersBuilder<S: BosStr, St: get_followers_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtIdentifier<S>>, Option<S>, Option<i64>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetFollowers<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetFollowersBuilder<'a, get_followers_state::Empty> {
+impl<S: BosStr> GetFollowers<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetFollowersBuilder<S, get_followers_state::Empty> {
         GetFollowersBuilder::new()
     }
 }
 
-impl<'a> GetFollowersBuilder<'a, get_followers_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetFollowersBuilder<S, get_followers_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetFollowersBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetFollowersBuilder<'a, S>
+impl<S: BosStr, St> GetFollowersBuilder<S, St>
 where
-    S: get_followers_state::State,
-    S::Actor: get_followers_state::IsUnset,
+    St: get_followers_state::State,
+    St::Actor: get_followers_state::IsUnset,
 {
     /// Set the `actor` field (required)
     pub fn actor(
         mut self,
         value: impl Into<AtIdentifier<S>>,
-    ) -> GetFollowersBuilder<'a, get_followers_state::SetActor<S>> {
+    ) -> GetFollowersBuilder<S, get_followers_state::SetActor<St>> {
         self._fields.0 = Option::Some(value.into());
         GetFollowersBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: get_followers_state::State> GetFollowersBuilder<'a, S> {
+impl<S: BosStr, St: get_followers_state::State> GetFollowersBuilder<S, St> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -176,7 +171,7 @@ impl<'a, S: get_followers_state::State> GetFollowersBuilder<'a, S> {
     }
 }
 
-impl<'a, S: get_followers_state::State> GetFollowersBuilder<'a, S> {
+impl<S: BosStr, St: get_followers_state::State> GetFollowersBuilder<S, St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -189,13 +184,13 @@ impl<'a, S: get_followers_state::State> GetFollowersBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GetFollowersBuilder<'a, S>
+impl<S: BosStr, St> GetFollowersBuilder<S, St>
 where
-    S: get_followers_state::State,
-    S::Actor: get_followers_state::IsSet,
+    St: get_followers_state::State,
+    St::Actor: get_followers_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetFollowers<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetFollowers<S> {
         GetFollowers {
             actor: self._fields.0.unwrap(),
             cursor: self._fields.1,

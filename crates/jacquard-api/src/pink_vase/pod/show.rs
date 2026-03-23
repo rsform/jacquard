@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use serde::{Serialize, Deserialize};
     rename = "pink.vase.pod.show",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Show<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Show<S: BosStr = DefaultStr> {
     ///Podcast categories e.g. 'Technology', 'Comedy'.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub categories: Option<Vec<S>>,
@@ -70,18 +70,18 @@ pub struct Show<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ShowGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ShowGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Show<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Show<S> {
+impl<S: BosStr> Show<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, ShowRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -94,17 +94,17 @@ pub struct ShowRecord;
 impl XrpcResp for ShowRecord {
     const NSID: &'static str = "pink.vase.pod.show";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ShowGetRecordOutput<S>;
+    type Output<S: BosStr> = ShowGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<ShowGetRecordOutput<S>> for Show<S> {
+impl<S: BosStr> From<ShowGetRecordOutput<S>> for Show<S> {
     fn from(output: ShowGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Show<S> {
+impl<S: BosStr> Collection for Show<S> {
     const NSID: &'static str = "pink.vase.pod.show";
     type Record = ShowRecord;
 }
@@ -114,7 +114,7 @@ impl Collection for ShowRecord {
     type Record = ShowRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Show<S> {
+impl<S: BosStr> LexiconSchema for Show<S> {
     fn nsid() -> &'static str {
         "pink.vase.pod.show"
     }
@@ -211,43 +211,43 @@ pub mod show_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Name;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Name = S::Name;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type CreatedAt = S::CreatedAt;
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
         type Name = Set<members::name>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Name = St::Name;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ShowBuilder<'a, S: show_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ShowBuilder<S: BosStr, St: show_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<S>>,
         Option<BlobRef<S>>,
@@ -258,28 +258,28 @@ pub struct ShowBuilder<'a, S: show_state::State> {
         Option<S>,
         Option<UriValue<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Show<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ShowBuilder<'a, show_state::Empty> {
+impl<S: BosStr> Show<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ShowBuilder<S, show_state::Empty> {
         ShowBuilder::new()
     }
 }
 
-impl<'a> ShowBuilder<'a, show_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ShowBuilder<S, show_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ShowBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: show_state::State> ShowBuilder<'a, S> {
+impl<S: BosStr, St: show_state::State> ShowBuilder<S, St> {
     /// Set the `categories` field (optional)
     pub fn categories(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -292,7 +292,7 @@ impl<'a, S: show_state::State> ShowBuilder<'a, S> {
     }
 }
 
-impl<'a, S: show_state::State> ShowBuilder<'a, S> {
+impl<S: BosStr, St: show_state::State> ShowBuilder<S, St> {
     /// Set the `coverArt` field (optional)
     pub fn cover_art(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -305,26 +305,26 @@ impl<'a, S: show_state::State> ShowBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ShowBuilder<'a, S>
+impl<S: BosStr, St> ShowBuilder<S, St>
 where
-    S: show_state::State,
-    S::CreatedAt: show_state::IsUnset,
+    St: show_state::State,
+    St::CreatedAt: show_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ShowBuilder<'a, show_state::SetCreatedAt<S>> {
+    ) -> ShowBuilder<S, show_state::SetCreatedAt<St>> {
         self._fields.2 = Option::Some(value.into());
         ShowBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: show_state::State> ShowBuilder<'a, S> {
+impl<S: BosStr, St: show_state::State> ShowBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -337,7 +337,7 @@ impl<'a, S: show_state::State> ShowBuilder<'a, S> {
     }
 }
 
-impl<'a, S: show_state::State> ShowBuilder<'a, S> {
+impl<S: BosStr, St: show_state::State> ShowBuilder<S, St> {
     /// Set the `explicit` field (optional)
     pub fn explicit(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.4 = value.into();
@@ -350,7 +350,7 @@ impl<'a, S: show_state::State> ShowBuilder<'a, S> {
     }
 }
 
-impl<'a, S: show_state::State> ShowBuilder<'a, S> {
+impl<S: BosStr, St: show_state::State> ShowBuilder<S, St> {
     /// Set the `language` field (optional)
     pub fn language(mut self, value: impl Into<Option<Language>>) -> Self {
         self._fields.5 = value.into();
@@ -363,26 +363,26 @@ impl<'a, S: show_state::State> ShowBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ShowBuilder<'a, S>
+impl<S: BosStr, St> ShowBuilder<S, St>
 where
-    S: show_state::State,
-    S::Name: show_state::IsUnset,
+    St: show_state::State,
+    St::Name: show_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> ShowBuilder<'a, show_state::SetName<S>> {
+    ) -> ShowBuilder<S, show_state::SetName<St>> {
         self._fields.6 = Option::Some(value.into());
         ShowBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: show_state::State> ShowBuilder<'a, S> {
+impl<S: BosStr, St: show_state::State> ShowBuilder<S, St> {
     /// Set the `websiteUrl` field (optional)
     pub fn website_url(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.7 = value.into();
@@ -395,14 +395,14 @@ impl<'a, S: show_state::State> ShowBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ShowBuilder<'a, S>
+impl<S: BosStr, St> ShowBuilder<S, St>
 where
-    S: show_state::State,
-    S::CreatedAt: show_state::IsSet,
-    S::Name: show_state::IsSet,
+    St: show_state::State,
+    St::Name: show_state::IsSet,
+    St::CreatedAt: show_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Show<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Show<S> {
         Show {
             categories: self._fields.0,
             cover_art: self._fields.1,
@@ -415,8 +415,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Show<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Show<S> {
         Show {
             categories: self._fields.0,
             cover_art: self._fields.1,

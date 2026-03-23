@@ -6,7 +6,13 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[allow(unused_imports)]
+use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 /// XRPC request marker type.
@@ -18,7 +24,7 @@ pub struct DestroyRepoResponse;
 impl jacquard_common::xrpc::XrpcResp for DestroyRepoResponse {
     const NSID: &'static str = "ooo.bsky.authfetch.destroyRepo";
     const ENCODING: &'static str = "application/json";
-    type Output<S: jacquard_common::Bos<str> + AsRef<str>> = ();
+    type Output<S: BosStr> = ();
     type Err = jacquard_common::xrpc::GenericError;
 }
 
@@ -37,6 +43,6 @@ impl jacquard_common::xrpc::XrpcEndpoint for DestroyRepoRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: jacquard_common::Bos<str> + AsRef<str>> = DestroyRepo;
+    type Request<S: BosStr> = DestroyRepo;
     type Response = DestroyRepoResponse;
 }

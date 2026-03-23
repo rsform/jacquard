@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -30,11 +30,11 @@ use serde::{Serialize, Deserialize};
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct WebBookmark<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct WebBookmark<S: BosStr = DefaultStr> {
     ///Page description/excerpt
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
@@ -52,7 +52,7 @@ pub struct WebBookmark<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for WebBookmark<S> {
+impl<S: BosStr> LexiconSchema for WebBookmark<S> {
     fn nsid() -> &'static str {
         "app.offprint.block.webBookmark"
     }
@@ -152,66 +152,66 @@ pub mod web_bookmark_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Href;
         type Title;
+        type Href;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Href = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `href` field to Set
-    pub struct SetHref<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHref<S> {}
-    impl<S: State> State for SetHref<S> {
-        type Href = Set<members::href>;
-        type Title = S::Title;
+        type Href = Unset;
     }
     ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Href = S::Href;
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
         type Title = Set<members::title>;
+        type Href = St::Href;
+    }
+    ///State transition - sets the `href` field to Set
+    pub struct SetHref<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHref<St> {}
+    impl<St: State> State for SetHref<St> {
+        type Title = St::Title;
+        type Href = Set<members::href>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `href` field
-        pub struct href(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `href` field
+        pub struct href(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct WebBookmarkBuilder<'a, S: web_bookmark_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct WebBookmarkBuilder<S: BosStr, St: web_bookmark_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<UriValue<S>>, Option<BlobRef<S>>, Option<S>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> WebBookmark<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> WebBookmarkBuilder<'a, web_bookmark_state::Empty> {
+impl<S: BosStr> WebBookmark<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> WebBookmarkBuilder<S, web_bookmark_state::Empty> {
         WebBookmarkBuilder::new()
     }
 }
 
-impl<'a> WebBookmarkBuilder<'a, web_bookmark_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> WebBookmarkBuilder<S, web_bookmark_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         WebBookmarkBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: web_bookmark_state::State> WebBookmarkBuilder<'a, S> {
+impl<S: BosStr, St: web_bookmark_state::State> WebBookmarkBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -224,26 +224,26 @@ impl<'a, S: web_bookmark_state::State> WebBookmarkBuilder<'a, S> {
     }
 }
 
-impl<'a, S> WebBookmarkBuilder<'a, S>
+impl<S: BosStr, St> WebBookmarkBuilder<S, St>
 where
-    S: web_bookmark_state::State,
-    S::Href: web_bookmark_state::IsUnset,
+    St: web_bookmark_state::State,
+    St::Href: web_bookmark_state::IsUnset,
 {
     /// Set the `href` field (required)
     pub fn href(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> WebBookmarkBuilder<'a, web_bookmark_state::SetHref<S>> {
+    ) -> WebBookmarkBuilder<S, web_bookmark_state::SetHref<St>> {
         self._fields.1 = Option::Some(value.into());
         WebBookmarkBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: web_bookmark_state::State> WebBookmarkBuilder<'a, S> {
+impl<S: BosStr, St: web_bookmark_state::State> WebBookmarkBuilder<S, St> {
     /// Set the `preview` field (optional)
     pub fn preview(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -256,7 +256,7 @@ impl<'a, S: web_bookmark_state::State> WebBookmarkBuilder<'a, S> {
     }
 }
 
-impl<'a, S: web_bookmark_state::State> WebBookmarkBuilder<'a, S> {
+impl<S: BosStr, St: web_bookmark_state::State> WebBookmarkBuilder<S, St> {
     /// Set the `siteName` field (optional)
     pub fn site_name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -269,33 +269,33 @@ impl<'a, S: web_bookmark_state::State> WebBookmarkBuilder<'a, S> {
     }
 }
 
-impl<'a, S> WebBookmarkBuilder<'a, S>
+impl<S: BosStr, St> WebBookmarkBuilder<S, St>
 where
-    S: web_bookmark_state::State,
-    S::Title: web_bookmark_state::IsUnset,
+    St: web_bookmark_state::State,
+    St::Title: web_bookmark_state::IsUnset,
 {
     /// Set the `title` field (required)
     pub fn title(
         mut self,
         value: impl Into<S>,
-    ) -> WebBookmarkBuilder<'a, web_bookmark_state::SetTitle<S>> {
+    ) -> WebBookmarkBuilder<S, web_bookmark_state::SetTitle<St>> {
         self._fields.4 = Option::Some(value.into());
         WebBookmarkBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> WebBookmarkBuilder<'a, S>
+impl<S: BosStr, St> WebBookmarkBuilder<S, St>
 where
-    S: web_bookmark_state::State,
-    S::Href: web_bookmark_state::IsSet,
-    S::Title: web_bookmark_state::IsSet,
+    St: web_bookmark_state::State,
+    St::Title: web_bookmark_state::IsSet,
+    St::Href: web_bookmark_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> WebBookmark<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> WebBookmark<S> {
         WebBookmark {
             description: self._fields.0,
             href: self._fields.1.unwrap(),
@@ -305,11 +305,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> WebBookmark<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> WebBookmark<S> {
         WebBookmark {
             description: self._fields.0,
             href: self._fields.1.unwrap(),

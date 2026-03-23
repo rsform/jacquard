@@ -10,28 +10,26 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct AddValues<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct AddValues<S: BosStr = DefaultStr> {
     ///Name of the set to add values to
     pub name: S,
     ///Array of string values to add to the set
     pub values: Vec<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -40,12 +38,11 @@ pub struct AddValuesResponse;
 impl jacquard_common::xrpc::XrpcResp for AddValuesResponse {
     const NSID: &'static str = "tools.ozone.set.addValues";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ();
+    type Output<S: BosStr> = ();
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for AddValues<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for AddValues<S> {
     const NSID: &'static str = "tools.ozone.set.addValues";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -60,7 +57,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for AddValuesRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = AddValues<S>;
+    type Request<S: BosStr> = AddValues<S>;
     type Response = AddValuesResponse;
 }
 
@@ -74,122 +71,122 @@ pub mod add_values_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Values;
         type Name;
+        type Values;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Values = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `values` field to Set
-    pub struct SetValues<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValues<S> {}
-    impl<S: State> State for SetValues<S> {
-        type Values = Set<members::values>;
-        type Name = S::Name;
+        type Values = Unset;
     }
     ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Values = S::Values;
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
         type Name = Set<members::name>;
+        type Values = St::Values;
+    }
+    ///State transition - sets the `values` field to Set
+    pub struct SetValues<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetValues<St> {}
+    impl<St: State> State for SetValues<St> {
+        type Name = St::Name;
+        type Values = Set<members::values>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `values` field
-        pub struct values(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `values` field
+        pub struct values(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct AddValuesBuilder<'a, S: add_values_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct AddValuesBuilder<S: BosStr, St: add_values_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<Vec<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> AddValues<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> AddValuesBuilder<'a, add_values_state::Empty> {
+impl<S: BosStr> AddValues<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> AddValuesBuilder<S, add_values_state::Empty> {
         AddValuesBuilder::new()
     }
 }
 
-impl<'a> AddValuesBuilder<'a, add_values_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> AddValuesBuilder<S, add_values_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         AddValuesBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AddValuesBuilder<'a, S>
+impl<S: BosStr, St> AddValuesBuilder<S, St>
 where
-    S: add_values_state::State,
-    S::Name: add_values_state::IsUnset,
+    St: add_values_state::State,
+    St::Name: add_values_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> AddValuesBuilder<'a, add_values_state::SetName<S>> {
+    ) -> AddValuesBuilder<S, add_values_state::SetName<St>> {
         self._fields.0 = Option::Some(value.into());
         AddValuesBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AddValuesBuilder<'a, S>
+impl<S: BosStr, St> AddValuesBuilder<S, St>
 where
-    S: add_values_state::State,
-    S::Values: add_values_state::IsUnset,
+    St: add_values_state::State,
+    St::Values: add_values_state::IsUnset,
 {
     /// Set the `values` field (required)
     pub fn values(
         mut self,
         value: impl Into<Vec<S>>,
-    ) -> AddValuesBuilder<'a, add_values_state::SetValues<S>> {
+    ) -> AddValuesBuilder<S, add_values_state::SetValues<St>> {
         self._fields.1 = Option::Some(value.into());
         AddValuesBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AddValuesBuilder<'a, S>
+impl<S: BosStr, St> AddValuesBuilder<S, St>
 where
-    S: add_values_state::State,
-    S::Values: add_values_state::IsSet,
-    S::Name: add_values_state::IsSet,
+    St: add_values_state::State,
+    St::Name: add_values_state::IsSet,
+    St::Values: add_values_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> AddValues<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> AddValues<S> {
         AddValues {
             name: self._fields.0.unwrap(),
             values: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> AddValues<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> AddValues<S> {
         AddValues {
             name: self._fields.0.unwrap(),
             values: self._fields.1.unwrap(),

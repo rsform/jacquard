@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -28,11 +28,11 @@ use serde::{Serialize, Deserialize};
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Address<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Address<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub addr: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -48,11 +48,11 @@ pub struct Address<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Coordinates<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Coordinates<S: BosStr = DefaultStr> {
     pub lat: i64,
     pub lng: i64,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -64,11 +64,11 @@ pub struct Coordinates<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct EventComponent<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct EventComponent<S: BosStr = DefaultStr> {
     pub data: Data<S>,
     pub r#type: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -80,11 +80,11 @@ pub struct EventComponent<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct EventInstance<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct EventInstance<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub end: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -99,7 +99,7 @@ pub struct EventInstance<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum EventStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum EventStatus<S: BosStr = DefaultStr> {
     Planned,
     Uncertain,
     Postponed,
@@ -108,7 +108,7 @@ pub enum EventStatus<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> EventStatus<S> {
+impl<S: BosStr> EventStatus<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Planned => "planned",
@@ -132,19 +132,19 @@ impl<S: Bos<str> + AsRef<str>> EventStatus<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for EventStatus<S> {
+impl<S: BosStr> AsRef<str> for EventStatus<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for EventStatus<S> {
+impl<S: BosStr> core::fmt::Display for EventStatus<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for EventStatus<S> {
+impl<S: BosStr> Serialize for EventStatus<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -153,8 +153,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for EventStatus<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for EventStatus<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for EventStatus<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -164,8 +163,12 @@ for EventStatus<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for EventStatus<S> {
-    type Output = EventStatus<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for EventStatus<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = EventStatus<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             EventStatus::Planned => EventStatus::Planned,
@@ -183,11 +186,11 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for EventStatus<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct OnlineVenue<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct OnlineVenue<S: BosStr = DefaultStr> {
     pub id: S,
     pub name: Data<S>,
     pub r#type: S,
@@ -202,11 +205,11 @@ pub struct OnlineVenue<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct PhysicalVenue<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct PhysicalVenue<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub address: Option<Data<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -223,11 +226,11 @@ pub struct PhysicalVenue<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct UnknownVenue<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct UnknownVenue<S: BosStr = DefaultStr> {
     pub id: S,
     pub name: Data<S>,
     pub r#type: S,
@@ -240,11 +243,11 @@ pub struct UnknownVenue<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Event<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Event<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub components: Option<Vec<Data<S>>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -267,12 +270,12 @@ pub struct Event<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EventVenuesItem<S: Bos<str> + AsRef<str> = DefaultStr> {}
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Address<S> {
+pub enum EventVenuesItem<S: BosStr = DefaultStr> {}
+impl<S: BosStr> LexiconSchema for Address<S> {
     fn nsid() -> &'static str {
         "directory.evnt.event"
     }
@@ -287,7 +290,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Address<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Coordinates<S> {
+impl<S: BosStr> LexiconSchema for Coordinates<S> {
     fn nsid() -> &'static str {
         "directory.evnt.event"
     }
@@ -302,7 +305,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Coordinates<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for EventComponent<S> {
+impl<S: BosStr> LexiconSchema for EventComponent<S> {
     fn nsid() -> &'static str {
         "directory.evnt.event"
     }
@@ -317,7 +320,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for EventComponent<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for EventInstance<S> {
+impl<S: BosStr> LexiconSchema for EventInstance<S> {
     fn nsid() -> &'static str {
         "directory.evnt.event"
     }
@@ -332,7 +335,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for EventInstance<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for OnlineVenue<S> {
+impl<S: BosStr> LexiconSchema for OnlineVenue<S> {
     fn nsid() -> &'static str {
         "directory.evnt.event"
     }
@@ -347,7 +350,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for OnlineVenue<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for PhysicalVenue<S> {
+impl<S: BosStr> LexiconSchema for PhysicalVenue<S> {
     fn nsid() -> &'static str {
         "directory.evnt.event"
     }
@@ -362,7 +365,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for PhysicalVenue<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for UnknownVenue<S> {
+impl<S: BosStr> LexiconSchema for UnknownVenue<S> {
     fn nsid() -> &'static str {
         "directory.evnt.event"
     }
@@ -377,7 +380,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for UnknownVenue<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Event<S> {
+impl<S: BosStr> LexiconSchema for Event<S> {
     fn nsid() -> &'static str {
         "directory.evnt.event"
     }
@@ -725,17 +728,17 @@ pub mod coordinates_state {
         type Lat = Unset;
     }
     ///State transition - sets the `lng` field to Set
-    pub struct SetLng<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLng<S> {}
-    impl<S: State> State for SetLng<S> {
+    pub struct SetLng<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLng<St> {}
+    impl<St: State> State for SetLng<St> {
         type Lng = Set<members::lng>;
-        type Lat = S::Lat;
+        type Lat = St::Lat;
     }
     ///State transition - sets the `lat` field to Set
-    pub struct SetLat<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLat<S> {}
-    impl<S: State> State for SetLat<S> {
-        type Lng = S::Lng;
+    pub struct SetLat<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLat<St> {}
+    impl<St: State> State for SetLat<St> {
+        type Lng = St::Lng;
         type Lat = Set<members::lat>;
     }
     /// Marker types for field names
@@ -748,88 +751,88 @@ pub mod coordinates_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct CoordinatesBuilder<'a, S: coordinates_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct CoordinatesBuilder<S: BosStr, St: coordinates_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<i64>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Coordinates<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> CoordinatesBuilder<'a, coordinates_state::Empty> {
+impl<S: BosStr> Coordinates<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> CoordinatesBuilder<S, coordinates_state::Empty> {
         CoordinatesBuilder::new()
     }
 }
 
-impl<'a> CoordinatesBuilder<'a, coordinates_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> CoordinatesBuilder<S, coordinates_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         CoordinatesBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CoordinatesBuilder<'a, S>
+impl<S: BosStr, St> CoordinatesBuilder<S, St>
 where
-    S: coordinates_state::State,
-    S::Lat: coordinates_state::IsUnset,
+    St: coordinates_state::State,
+    St::Lat: coordinates_state::IsUnset,
 {
     /// Set the `lat` field (required)
     pub fn lat(
         mut self,
         value: impl Into<i64>,
-    ) -> CoordinatesBuilder<'a, coordinates_state::SetLat<S>> {
+    ) -> CoordinatesBuilder<S, coordinates_state::SetLat<St>> {
         self._fields.0 = Option::Some(value.into());
         CoordinatesBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CoordinatesBuilder<'a, S>
+impl<S: BosStr, St> CoordinatesBuilder<S, St>
 where
-    S: coordinates_state::State,
-    S::Lng: coordinates_state::IsUnset,
+    St: coordinates_state::State,
+    St::Lng: coordinates_state::IsUnset,
 {
     /// Set the `lng` field (required)
     pub fn lng(
         mut self,
         value: impl Into<i64>,
-    ) -> CoordinatesBuilder<'a, coordinates_state::SetLng<S>> {
+    ) -> CoordinatesBuilder<S, coordinates_state::SetLng<St>> {
         self._fields.1 = Option::Some(value.into());
         CoordinatesBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CoordinatesBuilder<'a, S>
+impl<S: BosStr, St> CoordinatesBuilder<S, St>
 where
-    S: coordinates_state::State,
-    S::Lng: coordinates_state::IsSet,
-    S::Lat: coordinates_state::IsSet,
+    St: coordinates_state::State,
+    St::Lng: coordinates_state::IsSet,
+    St::Lat: coordinates_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Coordinates<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Coordinates<S> {
         Coordinates {
             lat: self._fields.0.unwrap(),
             lng: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Coordinates<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Coordinates<S> {
         Coordinates {
             lat: self._fields.0.unwrap(),
             lng: self._fields.1.unwrap(),
@@ -859,17 +862,17 @@ pub mod event_component_state {
         type Data = Unset;
     }
     ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
+    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetType<St> {}
+    impl<St: State> State for SetType<St> {
         type Type = Set<members::r#type>;
-        type Data = S::Data;
+        type Data = St::Data;
     }
     ///State transition - sets the `data` field to Set
-    pub struct SetData<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetData<S> {}
-    impl<S: State> State for SetData<S> {
-        type Type = S::Type;
+    pub struct SetData<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetData<St> {}
+    impl<St: State> State for SetData<St> {
+        type Type = St::Type;
         type Data = Set<members::data>;
     }
     /// Marker types for field names
@@ -882,88 +885,88 @@ pub mod event_component_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct EventComponentBuilder<'a, S: event_component_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct EventComponentBuilder<S: BosStr, St: event_component_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Data<S>>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> EventComponent<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> EventComponentBuilder<'a, event_component_state::Empty> {
+impl<S: BosStr> EventComponent<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> EventComponentBuilder<S, event_component_state::Empty> {
         EventComponentBuilder::new()
     }
 }
 
-impl<'a> EventComponentBuilder<'a, event_component_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> EventComponentBuilder<S, event_component_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         EventComponentBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> EventComponentBuilder<'a, S>
+impl<S: BosStr, St> EventComponentBuilder<S, St>
 where
-    S: event_component_state::State,
-    S::Data: event_component_state::IsUnset,
+    St: event_component_state::State,
+    St::Data: event_component_state::IsUnset,
 {
     /// Set the `data` field (required)
     pub fn data(
         mut self,
         value: impl Into<Data<S>>,
-    ) -> EventComponentBuilder<'a, event_component_state::SetData<S>> {
+    ) -> EventComponentBuilder<S, event_component_state::SetData<St>> {
         self._fields.0 = Option::Some(value.into());
         EventComponentBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> EventComponentBuilder<'a, S>
+impl<S: BosStr, St> EventComponentBuilder<S, St>
 where
-    S: event_component_state::State,
-    S::Type: event_component_state::IsUnset,
+    St: event_component_state::State,
+    St::Type: event_component_state::IsUnset,
 {
     /// Set the `type` field (required)
     pub fn r#type(
         mut self,
         value: impl Into<S>,
-    ) -> EventComponentBuilder<'a, event_component_state::SetType<S>> {
+    ) -> EventComponentBuilder<S, event_component_state::SetType<St>> {
         self._fields.1 = Option::Some(value.into());
         EventComponentBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> EventComponentBuilder<'a, S>
+impl<S: BosStr, St> EventComponentBuilder<S, St>
 where
-    S: event_component_state::State,
-    S::Type: event_component_state::IsSet,
-    S::Data: event_component_state::IsSet,
+    St: event_component_state::State,
+    St::Type: event_component_state::IsSet,
+    St::Data: event_component_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> EventComponent<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> EventComponent<S> {
         EventComponent {
             data: self._fields.0.unwrap(),
             r#type: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> EventComponent<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> EventComponent<S> {
         EventComponent {
             data: self._fields.0.unwrap(),
             r#type: self._fields.1.unwrap(),
@@ -982,137 +985,137 @@ pub mod online_venue_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Type;
         type Id;
         type Name;
-        type Type;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Type = Unset;
         type Id = Unset;
         type Name = Unset;
-        type Type = Unset;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type Id = Set<members::id>;
-        type Name = S::Name;
-        type Type = S::Type;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Id = S::Id;
-        type Name = Set<members::name>;
-        type Type = S::Type;
     }
     ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type Id = S::Id;
-        type Name = S::Name;
+    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetType<St> {}
+    impl<St: State> State for SetType<St> {
         type Type = Set<members::r#type>;
+        type Id = St::Id;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetId<St> {}
+    impl<St: State> State for SetId<St> {
+        type Type = St::Type;
+        type Id = Set<members::id>;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Type = St::Type;
+        type Id = St::Id;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `type` field
+        pub struct r#type(());
         ///Marker type for the `id` field
         pub struct id(());
         ///Marker type for the `name` field
         pub struct name(());
-        ///Marker type for the `type` field
-        pub struct r#type(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct OnlineVenueBuilder<'a, S: online_venue_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct OnlineVenueBuilder<S: BosStr, St: online_venue_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<Data<S>>, Option<S>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> OnlineVenue<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> OnlineVenueBuilder<'a, online_venue_state::Empty> {
+impl<S: BosStr> OnlineVenue<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> OnlineVenueBuilder<S, online_venue_state::Empty> {
         OnlineVenueBuilder::new()
     }
 }
 
-impl<'a> OnlineVenueBuilder<'a, online_venue_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> OnlineVenueBuilder<S, online_venue_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         OnlineVenueBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> OnlineVenueBuilder<'a, S>
+impl<S: BosStr, St> OnlineVenueBuilder<S, St>
 where
-    S: online_venue_state::State,
-    S::Id: online_venue_state::IsUnset,
+    St: online_venue_state::State,
+    St::Id: online_venue_state::IsUnset,
 {
     /// Set the `id` field (required)
     pub fn id(
         mut self,
         value: impl Into<S>,
-    ) -> OnlineVenueBuilder<'a, online_venue_state::SetId<S>> {
+    ) -> OnlineVenueBuilder<S, online_venue_state::SetId<St>> {
         self._fields.0 = Option::Some(value.into());
         OnlineVenueBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> OnlineVenueBuilder<'a, S>
+impl<S: BosStr, St> OnlineVenueBuilder<S, St>
 where
-    S: online_venue_state::State,
-    S::Name: online_venue_state::IsUnset,
+    St: online_venue_state::State,
+    St::Name: online_venue_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<Data<S>>,
-    ) -> OnlineVenueBuilder<'a, online_venue_state::SetName<S>> {
+    ) -> OnlineVenueBuilder<S, online_venue_state::SetName<St>> {
         self._fields.1 = Option::Some(value.into());
         OnlineVenueBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> OnlineVenueBuilder<'a, S>
+impl<S: BosStr, St> OnlineVenueBuilder<S, St>
 where
-    S: online_venue_state::State,
-    S::Type: online_venue_state::IsUnset,
+    St: online_venue_state::State,
+    St::Type: online_venue_state::IsUnset,
 {
     /// Set the `type` field (required)
     pub fn r#type(
         mut self,
         value: impl Into<S>,
-    ) -> OnlineVenueBuilder<'a, online_venue_state::SetType<S>> {
+    ) -> OnlineVenueBuilder<S, online_venue_state::SetType<St>> {
         self._fields.2 = Option::Some(value.into());
         OnlineVenueBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: online_venue_state::State> OnlineVenueBuilder<'a, S> {
+impl<S: BosStr, St: online_venue_state::State> OnlineVenueBuilder<S, St> {
     /// Set the `url` field (optional)
     pub fn url(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -1125,15 +1128,15 @@ impl<'a, S: online_venue_state::State> OnlineVenueBuilder<'a, S> {
     }
 }
 
-impl<'a, S> OnlineVenueBuilder<'a, S>
+impl<S: BosStr, St> OnlineVenueBuilder<S, St>
 where
-    S: online_venue_state::State,
-    S::Id: online_venue_state::IsSet,
-    S::Name: online_venue_state::IsSet,
-    S::Type: online_venue_state::IsSet,
+    St: online_venue_state::State,
+    St::Type: online_venue_state::IsSet,
+    St::Id: online_venue_state::IsSet,
+    St::Name: online_venue_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> OnlineVenue<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> OnlineVenue<S> {
         OnlineVenue {
             id: self._fields.0.unwrap(),
             name: self._fields.1.unwrap(),
@@ -1142,11 +1145,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> OnlineVenue<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> OnlineVenue<S> {
         OnlineVenue {
             id: self._fields.0.unwrap(),
             name: self._fields.1.unwrap(),
@@ -1167,80 +1170,80 @@ pub mod physical_venue_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Name;
         type Id;
         type Type;
-        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Name = Unset;
         type Id = Unset;
         type Type = Unset;
-        type Name = Unset;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type Id = Set<members::id>;
-        type Type = S::Type;
-        type Name = S::Name;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type Id = S::Id;
-        type Type = Set<members::r#type>;
-        type Name = S::Name;
     }
     ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Id = S::Id;
-        type Type = S::Type;
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
         type Name = Set<members::name>;
+        type Id = St::Id;
+        type Type = St::Type;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetId<St> {}
+    impl<St: State> State for SetId<St> {
+        type Name = St::Name;
+        type Id = Set<members::id>;
+        type Type = St::Type;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetType<St> {}
+    impl<St: State> State for SetType<St> {
+        type Name = St::Name;
+        type Id = St::Id;
+        type Type = Set<members::r#type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `id` field
         pub struct id(());
         ///Marker type for the `type` field
         pub struct r#type(());
-        ///Marker type for the `name` field
-        pub struct name(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct PhysicalVenueBuilder<'a, S: physical_venue_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct PhysicalVenueBuilder<S: BosStr, St: physical_venue_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Data<S>>, Option<Data<S>>, Option<S>, Option<Data<S>>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> PhysicalVenue<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> PhysicalVenueBuilder<'a, physical_venue_state::Empty> {
+impl<S: BosStr> PhysicalVenue<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> PhysicalVenueBuilder<S, physical_venue_state::Empty> {
         PhysicalVenueBuilder::new()
     }
 }
 
-impl<'a> PhysicalVenueBuilder<'a, physical_venue_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> PhysicalVenueBuilder<S, physical_venue_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         PhysicalVenueBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: physical_venue_state::State> PhysicalVenueBuilder<'a, S> {
+impl<S: BosStr, St: physical_venue_state::State> PhysicalVenueBuilder<S, St> {
     /// Set the `address` field (optional)
     pub fn address(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -1253,7 +1256,7 @@ impl<'a, S: physical_venue_state::State> PhysicalVenueBuilder<'a, S> {
     }
 }
 
-impl<'a, S: physical_venue_state::State> PhysicalVenueBuilder<'a, S> {
+impl<S: BosStr, St: physical_venue_state::State> PhysicalVenueBuilder<S, St> {
     /// Set the `coordinates` field (optional)
     pub fn coordinates(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -1266,72 +1269,72 @@ impl<'a, S: physical_venue_state::State> PhysicalVenueBuilder<'a, S> {
     }
 }
 
-impl<'a, S> PhysicalVenueBuilder<'a, S>
+impl<S: BosStr, St> PhysicalVenueBuilder<S, St>
 where
-    S: physical_venue_state::State,
-    S::Id: physical_venue_state::IsUnset,
+    St: physical_venue_state::State,
+    St::Id: physical_venue_state::IsUnset,
 {
     /// Set the `id` field (required)
     pub fn id(
         mut self,
         value: impl Into<S>,
-    ) -> PhysicalVenueBuilder<'a, physical_venue_state::SetId<S>> {
+    ) -> PhysicalVenueBuilder<S, physical_venue_state::SetId<St>> {
         self._fields.2 = Option::Some(value.into());
         PhysicalVenueBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PhysicalVenueBuilder<'a, S>
+impl<S: BosStr, St> PhysicalVenueBuilder<S, St>
 where
-    S: physical_venue_state::State,
-    S::Name: physical_venue_state::IsUnset,
+    St: physical_venue_state::State,
+    St::Name: physical_venue_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<Data<S>>,
-    ) -> PhysicalVenueBuilder<'a, physical_venue_state::SetName<S>> {
+    ) -> PhysicalVenueBuilder<S, physical_venue_state::SetName<St>> {
         self._fields.3 = Option::Some(value.into());
         PhysicalVenueBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PhysicalVenueBuilder<'a, S>
+impl<S: BosStr, St> PhysicalVenueBuilder<S, St>
 where
-    S: physical_venue_state::State,
-    S::Type: physical_venue_state::IsUnset,
+    St: physical_venue_state::State,
+    St::Type: physical_venue_state::IsUnset,
 {
     /// Set the `type` field (required)
     pub fn r#type(
         mut self,
         value: impl Into<S>,
-    ) -> PhysicalVenueBuilder<'a, physical_venue_state::SetType<S>> {
+    ) -> PhysicalVenueBuilder<S, physical_venue_state::SetType<St>> {
         self._fields.4 = Option::Some(value.into());
         PhysicalVenueBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PhysicalVenueBuilder<'a, S>
+impl<S: BosStr, St> PhysicalVenueBuilder<S, St>
 where
-    S: physical_venue_state::State,
-    S::Id: physical_venue_state::IsSet,
-    S::Type: physical_venue_state::IsSet,
-    S::Name: physical_venue_state::IsSet,
+    St: physical_venue_state::State,
+    St::Name: physical_venue_state::IsSet,
+    St::Id: physical_venue_state::IsSet,
+    St::Type: physical_venue_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> PhysicalVenue<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> PhysicalVenue<S> {
         PhysicalVenue {
             address: self._fields.0,
             coordinates: self._fields.1,
@@ -1341,11 +1344,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> PhysicalVenue<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> PhysicalVenue<S> {
         PhysicalVenue {
             address: self._fields.0,
             coordinates: self._fields.1,
@@ -1367,145 +1370,145 @@ pub mod unknown_venue_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Type;
-        type Name;
         type Id;
+        type Name;
+        type Type;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Type = Unset;
-        type Name = Unset;
         type Id = Unset;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
-        type Type = Set<members::r#type>;
-        type Name = S::Name;
-        type Id = S::Id;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Type = S::Type;
-        type Name = Set<members::name>;
-        type Id = S::Id;
+        type Name = Unset;
+        type Type = Unset;
     }
     ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type Type = S::Type;
-        type Name = S::Name;
+    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetId<St> {}
+    impl<St: State> State for SetId<St> {
         type Id = Set<members::id>;
+        type Name = St::Name;
+        type Type = St::Type;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Id = St::Id;
+        type Name = Set<members::name>;
+        type Type = St::Type;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetType<St> {}
+    impl<St: State> State for SetType<St> {
+        type Id = St::Id;
+        type Name = St::Name;
+        type Type = Set<members::r#type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `type` field
-        pub struct r#type(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `id` field
         pub struct id(());
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `type` field
+        pub struct r#type(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct UnknownVenueBuilder<'a, S: unknown_venue_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct UnknownVenueBuilder<S: BosStr, St: unknown_venue_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<Data<S>>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> UnknownVenue<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> UnknownVenueBuilder<'a, unknown_venue_state::Empty> {
+impl<S: BosStr> UnknownVenue<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> UnknownVenueBuilder<S, unknown_venue_state::Empty> {
         UnknownVenueBuilder::new()
     }
 }
 
-impl<'a> UnknownVenueBuilder<'a, unknown_venue_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> UnknownVenueBuilder<S, unknown_venue_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         UnknownVenueBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> UnknownVenueBuilder<'a, S>
+impl<S: BosStr, St> UnknownVenueBuilder<S, St>
 where
-    S: unknown_venue_state::State,
-    S::Id: unknown_venue_state::IsUnset,
+    St: unknown_venue_state::State,
+    St::Id: unknown_venue_state::IsUnset,
 {
     /// Set the `id` field (required)
     pub fn id(
         mut self,
         value: impl Into<S>,
-    ) -> UnknownVenueBuilder<'a, unknown_venue_state::SetId<S>> {
+    ) -> UnknownVenueBuilder<S, unknown_venue_state::SetId<St>> {
         self._fields.0 = Option::Some(value.into());
         UnknownVenueBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> UnknownVenueBuilder<'a, S>
+impl<S: BosStr, St> UnknownVenueBuilder<S, St>
 where
-    S: unknown_venue_state::State,
-    S::Name: unknown_venue_state::IsUnset,
+    St: unknown_venue_state::State,
+    St::Name: unknown_venue_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<Data<S>>,
-    ) -> UnknownVenueBuilder<'a, unknown_venue_state::SetName<S>> {
+    ) -> UnknownVenueBuilder<S, unknown_venue_state::SetName<St>> {
         self._fields.1 = Option::Some(value.into());
         UnknownVenueBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> UnknownVenueBuilder<'a, S>
+impl<S: BosStr, St> UnknownVenueBuilder<S, St>
 where
-    S: unknown_venue_state::State,
-    S::Type: unknown_venue_state::IsUnset,
+    St: unknown_venue_state::State,
+    St::Type: unknown_venue_state::IsUnset,
 {
     /// Set the `type` field (required)
     pub fn r#type(
         mut self,
         value: impl Into<S>,
-    ) -> UnknownVenueBuilder<'a, unknown_venue_state::SetType<S>> {
+    ) -> UnknownVenueBuilder<S, unknown_venue_state::SetType<St>> {
         self._fields.2 = Option::Some(value.into());
         UnknownVenueBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> UnknownVenueBuilder<'a, S>
+impl<S: BosStr, St> UnknownVenueBuilder<S, St>
 where
-    S: unknown_venue_state::State,
-    S::Type: unknown_venue_state::IsSet,
-    S::Name: unknown_venue_state::IsSet,
-    S::Id: unknown_venue_state::IsSet,
+    St: unknown_venue_state::State,
+    St::Id: unknown_venue_state::IsSet,
+    St::Name: unknown_venue_state::IsSet,
+    St::Type: unknown_venue_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> UnknownVenue<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> UnknownVenue<S> {
         UnknownVenue {
             id: self._fields.0.unwrap(),
             name: self._fields.1.unwrap(),
@@ -1513,11 +1516,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> UnknownVenue<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> UnknownVenue<S> {
         UnknownVenue {
             id: self._fields.0.unwrap(),
             name: self._fields.1.unwrap(),
@@ -1548,17 +1551,17 @@ pub mod event_state {
         type V = Unset;
     }
     ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
         type Name = Set<members::name>;
-        type V = S::V;
+        type V = St::V;
     }
     ///State transition - sets the `v` field to Set
-    pub struct SetV<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetV<S> {}
-    impl<S: State> State for SetV<S> {
-        type Name = S::Name;
+    pub struct SetV<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetV<St> {}
+    impl<St: State> State for SetV<St> {
+        type Name = St::Name;
         type V = Set<members::v>;
     }
     /// Marker types for field names
@@ -1571,9 +1574,9 @@ pub mod event_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct EventBuilder<'a, S: event_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct EventBuilder<S: BosStr, St: event_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<Data<S>>>,
         Option<Vec<Data<S>>>,
@@ -1583,28 +1586,28 @@ pub struct EventBuilder<'a, S: event_state::State> {
         Option<i64>,
         Option<Vec<EventVenuesItem<S>>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Event<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> EventBuilder<'a, event_state::Empty> {
+impl<S: BosStr> Event<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> EventBuilder<S, event_state::Empty> {
         EventBuilder::new()
     }
 }
 
-impl<'a> EventBuilder<'a, event_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> EventBuilder<S, event_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         EventBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: event_state::State> EventBuilder<'a, S> {
+impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     /// Set the `components` field (optional)
     pub fn components(mut self, value: impl Into<Option<Vec<Data<S>>>>) -> Self {
         self._fields.0 = value.into();
@@ -1617,7 +1620,7 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
     }
 }
 
-impl<'a, S: event_state::State> EventBuilder<'a, S> {
+impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     /// Set the `instances` field (optional)
     pub fn instances(mut self, value: impl Into<Option<Vec<Data<S>>>>) -> Self {
         self._fields.1 = value.into();
@@ -1630,7 +1633,7 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
     }
 }
 
-impl<'a, S: event_state::State> EventBuilder<'a, S> {
+impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     /// Set the `label` field (optional)
     pub fn label(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -1643,26 +1646,26 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
     }
 }
 
-impl<'a, S> EventBuilder<'a, S>
+impl<S: BosStr, St> EventBuilder<S, St>
 where
-    S: event_state::State,
-    S::Name: event_state::IsUnset,
+    St: event_state::State,
+    St::Name: event_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<Data<S>>,
-    ) -> EventBuilder<'a, event_state::SetName<S>> {
+    ) -> EventBuilder<S, event_state::SetName<St>> {
         self._fields.3 = Option::Some(value.into());
         EventBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: event_state::State> EventBuilder<'a, S> {
+impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     /// Set the `status` field (optional)
     pub fn status(mut self, value: impl Into<Option<Data<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -1675,23 +1678,23 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
     }
 }
 
-impl<'a, S> EventBuilder<'a, S>
+impl<S: BosStr, St> EventBuilder<S, St>
 where
-    S: event_state::State,
-    S::V: event_state::IsUnset,
+    St: event_state::State,
+    St::V: event_state::IsUnset,
 {
     /// Set the `v` field (required)
-    pub fn v(mut self, value: impl Into<i64>) -> EventBuilder<'a, event_state::SetV<S>> {
+    pub fn v(mut self, value: impl Into<i64>) -> EventBuilder<S, event_state::SetV<St>> {
         self._fields.5 = Option::Some(value.into());
         EventBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: event_state::State> EventBuilder<'a, S> {
+impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     /// Set the `venues` field (optional)
     pub fn venues(mut self, value: impl Into<Option<Vec<EventVenuesItem<S>>>>) -> Self {
         self._fields.6 = value.into();
@@ -1704,14 +1707,14 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
     }
 }
 
-impl<'a, S> EventBuilder<'a, S>
+impl<S: BosStr, St> EventBuilder<S, St>
 where
-    S: event_state::State,
-    S::Name: event_state::IsSet,
-    S::V: event_state::IsSet,
+    St: event_state::State,
+    St::Name: event_state::IsSet,
+    St::V: event_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Event<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Event<S> {
         Event {
             components: self._fields.0,
             instances: self._fields.1,
@@ -1723,8 +1726,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Event<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Event<S> {
         Event {
             components: self._fields.0,
             instances: self._fields.1,

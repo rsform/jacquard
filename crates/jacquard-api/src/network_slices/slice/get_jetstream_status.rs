@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
@@ -21,19 +21,17 @@ use serde::{Serialize, Deserialize};
 pub struct GetJetstreamStatus;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetJetstreamStatusOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetJetstreamStatusOutput<S: BosStr = DefaultStr> {
     ///Whether Jetstream is currently connected and receiving events
     pub connected: bool,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -42,7 +40,7 @@ pub struct GetJetstreamStatusResponse;
 impl jacquard_common::xrpc::XrpcResp for GetJetstreamStatusResponse {
     const NSID: &'static str = "network.slices.slice.getJetstreamStatus";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetJetstreamStatusOutput<S>;
+    type Output<S: BosStr> = GetJetstreamStatusOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
@@ -57,6 +55,6 @@ pub struct GetJetstreamStatusRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetJetstreamStatusRequest {
     const PATH: &'static str = "/xrpc/network.slices.slice.getJetstreamStatus";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetJetstreamStatus;
+    type Request<S: BosStr> = GetJetstreamStatus;
     type Response = GetJetstreamStatusResponse;
 }

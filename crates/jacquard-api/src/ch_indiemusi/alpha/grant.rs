@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "ch.indiemusi.alpha.grant",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Grant<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Grant<S: BosStr = DefaultStr> {
     ///When the grant was created
     pub created_at: Datetime,
     ///Optional expiration date. After this, the grant should be considered revoked.
@@ -66,18 +66,18 @@ pub struct Grant<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GrantGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GrantGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Grant<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Grant<S> {
+impl<S: BosStr> Grant<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, GrantRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -90,17 +90,17 @@ pub struct GrantRecord;
 impl XrpcResp for GrantRecord {
     const NSID: &'static str = "ch.indiemusi.alpha.grant";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GrantGetRecordOutput<S>;
+    type Output<S: BosStr> = GrantGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<GrantGetRecordOutput<S>> for Grant<S> {
+impl<S: BosStr> From<GrantGetRecordOutput<S>> for Grant<S> {
     fn from(output: GrantGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Grant<S> {
+impl<S: BosStr> Collection for Grant<S> {
     const NSID: &'static str = "ch.indiemusi.alpha.grant";
     type Record = GrantRecord;
 }
@@ -110,7 +110,7 @@ impl Collection for GrantRecord {
     type Record = GrantRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Grant<S> {
+impl<S: BosStr> LexiconSchema for Grant<S> {
     fn nsid() -> &'static str {
         "ch.indiemusi.alpha.grant"
     }
@@ -167,10 +167,8 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Grant<S> {
     }
 }
 
-fn _default_grant_wrapping_algorithm<S: From<&'static str>>() -> ::core::option::Option<
-    S,
-> {
-    Some(S::from("RSA-OAEP"))
+fn _default_grant_wrapping_algorithm<S: FromStaticStr>() -> ::core::option::Option<S> {
+    Some(S::from_static("RSA-OAEP"))
 }
 
 pub mod grant_state {
@@ -183,57 +181,57 @@ pub mod grant_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type ServiceDid;
         type WrappedMasterKey;
+        type ServiceDid;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type ServiceDid = Unset;
         type WrappedMasterKey = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type ServiceDid = S::ServiceDid;
-        type WrappedMasterKey = S::WrappedMasterKey;
-    }
-    ///State transition - sets the `service_did` field to Set
-    pub struct SetServiceDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetServiceDid<S> {}
-    impl<S: State> State for SetServiceDid<S> {
-        type CreatedAt = S::CreatedAt;
-        type ServiceDid = Set<members::service_did>;
-        type WrappedMasterKey = S::WrappedMasterKey;
+        type ServiceDid = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `wrapped_master_key` field to Set
-    pub struct SetWrappedMasterKey<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWrappedMasterKey<S> {}
-    impl<S: State> State for SetWrappedMasterKey<S> {
-        type CreatedAt = S::CreatedAt;
-        type ServiceDid = S::ServiceDid;
+    pub struct SetWrappedMasterKey<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetWrappedMasterKey<St> {}
+    impl<St: State> State for SetWrappedMasterKey<St> {
         type WrappedMasterKey = Set<members::wrapped_master_key>;
+        type ServiceDid = St::ServiceDid;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `service_did` field to Set
+    pub struct SetServiceDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetServiceDid<St> {}
+    impl<St: State> State for SetServiceDid<St> {
+        type WrappedMasterKey = St::WrappedMasterKey;
+        type ServiceDid = Set<members::service_did>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type WrappedMasterKey = St::WrappedMasterKey;
+        type ServiceDid = St::ServiceDid;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `service_did` field
-        pub struct service_did(());
         ///Marker type for the `wrapped_master_key` field
         pub struct wrapped_master_key(());
+        ///Marker type for the `service_did` field
+        pub struct service_did(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GrantBuilder<'a, S: grant_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GrantBuilder<S: BosStr, St: grant_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
         Option<Datetime>,
@@ -242,47 +240,47 @@ pub struct GrantBuilder<'a, S: grant_state::State> {
         Option<S>,
         Option<S>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Grant<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GrantBuilder<'a, grant_state::Empty> {
+impl<S: BosStr> Grant<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GrantBuilder<S, grant_state::Empty> {
         GrantBuilder::new()
     }
 }
 
-impl<'a> GrantBuilder<'a, grant_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GrantBuilder<S, grant_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GrantBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GrantBuilder<'a, S>
+impl<S: BosStr, St> GrantBuilder<S, St>
 where
-    S: grant_state::State,
-    S::CreatedAt: grant_state::IsUnset,
+    St: grant_state::State,
+    St::CreatedAt: grant_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> GrantBuilder<'a, grant_state::SetCreatedAt<S>> {
+    ) -> GrantBuilder<S, grant_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         GrantBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: grant_state::State> GrantBuilder<'a, S> {
+impl<S: BosStr, St: grant_state::State> GrantBuilder<S, St> {
     /// Set the `expiresAt` field (optional)
     pub fn expires_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.1 = value.into();
@@ -295,45 +293,45 @@ impl<'a, S: grant_state::State> GrantBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GrantBuilder<'a, S>
+impl<S: BosStr, St> GrantBuilder<S, St>
 where
-    S: grant_state::State,
-    S::ServiceDid: grant_state::IsUnset,
+    St: grant_state::State,
+    St::ServiceDid: grant_state::IsUnset,
 {
     /// Set the `serviceDid` field (required)
     pub fn service_did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> GrantBuilder<'a, grant_state::SetServiceDid<S>> {
+    ) -> GrantBuilder<S, grant_state::SetServiceDid<St>> {
         self._fields.2 = Option::Some(value.into());
         GrantBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GrantBuilder<'a, S>
+impl<S: BosStr, St> GrantBuilder<S, St>
 where
-    S: grant_state::State,
-    S::WrappedMasterKey: grant_state::IsUnset,
+    St: grant_state::State,
+    St::WrappedMasterKey: grant_state::IsUnset,
 {
     /// Set the `wrappedMasterKey` field (required)
     pub fn wrapped_master_key(
         mut self,
         value: impl Into<S>,
-    ) -> GrantBuilder<'a, grant_state::SetWrappedMasterKey<S>> {
+    ) -> GrantBuilder<S, grant_state::SetWrappedMasterKey<St>> {
         self._fields.3 = Option::Some(value.into());
         GrantBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: grant_state::State> GrantBuilder<'a, S> {
+impl<S: BosStr, St: grant_state::State> GrantBuilder<S, St> {
     /// Set the `wrappedMasterKeyIv` field (optional)
     pub fn wrapped_master_key_iv(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
@@ -346,7 +344,7 @@ impl<'a, S: grant_state::State> GrantBuilder<'a, S> {
     }
 }
 
-impl<'a, S: grant_state::State> GrantBuilder<'a, S> {
+impl<S: BosStr, St: grant_state::State> GrantBuilder<S, St> {
     /// Set the `wrappingAlgorithm` field (optional)
     pub fn wrapping_algorithm(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
@@ -359,15 +357,15 @@ impl<'a, S: grant_state::State> GrantBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GrantBuilder<'a, S>
+impl<S: BosStr, St> GrantBuilder<S, St>
 where
-    S: grant_state::State,
-    S::CreatedAt: grant_state::IsSet,
-    S::ServiceDid: grant_state::IsSet,
-    S::WrappedMasterKey: grant_state::IsSet,
+    St: grant_state::State,
+    St::WrappedMasterKey: grant_state::IsSet,
+    St::ServiceDid: grant_state::IsSet,
+    St::CreatedAt: grant_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Grant<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Grant<S> {
         Grant {
             created_at: self._fields.0.unwrap(),
             expires_at: self._fields.1,
@@ -377,12 +375,12 @@ where
             wrapping_algorithm: self
                 ._fields
                 .5
-                .or_else(|| Some(CowStr::from("RSA-OAEP"))),
+                .or_else(|| Some(SmolStr::from("RSA-OAEP"))),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Grant<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Grant<S> {
         Grant {
             created_at: self._fields.0.unwrap(),
             expires_at: self._fields.1,
@@ -392,7 +390,7 @@ where
             wrapping_algorithm: self
                 ._fields
                 .5
-                .or_else(|| Some(CowStr::from("RSA-OAEP"))),
+                .or_else(|| Some(SmolStr::from("RSA-OAEP"))),
             extra_data: Some(extra_data),
         }
     }

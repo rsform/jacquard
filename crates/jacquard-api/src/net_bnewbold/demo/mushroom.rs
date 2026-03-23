@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "net.bnewbold.demo.mushroom",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Mushroom<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Mushroom<S: BosStr = DefaultStr> {
     pub common_name: S,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub edible: Option<bool>,
@@ -55,18 +55,18 @@ pub struct Mushroom<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct MushroomGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct MushroomGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Mushroom<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Mushroom<S> {
+impl<S: BosStr> Mushroom<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, MushroomRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -79,17 +79,17 @@ pub struct MushroomRecord;
 impl XrpcResp for MushroomRecord {
     const NSID: &'static str = "net.bnewbold.demo.mushroom";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = MushroomGetRecordOutput<S>;
+    type Output<S: BosStr> = MushroomGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<MushroomGetRecordOutput<S>> for Mushroom<S> {
+impl<S: BosStr> From<MushroomGetRecordOutput<S>> for Mushroom<S> {
     fn from(output: MushroomGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Mushroom<S> {
+impl<S: BosStr> Collection for Mushroom<S> {
     const NSID: &'static str = "net.bnewbold.demo.mushroom";
     type Record = MushroomRecord;
 }
@@ -99,7 +99,7 @@ impl Collection for MushroomRecord {
     type Record = MushroomRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Mushroom<S> {
+impl<S: BosStr> LexiconSchema for Mushroom<S> {
     fn nsid() -> &'static str {
         "net.bnewbold.demo.mushroom"
     }
@@ -179,9 +179,9 @@ pub mod mushroom_state {
         type CommonName = Unset;
     }
     ///State transition - sets the `common_name` field to Set
-    pub struct SetCommonName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCommonName<S> {}
-    impl<S: State> State for SetCommonName<S> {
+    pub struct SetCommonName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCommonName<St> {}
+    impl<St: State> State for SetCommonName<St> {
         type CommonName = Set<members::common_name>;
     }
     /// Marker types for field names
@@ -192,51 +192,51 @@ pub mod mushroom_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct MushroomBuilder<'a, S: mushroom_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct MushroomBuilder<S: BosStr, St: mushroom_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<bool>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Mushroom<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> MushroomBuilder<'a, mushroom_state::Empty> {
+impl<S: BosStr> Mushroom<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> MushroomBuilder<S, mushroom_state::Empty> {
         MushroomBuilder::new()
     }
 }
 
-impl<'a> MushroomBuilder<'a, mushroom_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> MushroomBuilder<S, mushroom_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         MushroomBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> MushroomBuilder<'a, S>
+impl<S: BosStr, St> MushroomBuilder<S, St>
 where
-    S: mushroom_state::State,
-    S::CommonName: mushroom_state::IsUnset,
+    St: mushroom_state::State,
+    St::CommonName: mushroom_state::IsUnset,
 {
     /// Set the `commonName` field (required)
     pub fn common_name(
         mut self,
         value: impl Into<S>,
-    ) -> MushroomBuilder<'a, mushroom_state::SetCommonName<S>> {
+    ) -> MushroomBuilder<S, mushroom_state::SetCommonName<St>> {
         self._fields.0 = Option::Some(value.into());
         MushroomBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: mushroom_state::State> MushroomBuilder<'a, S> {
+impl<S: BosStr, St: mushroom_state::State> MushroomBuilder<S, St> {
     /// Set the `edible` field (optional)
     pub fn edible(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.1 = value.into();
@@ -249,7 +249,7 @@ impl<'a, S: mushroom_state::State> MushroomBuilder<'a, S> {
     }
 }
 
-impl<'a, S: mushroom_state::State> MushroomBuilder<'a, S> {
+impl<S: BosStr, St: mushroom_state::State> MushroomBuilder<S, St> {
     /// Set the `species` field (optional)
     pub fn species(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -262,13 +262,13 @@ impl<'a, S: mushroom_state::State> MushroomBuilder<'a, S> {
     }
 }
 
-impl<'a, S> MushroomBuilder<'a, S>
+impl<S: BosStr, St> MushroomBuilder<S, St>
 where
-    S: mushroom_state::State,
-    S::CommonName: mushroom_state::IsSet,
+    St: mushroom_state::State,
+    St::CommonName: mushroom_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Mushroom<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Mushroom<S> {
         Mushroom {
             common_name: self._fields.0.unwrap(),
             edible: self._fields.1,
@@ -276,11 +276,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Mushroom<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Mushroom<S> {
         Mushroom {
             common_name: self._fields.0.unwrap(),
             edible: self._fields.1,

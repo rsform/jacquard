@@ -6,33 +6,30 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[allow(unused_imports)]
+use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::app_bsky::unspecced::AgeAssuranceState;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetAgeAssuranceStateOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetAgeAssuranceStateOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
-    #[serde(borrow)]
     pub value: AgeAssuranceState<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
-    pub extra_data: Option<
-        alloc::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<S>,
-        >,
-    >,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// XRPC request marker type.
@@ -44,7 +41,7 @@ pub struct GetAgeAssuranceStateResponse;
 impl jacquard_common::xrpc::XrpcResp for GetAgeAssuranceStateResponse {
     const NSID: &'static str = "app.bsky.unspecced.getAgeAssuranceState";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetAgeAssuranceStateOutput<S>;
+    type Output<S: BosStr> = GetAgeAssuranceStateOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
@@ -59,6 +56,6 @@ pub struct GetAgeAssuranceStateRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetAgeAssuranceStateRequest {
     const PATH: &'static str = "/xrpc/app.bsky.unspecced.getAgeAssuranceState";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetAgeAssuranceState;
+    type Request<S: BosStr> = GetAgeAssuranceState;
     type Response = GetAgeAssuranceStateResponse;
 }

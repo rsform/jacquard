@@ -1,5 +1,4 @@
 use alloc::string::String;
-use core::fmt;
 use smol_str::SmolStr;
 
 use serde::{Deserialize, Serialize};
@@ -18,7 +17,7 @@ use crate::{BorrowOrShare, Bos, IntoStatic};
 /// The records all have the same Lexicon schema.
 ///
 /// Implemented on the record type itself.
-pub trait Collection: fmt::Debug + Serialize {
+pub trait Collection {
     /// The NSID for the Lexicon that defines the schema of records in this collection.
     const NSID: &'static str;
 

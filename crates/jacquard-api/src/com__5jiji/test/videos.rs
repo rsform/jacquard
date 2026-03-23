@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "com.5jiji.test.videos",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Videos<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Videos<S: BosStr = DefaultStr> {
     pub creator: Did<S>,
     pub id: Data<S>,
     pub title: S,
@@ -53,18 +53,18 @@ pub struct Videos<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct VideosGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct VideosGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Videos<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Videos<S> {
+impl<S: BosStr> Videos<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, VideosRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -77,17 +77,17 @@ pub struct VideosRecord;
 impl XrpcResp for VideosRecord {
     const NSID: &'static str = "com.5jiji.test.videos";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = VideosGetRecordOutput<S>;
+    type Output<S: BosStr> = VideosGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<VideosGetRecordOutput<S>> for Videos<S> {
+impl<S: BosStr> From<VideosGetRecordOutput<S>> for Videos<S> {
     fn from(output: VideosGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Videos<S> {
+impl<S: BosStr> Collection for Videos<S> {
     const NSID: &'static str = "com.5jiji.test.videos";
     type Record = VideosRecord;
 }
@@ -97,7 +97,7 @@ impl Collection for VideosRecord {
     type Record = VideosRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Videos<S> {
+impl<S: BosStr> LexiconSchema for Videos<S> {
     fn nsid() -> &'static str {
         "com.5jiji.test.videos"
     }
@@ -135,145 +135,145 @@ pub mod videos_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Title;
         type Creator;
         type Id;
-        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Title = Unset;
         type Creator = Unset;
         type Id = Unset;
-        type Title = Unset;
-    }
-    ///State transition - sets the `creator` field to Set
-    pub struct SetCreator<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreator<S> {}
-    impl<S: State> State for SetCreator<S> {
-        type Creator = Set<members::creator>;
-        type Id = S::Id;
-        type Title = S::Title;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type Creator = S::Creator;
-        type Id = Set<members::id>;
-        type Title = S::Title;
     }
     ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Creator = S::Creator;
-        type Id = S::Id;
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
         type Title = Set<members::title>;
+        type Creator = St::Creator;
+        type Id = St::Id;
+    }
+    ///State transition - sets the `creator` field to Set
+    pub struct SetCreator<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreator<St> {}
+    impl<St: State> State for SetCreator<St> {
+        type Title = St::Title;
+        type Creator = Set<members::creator>;
+        type Id = St::Id;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetId<St> {}
+    impl<St: State> State for SetId<St> {
+        type Title = St::Title;
+        type Creator = St::Creator;
+        type Id = Set<members::id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `title` field
+        pub struct title(());
         ///Marker type for the `creator` field
         pub struct creator(());
         ///Marker type for the `id` field
         pub struct id(());
-        ///Marker type for the `title` field
-        pub struct title(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct VideosBuilder<'a, S: videos_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct VideosBuilder<S: BosStr, St: videos_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>, Option<Data<S>>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Videos<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> VideosBuilder<'a, videos_state::Empty> {
+impl<S: BosStr> Videos<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> VideosBuilder<S, videos_state::Empty> {
         VideosBuilder::new()
     }
 }
 
-impl<'a> VideosBuilder<'a, videos_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> VideosBuilder<S, videos_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         VideosBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> VideosBuilder<'a, S>
+impl<S: BosStr, St> VideosBuilder<S, St>
 where
-    S: videos_state::State,
-    S::Creator: videos_state::IsUnset,
+    St: videos_state::State,
+    St::Creator: videos_state::IsUnset,
 {
     /// Set the `creator` field (required)
     pub fn creator(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> VideosBuilder<'a, videos_state::SetCreator<S>> {
+    ) -> VideosBuilder<S, videos_state::SetCreator<St>> {
         self._fields.0 = Option::Some(value.into());
         VideosBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> VideosBuilder<'a, S>
+impl<S: BosStr, St> VideosBuilder<S, St>
 where
-    S: videos_state::State,
-    S::Id: videos_state::IsUnset,
+    St: videos_state::State,
+    St::Id: videos_state::IsUnset,
 {
     /// Set the `id` field (required)
     pub fn id(
         mut self,
         value: impl Into<Data<S>>,
-    ) -> VideosBuilder<'a, videos_state::SetId<S>> {
+    ) -> VideosBuilder<S, videos_state::SetId<St>> {
         self._fields.1 = Option::Some(value.into());
         VideosBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> VideosBuilder<'a, S>
+impl<S: BosStr, St> VideosBuilder<S, St>
 where
-    S: videos_state::State,
-    S::Title: videos_state::IsUnset,
+    St: videos_state::State,
+    St::Title: videos_state::IsUnset,
 {
     /// Set the `title` field (required)
     pub fn title(
         mut self,
         value: impl Into<S>,
-    ) -> VideosBuilder<'a, videos_state::SetTitle<S>> {
+    ) -> VideosBuilder<S, videos_state::SetTitle<St>> {
         self._fields.2 = Option::Some(value.into());
         VideosBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> VideosBuilder<'a, S>
+impl<S: BosStr, St> VideosBuilder<S, St>
 where
-    S: videos_state::State,
-    S::Creator: videos_state::IsSet,
-    S::Id: videos_state::IsSet,
-    S::Title: videos_state::IsSet,
+    St: videos_state::State,
+    St::Title: videos_state::IsSet,
+    St::Creator: videos_state::IsSet,
+    St::Id: videos_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Videos<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Videos<S> {
         Videos {
             creator: self._fields.0.unwrap(),
             id: self._fields.1.unwrap(),
@@ -281,8 +281,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Videos<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Videos<S> {
         Videos {
             creator: self._fields.0.unwrap(),
             id: self._fields.1.unwrap(),

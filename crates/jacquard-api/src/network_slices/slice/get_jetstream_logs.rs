@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
@@ -18,37 +18,34 @@ use serde::{Serialize, Deserialize};
 use crate::network_slices::slice::get_job_logs::LogEntry;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetJetstreamLogs<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetJetstreamLogs<S: BosStr = DefaultStr> {
     ///Defaults to `100`. Min: 1. Max: 1000.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub slice: Option<S>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetJetstreamLogsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetJetstreamLogsOutput<S: BosStr = DefaultStr> {
     pub logs: Vec<LogEntry<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -57,12 +54,11 @@ pub struct GetJetstreamLogsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetJetstreamLogsResponse {
     const NSID: &'static str = "network.slices.slice.getJetstreamLogs";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetJetstreamLogsOutput<S>;
+    type Output<S: BosStr> = GetJetstreamLogsOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetJetstreamLogs<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetJetstreamLogs<S> {
     const NSID: &'static str = "network.slices.slice.getJetstreamLogs";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetJetstreamLogsResponse;
@@ -73,7 +69,7 @@ pub struct GetJetstreamLogsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetJetstreamLogsRequest {
     const PATH: &'static str = "/xrpc/network.slices.slice.getJetstreamLogs";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetJetstreamLogs<S>;
+    type Request<S: BosStr> = GetJetstreamLogs<S>;
     type Response = GetJetstreamLogsResponse;
 }
 
@@ -100,32 +96,32 @@ pub mod get_jetstream_logs_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetJetstreamLogsBuilder<'a, S: get_jetstream_logs_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetJetstreamLogsBuilder<S: BosStr, St: get_jetstream_logs_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetJetstreamLogs<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetJetstreamLogsBuilder<'a, get_jetstream_logs_state::Empty> {
+impl<S: BosStr> GetJetstreamLogs<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetJetstreamLogsBuilder<S, get_jetstream_logs_state::Empty> {
         GetJetstreamLogsBuilder::new()
     }
 }
 
-impl<'a> GetJetstreamLogsBuilder<'a, get_jetstream_logs_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetJetstreamLogsBuilder<S, get_jetstream_logs_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetJetstreamLogsBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: get_jetstream_logs_state::State> GetJetstreamLogsBuilder<'a, S> {
+impl<S: BosStr, St: get_jetstream_logs_state::State> GetJetstreamLogsBuilder<S, St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
@@ -138,7 +134,7 @@ impl<'a, S: get_jetstream_logs_state::State> GetJetstreamLogsBuilder<'a, S> {
     }
 }
 
-impl<'a, S: get_jetstream_logs_state::State> GetJetstreamLogsBuilder<'a, S> {
+impl<S: BosStr, St: get_jetstream_logs_state::State> GetJetstreamLogsBuilder<S, St> {
     /// Set the `slice` field (optional)
     pub fn slice(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -151,12 +147,12 @@ impl<'a, S: get_jetstream_logs_state::State> GetJetstreamLogsBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GetJetstreamLogsBuilder<'a, S>
+impl<S: BosStr, St> GetJetstreamLogsBuilder<S, St>
 where
-    S: get_jetstream_logs_state::State,
+    St: get_jetstream_logs_state::State,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetJetstreamLogs<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetJetstreamLogs<S> {
         GetJetstreamLogs {
             limit: self._fields.0,
             slice: self._fields.1,

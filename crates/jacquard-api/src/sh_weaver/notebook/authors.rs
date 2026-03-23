@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use crate::sh_weaver::notebook::authors;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct AuthorListItem<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct AuthorListItem<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub index: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -55,11 +55,11 @@ pub struct AuthorListItem<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum AuthorListItemProfile<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum AuthorListItemProfile<S: BosStr = DefaultStr> {
     #[serde(rename = "app.bsky.actor.defs#profileViewBasic")]
     ProfileViewBasic(Box<ProfileViewBasic<S>>),
     #[serde(rename = "sh.weaver.actor.defs#profileView")]
@@ -74,11 +74,11 @@ pub enum AuthorListItemProfile<S: Bos<str> + AsRef<str> = DefaultStr> {
     rename = "sh.weaver.notebook.authors",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Authors<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Authors<S: BosStr = DefaultStr> {
     pub author_list: Vec<authors::AuthorListItem<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
@@ -92,24 +92,24 @@ pub struct Authors<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct AuthorsGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct AuthorsGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Authors<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Authors<S> {
+impl<S: BosStr> Authors<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, AuthorsRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for AuthorListItem<S> {
+impl<S: BosStr> LexiconSchema for AuthorListItem<S> {
     fn nsid() -> &'static str {
         "sh.weaver.notebook.authors"
     }
@@ -131,17 +131,17 @@ pub struct AuthorsRecord;
 impl XrpcResp for AuthorsRecord {
     const NSID: &'static str = "sh.weaver.notebook.authors";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = AuthorsGetRecordOutput<S>;
+    type Output<S: BosStr> = AuthorsGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<AuthorsGetRecordOutput<S>> for Authors<S> {
+impl<S: BosStr> From<AuthorsGetRecordOutput<S>> for Authors<S> {
     fn from(output: AuthorsGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Authors<S> {
+impl<S: BosStr> Collection for Authors<S> {
     const NSID: &'static str = "sh.weaver.notebook.authors";
     type Record = AuthorsRecord;
 }
@@ -151,7 +151,7 @@ impl Collection for AuthorsRecord {
     type Record = AuthorsRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Authors<S> {
+impl<S: BosStr> LexiconSchema for Authors<S> {
     fn nsid() -> &'static str {
         "sh.weaver.notebook.authors"
     }
@@ -185,9 +185,9 @@ pub mod author_list_item_state {
         type ProfileIndex = Unset;
     }
     ///State transition - sets the `profile_index` field to Set
-    pub struct SetProfileIndex<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetProfileIndex<S> {}
-    impl<S: State> State for SetProfileIndex<S> {
+    pub struct SetProfileIndex<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetProfileIndex<St> {}
+    impl<St: State> State for SetProfileIndex<St> {
         type ProfileIndex = Set<members::profile_index>;
     }
     /// Marker types for field names
@@ -198,32 +198,32 @@ pub mod author_list_item_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct AuthorListItemBuilder<'a, S: author_list_item_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct AuthorListItemBuilder<S: BosStr, St: author_list_item_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<AuthorListItemProfile<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> AuthorListItem<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> AuthorListItemBuilder<'a, author_list_item_state::Empty> {
+impl<S: BosStr> AuthorListItem<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> AuthorListItemBuilder<S, author_list_item_state::Empty> {
         AuthorListItemBuilder::new()
     }
 }
 
-impl<'a> AuthorListItemBuilder<'a, author_list_item_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> AuthorListItemBuilder<S, author_list_item_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         AuthorListItemBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: author_list_item_state::State> AuthorListItemBuilder<'a, S> {
+impl<S: BosStr, St: author_list_item_state::State> AuthorListItemBuilder<S, St> {
     /// Set the `index` field (optional)
     pub fn index(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
@@ -236,7 +236,7 @@ impl<'a, S: author_list_item_state::State> AuthorListItemBuilder<'a, S> {
     }
 }
 
-impl<'a, S: author_list_item_state::State> AuthorListItemBuilder<'a, S> {
+impl<S: BosStr, St: author_list_item_state::State> AuthorListItemBuilder<S, St> {
     /// Set the `profile` field (optional)
     pub fn profile(
         mut self,
@@ -252,24 +252,24 @@ impl<'a, S: author_list_item_state::State> AuthorListItemBuilder<'a, S> {
     }
 }
 
-impl<'a, S> AuthorListItemBuilder<'a, S>
+impl<S: BosStr, St> AuthorListItemBuilder<S, St>
 where
-    S: author_list_item_state::State,
-    S::ProfileIndex: author_list_item_state::IsSet,
+    St: author_list_item_state::State,
+    St::ProfileIndex: author_list_item_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> AuthorListItem<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> AuthorListItem<S> {
         AuthorListItem {
             index: self._fields.0,
             profile: self._fields.1,
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> AuthorListItem<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> AuthorListItem<S> {
         AuthorListItem {
             index: self._fields.0,
             profile: self._fields.1,
@@ -380,9 +380,9 @@ pub mod authors_state {
         type AuthorList = Unset;
     }
     ///State transition - sets the `author_list` field to Set
-    pub struct SetAuthorList<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthorList<S> {}
-    impl<S: State> State for SetAuthorList<S> {
+    pub struct SetAuthorList<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAuthorList<St> {}
+    impl<St: State> State for SetAuthorList<St> {
         type AuthorList = Set<members::author_list>;
     }
     /// Marker types for field names
@@ -393,51 +393,51 @@ pub mod authors_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct AuthorsBuilder<'a, S: authors_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct AuthorsBuilder<S: BosStr, St: authors_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<authors::AuthorListItem<S>>>, Option<Datetime>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Authors<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> AuthorsBuilder<'a, authors_state::Empty> {
+impl<S: BosStr> Authors<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> AuthorsBuilder<S, authors_state::Empty> {
         AuthorsBuilder::new()
     }
 }
 
-impl<'a> AuthorsBuilder<'a, authors_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> AuthorsBuilder<S, authors_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         AuthorsBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AuthorsBuilder<'a, S>
+impl<S: BosStr, St> AuthorsBuilder<S, St>
 where
-    S: authors_state::State,
-    S::AuthorList: authors_state::IsUnset,
+    St: authors_state::State,
+    St::AuthorList: authors_state::IsUnset,
 {
     /// Set the `authorList` field (required)
     pub fn author_list(
         mut self,
         value: impl Into<Vec<authors::AuthorListItem<S>>>,
-    ) -> AuthorsBuilder<'a, authors_state::SetAuthorList<S>> {
+    ) -> AuthorsBuilder<S, authors_state::SetAuthorList<St>> {
         self._fields.0 = Option::Some(value.into());
         AuthorsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: authors_state::State> AuthorsBuilder<'a, S> {
+impl<S: BosStr, St: authors_state::State> AuthorsBuilder<S, St> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.1 = value.into();
@@ -450,24 +450,21 @@ impl<'a, S: authors_state::State> AuthorsBuilder<'a, S> {
     }
 }
 
-impl<'a, S> AuthorsBuilder<'a, S>
+impl<S: BosStr, St> AuthorsBuilder<S, St>
 where
-    S: authors_state::State,
-    S::AuthorList: authors_state::IsSet,
+    St: authors_state::State,
+    St::AuthorList: authors_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Authors<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Authors<S> {
         Authors {
             author_list: self._fields.0.unwrap(),
             created_at: self._fields.1,
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Authors<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Authors<S> {
         Authors {
             author_list: self._fields.0.unwrap(),
             created_at: self._fields.1,

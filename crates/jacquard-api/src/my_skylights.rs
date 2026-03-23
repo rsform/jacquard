@@ -12,7 +12,7 @@ pub mod rel;
 
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -30,11 +30,11 @@ use serde::{Serialize, Deserialize};
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Item<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Item<S: BosStr = DefaultStr> {
     pub r#ref: ItemRef<S>,
     pub value: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -43,14 +43,14 @@ pub struct Item<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ItemRef<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ItemRef<S: BosStr = DefaultStr> {
     OpenLibrary,
     TmdbM,
     TmdbS,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> ItemRef<S> {
+impl<S: BosStr> ItemRef<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::OpenLibrary => "open-library",
@@ -70,19 +70,19 @@ impl<S: Bos<str> + AsRef<str>> ItemRef<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ItemRef<S> {
+impl<S: BosStr> core::fmt::Display for ItemRef<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for ItemRef<S> {
+impl<S: BosStr> AsRef<str> for ItemRef<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for ItemRef<S> {
+impl<S: BosStr> Serialize for ItemRef<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -91,7 +91,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for ItemRef<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de> for ItemRef<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ItemRef<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -101,14 +101,18 @@ impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de> for Item
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for ItemRef<S> {
+impl<S: BosStr + Default> Default for ItemRef<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for ItemRef<S> {
-    type Output = ItemRef<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for ItemRef<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ItemRef<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             ItemRef::OpenLibrary => ItemRef::OpenLibrary,
@@ -119,7 +123,7 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for ItemRef<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Item<S> {
+impl<S: BosStr> LexiconSchema for Item<S> {
     fn nsid() -> &'static str {
         "my.skylights.defs"
     }

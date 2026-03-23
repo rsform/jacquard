@@ -13,7 +13,7 @@ pub mod get_temporary_link;
 
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -33,11 +33,11 @@ use crate::app_rocksky::dropbox;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct FileListView<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct FileListView<S: BosStr = DefaultStr> {
     ///A list of files in the Dropbox.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub files: Option<Vec<dropbox::FileView<S>>>,
@@ -50,11 +50,11 @@ pub struct FileListView<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct FileView<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct FileView<S: BosStr = DefaultStr> {
     ///The last modified date and time of the file on the client.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub client_modified: Option<Datetime>,
@@ -82,11 +82,11 @@ pub struct FileView<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct TemporaryLinkView<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct TemporaryLinkView<S: BosStr = DefaultStr> {
     ///The temporary link to access the file.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub link: Option<UriValue<S>>,
@@ -94,7 +94,7 @@ pub struct TemporaryLinkView<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for FileListView<S> {
+impl<S: BosStr> LexiconSchema for FileListView<S> {
     fn nsid() -> &'static str {
         "app.rocksky.dropbox.defs"
     }
@@ -109,7 +109,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for FileListView<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for FileView<S> {
+impl<S: BosStr> LexiconSchema for FileView<S> {
     fn nsid() -> &'static str {
         "app.rocksky.dropbox.defs"
     }
@@ -124,7 +124,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for FileView<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for TemporaryLinkView<S> {
+impl<S: BosStr> LexiconSchema for TemporaryLinkView<S> {
     fn nsid() -> &'static str {
         "app.rocksky.dropbox.defs"
     }

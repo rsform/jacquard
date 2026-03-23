@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "games.gamesgamesgamesgames.redirect",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Redirect<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Redirect<S: BosStr = DefaultStr> {
     pub collection: Nsid<S>,
     pub created_at: Datetime,
     pub source_uri: AtUri<S>,
@@ -54,18 +54,18 @@ pub struct Redirect<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct RedirectGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct RedirectGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Redirect<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Redirect<S> {
+impl<S: BosStr> Redirect<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, RedirectRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -78,17 +78,17 @@ pub struct RedirectRecord;
 impl XrpcResp for RedirectRecord {
     const NSID: &'static str = "games.gamesgamesgamesgames.redirect";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = RedirectGetRecordOutput<S>;
+    type Output<S: BosStr> = RedirectGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<RedirectGetRecordOutput<S>> for Redirect<S> {
+impl<S: BosStr> From<RedirectGetRecordOutput<S>> for Redirect<S> {
     fn from(output: RedirectGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Redirect<S> {
+impl<S: BosStr> Collection for Redirect<S> {
     const NSID: &'static str = "games.gamesgamesgamesgames.redirect";
     type Record = RedirectRecord;
 }
@@ -98,7 +98,7 @@ impl Collection for RedirectRecord {
     type Record = RedirectRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Redirect<S> {
+impl<S: BosStr> LexiconSchema for Redirect<S> {
     fn nsid() -> &'static str {
         "games.gamesgamesgamesgames.redirect"
     }
@@ -123,181 +123,181 @@ pub mod redirect_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Collection;
-        type SourceUri;
-        type CreatedAt;
         type TargetUri;
+        type Collection;
+        type CreatedAt;
+        type SourceUri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Collection = Unset;
-        type SourceUri = Unset;
-        type CreatedAt = Unset;
         type TargetUri = Unset;
-    }
-    ///State transition - sets the `collection` field to Set
-    pub struct SetCollection<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCollection<S> {}
-    impl<S: State> State for SetCollection<S> {
-        type Collection = Set<members::collection>;
-        type SourceUri = S::SourceUri;
-        type CreatedAt = S::CreatedAt;
-        type TargetUri = S::TargetUri;
-    }
-    ///State transition - sets the `source_uri` field to Set
-    pub struct SetSourceUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSourceUri<S> {}
-    impl<S: State> State for SetSourceUri<S> {
-        type Collection = S::Collection;
-        type SourceUri = Set<members::source_uri>;
-        type CreatedAt = S::CreatedAt;
-        type TargetUri = S::TargetUri;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Collection = S::Collection;
-        type SourceUri = S::SourceUri;
-        type CreatedAt = Set<members::created_at>;
-        type TargetUri = S::TargetUri;
+        type Collection = Unset;
+        type CreatedAt = Unset;
+        type SourceUri = Unset;
     }
     ///State transition - sets the `target_uri` field to Set
-    pub struct SetTargetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTargetUri<S> {}
-    impl<S: State> State for SetTargetUri<S> {
-        type Collection = S::Collection;
-        type SourceUri = S::SourceUri;
-        type CreatedAt = S::CreatedAt;
+    pub struct SetTargetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTargetUri<St> {}
+    impl<St: State> State for SetTargetUri<St> {
         type TargetUri = Set<members::target_uri>;
+        type Collection = St::Collection;
+        type CreatedAt = St::CreatedAt;
+        type SourceUri = St::SourceUri;
+    }
+    ///State transition - sets the `collection` field to Set
+    pub struct SetCollection<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCollection<St> {}
+    impl<St: State> State for SetCollection<St> {
+        type TargetUri = St::TargetUri;
+        type Collection = Set<members::collection>;
+        type CreatedAt = St::CreatedAt;
+        type SourceUri = St::SourceUri;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type TargetUri = St::TargetUri;
+        type Collection = St::Collection;
+        type CreatedAt = Set<members::created_at>;
+        type SourceUri = St::SourceUri;
+    }
+    ///State transition - sets the `source_uri` field to Set
+    pub struct SetSourceUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSourceUri<St> {}
+    impl<St: State> State for SetSourceUri<St> {
+        type TargetUri = St::TargetUri;
+        type Collection = St::Collection;
+        type CreatedAt = St::CreatedAt;
+        type SourceUri = Set<members::source_uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `collection` field
-        pub struct collection(());
-        ///Marker type for the `source_uri` field
-        pub struct source_uri(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `target_uri` field
         pub struct target_uri(());
+        ///Marker type for the `collection` field
+        pub struct collection(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `source_uri` field
+        pub struct source_uri(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct RedirectBuilder<'a, S: redirect_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct RedirectBuilder<S: BosStr, St: redirect_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Nsid<S>>, Option<Datetime>, Option<AtUri<S>>, Option<AtUri<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Redirect<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> RedirectBuilder<'a, redirect_state::Empty> {
+impl<S: BosStr> Redirect<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> RedirectBuilder<S, redirect_state::Empty> {
         RedirectBuilder::new()
     }
 }
 
-impl<'a> RedirectBuilder<'a, redirect_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> RedirectBuilder<S, redirect_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         RedirectBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RedirectBuilder<'a, S>
+impl<S: BosStr, St> RedirectBuilder<S, St>
 where
-    S: redirect_state::State,
-    S::Collection: redirect_state::IsUnset,
+    St: redirect_state::State,
+    St::Collection: redirect_state::IsUnset,
 {
     /// Set the `collection` field (required)
     pub fn collection(
         mut self,
         value: impl Into<Nsid<S>>,
-    ) -> RedirectBuilder<'a, redirect_state::SetCollection<S>> {
+    ) -> RedirectBuilder<S, redirect_state::SetCollection<St>> {
         self._fields.0 = Option::Some(value.into());
         RedirectBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RedirectBuilder<'a, S>
+impl<S: BosStr, St> RedirectBuilder<S, St>
 where
-    S: redirect_state::State,
-    S::CreatedAt: redirect_state::IsUnset,
+    St: redirect_state::State,
+    St::CreatedAt: redirect_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> RedirectBuilder<'a, redirect_state::SetCreatedAt<S>> {
+    ) -> RedirectBuilder<S, redirect_state::SetCreatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         RedirectBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RedirectBuilder<'a, S>
+impl<S: BosStr, St> RedirectBuilder<S, St>
 where
-    S: redirect_state::State,
-    S::SourceUri: redirect_state::IsUnset,
+    St: redirect_state::State,
+    St::SourceUri: redirect_state::IsUnset,
 {
     /// Set the `sourceUri` field (required)
     pub fn source_uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> RedirectBuilder<'a, redirect_state::SetSourceUri<S>> {
+    ) -> RedirectBuilder<S, redirect_state::SetSourceUri<St>> {
         self._fields.2 = Option::Some(value.into());
         RedirectBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RedirectBuilder<'a, S>
+impl<S: BosStr, St> RedirectBuilder<S, St>
 where
-    S: redirect_state::State,
-    S::TargetUri: redirect_state::IsUnset,
+    St: redirect_state::State,
+    St::TargetUri: redirect_state::IsUnset,
 {
     /// Set the `targetUri` field (required)
     pub fn target_uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> RedirectBuilder<'a, redirect_state::SetTargetUri<S>> {
+    ) -> RedirectBuilder<S, redirect_state::SetTargetUri<St>> {
         self._fields.3 = Option::Some(value.into());
         RedirectBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RedirectBuilder<'a, S>
+impl<S: BosStr, St> RedirectBuilder<S, St>
 where
-    S: redirect_state::State,
-    S::Collection: redirect_state::IsSet,
-    S::SourceUri: redirect_state::IsSet,
-    S::CreatedAt: redirect_state::IsSet,
-    S::TargetUri: redirect_state::IsSet,
+    St: redirect_state::State,
+    St::TargetUri: redirect_state::IsSet,
+    St::Collection: redirect_state::IsSet,
+    St::CreatedAt: redirect_state::IsSet,
+    St::SourceUri: redirect_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Redirect<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Redirect<S> {
         Redirect {
             collection: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
@@ -306,11 +306,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Redirect<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Redirect<S> {
         Redirect {
             collection: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),

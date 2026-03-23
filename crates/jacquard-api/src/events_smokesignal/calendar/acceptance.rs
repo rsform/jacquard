@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "events.smokesignal.calendar.acceptance",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Acceptance<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Acceptance<S: BosStr = DefaultStr> {
     ///The CID (Content Identifier) of the rsvp that this proof validates.
     pub cid: Cid<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -52,18 +52,18 @@ pub struct Acceptance<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct AcceptanceGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct AcceptanceGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Acceptance<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Acceptance<S> {
+impl<S: BosStr> Acceptance<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, AcceptanceRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -76,17 +76,17 @@ pub struct AcceptanceRecord;
 impl XrpcResp for AcceptanceRecord {
     const NSID: &'static str = "events.smokesignal.calendar.acceptance";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = AcceptanceGetRecordOutput<S>;
+    type Output<S: BosStr> = AcceptanceGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<AcceptanceGetRecordOutput<S>> for Acceptance<S> {
+impl<S: BosStr> From<AcceptanceGetRecordOutput<S>> for Acceptance<S> {
     fn from(output: AcceptanceGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Acceptance<S> {
+impl<S: BosStr> Collection for Acceptance<S> {
     const NSID: &'static str = "events.smokesignal.calendar.acceptance";
     type Record = AcceptanceRecord;
 }
@@ -96,7 +96,7 @@ impl Collection for AcceptanceRecord {
     type Record = AcceptanceRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Acceptance<S> {
+impl<S: BosStr> LexiconSchema for Acceptance<S> {
     fn nsid() -> &'static str {
         "events.smokesignal.calendar.acceptance"
     }
@@ -130,9 +130,9 @@ pub mod acceptance_state {
         type Cid = Unset;
     }
     ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
+    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCid<St> {}
+    impl<St: State> State for SetCid<St> {
         type Cid = Set<members::cid>;
     }
     /// Marker types for field names
@@ -143,67 +143,67 @@ pub mod acceptance_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct AcceptanceBuilder<'a, S: acceptance_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct AcceptanceBuilder<S: BosStr, St: acceptance_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Cid<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Acceptance<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> AcceptanceBuilder<'a, acceptance_state::Empty> {
+impl<S: BosStr> Acceptance<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> AcceptanceBuilder<S, acceptance_state::Empty> {
         AcceptanceBuilder::new()
     }
 }
 
-impl<'a> AcceptanceBuilder<'a, acceptance_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> AcceptanceBuilder<S, acceptance_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         AcceptanceBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AcceptanceBuilder<'a, S>
+impl<S: BosStr, St> AcceptanceBuilder<S, St>
 where
-    S: acceptance_state::State,
-    S::Cid: acceptance_state::IsUnset,
+    St: acceptance_state::State,
+    St::Cid: acceptance_state::IsUnset,
 {
     /// Set the `cid` field (required)
     pub fn cid(
         mut self,
         value: impl Into<Cid<S>>,
-    ) -> AcceptanceBuilder<'a, acceptance_state::SetCid<S>> {
+    ) -> AcceptanceBuilder<S, acceptance_state::SetCid<St>> {
         self._fields.0 = Option::Some(value.into());
         AcceptanceBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AcceptanceBuilder<'a, S>
+impl<S: BosStr, St> AcceptanceBuilder<S, St>
 where
-    S: acceptance_state::State,
-    S::Cid: acceptance_state::IsSet,
+    St: acceptance_state::State,
+    St::Cid: acceptance_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Acceptance<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Acceptance<S> {
         Acceptance {
             cid: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Acceptance<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Acceptance<S> {
         Acceptance {
             cid: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

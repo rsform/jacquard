@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -32,14 +32,14 @@ use crate::sh_weaver::collab::invite;
 /// The scope/type of collaboration.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum CollabScope<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum CollabScope<S: BosStr = DefaultStr> {
     ShWeaverCollabDefsNotebook,
     ShWeaverCollabDefsEntry,
     ShWeaverCollabDefsChapter,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> CollabScope<S> {
+impl<S: BosStr> CollabScope<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::ShWeaverCollabDefsNotebook => "sh.weaver.collab.defs#notebook",
@@ -59,19 +59,19 @@ impl<S: Bos<str> + AsRef<str>> CollabScope<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for CollabScope<S> {
+impl<S: BosStr> AsRef<str> for CollabScope<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for CollabScope<S> {
+impl<S: BosStr> core::fmt::Display for CollabScope<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for CollabScope<S> {
+impl<S: BosStr> Serialize for CollabScope<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -80,8 +80,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for CollabScope<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for CollabScope<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for CollabScope<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -91,8 +90,12 @@ for CollabScope<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for CollabScope<S> {
-    type Output = CollabScope<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for CollabScope<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = CollabScope<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             CollabScope::ShWeaverCollabDefsNotebook => {
@@ -115,11 +118,11 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for CollabScope<S> {
     rename = "sh.weaver.collab.invite",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Invite<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Invite<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     ///Optional expiration for the invite.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -144,18 +147,18 @@ pub struct Invite<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct InviteGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct InviteGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Invite<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Invite<S> {
+impl<S: BosStr> Invite<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, InviteRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -168,17 +171,17 @@ pub struct InviteRecord;
 impl XrpcResp for InviteRecord {
     const NSID: &'static str = "sh.weaver.collab.invite";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = InviteGetRecordOutput<S>;
+    type Output<S: BosStr> = InviteGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<InviteGetRecordOutput<S>> for Invite<S> {
+impl<S: BosStr> From<InviteGetRecordOutput<S>> for Invite<S> {
     fn from(output: InviteGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Invite<S> {
+impl<S: BosStr> Collection for Invite<S> {
     const NSID: &'static str = "sh.weaver.collab.invite";
     type Record = InviteRecord;
 }
@@ -188,7 +191,7 @@ impl Collection for InviteRecord {
     type Record = InviteRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Invite<S> {
+impl<S: BosStr> LexiconSchema for Invite<S> {
     fn nsid() -> &'static str {
         "sh.weaver.collab.invite"
     }
@@ -235,57 +238,57 @@ pub mod invite_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Invitee;
-        type Resource;
         type CreatedAt;
+        type Resource;
+        type Invitee;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Invitee = Unset;
-        type Resource = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `invitee` field to Set
-    pub struct SetInvitee<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetInvitee<S> {}
-    impl<S: State> State for SetInvitee<S> {
-        type Invitee = Set<members::invitee>;
-        type Resource = S::Resource;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `resource` field to Set
-    pub struct SetResource<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetResource<S> {}
-    impl<S: State> State for SetResource<S> {
-        type Invitee = S::Invitee;
-        type Resource = Set<members::resource>;
-        type CreatedAt = S::CreatedAt;
+        type Resource = Unset;
+        type Invitee = Unset;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Invitee = S::Invitee;
-        type Resource = S::Resource;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
+        type Resource = St::Resource;
+        type Invitee = St::Invitee;
+    }
+    ///State transition - sets the `resource` field to Set
+    pub struct SetResource<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetResource<St> {}
+    impl<St: State> State for SetResource<St> {
+        type CreatedAt = St::CreatedAt;
+        type Resource = Set<members::resource>;
+        type Invitee = St::Invitee;
+    }
+    ///State transition - sets the `invitee` field to Set
+    pub struct SetInvitee<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetInvitee<St> {}
+    impl<St: State> State for SetInvitee<St> {
+        type CreatedAt = St::CreatedAt;
+        type Resource = St::Resource;
+        type Invitee = Set<members::invitee>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `invitee` field
-        pub struct invitee(());
-        ///Marker type for the `resource` field
-        pub struct resource(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `resource` field
+        pub struct resource(());
+        ///Marker type for the `invitee` field
+        pub struct invitee(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct InviteBuilder<'a, S: invite_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct InviteBuilder<S: BosStr, St: invite_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
         Option<Datetime>,
@@ -294,47 +297,47 @@ pub struct InviteBuilder<'a, S: invite_state::State> {
         Option<StrongRef<S>>,
         Option<invite::CollabScope<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Invite<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> InviteBuilder<'a, invite_state::Empty> {
+impl<S: BosStr> Invite<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> InviteBuilder<S, invite_state::Empty> {
         InviteBuilder::new()
     }
 }
 
-impl<'a> InviteBuilder<'a, invite_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> InviteBuilder<S, invite_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         InviteBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> InviteBuilder<'a, S>
+impl<S: BosStr, St> InviteBuilder<S, St>
 where
-    S: invite_state::State,
-    S::CreatedAt: invite_state::IsUnset,
+    St: invite_state::State,
+    St::CreatedAt: invite_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> InviteBuilder<'a, invite_state::SetCreatedAt<S>> {
+    ) -> InviteBuilder<S, invite_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         InviteBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: invite_state::State> InviteBuilder<'a, S> {
+impl<S: BosStr, St: invite_state::State> InviteBuilder<S, St> {
     /// Set the `expiresAt` field (optional)
     pub fn expires_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.1 = value.into();
@@ -347,26 +350,26 @@ impl<'a, S: invite_state::State> InviteBuilder<'a, S> {
     }
 }
 
-impl<'a, S> InviteBuilder<'a, S>
+impl<S: BosStr, St> InviteBuilder<S, St>
 where
-    S: invite_state::State,
-    S::Invitee: invite_state::IsUnset,
+    St: invite_state::State,
+    St::Invitee: invite_state::IsUnset,
 {
     /// Set the `invitee` field (required)
     pub fn invitee(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> InviteBuilder<'a, invite_state::SetInvitee<S>> {
+    ) -> InviteBuilder<S, invite_state::SetInvitee<St>> {
         self._fields.2 = Option::Some(value.into());
         InviteBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: invite_state::State> InviteBuilder<'a, S> {
+impl<S: BosStr, St: invite_state::State> InviteBuilder<S, St> {
     /// Set the `message` field (optional)
     pub fn message(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -379,26 +382,26 @@ impl<'a, S: invite_state::State> InviteBuilder<'a, S> {
     }
 }
 
-impl<'a, S> InviteBuilder<'a, S>
+impl<S: BosStr, St> InviteBuilder<S, St>
 where
-    S: invite_state::State,
-    S::Resource: invite_state::IsUnset,
+    St: invite_state::State,
+    St::Resource: invite_state::IsUnset,
 {
     /// Set the `resource` field (required)
     pub fn resource(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> InviteBuilder<'a, invite_state::SetResource<S>> {
+    ) -> InviteBuilder<S, invite_state::SetResource<St>> {
         self._fields.4 = Option::Some(value.into());
         InviteBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: invite_state::State> InviteBuilder<'a, S> {
+impl<S: BosStr, St: invite_state::State> InviteBuilder<S, St> {
     /// Set the `scope` field (optional)
     pub fn scope(mut self, value: impl Into<Option<invite::CollabScope<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -411,15 +414,15 @@ impl<'a, S: invite_state::State> InviteBuilder<'a, S> {
     }
 }
 
-impl<'a, S> InviteBuilder<'a, S>
+impl<S: BosStr, St> InviteBuilder<S, St>
 where
-    S: invite_state::State,
-    S::Invitee: invite_state::IsSet,
-    S::Resource: invite_state::IsSet,
-    S::CreatedAt: invite_state::IsSet,
+    St: invite_state::State,
+    St::CreatedAt: invite_state::IsSet,
+    St::Resource: invite_state::IsSet,
+    St::Invitee: invite_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Invite<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Invite<S> {
         Invite {
             created_at: self._fields.0.unwrap(),
             expires_at: self._fields.1,
@@ -430,8 +433,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Invite<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Invite<S> {
         Invite {
             created_at: self._fields.0.unwrap(),
             expires_at: self._fields.1,

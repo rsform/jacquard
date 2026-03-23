@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use crate::buzz_bookhive::BookIdentifiers;
     rename = "buzz.bookhive.hiveBook",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct HiveBook<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct HiveBook<S: BosStr = DefaultStr> {
     ///The authors of the book (tab separated)
     pub authors: S,
     ///URL to full-size cover image
@@ -85,18 +85,18 @@ pub struct HiveBook<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct HiveBookGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct HiveBookGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: HiveBook<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> HiveBook<S> {
+impl<S: BosStr> HiveBook<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, HiveBookRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -109,17 +109,17 @@ pub struct HiveBookRecord;
 impl XrpcResp for HiveBookRecord {
     const NSID: &'static str = "buzz.bookhive.hiveBook";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = HiveBookGetRecordOutput<S>;
+    type Output<S: BosStr> = HiveBookGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<HiveBookGetRecordOutput<S>> for HiveBook<S> {
+impl<S: BosStr> From<HiveBookGetRecordOutput<S>> for HiveBook<S> {
     fn from(output: HiveBookGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for HiveBook<S> {
+impl<S: BosStr> Collection for HiveBook<S> {
     const NSID: &'static str = "buzz.bookhive.hiveBook";
     type Record = HiveBookRecord;
 }
@@ -129,7 +129,7 @@ impl Collection for HiveBookRecord {
     type Record = HiveBookRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for HiveBook<S> {
+impl<S: BosStr> LexiconSchema for HiveBook<S> {
     fn nsid() -> &'static str {
         "buzz.bookhive.hiveBook"
     }
@@ -229,9 +229,9 @@ pub mod hive_book_state {
         type Title;
         type Authors;
         type CreatedAt;
+        type Id;
         type UpdatedAt;
         type Thumbnail;
-        type Id;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -240,75 +240,75 @@ pub mod hive_book_state {
         type Title = Unset;
         type Authors = Unset;
         type CreatedAt = Unset;
+        type Id = Unset;
         type UpdatedAt = Unset;
         type Thumbnail = Unset;
-        type Id = Unset;
     }
     ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
         type Title = Set<members::title>;
-        type Authors = S::Authors;
-        type CreatedAt = S::CreatedAt;
-        type UpdatedAt = S::UpdatedAt;
-        type Thumbnail = S::Thumbnail;
-        type Id = S::Id;
+        type Authors = St::Authors;
+        type CreatedAt = St::CreatedAt;
+        type Id = St::Id;
+        type UpdatedAt = St::UpdatedAt;
+        type Thumbnail = St::Thumbnail;
     }
     ///State transition - sets the `authors` field to Set
-    pub struct SetAuthors<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthors<S> {}
-    impl<S: State> State for SetAuthors<S> {
-        type Title = S::Title;
+    pub struct SetAuthors<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAuthors<St> {}
+    impl<St: State> State for SetAuthors<St> {
+        type Title = St::Title;
         type Authors = Set<members::authors>;
-        type CreatedAt = S::CreatedAt;
-        type UpdatedAt = S::UpdatedAt;
-        type Thumbnail = S::Thumbnail;
-        type Id = S::Id;
+        type CreatedAt = St::CreatedAt;
+        type Id = St::Id;
+        type UpdatedAt = St::UpdatedAt;
+        type Thumbnail = St::Thumbnail;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Title = S::Title;
-        type Authors = S::Authors;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Title = St::Title;
+        type Authors = St::Authors;
         type CreatedAt = Set<members::created_at>;
-        type UpdatedAt = S::UpdatedAt;
-        type Thumbnail = S::Thumbnail;
-        type Id = S::Id;
-    }
-    ///State transition - sets the `updated_at` field to Set
-    pub struct SetUpdatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUpdatedAt<S> {}
-    impl<S: State> State for SetUpdatedAt<S> {
-        type Title = S::Title;
-        type Authors = S::Authors;
-        type CreatedAt = S::CreatedAt;
-        type UpdatedAt = Set<members::updated_at>;
-        type Thumbnail = S::Thumbnail;
-        type Id = S::Id;
-    }
-    ///State transition - sets the `thumbnail` field to Set
-    pub struct SetThumbnail<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetThumbnail<S> {}
-    impl<S: State> State for SetThumbnail<S> {
-        type Title = S::Title;
-        type Authors = S::Authors;
-        type CreatedAt = S::CreatedAt;
-        type UpdatedAt = S::UpdatedAt;
-        type Thumbnail = Set<members::thumbnail>;
-        type Id = S::Id;
+        type Id = St::Id;
+        type UpdatedAt = St::UpdatedAt;
+        type Thumbnail = St::Thumbnail;
     }
     ///State transition - sets the `id` field to Set
-    pub struct SetId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetId<S> {}
-    impl<S: State> State for SetId<S> {
-        type Title = S::Title;
-        type Authors = S::Authors;
-        type CreatedAt = S::CreatedAt;
-        type UpdatedAt = S::UpdatedAt;
-        type Thumbnail = S::Thumbnail;
+    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetId<St> {}
+    impl<St: State> State for SetId<St> {
+        type Title = St::Title;
+        type Authors = St::Authors;
+        type CreatedAt = St::CreatedAt;
         type Id = Set<members::id>;
+        type UpdatedAt = St::UpdatedAt;
+        type Thumbnail = St::Thumbnail;
+    }
+    ///State transition - sets the `updated_at` field to Set
+    pub struct SetUpdatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUpdatedAt<St> {}
+    impl<St: State> State for SetUpdatedAt<St> {
+        type Title = St::Title;
+        type Authors = St::Authors;
+        type CreatedAt = St::CreatedAt;
+        type Id = St::Id;
+        type UpdatedAt = Set<members::updated_at>;
+        type Thumbnail = St::Thumbnail;
+    }
+    ///State transition - sets the `thumbnail` field to Set
+    pub struct SetThumbnail<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetThumbnail<St> {}
+    impl<St: State> State for SetThumbnail<St> {
+        type Title = St::Title;
+        type Authors = St::Authors;
+        type CreatedAt = St::CreatedAt;
+        type Id = St::Id;
+        type UpdatedAt = St::UpdatedAt;
+        type Thumbnail = Set<members::thumbnail>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -319,18 +319,18 @@ pub mod hive_book_state {
         pub struct authors(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `id` field
+        pub struct id(());
         ///Marker type for the `updated_at` field
         pub struct updated_at(());
         ///Marker type for the `thumbnail` field
         pub struct thumbnail(());
-        ///Marker type for the `id` field
-        pub struct id(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct HiveBookBuilder<'a, S: hive_book_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct HiveBookBuilder<S: BosStr, St: hive_book_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
         Option<S>,
@@ -347,18 +347,18 @@ pub struct HiveBookBuilder<'a, S: hive_book_state::State> {
         Option<S>,
         Option<Datetime>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> HiveBook<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> HiveBookBuilder<'a, hive_book_state::Empty> {
+impl<S: BosStr> HiveBook<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> HiveBookBuilder<S, hive_book_state::Empty> {
         HiveBookBuilder::new()
     }
 }
 
-impl<'a> HiveBookBuilder<'a, hive_book_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> HiveBookBuilder<S, hive_book_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         HiveBookBuilder {
             _state: PhantomData,
@@ -378,31 +378,31 @@ impl<'a> HiveBookBuilder<'a, hive_book_state::Empty> {
                 None,
                 None,
             ),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> HiveBookBuilder<'a, S>
+impl<S: BosStr, St> HiveBookBuilder<S, St>
 where
-    S: hive_book_state::State,
-    S::Authors: hive_book_state::IsUnset,
+    St: hive_book_state::State,
+    St::Authors: hive_book_state::IsUnset,
 {
     /// Set the `authors` field (required)
     pub fn authors(
         mut self,
         value: impl Into<S>,
-    ) -> HiveBookBuilder<'a, hive_book_state::SetAuthors<S>> {
+    ) -> HiveBookBuilder<S, hive_book_state::SetAuthors<St>> {
         self._fields.0 = Option::Some(value.into());
         HiveBookBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: hive_book_state::State> HiveBookBuilder<'a, S> {
+impl<S: BosStr, St: hive_book_state::State> HiveBookBuilder<S, St> {
     /// Set the `cover` field (optional)
     pub fn cover(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -415,26 +415,26 @@ impl<'a, S: hive_book_state::State> HiveBookBuilder<'a, S> {
     }
 }
 
-impl<'a, S> HiveBookBuilder<'a, S>
+impl<S: BosStr, St> HiveBookBuilder<S, St>
 where
-    S: hive_book_state::State,
-    S::CreatedAt: hive_book_state::IsUnset,
+    St: hive_book_state::State,
+    St::CreatedAt: hive_book_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> HiveBookBuilder<'a, hive_book_state::SetCreatedAt<S>> {
+    ) -> HiveBookBuilder<S, hive_book_state::SetCreatedAt<St>> {
         self._fields.2 = Option::Some(value.into());
         HiveBookBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: hive_book_state::State> HiveBookBuilder<'a, S> {
+impl<S: BosStr, St: hive_book_state::State> HiveBookBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -447,26 +447,26 @@ impl<'a, S: hive_book_state::State> HiveBookBuilder<'a, S> {
     }
 }
 
-impl<'a, S> HiveBookBuilder<'a, S>
+impl<S: BosStr, St> HiveBookBuilder<S, St>
 where
-    S: hive_book_state::State,
-    S::Id: hive_book_state::IsUnset,
+    St: hive_book_state::State,
+    St::Id: hive_book_state::IsUnset,
 {
     /// Set the `id` field (required)
     pub fn id(
         mut self,
         value: impl Into<S>,
-    ) -> HiveBookBuilder<'a, hive_book_state::SetId<S>> {
+    ) -> HiveBookBuilder<S, hive_book_state::SetId<St>> {
         self._fields.4 = Option::Some(value.into());
         HiveBookBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: hive_book_state::State> HiveBookBuilder<'a, S> {
+impl<S: BosStr, St: hive_book_state::State> HiveBookBuilder<S, St> {
     /// Set the `identifiers` field (optional)
     pub fn identifiers(mut self, value: impl Into<Option<BookIdentifiers<S>>>) -> Self {
         self._fields.5 = value.into();
@@ -479,7 +479,7 @@ impl<'a, S: hive_book_state::State> HiveBookBuilder<'a, S> {
     }
 }
 
-impl<'a, S: hive_book_state::State> HiveBookBuilder<'a, S> {
+impl<S: BosStr, St: hive_book_state::State> HiveBookBuilder<S, St> {
     /// Set the `rating` field (optional)
     pub fn rating(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.6 = value.into();
@@ -492,7 +492,7 @@ impl<'a, S: hive_book_state::State> HiveBookBuilder<'a, S> {
     }
 }
 
-impl<'a, S: hive_book_state::State> HiveBookBuilder<'a, S> {
+impl<S: BosStr, St: hive_book_state::State> HiveBookBuilder<S, St> {
     /// Set the `ratingsCount` field (optional)
     pub fn ratings_count(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.7 = value.into();
@@ -505,7 +505,7 @@ impl<'a, S: hive_book_state::State> HiveBookBuilder<'a, S> {
     }
 }
 
-impl<'a, S: hive_book_state::State> HiveBookBuilder<'a, S> {
+impl<S: BosStr, St: hive_book_state::State> HiveBookBuilder<S, St> {
     /// Set the `source` field (optional)
     pub fn source(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.8 = value.into();
@@ -518,7 +518,7 @@ impl<'a, S: hive_book_state::State> HiveBookBuilder<'a, S> {
     }
 }
 
-impl<'a, S: hive_book_state::State> HiveBookBuilder<'a, S> {
+impl<S: BosStr, St: hive_book_state::State> HiveBookBuilder<S, St> {
     /// Set the `sourceId` field (optional)
     pub fn source_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.9 = value.into();
@@ -531,7 +531,7 @@ impl<'a, S: hive_book_state::State> HiveBookBuilder<'a, S> {
     }
 }
 
-impl<'a, S: hive_book_state::State> HiveBookBuilder<'a, S> {
+impl<S: BosStr, St: hive_book_state::State> HiveBookBuilder<S, St> {
     /// Set the `sourceUrl` field (optional)
     pub fn source_url(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.10 = value.into();
@@ -544,75 +544,75 @@ impl<'a, S: hive_book_state::State> HiveBookBuilder<'a, S> {
     }
 }
 
-impl<'a, S> HiveBookBuilder<'a, S>
+impl<S: BosStr, St> HiveBookBuilder<S, St>
 where
-    S: hive_book_state::State,
-    S::Thumbnail: hive_book_state::IsUnset,
+    St: hive_book_state::State,
+    St::Thumbnail: hive_book_state::IsUnset,
 {
     /// Set the `thumbnail` field (required)
     pub fn thumbnail(
         mut self,
         value: impl Into<S>,
-    ) -> HiveBookBuilder<'a, hive_book_state::SetThumbnail<S>> {
+    ) -> HiveBookBuilder<S, hive_book_state::SetThumbnail<St>> {
         self._fields.11 = Option::Some(value.into());
         HiveBookBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> HiveBookBuilder<'a, S>
+impl<S: BosStr, St> HiveBookBuilder<S, St>
 where
-    S: hive_book_state::State,
-    S::Title: hive_book_state::IsUnset,
+    St: hive_book_state::State,
+    St::Title: hive_book_state::IsUnset,
 {
     /// Set the `title` field (required)
     pub fn title(
         mut self,
         value: impl Into<S>,
-    ) -> HiveBookBuilder<'a, hive_book_state::SetTitle<S>> {
+    ) -> HiveBookBuilder<S, hive_book_state::SetTitle<St>> {
         self._fields.12 = Option::Some(value.into());
         HiveBookBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> HiveBookBuilder<'a, S>
+impl<S: BosStr, St> HiveBookBuilder<S, St>
 where
-    S: hive_book_state::State,
-    S::UpdatedAt: hive_book_state::IsUnset,
+    St: hive_book_state::State,
+    St::UpdatedAt: hive_book_state::IsUnset,
 {
     /// Set the `updatedAt` field (required)
     pub fn updated_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> HiveBookBuilder<'a, hive_book_state::SetUpdatedAt<S>> {
+    ) -> HiveBookBuilder<S, hive_book_state::SetUpdatedAt<St>> {
         self._fields.13 = Option::Some(value.into());
         HiveBookBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> HiveBookBuilder<'a, S>
+impl<S: BosStr, St> HiveBookBuilder<S, St>
 where
-    S: hive_book_state::State,
-    S::Title: hive_book_state::IsSet,
-    S::Authors: hive_book_state::IsSet,
-    S::CreatedAt: hive_book_state::IsSet,
-    S::UpdatedAt: hive_book_state::IsSet,
-    S::Thumbnail: hive_book_state::IsSet,
-    S::Id: hive_book_state::IsSet,
+    St: hive_book_state::State,
+    St::Title: hive_book_state::IsSet,
+    St::Authors: hive_book_state::IsSet,
+    St::CreatedAt: hive_book_state::IsSet,
+    St::Id: hive_book_state::IsSet,
+    St::UpdatedAt: hive_book_state::IsSet,
+    St::Thumbnail: hive_book_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> HiveBook<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> HiveBook<S> {
         HiveBook {
             authors: self._fields.0.unwrap(),
             cover: self._fields.1,
@@ -631,11 +631,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> HiveBook<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> HiveBook<S> {
         HiveBook {
             authors: self._fields.0.unwrap(),
             cover: self._fields.1,

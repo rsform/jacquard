@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "app.beaconbits.report",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Report<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Report<S: BosStr = DefaultStr> {
     ///AT URI of the beacon being reported
     pub beacon_uri: AtUri<S>,
     ///Timestamp when the report was created
@@ -56,7 +56,7 @@ pub struct Report<S: Bos<str> + AsRef<str> = DefaultStr> {
 /// Reason for the report
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ReportReason<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ReportReason<S: BosStr = DefaultStr> {
     Spam,
     InappropriateContent,
     Doxxing,
@@ -66,7 +66,7 @@ pub enum ReportReason<S: Bos<str> + AsRef<str> = DefaultStr> {
     UnknownValue(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> ReportReason<S> {
+impl<S: BosStr> ReportReason<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Spam => "spam",
@@ -92,19 +92,19 @@ impl<S: Bos<str> + AsRef<str>> ReportReason<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ReportReason<S> {
+impl<S: BosStr> core::fmt::Display for ReportReason<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for ReportReason<S> {
+impl<S: BosStr> AsRef<str> for ReportReason<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for ReportReason<S> {
+impl<S: BosStr> Serialize for ReportReason<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -113,8 +113,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for ReportReason<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for ReportReason<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ReportReason<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -124,14 +123,18 @@ for ReportReason<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for ReportReason<S> {
+impl<S: BosStr + Default> Default for ReportReason<S> {
     fn default() -> Self {
         Self::UnknownValue(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for ReportReason<S> {
-    type Output = ReportReason<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for ReportReason<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ReportReason<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             ReportReason::Spam => ReportReason::Spam,
@@ -151,18 +154,18 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for ReportReason<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ReportGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ReportGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Report<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Report<S> {
+impl<S: BosStr> Report<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, ReportRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -175,17 +178,17 @@ pub struct ReportRecord;
 impl XrpcResp for ReportRecord {
     const NSID: &'static str = "app.beaconbits.report";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ReportGetRecordOutput<S>;
+    type Output<S: BosStr> = ReportGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<ReportGetRecordOutput<S>> for Report<S> {
+impl<S: BosStr> From<ReportGetRecordOutput<S>> for Report<S> {
     fn from(output: ReportGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Report<S> {
+impl<S: BosStr> Collection for Report<S> {
     const NSID: &'static str = "app.beaconbits.report";
     type Record = ReportRecord;
 }
@@ -195,7 +198,7 @@ impl Collection for ReportRecord {
     type Record = ReportRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Report<S> {
+impl<S: BosStr> LexiconSchema for Report<S> {
     fn nsid() -> &'static str {
         "app.beaconbits.report"
     }
@@ -245,118 +248,118 @@ pub mod report_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type BeaconUri;
         type Reason;
         type CreatedAt;
-        type BeaconUri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type BeaconUri = Unset;
         type Reason = Unset;
         type CreatedAt = Unset;
-        type BeaconUri = Unset;
-    }
-    ///State transition - sets the `reason` field to Set
-    pub struct SetReason<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetReason<S> {}
-    impl<S: State> State for SetReason<S> {
-        type Reason = Set<members::reason>;
-        type CreatedAt = S::CreatedAt;
-        type BeaconUri = S::BeaconUri;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Reason = S::Reason;
-        type CreatedAt = Set<members::created_at>;
-        type BeaconUri = S::BeaconUri;
     }
     ///State transition - sets the `beacon_uri` field to Set
-    pub struct SetBeaconUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBeaconUri<S> {}
-    impl<S: State> State for SetBeaconUri<S> {
-        type Reason = S::Reason;
-        type CreatedAt = S::CreatedAt;
+    pub struct SetBeaconUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBeaconUri<St> {}
+    impl<St: State> State for SetBeaconUri<St> {
         type BeaconUri = Set<members::beacon_uri>;
+        type Reason = St::Reason;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `reason` field to Set
+    pub struct SetReason<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetReason<St> {}
+    impl<St: State> State for SetReason<St> {
+        type BeaconUri = St::BeaconUri;
+        type Reason = Set<members::reason>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type BeaconUri = St::BeaconUri;
+        type Reason = St::Reason;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `beacon_uri` field
+        pub struct beacon_uri(());
         ///Marker type for the `reason` field
         pub struct reason(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `beacon_uri` field
-        pub struct beacon_uri(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ReportBuilder<'a, S: report_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ReportBuilder<S: BosStr, St: report_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>, Option<Datetime>, Option<S>, Option<ReportReason<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Report<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ReportBuilder<'a, report_state::Empty> {
+impl<S: BosStr> Report<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ReportBuilder<S, report_state::Empty> {
         ReportBuilder::new()
     }
 }
 
-impl<'a> ReportBuilder<'a, report_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ReportBuilder<S, report_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ReportBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ReportBuilder<'a, S>
+impl<S: BosStr, St> ReportBuilder<S, St>
 where
-    S: report_state::State,
-    S::BeaconUri: report_state::IsUnset,
+    St: report_state::State,
+    St::BeaconUri: report_state::IsUnset,
 {
     /// Set the `beaconUri` field (required)
     pub fn beacon_uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> ReportBuilder<'a, report_state::SetBeaconUri<S>> {
+    ) -> ReportBuilder<S, report_state::SetBeaconUri<St>> {
         self._fields.0 = Option::Some(value.into());
         ReportBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ReportBuilder<'a, S>
+impl<S: BosStr, St> ReportBuilder<S, St>
 where
-    S: report_state::State,
-    S::CreatedAt: report_state::IsUnset,
+    St: report_state::State,
+    St::CreatedAt: report_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ReportBuilder<'a, report_state::SetCreatedAt<S>> {
+    ) -> ReportBuilder<S, report_state::SetCreatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         ReportBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: report_state::State> ReportBuilder<'a, S> {
+impl<S: BosStr, St: report_state::State> ReportBuilder<S, St> {
     /// Set the `details` field (optional)
     pub fn details(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -369,34 +372,34 @@ impl<'a, S: report_state::State> ReportBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ReportBuilder<'a, S>
+impl<S: BosStr, St> ReportBuilder<S, St>
 where
-    S: report_state::State,
-    S::Reason: report_state::IsUnset,
+    St: report_state::State,
+    St::Reason: report_state::IsUnset,
 {
     /// Set the `reason` field (required)
     pub fn reason(
         mut self,
         value: impl Into<ReportReason<S>>,
-    ) -> ReportBuilder<'a, report_state::SetReason<S>> {
+    ) -> ReportBuilder<S, report_state::SetReason<St>> {
         self._fields.3 = Option::Some(value.into());
         ReportBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ReportBuilder<'a, S>
+impl<S: BosStr, St> ReportBuilder<S, St>
 where
-    S: report_state::State,
-    S::Reason: report_state::IsSet,
-    S::CreatedAt: report_state::IsSet,
-    S::BeaconUri: report_state::IsSet,
+    St: report_state::State,
+    St::BeaconUri: report_state::IsSet,
+    St::Reason: report_state::IsSet,
+    St::CreatedAt: report_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Report<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Report<S> {
         Report {
             beacon_uri: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
@@ -405,8 +408,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Report<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Report<S> {
         Report {
             beacon_uri: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),

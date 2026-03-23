@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -29,11 +29,11 @@ use crate::fyi_frontpage::richtext::block;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Block<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Block<S: BosStr = DefaultStr> {
     pub content: block::PlaintextParagraph<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
@@ -44,17 +44,17 @@ pub struct Block<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct PlaintextParagraph<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct PlaintextParagraph<S: BosStr = DefaultStr> {
     pub text: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Block<S> {
+impl<S: BosStr> LexiconSchema for Block<S> {
     fn nsid() -> &'static str {
         "fyi.frontpage.richtext.block"
     }
@@ -69,7 +69,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Block<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for PlaintextParagraph<S> {
+impl<S: BosStr> LexiconSchema for PlaintextParagraph<S> {
     fn nsid() -> &'static str {
         "fyi.frontpage.richtext.block"
     }
@@ -127,9 +127,9 @@ pub mod block_state {
         type Content = Unset;
     }
     ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
+    pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetContent<St> {}
+    impl<St: State> State for SetContent<St> {
         type Content = Set<members::content>;
     }
     /// Marker types for field names
@@ -140,64 +140,64 @@ pub mod block_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct BlockBuilder<'a, S: block_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct BlockBuilder<S: BosStr, St: block_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<block::PlaintextParagraph<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Block<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> BlockBuilder<'a, block_state::Empty> {
+impl<S: BosStr> Block<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> BlockBuilder<S, block_state::Empty> {
         BlockBuilder::new()
     }
 }
 
-impl<'a> BlockBuilder<'a, block_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> BlockBuilder<S, block_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         BlockBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BlockBuilder<'a, S>
+impl<S: BosStr, St> BlockBuilder<S, St>
 where
-    S: block_state::State,
-    S::Content: block_state::IsUnset,
+    St: block_state::State,
+    St::Content: block_state::IsUnset,
 {
     /// Set the `content` field (required)
     pub fn content(
         mut self,
         value: impl Into<block::PlaintextParagraph<S>>,
-    ) -> BlockBuilder<'a, block_state::SetContent<S>> {
+    ) -> BlockBuilder<S, block_state::SetContent<St>> {
         self._fields.0 = Option::Some(value.into());
         BlockBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BlockBuilder<'a, S>
+impl<S: BosStr, St> BlockBuilder<S, St>
 where
-    S: block_state::State,
-    S::Content: block_state::IsSet,
+    St: block_state::State,
+    St::Content: block_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Block<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Block<S> {
         Block {
             content: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Block<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Block<S> {
         Block {
             content: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

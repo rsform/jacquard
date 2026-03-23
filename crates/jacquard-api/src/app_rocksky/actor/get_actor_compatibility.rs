@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::value::Data;
@@ -19,33 +19,30 @@ use serde::{Serialize, Deserialize};
 use crate::app_rocksky::actor::CompatibilityViewBasic;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetActorCompatibility<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct GetActorCompatibility<S: BosStr = DefaultStr> {
     pub did: AtIdentifier<S>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetActorCompatibilityOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetActorCompatibilityOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub compatibility: Option<CompatibilityViewBasic<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -54,12 +51,11 @@ pub struct GetActorCompatibilityResponse;
 impl jacquard_common::xrpc::XrpcResp for GetActorCompatibilityResponse {
     const NSID: &'static str = "app.rocksky.actor.getActorCompatibility";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetActorCompatibilityOutput<S>;
+    type Output<S: BosStr> = GetActorCompatibilityOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetActorCompatibility<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetActorCompatibility<S> {
     const NSID: &'static str = "app.rocksky.actor.getActorCompatibility";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetActorCompatibilityResponse;
@@ -70,7 +66,7 @@ pub struct GetActorCompatibilityRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetActorCompatibilityRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.actor.getActorCompatibility";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetActorCompatibility<S>;
+    type Request<S: BosStr> = GetActorCompatibility<S>;
     type Response = GetActorCompatibilityResponse;
 }
 
@@ -93,9 +89,9 @@ pub mod get_actor_compatibility_state {
         type Did = Unset;
     }
     ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
         type Did = Set<members::did>;
     }
     /// Marker types for field names
@@ -106,60 +102,63 @@ pub mod get_actor_compatibility_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetActorCompatibilityBuilder<'a, S: get_actor_compatibility_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetActorCompatibilityBuilder<
+    S: BosStr,
+    St: get_actor_compatibility_state::State,
+> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtIdentifier<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetActorCompatibility<'a> {
-    /// Create a new builder for this type
+impl<S: BosStr> GetActorCompatibility<S> {
+    /// Create a new builder for this type.
     pub fn new() -> GetActorCompatibilityBuilder<
-        'a,
+        S,
         get_actor_compatibility_state::Empty,
     > {
         GetActorCompatibilityBuilder::new()
     }
 }
 
-impl<'a> GetActorCompatibilityBuilder<'a, get_actor_compatibility_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetActorCompatibilityBuilder<S, get_actor_compatibility_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetActorCompatibilityBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetActorCompatibilityBuilder<'a, S>
+impl<S: BosStr, St> GetActorCompatibilityBuilder<S, St>
 where
-    S: get_actor_compatibility_state::State,
-    S::Did: get_actor_compatibility_state::IsUnset,
+    St: get_actor_compatibility_state::State,
+    St::Did: get_actor_compatibility_state::IsUnset,
 {
     /// Set the `did` field (required)
     pub fn did(
         mut self,
         value: impl Into<AtIdentifier<S>>,
-    ) -> GetActorCompatibilityBuilder<'a, get_actor_compatibility_state::SetDid<S>> {
+    ) -> GetActorCompatibilityBuilder<S, get_actor_compatibility_state::SetDid<St>> {
         self._fields.0 = Option::Some(value.into());
         GetActorCompatibilityBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetActorCompatibilityBuilder<'a, S>
+impl<S: BosStr, St> GetActorCompatibilityBuilder<S, St>
 where
-    S: get_actor_compatibility_state::State,
-    S::Did: get_actor_compatibility_state::IsSet,
+    St: get_actor_compatibility_state::State,
+    St::Did: get_actor_compatibility_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetActorCompatibility<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetActorCompatibility<S> {
         GetActorCompatibility {
             did: self._fields.0.unwrap(),
         }

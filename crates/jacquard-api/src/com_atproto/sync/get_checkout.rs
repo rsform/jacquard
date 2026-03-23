@@ -6,23 +6,27 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[allow(unused_imports)]
+use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
+use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
+use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetCheckout<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct GetCheckout<S: BosStr = DefaultStr> {
     pub did: Did<S>,
 }
 
@@ -38,9 +42,9 @@ pub struct GetCheckoutResponse;
 impl jacquard_common::xrpc::XrpcResp for GetCheckoutResponse {
     const NSID: &'static str = "com.atproto.sync.getCheckout";
     const ENCODING: &'static str = "application/vnd.ipld.car";
-    type Output<S: Bos<str> + AsRef<str>> = GetCheckoutOutput;
+    type Output<S: BosStr> = GetCheckoutOutput;
     type Err = jacquard_common::xrpc::GenericError;
-    fn encode_output<S: Bos<str> + AsRef<str>>(
+    fn encode_output<S: BosStr>(
         output: &Self::Output<S>,
     ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError>
     where
@@ -52,7 +56,7 @@ impl jacquard_common::xrpc::XrpcResp for GetCheckoutResponse {
         body: &'de [u8],
     ) -> Result<Self::Output<S>, jacquard_common::error::DecodeError>
     where
-        S: Bos<str> + AsRef<str> + Deserialize<'de>,
+        S: BosStr + Deserialize<'de>,
         Self::Output<S>: Deserialize<'de>,
     {
         Ok(GetCheckoutOutput {
@@ -61,8 +65,7 @@ impl jacquard_common::xrpc::XrpcResp for GetCheckoutResponse {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetCheckout<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetCheckout<S> {
     const NSID: &'static str = "com.atproto.sync.getCheckout";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetCheckoutResponse;
@@ -73,7 +76,7 @@ pub struct GetCheckoutRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetCheckoutRequest {
     const PATH: &'static str = "/xrpc/com.atproto.sync.getCheckout";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetCheckout<S>;
+    type Request<S: BosStr> = GetCheckout<S>;
     type Response = GetCheckoutResponse;
 }
 
@@ -96,9 +99,9 @@ pub mod get_checkout_state {
         type Did = Unset;
     }
     ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
         type Did = Set<members::did>;
     }
     /// Marker types for field names
@@ -109,57 +112,57 @@ pub mod get_checkout_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetCheckoutBuilder<'a, S: get_checkout_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetCheckoutBuilder<S: BosStr, St: get_checkout_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetCheckout<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetCheckoutBuilder<'a, get_checkout_state::Empty> {
+impl<S: BosStr> GetCheckout<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetCheckoutBuilder<S, get_checkout_state::Empty> {
         GetCheckoutBuilder::new()
     }
 }
 
-impl<'a> GetCheckoutBuilder<'a, get_checkout_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetCheckoutBuilder<S, get_checkout_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetCheckoutBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetCheckoutBuilder<'a, S>
+impl<S: BosStr, St> GetCheckoutBuilder<S, St>
 where
-    S: get_checkout_state::State,
-    S::Did: get_checkout_state::IsUnset,
+    St: get_checkout_state::State,
+    St::Did: get_checkout_state::IsUnset,
 {
     /// Set the `did` field (required)
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> GetCheckoutBuilder<'a, get_checkout_state::SetDid<S>> {
+    ) -> GetCheckoutBuilder<S, get_checkout_state::SetDid<St>> {
         self._fields.0 = Option::Some(value.into());
         GetCheckoutBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetCheckoutBuilder<'a, S>
+impl<S: BosStr, St> GetCheckoutBuilder<S, St>
 where
-    S: get_checkout_state::State,
-    S::Did: get_checkout_state::IsSet,
+    St: get_checkout_state::State,
+    St::Did: get_checkout_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetCheckout<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetCheckout<S> {
         GetCheckout {
             did: self._fields.0.unwrap(),
         }

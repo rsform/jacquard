@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "blue.atplane.favClient",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct FavClient<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct FavClient<S: BosStr = DefaultStr> {
     ///Set to your favorite client.
     pub fav_client: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -52,18 +52,18 @@ pub struct FavClient<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct FavClientGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct FavClientGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: FavClient<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> FavClient<S> {
+impl<S: BosStr> FavClient<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, FavClientRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -76,17 +76,17 @@ pub struct FavClientRecord;
 impl XrpcResp for FavClientRecord {
     const NSID: &'static str = "blue.atplane.favClient";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = FavClientGetRecordOutput<S>;
+    type Output<S: BosStr> = FavClientGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<FavClientGetRecordOutput<S>> for FavClient<S> {
+impl<S: BosStr> From<FavClientGetRecordOutput<S>> for FavClient<S> {
     fn from(output: FavClientGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for FavClient<S> {
+impl<S: BosStr> Collection for FavClient<S> {
     const NSID: &'static str = "blue.atplane.favClient";
     type Record = FavClientRecord;
 }
@@ -96,7 +96,7 @@ impl Collection for FavClientRecord {
     type Record = FavClientRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for FavClient<S> {
+impl<S: BosStr> LexiconSchema for FavClient<S> {
     fn nsid() -> &'static str {
         "blue.atplane.favClient"
     }
@@ -141,9 +141,9 @@ pub mod fav_client_state {
         type FavClient = Unset;
     }
     ///State transition - sets the `fav_client` field to Set
-    pub struct SetFavClient<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFavClient<S> {}
-    impl<S: State> State for SetFavClient<S> {
+    pub struct SetFavClient<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetFavClient<St> {}
+    impl<St: State> State for SetFavClient<St> {
         type FavClient = Set<members::fav_client>;
     }
     /// Marker types for field names
@@ -154,67 +154,67 @@ pub mod fav_client_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct FavClientBuilder<'a, S: fav_client_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct FavClientBuilder<S: BosStr, St: fav_client_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> FavClient<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> FavClientBuilder<'a, fav_client_state::Empty> {
+impl<S: BosStr> FavClient<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> FavClientBuilder<S, fav_client_state::Empty> {
         FavClientBuilder::new()
     }
 }
 
-impl<'a> FavClientBuilder<'a, fav_client_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> FavClientBuilder<S, fav_client_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         FavClientBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> FavClientBuilder<'a, S>
+impl<S: BosStr, St> FavClientBuilder<S, St>
 where
-    S: fav_client_state::State,
-    S::FavClient: fav_client_state::IsUnset,
+    St: fav_client_state::State,
+    St::FavClient: fav_client_state::IsUnset,
 {
     /// Set the `favClient` field (required)
     pub fn fav_client(
         mut self,
         value: impl Into<S>,
-    ) -> FavClientBuilder<'a, fav_client_state::SetFavClient<S>> {
+    ) -> FavClientBuilder<S, fav_client_state::SetFavClient<St>> {
         self._fields.0 = Option::Some(value.into());
         FavClientBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> FavClientBuilder<'a, S>
+impl<S: BosStr, St> FavClientBuilder<S, St>
 where
-    S: fav_client_state::State,
-    S::FavClient: fav_client_state::IsSet,
+    St: fav_client_state::State,
+    St::FavClient: fav_client_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> FavClient<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> FavClient<S> {
         FavClient {
             fav_client: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> FavClient<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> FavClient<S> {
         FavClient {
             fav_client: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

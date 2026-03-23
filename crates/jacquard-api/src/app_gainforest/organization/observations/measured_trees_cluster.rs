@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "app.gainforest.organization.observations.measuredTreesCluster",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct MeasuredTreesCluster<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct MeasuredTreesCluster<S: BosStr = DefaultStr> {
     ///The date and time of the creation of the record
     pub created_at: Datetime,
     ///A blob pointing to a shapefile of the measured trees cluster
@@ -54,18 +54,18 @@ pub struct MeasuredTreesCluster<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct MeasuredTreesClusterGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct MeasuredTreesClusterGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: MeasuredTreesCluster<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> MeasuredTreesCluster<S> {
+impl<S: BosStr> MeasuredTreesCluster<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, MeasuredTreesClusterRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -78,18 +78,18 @@ pub struct MeasuredTreesClusterRecord;
 impl XrpcResp for MeasuredTreesClusterRecord {
     const NSID: &'static str = "app.gainforest.organization.observations.measuredTreesCluster";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = MeasuredTreesClusterGetRecordOutput<S>;
+    type Output<S: BosStr> = MeasuredTreesClusterGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<MeasuredTreesClusterGetRecordOutput<S>>
+impl<S: BosStr> From<MeasuredTreesClusterGetRecordOutput<S>>
 for MeasuredTreesCluster<S> {
     fn from(output: MeasuredTreesClusterGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for MeasuredTreesCluster<S> {
+impl<S: BosStr> Collection for MeasuredTreesCluster<S> {
     const NSID: &'static str = "app.gainforest.organization.observations.measuredTreesCluster";
     type Record = MeasuredTreesClusterRecord;
 }
@@ -99,7 +99,7 @@ impl Collection for MeasuredTreesClusterRecord {
     type Record = MeasuredTreesClusterRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for MeasuredTreesCluster<S> {
+impl<S: BosStr> LexiconSchema for MeasuredTreesCluster<S> {
     fn nsid() -> &'static str {
         "app.gainforest.organization.observations.measuredTreesCluster"
     }
@@ -135,17 +135,17 @@ pub mod measured_trees_cluster_state {
         type Shapefile = Unset;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
-        type Shapefile = S::Shapefile;
+        type Shapefile = St::Shapefile;
     }
     ///State transition - sets the `shapefile` field to Set
-    pub struct SetShapefile<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetShapefile<S> {}
-    impl<S: State> State for SetShapefile<S> {
-        type CreatedAt = S::CreatedAt;
+    pub struct SetShapefile<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetShapefile<St> {}
+    impl<St: State> State for SetShapefile<St> {
+        type CreatedAt = St::CreatedAt;
         type Shapefile = Set<members::shapefile>;
     }
     /// Marker types for field names
@@ -158,91 +158,91 @@ pub mod measured_trees_cluster_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct MeasuredTreesClusterBuilder<'a, S: measured_trees_cluster_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct MeasuredTreesClusterBuilder<
+    S: BosStr,
+    St: measured_trees_cluster_state::State,
+> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<Data<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> MeasuredTreesCluster<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> MeasuredTreesClusterBuilder<
-        'a,
-        measured_trees_cluster_state::Empty,
-    > {
+impl<S: BosStr> MeasuredTreesCluster<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> MeasuredTreesClusterBuilder<S, measured_trees_cluster_state::Empty> {
         MeasuredTreesClusterBuilder::new()
     }
 }
 
-impl<'a> MeasuredTreesClusterBuilder<'a, measured_trees_cluster_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> MeasuredTreesClusterBuilder<S, measured_trees_cluster_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         MeasuredTreesClusterBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> MeasuredTreesClusterBuilder<'a, S>
+impl<S: BosStr, St> MeasuredTreesClusterBuilder<S, St>
 where
-    S: measured_trees_cluster_state::State,
-    S::CreatedAt: measured_trees_cluster_state::IsUnset,
+    St: measured_trees_cluster_state::State,
+    St::CreatedAt: measured_trees_cluster_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> MeasuredTreesClusterBuilder<'a, measured_trees_cluster_state::SetCreatedAt<S>> {
+    ) -> MeasuredTreesClusterBuilder<S, measured_trees_cluster_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         MeasuredTreesClusterBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> MeasuredTreesClusterBuilder<'a, S>
+impl<S: BosStr, St> MeasuredTreesClusterBuilder<S, St>
 where
-    S: measured_trees_cluster_state::State,
-    S::Shapefile: measured_trees_cluster_state::IsUnset,
+    St: measured_trees_cluster_state::State,
+    St::Shapefile: measured_trees_cluster_state::IsUnset,
 {
     /// Set the `shapefile` field (required)
     pub fn shapefile(
         mut self,
         value: impl Into<Data<S>>,
-    ) -> MeasuredTreesClusterBuilder<'a, measured_trees_cluster_state::SetShapefile<S>> {
+    ) -> MeasuredTreesClusterBuilder<S, measured_trees_cluster_state::SetShapefile<St>> {
         self._fields.1 = Option::Some(value.into());
         MeasuredTreesClusterBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> MeasuredTreesClusterBuilder<'a, S>
+impl<S: BosStr, St> MeasuredTreesClusterBuilder<S, St>
 where
-    S: measured_trees_cluster_state::State,
-    S::CreatedAt: measured_trees_cluster_state::IsSet,
-    S::Shapefile: measured_trees_cluster_state::IsSet,
+    St: measured_trees_cluster_state::State,
+    St::CreatedAt: measured_trees_cluster_state::IsSet,
+    St::Shapefile: measured_trees_cluster_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> MeasuredTreesCluster<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> MeasuredTreesCluster<S> {
         MeasuredTreesCluster {
             created_at: self._fields.0.unwrap(),
             shapefile: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> MeasuredTreesCluster<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> MeasuredTreesCluster<S> {
         MeasuredTreesCluster {
             created_at: self._fields.0.unwrap(),
             shapefile: self._fields.1.unwrap(),

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
@@ -18,39 +18,35 @@ use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct UpdateCrewTier<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct UpdateCrewTier<S: BosStr = DefaultStr> {
     ///Tier rank index (0-based, maps to hold tier list by position).
     pub tier_rank: i64,
     ///DID of the crew member whose tier is being updated.
     pub user_did: Did<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct UpdateCrewTierOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct UpdateCrewTierOutput<S: BosStr = DefaultStr> {
     ///Resolved tier name on this hold.
     pub tier_name: S,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -112,12 +108,11 @@ pub struct UpdateCrewTierResponse;
 impl jacquard_common::xrpc::XrpcResp for UpdateCrewTierResponse {
     const NSID: &'static str = "io.atcr.hold.updateCrewTier";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = UpdateCrewTierOutput<S>;
+    type Output<S: BosStr> = UpdateCrewTierOutput<S>;
     type Err = UpdateCrewTierError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for UpdateCrewTier<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UpdateCrewTier<S> {
     const NSID: &'static str = "io.atcr.hold.updateCrewTier";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -132,7 +127,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for UpdateCrewTierRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = UpdateCrewTier<S>;
+    type Request<S: BosStr> = UpdateCrewTier<S>;
     type Response = UpdateCrewTierResponse;
 }
 
@@ -146,122 +141,122 @@ pub mod update_crew_tier_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type UserDid;
         type TierRank;
+        type UserDid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type UserDid = Unset;
         type TierRank = Unset;
-    }
-    ///State transition - sets the `user_did` field to Set
-    pub struct SetUserDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUserDid<S> {}
-    impl<S: State> State for SetUserDid<S> {
-        type UserDid = Set<members::user_did>;
-        type TierRank = S::TierRank;
+        type UserDid = Unset;
     }
     ///State transition - sets the `tier_rank` field to Set
-    pub struct SetTierRank<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTierRank<S> {}
-    impl<S: State> State for SetTierRank<S> {
-        type UserDid = S::UserDid;
+    pub struct SetTierRank<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTierRank<St> {}
+    impl<St: State> State for SetTierRank<St> {
         type TierRank = Set<members::tier_rank>;
+        type UserDid = St::UserDid;
+    }
+    ///State transition - sets the `user_did` field to Set
+    pub struct SetUserDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUserDid<St> {}
+    impl<St: State> State for SetUserDid<St> {
+        type TierRank = St::TierRank;
+        type UserDid = Set<members::user_did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `user_did` field
-        pub struct user_did(());
         ///Marker type for the `tier_rank` field
         pub struct tier_rank(());
+        ///Marker type for the `user_did` field
+        pub struct user_did(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct UpdateCrewTierBuilder<'a, S: update_crew_tier_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct UpdateCrewTierBuilder<S: BosStr, St: update_crew_tier_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<Did<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> UpdateCrewTier<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> UpdateCrewTierBuilder<'a, update_crew_tier_state::Empty> {
+impl<S: BosStr> UpdateCrewTier<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> UpdateCrewTierBuilder<S, update_crew_tier_state::Empty> {
         UpdateCrewTierBuilder::new()
     }
 }
 
-impl<'a> UpdateCrewTierBuilder<'a, update_crew_tier_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> UpdateCrewTierBuilder<S, update_crew_tier_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         UpdateCrewTierBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> UpdateCrewTierBuilder<'a, S>
+impl<S: BosStr, St> UpdateCrewTierBuilder<S, St>
 where
-    S: update_crew_tier_state::State,
-    S::TierRank: update_crew_tier_state::IsUnset,
+    St: update_crew_tier_state::State,
+    St::TierRank: update_crew_tier_state::IsUnset,
 {
     /// Set the `tierRank` field (required)
     pub fn tier_rank(
         mut self,
         value: impl Into<i64>,
-    ) -> UpdateCrewTierBuilder<'a, update_crew_tier_state::SetTierRank<S>> {
+    ) -> UpdateCrewTierBuilder<S, update_crew_tier_state::SetTierRank<St>> {
         self._fields.0 = Option::Some(value.into());
         UpdateCrewTierBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> UpdateCrewTierBuilder<'a, S>
+impl<S: BosStr, St> UpdateCrewTierBuilder<S, St>
 where
-    S: update_crew_tier_state::State,
-    S::UserDid: update_crew_tier_state::IsUnset,
+    St: update_crew_tier_state::State,
+    St::UserDid: update_crew_tier_state::IsUnset,
 {
     /// Set the `userDid` field (required)
     pub fn user_did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> UpdateCrewTierBuilder<'a, update_crew_tier_state::SetUserDid<S>> {
+    ) -> UpdateCrewTierBuilder<S, update_crew_tier_state::SetUserDid<St>> {
         self._fields.1 = Option::Some(value.into());
         UpdateCrewTierBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> UpdateCrewTierBuilder<'a, S>
+impl<S: BosStr, St> UpdateCrewTierBuilder<S, St>
 where
-    S: update_crew_tier_state::State,
-    S::UserDid: update_crew_tier_state::IsSet,
-    S::TierRank: update_crew_tier_state::IsSet,
+    St: update_crew_tier_state::State,
+    St::TierRank: update_crew_tier_state::IsSet,
+    St::UserDid: update_crew_tier_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> UpdateCrewTier<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> UpdateCrewTier<S> {
         UpdateCrewTier {
             tier_rank: self._fields.0.unwrap(),
             user_did: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> UpdateCrewTier<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> UpdateCrewTier<S> {
         UpdateCrewTier {
             tier_rank: self._fields.0.unwrap(),
             user_did: self._fields.1.unwrap(),

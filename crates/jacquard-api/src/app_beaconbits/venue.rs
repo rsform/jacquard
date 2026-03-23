@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -37,11 +37,11 @@ use crate::community_lexicon::location::geo::Geo;
     rename = "app.beaconbits.venue",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Venue<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Venue<S: BosStr = DefaultStr> {
     ///Human-readable address
     #[serde(skip_serializing_if = "Option::is_none")]
     pub address: Option<S>,
@@ -71,18 +71,18 @@ pub struct Venue<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct VenueGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct VenueGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Venue<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Venue<S> {
+impl<S: BosStr> Venue<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, VenueRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -95,17 +95,17 @@ pub struct VenueRecord;
 impl XrpcResp for VenueRecord {
     const NSID: &'static str = "app.beaconbits.venue";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = VenueGetRecordOutput<S>;
+    type Output<S: BosStr> = VenueGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<VenueGetRecordOutput<S>> for Venue<S> {
+impl<S: BosStr> From<VenueGetRecordOutput<S>> for Venue<S> {
     fn from(output: VenueGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Venue<S> {
+impl<S: BosStr> Collection for Venue<S> {
     const NSID: &'static str = "app.beaconbits.venue";
     type Record = VenueRecord;
 }
@@ -115,7 +115,7 @@ impl Collection for VenueRecord {
     type Record = VenueRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Venue<S> {
+impl<S: BosStr> LexiconSchema for Venue<S> {
     fn nsid() -> &'static str {
         "app.beaconbits.venue"
     }
@@ -177,43 +177,43 @@ pub mod venue_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type CreatedAt;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Name = Set<members::name>;
-        type CreatedAt = S::CreatedAt;
+        type Name = Unset;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Name = S::Name;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type CreatedAt = St::CreatedAt;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct VenueBuilder<'a, S: venue_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct VenueBuilder<S: BosStr, St: venue_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
         Option<Address<S>>,
@@ -223,28 +223,28 @@ pub struct VenueBuilder<'a, S: venue_state::State> {
         Option<S>,
         Option<UriValue<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Venue<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> VenueBuilder<'a, venue_state::Empty> {
+impl<S: BosStr> Venue<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> VenueBuilder<S, venue_state::Empty> {
         VenueBuilder::new()
     }
 }
 
-impl<'a> VenueBuilder<'a, venue_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> VenueBuilder<S, venue_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         VenueBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: venue_state::State> VenueBuilder<'a, S> {
+impl<S: BosStr, St: venue_state::State> VenueBuilder<S, St> {
     /// Set the `address` field (optional)
     pub fn address(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -257,7 +257,7 @@ impl<'a, S: venue_state::State> VenueBuilder<'a, S> {
     }
 }
 
-impl<'a, S: venue_state::State> VenueBuilder<'a, S> {
+impl<S: BosStr, St: venue_state::State> VenueBuilder<S, St> {
     /// Set the `addressDetails` field (optional)
     pub fn address_details(mut self, value: impl Into<Option<Address<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -270,7 +270,7 @@ impl<'a, S: venue_state::State> VenueBuilder<'a, S> {
     }
 }
 
-impl<'a, S: venue_state::State> VenueBuilder<'a, S> {
+impl<S: BosStr, St: venue_state::State> VenueBuilder<S, St> {
     /// Set the `category` field (optional)
     pub fn category(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -283,26 +283,26 @@ impl<'a, S: venue_state::State> VenueBuilder<'a, S> {
     }
 }
 
-impl<'a, S> VenueBuilder<'a, S>
+impl<S: BosStr, St> VenueBuilder<S, St>
 where
-    S: venue_state::State,
-    S::CreatedAt: venue_state::IsUnset,
+    St: venue_state::State,
+    St::CreatedAt: venue_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> VenueBuilder<'a, venue_state::SetCreatedAt<S>> {
+    ) -> VenueBuilder<S, venue_state::SetCreatedAt<St>> {
         self._fields.3 = Option::Some(value.into());
         VenueBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: venue_state::State> VenueBuilder<'a, S> {
+impl<S: BosStr, St: venue_state::State> VenueBuilder<S, St> {
     /// Set the `location` field (optional)
     pub fn location(mut self, value: impl Into<Option<Geo<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -315,26 +315,26 @@ impl<'a, S: venue_state::State> VenueBuilder<'a, S> {
     }
 }
 
-impl<'a, S> VenueBuilder<'a, S>
+impl<S: BosStr, St> VenueBuilder<S, St>
 where
-    S: venue_state::State,
-    S::Name: venue_state::IsUnset,
+    St: venue_state::State,
+    St::Name: venue_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> VenueBuilder<'a, venue_state::SetName<S>> {
+    ) -> VenueBuilder<S, venue_state::SetName<St>> {
         self._fields.5 = Option::Some(value.into());
         VenueBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: venue_state::State> VenueBuilder<'a, S> {
+impl<S: BosStr, St: venue_state::State> VenueBuilder<S, St> {
     /// Set the `osmUri` field (optional)
     pub fn osm_uri(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -347,14 +347,14 @@ impl<'a, S: venue_state::State> VenueBuilder<'a, S> {
     }
 }
 
-impl<'a, S> VenueBuilder<'a, S>
+impl<S: BosStr, St> VenueBuilder<S, St>
 where
-    S: venue_state::State,
-    S::Name: venue_state::IsSet,
-    S::CreatedAt: venue_state::IsSet,
+    St: venue_state::State,
+    St::CreatedAt: venue_state::IsSet,
+    St::Name: venue_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Venue<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Venue<S> {
         Venue {
             address: self._fields.0,
             address_details: self._fields.1,
@@ -366,8 +366,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Venue<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Venue<S> {
         Venue {
             address: self._fields.0,
             address_details: self._fields.1,

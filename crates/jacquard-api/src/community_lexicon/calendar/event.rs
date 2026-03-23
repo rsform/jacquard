@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -70,11 +70,11 @@ impl core::fmt::Display for Inperson {
     rename = "community.lexicon.calendar.event",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Event<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Event<S: BosStr = DefaultStr> {
     ///Client-declared timestamp when the event was created.
     pub created_at: Datetime,
     ///The description of the event.
@@ -110,11 +110,11 @@ pub struct Event<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EventLocationsItem<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum EventLocationsItem<S: BosStr = DefaultStr> {
     #[serde(rename = "community.lexicon.calendar.event#uri")]
     Uri(Box<event::Uri<S>>),
     #[serde(rename = "community.lexicon.location.address")]
@@ -133,11 +133,11 @@ pub enum EventLocationsItem<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct EventGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct EventGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
@@ -147,14 +147,14 @@ pub struct EventGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 /// The mode of the event.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum Mode<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum Mode<S: BosStr = DefaultStr> {
     CommunityLexiconCalendarEventHybrid,
     CommunityLexiconCalendarEventInperson,
     CommunityLexiconCalendarEventVirtual,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> Mode<S> {
+impl<S: BosStr> Mode<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::CommunityLexiconCalendarEventHybrid => {
@@ -186,19 +186,19 @@ impl<S: Bos<str> + AsRef<str>> Mode<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for Mode<S> {
+impl<S: BosStr> AsRef<str> for Mode<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for Mode<S> {
+impl<S: BosStr> core::fmt::Display for Mode<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for Mode<S> {
+impl<S: BosStr> Serialize for Mode<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -207,7 +207,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for Mode<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de> for Mode<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for Mode<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -217,8 +217,12 @@ impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de> for Mode
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for Mode<S> {
-    type Output = Mode<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for Mode<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = Mode<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             Mode::CommunityLexiconCalendarEventHybrid => {
@@ -278,7 +282,7 @@ impl core::fmt::Display for Scheduled {
 /// The status of the event.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum Status<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum Status<S: BosStr = DefaultStr> {
     CommunityLexiconCalendarEventCancelled,
     CommunityLexiconCalendarEventPlanned,
     CommunityLexiconCalendarEventPostponed,
@@ -287,7 +291,7 @@ pub enum Status<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> Status<S> {
+impl<S: BosStr> Status<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::CommunityLexiconCalendarEventCancelled => {
@@ -331,19 +335,19 @@ impl<S: Bos<str> + AsRef<str>> Status<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for Status<S> {
+impl<S: BosStr> AsRef<str> for Status<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for Status<S> {
+impl<S: BosStr> core::fmt::Display for Status<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for Status<S> {
+impl<S: BosStr> Serialize for Status<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -352,7 +356,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for Status<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de> for Status<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for Status<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -362,8 +366,12 @@ impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de> for Stat
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for Status<S> {
-    type Output = Status<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for Status<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = Status<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             Status::CommunityLexiconCalendarEventCancelled => {
@@ -392,11 +400,11 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for Status<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Uri<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Uri<S: BosStr = DefaultStr> {
     ///The display name of the URI.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<S>,
@@ -415,7 +423,7 @@ impl core::fmt::Display for Virtual {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Event<S> {
+impl<S: BosStr> Event<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, EventRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -428,17 +436,17 @@ pub struct EventRecord;
 impl XrpcResp for EventRecord {
     const NSID: &'static str = "community.lexicon.calendar.event";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = EventGetRecordOutput<S>;
+    type Output<S: BosStr> = EventGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<EventGetRecordOutput<S>> for Event<S> {
+impl<S: BosStr> From<EventGetRecordOutput<S>> for Event<S> {
     fn from(output: EventGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Event<S> {
+impl<S: BosStr> Collection for Event<S> {
     const NSID: &'static str = "community.lexicon.calendar.event";
     type Record = EventRecord;
 }
@@ -448,7 +456,7 @@ impl Collection for EventRecord {
     type Record = EventRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Event<S> {
+impl<S: BosStr> LexiconSchema for Event<S> {
     fn nsid() -> &'static str {
         "community.lexicon.calendar.event"
     }
@@ -463,7 +471,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Event<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Uri<S> {
+impl<S: BosStr> LexiconSchema for Uri<S> {
     fn nsid() -> &'static str {
         "community.lexicon.calendar.event"
     }
@@ -499,17 +507,17 @@ pub mod event_state {
         type Name = Unset;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
-        type Name = S::Name;
+        type Name = St::Name;
     }
     ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type CreatedAt = S::CreatedAt;
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type CreatedAt = St::CreatedAt;
         type Name = Set<members::name>;
     }
     /// Marker types for field names
@@ -522,9 +530,9 @@ pub mod event_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct EventBuilder<'a, S: event_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct EventBuilder<S: BosStr, St: event_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
         Option<S>,
@@ -536,47 +544,47 @@ pub struct EventBuilder<'a, S: event_state::State> {
         Option<event::Status<S>>,
         Option<Vec<event::Uri<S>>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Event<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> EventBuilder<'a, event_state::Empty> {
+impl<S: BosStr> Event<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> EventBuilder<S, event_state::Empty> {
         EventBuilder::new()
     }
 }
 
-impl<'a> EventBuilder<'a, event_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> EventBuilder<S, event_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         EventBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> EventBuilder<'a, S>
+impl<S: BosStr, St> EventBuilder<S, St>
 where
-    S: event_state::State,
-    S::CreatedAt: event_state::IsUnset,
+    St: event_state::State,
+    St::CreatedAt: event_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> EventBuilder<'a, event_state::SetCreatedAt<S>> {
+    ) -> EventBuilder<S, event_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         EventBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: event_state::State> EventBuilder<'a, S> {
+impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -589,7 +597,7 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
     }
 }
 
-impl<'a, S: event_state::State> EventBuilder<'a, S> {
+impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     /// Set the `endsAt` field (optional)
     pub fn ends_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.2 = value.into();
@@ -602,7 +610,7 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
     }
 }
 
-impl<'a, S: event_state::State> EventBuilder<'a, S> {
+impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     /// Set the `locations` field (optional)
     pub fn locations(
         mut self,
@@ -618,7 +626,7 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
     }
 }
 
-impl<'a, S: event_state::State> EventBuilder<'a, S> {
+impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     /// Set the `mode` field (optional)
     pub fn mode(mut self, value: impl Into<Option<event::Mode<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -631,26 +639,26 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
     }
 }
 
-impl<'a, S> EventBuilder<'a, S>
+impl<S: BosStr, St> EventBuilder<S, St>
 where
-    S: event_state::State,
-    S::Name: event_state::IsUnset,
+    St: event_state::State,
+    St::Name: event_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> EventBuilder<'a, event_state::SetName<S>> {
+    ) -> EventBuilder<S, event_state::SetName<St>> {
         self._fields.5 = Option::Some(value.into());
         EventBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: event_state::State> EventBuilder<'a, S> {
+impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     /// Set the `startsAt` field (optional)
     pub fn starts_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.6 = value.into();
@@ -663,7 +671,7 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
     }
 }
 
-impl<'a, S: event_state::State> EventBuilder<'a, S> {
+impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     /// Set the `status` field (optional)
     pub fn status(mut self, value: impl Into<Option<event::Status<S>>>) -> Self {
         self._fields.7 = value.into();
@@ -676,7 +684,7 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
     }
 }
 
-impl<'a, S: event_state::State> EventBuilder<'a, S> {
+impl<S: BosStr, St: event_state::State> EventBuilder<S, St> {
     /// Set the `uris` field (optional)
     pub fn uris(mut self, value: impl Into<Option<Vec<event::Uri<S>>>>) -> Self {
         self._fields.8 = value.into();
@@ -689,14 +697,14 @@ impl<'a, S: event_state::State> EventBuilder<'a, S> {
     }
 }
 
-impl<'a, S> EventBuilder<'a, S>
+impl<S: BosStr, St> EventBuilder<S, St>
 where
-    S: event_state::State,
-    S::CreatedAt: event_state::IsSet,
-    S::Name: event_state::IsSet,
+    St: event_state::State,
+    St::CreatedAt: event_state::IsSet,
+    St::Name: event_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Event<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Event<S> {
         Event {
             created_at: self._fields.0.unwrap(),
             description: self._fields.1,
@@ -710,8 +718,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Event<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Event<S> {
         Event {
             created_at: self._fields.0.unwrap(),
             description: self._fields.1,
@@ -969,9 +977,9 @@ pub mod uri_state {
         type Uri = Unset;
     }
     ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
         type Uri = Set<members::uri>;
     }
     /// Marker types for field names
@@ -982,32 +990,32 @@ pub mod uri_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct UriBuilder<'a, S: uri_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct UriBuilder<S: BosStr, St: uri_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<UriValue<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Uri<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> UriBuilder<'a, uri_state::Empty> {
+impl<S: BosStr> Uri<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> UriBuilder<S, uri_state::Empty> {
         UriBuilder::new()
     }
 }
 
-impl<'a> UriBuilder<'a, uri_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> UriBuilder<S, uri_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         UriBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: uri_state::State> UriBuilder<'a, S> {
+impl<S: BosStr, St: uri_state::State> UriBuilder<S, St> {
     /// Set the `name` field (optional)
     pub fn name(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -1020,40 +1028,40 @@ impl<'a, S: uri_state::State> UriBuilder<'a, S> {
     }
 }
 
-impl<'a, S> UriBuilder<'a, S>
+impl<S: BosStr, St> UriBuilder<S, St>
 where
-    S: uri_state::State,
-    S::Uri: uri_state::IsUnset,
+    St: uri_state::State,
+    St::Uri: uri_state::IsUnset,
 {
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> UriBuilder<'a, uri_state::SetUri<S>> {
+    ) -> UriBuilder<S, uri_state::SetUri<St>> {
         self._fields.1 = Option::Some(value.into());
         UriBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> UriBuilder<'a, S>
+impl<S: BosStr, St> UriBuilder<S, St>
 where
-    S: uri_state::State,
-    S::Uri: uri_state::IsSet,
+    St: uri_state::State,
+    St::Uri: uri_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Uri<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Uri<S> {
         Uri {
             name: self._fields.0,
             uri: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Uri<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Uri<S> {
         Uri {
             name: self._fields.0,
             uri: self._fields.1.unwrap(),

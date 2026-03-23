@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
@@ -18,16 +18,15 @@ use serde::{Serialize, Deserialize};
 use crate::app_bsky::actor::ProfileView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetSuggestions<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetSuggestions<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub cursor: Option<S>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
@@ -37,14 +36,14 @@ pub struct GetSuggestions<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetSuggestionsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetSuggestionsOutput<S: BosStr = DefaultStr> {
     pub actors: Vec<ProfileView<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
@@ -54,9 +53,7 @@ pub struct GetSuggestionsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///Snowflake for this recommendation, use when submitting recommendation events.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub rec_id_str: Option<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -65,12 +62,11 @@ pub struct GetSuggestionsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetSuggestionsResponse {
     const NSID: &'static str = "app.bsky.actor.getSuggestions";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetSuggestionsOutput<S>;
+    type Output<S: BosStr> = GetSuggestionsOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetSuggestions<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetSuggestions<S> {
     const NSID: &'static str = "app.bsky.actor.getSuggestions";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetSuggestionsResponse;
@@ -81,7 +77,7 @@ pub struct GetSuggestionsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetSuggestionsRequest {
     const PATH: &'static str = "/xrpc/app.bsky.actor.getSuggestions";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetSuggestions<S>;
+    type Request<S: BosStr> = GetSuggestions<S>;
     type Response = GetSuggestionsResponse;
 }
 
@@ -108,32 +104,32 @@ pub mod get_suggestions_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetSuggestionsBuilder<'a, S: get_suggestions_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetSuggestionsBuilder<S: BosStr, St: get_suggestions_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetSuggestions<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetSuggestionsBuilder<'a, get_suggestions_state::Empty> {
+impl<S: BosStr> GetSuggestions<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetSuggestionsBuilder<S, get_suggestions_state::Empty> {
         GetSuggestionsBuilder::new()
     }
 }
 
-impl<'a> GetSuggestionsBuilder<'a, get_suggestions_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetSuggestionsBuilder<S, get_suggestions_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetSuggestionsBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: get_suggestions_state::State> GetSuggestionsBuilder<'a, S> {
+impl<S: BosStr, St: get_suggestions_state::State> GetSuggestionsBuilder<S, St> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -146,7 +142,7 @@ impl<'a, S: get_suggestions_state::State> GetSuggestionsBuilder<'a, S> {
     }
 }
 
-impl<'a, S: get_suggestions_state::State> GetSuggestionsBuilder<'a, S> {
+impl<S: BosStr, St: get_suggestions_state::State> GetSuggestionsBuilder<S, St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -159,12 +155,12 @@ impl<'a, S: get_suggestions_state::State> GetSuggestionsBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GetSuggestionsBuilder<'a, S>
+impl<S: BosStr, St> GetSuggestionsBuilder<S, St>
 where
-    S: get_suggestions_state::State,
+    St: get_suggestions_state::State,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetSuggestions<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetSuggestions<S> {
         GetSuggestions {
             cursor: self._fields.0,
             limit: self._fields.1,

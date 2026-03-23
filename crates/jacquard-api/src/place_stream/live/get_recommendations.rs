@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -30,11 +30,11 @@ use crate::place_stream::live::get_recommendations;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct LivestreamRecommendation<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct LivestreamRecommendation<S: BosStr = DefaultStr> {
     ///The DID of the recommended streamer
     pub did: Did<S>,
     ///Source of the recommendation
@@ -45,40 +45,37 @@ pub struct LivestreamRecommendation<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetRecommendations<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct GetRecommendations<S: BosStr = DefaultStr> {
     pub user_did: Did<S>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetRecommendationsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetRecommendationsOutput<S: BosStr = DefaultStr> {
     ///Ordered list of recommendations
     pub recommendations: Vec<get_recommendations::LivestreamRecommendation<S>>,
     ///The user DID this recommendation is for
     #[serde(skip_serializing_if = "Option::is_none")]
     pub user_did: Option<Did<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for LivestreamRecommendation<S> {
+impl<S: BosStr> LexiconSchema for LivestreamRecommendation<S> {
     fn nsid() -> &'static str {
         "place.stream.live.getRecommendations"
     }
@@ -98,12 +95,11 @@ pub struct GetRecommendationsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetRecommendationsResponse {
     const NSID: &'static str = "place.stream.live.getRecommendations";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetRecommendationsOutput<S>;
+    type Output<S: BosStr> = GetRecommendationsOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetRecommendations<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetRecommendations<S> {
     const NSID: &'static str = "place.stream.live.getRecommendations";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetRecommendationsResponse;
@@ -114,7 +110,7 @@ pub struct GetRecommendationsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetRecommendationsRequest {
     const PATH: &'static str = "/xrpc/place.stream.live.getRecommendations";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetRecommendations<S>;
+    type Request<S: BosStr> = GetRecommendations<S>;
     type Response = GetRecommendationsResponse;
 }
 
@@ -139,17 +135,17 @@ pub mod livestream_recommendation_state {
         type Source = Unset;
     }
     ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
         type Did = Set<members::did>;
-        type Source = S::Source;
+        type Source = St::Source;
     }
     ///State transition - sets the `source` field to Set
-    pub struct SetSource<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSource<S> {}
-    impl<S: State> State for SetSource<S> {
-        type Did = S::Did;
+    pub struct SetSource<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSource<St> {}
+    impl<St: State> State for SetSource<St> {
+        type Did = St::Did;
         type Source = Set<members::source>;
     }
     /// Marker types for field names
@@ -162,100 +158,102 @@ pub mod livestream_recommendation_state {
     }
 }
 
-/// Builder for constructing an instance of this type
+/// Builder for constructing an instance of this type.
 pub struct LivestreamRecommendationBuilder<
-    'a,
-    S: livestream_recommendation_state::State,
+    S: BosStr,
+    St: livestream_recommendation_state::State,
 > {
-    _state: PhantomData<fn() -> S>,
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> LivestreamRecommendation<'a> {
-    /// Create a new builder for this type
+impl<S: BosStr> LivestreamRecommendation<S> {
+    /// Create a new builder for this type.
     pub fn new() -> LivestreamRecommendationBuilder<
-        'a,
+        S,
         livestream_recommendation_state::Empty,
     > {
         LivestreamRecommendationBuilder::new()
     }
 }
 
-impl<'a> LivestreamRecommendationBuilder<'a, livestream_recommendation_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<
+    S: BosStr,
+> LivestreamRecommendationBuilder<S, livestream_recommendation_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         LivestreamRecommendationBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LivestreamRecommendationBuilder<'a, S>
+impl<S: BosStr, St> LivestreamRecommendationBuilder<S, St>
 where
-    S: livestream_recommendation_state::State,
-    S::Did: livestream_recommendation_state::IsUnset,
+    St: livestream_recommendation_state::State,
+    St::Did: livestream_recommendation_state::IsUnset,
 {
     /// Set the `did` field (required)
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
     ) -> LivestreamRecommendationBuilder<
-        'a,
-        livestream_recommendation_state::SetDid<S>,
+        S,
+        livestream_recommendation_state::SetDid<St>,
     > {
         self._fields.0 = Option::Some(value.into());
         LivestreamRecommendationBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LivestreamRecommendationBuilder<'a, S>
+impl<S: BosStr, St> LivestreamRecommendationBuilder<S, St>
 where
-    S: livestream_recommendation_state::State,
-    S::Source: livestream_recommendation_state::IsUnset,
+    St: livestream_recommendation_state::State,
+    St::Source: livestream_recommendation_state::IsUnset,
 {
     /// Set the `source` field (required)
     pub fn source(
         mut self,
         value: impl Into<S>,
     ) -> LivestreamRecommendationBuilder<
-        'a,
-        livestream_recommendation_state::SetSource<S>,
+        S,
+        livestream_recommendation_state::SetSource<St>,
     > {
         self._fields.1 = Option::Some(value.into());
         LivestreamRecommendationBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LivestreamRecommendationBuilder<'a, S>
+impl<S: BosStr, St> LivestreamRecommendationBuilder<S, St>
 where
-    S: livestream_recommendation_state::State,
-    S::Did: livestream_recommendation_state::IsSet,
-    S::Source: livestream_recommendation_state::IsSet,
+    St: livestream_recommendation_state::State,
+    St::Did: livestream_recommendation_state::IsSet,
+    St::Source: livestream_recommendation_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> LivestreamRecommendation<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> LivestreamRecommendation<S> {
         LivestreamRecommendation {
             did: self._fields.0.unwrap(),
             source: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> LivestreamRecommendation<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> LivestreamRecommendation<S> {
         LivestreamRecommendation {
             did: self._fields.0.unwrap(),
             source: self._fields.1.unwrap(),
@@ -361,9 +359,9 @@ pub mod get_recommendations_state {
         type UserDid = Unset;
     }
     ///State transition - sets the `user_did` field to Set
-    pub struct SetUserDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUserDid<S> {}
-    impl<S: State> State for SetUserDid<S> {
+    pub struct SetUserDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUserDid<St> {}
+    impl<St: State> State for SetUserDid<St> {
         type UserDid = Set<members::user_did>;
     }
     /// Marker types for field names
@@ -374,57 +372,57 @@ pub mod get_recommendations_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetRecommendationsBuilder<'a, S: get_recommendations_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetRecommendationsBuilder<S: BosStr, St: get_recommendations_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetRecommendations<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetRecommendationsBuilder<'a, get_recommendations_state::Empty> {
+impl<S: BosStr> GetRecommendations<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetRecommendationsBuilder<S, get_recommendations_state::Empty> {
         GetRecommendationsBuilder::new()
     }
 }
 
-impl<'a> GetRecommendationsBuilder<'a, get_recommendations_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetRecommendationsBuilder<S, get_recommendations_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetRecommendationsBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetRecommendationsBuilder<'a, S>
+impl<S: BosStr, St> GetRecommendationsBuilder<S, St>
 where
-    S: get_recommendations_state::State,
-    S::UserDid: get_recommendations_state::IsUnset,
+    St: get_recommendations_state::State,
+    St::UserDid: get_recommendations_state::IsUnset,
 {
     /// Set the `userDID` field (required)
     pub fn user_did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> GetRecommendationsBuilder<'a, get_recommendations_state::SetUserDid<S>> {
+    ) -> GetRecommendationsBuilder<S, get_recommendations_state::SetUserDid<St>> {
         self._fields.0 = Option::Some(value.into());
         GetRecommendationsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetRecommendationsBuilder<'a, S>
+impl<S: BosStr, St> GetRecommendationsBuilder<S, St>
 where
-    S: get_recommendations_state::State,
-    S::UserDid: get_recommendations_state::IsSet,
+    St: get_recommendations_state::State,
+    St::UserDid: get_recommendations_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetRecommendations<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetRecommendations<S> {
         GetRecommendations {
             user_did: self._fields.0.unwrap(),
         }

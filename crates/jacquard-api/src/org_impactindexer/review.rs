@@ -14,7 +14,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,11 +34,11 @@ use crate::org_impactindexer::review;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SubjectRef<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SubjectRef<S: BosStr = DefaultStr> {
     ///Optional CID for record subjects to pin to a specific version.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<S>,
@@ -53,7 +53,7 @@ pub struct SubjectRef<S: Bos<str> + AsRef<str> = DefaultStr> {
 /// The type of subject being reviewed.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum SubjectType<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum SubjectType<S: BosStr = DefaultStr> {
     Record,
     User,
     Pds,
@@ -61,7 +61,7 @@ pub enum SubjectType<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> SubjectType<S> {
+impl<S: BosStr> SubjectType<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Record => "record",
@@ -83,19 +83,19 @@ impl<S: Bos<str> + AsRef<str>> SubjectType<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for SubjectType<S> {
+impl<S: BosStr> AsRef<str> for SubjectType<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for SubjectType<S> {
+impl<S: BosStr> core::fmt::Display for SubjectType<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for SubjectType<S> {
+impl<S: BosStr> Serialize for SubjectType<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -104,8 +104,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for SubjectType<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for SubjectType<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for SubjectType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -115,8 +114,12 @@ for SubjectType<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for SubjectType<S> {
-    type Output = SubjectType<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for SubjectType<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = SubjectType<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             SubjectType::Record => SubjectType::Record,
@@ -128,7 +131,7 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for SubjectType<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for SubjectRef<S> {
+impl<S: BosStr> LexiconSchema for SubjectRef<S> {
     fn nsid() -> &'static str {
         "org.impactindexer.review.defs"
     }
@@ -185,17 +188,17 @@ pub mod subject_ref_state {
         type Uri = Unset;
     }
     ///State transition - sets the `type` field to Set
-    pub struct SetType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetType<S> {}
-    impl<S: State> State for SetType<S> {
+    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetType<St> {}
+    impl<St: State> State for SetType<St> {
         type Type = Set<members::r#type>;
-        type Uri = S::Uri;
+        type Uri = St::Uri;
     }
     ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Type = S::Type;
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Type = St::Type;
         type Uri = Set<members::uri>;
     }
     /// Marker types for field names
@@ -208,32 +211,32 @@ pub mod subject_ref_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct SubjectRefBuilder<'a, S: subject_ref_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct SubjectRefBuilder<S: BosStr, St: subject_ref_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<review::SubjectType<S>>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> SubjectRef<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> SubjectRefBuilder<'a, subject_ref_state::Empty> {
+impl<S: BosStr> SubjectRef<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> SubjectRefBuilder<S, subject_ref_state::Empty> {
         SubjectRefBuilder::new()
     }
 }
 
-impl<'a> SubjectRefBuilder<'a, subject_ref_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> SubjectRefBuilder<S, subject_ref_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SubjectRefBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: subject_ref_state::State> SubjectRefBuilder<'a, S> {
+impl<S: BosStr, St: subject_ref_state::State> SubjectRefBuilder<S, St> {
     /// Set the `cid` field (optional)
     pub fn cid(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -246,52 +249,52 @@ impl<'a, S: subject_ref_state::State> SubjectRefBuilder<'a, S> {
     }
 }
 
-impl<'a, S> SubjectRefBuilder<'a, S>
+impl<S: BosStr, St> SubjectRefBuilder<S, St>
 where
-    S: subject_ref_state::State,
-    S::Type: subject_ref_state::IsUnset,
+    St: subject_ref_state::State,
+    St::Type: subject_ref_state::IsUnset,
 {
     /// Set the `type` field (required)
     pub fn r#type(
         mut self,
         value: impl Into<review::SubjectType<S>>,
-    ) -> SubjectRefBuilder<'a, subject_ref_state::SetType<S>> {
+    ) -> SubjectRefBuilder<S, subject_ref_state::SetType<St>> {
         self._fields.1 = Option::Some(value.into());
         SubjectRefBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SubjectRefBuilder<'a, S>
+impl<S: BosStr, St> SubjectRefBuilder<S, St>
 where
-    S: subject_ref_state::State,
-    S::Uri: subject_ref_state::IsUnset,
+    St: subject_ref_state::State,
+    St::Uri: subject_ref_state::IsUnset,
 {
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
         value: impl Into<S>,
-    ) -> SubjectRefBuilder<'a, subject_ref_state::SetUri<S>> {
+    ) -> SubjectRefBuilder<S, subject_ref_state::SetUri<St>> {
         self._fields.2 = Option::Some(value.into());
         SubjectRefBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SubjectRefBuilder<'a, S>
+impl<S: BosStr, St> SubjectRefBuilder<S, St>
 where
-    S: subject_ref_state::State,
-    S::Type: subject_ref_state::IsSet,
-    S::Uri: subject_ref_state::IsSet,
+    St: subject_ref_state::State,
+    St::Type: subject_ref_state::IsSet,
+    St::Uri: subject_ref_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> SubjectRef<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> SubjectRef<S> {
         SubjectRef {
             cid: self._fields.0,
             r#type: self._fields.1.unwrap(),
@@ -299,11 +302,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> SubjectRef<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> SubjectRef<S> {
         SubjectRef {
             cid: self._fields.0,
             r#type: self._fields.1.unwrap(),

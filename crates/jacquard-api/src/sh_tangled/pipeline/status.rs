@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,11 +34,11 @@ use serde::{Serialize, Deserialize};
     rename = "sh.tangled.pipeline.status",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Status<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Status<S: BosStr = DefaultStr> {
     ///time of creation of this status update
     pub created_at: Datetime,
     ///error message if failed
@@ -63,18 +63,18 @@ pub struct Status<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct StatusGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct StatusGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Status<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Status<S> {
+impl<S: BosStr> Status<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, StatusRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -87,17 +87,17 @@ pub struct StatusRecord;
 impl XrpcResp for StatusRecord {
     const NSID: &'static str = "sh.tangled.pipeline.status";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = StatusGetRecordOutput<S>;
+    type Output<S: BosStr> = StatusGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<StatusGetRecordOutput<S>> for Status<S> {
+impl<S: BosStr> From<StatusGetRecordOutput<S>> for Status<S> {
     fn from(output: StatusGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Status<S> {
+impl<S: BosStr> Collection for Status<S> {
     const NSID: &'static str = "sh.tangled.pipeline.status";
     type Record = StatusRecord;
 }
@@ -107,7 +107,7 @@ impl Collection for StatusRecord {
     type Record = StatusRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Status<S> {
+impl<S: BosStr> LexiconSchema for Status<S> {
     fn nsid() -> &'static str {
         "sh.tangled.pipeline.status"
     }
@@ -132,73 +132,73 @@ pub mod status_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Pipeline;
         type Workflow;
         type CreatedAt;
+        type Pipeline;
         type Status;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Pipeline = Unset;
         type Workflow = Unset;
         type CreatedAt = Unset;
+        type Pipeline = Unset;
         type Status = Unset;
     }
-    ///State transition - sets the `pipeline` field to Set
-    pub struct SetPipeline<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPipeline<S> {}
-    impl<S: State> State for SetPipeline<S> {
-        type Pipeline = Set<members::pipeline>;
-        type Workflow = S::Workflow;
-        type CreatedAt = S::CreatedAt;
-        type Status = S::Status;
-    }
     ///State transition - sets the `workflow` field to Set
-    pub struct SetWorkflow<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetWorkflow<S> {}
-    impl<S: State> State for SetWorkflow<S> {
-        type Pipeline = S::Pipeline;
+    pub struct SetWorkflow<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetWorkflow<St> {}
+    impl<St: State> State for SetWorkflow<St> {
         type Workflow = Set<members::workflow>;
-        type CreatedAt = S::CreatedAt;
-        type Status = S::Status;
+        type CreatedAt = St::CreatedAt;
+        type Pipeline = St::Pipeline;
+        type Status = St::Status;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Pipeline = S::Pipeline;
-        type Workflow = S::Workflow;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Workflow = St::Workflow;
         type CreatedAt = Set<members::created_at>;
-        type Status = S::Status;
+        type Pipeline = St::Pipeline;
+        type Status = St::Status;
+    }
+    ///State transition - sets the `pipeline` field to Set
+    pub struct SetPipeline<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPipeline<St> {}
+    impl<St: State> State for SetPipeline<St> {
+        type Workflow = St::Workflow;
+        type CreatedAt = St::CreatedAt;
+        type Pipeline = Set<members::pipeline>;
+        type Status = St::Status;
     }
     ///State transition - sets the `status` field to Set
-    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStatus<S> {}
-    impl<S: State> State for SetStatus<S> {
-        type Pipeline = S::Pipeline;
-        type Workflow = S::Workflow;
-        type CreatedAt = S::CreatedAt;
+    pub struct SetStatus<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStatus<St> {}
+    impl<St: State> State for SetStatus<St> {
+        type Workflow = St::Workflow;
+        type CreatedAt = St::CreatedAt;
+        type Pipeline = St::Pipeline;
         type Status = Set<members::status>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `pipeline` field
-        pub struct pipeline(());
         ///Marker type for the `workflow` field
         pub struct workflow(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `pipeline` field
+        pub struct pipeline(());
         ///Marker type for the `status` field
         pub struct status(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct StatusBuilder<'a, S: status_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct StatusBuilder<S: BosStr, St: status_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
         Option<S>,
@@ -207,47 +207,47 @@ pub struct StatusBuilder<'a, S: status_state::State> {
         Option<S>,
         Option<AtUri<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Status<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> StatusBuilder<'a, status_state::Empty> {
+impl<S: BosStr> Status<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> StatusBuilder<S, status_state::Empty> {
         StatusBuilder::new()
     }
 }
 
-impl<'a> StatusBuilder<'a, status_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> StatusBuilder<S, status_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         StatusBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> StatusBuilder<'a, S>
+impl<S: BosStr, St> StatusBuilder<S, St>
 where
-    S: status_state::State,
-    S::CreatedAt: status_state::IsUnset,
+    St: status_state::State,
+    St::CreatedAt: status_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> StatusBuilder<'a, status_state::SetCreatedAt<S>> {
+    ) -> StatusBuilder<S, status_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         StatusBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: status_state::State> StatusBuilder<'a, S> {
+impl<S: BosStr, St: status_state::State> StatusBuilder<S, St> {
     /// Set the `error` field (optional)
     pub fn error(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -260,7 +260,7 @@ impl<'a, S: status_state::State> StatusBuilder<'a, S> {
     }
 }
 
-impl<'a, S: status_state::State> StatusBuilder<'a, S> {
+impl<S: BosStr, St: status_state::State> StatusBuilder<S, St> {
     /// Set the `exitCode` field (optional)
     pub fn exit_code(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -273,73 +273,73 @@ impl<'a, S: status_state::State> StatusBuilder<'a, S> {
     }
 }
 
-impl<'a, S> StatusBuilder<'a, S>
+impl<S: BosStr, St> StatusBuilder<S, St>
 where
-    S: status_state::State,
-    S::Pipeline: status_state::IsUnset,
+    St: status_state::State,
+    St::Pipeline: status_state::IsUnset,
 {
     /// Set the `pipeline` field (required)
     pub fn pipeline(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> StatusBuilder<'a, status_state::SetPipeline<S>> {
+    ) -> StatusBuilder<S, status_state::SetPipeline<St>> {
         self._fields.3 = Option::Some(value.into());
         StatusBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> StatusBuilder<'a, S>
+impl<S: BosStr, St> StatusBuilder<S, St>
 where
-    S: status_state::State,
-    S::Status: status_state::IsUnset,
+    St: status_state::State,
+    St::Status: status_state::IsUnset,
 {
     /// Set the `status` field (required)
     pub fn status(
         mut self,
         value: impl Into<S>,
-    ) -> StatusBuilder<'a, status_state::SetStatus<S>> {
+    ) -> StatusBuilder<S, status_state::SetStatus<St>> {
         self._fields.4 = Option::Some(value.into());
         StatusBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> StatusBuilder<'a, S>
+impl<S: BosStr, St> StatusBuilder<S, St>
 where
-    S: status_state::State,
-    S::Workflow: status_state::IsUnset,
+    St: status_state::State,
+    St::Workflow: status_state::IsUnset,
 {
     /// Set the `workflow` field (required)
     pub fn workflow(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> StatusBuilder<'a, status_state::SetWorkflow<S>> {
+    ) -> StatusBuilder<S, status_state::SetWorkflow<St>> {
         self._fields.5 = Option::Some(value.into());
         StatusBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> StatusBuilder<'a, S>
+impl<S: BosStr, St> StatusBuilder<S, St>
 where
-    S: status_state::State,
-    S::Pipeline: status_state::IsSet,
-    S::Workflow: status_state::IsSet,
-    S::CreatedAt: status_state::IsSet,
-    S::Status: status_state::IsSet,
+    St: status_state::State,
+    St::Workflow: status_state::IsSet,
+    St::CreatedAt: status_state::IsSet,
+    St::Pipeline: status_state::IsSet,
+    St::Status: status_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Status<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Status<S> {
         Status {
             created_at: self._fields.0.unwrap(),
             error: self._fields.1,
@@ -350,8 +350,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Status<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Status<S> {
         Status {
             created_at: self._fields.0.unwrap(),
             error: self._fields.1,

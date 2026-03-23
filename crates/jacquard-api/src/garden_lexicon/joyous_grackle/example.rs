@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "garden.lexicon.joyous-grackle.example",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Example<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Example<S: BosStr = DefaultStr> {
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
@@ -50,18 +50,18 @@ pub struct Example<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ExampleGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ExampleGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Example<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Example<S> {
+impl<S: BosStr> Example<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, ExampleRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -74,17 +74,17 @@ pub struct ExampleRecord;
 impl XrpcResp for ExampleRecord {
     const NSID: &'static str = "garden.lexicon.joyous-grackle.example";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ExampleGetRecordOutput<S>;
+    type Output<S: BosStr> = ExampleGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<ExampleGetRecordOutput<S>> for Example<S> {
+impl<S: BosStr> From<ExampleGetRecordOutput<S>> for Example<S> {
     fn from(output: ExampleGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Example<S> {
+impl<S: BosStr> Collection for Example<S> {
     const NSID: &'static str = "garden.lexicon.joyous-grackle.example";
     type Record = ExampleRecord;
 }
@@ -94,7 +94,7 @@ impl Collection for ExampleRecord {
     type Record = ExampleRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Example<S> {
+impl<S: BosStr> LexiconSchema for Example<S> {
     fn nsid() -> &'static str {
         "garden.lexicon.joyous-grackle.example"
     }

@@ -15,7 +15,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use crate::network_slices::tools;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Image<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Image<S: BosStr = DefaultStr> {
     ///Alt text description of the image, for accessibility
     pub alt: S,
     pub image: BlobRef<S>,
@@ -52,17 +52,17 @@ pub struct Image<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Images<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Images<S: BosStr = DefaultStr> {
     pub images: Vec<tools::Image<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Image<S> {
+impl<S: BosStr> LexiconSchema for Image<S> {
     fn nsid() -> &'static str {
         "network.slices.tools.defs"
     }
@@ -117,7 +117,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Image<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Images<S> {
+impl<S: BosStr> LexiconSchema for Images<S> {
     fn nsid() -> &'static str {
         "network.slices.tools.defs"
     }
@@ -164,17 +164,17 @@ pub mod image_state {
         type Image = Unset;
     }
     ///State transition - sets the `alt` field to Set
-    pub struct SetAlt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAlt<S> {}
-    impl<S: State> State for SetAlt<S> {
+    pub struct SetAlt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAlt<St> {}
+    impl<St: State> State for SetAlt<St> {
         type Alt = Set<members::alt>;
-        type Image = S::Image;
+        type Image = St::Image;
     }
     ///State transition - sets the `image` field to Set
-    pub struct SetImage<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetImage<S> {}
-    impl<S: State> State for SetImage<S> {
-        type Alt = S::Alt;
+    pub struct SetImage<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetImage<St> {}
+    impl<St: State> State for SetImage<St> {
+        type Alt = St::Alt;
         type Image = Set<members::image>;
     }
     /// Marker types for field names
@@ -187,85 +187,85 @@ pub mod image_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ImageBuilder<'a, S: image_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ImageBuilder<S: BosStr, St: image_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<BlobRef<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Image<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ImageBuilder<'a, image_state::Empty> {
+impl<S: BosStr> Image<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ImageBuilder<S, image_state::Empty> {
         ImageBuilder::new()
     }
 }
 
-impl<'a> ImageBuilder<'a, image_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ImageBuilder<S, image_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ImageBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ImageBuilder<'a, S>
+impl<S: BosStr, St> ImageBuilder<S, St>
 where
-    S: image_state::State,
-    S::Alt: image_state::IsUnset,
+    St: image_state::State,
+    St::Alt: image_state::IsUnset,
 {
     /// Set the `alt` field (required)
     pub fn alt(
         mut self,
         value: impl Into<S>,
-    ) -> ImageBuilder<'a, image_state::SetAlt<S>> {
+    ) -> ImageBuilder<S, image_state::SetAlt<St>> {
         self._fields.0 = Option::Some(value.into());
         ImageBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ImageBuilder<'a, S>
+impl<S: BosStr, St> ImageBuilder<S, St>
 where
-    S: image_state::State,
-    S::Image: image_state::IsUnset,
+    St: image_state::State,
+    St::Image: image_state::IsUnset,
 {
     /// Set the `image` field (required)
     pub fn image(
         mut self,
         value: impl Into<BlobRef<S>>,
-    ) -> ImageBuilder<'a, image_state::SetImage<S>> {
+    ) -> ImageBuilder<S, image_state::SetImage<St>> {
         self._fields.1 = Option::Some(value.into());
         ImageBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ImageBuilder<'a, S>
+impl<S: BosStr, St> ImageBuilder<S, St>
 where
-    S: image_state::State,
-    S::Alt: image_state::IsSet,
-    S::Image: image_state::IsSet,
+    St: image_state::State,
+    St::Alt: image_state::IsSet,
+    St::Image: image_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Image<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Image<S> {
         Image {
             alt: self._fields.0.unwrap(),
             image: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Image<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Image<S> {
         Image {
             alt: self._fields.0.unwrap(),
             image: self._fields.1.unwrap(),
@@ -361,9 +361,9 @@ pub mod images_state {
         type Images = Unset;
     }
     ///State transition - sets the `images` field to Set
-    pub struct SetImages<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetImages<S> {}
-    impl<S: State> State for SetImages<S> {
+    pub struct SetImages<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetImages<St> {}
+    impl<St: State> State for SetImages<St> {
         type Images = Set<members::images>;
     }
     /// Marker types for field names
@@ -374,64 +374,64 @@ pub mod images_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ImagesBuilder<'a, S: images_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ImagesBuilder<S: BosStr, St: images_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<tools::Image<S>>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Images<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ImagesBuilder<'a, images_state::Empty> {
+impl<S: BosStr> Images<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ImagesBuilder<S, images_state::Empty> {
         ImagesBuilder::new()
     }
 }
 
-impl<'a> ImagesBuilder<'a, images_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ImagesBuilder<S, images_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ImagesBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ImagesBuilder<'a, S>
+impl<S: BosStr, St> ImagesBuilder<S, St>
 where
-    S: images_state::State,
-    S::Images: images_state::IsUnset,
+    St: images_state::State,
+    St::Images: images_state::IsUnset,
 {
     /// Set the `images` field (required)
     pub fn images(
         mut self,
         value: impl Into<Vec<tools::Image<S>>>,
-    ) -> ImagesBuilder<'a, images_state::SetImages<S>> {
+    ) -> ImagesBuilder<S, images_state::SetImages<St>> {
         self._fields.0 = Option::Some(value.into());
         ImagesBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ImagesBuilder<'a, S>
+impl<S: BosStr, St> ImagesBuilder<S, St>
 where
-    S: images_state::State,
-    S::Images: images_state::IsSet,
+    St: images_state::State,
+    St::Images: images_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Images<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Images<S> {
         Images {
             images: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Images<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Images<S> {
         Images {
             images: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

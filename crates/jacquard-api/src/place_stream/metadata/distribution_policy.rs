@@ -7,7 +7,7 @@
 
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -26,11 +26,11 @@ use serde::{Serialize, Deserialize};
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DistributionPolicy<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DistributionPolicy<S: BosStr = DefaultStr> {
     ///List of did:webs of the broadcasters you want to allow to distribute your content. "*" allows anyone. Starting a line with a "!" bans that broadcaster.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub allowed_broadcasters: Option<Vec<S>>,
@@ -41,7 +41,7 @@ pub struct DistributionPolicy<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for DistributionPolicy<S> {
+impl<S: BosStr> LexiconSchema for DistributionPolicy<S> {
     fn nsid() -> &'static str {
         "place.stream.metadata.distributionPolicy"
     }

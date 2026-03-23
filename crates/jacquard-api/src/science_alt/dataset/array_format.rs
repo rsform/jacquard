@@ -5,7 +5,7 @@
 // This file was automatically generated from Lexicon schemas.
 // Any manual changes will be overwritten on the next regeneration.
 
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 /// Arrow tensor format. Stores multi-dimensional arrays using Arrow's tensor IPC format. Versions maintained at https://json-schema.alt.science/atdata-arrow-tensor/{version}/
@@ -21,9 +21,7 @@ impl core::fmt::Display for ArrowTensor {
 /// Array serialization format identifier for NDArray fields in sample schemas. Known values correspond to token definitions in this Lexicon. Each format has versioned specifications maintained by alt.science at canonical URLs.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ArrayFormat<
-    S: jacquard_common::Bos<str> + AsRef<str> = jacquard_common::DefaultStr,
-> {
+pub enum ArrayFormat<S: BosStr = DefaultStr> {
     NdarrayBytes,
     SparseBytes,
     StructuredBytes,
@@ -32,7 +30,7 @@ pub enum ArrayFormat<
     Other(S),
 }
 
-impl<S: jacquard_common::Bos<str> + AsRef<str>> ArrayFormat<S> {
+impl<S: BosStr> ArrayFormat<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::NdarrayBytes => "ndarrayBytes",
@@ -56,19 +54,19 @@ impl<S: jacquard_common::Bos<str> + AsRef<str>> ArrayFormat<S> {
     }
 }
 
-impl<S: jacquard_common::Bos<str> + AsRef<str>> AsRef<str> for ArrayFormat<S> {
+impl<S: BosStr> AsRef<str> for ArrayFormat<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: jacquard_common::Bos<str> + AsRef<str>> core::fmt::Display for ArrayFormat<S> {
+impl<S: BosStr> core::fmt::Display for ArrayFormat<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: jacquard_common::Bos<str> + AsRef<str>> Serialize for ArrayFormat<S> {
+impl<S: BosStr> Serialize for ArrayFormat<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -77,8 +75,7 @@ impl<S: jacquard_common::Bos<str> + AsRef<str>> Serialize for ArrayFormat<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + jacquard_common::Bos<str> + AsRef<str>> Deserialize<'de>
-for ArrayFormat<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ArrayFormat<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -88,8 +85,12 @@ for ArrayFormat<S> {
     }
 }
 
-impl<S: jacquard_common::Bos<str> + AsRef<str>> IntoStatic for ArrayFormat<S> {
-    type Output = ArrayFormat<jacquard_common::DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for ArrayFormat<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ArrayFormat<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             ArrayFormat::NdarrayBytes => ArrayFormat::NdarrayBytes,

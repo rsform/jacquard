@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use crate::sh_tangled::label::definition;
     rename = "sh.tangled.label.definition",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Definition<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Definition<S: BosStr = DefaultStr> {
     ///The hex value for the background color for the label. Appviews may choose to respect this.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub color: Option<S>,
@@ -63,11 +63,11 @@ pub struct Definition<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DefinitionGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DefinitionGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
@@ -79,11 +79,11 @@ pub struct DefinitionGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ValueType<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ValueType<S: BosStr = DefaultStr> {
     ///Closed set of values that this label can take.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub r#enum: Option<Vec<S>>,
@@ -95,7 +95,7 @@ pub struct ValueType<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Definition<S> {
+impl<S: BosStr> Definition<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, DefinitionRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -108,17 +108,17 @@ pub struct DefinitionRecord;
 impl XrpcResp for DefinitionRecord {
     const NSID: &'static str = "sh.tangled.label.definition";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = DefinitionGetRecordOutput<S>;
+    type Output<S: BosStr> = DefinitionGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<DefinitionGetRecordOutput<S>> for Definition<S> {
+impl<S: BosStr> From<DefinitionGetRecordOutput<S>> for Definition<S> {
     fn from(output: DefinitionGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Definition<S> {
+impl<S: BosStr> Collection for Definition<S> {
     const NSID: &'static str = "sh.tangled.label.definition";
     type Record = DefinitionRecord;
 }
@@ -128,7 +128,7 @@ impl Collection for DefinitionRecord {
     type Record = DefinitionRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Definition<S> {
+impl<S: BosStr> LexiconSchema for Definition<S> {
     fn nsid() -> &'static str {
         "sh.tangled.label.definition"
     }
@@ -169,7 +169,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Definition<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ValueType<S> {
+impl<S: BosStr> LexiconSchema for ValueType<S> {
     fn nsid() -> &'static str {
         "sh.tangled.label.definition"
     }
@@ -195,72 +195,72 @@ pub mod definition_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type ValueType;
+        type Scope;
         type CreatedAt;
         type Name;
-        type Scope;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type ValueType = Unset;
+        type Scope = Unset;
         type CreatedAt = Unset;
         type Name = Unset;
-        type Scope = Unset;
     }
     ///State transition - sets the `value_type` field to Set
-    pub struct SetValueType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValueType<S> {}
-    impl<S: State> State for SetValueType<S> {
+    pub struct SetValueType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetValueType<St> {}
+    impl<St: State> State for SetValueType<St> {
         type ValueType = Set<members::value_type>;
-        type CreatedAt = S::CreatedAt;
-        type Name = S::Name;
-        type Scope = S::Scope;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type ValueType = S::ValueType;
-        type CreatedAt = Set<members::created_at>;
-        type Name = S::Name;
-        type Scope = S::Scope;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type ValueType = S::ValueType;
-        type CreatedAt = S::CreatedAt;
-        type Name = Set<members::name>;
-        type Scope = S::Scope;
+        type Scope = St::Scope;
+        type CreatedAt = St::CreatedAt;
+        type Name = St::Name;
     }
     ///State transition - sets the `scope` field to Set
-    pub struct SetScope<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetScope<S> {}
-    impl<S: State> State for SetScope<S> {
-        type ValueType = S::ValueType;
-        type CreatedAt = S::CreatedAt;
-        type Name = S::Name;
+    pub struct SetScope<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetScope<St> {}
+    impl<St: State> State for SetScope<St> {
+        type ValueType = St::ValueType;
         type Scope = Set<members::scope>;
+        type CreatedAt = St::CreatedAt;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type ValueType = St::ValueType;
+        type Scope = St::Scope;
+        type CreatedAt = Set<members::created_at>;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type ValueType = St::ValueType;
+        type Scope = St::Scope;
+        type CreatedAt = St::CreatedAt;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `value_type` field
         pub struct value_type(());
+        ///Marker type for the `scope` field
+        pub struct scope(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `name` field
         pub struct name(());
-        ///Marker type for the `scope` field
-        pub struct scope(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct DefinitionBuilder<'a, S: definition_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct DefinitionBuilder<S: BosStr, St: definition_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
         Option<Datetime>,
@@ -269,28 +269,28 @@ pub struct DefinitionBuilder<'a, S: definition_state::State> {
         Option<Vec<Nsid<S>>>,
         Option<definition::ValueType<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Definition<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> DefinitionBuilder<'a, definition_state::Empty> {
+impl<S: BosStr> Definition<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> DefinitionBuilder<S, definition_state::Empty> {
         DefinitionBuilder::new()
     }
 }
 
-impl<'a> DefinitionBuilder<'a, definition_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> DefinitionBuilder<S, definition_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         DefinitionBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: definition_state::State> DefinitionBuilder<'a, S> {
+impl<S: BosStr, St: definition_state::State> DefinitionBuilder<S, St> {
     /// Set the `color` field (optional)
     pub fn color(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -303,26 +303,26 @@ impl<'a, S: definition_state::State> DefinitionBuilder<'a, S> {
     }
 }
 
-impl<'a, S> DefinitionBuilder<'a, S>
+impl<S: BosStr, St> DefinitionBuilder<S, St>
 where
-    S: definition_state::State,
-    S::CreatedAt: definition_state::IsUnset,
+    St: definition_state::State,
+    St::CreatedAt: definition_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> DefinitionBuilder<'a, definition_state::SetCreatedAt<S>> {
+    ) -> DefinitionBuilder<S, definition_state::SetCreatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         DefinitionBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: definition_state::State> DefinitionBuilder<'a, S> {
+impl<S: BosStr, St: definition_state::State> DefinitionBuilder<S, St> {
     /// Set the `multiple` field (optional)
     pub fn multiple(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.2 = value.into();
@@ -335,73 +335,73 @@ impl<'a, S: definition_state::State> DefinitionBuilder<'a, S> {
     }
 }
 
-impl<'a, S> DefinitionBuilder<'a, S>
+impl<S: BosStr, St> DefinitionBuilder<S, St>
 where
-    S: definition_state::State,
-    S::Name: definition_state::IsUnset,
+    St: definition_state::State,
+    St::Name: definition_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> DefinitionBuilder<'a, definition_state::SetName<S>> {
+    ) -> DefinitionBuilder<S, definition_state::SetName<St>> {
         self._fields.3 = Option::Some(value.into());
         DefinitionBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DefinitionBuilder<'a, S>
+impl<S: BosStr, St> DefinitionBuilder<S, St>
 where
-    S: definition_state::State,
-    S::Scope: definition_state::IsUnset,
+    St: definition_state::State,
+    St::Scope: definition_state::IsUnset,
 {
     /// Set the `scope` field (required)
     pub fn scope(
         mut self,
         value: impl Into<Vec<Nsid<S>>>,
-    ) -> DefinitionBuilder<'a, definition_state::SetScope<S>> {
+    ) -> DefinitionBuilder<S, definition_state::SetScope<St>> {
         self._fields.4 = Option::Some(value.into());
         DefinitionBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DefinitionBuilder<'a, S>
+impl<S: BosStr, St> DefinitionBuilder<S, St>
 where
-    S: definition_state::State,
-    S::ValueType: definition_state::IsUnset,
+    St: definition_state::State,
+    St::ValueType: definition_state::IsUnset,
 {
     /// Set the `valueType` field (required)
     pub fn value_type(
         mut self,
         value: impl Into<definition::ValueType<S>>,
-    ) -> DefinitionBuilder<'a, definition_state::SetValueType<S>> {
+    ) -> DefinitionBuilder<S, definition_state::SetValueType<St>> {
         self._fields.5 = Option::Some(value.into());
         DefinitionBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DefinitionBuilder<'a, S>
+impl<S: BosStr, St> DefinitionBuilder<S, St>
 where
-    S: definition_state::State,
-    S::ValueType: definition_state::IsSet,
-    S::CreatedAt: definition_state::IsSet,
-    S::Name: definition_state::IsSet,
-    S::Scope: definition_state::IsSet,
+    St: definition_state::State,
+    St::ValueType: definition_state::IsSet,
+    St::Scope: definition_state::IsSet,
+    St::CreatedAt: definition_state::IsSet,
+    St::Name: definition_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Definition<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Definition<S> {
         Definition {
             color: self._fields.0,
             created_at: self._fields.1.unwrap(),
@@ -412,11 +412,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Definition<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Definition<S> {
         Definition {
             color: self._fields.0,
             created_at: self._fields.1.unwrap(),

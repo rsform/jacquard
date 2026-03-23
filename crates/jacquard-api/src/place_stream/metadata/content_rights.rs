@@ -7,7 +7,7 @@
 
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -106,11 +106,11 @@ impl core::fmt::Display for Cc010 {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ContentRights<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ContentRights<S: BosStr = DefaultStr> {
     ///Copyright notice for the work.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub copyright_notice: Option<S>,
@@ -133,7 +133,7 @@ pub struct ContentRights<S: Bos<str> + AsRef<str> = DefaultStr> {
 /// License URL or identifier.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ContentRightsLicense<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ContentRightsLicense<S: BosStr = DefaultStr> {
     AllRightsReserved,
     Cc010,
     CcBy40,
@@ -145,7 +145,7 @@ pub enum ContentRightsLicense<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> ContentRightsLicense<S> {
+impl<S: BosStr> ContentRightsLicense<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::AllRightsReserved => {
@@ -179,19 +179,19 @@ impl<S: Bos<str> + AsRef<str>> ContentRightsLicense<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ContentRightsLicense<S> {
+impl<S: BosStr> core::fmt::Display for ContentRightsLicense<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for ContentRightsLicense<S> {
+impl<S: BosStr> AsRef<str> for ContentRightsLicense<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for ContentRightsLicense<S> {
+impl<S: BosStr> Serialize for ContentRightsLicense<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -200,8 +200,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for ContentRightsLicense<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for ContentRightsLicense<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ContentRightsLicense<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -211,14 +210,18 @@ for ContentRightsLicense<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for ContentRightsLicense<S> {
+impl<S: BosStr + Default> Default for ContentRightsLicense<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for ContentRightsLicense<S> {
-    type Output = ContentRightsLicense<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for ContentRightsLicense<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ContentRightsLicense<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             ContentRightsLicense::AllRightsReserved => {
@@ -238,7 +241,7 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for ContentRightsLicense<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ContentRights<S> {
+impl<S: BosStr> LexiconSchema for ContentRights<S> {
     fn nsid() -> &'static str {
         "place.stream.metadata.contentRights"
     }

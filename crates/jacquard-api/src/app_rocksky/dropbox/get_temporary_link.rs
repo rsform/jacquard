@@ -6,47 +6,43 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[allow(unused_imports)]
+use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::app_rocksky::dropbox::TemporaryLinkView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetTemporaryLink<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct GetTemporaryLink<S: BosStr = DefaultStr> {
     pub path: S,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetTemporaryLinkOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetTemporaryLinkOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
-    #[serde(borrow)]
     pub value: TemporaryLinkView<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
-    pub extra_data: Option<
-        alloc::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<S>,
-        >,
-    >,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for app.rocksky.dropbox.getTemporaryLink
@@ -54,12 +50,11 @@ pub struct GetTemporaryLinkResponse;
 impl jacquard_common::xrpc::XrpcResp for GetTemporaryLinkResponse {
     const NSID: &'static str = "app.rocksky.dropbox.getTemporaryLink";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetTemporaryLinkOutput<S>;
+    type Output<S: BosStr> = GetTemporaryLinkOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetTemporaryLink<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetTemporaryLink<S> {
     const NSID: &'static str = "app.rocksky.dropbox.getTemporaryLink";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetTemporaryLinkResponse;
@@ -70,7 +65,7 @@ pub struct GetTemporaryLinkRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetTemporaryLinkRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.dropbox.getTemporaryLink";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetTemporaryLink<S>;
+    type Request<S: BosStr> = GetTemporaryLink<S>;
     type Response = GetTemporaryLinkResponse;
 }
 
@@ -93,9 +88,9 @@ pub mod get_temporary_link_state {
         type Path = Unset;
     }
     ///State transition - sets the `path` field to Set
-    pub struct SetPath<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPath<S> {}
-    impl<S: State> State for SetPath<S> {
+    pub struct SetPath<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPath<St> {}
+    impl<St: State> State for SetPath<St> {
         type Path = Set<members::path>;
     }
     /// Marker types for field names
@@ -106,57 +101,57 @@ pub mod get_temporary_link_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetTemporaryLinkBuilder<'a, S: get_temporary_link_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetTemporaryLinkBuilder<S: BosStr, St: get_temporary_link_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetTemporaryLink<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetTemporaryLinkBuilder<'a, get_temporary_link_state::Empty> {
+impl<S: BosStr> GetTemporaryLink<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetTemporaryLinkBuilder<S, get_temporary_link_state::Empty> {
         GetTemporaryLinkBuilder::new()
     }
 }
 
-impl<'a> GetTemporaryLinkBuilder<'a, get_temporary_link_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetTemporaryLinkBuilder<S, get_temporary_link_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetTemporaryLinkBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetTemporaryLinkBuilder<'a, S>
+impl<S: BosStr, St> GetTemporaryLinkBuilder<S, St>
 where
-    S: get_temporary_link_state::State,
-    S::Path: get_temporary_link_state::IsUnset,
+    St: get_temporary_link_state::State,
+    St::Path: get_temporary_link_state::IsUnset,
 {
     /// Set the `path` field (required)
     pub fn path(
         mut self,
         value: impl Into<S>,
-    ) -> GetTemporaryLinkBuilder<'a, get_temporary_link_state::SetPath<S>> {
+    ) -> GetTemporaryLinkBuilder<S, get_temporary_link_state::SetPath<St>> {
         self._fields.0 = Option::Some(value.into());
         GetTemporaryLinkBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetTemporaryLinkBuilder<'a, S>
+impl<S: BosStr, St> GetTemporaryLinkBuilder<S, St>
 where
-    S: get_temporary_link_state::State,
-    S::Path: get_temporary_link_state::IsSet,
+    St: get_temporary_link_state::State,
+    St::Path: get_temporary_link_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetTemporaryLink<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetTemporaryLink<S> {
         GetTemporaryLink {
             path: self._fields.0.unwrap(),
         }

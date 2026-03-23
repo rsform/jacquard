@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -29,18 +29,18 @@ use crate::blog_pckt::block::table_row::TableRow;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Table<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Table<S: BosStr = DefaultStr> {
     ///Array of table rows
     pub content: Vec<TableRow<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Table<S> {
+impl<S: BosStr> LexiconSchema for Table<S> {
     fn nsid() -> &'static str {
         "blog.pckt.block.table"
     }
@@ -74,9 +74,9 @@ pub mod table_state {
         type Content = Unset;
     }
     ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
+    pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetContent<St> {}
+    impl<St: State> State for SetContent<St> {
         type Content = Set<members::content>;
     }
     /// Marker types for field names
@@ -87,64 +87,64 @@ pub mod table_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct TableBuilder<'a, S: table_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct TableBuilder<S: BosStr, St: table_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<TableRow<S>>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Table<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> TableBuilder<'a, table_state::Empty> {
+impl<S: BosStr> Table<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> TableBuilder<S, table_state::Empty> {
         TableBuilder::new()
     }
 }
 
-impl<'a> TableBuilder<'a, table_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> TableBuilder<S, table_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         TableBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> TableBuilder<'a, S>
+impl<S: BosStr, St> TableBuilder<S, St>
 where
-    S: table_state::State,
-    S::Content: table_state::IsUnset,
+    St: table_state::State,
+    St::Content: table_state::IsUnset,
 {
     /// Set the `content` field (required)
     pub fn content(
         mut self,
         value: impl Into<Vec<TableRow<S>>>,
-    ) -> TableBuilder<'a, table_state::SetContent<S>> {
+    ) -> TableBuilder<S, table_state::SetContent<St>> {
         self._fields.0 = Option::Some(value.into());
         TableBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> TableBuilder<'a, S>
+impl<S: BosStr, St> TableBuilder<S, St>
 where
-    S: table_state::State,
-    S::Content: table_state::IsSet,
+    St: table_state::State,
+    St::Content: table_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Table<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Table<S> {
         Table {
             content: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Table<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Table<S> {
         Table {
             content: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

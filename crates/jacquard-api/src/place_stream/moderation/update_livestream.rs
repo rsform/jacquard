@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, AtUri, Cid};
 use jacquard_common::types::value::Data;
@@ -18,14 +18,14 @@ use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct UpdateLivestream<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct UpdateLivestream<S: BosStr = DefaultStr> {
     ///The AT-URI of the livestream record to update.
     pub livestream_uri: AtUri<S>,
     ///The DID of the streamer.
@@ -33,29 +33,25 @@ pub struct UpdateLivestream<S: Bos<str> + AsRef<str> = DefaultStr> {
     ///New title for the livestream.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub title: Option<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct UpdateLivestreamOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct UpdateLivestreamOutput<S: BosStr = DefaultStr> {
     ///The CID of the updated livestream record.
     pub cid: Cid<S>,
     ///The AT-URI of the updated livestream record.
     pub uri: AtUri<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -137,12 +133,11 @@ pub struct UpdateLivestreamResponse;
 impl jacquard_common::xrpc::XrpcResp for UpdateLivestreamResponse {
     const NSID: &'static str = "place.stream.moderation.updateLivestream";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = UpdateLivestreamOutput<S>;
+    type Output<S: BosStr> = UpdateLivestreamOutput<S>;
     type Err = UpdateLivestreamError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for UpdateLivestream<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for UpdateLivestream<S> {
     const NSID: &'static str = "place.stream.moderation.updateLivestream";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -157,7 +152,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for UpdateLivestreamRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = UpdateLivestream<S>;
+    type Request<S: BosStr> = UpdateLivestream<S>;
     type Response = UpdateLivestreamResponse;
 }
 
@@ -182,17 +177,17 @@ pub mod update_livestream_state {
         type Streamer = Unset;
     }
     ///State transition - sets the `livestream_uri` field to Set
-    pub struct SetLivestreamUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLivestreamUri<S> {}
-    impl<S: State> State for SetLivestreamUri<S> {
+    pub struct SetLivestreamUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLivestreamUri<St> {}
+    impl<St: State> State for SetLivestreamUri<St> {
         type LivestreamUri = Set<members::livestream_uri>;
-        type Streamer = S::Streamer;
+        type Streamer = St::Streamer;
     }
     ///State transition - sets the `streamer` field to Set
-    pub struct SetStreamer<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStreamer<S> {}
-    impl<S: State> State for SetStreamer<S> {
-        type LivestreamUri = S::LivestreamUri;
+    pub struct SetStreamer<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStreamer<St> {}
+    impl<St: State> State for SetStreamer<St> {
+        type LivestreamUri = St::LivestreamUri;
         type Streamer = Set<members::streamer>;
     }
     /// Marker types for field names
@@ -205,70 +200,70 @@ pub mod update_livestream_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct UpdateLivestreamBuilder<'a, S: update_livestream_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct UpdateLivestreamBuilder<S: BosStr, St: update_livestream_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>, Option<Did<S>>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> UpdateLivestream<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> UpdateLivestreamBuilder<'a, update_livestream_state::Empty> {
+impl<S: BosStr> UpdateLivestream<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> UpdateLivestreamBuilder<S, update_livestream_state::Empty> {
         UpdateLivestreamBuilder::new()
     }
 }
 
-impl<'a> UpdateLivestreamBuilder<'a, update_livestream_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> UpdateLivestreamBuilder<S, update_livestream_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         UpdateLivestreamBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> UpdateLivestreamBuilder<'a, S>
+impl<S: BosStr, St> UpdateLivestreamBuilder<S, St>
 where
-    S: update_livestream_state::State,
-    S::LivestreamUri: update_livestream_state::IsUnset,
+    St: update_livestream_state::State,
+    St::LivestreamUri: update_livestream_state::IsUnset,
 {
     /// Set the `livestreamUri` field (required)
     pub fn livestream_uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> UpdateLivestreamBuilder<'a, update_livestream_state::SetLivestreamUri<S>> {
+    ) -> UpdateLivestreamBuilder<S, update_livestream_state::SetLivestreamUri<St>> {
         self._fields.0 = Option::Some(value.into());
         UpdateLivestreamBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> UpdateLivestreamBuilder<'a, S>
+impl<S: BosStr, St> UpdateLivestreamBuilder<S, St>
 where
-    S: update_livestream_state::State,
-    S::Streamer: update_livestream_state::IsUnset,
+    St: update_livestream_state::State,
+    St::Streamer: update_livestream_state::IsUnset,
 {
     /// Set the `streamer` field (required)
     pub fn streamer(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> UpdateLivestreamBuilder<'a, update_livestream_state::SetStreamer<S>> {
+    ) -> UpdateLivestreamBuilder<S, update_livestream_state::SetStreamer<St>> {
         self._fields.1 = Option::Some(value.into());
         UpdateLivestreamBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: update_livestream_state::State> UpdateLivestreamBuilder<'a, S> {
+impl<S: BosStr, St: update_livestream_state::State> UpdateLivestreamBuilder<S, St> {
     /// Set the `title` field (optional)
     pub fn title(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -281,14 +276,14 @@ impl<'a, S: update_livestream_state::State> UpdateLivestreamBuilder<'a, S> {
     }
 }
 
-impl<'a, S> UpdateLivestreamBuilder<'a, S>
+impl<S: BosStr, St> UpdateLivestreamBuilder<S, St>
 where
-    S: update_livestream_state::State,
-    S::LivestreamUri: update_livestream_state::IsSet,
-    S::Streamer: update_livestream_state::IsSet,
+    St: update_livestream_state::State,
+    St::LivestreamUri: update_livestream_state::IsSet,
+    St::Streamer: update_livestream_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> UpdateLivestream<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> UpdateLivestream<S> {
         UpdateLivestream {
             livestream_uri: self._fields.0.unwrap(),
             streamer: self._fields.1.unwrap(),
@@ -296,11 +291,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> UpdateLivestream<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> UpdateLivestream<S> {
         UpdateLivestream {
             livestream_uri: self._fields.0.unwrap(),
             streamer: self._fields.1.unwrap(),

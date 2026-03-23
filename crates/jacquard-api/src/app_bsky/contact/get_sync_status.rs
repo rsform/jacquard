@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
@@ -22,20 +22,18 @@ use crate::app_bsky::contact::SyncStatus;
 pub struct GetSyncStatus;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetSyncStatusOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetSyncStatusOutput<S: BosStr = DefaultStr> {
     ///If present, indicates the user has imported their contacts. If not present, indicates the user never used the feature or called `app.bsky.contact.removeData` and didn't import again since.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sync_status: Option<SyncStatus<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -95,7 +93,7 @@ pub struct GetSyncStatusResponse;
 impl jacquard_common::xrpc::XrpcResp for GetSyncStatusResponse {
     const NSID: &'static str = "app.bsky.contact.getSyncStatus";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetSyncStatusOutput<S>;
+    type Output<S: BosStr> = GetSyncStatusOutput<S>;
     type Err = GetSyncStatusError;
 }
 
@@ -110,6 +108,6 @@ pub struct GetSyncStatusRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetSyncStatusRequest {
     const PATH: &'static str = "/xrpc/app.bsky.contact.getSyncStatus";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetSyncStatus;
+    type Request<S: BosStr> = GetSyncStatus;
     type Response = GetSyncStatusResponse;
 }

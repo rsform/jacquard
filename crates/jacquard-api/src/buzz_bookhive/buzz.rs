@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
     rename = "buzz.bookhive.buzz",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Buzz<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Buzz<S: BosStr = DefaultStr> {
     pub book: StrongRef<S>,
     ///The content of the comment.
     pub comment: S,
@@ -57,18 +57,18 @@ pub struct Buzz<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct BuzzGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct BuzzGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Buzz<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Buzz<S> {
+impl<S: BosStr> Buzz<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, BuzzRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -81,17 +81,17 @@ pub struct BuzzRecord;
 impl XrpcResp for BuzzRecord {
     const NSID: &'static str = "buzz.bookhive.buzz";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = BuzzGetRecordOutput<S>;
+    type Output<S: BosStr> = BuzzGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<BuzzGetRecordOutput<S>> for Buzz<S> {
+impl<S: BosStr> From<BuzzGetRecordOutput<S>> for Buzz<S> {
     fn from(output: BuzzGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Buzz<S> {
+impl<S: BosStr> Collection for Buzz<S> {
     const NSID: &'static str = "buzz.bookhive.buzz";
     type Record = BuzzRecord;
 }
@@ -101,7 +101,7 @@ impl Collection for BuzzRecord {
     type Record = BuzzRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Buzz<S> {
+impl<S: BosStr> LexiconSchema for Buzz<S> {
     fn nsid() -> &'static str {
         "buzz.bookhive.buzz"
     }
@@ -150,181 +150,181 @@ pub mod buzz_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Book;
         type CreatedAt;
         type Comment;
         type Parent;
+        type Book;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Book = Unset;
         type CreatedAt = Unset;
         type Comment = Unset;
         type Parent = Unset;
-    }
-    ///State transition - sets the `book` field to Set
-    pub struct SetBook<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBook<S> {}
-    impl<S: State> State for SetBook<S> {
-        type Book = Set<members::book>;
-        type CreatedAt = S::CreatedAt;
-        type Comment = S::Comment;
-        type Parent = S::Parent;
+        type Book = Unset;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Book = S::Book;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
-        type Comment = S::Comment;
-        type Parent = S::Parent;
+        type Comment = St::Comment;
+        type Parent = St::Parent;
+        type Book = St::Book;
     }
     ///State transition - sets the `comment` field to Set
-    pub struct SetComment<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetComment<S> {}
-    impl<S: State> State for SetComment<S> {
-        type Book = S::Book;
-        type CreatedAt = S::CreatedAt;
+    pub struct SetComment<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetComment<St> {}
+    impl<St: State> State for SetComment<St> {
+        type CreatedAt = St::CreatedAt;
         type Comment = Set<members::comment>;
-        type Parent = S::Parent;
+        type Parent = St::Parent;
+        type Book = St::Book;
     }
     ///State transition - sets the `parent` field to Set
-    pub struct SetParent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetParent<S> {}
-    impl<S: State> State for SetParent<S> {
-        type Book = S::Book;
-        type CreatedAt = S::CreatedAt;
-        type Comment = S::Comment;
+    pub struct SetParent<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetParent<St> {}
+    impl<St: State> State for SetParent<St> {
+        type CreatedAt = St::CreatedAt;
+        type Comment = St::Comment;
         type Parent = Set<members::parent>;
+        type Book = St::Book;
+    }
+    ///State transition - sets the `book` field to Set
+    pub struct SetBook<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBook<St> {}
+    impl<St: State> State for SetBook<St> {
+        type CreatedAt = St::CreatedAt;
+        type Comment = St::Comment;
+        type Parent = St::Parent;
+        type Book = Set<members::book>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `book` field
-        pub struct book(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `comment` field
         pub struct comment(());
         ///Marker type for the `parent` field
         pub struct parent(());
+        ///Marker type for the `book` field
+        pub struct book(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct BuzzBuilder<'a, S: buzz_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct BuzzBuilder<S: BosStr, St: buzz_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<StrongRef<S>>, Option<S>, Option<Datetime>, Option<StrongRef<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Buzz<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> BuzzBuilder<'a, buzz_state::Empty> {
+impl<S: BosStr> Buzz<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> BuzzBuilder<S, buzz_state::Empty> {
         BuzzBuilder::new()
     }
 }
 
-impl<'a> BuzzBuilder<'a, buzz_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> BuzzBuilder<S, buzz_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         BuzzBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BuzzBuilder<'a, S>
+impl<S: BosStr, St> BuzzBuilder<S, St>
 where
-    S: buzz_state::State,
-    S::Book: buzz_state::IsUnset,
+    St: buzz_state::State,
+    St::Book: buzz_state::IsUnset,
 {
     /// Set the `book` field (required)
     pub fn book(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> BuzzBuilder<'a, buzz_state::SetBook<S>> {
+    ) -> BuzzBuilder<S, buzz_state::SetBook<St>> {
         self._fields.0 = Option::Some(value.into());
         BuzzBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BuzzBuilder<'a, S>
+impl<S: BosStr, St> BuzzBuilder<S, St>
 where
-    S: buzz_state::State,
-    S::Comment: buzz_state::IsUnset,
+    St: buzz_state::State,
+    St::Comment: buzz_state::IsUnset,
 {
     /// Set the `comment` field (required)
     pub fn comment(
         mut self,
         value: impl Into<S>,
-    ) -> BuzzBuilder<'a, buzz_state::SetComment<S>> {
+    ) -> BuzzBuilder<S, buzz_state::SetComment<St>> {
         self._fields.1 = Option::Some(value.into());
         BuzzBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BuzzBuilder<'a, S>
+impl<S: BosStr, St> BuzzBuilder<S, St>
 where
-    S: buzz_state::State,
-    S::CreatedAt: buzz_state::IsUnset,
+    St: buzz_state::State,
+    St::CreatedAt: buzz_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> BuzzBuilder<'a, buzz_state::SetCreatedAt<S>> {
+    ) -> BuzzBuilder<S, buzz_state::SetCreatedAt<St>> {
         self._fields.2 = Option::Some(value.into());
         BuzzBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BuzzBuilder<'a, S>
+impl<S: BosStr, St> BuzzBuilder<S, St>
 where
-    S: buzz_state::State,
-    S::Parent: buzz_state::IsUnset,
+    St: buzz_state::State,
+    St::Parent: buzz_state::IsUnset,
 {
     /// Set the `parent` field (required)
     pub fn parent(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> BuzzBuilder<'a, buzz_state::SetParent<S>> {
+    ) -> BuzzBuilder<S, buzz_state::SetParent<St>> {
         self._fields.3 = Option::Some(value.into());
         BuzzBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BuzzBuilder<'a, S>
+impl<S: BosStr, St> BuzzBuilder<S, St>
 where
-    S: buzz_state::State,
-    S::Book: buzz_state::IsSet,
-    S::CreatedAt: buzz_state::IsSet,
-    S::Comment: buzz_state::IsSet,
-    S::Parent: buzz_state::IsSet,
+    St: buzz_state::State,
+    St::CreatedAt: buzz_state::IsSet,
+    St::Comment: buzz_state::IsSet,
+    St::Parent: buzz_state::IsSet,
+    St::Book: buzz_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Buzz<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Buzz<S> {
         Buzz {
             book: self._fields.0.unwrap(),
             comment: self._fields.1.unwrap(),
@@ -333,8 +333,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Buzz<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Buzz<S> {
         Buzz {
             book: self._fields.0.unwrap(),
             comment: self._fields.1.unwrap(),

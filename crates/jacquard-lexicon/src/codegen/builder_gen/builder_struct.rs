@@ -14,6 +14,7 @@ pub fn generate_builder_struct(
     type_name: &str,
     schema: &BuilderSchema,
     has_lifetime: bool,
+    has_type_param: bool,
     resolved: &crate::codegen::prettify::ResolvedImports,
 ) -> TokenStream {
     let builder_name = format_ident!("{}Builder", type_name);
@@ -23,12 +24,10 @@ pub fn generate_builder_struct(
     // Generate field declarations
     let field_decls = generate_field_declarations(codegen, nsid, type_name, schema, resolved);
 
-    // Generate lifetime generic if needed
-    let lifetime_generic = if has_lifetime {
-        quote! { <'a> }
-    } else {
-        quote! {}
-    };
+    // When has_type_param is true, the actual type (not the builder) carries S.
+    // The builder still carries 'a for borrow-scoping via PhantomData.
+    let bosstr_path =
+        resolved.external_type_tokens(&crate::codegen::prettify::ExternalImport::BosStr);
 
     let lifetime_param = if has_lifetime {
         quote! { 'a, }
@@ -36,20 +35,68 @@ pub fn generate_builder_struct(
         quote! {}
     };
 
+    // The S type parameter for the builder struct (when has_type_param)
+    let builder_s_param = if has_type_param {
+        quote! { S: #bosstr_path, }
+    } else {
+        quote! {}
+    };
+
+    // The S arg for instantiating the builder (bare, no bounds)
+    let builder_s_arg = if has_type_param {
+        quote! { S, }
+    } else {
+        quote! {}
+    };
+
     let phantom = resolved.phantom_data();
-    let phantom_field = if has_lifetime {
+    let phantom_lifetime_field = if has_lifetime {
         quote! {
             _lifetime: #phantom<&'a ()>,
         }
     } else {
         quote! {}
     };
+    let phantom_s_field = if has_type_param {
+        quote! {
+            _type: #phantom<fn() -> S>,
+        }
+    } else {
+        quote! {}
+    };
 
-    // Generate Struct::new() constructor on original type
-    let struct_constructor = {
+    // Generate Struct::new() constructor on original type.
+    //
+    // When has_type_param: the type is `Foo<S>` (no 'a lifetime), so the impl
+    // is `impl<S: BosStr> Foo<S>`, and it returns a builder with
+    // an elided lifetime for the borrow scope: `FooBuilder<'_, S, Empty>`.
+    //
+    // When !has_type_param: fall back to the old `impl<'a> Foo<'a>` pattern if
+    // has_lifetime, or `impl Foo` if neither.
+    let struct_constructor = if has_type_param {
+        let type_s_impl = quote! { <S: #bosstr_path> };
+        let lifetime = if has_lifetime {
+            quote! { '_ }
+        } else {
+            quote! {}
+        };
+        quote! {
+            impl #type_s_impl #type_ident<S> {
+                /// Create a new builder for this type.
+                pub fn new() -> #builder_name<#lifetime #builder_s_arg #state_mod_name::Empty> {
+                    #builder_name::new()
+                }
+            }
+        }
+    } else {
+        let lifetime_generic = if has_lifetime {
+            quote! { <'a> }
+        } else {
+            quote! {}
+        };
         quote! {
             impl #lifetime_generic #type_ident #lifetime_generic {
-                /// Create a new builder for this type
+                /// Create a new builder for this type.
                 pub fn new() -> #builder_name<#lifetime_param #state_mod_name::Empty> {
                     #builder_name::new()
                 }
@@ -62,15 +109,17 @@ pub fn generate_builder_struct(
         &builder_name,
         schema,
         has_lifetime,
+        has_type_param,
         &state_mod_name,
         resolved,
     );
 
     quote! {
-        /// Builder for constructing an instance of this type
-        pub struct #builder_name<#lifetime_param S: #state_mod_name::State> {
+        /// Builder for constructing an instance of this type.
+        pub struct #builder_name<#lifetime_param #builder_s_param St: #state_mod_name::State> {
             #field_decls
-            #phantom_field
+            #phantom_lifetime_field
+            #phantom_s_field
         }
 
         #struct_constructor
@@ -124,7 +173,7 @@ fn generate_field_declarations(
         quote! {}
     } else {
         quote! {
-            _state: #phantom<fn() -> S>,
+            _state: #phantom<fn() -> St>,
             _fields: ( #(#field_types)* ),
         }
     }
@@ -165,12 +214,30 @@ fn generate_builder_constructor(
     builder_name: &syn::Ident,
     schema: &BuilderSchema,
     has_lifetime: bool,
+    has_type_param: bool,
     state_mod_name: &syn::Ident,
     resolved: &crate::codegen::prettify::ResolvedImports,
 ) -> TokenStream {
     let phantom = resolved.phantom_data();
+    let bosstr_path =
+        resolved.external_type_tokens(&crate::codegen::prettify::ExternalImport::BosStr);
+
     let lifetime_param = if has_lifetime {
         quote! { 'a, }
+    } else {
+        quote! {}
+    };
+
+    // S type parameter for the impl block (with bounds)
+    let s_param = if has_type_param {
+        quote! { S: #bosstr_path, }
+    } else {
+        quote! {}
+    };
+
+    // S arg for the builder instantiation path (bare, no bounds)
+    let s_arg = if has_type_param {
+        quote! { S, }
     } else {
         quote! {}
     };
@@ -192,7 +259,7 @@ fn generate_builder_constructor(
         )
     };
 
-    let phantom_lifetime = if has_lifetime {
+    let phantom_lifetime_init = if has_lifetime {
         quote! {
             _lifetime: #phantom,
         }
@@ -200,14 +267,23 @@ fn generate_builder_constructor(
         quote! {}
     };
 
+    let phantom_s_init = if has_type_param {
+        quote! {
+            _type: #phantom,
+        }
+    } else {
+        quote! {}
+    };
+
     quote! {
-        impl<#lifetime_param> #builder_name<#lifetime_param #state_mod_name::Empty> {
-            /// Create a new builder with all fields unset
+        impl<#lifetime_param #s_param> #builder_name<#lifetime_param #s_arg #state_mod_name::Empty> {
+            /// Create a new builder with all fields unset.
             pub fn new() -> Self {
                 #builder_name {
                     #phantom_init
                     #tuple_init
-                    #phantom_lifetime
+                    #phantom_lifetime_init
+                    #phantom_s_init
                 }
             }
         }

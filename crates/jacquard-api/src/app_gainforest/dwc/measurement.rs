@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "app.gainforest.dwc.measurement",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Measurement<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Measurement<S: BosStr = DefaultStr> {
     ///Timestamp of record creation in the ATProto PDS.
     pub created_at: Datetime,
     ///The description of the potential error associated with the measurementValue (e.g., '0.5 cm', '5%').
@@ -82,18 +82,18 @@ pub struct Measurement<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct MeasurementGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct MeasurementGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Measurement<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Measurement<S> {
+impl<S: BosStr> Measurement<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, MeasurementRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -106,17 +106,17 @@ pub struct MeasurementRecord;
 impl XrpcResp for MeasurementRecord {
     const NSID: &'static str = "app.gainforest.dwc.measurement";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = MeasurementGetRecordOutput<S>;
+    type Output<S: BosStr> = MeasurementGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<MeasurementGetRecordOutput<S>> for Measurement<S> {
+impl<S: BosStr> From<MeasurementGetRecordOutput<S>> for Measurement<S> {
     fn from(output: MeasurementGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Measurement<S> {
+impl<S: BosStr> Collection for Measurement<S> {
     const NSID: &'static str = "app.gainforest.dwc.measurement";
     type Record = MeasurementRecord;
 }
@@ -126,7 +126,7 @@ impl Collection for MeasurementRecord {
     type Record = MeasurementRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Measurement<S> {
+impl<S: BosStr> LexiconSchema for Measurement<S> {
     fn nsid() -> &'static str {
         "app.gainforest.dwc.measurement"
     }
@@ -273,73 +273,73 @@ pub mod measurement_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type MeasurementType;
         type CreatedAt;
-        type MeasurementValue;
         type OccurrenceRef;
+        type MeasurementValue;
+        type MeasurementType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type MeasurementType = Unset;
         type CreatedAt = Unset;
-        type MeasurementValue = Unset;
         type OccurrenceRef = Unset;
-    }
-    ///State transition - sets the `measurement_type` field to Set
-    pub struct SetMeasurementType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMeasurementType<S> {}
-    impl<S: State> State for SetMeasurementType<S> {
-        type MeasurementType = Set<members::measurement_type>;
-        type CreatedAt = S::CreatedAt;
-        type MeasurementValue = S::MeasurementValue;
-        type OccurrenceRef = S::OccurrenceRef;
+        type MeasurementValue = Unset;
+        type MeasurementType = Unset;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type MeasurementType = S::MeasurementType;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
-        type MeasurementValue = S::MeasurementValue;
-        type OccurrenceRef = S::OccurrenceRef;
-    }
-    ///State transition - sets the `measurement_value` field to Set
-    pub struct SetMeasurementValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMeasurementValue<S> {}
-    impl<S: State> State for SetMeasurementValue<S> {
-        type MeasurementType = S::MeasurementType;
-        type CreatedAt = S::CreatedAt;
-        type MeasurementValue = Set<members::measurement_value>;
-        type OccurrenceRef = S::OccurrenceRef;
+        type OccurrenceRef = St::OccurrenceRef;
+        type MeasurementValue = St::MeasurementValue;
+        type MeasurementType = St::MeasurementType;
     }
     ///State transition - sets the `occurrence_ref` field to Set
-    pub struct SetOccurrenceRef<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetOccurrenceRef<S> {}
-    impl<S: State> State for SetOccurrenceRef<S> {
-        type MeasurementType = S::MeasurementType;
-        type CreatedAt = S::CreatedAt;
-        type MeasurementValue = S::MeasurementValue;
+    pub struct SetOccurrenceRef<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetOccurrenceRef<St> {}
+    impl<St: State> State for SetOccurrenceRef<St> {
+        type CreatedAt = St::CreatedAt;
         type OccurrenceRef = Set<members::occurrence_ref>;
+        type MeasurementValue = St::MeasurementValue;
+        type MeasurementType = St::MeasurementType;
+    }
+    ///State transition - sets the `measurement_value` field to Set
+    pub struct SetMeasurementValue<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMeasurementValue<St> {}
+    impl<St: State> State for SetMeasurementValue<St> {
+        type CreatedAt = St::CreatedAt;
+        type OccurrenceRef = St::OccurrenceRef;
+        type MeasurementValue = Set<members::measurement_value>;
+        type MeasurementType = St::MeasurementType;
+    }
+    ///State transition - sets the `measurement_type` field to Set
+    pub struct SetMeasurementType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMeasurementType<St> {}
+    impl<St: State> State for SetMeasurementType<St> {
+        type CreatedAt = St::CreatedAt;
+        type OccurrenceRef = St::OccurrenceRef;
+        type MeasurementValue = St::MeasurementValue;
+        type MeasurementType = Set<members::measurement_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `measurement_type` field
-        pub struct measurement_type(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `measurement_value` field
-        pub struct measurement_value(());
         ///Marker type for the `occurrence_ref` field
         pub struct occurrence_ref(());
+        ///Marker type for the `measurement_value` field
+        pub struct measurement_value(());
+        ///Marker type for the `measurement_type` field
+        pub struct measurement_type(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct MeasurementBuilder<'a, S: measurement_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct MeasurementBuilder<S: BosStr, St: measurement_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
         Option<S>,
@@ -354,18 +354,18 @@ pub struct MeasurementBuilder<'a, S: measurement_state::State> {
         Option<S>,
         Option<AtUri<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Measurement<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> MeasurementBuilder<'a, measurement_state::Empty> {
+impl<S: BosStr> Measurement<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> MeasurementBuilder<S, measurement_state::Empty> {
         MeasurementBuilder::new()
     }
 }
 
-impl<'a> MeasurementBuilder<'a, measurement_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> MeasurementBuilder<S, measurement_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         MeasurementBuilder {
             _state: PhantomData,
@@ -383,31 +383,31 @@ impl<'a> MeasurementBuilder<'a, measurement_state::Empty> {
                 None,
                 None,
             ),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> MeasurementBuilder<'a, S>
+impl<S: BosStr, St> MeasurementBuilder<S, St>
 where
-    S: measurement_state::State,
-    S::CreatedAt: measurement_state::IsUnset,
+    St: measurement_state::State,
+    St::CreatedAt: measurement_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> MeasurementBuilder<'a, measurement_state::SetCreatedAt<S>> {
+    ) -> MeasurementBuilder<S, measurement_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         MeasurementBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
+impl<S: BosStr, St: measurement_state::State> MeasurementBuilder<S, St> {
     /// Set the `measurementAccuracy` field (optional)
     pub fn measurement_accuracy(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -420,7 +420,7 @@ impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
     }
 }
 
-impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
+impl<S: BosStr, St: measurement_state::State> MeasurementBuilder<S, St> {
     /// Set the `measurementDeterminedBy` field (optional)
     pub fn measurement_determined_by(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -433,7 +433,7 @@ impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
     }
 }
 
-impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
+impl<S: BosStr, St: measurement_state::State> MeasurementBuilder<S, St> {
     /// Set the `measurementDeterminedDate` field (optional)
     pub fn measurement_determined_date(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -446,7 +446,7 @@ impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
     }
 }
 
-impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
+impl<S: BosStr, St: measurement_state::State> MeasurementBuilder<S, St> {
     /// Set the `measurementID` field (optional)
     pub fn measurement_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
@@ -459,7 +459,7 @@ impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
     }
 }
 
-impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
+impl<S: BosStr, St: measurement_state::State> MeasurementBuilder<S, St> {
     /// Set the `measurementMethod` field (optional)
     pub fn measurement_method(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.5 = value.into();
@@ -472,7 +472,7 @@ impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
     }
 }
 
-impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
+impl<S: BosStr, St: measurement_state::State> MeasurementBuilder<S, St> {
     /// Set the `measurementRemarks` field (optional)
     pub fn measurement_remarks(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.6 = value.into();
@@ -485,26 +485,26 @@ impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
     }
 }
 
-impl<'a, S> MeasurementBuilder<'a, S>
+impl<S: BosStr, St> MeasurementBuilder<S, St>
 where
-    S: measurement_state::State,
-    S::MeasurementType: measurement_state::IsUnset,
+    St: measurement_state::State,
+    St::MeasurementType: measurement_state::IsUnset,
 {
     /// Set the `measurementType` field (required)
     pub fn measurement_type(
         mut self,
         value: impl Into<S>,
-    ) -> MeasurementBuilder<'a, measurement_state::SetMeasurementType<S>> {
+    ) -> MeasurementBuilder<S, measurement_state::SetMeasurementType<St>> {
         self._fields.7 = Option::Some(value.into());
         MeasurementBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
+impl<S: BosStr, St: measurement_state::State> MeasurementBuilder<S, St> {
     /// Set the `measurementUnit` field (optional)
     pub fn measurement_unit(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.8 = value.into();
@@ -517,26 +517,26 @@ impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
     }
 }
 
-impl<'a, S> MeasurementBuilder<'a, S>
+impl<S: BosStr, St> MeasurementBuilder<S, St>
 where
-    S: measurement_state::State,
-    S::MeasurementValue: measurement_state::IsUnset,
+    St: measurement_state::State,
+    St::MeasurementValue: measurement_state::IsUnset,
 {
     /// Set the `measurementValue` field (required)
     pub fn measurement_value(
         mut self,
         value: impl Into<S>,
-    ) -> MeasurementBuilder<'a, measurement_state::SetMeasurementValue<S>> {
+    ) -> MeasurementBuilder<S, measurement_state::SetMeasurementValue<St>> {
         self._fields.9 = Option::Some(value.into());
         MeasurementBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
+impl<S: BosStr, St: measurement_state::State> MeasurementBuilder<S, St> {
     /// Set the `occurrenceID` field (optional)
     pub fn occurrence_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.10 = value.into();
@@ -549,35 +549,35 @@ impl<'a, S: measurement_state::State> MeasurementBuilder<'a, S> {
     }
 }
 
-impl<'a, S> MeasurementBuilder<'a, S>
+impl<S: BosStr, St> MeasurementBuilder<S, St>
 where
-    S: measurement_state::State,
-    S::OccurrenceRef: measurement_state::IsUnset,
+    St: measurement_state::State,
+    St::OccurrenceRef: measurement_state::IsUnset,
 {
     /// Set the `occurrenceRef` field (required)
     pub fn occurrence_ref(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> MeasurementBuilder<'a, measurement_state::SetOccurrenceRef<S>> {
+    ) -> MeasurementBuilder<S, measurement_state::SetOccurrenceRef<St>> {
         self._fields.11 = Option::Some(value.into());
         MeasurementBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> MeasurementBuilder<'a, S>
+impl<S: BosStr, St> MeasurementBuilder<S, St>
 where
-    S: measurement_state::State,
-    S::MeasurementType: measurement_state::IsSet,
-    S::CreatedAt: measurement_state::IsSet,
-    S::MeasurementValue: measurement_state::IsSet,
-    S::OccurrenceRef: measurement_state::IsSet,
+    St: measurement_state::State,
+    St::CreatedAt: measurement_state::IsSet,
+    St::OccurrenceRef: measurement_state::IsSet,
+    St::MeasurementValue: measurement_state::IsSet,
+    St::MeasurementType: measurement_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Measurement<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Measurement<S> {
         Measurement {
             created_at: self._fields.0.unwrap(),
             measurement_accuracy: self._fields.1,
@@ -594,11 +594,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Measurement<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Measurement<S> {
         Measurement {
             created_at: self._fields.0.unwrap(),
             measurement_accuracy: self._fields.1,

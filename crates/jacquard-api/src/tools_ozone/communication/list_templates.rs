@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
@@ -18,18 +18,16 @@ use serde::{Serialize, Deserialize};
 use crate::tools_ozone::communication::TemplateView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ListTemplatesOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ListTemplatesOutput<S: BosStr = DefaultStr> {
     pub communication_templates: Vec<TemplateView<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -42,7 +40,7 @@ pub struct ListTemplatesResponse;
 impl jacquard_common::xrpc::XrpcResp for ListTemplatesResponse {
     const NSID: &'static str = "tools.ozone.communication.listTemplates";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ListTemplatesOutput<S>;
+    type Output<S: BosStr> = ListTemplatesOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
@@ -57,6 +55,6 @@ pub struct ListTemplatesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListTemplatesRequest {
     const PATH: &'static str = "/xrpc/tools.ozone.communication.listTemplates";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = ListTemplates;
+    type Request<S: BosStr> = ListTemplates;
     type Response = ListTemplatesResponse;
 }

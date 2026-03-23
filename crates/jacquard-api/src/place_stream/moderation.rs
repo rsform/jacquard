@@ -18,7 +18,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -38,11 +38,11 @@ use crate::app_bsky::actor::ProfileViewBasic;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct PermissionView<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct PermissionView<S: BosStr = DefaultStr> {
     ///The streamer who granted these permissions
     pub author: ProfileViewBasic<S>,
     ///Content identifier of the permission record
@@ -55,7 +55,7 @@ pub struct PermissionView<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for PermissionView<S> {
+impl<S: BosStr> LexiconSchema for PermissionView<S> {
     fn nsid() -> &'static str {
         "place.stream.moderation.defs"
     }
@@ -80,186 +80,186 @@ pub mod permission_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
-        type Cid;
         type Author;
         type Record;
+        type Uri;
+        type Cid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
-        type Cid = Unset;
         type Author = Unset;
         type Record = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
-        type Uri = Set<members::uri>;
-        type Cid = S::Cid;
-        type Author = S::Author;
-        type Record = S::Record;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCid<S> {}
-    impl<S: State> State for SetCid<S> {
-        type Uri = S::Uri;
-        type Cid = Set<members::cid>;
-        type Author = S::Author;
-        type Record = S::Record;
+        type Uri = Unset;
+        type Cid = Unset;
     }
     ///State transition - sets the `author` field to Set
-    pub struct SetAuthor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthor<S> {}
-    impl<S: State> State for SetAuthor<S> {
-        type Uri = S::Uri;
-        type Cid = S::Cid;
+    pub struct SetAuthor<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAuthor<St> {}
+    impl<St: State> State for SetAuthor<St> {
         type Author = Set<members::author>;
-        type Record = S::Record;
+        type Record = St::Record;
+        type Uri = St::Uri;
+        type Cid = St::Cid;
     }
     ///State transition - sets the `record` field to Set
-    pub struct SetRecord<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRecord<S> {}
-    impl<S: State> State for SetRecord<S> {
-        type Uri = S::Uri;
-        type Cid = S::Cid;
-        type Author = S::Author;
+    pub struct SetRecord<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRecord<St> {}
+    impl<St: State> State for SetRecord<St> {
+        type Author = St::Author;
         type Record = Set<members::record>;
+        type Uri = St::Uri;
+        type Cid = St::Cid;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Author = St::Author;
+        type Record = St::Record;
+        type Uri = Set<members::uri>;
+        type Cid = St::Cid;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCid<St> {}
+    impl<St: State> State for SetCid<St> {
+        type Author = St::Author;
+        type Record = St::Record;
+        type Uri = St::Uri;
+        type Cid = Set<members::cid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `author` field
         pub struct author(());
         ///Marker type for the `record` field
         pub struct record(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct PermissionViewBuilder<'a, S: permission_view_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct PermissionViewBuilder<S: BosStr, St: permission_view_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<ProfileViewBasic<S>>,
         Option<Cid<S>>,
         Option<Data<S>>,
         Option<AtUri<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> PermissionView<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> PermissionViewBuilder<'a, permission_view_state::Empty> {
+impl<S: BosStr> PermissionView<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> PermissionViewBuilder<S, permission_view_state::Empty> {
         PermissionViewBuilder::new()
     }
 }
 
-impl<'a> PermissionViewBuilder<'a, permission_view_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> PermissionViewBuilder<S, permission_view_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         PermissionViewBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PermissionViewBuilder<'a, S>
+impl<S: BosStr, St> PermissionViewBuilder<S, St>
 where
-    S: permission_view_state::State,
-    S::Author: permission_view_state::IsUnset,
+    St: permission_view_state::State,
+    St::Author: permission_view_state::IsUnset,
 {
     /// Set the `author` field (required)
     pub fn author(
         mut self,
         value: impl Into<ProfileViewBasic<S>>,
-    ) -> PermissionViewBuilder<'a, permission_view_state::SetAuthor<S>> {
+    ) -> PermissionViewBuilder<S, permission_view_state::SetAuthor<St>> {
         self._fields.0 = Option::Some(value.into());
         PermissionViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PermissionViewBuilder<'a, S>
+impl<S: BosStr, St> PermissionViewBuilder<S, St>
 where
-    S: permission_view_state::State,
-    S::Cid: permission_view_state::IsUnset,
+    St: permission_view_state::State,
+    St::Cid: permission_view_state::IsUnset,
 {
     /// Set the `cid` field (required)
     pub fn cid(
         mut self,
         value: impl Into<Cid<S>>,
-    ) -> PermissionViewBuilder<'a, permission_view_state::SetCid<S>> {
+    ) -> PermissionViewBuilder<S, permission_view_state::SetCid<St>> {
         self._fields.1 = Option::Some(value.into());
         PermissionViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PermissionViewBuilder<'a, S>
+impl<S: BosStr, St> PermissionViewBuilder<S, St>
 where
-    S: permission_view_state::State,
-    S::Record: permission_view_state::IsUnset,
+    St: permission_view_state::State,
+    St::Record: permission_view_state::IsUnset,
 {
     /// Set the `record` field (required)
     pub fn record(
         mut self,
         value: impl Into<Data<S>>,
-    ) -> PermissionViewBuilder<'a, permission_view_state::SetRecord<S>> {
+    ) -> PermissionViewBuilder<S, permission_view_state::SetRecord<St>> {
         self._fields.2 = Option::Some(value.into());
         PermissionViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PermissionViewBuilder<'a, S>
+impl<S: BosStr, St> PermissionViewBuilder<S, St>
 where
-    S: permission_view_state::State,
-    S::Uri: permission_view_state::IsUnset,
+    St: permission_view_state::State,
+    St::Uri: permission_view_state::IsUnset,
 {
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> PermissionViewBuilder<'a, permission_view_state::SetUri<S>> {
+    ) -> PermissionViewBuilder<S, permission_view_state::SetUri<St>> {
         self._fields.3 = Option::Some(value.into());
         PermissionViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PermissionViewBuilder<'a, S>
+impl<S: BosStr, St> PermissionViewBuilder<S, St>
 where
-    S: permission_view_state::State,
-    S::Uri: permission_view_state::IsSet,
-    S::Cid: permission_view_state::IsSet,
-    S::Author: permission_view_state::IsSet,
-    S::Record: permission_view_state::IsSet,
+    St: permission_view_state::State,
+    St::Author: permission_view_state::IsSet,
+    St::Record: permission_view_state::IsSet,
+    St::Uri: permission_view_state::IsSet,
+    St::Cid: permission_view_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> PermissionView<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> PermissionView<S> {
         PermissionView {
             author: self._fields.0.unwrap(),
             cid: self._fields.1.unwrap(),
@@ -268,11 +268,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> PermissionView<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> PermissionView<S> {
         PermissionView {
             author: self._fields.0.unwrap(),
             cid: self._fields.1.unwrap(),

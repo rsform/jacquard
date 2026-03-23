@@ -7,7 +7,7 @@
 
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -29,11 +29,11 @@ use crate::blog_pckt::richtext::facet::Facet;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Paragraph<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Paragraph<S: BosStr = DefaultStr> {
     ///Array of inline content nodes (text, hard breaks, and mentions)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub content: Option<Vec<ParagraphContentItem<S>>>,
@@ -50,11 +50,11 @@ pub struct Paragraph<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ParagraphContentItem<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ParagraphContentItem<S: BosStr = DefaultStr> {
     #[serde(rename = "blog.pckt.block.text")]
     Text(Box<Text<S>>),
     #[serde(rename = "blog.pckt.block.hardBreak")]
@@ -63,7 +63,7 @@ pub enum ParagraphContentItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     Mention(Box<Mention<S>>),
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Paragraph<S> {
+impl<S: BosStr> LexiconSchema for Paragraph<S> {
     fn nsid() -> &'static str {
         "blog.pckt.block.paragraph"
     }

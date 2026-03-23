@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
@@ -18,32 +18,29 @@ use serde::{Serialize, Deserialize};
 use crate::chat_bsky::convo::ConvoView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetConvo<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct GetConvo<S: BosStr = DefaultStr> {
     pub convo_id: S,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetConvoOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetConvoOutput<S: BosStr = DefaultStr> {
     pub convo: ConvoView<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -52,12 +49,11 @@ pub struct GetConvoResponse;
 impl jacquard_common::xrpc::XrpcResp for GetConvoResponse {
     const NSID: &'static str = "chat.bsky.convo.getConvo";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetConvoOutput<S>;
+    type Output<S: BosStr> = GetConvoOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetConvo<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetConvo<S> {
     const NSID: &'static str = "chat.bsky.convo.getConvo";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetConvoResponse;
@@ -68,7 +64,7 @@ pub struct GetConvoRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetConvoRequest {
     const PATH: &'static str = "/xrpc/chat.bsky.convo.getConvo";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetConvo<S>;
+    type Request<S: BosStr> = GetConvo<S>;
     type Response = GetConvoResponse;
 }
 
@@ -91,9 +87,9 @@ pub mod get_convo_state {
         type ConvoId = Unset;
     }
     ///State transition - sets the `convo_id` field to Set
-    pub struct SetConvoId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetConvoId<S> {}
-    impl<S: State> State for SetConvoId<S> {
+    pub struct SetConvoId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetConvoId<St> {}
+    impl<St: State> State for SetConvoId<St> {
         type ConvoId = Set<members::convo_id>;
     }
     /// Marker types for field names
@@ -104,57 +100,57 @@ pub mod get_convo_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetConvoBuilder<'a, S: get_convo_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetConvoBuilder<S: BosStr, St: get_convo_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetConvo<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetConvoBuilder<'a, get_convo_state::Empty> {
+impl<S: BosStr> GetConvo<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetConvoBuilder<S, get_convo_state::Empty> {
         GetConvoBuilder::new()
     }
 }
 
-impl<'a> GetConvoBuilder<'a, get_convo_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetConvoBuilder<S, get_convo_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetConvoBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetConvoBuilder<'a, S>
+impl<S: BosStr, St> GetConvoBuilder<S, St>
 where
-    S: get_convo_state::State,
-    S::ConvoId: get_convo_state::IsUnset,
+    St: get_convo_state::State,
+    St::ConvoId: get_convo_state::IsUnset,
 {
     /// Set the `convoId` field (required)
     pub fn convo_id(
         mut self,
         value: impl Into<S>,
-    ) -> GetConvoBuilder<'a, get_convo_state::SetConvoId<S>> {
+    ) -> GetConvoBuilder<S, get_convo_state::SetConvoId<St>> {
         self._fields.0 = Option::Some(value.into());
         GetConvoBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetConvoBuilder<'a, S>
+impl<S: BosStr, St> GetConvoBuilder<S, St>
 where
-    S: get_convo_state::State,
-    S::ConvoId: get_convo_state::IsSet,
+    St: get_convo_state::State,
+    St::ConvoId: get_convo_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetConvo<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetConvo<S> {
         GetConvo {
             convo_id: self._fields.0.unwrap(),
         }

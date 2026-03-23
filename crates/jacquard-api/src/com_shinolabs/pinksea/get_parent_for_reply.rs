@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::value::Data;
@@ -18,37 +18,33 @@ use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetParentForReply<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct GetParentForReply<S: BosStr = DefaultStr> {
     pub did: AtIdentifier<S>,
-    #[serde(borrow)]
     pub rkey: S,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetParentForReplyOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetParentForReplyOutput<S: BosStr = DefaultStr> {
     ///The DID of the author.
     pub did: AtIdentifier<S>,
     ///The record key.
     pub rkey: S,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -57,12 +53,11 @@ pub struct GetParentForReplyResponse;
 impl jacquard_common::xrpc::XrpcResp for GetParentForReplyResponse {
     const NSID: &'static str = "com.shinolabs.pinksea.getParentForReply";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetParentForReplyOutput<S>;
+    type Output<S: BosStr> = GetParentForReplyOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetParentForReply<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetParentForReply<S> {
     const NSID: &'static str = "com.shinolabs.pinksea.getParentForReply";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetParentForReplyResponse;
@@ -73,7 +68,7 @@ pub struct GetParentForReplyRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetParentForReplyRequest {
     const PATH: &'static str = "/xrpc/com.shinolabs.pinksea.getParentForReply";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetParentForReply<S>;
+    type Request<S: BosStr> = GetParentForReply<S>;
     type Response = GetParentForReplyResponse;
 }
 
@@ -98,17 +93,17 @@ pub mod get_parent_for_reply_state {
         type Rkey = Unset;
     }
     ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
         type Did = Set<members::did>;
-        type Rkey = S::Rkey;
+        type Rkey = St::Rkey;
     }
     ///State transition - sets the `rkey` field to Set
-    pub struct SetRkey<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRkey<S> {}
-    impl<S: State> State for SetRkey<S> {
-        type Did = S::Did;
+    pub struct SetRkey<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRkey<St> {}
+    impl<St: State> State for SetRkey<St> {
+        type Did = St::Did;
         type Rkey = Set<members::rkey>;
     }
     /// Marker types for field names
@@ -121,77 +116,77 @@ pub mod get_parent_for_reply_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetParentForReplyBuilder<'a, S: get_parent_for_reply_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetParentForReplyBuilder<S: BosStr, St: get_parent_for_reply_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtIdentifier<S>>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetParentForReply<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetParentForReplyBuilder<'a, get_parent_for_reply_state::Empty> {
+impl<S: BosStr> GetParentForReply<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetParentForReplyBuilder<S, get_parent_for_reply_state::Empty> {
         GetParentForReplyBuilder::new()
     }
 }
 
-impl<'a> GetParentForReplyBuilder<'a, get_parent_for_reply_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetParentForReplyBuilder<S, get_parent_for_reply_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetParentForReplyBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetParentForReplyBuilder<'a, S>
+impl<S: BosStr, St> GetParentForReplyBuilder<S, St>
 where
-    S: get_parent_for_reply_state::State,
-    S::Did: get_parent_for_reply_state::IsUnset,
+    St: get_parent_for_reply_state::State,
+    St::Did: get_parent_for_reply_state::IsUnset,
 {
     /// Set the `did` field (required)
     pub fn did(
         mut self,
         value: impl Into<AtIdentifier<S>>,
-    ) -> GetParentForReplyBuilder<'a, get_parent_for_reply_state::SetDid<S>> {
+    ) -> GetParentForReplyBuilder<S, get_parent_for_reply_state::SetDid<St>> {
         self._fields.0 = Option::Some(value.into());
         GetParentForReplyBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetParentForReplyBuilder<'a, S>
+impl<S: BosStr, St> GetParentForReplyBuilder<S, St>
 where
-    S: get_parent_for_reply_state::State,
-    S::Rkey: get_parent_for_reply_state::IsUnset,
+    St: get_parent_for_reply_state::State,
+    St::Rkey: get_parent_for_reply_state::IsUnset,
 {
     /// Set the `rkey` field (required)
     pub fn rkey(
         mut self,
         value: impl Into<S>,
-    ) -> GetParentForReplyBuilder<'a, get_parent_for_reply_state::SetRkey<S>> {
+    ) -> GetParentForReplyBuilder<S, get_parent_for_reply_state::SetRkey<St>> {
         self._fields.1 = Option::Some(value.into());
         GetParentForReplyBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetParentForReplyBuilder<'a, S>
+impl<S: BosStr, St> GetParentForReplyBuilder<S, St>
 where
-    S: get_parent_for_reply_state::State,
-    S::Did: get_parent_for_reply_state::IsSet,
-    S::Rkey: get_parent_for_reply_state::IsSet,
+    St: get_parent_for_reply_state::State,
+    St::Did: get_parent_for_reply_state::IsSet,
+    St::Rkey: get_parent_for_reply_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetParentForReply<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetParentForReply<S> {
         GetParentForReply {
             did: self._fields.0.unwrap(),
             rkey: self._fields.1.unwrap(),

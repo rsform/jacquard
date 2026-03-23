@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
@@ -18,21 +18,19 @@ use serde::{Serialize, Deserialize};
 use crate::place_stream::server::Webhook;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ListWebhooks<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ListWebhooks<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub active: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub cursor: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub event: Option<S>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
@@ -42,21 +40,19 @@ pub struct ListWebhooks<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ListWebhooksOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ListWebhooksOutput<S: BosStr = DefaultStr> {
     ///A cursor for pagination, if there are more results.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
     pub webhooks: Vec<Webhook<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -108,12 +104,11 @@ pub struct ListWebhooksResponse;
 impl jacquard_common::xrpc::XrpcResp for ListWebhooksResponse {
     const NSID: &'static str = "place.stream.server.listWebhooks";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ListWebhooksOutput<S>;
+    type Output<S: BosStr> = ListWebhooksOutput<S>;
     type Err = ListWebhooksError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for ListWebhooks<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ListWebhooks<S> {
     const NSID: &'static str = "place.stream.server.listWebhooks";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ListWebhooksResponse;
@@ -124,7 +119,7 @@ pub struct ListWebhooksRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ListWebhooksRequest {
     const PATH: &'static str = "/xrpc/place.stream.server.listWebhooks";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = ListWebhooks<S>;
+    type Request<S: BosStr> = ListWebhooks<S>;
     type Response = ListWebhooksResponse;
 }
 
@@ -151,32 +146,32 @@ pub mod list_webhooks_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct ListWebhooksBuilder<'a, S: list_webhooks_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ListWebhooksBuilder<S: BosStr, St: list_webhooks_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<bool>, Option<S>, Option<S>, Option<i64>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ListWebhooks<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ListWebhooksBuilder<'a, list_webhooks_state::Empty> {
+impl<S: BosStr> ListWebhooks<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ListWebhooksBuilder<S, list_webhooks_state::Empty> {
         ListWebhooksBuilder::new()
     }
 }
 
-impl<'a> ListWebhooksBuilder<'a, list_webhooks_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ListWebhooksBuilder<S, list_webhooks_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ListWebhooksBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: list_webhooks_state::State> ListWebhooksBuilder<'a, S> {
+impl<S: BosStr, St: list_webhooks_state::State> ListWebhooksBuilder<S, St> {
     /// Set the `active` field (optional)
     pub fn active(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.0 = value.into();
@@ -189,7 +184,7 @@ impl<'a, S: list_webhooks_state::State> ListWebhooksBuilder<'a, S> {
     }
 }
 
-impl<'a, S: list_webhooks_state::State> ListWebhooksBuilder<'a, S> {
+impl<S: BosStr, St: list_webhooks_state::State> ListWebhooksBuilder<S, St> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -202,7 +197,7 @@ impl<'a, S: list_webhooks_state::State> ListWebhooksBuilder<'a, S> {
     }
 }
 
-impl<'a, S: list_webhooks_state::State> ListWebhooksBuilder<'a, S> {
+impl<S: BosStr, St: list_webhooks_state::State> ListWebhooksBuilder<S, St> {
     /// Set the `event` field (optional)
     pub fn event(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -215,7 +210,7 @@ impl<'a, S: list_webhooks_state::State> ListWebhooksBuilder<'a, S> {
     }
 }
 
-impl<'a, S: list_webhooks_state::State> ListWebhooksBuilder<'a, S> {
+impl<S: BosStr, St: list_webhooks_state::State> ListWebhooksBuilder<S, St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.3 = value.into();
@@ -228,12 +223,12 @@ impl<'a, S: list_webhooks_state::State> ListWebhooksBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ListWebhooksBuilder<'a, S>
+impl<S: BosStr, St> ListWebhooksBuilder<S, St>
 where
-    S: list_webhooks_state::State,
+    St: list_webhooks_state::State,
 {
-    /// Build the final struct
-    pub fn build(self) -> ListWebhooks<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ListWebhooks<S> {
         ListWebhooks {
             active: self._fields.0,
             cursor: self._fields.1,

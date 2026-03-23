@@ -6,8 +6,13 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[allow(unused_imports)]
+use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 use crate::app_rocksky::feed::FeedGeneratorsView;
@@ -22,26 +27,18 @@ pub struct GetFeedGenerators {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetFeedGeneratorsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetFeedGeneratorsOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
-    #[serde(borrow)]
     pub value: FeedGeneratorsView<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
-    pub extra_data: Option<
-        alloc::collections::BTreeMap<
-            jacquard_common::deps::smol_str::SmolStr,
-            jacquard_common::types::value::Data<S>,
-        >,
-    >,
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
+    pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 /// Response type for app.rocksky.feed.getFeedGenerators
@@ -49,7 +46,7 @@ pub struct GetFeedGeneratorsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetFeedGeneratorsResponse {
     const NSID: &'static str = "app.rocksky.feed.getFeedGenerators";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetFeedGeneratorsOutput<S>;
+    type Output<S: BosStr> = GetFeedGeneratorsOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
@@ -64,7 +61,7 @@ pub struct GetFeedGeneratorsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetFeedGeneratorsRequest {
     const PATH: &'static str = "/xrpc/app.rocksky.feed.getFeedGenerators";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetFeedGenerators;
+    type Request<S: BosStr> = GetFeedGenerators;
     type Response = GetFeedGeneratorsResponse;
 }
 
@@ -87,21 +84,21 @@ pub mod get_feed_generators_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetFeedGeneratorsBuilder<S: get_feed_generators_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetFeedGeneratorsBuilder<St: get_feed_generators_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>,),
 }
 
 impl GetFeedGenerators {
-    /// Create a new builder for this type
+    /// Create a new builder for this type.
     pub fn new() -> GetFeedGeneratorsBuilder<get_feed_generators_state::Empty> {
         GetFeedGeneratorsBuilder::new()
     }
 }
 
 impl GetFeedGeneratorsBuilder<get_feed_generators_state::Empty> {
-    /// Create a new builder with all fields unset
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetFeedGeneratorsBuilder {
             _state: PhantomData,
@@ -110,7 +107,7 @@ impl GetFeedGeneratorsBuilder<get_feed_generators_state::Empty> {
     }
 }
 
-impl<S: get_feed_generators_state::State> GetFeedGeneratorsBuilder<S> {
+impl<St: get_feed_generators_state::State> GetFeedGeneratorsBuilder<St> {
     /// Set the `size` field (optional)
     pub fn size(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
@@ -123,11 +120,11 @@ impl<S: get_feed_generators_state::State> GetFeedGeneratorsBuilder<S> {
     }
 }
 
-impl<S> GetFeedGeneratorsBuilder<S>
+impl<St> GetFeedGeneratorsBuilder<St>
 where
-    S: get_feed_generators_state::State,
+    St: get_feed_generators_state::State,
 {
-    /// Build the final struct
+    /// Build the final struct.
     pub fn build(self) -> GetFeedGenerators {
         GetFeedGenerators {
             size: self._fields.0,

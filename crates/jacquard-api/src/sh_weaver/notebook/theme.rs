@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use crate::sh_weaver::notebook::theme;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CodeThemeFile<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CodeThemeFile<S: BosStr = DefaultStr> {
     pub content: BlobRef<S>,
     pub did: Did<S>,
     pub name: S,
@@ -48,17 +48,17 @@ pub struct CodeThemeFile<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-pub type CodeThemeName<'a> = S;
+pub type CodeThemeName<S: BosStr = DefaultStr> = S;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Font<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Font<S: BosStr = DefaultStr> {
     ///Font for a notebook
     pub value: FontValue<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -71,11 +71,11 @@ pub struct Font<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum FontValue<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum FontValue<S: BosStr = DefaultStr> {
     #[serde(rename = "sh.weaver.notebook.theme#fontName")]
     FontName(Box<theme::FontName<S>>),
     #[serde(rename = "sh.weaver.notebook.theme#fontFile")]
@@ -88,11 +88,11 @@ pub enum FontValue<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct FontFile<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct FontFile<S: BosStr = DefaultStr> {
     pub content: BlobRef<S>,
     pub did: Did<S>,
     pub name: S,
@@ -100,7 +100,7 @@ pub struct FontFile<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-pub type FontName<'a> = S;
+pub type FontName<S: BosStr = DefaultStr> = S;
 /// Theme for a notebook
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
@@ -109,11 +109,11 @@ pub type FontName<'a> = S;
     rename = "sh.weaver.notebook.theme",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Theme<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Theme<S: BosStr = DefaultStr> {
     ///Syntax highlighting theme for dark mode
     pub dark_code_theme: ThemeDarkCodeTheme<S>,
     ///Reference to a dark colour scheme
@@ -139,11 +139,11 @@ pub struct Theme<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ThemeDarkCodeTheme<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ThemeDarkCodeTheme<S: BosStr = DefaultStr> {
     #[serde(rename = "sh.weaver.notebook.theme#codeThemeName")]
     CodeThemeName(Box<theme::CodeThemeName<S>>),
     #[serde(rename = "sh.weaver.notebook.theme#codeThemeFile")]
@@ -156,11 +156,11 @@ pub enum ThemeDarkCodeTheme<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ThemeFonts<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ThemeFonts<S: BosStr = DefaultStr> {
     pub body: Vec<crate::sh_weaver::notebook::theme::Font<S>>,
     pub heading: Vec<crate::sh_weaver::notebook::theme::Font<S>>,
     pub monospace: Vec<crate::sh_weaver::notebook::theme::Font<S>>,
@@ -174,11 +174,11 @@ pub struct ThemeFonts<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ThemeLightCodeTheme<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ThemeLightCodeTheme<S: BosStr = DefaultStr> {
     #[serde(rename = "sh.weaver.notebook.theme#codeThemeName")]
     CodeThemeName(Box<theme::CodeThemeName<S>>),
     #[serde(rename = "sh.weaver.notebook.theme#codeThemeFile")]
@@ -190,11 +190,11 @@ pub enum ThemeLightCodeTheme<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ThemeSpacing<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ThemeSpacing<S: BosStr = DefaultStr> {
     pub base_size: S,
     pub line_height: S,
     pub scale: S,
@@ -208,24 +208,24 @@ pub struct ThemeSpacing<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ThemeGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ThemeGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Theme<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Theme<S> {
+impl<S: BosStr> Theme<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, ThemeRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for CodeThemeFile<S> {
+impl<S: BosStr> LexiconSchema for CodeThemeFile<S> {
     fn nsid() -> &'static str {
         "sh.weaver.notebook.theme"
     }
@@ -280,7 +280,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for CodeThemeFile<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Font<S> {
+impl<S: BosStr> LexiconSchema for Font<S> {
     fn nsid() -> &'static str {
         "sh.weaver.notebook.theme"
     }
@@ -295,7 +295,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Font<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for FontFile<S> {
+impl<S: BosStr> LexiconSchema for FontFile<S> {
     fn nsid() -> &'static str {
         "sh.weaver.notebook.theme"
     }
@@ -357,17 +357,17 @@ pub struct ThemeRecord;
 impl XrpcResp for ThemeRecord {
     const NSID: &'static str = "sh.weaver.notebook.theme";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ThemeGetRecordOutput<S>;
+    type Output<S: BosStr> = ThemeGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<ThemeGetRecordOutput<S>> for Theme<S> {
+impl<S: BosStr> From<ThemeGetRecordOutput<S>> for Theme<S> {
     fn from(output: ThemeGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Theme<S> {
+impl<S: BosStr> Collection for Theme<S> {
     const NSID: &'static str = "sh.weaver.notebook.theme";
     type Record = ThemeRecord;
 }
@@ -377,7 +377,7 @@ impl Collection for ThemeRecord {
     type Record = ThemeRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Theme<S> {
+impl<S: BosStr> LexiconSchema for Theme<S> {
     fn nsid() -> &'static str {
         "sh.weaver.notebook.theme"
     }
@@ -415,27 +415,27 @@ pub mod code_theme_file_state {
         type Name = Unset;
     }
     ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
         type Did = Set<members::did>;
-        type Content = S::Content;
-        type Name = S::Name;
+        type Content = St::Content;
+        type Name = St::Name;
     }
     ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type Did = S::Did;
+    pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetContent<St> {}
+    impl<St: State> State for SetContent<St> {
+        type Did = St::Did;
         type Content = Set<members::content>;
-        type Name = S::Name;
+        type Name = St::Name;
     }
     ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Did = S::Did;
-        type Content = S::Content;
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Did = St::Did;
+        type Content = St::Content;
         type Name = Set<members::name>;
     }
     /// Marker types for field names
@@ -450,97 +450,97 @@ pub mod code_theme_file_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct CodeThemeFileBuilder<'a, S: code_theme_file_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct CodeThemeFileBuilder<S: BosStr, St: code_theme_file_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<BlobRef<S>>, Option<Did<S>>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> CodeThemeFile<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> CodeThemeFileBuilder<'a, code_theme_file_state::Empty> {
+impl<S: BosStr> CodeThemeFile<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> CodeThemeFileBuilder<S, code_theme_file_state::Empty> {
         CodeThemeFileBuilder::new()
     }
 }
 
-impl<'a> CodeThemeFileBuilder<'a, code_theme_file_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> CodeThemeFileBuilder<S, code_theme_file_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         CodeThemeFileBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CodeThemeFileBuilder<'a, S>
+impl<S: BosStr, St> CodeThemeFileBuilder<S, St>
 where
-    S: code_theme_file_state::State,
-    S::Content: code_theme_file_state::IsUnset,
+    St: code_theme_file_state::State,
+    St::Content: code_theme_file_state::IsUnset,
 {
     /// Set the `content` field (required)
     pub fn content(
         mut self,
         value: impl Into<BlobRef<S>>,
-    ) -> CodeThemeFileBuilder<'a, code_theme_file_state::SetContent<S>> {
+    ) -> CodeThemeFileBuilder<S, code_theme_file_state::SetContent<St>> {
         self._fields.0 = Option::Some(value.into());
         CodeThemeFileBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CodeThemeFileBuilder<'a, S>
+impl<S: BosStr, St> CodeThemeFileBuilder<S, St>
 where
-    S: code_theme_file_state::State,
-    S::Did: code_theme_file_state::IsUnset,
+    St: code_theme_file_state::State,
+    St::Did: code_theme_file_state::IsUnset,
 {
     /// Set the `did` field (required)
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> CodeThemeFileBuilder<'a, code_theme_file_state::SetDid<S>> {
+    ) -> CodeThemeFileBuilder<S, code_theme_file_state::SetDid<St>> {
         self._fields.1 = Option::Some(value.into());
         CodeThemeFileBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CodeThemeFileBuilder<'a, S>
+impl<S: BosStr, St> CodeThemeFileBuilder<S, St>
 where
-    S: code_theme_file_state::State,
-    S::Name: code_theme_file_state::IsUnset,
+    St: code_theme_file_state::State,
+    St::Name: code_theme_file_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> CodeThemeFileBuilder<'a, code_theme_file_state::SetName<S>> {
+    ) -> CodeThemeFileBuilder<S, code_theme_file_state::SetName<St>> {
         self._fields.2 = Option::Some(value.into());
         CodeThemeFileBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CodeThemeFileBuilder<'a, S>
+impl<S: BosStr, St> CodeThemeFileBuilder<S, St>
 where
-    S: code_theme_file_state::State,
-    S::Did: code_theme_file_state::IsSet,
-    S::Content: code_theme_file_state::IsSet,
-    S::Name: code_theme_file_state::IsSet,
+    St: code_theme_file_state::State,
+    St::Did: code_theme_file_state::IsSet,
+    St::Content: code_theme_file_state::IsSet,
+    St::Name: code_theme_file_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> CodeThemeFile<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> CodeThemeFile<S> {
         CodeThemeFile {
             content: self._fields.0.unwrap(),
             did: self._fields.1.unwrap(),
@@ -548,11 +548,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> CodeThemeFile<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> CodeThemeFile<S> {
         CodeThemeFile {
             content: self._fields.0.unwrap(),
             did: self._fields.1.unwrap(),
@@ -866,9 +866,9 @@ pub mod font_state {
         type Value = Unset;
     }
     ///State transition - sets the `value` field to Set
-    pub struct SetValue<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetValue<S> {}
-    impl<S: State> State for SetValue<S> {
+    pub struct SetValue<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetValue<St> {}
+    impl<St: State> State for SetValue<St> {
         type Value = Set<members::value>;
     }
     /// Marker types for field names
@@ -879,64 +879,64 @@ pub mod font_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct FontBuilder<'a, S: font_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct FontBuilder<S: BosStr, St: font_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<FontValue<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Font<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> FontBuilder<'a, font_state::Empty> {
+impl<S: BosStr> Font<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> FontBuilder<S, font_state::Empty> {
         FontBuilder::new()
     }
 }
 
-impl<'a> FontBuilder<'a, font_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> FontBuilder<S, font_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         FontBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> FontBuilder<'a, S>
+impl<S: BosStr, St> FontBuilder<S, St>
 where
-    S: font_state::State,
-    S::Value: font_state::IsUnset,
+    St: font_state::State,
+    St::Value: font_state::IsUnset,
 {
     /// Set the `value` field (required)
     pub fn value(
         mut self,
         value: impl Into<FontValue<S>>,
-    ) -> FontBuilder<'a, font_state::SetValue<S>> {
+    ) -> FontBuilder<S, font_state::SetValue<St>> {
         self._fields.0 = Option::Some(value.into());
         FontBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> FontBuilder<'a, S>
+impl<S: BosStr, St> FontBuilder<S, St>
 where
-    S: font_state::State,
-    S::Value: font_state::IsSet,
+    St: font_state::State,
+    St::Value: font_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Font<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Font<S> {
         Font {
             value: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Font<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Font<S> {
         Font {
             value: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -954,145 +954,145 @@ pub mod font_file_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Content;
         type Name;
+        type Content;
         type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Content = Unset;
         type Name = Unset;
+        type Content = Unset;
         type Did = Unset;
     }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetContent<S> {}
-    impl<S: State> State for SetContent<S> {
-        type Content = Set<members::content>;
-        type Name = S::Name;
-        type Did = S::Did;
-    }
     ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Content = S::Content;
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
         type Name = Set<members::name>;
-        type Did = S::Did;
+        type Content = St::Content;
+        type Did = St::Did;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetContent<St> {}
+    impl<St: State> State for SetContent<St> {
+        type Name = St::Name;
+        type Content = Set<members::content>;
+        type Did = St::Did;
     }
     ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Content = S::Content;
-        type Name = S::Name;
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
+        type Name = St::Name;
+        type Content = St::Content;
         type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `content` field
-        pub struct content(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `content` field
+        pub struct content(());
         ///Marker type for the `did` field
         pub struct did(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct FontFileBuilder<'a, S: font_file_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct FontFileBuilder<S: BosStr, St: font_file_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<BlobRef<S>>, Option<Did<S>>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> FontFile<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> FontFileBuilder<'a, font_file_state::Empty> {
+impl<S: BosStr> FontFile<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> FontFileBuilder<S, font_file_state::Empty> {
         FontFileBuilder::new()
     }
 }
 
-impl<'a> FontFileBuilder<'a, font_file_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> FontFileBuilder<S, font_file_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         FontFileBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> FontFileBuilder<'a, S>
+impl<S: BosStr, St> FontFileBuilder<S, St>
 where
-    S: font_file_state::State,
-    S::Content: font_file_state::IsUnset,
+    St: font_file_state::State,
+    St::Content: font_file_state::IsUnset,
 {
     /// Set the `content` field (required)
     pub fn content(
         mut self,
         value: impl Into<BlobRef<S>>,
-    ) -> FontFileBuilder<'a, font_file_state::SetContent<S>> {
+    ) -> FontFileBuilder<S, font_file_state::SetContent<St>> {
         self._fields.0 = Option::Some(value.into());
         FontFileBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> FontFileBuilder<'a, S>
+impl<S: BosStr, St> FontFileBuilder<S, St>
 where
-    S: font_file_state::State,
-    S::Did: font_file_state::IsUnset,
+    St: font_file_state::State,
+    St::Did: font_file_state::IsUnset,
 {
     /// Set the `did` field (required)
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> FontFileBuilder<'a, font_file_state::SetDid<S>> {
+    ) -> FontFileBuilder<S, font_file_state::SetDid<St>> {
         self._fields.1 = Option::Some(value.into());
         FontFileBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> FontFileBuilder<'a, S>
+impl<S: BosStr, St> FontFileBuilder<S, St>
 where
-    S: font_file_state::State,
-    S::Name: font_file_state::IsUnset,
+    St: font_file_state::State,
+    St::Name: font_file_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> FontFileBuilder<'a, font_file_state::SetName<S>> {
+    ) -> FontFileBuilder<S, font_file_state::SetName<St>> {
         self._fields.2 = Option::Some(value.into());
         FontFileBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> FontFileBuilder<'a, S>
+impl<S: BosStr, St> FontFileBuilder<S, St>
 where
-    S: font_file_state::State,
-    S::Content: font_file_state::IsSet,
-    S::Name: font_file_state::IsSet,
-    S::Did: font_file_state::IsSet,
+    St: font_file_state::State,
+    St::Name: font_file_state::IsSet,
+    St::Content: font_file_state::IsSet,
+    St::Did: font_file_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> FontFile<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> FontFile<S> {
         FontFile {
             content: self._fields.0.unwrap(),
             did: self._fields.1.unwrap(),
@@ -1100,11 +1100,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> FontFile<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> FontFile<S> {
         FontFile {
             content: self._fields.0.unwrap(),
             did: self._fields.1.unwrap(),
@@ -1114,11 +1111,11 @@ where
     }
 }
 
-fn _default_theme_default_theme<S: From<&'static str>>() -> ::core::option::Option<S> {
-    Some(S::from("auto"))
+fn _default_theme_default_theme<S: FromStaticStr>() -> ::core::option::Option<S> {
+    Some(S::from_static("auto"))
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ThemeFonts<S> {
+impl<S: BosStr> LexiconSchema for ThemeFonts<S> {
     fn nsid() -> &'static str {
         "sh.weaver.notebook.theme"
     }
@@ -1156,27 +1153,27 @@ pub mod theme_fonts_state {
         type Body = Unset;
     }
     ///State transition - sets the `monospace` field to Set
-    pub struct SetMonospace<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMonospace<S> {}
-    impl<S: State> State for SetMonospace<S> {
+    pub struct SetMonospace<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMonospace<St> {}
+    impl<St: State> State for SetMonospace<St> {
         type Monospace = Set<members::monospace>;
-        type Heading = S::Heading;
-        type Body = S::Body;
+        type Heading = St::Heading;
+        type Body = St::Body;
     }
     ///State transition - sets the `heading` field to Set
-    pub struct SetHeading<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHeading<S> {}
-    impl<S: State> State for SetHeading<S> {
-        type Monospace = S::Monospace;
+    pub struct SetHeading<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHeading<St> {}
+    impl<St: State> State for SetHeading<St> {
+        type Monospace = St::Monospace;
         type Heading = Set<members::heading>;
-        type Body = S::Body;
+        type Body = St::Body;
     }
     ///State transition - sets the `body` field to Set
-    pub struct SetBody<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBody<S> {}
-    impl<S: State> State for SetBody<S> {
-        type Monospace = S::Monospace;
-        type Heading = S::Heading;
+    pub struct SetBody<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBody<St> {}
+    impl<St: State> State for SetBody<St> {
+        type Monospace = St::Monospace;
+        type Heading = St::Heading;
         type Body = Set<members::body>;
     }
     /// Marker types for field names
@@ -1191,101 +1188,101 @@ pub mod theme_fonts_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ThemeFontsBuilder<'a, S: theme_fonts_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ThemeFontsBuilder<S: BosStr, St: theme_fonts_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<crate::sh_weaver::notebook::theme::Font<S>>>,
         Option<Vec<crate::sh_weaver::notebook::theme::Font<S>>>,
         Option<Vec<crate::sh_weaver::notebook::theme::Font<S>>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ThemeFonts<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ThemeFontsBuilder<'a, theme_fonts_state::Empty> {
+impl<S: BosStr> ThemeFonts<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ThemeFontsBuilder<S, theme_fonts_state::Empty> {
         ThemeFontsBuilder::new()
     }
 }
 
-impl<'a> ThemeFontsBuilder<'a, theme_fonts_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ThemeFontsBuilder<S, theme_fonts_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ThemeFontsBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ThemeFontsBuilder<'a, S>
+impl<S: BosStr, St> ThemeFontsBuilder<S, St>
 where
-    S: theme_fonts_state::State,
-    S::Body: theme_fonts_state::IsUnset,
+    St: theme_fonts_state::State,
+    St::Body: theme_fonts_state::IsUnset,
 {
     /// Set the `body` field (required)
     pub fn body(
         mut self,
         value: impl Into<Vec<crate::sh_weaver::notebook::theme::Font<S>>>,
-    ) -> ThemeFontsBuilder<'a, theme_fonts_state::SetBody<S>> {
+    ) -> ThemeFontsBuilder<S, theme_fonts_state::SetBody<St>> {
         self._fields.0 = Option::Some(value.into());
         ThemeFontsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ThemeFontsBuilder<'a, S>
+impl<S: BosStr, St> ThemeFontsBuilder<S, St>
 where
-    S: theme_fonts_state::State,
-    S::Heading: theme_fonts_state::IsUnset,
+    St: theme_fonts_state::State,
+    St::Heading: theme_fonts_state::IsUnset,
 {
     /// Set the `heading` field (required)
     pub fn heading(
         mut self,
         value: impl Into<Vec<crate::sh_weaver::notebook::theme::Font<S>>>,
-    ) -> ThemeFontsBuilder<'a, theme_fonts_state::SetHeading<S>> {
+    ) -> ThemeFontsBuilder<S, theme_fonts_state::SetHeading<St>> {
         self._fields.1 = Option::Some(value.into());
         ThemeFontsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ThemeFontsBuilder<'a, S>
+impl<S: BosStr, St> ThemeFontsBuilder<S, St>
 where
-    S: theme_fonts_state::State,
-    S::Monospace: theme_fonts_state::IsUnset,
+    St: theme_fonts_state::State,
+    St::Monospace: theme_fonts_state::IsUnset,
 {
     /// Set the `monospace` field (required)
     pub fn monospace(
         mut self,
         value: impl Into<Vec<crate::sh_weaver::notebook::theme::Font<S>>>,
-    ) -> ThemeFontsBuilder<'a, theme_fonts_state::SetMonospace<S>> {
+    ) -> ThemeFontsBuilder<S, theme_fonts_state::SetMonospace<St>> {
         self._fields.2 = Option::Some(value.into());
         ThemeFontsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ThemeFontsBuilder<'a, S>
+impl<S: BosStr, St> ThemeFontsBuilder<S, St>
 where
-    S: theme_fonts_state::State,
-    S::Monospace: theme_fonts_state::IsSet,
-    S::Heading: theme_fonts_state::IsSet,
-    S::Body: theme_fonts_state::IsSet,
+    St: theme_fonts_state::State,
+    St::Monospace: theme_fonts_state::IsSet,
+    St::Heading: theme_fonts_state::IsSet,
+    St::Body: theme_fonts_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ThemeFonts<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ThemeFonts<S> {
         ThemeFonts {
             body: self._fields.0.unwrap(),
             heading: self._fields.1.unwrap(),
@@ -1293,11 +1290,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> ThemeFonts<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> ThemeFonts<S> {
         ThemeFonts {
             body: self._fields.0.unwrap(),
             heading: self._fields.1.unwrap(),
@@ -1307,7 +1304,7 @@ where
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ThemeSpacing<S> {
+impl<S: BosStr> LexiconSchema for ThemeSpacing<S> {
     fn nsid() -> &'static str {
         "sh.weaver.notebook.theme"
     }
@@ -1332,111 +1329,111 @@ pub mod theme_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Spacing;
-        type LightScheme;
         type DarkScheme;
+        type Spacing;
         type Fonts;
         type DarkCodeTheme;
+        type LightScheme;
         type LightCodeTheme;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Spacing = Unset;
-        type LightScheme = Unset;
         type DarkScheme = Unset;
+        type Spacing = Unset;
         type Fonts = Unset;
         type DarkCodeTheme = Unset;
+        type LightScheme = Unset;
         type LightCodeTheme = Unset;
     }
-    ///State transition - sets the `spacing` field to Set
-    pub struct SetSpacing<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSpacing<S> {}
-    impl<S: State> State for SetSpacing<S> {
-        type Spacing = Set<members::spacing>;
-        type LightScheme = S::LightScheme;
-        type DarkScheme = S::DarkScheme;
-        type Fonts = S::Fonts;
-        type DarkCodeTheme = S::DarkCodeTheme;
-        type LightCodeTheme = S::LightCodeTheme;
-    }
-    ///State transition - sets the `light_scheme` field to Set
-    pub struct SetLightScheme<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLightScheme<S> {}
-    impl<S: State> State for SetLightScheme<S> {
-        type Spacing = S::Spacing;
-        type LightScheme = Set<members::light_scheme>;
-        type DarkScheme = S::DarkScheme;
-        type Fonts = S::Fonts;
-        type DarkCodeTheme = S::DarkCodeTheme;
-        type LightCodeTheme = S::LightCodeTheme;
-    }
     ///State transition - sets the `dark_scheme` field to Set
-    pub struct SetDarkScheme<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDarkScheme<S> {}
-    impl<S: State> State for SetDarkScheme<S> {
-        type Spacing = S::Spacing;
-        type LightScheme = S::LightScheme;
+    pub struct SetDarkScheme<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDarkScheme<St> {}
+    impl<St: State> State for SetDarkScheme<St> {
         type DarkScheme = Set<members::dark_scheme>;
-        type Fonts = S::Fonts;
-        type DarkCodeTheme = S::DarkCodeTheme;
-        type LightCodeTheme = S::LightCodeTheme;
+        type Spacing = St::Spacing;
+        type Fonts = St::Fonts;
+        type DarkCodeTheme = St::DarkCodeTheme;
+        type LightScheme = St::LightScheme;
+        type LightCodeTheme = St::LightCodeTheme;
+    }
+    ///State transition - sets the `spacing` field to Set
+    pub struct SetSpacing<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSpacing<St> {}
+    impl<St: State> State for SetSpacing<St> {
+        type DarkScheme = St::DarkScheme;
+        type Spacing = Set<members::spacing>;
+        type Fonts = St::Fonts;
+        type DarkCodeTheme = St::DarkCodeTheme;
+        type LightScheme = St::LightScheme;
+        type LightCodeTheme = St::LightCodeTheme;
     }
     ///State transition - sets the `fonts` field to Set
-    pub struct SetFonts<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFonts<S> {}
-    impl<S: State> State for SetFonts<S> {
-        type Spacing = S::Spacing;
-        type LightScheme = S::LightScheme;
-        type DarkScheme = S::DarkScheme;
+    pub struct SetFonts<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetFonts<St> {}
+    impl<St: State> State for SetFonts<St> {
+        type DarkScheme = St::DarkScheme;
+        type Spacing = St::Spacing;
         type Fonts = Set<members::fonts>;
-        type DarkCodeTheme = S::DarkCodeTheme;
-        type LightCodeTheme = S::LightCodeTheme;
+        type DarkCodeTheme = St::DarkCodeTheme;
+        type LightScheme = St::LightScheme;
+        type LightCodeTheme = St::LightCodeTheme;
     }
     ///State transition - sets the `dark_code_theme` field to Set
-    pub struct SetDarkCodeTheme<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDarkCodeTheme<S> {}
-    impl<S: State> State for SetDarkCodeTheme<S> {
-        type Spacing = S::Spacing;
-        type LightScheme = S::LightScheme;
-        type DarkScheme = S::DarkScheme;
-        type Fonts = S::Fonts;
+    pub struct SetDarkCodeTheme<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDarkCodeTheme<St> {}
+    impl<St: State> State for SetDarkCodeTheme<St> {
+        type DarkScheme = St::DarkScheme;
+        type Spacing = St::Spacing;
+        type Fonts = St::Fonts;
         type DarkCodeTheme = Set<members::dark_code_theme>;
-        type LightCodeTheme = S::LightCodeTheme;
+        type LightScheme = St::LightScheme;
+        type LightCodeTheme = St::LightCodeTheme;
+    }
+    ///State transition - sets the `light_scheme` field to Set
+    pub struct SetLightScheme<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLightScheme<St> {}
+    impl<St: State> State for SetLightScheme<St> {
+        type DarkScheme = St::DarkScheme;
+        type Spacing = St::Spacing;
+        type Fonts = St::Fonts;
+        type DarkCodeTheme = St::DarkCodeTheme;
+        type LightScheme = Set<members::light_scheme>;
+        type LightCodeTheme = St::LightCodeTheme;
     }
     ///State transition - sets the `light_code_theme` field to Set
-    pub struct SetLightCodeTheme<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetLightCodeTheme<S> {}
-    impl<S: State> State for SetLightCodeTheme<S> {
-        type Spacing = S::Spacing;
-        type LightScheme = S::LightScheme;
-        type DarkScheme = S::DarkScheme;
-        type Fonts = S::Fonts;
-        type DarkCodeTheme = S::DarkCodeTheme;
+    pub struct SetLightCodeTheme<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLightCodeTheme<St> {}
+    impl<St: State> State for SetLightCodeTheme<St> {
+        type DarkScheme = St::DarkScheme;
+        type Spacing = St::Spacing;
+        type Fonts = St::Fonts;
+        type DarkCodeTheme = St::DarkCodeTheme;
+        type LightScheme = St::LightScheme;
         type LightCodeTheme = Set<members::light_code_theme>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `spacing` field
-        pub struct spacing(());
-        ///Marker type for the `light_scheme` field
-        pub struct light_scheme(());
         ///Marker type for the `dark_scheme` field
         pub struct dark_scheme(());
+        ///Marker type for the `spacing` field
+        pub struct spacing(());
         ///Marker type for the `fonts` field
         pub struct fonts(());
         ///Marker type for the `dark_code_theme` field
         pub struct dark_code_theme(());
+        ///Marker type for the `light_scheme` field
+        pub struct light_scheme(());
         ///Marker type for the `light_code_theme` field
         pub struct light_code_theme(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ThemeBuilder<'a, S: theme_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ThemeBuilder<S: BosStr, St: theme_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<ThemeDarkCodeTheme<S>>,
         Option<StrongRef<S>>,
@@ -1446,66 +1443,66 @@ pub struct ThemeBuilder<'a, S: theme_state::State> {
         Option<StrongRef<S>>,
         Option<ThemeSpacing<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Theme<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ThemeBuilder<'a, theme_state::Empty> {
+impl<S: BosStr> Theme<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ThemeBuilder<S, theme_state::Empty> {
         ThemeBuilder::new()
     }
 }
 
-impl<'a> ThemeBuilder<'a, theme_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ThemeBuilder<S, theme_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ThemeBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ThemeBuilder<'a, S>
+impl<S: BosStr, St> ThemeBuilder<S, St>
 where
-    S: theme_state::State,
-    S::DarkCodeTheme: theme_state::IsUnset,
+    St: theme_state::State,
+    St::DarkCodeTheme: theme_state::IsUnset,
 {
     /// Set the `darkCodeTheme` field (required)
     pub fn dark_code_theme(
         mut self,
         value: impl Into<ThemeDarkCodeTheme<S>>,
-    ) -> ThemeBuilder<'a, theme_state::SetDarkCodeTheme<S>> {
+    ) -> ThemeBuilder<S, theme_state::SetDarkCodeTheme<St>> {
         self._fields.0 = Option::Some(value.into());
         ThemeBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ThemeBuilder<'a, S>
+impl<S: BosStr, St> ThemeBuilder<S, St>
 where
-    S: theme_state::State,
-    S::DarkScheme: theme_state::IsUnset,
+    St: theme_state::State,
+    St::DarkScheme: theme_state::IsUnset,
 {
     /// Set the `darkScheme` field (required)
     pub fn dark_scheme(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> ThemeBuilder<'a, theme_state::SetDarkScheme<S>> {
+    ) -> ThemeBuilder<S, theme_state::SetDarkScheme<St>> {
         self._fields.1 = Option::Some(value.into());
         ThemeBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: theme_state::State> ThemeBuilder<'a, S> {
+impl<S: BosStr, St: theme_state::State> ThemeBuilder<S, St> {
     /// Set the `defaultTheme` field (optional)
     pub fn default_theme(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -1518,98 +1515,98 @@ impl<'a, S: theme_state::State> ThemeBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ThemeBuilder<'a, S>
+impl<S: BosStr, St> ThemeBuilder<S, St>
 where
-    S: theme_state::State,
-    S::Fonts: theme_state::IsUnset,
+    St: theme_state::State,
+    St::Fonts: theme_state::IsUnset,
 {
     /// Set the `fonts` field (required)
     pub fn fonts(
         mut self,
         value: impl Into<ThemeFonts<S>>,
-    ) -> ThemeBuilder<'a, theme_state::SetFonts<S>> {
+    ) -> ThemeBuilder<S, theme_state::SetFonts<St>> {
         self._fields.3 = Option::Some(value.into());
         ThemeBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ThemeBuilder<'a, S>
+impl<S: BosStr, St> ThemeBuilder<S, St>
 where
-    S: theme_state::State,
-    S::LightCodeTheme: theme_state::IsUnset,
+    St: theme_state::State,
+    St::LightCodeTheme: theme_state::IsUnset,
 {
     /// Set the `lightCodeTheme` field (required)
     pub fn light_code_theme(
         mut self,
         value: impl Into<ThemeLightCodeTheme<S>>,
-    ) -> ThemeBuilder<'a, theme_state::SetLightCodeTheme<S>> {
+    ) -> ThemeBuilder<S, theme_state::SetLightCodeTheme<St>> {
         self._fields.4 = Option::Some(value.into());
         ThemeBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ThemeBuilder<'a, S>
+impl<S: BosStr, St> ThemeBuilder<S, St>
 where
-    S: theme_state::State,
-    S::LightScheme: theme_state::IsUnset,
+    St: theme_state::State,
+    St::LightScheme: theme_state::IsUnset,
 {
     /// Set the `lightScheme` field (required)
     pub fn light_scheme(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> ThemeBuilder<'a, theme_state::SetLightScheme<S>> {
+    ) -> ThemeBuilder<S, theme_state::SetLightScheme<St>> {
         self._fields.5 = Option::Some(value.into());
         ThemeBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ThemeBuilder<'a, S>
+impl<S: BosStr, St> ThemeBuilder<S, St>
 where
-    S: theme_state::State,
-    S::Spacing: theme_state::IsUnset,
+    St: theme_state::State,
+    St::Spacing: theme_state::IsUnset,
 {
     /// Set the `spacing` field (required)
     pub fn spacing(
         mut self,
         value: impl Into<ThemeSpacing<S>>,
-    ) -> ThemeBuilder<'a, theme_state::SetSpacing<S>> {
+    ) -> ThemeBuilder<S, theme_state::SetSpacing<St>> {
         self._fields.6 = Option::Some(value.into());
         ThemeBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ThemeBuilder<'a, S>
+impl<S: BosStr, St> ThemeBuilder<S, St>
 where
-    S: theme_state::State,
-    S::Spacing: theme_state::IsSet,
-    S::LightScheme: theme_state::IsSet,
-    S::DarkScheme: theme_state::IsSet,
-    S::Fonts: theme_state::IsSet,
-    S::DarkCodeTheme: theme_state::IsSet,
-    S::LightCodeTheme: theme_state::IsSet,
+    St: theme_state::State,
+    St::DarkScheme: theme_state::IsSet,
+    St::Spacing: theme_state::IsSet,
+    St::Fonts: theme_state::IsSet,
+    St::DarkCodeTheme: theme_state::IsSet,
+    St::LightScheme: theme_state::IsSet,
+    St::LightCodeTheme: theme_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Theme<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Theme<S> {
         Theme {
             dark_code_theme: self._fields.0.unwrap(),
             dark_scheme: self._fields.1.unwrap(),
-            default_theme: self._fields.2.or_else(|| Some(CowStr::from("auto"))),
+            default_theme: self._fields.2.or_else(|| Some(SmolStr::from("auto"))),
             fonts: self._fields.3.unwrap(),
             light_code_theme: self._fields.4.unwrap(),
             light_scheme: self._fields.5.unwrap(),
@@ -1617,12 +1614,12 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Theme<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Theme<S> {
         Theme {
             dark_code_theme: self._fields.0.unwrap(),
             dark_scheme: self._fields.1.unwrap(),
-            default_theme: self._fields.2.or_else(|| Some(CowStr::from("auto"))),
+            default_theme: self._fields.2.or_else(|| Some(SmolStr::from("auto"))),
             fonts: self._fields.3.unwrap(),
             light_code_theme: self._fields.4.unwrap(),
             light_scheme: self._fields.5.unwrap(),

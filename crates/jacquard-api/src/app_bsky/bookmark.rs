@@ -15,7 +15,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -39,11 +39,11 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Bookmark<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Bookmark<S: BosStr = DefaultStr> {
     ///A strong ref to the record to be bookmarked. Currently, only `app.bsky.feed.post` records are supported.
     pub subject: StrongRef<S>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -55,11 +55,11 @@ pub struct Bookmark<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct BookmarkView<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct BookmarkView<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
     pub item: BookmarkViewItem<S>,
@@ -75,11 +75,11 @@ pub struct BookmarkView<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum BookmarkViewItem<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum BookmarkViewItem<S: BosStr = DefaultStr> {
     #[serde(rename = "app.bsky.feed.defs#blockedPost")]
     BlockedPost(Box<BlockedPost<S>>),
     #[serde(rename = "app.bsky.feed.defs#notFoundPost")]
@@ -88,7 +88,7 @@ pub enum BookmarkViewItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     PostView(Box<PostView<S>>),
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Bookmark<S> {
+impl<S: BosStr> LexiconSchema for Bookmark<S> {
     fn nsid() -> &'static str {
         "app.bsky.bookmark.defs"
     }
@@ -103,7 +103,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Bookmark<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for BookmarkView<S> {
+impl<S: BosStr> LexiconSchema for BookmarkView<S> {
     fn nsid() -> &'static str {
         "app.bsky.bookmark.defs"
     }
@@ -137,9 +137,9 @@ pub mod bookmark_state {
         type Subject = Unset;
     }
     ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
+    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubject<St> {}
+    impl<St: State> State for SetSubject<St> {
         type Subject = Set<members::subject>;
     }
     /// Marker types for field names
@@ -150,67 +150,64 @@ pub mod bookmark_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct BookmarkBuilder<'a, S: bookmark_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct BookmarkBuilder<S: BosStr, St: bookmark_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<StrongRef<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Bookmark<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> BookmarkBuilder<'a, bookmark_state::Empty> {
+impl<S: BosStr> Bookmark<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> BookmarkBuilder<S, bookmark_state::Empty> {
         BookmarkBuilder::new()
     }
 }
 
-impl<'a> BookmarkBuilder<'a, bookmark_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> BookmarkBuilder<S, bookmark_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         BookmarkBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BookmarkBuilder<'a, S>
+impl<S: BosStr, St> BookmarkBuilder<S, St>
 where
-    S: bookmark_state::State,
-    S::Subject: bookmark_state::IsUnset,
+    St: bookmark_state::State,
+    St::Subject: bookmark_state::IsUnset,
 {
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> BookmarkBuilder<'a, bookmark_state::SetSubject<S>> {
+    ) -> BookmarkBuilder<S, bookmark_state::SetSubject<St>> {
         self._fields.0 = Option::Some(value.into());
         BookmarkBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BookmarkBuilder<'a, S>
+impl<S: BosStr, St> BookmarkBuilder<S, St>
 where
-    S: bookmark_state::State,
-    S::Subject: bookmark_state::IsSet,
+    St: bookmark_state::State,
+    St::Subject: bookmark_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Bookmark<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Bookmark<S> {
         Bookmark {
             subject: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Bookmark<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Bookmark<S> {
         Bookmark {
             subject: self._fields.0.unwrap(),
             extra_data: Some(extra_data),
@@ -307,66 +304,66 @@ pub mod bookmark_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Item;
         type Subject;
+        type Item;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Item = Unset;
         type Subject = Unset;
-    }
-    ///State transition - sets the `item` field to Set
-    pub struct SetItem<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetItem<S> {}
-    impl<S: State> State for SetItem<S> {
-        type Item = Set<members::item>;
-        type Subject = S::Subject;
+        type Item = Unset;
     }
     ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type Item = S::Item;
+    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubject<St> {}
+    impl<St: State> State for SetSubject<St> {
         type Subject = Set<members::subject>;
+        type Item = St::Item;
+    }
+    ///State transition - sets the `item` field to Set
+    pub struct SetItem<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetItem<St> {}
+    impl<St: State> State for SetItem<St> {
+        type Subject = St::Subject;
+        type Item = Set<members::item>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `item` field
-        pub struct item(());
         ///Marker type for the `subject` field
         pub struct subject(());
+        ///Marker type for the `item` field
+        pub struct item(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct BookmarkViewBuilder<'a, S: bookmark_view_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct BookmarkViewBuilder<S: BosStr, St: bookmark_view_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<BookmarkViewItem<S>>, Option<StrongRef<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> BookmarkView<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> BookmarkViewBuilder<'a, bookmark_view_state::Empty> {
+impl<S: BosStr> BookmarkView<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> BookmarkViewBuilder<S, bookmark_view_state::Empty> {
         BookmarkViewBuilder::new()
     }
 }
 
-impl<'a> BookmarkViewBuilder<'a, bookmark_view_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> BookmarkViewBuilder<S, bookmark_view_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         BookmarkViewBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: bookmark_view_state::State> BookmarkViewBuilder<'a, S> {
+impl<S: BosStr, St: bookmark_view_state::State> BookmarkViewBuilder<S, St> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.0 = value.into();
@@ -379,52 +376,52 @@ impl<'a, S: bookmark_view_state::State> BookmarkViewBuilder<'a, S> {
     }
 }
 
-impl<'a, S> BookmarkViewBuilder<'a, S>
+impl<S: BosStr, St> BookmarkViewBuilder<S, St>
 where
-    S: bookmark_view_state::State,
-    S::Item: bookmark_view_state::IsUnset,
+    St: bookmark_view_state::State,
+    St::Item: bookmark_view_state::IsUnset,
 {
     /// Set the `item` field (required)
     pub fn item(
         mut self,
         value: impl Into<BookmarkViewItem<S>>,
-    ) -> BookmarkViewBuilder<'a, bookmark_view_state::SetItem<S>> {
+    ) -> BookmarkViewBuilder<S, bookmark_view_state::SetItem<St>> {
         self._fields.1 = Option::Some(value.into());
         BookmarkViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BookmarkViewBuilder<'a, S>
+impl<S: BosStr, St> BookmarkViewBuilder<S, St>
 where
-    S: bookmark_view_state::State,
-    S::Subject: bookmark_view_state::IsUnset,
+    St: bookmark_view_state::State,
+    St::Subject: bookmark_view_state::IsUnset,
 {
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> BookmarkViewBuilder<'a, bookmark_view_state::SetSubject<S>> {
+    ) -> BookmarkViewBuilder<S, bookmark_view_state::SetSubject<St>> {
         self._fields.2 = Option::Some(value.into());
         BookmarkViewBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BookmarkViewBuilder<'a, S>
+impl<S: BosStr, St> BookmarkViewBuilder<S, St>
 where
-    S: bookmark_view_state::State,
-    S::Item: bookmark_view_state::IsSet,
-    S::Subject: bookmark_view_state::IsSet,
+    St: bookmark_view_state::State,
+    St::Subject: bookmark_view_state::IsSet,
+    St::Item: bookmark_view_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> BookmarkView<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> BookmarkView<S> {
         BookmarkView {
             created_at: self._fields.0,
             item: self._fields.1.unwrap(),
@@ -432,11 +429,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> BookmarkView<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> BookmarkView<S> {
         BookmarkView {
             created_at: self._fields.0,
             item: self._fields.1.unwrap(),

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -37,11 +37,11 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
     rename = "pink.vase.pod.episode",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Episode<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Episode<S: BosStr = DefaultStr> {
     ///URL to the audio file. Can be any host the creator controls.
     pub audio_url: UriValue<S>,
     ///Optional per-episode cover art, overrides show art.
@@ -72,14 +72,14 @@ pub struct Episode<S: Bos<str> + AsRef<str> = DefaultStr> {
 /// Follows podcast RSS spec episode types.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum EpisodeEpisodeType<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum EpisodeEpisodeType<S: BosStr = DefaultStr> {
     Full,
     Trailer,
     Bonus,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> EpisodeEpisodeType<S> {
+impl<S: BosStr> EpisodeEpisodeType<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Full => "full",
@@ -99,19 +99,19 @@ impl<S: Bos<str> + AsRef<str>> EpisodeEpisodeType<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for EpisodeEpisodeType<S> {
+impl<S: BosStr> core::fmt::Display for EpisodeEpisodeType<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for EpisodeEpisodeType<S> {
+impl<S: BosStr> AsRef<str> for EpisodeEpisodeType<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for EpisodeEpisodeType<S> {
+impl<S: BosStr> Serialize for EpisodeEpisodeType<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -120,8 +120,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for EpisodeEpisodeType<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for EpisodeEpisodeType<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for EpisodeEpisodeType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -131,14 +130,18 @@ for EpisodeEpisodeType<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for EpisodeEpisodeType<S> {
+impl<S: BosStr + Default> Default for EpisodeEpisodeType<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for EpisodeEpisodeType<S> {
-    type Output = EpisodeEpisodeType<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for EpisodeEpisodeType<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = EpisodeEpisodeType<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             EpisodeEpisodeType::Full => EpisodeEpisodeType::Full,
@@ -155,18 +158,18 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for EpisodeEpisodeType<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct EpisodeGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct EpisodeGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Episode<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Episode<S> {
+impl<S: BosStr> Episode<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, EpisodeRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -179,17 +182,17 @@ pub struct EpisodeRecord;
 impl XrpcResp for EpisodeRecord {
     const NSID: &'static str = "pink.vase.pod.episode";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = EpisodeGetRecordOutput<S>;
+    type Output<S: BosStr> = EpisodeGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<EpisodeGetRecordOutput<S>> for Episode<S> {
+impl<S: BosStr> From<EpisodeGetRecordOutput<S>> for Episode<S> {
     fn from(output: EpisodeGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Episode<S> {
+impl<S: BosStr> Collection for Episode<S> {
     const NSID: &'static str = "pink.vase.pod.episode";
     type Record = EpisodeRecord;
 }
@@ -199,7 +202,7 @@ impl Collection for EpisodeRecord {
     type Record = EpisodeRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Episode<S> {
+impl<S: BosStr> LexiconSchema for Episode<S> {
     fn nsid() -> &'static str {
         "pink.vase.pod.episode"
     }
@@ -288,8 +291,8 @@ pub mod episode_state {
     pub trait State: sealed::Sealed {
         type Title;
         type CreatedAt;
-        type Show;
         type AudioUrl;
+        type Show;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -297,44 +300,44 @@ pub mod episode_state {
     impl State for Empty {
         type Title = Unset;
         type CreatedAt = Unset;
-        type Show = Unset;
         type AudioUrl = Unset;
+        type Show = Unset;
     }
     ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
         type Title = Set<members::title>;
-        type CreatedAt = S::CreatedAt;
-        type Show = S::Show;
-        type AudioUrl = S::AudioUrl;
+        type CreatedAt = St::CreatedAt;
+        type AudioUrl = St::AudioUrl;
+        type Show = St::Show;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Title = S::Title;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Title = St::Title;
         type CreatedAt = Set<members::created_at>;
-        type Show = S::Show;
-        type AudioUrl = S::AudioUrl;
-    }
-    ///State transition - sets the `show` field to Set
-    pub struct SetShow<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetShow<S> {}
-    impl<S: State> State for SetShow<S> {
-        type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
-        type Show = Set<members::show>;
-        type AudioUrl = S::AudioUrl;
+        type AudioUrl = St::AudioUrl;
+        type Show = St::Show;
     }
     ///State transition - sets the `audio_url` field to Set
-    pub struct SetAudioUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAudioUrl<S> {}
-    impl<S: State> State for SetAudioUrl<S> {
-        type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
-        type Show = S::Show;
+    pub struct SetAudioUrl<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAudioUrl<St> {}
+    impl<St: State> State for SetAudioUrl<St> {
+        type Title = St::Title;
+        type CreatedAt = St::CreatedAt;
         type AudioUrl = Set<members::audio_url>;
+        type Show = St::Show;
+    }
+    ///State transition - sets the `show` field to Set
+    pub struct SetShow<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetShow<St> {}
+    impl<St: State> State for SetShow<St> {
+        type Title = St::Title;
+        type CreatedAt = St::CreatedAt;
+        type AudioUrl = St::AudioUrl;
+        type Show = Set<members::show>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -343,16 +346,16 @@ pub mod episode_state {
         pub struct title(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `show` field
-        pub struct show(());
         ///Marker type for the `audio_url` field
         pub struct audio_url(());
+        ///Marker type for the `show` field
+        pub struct show(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct EpisodeBuilder<'a, S: episode_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct EpisodeBuilder<S: BosStr, St: episode_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<UriValue<S>>,
         Option<BlobRef<S>>,
@@ -366,47 +369,47 @@ pub struct EpisodeBuilder<'a, S: episode_state::State> {
         Option<StrongRef<S>>,
         Option<S>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Episode<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> EpisodeBuilder<'a, episode_state::Empty> {
+impl<S: BosStr> Episode<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> EpisodeBuilder<S, episode_state::Empty> {
         EpisodeBuilder::new()
     }
 }
 
-impl<'a> EpisodeBuilder<'a, episode_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> EpisodeBuilder<S, episode_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         EpisodeBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> EpisodeBuilder<'a, S>
+impl<S: BosStr, St> EpisodeBuilder<S, St>
 where
-    S: episode_state::State,
-    S::AudioUrl: episode_state::IsUnset,
+    St: episode_state::State,
+    St::AudioUrl: episode_state::IsUnset,
 {
     /// Set the `audioUrl` field (required)
     pub fn audio_url(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> EpisodeBuilder<'a, episode_state::SetAudioUrl<S>> {
+    ) -> EpisodeBuilder<S, episode_state::SetAudioUrl<St>> {
         self._fields.0 = Option::Some(value.into());
         EpisodeBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
+impl<S: BosStr, St: episode_state::State> EpisodeBuilder<S, St> {
     /// Set the `coverArt` field (optional)
     pub fn cover_art(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -419,26 +422,26 @@ impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
     }
 }
 
-impl<'a, S> EpisodeBuilder<'a, S>
+impl<S: BosStr, St> EpisodeBuilder<S, St>
 where
-    S: episode_state::State,
-    S::CreatedAt: episode_state::IsUnset,
+    St: episode_state::State,
+    St::CreatedAt: episode_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> EpisodeBuilder<'a, episode_state::SetCreatedAt<S>> {
+    ) -> EpisodeBuilder<S, episode_state::SetCreatedAt<St>> {
         self._fields.2 = Option::Some(value.into());
         EpisodeBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
+impl<S: BosStr, St: episode_state::State> EpisodeBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -451,7 +454,7 @@ impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
+impl<S: BosStr, St: episode_state::State> EpisodeBuilder<S, St> {
     /// Set the `durationSeconds` field (optional)
     pub fn duration_seconds(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.4 = value.into();
@@ -464,7 +467,7 @@ impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
+impl<S: BosStr, St: episode_state::State> EpisodeBuilder<S, St> {
     /// Set the `episodeNumber` field (optional)
     pub fn episode_number(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.5 = value.into();
@@ -477,7 +480,7 @@ impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
+impl<S: BosStr, St: episode_state::State> EpisodeBuilder<S, St> {
     /// Set the `episodeType` field (optional)
     pub fn episode_type(
         mut self,
@@ -493,7 +496,7 @@ impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
+impl<S: BosStr, St: episode_state::State> EpisodeBuilder<S, St> {
     /// Set the `explicit` field (optional)
     pub fn explicit(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.7 = value.into();
@@ -506,7 +509,7 @@ impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
     }
 }
 
-impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
+impl<S: BosStr, St: episode_state::State> EpisodeBuilder<S, St> {
     /// Set the `seasonNumber` field (optional)
     pub fn season_number(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.8 = value.into();
@@ -519,54 +522,54 @@ impl<'a, S: episode_state::State> EpisodeBuilder<'a, S> {
     }
 }
 
-impl<'a, S> EpisodeBuilder<'a, S>
+impl<S: BosStr, St> EpisodeBuilder<S, St>
 where
-    S: episode_state::State,
-    S::Show: episode_state::IsUnset,
+    St: episode_state::State,
+    St::Show: episode_state::IsUnset,
 {
     /// Set the `show` field (required)
     pub fn show(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> EpisodeBuilder<'a, episode_state::SetShow<S>> {
+    ) -> EpisodeBuilder<S, episode_state::SetShow<St>> {
         self._fields.9 = Option::Some(value.into());
         EpisodeBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> EpisodeBuilder<'a, S>
+impl<S: BosStr, St> EpisodeBuilder<S, St>
 where
-    S: episode_state::State,
-    S::Title: episode_state::IsUnset,
+    St: episode_state::State,
+    St::Title: episode_state::IsUnset,
 {
     /// Set the `title` field (required)
     pub fn title(
         mut self,
         value: impl Into<S>,
-    ) -> EpisodeBuilder<'a, episode_state::SetTitle<S>> {
+    ) -> EpisodeBuilder<S, episode_state::SetTitle<St>> {
         self._fields.10 = Option::Some(value.into());
         EpisodeBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> EpisodeBuilder<'a, S>
+impl<S: BosStr, St> EpisodeBuilder<S, St>
 where
-    S: episode_state::State,
-    S::Title: episode_state::IsSet,
-    S::CreatedAt: episode_state::IsSet,
-    S::Show: episode_state::IsSet,
-    S::AudioUrl: episode_state::IsSet,
+    St: episode_state::State,
+    St::Title: episode_state::IsSet,
+    St::CreatedAt: episode_state::IsSet,
+    St::AudioUrl: episode_state::IsSet,
+    St::Show: episode_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Episode<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Episode<S> {
         Episode {
             audio_url: self._fields.0.unwrap(),
             cover_art: self._fields.1,
@@ -582,11 +585,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Episode<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Episode<S> {
         Episode {
             audio_url: self._fields.0.unwrap(),
             cover_art: self._fields.1,

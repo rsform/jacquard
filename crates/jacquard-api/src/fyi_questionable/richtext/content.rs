@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -38,11 +38,11 @@ use crate::fyi_questionable::richtext::website::Website;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Content<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Content<S: BosStr = DefaultStr> {
     ///Array of content blocks
     pub items: Vec<ContentItemsItem<S>>,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -55,11 +55,11 @@ pub struct Content<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum ContentItemsItem<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ContentItemsItem<S: BosStr = DefaultStr> {
     #[serde(rename = "fyi.questionable.richtext.text")]
     Text(Box<Text<S>>),
     #[serde(rename = "fyi.questionable.richtext.blockquote")]
@@ -82,7 +82,7 @@ pub enum ContentItemsItem<S: Bos<str> + AsRef<str> = DefaultStr> {
     Website(Box<Website<S>>),
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Content<S> {
+impl<S: BosStr> LexiconSchema for Content<S> {
     fn nsid() -> &'static str {
         "fyi.questionable.richtext.content"
     }
@@ -127,9 +127,9 @@ pub mod content_state {
         type Items = Unset;
     }
     ///State transition - sets the `items` field to Set
-    pub struct SetItems<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetItems<S> {}
-    impl<S: State> State for SetItems<S> {
+    pub struct SetItems<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetItems<St> {}
+    impl<St: State> State for SetItems<St> {
         type Items = Set<members::items>;
     }
     /// Marker types for field names
@@ -140,67 +140,64 @@ pub mod content_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ContentBuilder<'a, S: content_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ContentBuilder<S: BosStr, St: content_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<ContentItemsItem<S>>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Content<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ContentBuilder<'a, content_state::Empty> {
+impl<S: BosStr> Content<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ContentBuilder<S, content_state::Empty> {
         ContentBuilder::new()
     }
 }
 
-impl<'a> ContentBuilder<'a, content_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ContentBuilder<S, content_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ContentBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ContentBuilder<'a, S>
+impl<S: BosStr, St> ContentBuilder<S, St>
 where
-    S: content_state::State,
-    S::Items: content_state::IsUnset,
+    St: content_state::State,
+    St::Items: content_state::IsUnset,
 {
     /// Set the `items` field (required)
     pub fn items(
         mut self,
         value: impl Into<Vec<ContentItemsItem<S>>>,
-    ) -> ContentBuilder<'a, content_state::SetItems<S>> {
+    ) -> ContentBuilder<S, content_state::SetItems<St>> {
         self._fields.0 = Option::Some(value.into());
         ContentBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ContentBuilder<'a, S>
+impl<S: BosStr, St> ContentBuilder<S, St>
 where
-    S: content_state::State,
-    S::Items: content_state::IsSet,
+    St: content_state::State,
+    St::Items: content_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Content<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Content<S> {
         Content {
             items: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Content<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Content<S> {
         Content {
             items: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

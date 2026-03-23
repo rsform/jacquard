@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
@@ -18,43 +18,39 @@ use serde::{Serialize, Deserialize};
 use crate::social_clippr::actor::ProfileView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SearchProfiles<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SearchProfiles<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub cursor: Option<S>,
     ///Defaults to `25`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub q: Option<S>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SearchProfilesOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SearchProfilesOutput<S: BosStr = DefaultStr> {
     pub actors: Vec<ProfileView<S>>,
     ///A parameter used for pagination
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -63,12 +59,11 @@ pub struct SearchProfilesResponse;
 impl jacquard_common::xrpc::XrpcResp for SearchProfilesResponse {
     const NSID: &'static str = "social.clippr.actor.searchProfiles";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = SearchProfilesOutput<S>;
+    type Output<S: BosStr> = SearchProfilesOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for SearchProfiles<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for SearchProfiles<S> {
     const NSID: &'static str = "social.clippr.actor.searchProfiles";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = SearchProfilesResponse;
@@ -79,7 +74,7 @@ pub struct SearchProfilesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SearchProfilesRequest {
     const PATH: &'static str = "/xrpc/social.clippr.actor.searchProfiles";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = SearchProfiles<S>;
+    type Request<S: BosStr> = SearchProfiles<S>;
     type Response = SearchProfilesResponse;
 }
 
@@ -106,32 +101,32 @@ pub mod search_profiles_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct SearchProfilesBuilder<'a, S: search_profiles_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct SearchProfilesBuilder<S: BosStr, St: search_profiles_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> SearchProfiles<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> SearchProfilesBuilder<'a, search_profiles_state::Empty> {
+impl<S: BosStr> SearchProfiles<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> SearchProfilesBuilder<S, search_profiles_state::Empty> {
         SearchProfilesBuilder::new()
     }
 }
 
-impl<'a> SearchProfilesBuilder<'a, search_profiles_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> SearchProfilesBuilder<S, search_profiles_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SearchProfilesBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: search_profiles_state::State> SearchProfilesBuilder<'a, S> {
+impl<S: BosStr, St: search_profiles_state::State> SearchProfilesBuilder<S, St> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -144,7 +139,7 @@ impl<'a, S: search_profiles_state::State> SearchProfilesBuilder<'a, S> {
     }
 }
 
-impl<'a, S: search_profiles_state::State> SearchProfilesBuilder<'a, S> {
+impl<S: BosStr, St: search_profiles_state::State> SearchProfilesBuilder<S, St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -157,7 +152,7 @@ impl<'a, S: search_profiles_state::State> SearchProfilesBuilder<'a, S> {
     }
 }
 
-impl<'a, S: search_profiles_state::State> SearchProfilesBuilder<'a, S> {
+impl<S: BosStr, St: search_profiles_state::State> SearchProfilesBuilder<S, St> {
     /// Set the `q` field (optional)
     pub fn q(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -170,12 +165,12 @@ impl<'a, S: search_profiles_state::State> SearchProfilesBuilder<'a, S> {
     }
 }
 
-impl<'a, S> SearchProfilesBuilder<'a, S>
+impl<S: BosStr, St> SearchProfilesBuilder<S, St>
 where
-    S: search_profiles_state::State,
+    St: search_profiles_state::State,
 {
-    /// Build the final struct
-    pub fn build(self) -> SearchProfiles<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> SearchProfiles<S> {
         SearchProfiles {
             cursor: self._fields.0,
             limit: self._fields.1,

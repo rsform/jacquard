@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
@@ -20,46 +20,41 @@ use crate::social_showcase::ItemView;
 use crate::social_showcase::ProfileView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SearchPosts<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SearchPosts<S: BosStr = DefaultStr> {
     ///(max length: 512)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub cursor: Option<S>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
-    #[serde(borrow)]
     pub q: S,
     ///(max length: 20)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub r#type: Option<S>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SearchPostsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SearchPostsOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
     pub results: Vec<SearchPostsOutputResultsItem<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -69,11 +64,11 @@ pub struct SearchPostsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum SearchPostsOutputResultsItem<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum SearchPostsOutputResultsItem<S: BosStr = DefaultStr> {
     #[serde(rename = "social.showcase.defs#itemView")]
     ItemView(Box<ItemView<S>>),
     #[serde(rename = "social.showcase.defs#collectionView")]
@@ -87,12 +82,11 @@ pub struct SearchPostsResponse;
 impl jacquard_common::xrpc::XrpcResp for SearchPostsResponse {
     const NSID: &'static str = "social.showcase.feed.searchPosts";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = SearchPostsOutput<S>;
+    type Output<S: BosStr> = SearchPostsOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for SearchPosts<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for SearchPosts<S> {
     const NSID: &'static str = "social.showcase.feed.searchPosts";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = SearchPostsResponse;
@@ -103,7 +97,7 @@ pub struct SearchPostsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for SearchPostsRequest {
     const PATH: &'static str = "/xrpc/social.showcase.feed.searchPosts";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = SearchPosts<S>;
+    type Request<S: BosStr> = SearchPosts<S>;
     type Response = SearchPostsResponse;
 }
 
@@ -130,9 +124,9 @@ pub mod search_posts_state {
         type Q = Unset;
     }
     ///State transition - sets the `q` field to Set
-    pub struct SetQ<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetQ<S> {}
-    impl<S: State> State for SetQ<S> {
+    pub struct SetQ<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetQ<St> {}
+    impl<St: State> State for SetQ<St> {
         type Q = Set<members::q>;
     }
     /// Marker types for field names
@@ -143,32 +137,32 @@ pub mod search_posts_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct SearchPostsBuilder<'a, S: search_posts_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct SearchPostsBuilder<S: BosStr, St: search_posts_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>, Option<S>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> SearchPosts<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> SearchPostsBuilder<'a, search_posts_state::Empty> {
+impl<S: BosStr> SearchPosts<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> SearchPostsBuilder<S, search_posts_state::Empty> {
         SearchPostsBuilder::new()
     }
 }
 
-impl<'a> SearchPostsBuilder<'a, search_posts_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> SearchPostsBuilder<S, search_posts_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SearchPostsBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: search_posts_state::State> SearchPostsBuilder<'a, S> {
+impl<S: BosStr, St: search_posts_state::State> SearchPostsBuilder<S, St> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -181,7 +175,7 @@ impl<'a, S: search_posts_state::State> SearchPostsBuilder<'a, S> {
     }
 }
 
-impl<'a, S: search_posts_state::State> SearchPostsBuilder<'a, S> {
+impl<S: BosStr, St: search_posts_state::State> SearchPostsBuilder<S, St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -194,26 +188,26 @@ impl<'a, S: search_posts_state::State> SearchPostsBuilder<'a, S> {
     }
 }
 
-impl<'a, S> SearchPostsBuilder<'a, S>
+impl<S: BosStr, St> SearchPostsBuilder<S, St>
 where
-    S: search_posts_state::State,
-    S::Q: search_posts_state::IsUnset,
+    St: search_posts_state::State,
+    St::Q: search_posts_state::IsUnset,
 {
     /// Set the `q` field (required)
     pub fn q(
         mut self,
         value: impl Into<S>,
-    ) -> SearchPostsBuilder<'a, search_posts_state::SetQ<S>> {
+    ) -> SearchPostsBuilder<S, search_posts_state::SetQ<St>> {
         self._fields.2 = Option::Some(value.into());
         SearchPostsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: search_posts_state::State> SearchPostsBuilder<'a, S> {
+impl<S: BosStr, St: search_posts_state::State> SearchPostsBuilder<S, St> {
     /// Set the `type` field (optional)
     pub fn r#type(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -226,13 +220,13 @@ impl<'a, S: search_posts_state::State> SearchPostsBuilder<'a, S> {
     }
 }
 
-impl<'a, S> SearchPostsBuilder<'a, S>
+impl<S: BosStr, St> SearchPostsBuilder<S, St>
 where
-    S: search_posts_state::State,
-    S::Q: search_posts_state::IsSet,
+    St: search_posts_state::State,
+    St::Q: search_posts_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> SearchPosts<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> SearchPosts<S> {
         SearchPosts {
             cursor: self._fields.0,
             limit: self._fields.1,

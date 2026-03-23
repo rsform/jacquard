@@ -75,6 +75,7 @@ use crate::resolver::{
     ResolverOptions,
 };
 use bytes::Bytes;
+use jacquard_common::BosStr;
 #[cfg(feature = "streaming")]
 use jacquard_common::ByteStream;
 use jacquard_common::bos::Bos;
@@ -421,10 +422,7 @@ impl JacquardResolver {
     ///
     /// - `did:web:example.com` → `https://example.com/.well-known/did.json`
     /// - `did:web:example.com:user:alice` → `https://example.com/user/alice/did.json`
-    fn did_web_url<S: Bos<str> + AsRef<str> + Sync>(
-        &self,
-        did: &Did<S>,
-    ) -> resolver::Result<Uri<String>> {
+    fn did_web_url<S: BosStr + Sync>(&self, did: &Did<S>) -> resolver::Result<Uri<String>> {
         // did:web:example.com[:path:segments]
         let s = did.as_str();
         let rest = s
@@ -457,7 +455,7 @@ impl JacquardResolver {
 
     #[cfg(test)]
     fn test_did_web_url_raw(&self, s: &str) -> String {
-        let did = Did::new(s).unwrap();
+        let did: Did<SmolStr> = Did::new_owned(s).unwrap();
         self.did_web_url(&did).unwrap().to_string()
     }
 
@@ -571,7 +569,7 @@ impl JacquardResolver {
 
 impl JacquardResolver {
     /// Resolve handle to DID via a PDS XRPC call (stateless, unauth by default)
-    pub async fn resolve_handle_via_pds<S: Bos<str> + AsRef<str> + Sync>(
+    pub async fn resolve_handle_via_pds<S: BosStr + Sync>(
         &self,
         handle: &Handle<S>,
     ) -> resolver::Result<Did> {
@@ -602,7 +600,7 @@ impl JacquardResolver {
     }
 
     /// Fetch DID document via PDS resolveDid (returns owned DidDocument)
-    pub async fn fetch_did_doc_via_pds_owned<S: Bos<str> + AsRef<str> + Sync>(
+    pub async fn fetch_did_doc_via_pds_owned<S: BosStr + Sync>(
         &self,
         did: &Did<S>,
     ) -> resolver::Result<DidDocument> {
@@ -628,7 +626,7 @@ impl JacquardResolver {
 
     /// Fetch a minimal DID document via a Slingshot mini-doc endpoint, if your PlcSource uses Slingshot.
     /// Returns the raw response wrapper for borrowed parsing and validation.
-    pub async fn fetch_mini_doc_via_slingshot<S: Bos<str> + AsRef<str> + Sync>(
+    pub async fn fetch_mini_doc_via_slingshot<S: BosStr + Sync>(
         &self,
         did: &Did<S>,
     ) -> resolver::Result<DidDocResponse> {
@@ -676,10 +674,7 @@ impl IdentityResolver for JacquardResolver {
         &self.opts
     }
     #[cfg_attr(feature = "tracing", tracing::instrument(level = "debug", skip(self), fields(handle = %handle)))]
-    async fn resolve_handle<S: Bos<str> + AsRef<str> + Sync>(
-        &self,
-        handle: &Handle<S>,
-    ) -> resolver::Result<Did> {
+    async fn resolve_handle<S: BosStr + Sync>(&self, handle: &Handle<S>) -> resolver::Result<Did> {
         // Try cache first
         #[cfg(feature = "cache")]
         if let Some(caches) = &self.caches {
@@ -829,7 +824,7 @@ impl IdentityResolver for JacquardResolver {
     }
 
     #[cfg_attr(feature = "tracing", tracing::instrument(level = "debug", skip(self), fields(did = %did)))]
-    async fn resolve_did_doc<S: Bos<str> + AsRef<str> + Sync>(
+    async fn resolve_did_doc<S: BosStr + Sync>(
         &self,
         did: &Did<S>,
     ) -> resolver::Result<DidDocResponse> {
@@ -1040,7 +1035,7 @@ pub enum IdentityWarning {
 impl JacquardResolver {
     /// Resolve a handle to its DID, fetch the DID document, and return doc plus any warnings.
     /// This applies the default equality check on the document id (error with doc if mismatch).
-    pub async fn resolve_handle_and_doc<S: Bos<str> + AsRef<str> + Sync>(
+    pub async fn resolve_handle_and_doc<S: BosStr + Sync>(
         &self,
         handle: &Handle<S>,
     ) -> resolver::Result<(Did, DidDocResponse, Vec<IdentityWarning>)> {
@@ -1099,7 +1094,7 @@ impl JacquardResolver {
     }
 
     #[cfg(feature = "cache")]
-    async fn invalidate_handle_chain<S: Bos<str> + AsRef<str> + Sync>(&self, handle: &Handle<S>) {
+    async fn invalidate_handle_chain<S: BosStr + Sync>(&self, handle: &Handle<S>) {
         if let Some(caches) = &self.caches {
             let key = Handle::new_owned(handle.as_str()).expect("already validated handle");
             cache_impl::invalidate(&caches.handle_to_did, &key);
@@ -1107,7 +1102,7 @@ impl JacquardResolver {
     }
 
     #[cfg(feature = "cache")]
-    async fn invalidate_did_chain<S: Bos<str> + AsRef<str> + Sync>(&self, did: &Did<S>) {
+    async fn invalidate_did_chain<S: BosStr + Sync>(&self, did: &Did<S>) {
         if let Some(caches) = &self.caches {
             let did_key = Did::new_owned(did.as_str()).expect("already validated DID");
             // Get doc before evicting to extract handles
@@ -1138,7 +1133,7 @@ impl JacquardResolver {
     }
 
     #[cfg(feature = "cache")]
-    async fn invalidate_lexicon_chain<S: Bos<str> + AsRef<str> + Sync>(
+    async fn invalidate_lexicon_chain<S: BosStr + Sync>(
         &self,
         nsid: &jacquard_common::types::string::Nsid<S>,
     ) {

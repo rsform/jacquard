@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
@@ -18,18 +18,16 @@ use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct DeleteMember<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct DeleteMember<S: BosStr = DefaultStr> {
     pub did: Did<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -91,12 +89,11 @@ pub struct DeleteMemberResponse;
 impl jacquard_common::xrpc::XrpcResp for DeleteMemberResponse {
     const NSID: &'static str = "tools.ozone.team.deleteMember";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ();
+    type Output<S: BosStr> = ();
     type Err = DeleteMemberError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for DeleteMember<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for DeleteMember<S> {
     const NSID: &'static str = "tools.ozone.team.deleteMember";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -111,7 +108,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for DeleteMemberRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = DeleteMember<S>;
+    type Request<S: BosStr> = DeleteMember<S>;
     type Response = DeleteMemberResponse;
 }
 
@@ -134,9 +131,9 @@ pub mod delete_member_state {
         type Did = Unset;
     }
     ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
         type Did = Set<members::did>;
     }
     /// Marker types for field names
@@ -147,67 +144,67 @@ pub mod delete_member_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct DeleteMemberBuilder<'a, S: delete_member_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct DeleteMemberBuilder<S: BosStr, St: delete_member_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Did<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> DeleteMember<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> DeleteMemberBuilder<'a, delete_member_state::Empty> {
+impl<S: BosStr> DeleteMember<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> DeleteMemberBuilder<S, delete_member_state::Empty> {
         DeleteMemberBuilder::new()
     }
 }
 
-impl<'a> DeleteMemberBuilder<'a, delete_member_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> DeleteMemberBuilder<S, delete_member_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         DeleteMemberBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DeleteMemberBuilder<'a, S>
+impl<S: BosStr, St> DeleteMemberBuilder<S, St>
 where
-    S: delete_member_state::State,
-    S::Did: delete_member_state::IsUnset,
+    St: delete_member_state::State,
+    St::Did: delete_member_state::IsUnset,
 {
     /// Set the `did` field (required)
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> DeleteMemberBuilder<'a, delete_member_state::SetDid<S>> {
+    ) -> DeleteMemberBuilder<S, delete_member_state::SetDid<St>> {
         self._fields.0 = Option::Some(value.into());
         DeleteMemberBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> DeleteMemberBuilder<'a, S>
+impl<S: BosStr, St> DeleteMemberBuilder<S, St>
 where
-    S: delete_member_state::State,
-    S::Did: delete_member_state::IsSet,
+    St: delete_member_state::State,
+    St::Did: delete_member_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> DeleteMember<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> DeleteMember<S> {
         DeleteMember {
             did: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> DeleteMember<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> DeleteMember<S> {
         DeleteMember {
             did: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

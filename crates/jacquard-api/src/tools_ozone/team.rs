@@ -16,7 +16,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use crate::app_bsky::actor::ProfileViewDetailed;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Member<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Member<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
     pub did: Did<S>,
@@ -59,7 +59,7 @@ pub struct Member<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum MemberRole<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum MemberRole<S: BosStr = DefaultStr> {
     RoleAdmin,
     RoleModerator,
     RoleTriage,
@@ -67,7 +67,7 @@ pub enum MemberRole<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> MemberRole<S> {
+impl<S: BosStr> MemberRole<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::RoleAdmin => "tools.ozone.team.defs#roleAdmin",
@@ -89,19 +89,19 @@ impl<S: Bos<str> + AsRef<str>> MemberRole<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for MemberRole<S> {
+impl<S: BosStr> core::fmt::Display for MemberRole<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for MemberRole<S> {
+impl<S: BosStr> AsRef<str> for MemberRole<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for MemberRole<S> {
+impl<S: BosStr> Serialize for MemberRole<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -110,8 +110,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for MemberRole<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for MemberRole<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for MemberRole<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -121,14 +120,18 @@ for MemberRole<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for MemberRole<S> {
+impl<S: BosStr + Default> Default for MemberRole<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for MemberRole<S> {
-    type Output = MemberRole<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for MemberRole<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = MemberRole<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             MemberRole::RoleAdmin => MemberRole::RoleAdmin,
@@ -180,7 +183,7 @@ impl core::fmt::Display for RoleVerifier {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Member<S> {
+impl<S: BosStr> LexiconSchema for Member<S> {
     fn nsid() -> &'static str {
         "tools.ozone.team.defs"
     }
@@ -216,17 +219,17 @@ pub mod member_state {
         type Role = Unset;
     }
     ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
         type Did = Set<members::did>;
-        type Role = S::Role;
+        type Role = St::Role;
     }
     ///State transition - sets the `role` field to Set
-    pub struct SetRole<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRole<S> {}
-    impl<S: State> State for SetRole<S> {
-        type Did = S::Did;
+    pub struct SetRole<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRole<St> {}
+    impl<St: State> State for SetRole<St> {
+        type Did = St::Did;
         type Role = Set<members::role>;
     }
     /// Marker types for field names
@@ -239,9 +242,9 @@ pub mod member_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct MemberBuilder<'a, S: member_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct MemberBuilder<S: BosStr, St: member_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
         Option<Did<S>>,
@@ -251,28 +254,28 @@ pub struct MemberBuilder<'a, S: member_state::State> {
         Option<MemberRole<S>>,
         Option<Datetime>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Member<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> MemberBuilder<'a, member_state::Empty> {
+impl<S: BosStr> Member<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> MemberBuilder<S, member_state::Empty> {
         MemberBuilder::new()
     }
 }
 
-impl<'a> MemberBuilder<'a, member_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> MemberBuilder<S, member_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         MemberBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: member_state::State> MemberBuilder<'a, S> {
+impl<S: BosStr, St: member_state::State> MemberBuilder<S, St> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.0 = value.into();
@@ -285,26 +288,26 @@ impl<'a, S: member_state::State> MemberBuilder<'a, S> {
     }
 }
 
-impl<'a, S> MemberBuilder<'a, S>
+impl<S: BosStr, St> MemberBuilder<S, St>
 where
-    S: member_state::State,
-    S::Did: member_state::IsUnset,
+    St: member_state::State,
+    St::Did: member_state::IsUnset,
 {
     /// Set the `did` field (required)
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> MemberBuilder<'a, member_state::SetDid<S>> {
+    ) -> MemberBuilder<S, member_state::SetDid<St>> {
         self._fields.1 = Option::Some(value.into());
         MemberBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: member_state::State> MemberBuilder<'a, S> {
+impl<S: BosStr, St: member_state::State> MemberBuilder<S, St> {
     /// Set the `disabled` field (optional)
     pub fn disabled(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.2 = value.into();
@@ -317,7 +320,7 @@ impl<'a, S: member_state::State> MemberBuilder<'a, S> {
     }
 }
 
-impl<'a, S: member_state::State> MemberBuilder<'a, S> {
+impl<S: BosStr, St: member_state::State> MemberBuilder<S, St> {
     /// Set the `lastUpdatedBy` field (optional)
     pub fn last_updated_by(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -330,7 +333,7 @@ impl<'a, S: member_state::State> MemberBuilder<'a, S> {
     }
 }
 
-impl<'a, S: member_state::State> MemberBuilder<'a, S> {
+impl<S: BosStr, St: member_state::State> MemberBuilder<S, St> {
     /// Set the `profile` field (optional)
     pub fn profile(mut self, value: impl Into<Option<ProfileViewDetailed<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -343,26 +346,26 @@ impl<'a, S: member_state::State> MemberBuilder<'a, S> {
     }
 }
 
-impl<'a, S> MemberBuilder<'a, S>
+impl<S: BosStr, St> MemberBuilder<S, St>
 where
-    S: member_state::State,
-    S::Role: member_state::IsUnset,
+    St: member_state::State,
+    St::Role: member_state::IsUnset,
 {
     /// Set the `role` field (required)
     pub fn role(
         mut self,
         value: impl Into<MemberRole<S>>,
-    ) -> MemberBuilder<'a, member_state::SetRole<S>> {
+    ) -> MemberBuilder<S, member_state::SetRole<St>> {
         self._fields.5 = Option::Some(value.into());
         MemberBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: member_state::State> MemberBuilder<'a, S> {
+impl<S: BosStr, St: member_state::State> MemberBuilder<S, St> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.6 = value.into();
@@ -375,14 +378,14 @@ impl<'a, S: member_state::State> MemberBuilder<'a, S> {
     }
 }
 
-impl<'a, S> MemberBuilder<'a, S>
+impl<S: BosStr, St> MemberBuilder<S, St>
 where
-    S: member_state::State,
-    S::Did: member_state::IsSet,
-    S::Role: member_state::IsSet,
+    St: member_state::State,
+    St::Did: member_state::IsSet,
+    St::Role: member_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Member<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Member<S> {
         Member {
             created_at: self._fields.0,
             did: self._fields.1.unwrap(),
@@ -394,8 +397,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Member<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Member<S> {
         Member {
             created_at: self._fields.0,
             did: self._fields.1.unwrap(),

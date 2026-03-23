@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "tech.lenooby09.didgit.ref",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Ref<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Ref<S: BosStr = DefaultStr> {
     ///The hex SHA-256 object ID this ref points to.
     pub object_id: S,
     ///The full ref name, e.g. refs/heads/main.
@@ -56,18 +56,18 @@ pub struct Ref<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct RefGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct RefGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Ref<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Ref<S> {
+impl<S: BosStr> Ref<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, RefRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -80,17 +80,17 @@ pub struct RefRecord;
 impl XrpcResp for RefRecord {
     const NSID: &'static str = "tech.lenooby09.didgit.ref";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = RefGetRecordOutput<S>;
+    type Output<S: BosStr> = RefGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<RefGetRecordOutput<S>> for Ref<S> {
+impl<S: BosStr> From<RefGetRecordOutput<S>> for Ref<S> {
     fn from(output: RefGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Ref<S> {
+impl<S: BosStr> Collection for Ref<S> {
     const NSID: &'static str = "tech.lenooby09.didgit.ref";
     type Record = RefRecord;
 }
@@ -100,7 +100,7 @@ impl Collection for RefRecord {
     type Record = RefRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Ref<S> {
+impl<S: BosStr> LexiconSchema for Ref<S> {
     fn nsid() -> &'static str {
         "tech.lenooby09.didgit.ref"
     }
@@ -158,142 +158,142 @@ pub mod ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type RefName;
         type ObjectId;
         type Repo;
-        type RefName;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type RefName = Unset;
         type ObjectId = Unset;
         type Repo = Unset;
-        type RefName = Unset;
-    }
-    ///State transition - sets the `object_id` field to Set
-    pub struct SetObjectId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetObjectId<S> {}
-    impl<S: State> State for SetObjectId<S> {
-        type ObjectId = Set<members::object_id>;
-        type Repo = S::Repo;
-        type RefName = S::RefName;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRepo<S> {}
-    impl<S: State> State for SetRepo<S> {
-        type ObjectId = S::ObjectId;
-        type Repo = Set<members::repo>;
-        type RefName = S::RefName;
     }
     ///State transition - sets the `ref_name` field to Set
-    pub struct SetRefName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRefName<S> {}
-    impl<S: State> State for SetRefName<S> {
-        type ObjectId = S::ObjectId;
-        type Repo = S::Repo;
+    pub struct SetRefName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRefName<St> {}
+    impl<St: State> State for SetRefName<St> {
         type RefName = Set<members::ref_name>;
+        type ObjectId = St::ObjectId;
+        type Repo = St::Repo;
+    }
+    ///State transition - sets the `object_id` field to Set
+    pub struct SetObjectId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetObjectId<St> {}
+    impl<St: State> State for SetObjectId<St> {
+        type RefName = St::RefName;
+        type ObjectId = Set<members::object_id>;
+        type Repo = St::Repo;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRepo<St> {}
+    impl<St: State> State for SetRepo<St> {
+        type RefName = St::RefName;
+        type ObjectId = St::ObjectId;
+        type Repo = Set<members::repo>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `ref_name` field
+        pub struct ref_name(());
         ///Marker type for the `object_id` field
         pub struct object_id(());
         ///Marker type for the `repo` field
         pub struct repo(());
-        ///Marker type for the `ref_name` field
-        pub struct ref_name(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct RefBuilder<'a, S: ref_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct RefBuilder<S: BosStr, St: ref_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Ref<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> RefBuilder<'a, ref_state::Empty> {
+impl<S: BosStr> Ref<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> RefBuilder<S, ref_state::Empty> {
         RefBuilder::new()
     }
 }
 
-impl<'a> RefBuilder<'a, ref_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> RefBuilder<S, ref_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         RefBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RefBuilder<'a, S>
+impl<S: BosStr, St> RefBuilder<S, St>
 where
-    S: ref_state::State,
-    S::ObjectId: ref_state::IsUnset,
+    St: ref_state::State,
+    St::ObjectId: ref_state::IsUnset,
 {
     /// Set the `objectId` field (required)
     pub fn object_id(
         mut self,
         value: impl Into<S>,
-    ) -> RefBuilder<'a, ref_state::SetObjectId<S>> {
+    ) -> RefBuilder<S, ref_state::SetObjectId<St>> {
         self._fields.0 = Option::Some(value.into());
         RefBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RefBuilder<'a, S>
+impl<S: BosStr, St> RefBuilder<S, St>
 where
-    S: ref_state::State,
-    S::RefName: ref_state::IsUnset,
+    St: ref_state::State,
+    St::RefName: ref_state::IsUnset,
 {
     /// Set the `refName` field (required)
     pub fn ref_name(
         mut self,
         value: impl Into<S>,
-    ) -> RefBuilder<'a, ref_state::SetRefName<S>> {
+    ) -> RefBuilder<S, ref_state::SetRefName<St>> {
         self._fields.1 = Option::Some(value.into());
         RefBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RefBuilder<'a, S>
+impl<S: BosStr, St> RefBuilder<S, St>
 where
-    S: ref_state::State,
-    S::Repo: ref_state::IsUnset,
+    St: ref_state::State,
+    St::Repo: ref_state::IsUnset,
 {
     /// Set the `repo` field (required)
-    pub fn repo(mut self, value: impl Into<S>) -> RefBuilder<'a, ref_state::SetRepo<S>> {
+    pub fn repo(mut self, value: impl Into<S>) -> RefBuilder<S, ref_state::SetRepo<St>> {
         self._fields.2 = Option::Some(value.into());
         RefBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RefBuilder<'a, S>
+impl<S: BosStr, St> RefBuilder<S, St>
 where
-    S: ref_state::State,
-    S::ObjectId: ref_state::IsSet,
-    S::Repo: ref_state::IsSet,
-    S::RefName: ref_state::IsSet,
+    St: ref_state::State,
+    St::RefName: ref_state::IsSet,
+    St::ObjectId: ref_state::IsSet,
+    St::Repo: ref_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Ref<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Ref<S> {
         Ref {
             object_id: self._fields.0.unwrap(),
             ref_name: self._fields.1.unwrap(),
@@ -301,8 +301,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Ref<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Ref<S> {
         Ref {
             object_id: self._fields.0.unwrap(),
             ref_name: self._fields.1.unwrap(),

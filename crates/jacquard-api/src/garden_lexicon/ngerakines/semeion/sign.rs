@@ -6,8 +6,14 @@
 // Any manual changes will be overwritten on the next regeneration.
 
 #[allow(unused_imports)]
+use alloc::collections::BTreeMap;
+
+#[allow(unused_imports)]
 use core::marker::PhantomData;
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::bytes::Bytes;
+use jacquard_common::deps::smol_str::SmolStr;
+use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
@@ -29,9 +35,9 @@ pub struct SignResponse;
 impl jacquard_common::xrpc::XrpcResp for SignResponse {
     const NSID: &'static str = "garden.lexicon.ngerakines.semeion.Sign";
     const ENCODING: &'static str = "application/octet-stream";
-    type Output<S: jacquard_common::Bos<str> + AsRef<str>> = SignOutput;
+    type Output<S: BosStr> = SignOutput;
     type Err = jacquard_common::xrpc::GenericError;
-    fn encode_output<S: jacquard_common::Bos<str> + AsRef<str>>(
+    fn encode_output<S: BosStr>(
         output: &Self::Output<S>,
     ) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError>
     where
@@ -43,7 +49,7 @@ impl jacquard_common::xrpc::XrpcResp for SignResponse {
         body: &'de [u8],
     ) -> Result<Self::Output<S>, jacquard_common::error::DecodeError>
     where
-        S: jacquard_common::Bos<str> + AsRef<str> + Deserialize<'de>,
+        S: BosStr + Deserialize<'de>,
         Self::Output<S>: Deserialize<'de>,
     {
         Ok(SignOutput {
@@ -58,20 +64,24 @@ impl jacquard_common::xrpc::XrpcRequest for Sign {
         "*/*",
     );
     type Response = SignResponse;
-    fn encode_body(&self) -> Result<Vec<u8>, jacquard_common::xrpc::EncodeError> {
-        Ok(self.body.to_vec())
+    fn encode_body(
+        &self,
+        buffer: &mut [u8],
+    ) -> Result<(), jacquard_common::xrpc::EncodeError>
+    where
+        Self: Serialize,
+    {
+        Ok(buffer.copy_from_slice(self.body.as_ref()))
     }
     fn decode_body<'de>(
         body: &'de [u8],
-    ) -> Result<Box<Self>, jacquard_common::error::DecodeError>
+    ) -> Result<Self, jacquard_common::error::DecodeError>
     where
         Self: Deserialize<'de>,
     {
-        Ok(
-            Box::new(Self {
-                body: jacquard_common::deps::bytes::Bytes::copy_from_slice(body),
-            }),
-        )
+        Ok(Self {
+            body: jacquard_common::deps::bytes::Bytes::copy_from_slice(body),
+        })
     }
 }
 
@@ -82,6 +92,6 @@ impl jacquard_common::xrpc::XrpcEndpoint for SignRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "*/*",
     );
-    type Request<S: jacquard_common::Bos<str> + AsRef<str>> = Sign;
+    type Request<S: BosStr> = Sign;
     type Response = SignResponse;
 }

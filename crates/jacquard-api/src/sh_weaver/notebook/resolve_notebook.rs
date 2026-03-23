@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::ident::AtIdentifier;
 use jacquard_common::types::value::Data;
@@ -20,44 +20,39 @@ use crate::sh_weaver::notebook::BookEntryView;
 use crate::sh_weaver::notebook::NotebookView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ResolveNotebook<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct ResolveNotebook<S: BosStr = DefaultStr> {
     pub actor: AtIdentifier<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub entry_cursor: Option<S>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_entry_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub entry_limit: Option<i64>,
-    #[serde(borrow)]
     pub name: S,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ResolveNotebookOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ResolveNotebookOutput<S: BosStr = DefaultStr> {
     pub entries: Vec<BookEntryView<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub entry_cursor: Option<S>,
     pub notebook: NotebookView<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -108,12 +103,11 @@ pub struct ResolveNotebookResponse;
 impl jacquard_common::xrpc::XrpcResp for ResolveNotebookResponse {
     const NSID: &'static str = "sh.weaver.notebook.resolveNotebook";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ResolveNotebookOutput<S>;
+    type Output<S: BosStr> = ResolveNotebookOutput<S>;
     type Err = ResolveNotebookError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for ResolveNotebook<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ResolveNotebook<S> {
     const NSID: &'static str = "sh.weaver.notebook.resolveNotebook";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ResolveNotebookResponse;
@@ -124,7 +118,7 @@ pub struct ResolveNotebookRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ResolveNotebookRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.notebook.resolveNotebook";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = ResolveNotebook<S>;
+    type Request<S: BosStr> = ResolveNotebook<S>;
     type Response = ResolveNotebookResponse;
 }
 
@@ -153,17 +147,17 @@ pub mod resolve_notebook_state {
         type Actor = Unset;
     }
     ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
         type Name = Set<members::name>;
-        type Actor = S::Actor;
+        type Actor = St::Actor;
     }
     ///State transition - sets the `actor` field to Set
-    pub struct SetActor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetActor<S> {}
-    impl<S: State> State for SetActor<S> {
-        type Name = S::Name;
+    pub struct SetActor<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetActor<St> {}
+    impl<St: State> State for SetActor<St> {
+        type Name = St::Name;
         type Actor = Set<members::actor>;
     }
     /// Marker types for field names
@@ -176,51 +170,51 @@ pub mod resolve_notebook_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ResolveNotebookBuilder<'a, S: resolve_notebook_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ResolveNotebookBuilder<S: BosStr, St: resolve_notebook_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtIdentifier<S>>, Option<S>, Option<i64>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ResolveNotebook<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ResolveNotebookBuilder<'a, resolve_notebook_state::Empty> {
+impl<S: BosStr> ResolveNotebook<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ResolveNotebookBuilder<S, resolve_notebook_state::Empty> {
         ResolveNotebookBuilder::new()
     }
 }
 
-impl<'a> ResolveNotebookBuilder<'a, resolve_notebook_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ResolveNotebookBuilder<S, resolve_notebook_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ResolveNotebookBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ResolveNotebookBuilder<'a, S>
+impl<S: BosStr, St> ResolveNotebookBuilder<S, St>
 where
-    S: resolve_notebook_state::State,
-    S::Actor: resolve_notebook_state::IsUnset,
+    St: resolve_notebook_state::State,
+    St::Actor: resolve_notebook_state::IsUnset,
 {
     /// Set the `actor` field (required)
     pub fn actor(
         mut self,
         value: impl Into<AtIdentifier<S>>,
-    ) -> ResolveNotebookBuilder<'a, resolve_notebook_state::SetActor<S>> {
+    ) -> ResolveNotebookBuilder<S, resolve_notebook_state::SetActor<St>> {
         self._fields.0 = Option::Some(value.into());
         ResolveNotebookBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: resolve_notebook_state::State> ResolveNotebookBuilder<'a, S> {
+impl<S: BosStr, St: resolve_notebook_state::State> ResolveNotebookBuilder<S, St> {
     /// Set the `entryCursor` field (optional)
     pub fn entry_cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -233,7 +227,7 @@ impl<'a, S: resolve_notebook_state::State> ResolveNotebookBuilder<'a, S> {
     }
 }
 
-impl<'a, S: resolve_notebook_state::State> ResolveNotebookBuilder<'a, S> {
+impl<S: BosStr, St: resolve_notebook_state::State> ResolveNotebookBuilder<S, St> {
     /// Set the `entryLimit` field (optional)
     pub fn entry_limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -246,33 +240,33 @@ impl<'a, S: resolve_notebook_state::State> ResolveNotebookBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ResolveNotebookBuilder<'a, S>
+impl<S: BosStr, St> ResolveNotebookBuilder<S, St>
 where
-    S: resolve_notebook_state::State,
-    S::Name: resolve_notebook_state::IsUnset,
+    St: resolve_notebook_state::State,
+    St::Name: resolve_notebook_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> ResolveNotebookBuilder<'a, resolve_notebook_state::SetName<S>> {
+    ) -> ResolveNotebookBuilder<S, resolve_notebook_state::SetName<St>> {
         self._fields.3 = Option::Some(value.into());
         ResolveNotebookBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ResolveNotebookBuilder<'a, S>
+impl<S: BosStr, St> ResolveNotebookBuilder<S, St>
 where
-    S: resolve_notebook_state::State,
-    S::Name: resolve_notebook_state::IsSet,
-    S::Actor: resolve_notebook_state::IsSet,
+    St: resolve_notebook_state::State,
+    St::Name: resolve_notebook_state::IsSet,
+    St::Actor: resolve_notebook_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ResolveNotebook<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ResolveNotebook<S> {
         ResolveNotebook {
             actor: self._fields.0.unwrap(),
             entry_cursor: self._fields.1,

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -33,11 +33,11 @@ use crate::download_darkworld::state;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Favorite<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Favorite<S: BosStr = DefaultStr> {
     pub album: Vec<S>,
     pub artist: Vec<S>,
     pub deltarune_character: Vec<S>,
@@ -54,11 +54,11 @@ pub struct Favorite<S: Bos<str> + AsRef<str> = DefaultStr> {
     rename = "download.darkworld.state",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct State<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct State<S: BosStr = DefaultStr> {
     ///The user's favorites/likes/preferences.
     pub favorite: state::Favorite<S>,
     ///Describe the site's content/look.
@@ -73,11 +73,11 @@ pub struct State<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct StateGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct StateGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
@@ -89,11 +89,11 @@ pub struct StateGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Site<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Site<S: BosStr = DefaultStr> {
     ///Swap out Kris with Susie in the prophecy panel.
     pub susie_prophecy: bool,
     ///TBD
@@ -106,7 +106,7 @@ pub struct Site<S: Bos<str> + AsRef<str> = DefaultStr> {
 /// TBD
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum SiteTitleColors<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum SiteTitleColors<S: BosStr = DefaultStr> {
     Enby,
     Trans,
     Pan,
@@ -114,7 +114,7 @@ pub enum SiteTitleColors<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> SiteTitleColors<S> {
+impl<S: BosStr> SiteTitleColors<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Enby => "enby",
@@ -136,19 +136,19 @@ impl<S: Bos<str> + AsRef<str>> SiteTitleColors<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for SiteTitleColors<S> {
+impl<S: BosStr> core::fmt::Display for SiteTitleColors<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for SiteTitleColors<S> {
+impl<S: BosStr> AsRef<str> for SiteTitleColors<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for SiteTitleColors<S> {
+impl<S: BosStr> Serialize for SiteTitleColors<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -157,8 +157,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for SiteTitleColors<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for SiteTitleColors<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for SiteTitleColors<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -168,14 +167,18 @@ for SiteTitleColors<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for SiteTitleColors<S> {
+impl<S: BosStr + Default> Default for SiteTitleColors<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for SiteTitleColors<S> {
-    type Output = SiteTitleColors<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for SiteTitleColors<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = SiteTitleColors<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             SiteTitleColors::Enby => SiteTitleColors::Enby,
@@ -187,13 +190,13 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for SiteTitleColors<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> State<S> {
+impl<S: BosStr> State<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, StateRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Favorite<S> {
+impl<S: BosStr> LexiconSchema for Favorite<S> {
     fn nsid() -> &'static str {
         "download.darkworld.state"
     }
@@ -215,17 +218,17 @@ pub struct StateRecord;
 impl XrpcResp for StateRecord {
     const NSID: &'static str = "download.darkworld.state";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = StateGetRecordOutput<S>;
+    type Output<S: BosStr> = StateGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<StateGetRecordOutput<S>> for State<S> {
+impl<S: BosStr> From<StateGetRecordOutput<S>> for State<S> {
     fn from(output: StateGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for State<S> {
+impl<S: BosStr> Collection for State<S> {
     const NSID: &'static str = "download.darkworld.state";
     type Record = StateRecord;
 }
@@ -235,7 +238,7 @@ impl Collection for StateRecord {
     type Record = StateRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for State<S> {
+impl<S: BosStr> LexiconSchema for State<S> {
     fn nsid() -> &'static str {
         "download.darkworld.state"
     }
@@ -250,7 +253,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for State<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Site<S> {
+impl<S: BosStr> LexiconSchema for Site<S> {
     fn nsid() -> &'static str {
         "download.darkworld.state"
     }
@@ -275,181 +278,181 @@ pub mod favorite_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Artist;
-        type Game;
         type Album;
         type DeltaruneCharacter;
+        type Artist;
+        type Game;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Artist = Unset;
-        type Game = Unset;
         type Album = Unset;
         type DeltaruneCharacter = Unset;
-    }
-    ///State transition - sets the `artist` field to Set
-    pub struct SetArtist<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetArtist<S> {}
-    impl<S: State> State for SetArtist<S> {
-        type Artist = Set<members::artist>;
-        type Game = S::Game;
-        type Album = S::Album;
-        type DeltaruneCharacter = S::DeltaruneCharacter;
-    }
-    ///State transition - sets the `game` field to Set
-    pub struct SetGame<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetGame<S> {}
-    impl<S: State> State for SetGame<S> {
-        type Artist = S::Artist;
-        type Game = Set<members::game>;
-        type Album = S::Album;
-        type DeltaruneCharacter = S::DeltaruneCharacter;
+        type Artist = Unset;
+        type Game = Unset;
     }
     ///State transition - sets the `album` field to Set
-    pub struct SetAlbum<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAlbum<S> {}
-    impl<S: State> State for SetAlbum<S> {
-        type Artist = S::Artist;
-        type Game = S::Game;
+    pub struct SetAlbum<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAlbum<St> {}
+    impl<St: State> State for SetAlbum<St> {
         type Album = Set<members::album>;
-        type DeltaruneCharacter = S::DeltaruneCharacter;
+        type DeltaruneCharacter = St::DeltaruneCharacter;
+        type Artist = St::Artist;
+        type Game = St::Game;
     }
     ///State transition - sets the `deltarune_character` field to Set
-    pub struct SetDeltaruneCharacter<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDeltaruneCharacter<S> {}
-    impl<S: State> State for SetDeltaruneCharacter<S> {
-        type Artist = S::Artist;
-        type Game = S::Game;
-        type Album = S::Album;
+    pub struct SetDeltaruneCharacter<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDeltaruneCharacter<St> {}
+    impl<St: State> State for SetDeltaruneCharacter<St> {
+        type Album = St::Album;
         type DeltaruneCharacter = Set<members::deltarune_character>;
+        type Artist = St::Artist;
+        type Game = St::Game;
+    }
+    ///State transition - sets the `artist` field to Set
+    pub struct SetArtist<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetArtist<St> {}
+    impl<St: State> State for SetArtist<St> {
+        type Album = St::Album;
+        type DeltaruneCharacter = St::DeltaruneCharacter;
+        type Artist = Set<members::artist>;
+        type Game = St::Game;
+    }
+    ///State transition - sets the `game` field to Set
+    pub struct SetGame<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetGame<St> {}
+    impl<St: State> State for SetGame<St> {
+        type Album = St::Album;
+        type DeltaruneCharacter = St::DeltaruneCharacter;
+        type Artist = St::Artist;
+        type Game = Set<members::game>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `artist` field
-        pub struct artist(());
-        ///Marker type for the `game` field
-        pub struct game(());
         ///Marker type for the `album` field
         pub struct album(());
         ///Marker type for the `deltarune_character` field
         pub struct deltarune_character(());
+        ///Marker type for the `artist` field
+        pub struct artist(());
+        ///Marker type for the `game` field
+        pub struct game(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct FavoriteBuilder<'a, S: favorite_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct FavoriteBuilder<S: BosStr, St: favorite_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<S>>, Option<Vec<S>>, Option<Vec<S>>, Option<Vec<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Favorite<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> FavoriteBuilder<'a, favorite_state::Empty> {
+impl<S: BosStr> Favorite<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> FavoriteBuilder<S, favorite_state::Empty> {
         FavoriteBuilder::new()
     }
 }
 
-impl<'a> FavoriteBuilder<'a, favorite_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> FavoriteBuilder<S, favorite_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         FavoriteBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> FavoriteBuilder<'a, S>
+impl<S: BosStr, St> FavoriteBuilder<S, St>
 where
-    S: favorite_state::State,
-    S::Album: favorite_state::IsUnset,
+    St: favorite_state::State,
+    St::Album: favorite_state::IsUnset,
 {
     /// Set the `album` field (required)
     pub fn album(
         mut self,
         value: impl Into<Vec<S>>,
-    ) -> FavoriteBuilder<'a, favorite_state::SetAlbum<S>> {
+    ) -> FavoriteBuilder<S, favorite_state::SetAlbum<St>> {
         self._fields.0 = Option::Some(value.into());
         FavoriteBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> FavoriteBuilder<'a, S>
+impl<S: BosStr, St> FavoriteBuilder<S, St>
 where
-    S: favorite_state::State,
-    S::Artist: favorite_state::IsUnset,
+    St: favorite_state::State,
+    St::Artist: favorite_state::IsUnset,
 {
     /// Set the `artist` field (required)
     pub fn artist(
         mut self,
         value: impl Into<Vec<S>>,
-    ) -> FavoriteBuilder<'a, favorite_state::SetArtist<S>> {
+    ) -> FavoriteBuilder<S, favorite_state::SetArtist<St>> {
         self._fields.1 = Option::Some(value.into());
         FavoriteBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> FavoriteBuilder<'a, S>
+impl<S: BosStr, St> FavoriteBuilder<S, St>
 where
-    S: favorite_state::State,
-    S::DeltaruneCharacter: favorite_state::IsUnset,
+    St: favorite_state::State,
+    St::DeltaruneCharacter: favorite_state::IsUnset,
 {
     /// Set the `deltaruneCharacter` field (required)
     pub fn deltarune_character(
         mut self,
         value: impl Into<Vec<S>>,
-    ) -> FavoriteBuilder<'a, favorite_state::SetDeltaruneCharacter<S>> {
+    ) -> FavoriteBuilder<S, favorite_state::SetDeltaruneCharacter<St>> {
         self._fields.2 = Option::Some(value.into());
         FavoriteBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> FavoriteBuilder<'a, S>
+impl<S: BosStr, St> FavoriteBuilder<S, St>
 where
-    S: favorite_state::State,
-    S::Game: favorite_state::IsUnset,
+    St: favorite_state::State,
+    St::Game: favorite_state::IsUnset,
 {
     /// Set the `game` field (required)
     pub fn game(
         mut self,
         value: impl Into<Vec<S>>,
-    ) -> FavoriteBuilder<'a, favorite_state::SetGame<S>> {
+    ) -> FavoriteBuilder<S, favorite_state::SetGame<St>> {
         self._fields.3 = Option::Some(value.into());
         FavoriteBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> FavoriteBuilder<'a, S>
+impl<S: BosStr, St> FavoriteBuilder<S, St>
 where
-    S: favorite_state::State,
-    S::Artist: favorite_state::IsSet,
-    S::Game: favorite_state::IsSet,
-    S::Album: favorite_state::IsSet,
-    S::DeltaruneCharacter: favorite_state::IsSet,
+    St: favorite_state::State,
+    St::Album: favorite_state::IsSet,
+    St::DeltaruneCharacter: favorite_state::IsSet,
+    St::Artist: favorite_state::IsSet,
+    St::Game: favorite_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Favorite<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Favorite<S> {
         Favorite {
             album: self._fields.0.unwrap(),
             artist: self._fields.1.unwrap(),
@@ -458,11 +461,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Favorite<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Favorite<S> {
         Favorite {
             album: self._fields.0.unwrap(),
             artist: self._fields.1.unwrap(),
@@ -627,119 +627,119 @@ pub mod state_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Site;
         type Favorite;
+        type Site;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Site = Unset;
         type Favorite = Unset;
-    }
-    ///State transition - sets the `site` field to Set
-    pub struct SetSite<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSite<S> {}
-    impl<S: State> State for SetSite<S> {
-        type Site = Set<members::site>;
-        type Favorite = S::Favorite;
+        type Site = Unset;
     }
     ///State transition - sets the `favorite` field to Set
-    pub struct SetFavorite<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetFavorite<S> {}
-    impl<S: State> State for SetFavorite<S> {
-        type Site = S::Site;
+    pub struct SetFavorite<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetFavorite<St> {}
+    impl<St: State> State for SetFavorite<St> {
         type Favorite = Set<members::favorite>;
+        type Site = St::Site;
+    }
+    ///State transition - sets the `site` field to Set
+    pub struct SetSite<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSite<St> {}
+    impl<St: State> State for SetSite<St> {
+        type Favorite = St::Favorite;
+        type Site = Set<members::site>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `site` field
-        pub struct site(());
         ///Marker type for the `favorite` field
         pub struct favorite(());
+        ///Marker type for the `site` field
+        pub struct site(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct StateBuilder<'a, S: state_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct StateBuilder<S: BosStr, St: state_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<state::Favorite<S>>, Option<state::Site<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> State<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> StateBuilder<'a, state_state::Empty> {
+impl<S: BosStr> State<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> StateBuilder<S, state_state::Empty> {
         StateBuilder::new()
     }
 }
 
-impl<'a> StateBuilder<'a, state_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> StateBuilder<S, state_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         StateBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> StateBuilder<'a, S>
+impl<S: BosStr, St> StateBuilder<S, St>
 where
-    S: state_state::State,
-    S::Favorite: state_state::IsUnset,
+    St: state_state::State,
+    St::Favorite: state_state::IsUnset,
 {
     /// Set the `favorite` field (required)
     pub fn favorite(
         mut self,
         value: impl Into<state::Favorite<S>>,
-    ) -> StateBuilder<'a, state_state::SetFavorite<S>> {
+    ) -> StateBuilder<S, state_state::SetFavorite<St>> {
         self._fields.0 = Option::Some(value.into());
         StateBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> StateBuilder<'a, S>
+impl<S: BosStr, St> StateBuilder<S, St>
 where
-    S: state_state::State,
-    S::Site: state_state::IsUnset,
+    St: state_state::State,
+    St::Site: state_state::IsUnset,
 {
     /// Set the `site` field (required)
     pub fn site(
         mut self,
         value: impl Into<state::Site<S>>,
-    ) -> StateBuilder<'a, state_state::SetSite<S>> {
+    ) -> StateBuilder<S, state_state::SetSite<St>> {
         self._fields.1 = Option::Some(value.into());
         StateBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> StateBuilder<'a, S>
+impl<S: BosStr, St> StateBuilder<S, St>
 where
-    S: state_state::State,
-    S::Site: state_state::IsSet,
-    S::Favorite: state_state::IsSet,
+    St: state_state::State,
+    St::Favorite: state_state::IsSet,
+    St::Site: state_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> State<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> State<S> {
         State {
             favorite: self._fields.0.unwrap(),
             site: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> State<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> State<S> {
         State {
             favorite: self._fields.0.unwrap(),
             site: self._fields.1.unwrap(),
@@ -767,9 +767,9 @@ pub mod site_state {
         type SusieProphecy = Unset;
     }
     ///State transition - sets the `susie_prophecy` field to Set
-    pub struct SetSusieProphecy<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSusieProphecy<S> {}
-    impl<S: State> State for SetSusieProphecy<S> {
+    pub struct SetSusieProphecy<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSusieProphecy<St> {}
+    impl<St: State> State for SetSusieProphecy<St> {
         type SusieProphecy = Set<members::susie_prophecy>;
     }
     /// Marker types for field names
@@ -780,51 +780,51 @@ pub mod site_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct SiteBuilder<'a, S: site_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct SiteBuilder<S: BosStr, St: site_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<bool>, Option<SiteTitleColors<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Site<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> SiteBuilder<'a, site_state::Empty> {
+impl<S: BosStr> Site<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> SiteBuilder<S, site_state::Empty> {
         SiteBuilder::new()
     }
 }
 
-impl<'a> SiteBuilder<'a, site_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> SiteBuilder<S, site_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SiteBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SiteBuilder<'a, S>
+impl<S: BosStr, St> SiteBuilder<S, St>
 where
-    S: site_state::State,
-    S::SusieProphecy: site_state::IsUnset,
+    St: site_state::State,
+    St::SusieProphecy: site_state::IsUnset,
 {
     /// Set the `susieProphecy` field (required)
     pub fn susie_prophecy(
         mut self,
         value: impl Into<bool>,
-    ) -> SiteBuilder<'a, site_state::SetSusieProphecy<S>> {
+    ) -> SiteBuilder<S, site_state::SetSusieProphecy<St>> {
         self._fields.0 = Option::Some(value.into());
         SiteBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: site_state::State> SiteBuilder<'a, S> {
+impl<S: BosStr, St: site_state::State> SiteBuilder<S, St> {
     /// Set the `titleColors` field (optional)
     pub fn title_colors(mut self, value: impl Into<Option<SiteTitleColors<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -837,21 +837,21 @@ impl<'a, S: site_state::State> SiteBuilder<'a, S> {
     }
 }
 
-impl<'a, S> SiteBuilder<'a, S>
+impl<S: BosStr, St> SiteBuilder<S, St>
 where
-    S: site_state::State,
-    S::SusieProphecy: site_state::IsSet,
+    St: site_state::State,
+    St::SusieProphecy: site_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Site<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Site<S> {
         Site {
             susie_prophecy: self._fields.0.unwrap(),
             title_colors: self._fields.1,
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Site<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Site<S> {
         Site {
             susie_prophecy: self._fields.0.unwrap(),
             title_colors: self._fields.1,

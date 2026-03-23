@@ -20,7 +20,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -39,11 +39,11 @@ use serde::{Serialize, Deserialize};
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct AuthCallback<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct AuthCallback<S: BosStr = DefaultStr> {
     pub access_jwt: S,
     pub did: Did<S>,
     pub handle: S,
@@ -52,7 +52,7 @@ pub struct AuthCallback<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for AuthCallback<S> {
+impl<S: BosStr> LexiconSchema for AuthCallback<S> {
     fn nsid() -> &'static str {
         "app.ocho.auth.defs"
     }
@@ -77,181 +77,181 @@ pub mod auth_callback_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Handle;
         type Did;
         type RefreshJwt;
         type AccessJwt;
+        type Handle;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Handle = Unset;
         type Did = Unset;
         type RefreshJwt = Unset;
         type AccessJwt = Unset;
-    }
-    ///State transition - sets the `handle` field to Set
-    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHandle<S> {}
-    impl<S: State> State for SetHandle<S> {
-        type Handle = Set<members::handle>;
-        type Did = S::Did;
-        type RefreshJwt = S::RefreshJwt;
-        type AccessJwt = S::AccessJwt;
+        type Handle = Unset;
     }
     ///State transition - sets the `did` field to Set
-    pub struct SetDid<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDid<S> {}
-    impl<S: State> State for SetDid<S> {
-        type Handle = S::Handle;
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
         type Did = Set<members::did>;
-        type RefreshJwt = S::RefreshJwt;
-        type AccessJwt = S::AccessJwt;
+        type RefreshJwt = St::RefreshJwt;
+        type AccessJwt = St::AccessJwt;
+        type Handle = St::Handle;
     }
     ///State transition - sets the `refresh_jwt` field to Set
-    pub struct SetRefreshJwt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRefreshJwt<S> {}
-    impl<S: State> State for SetRefreshJwt<S> {
-        type Handle = S::Handle;
-        type Did = S::Did;
+    pub struct SetRefreshJwt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRefreshJwt<St> {}
+    impl<St: State> State for SetRefreshJwt<St> {
+        type Did = St::Did;
         type RefreshJwt = Set<members::refresh_jwt>;
-        type AccessJwt = S::AccessJwt;
+        type AccessJwt = St::AccessJwt;
+        type Handle = St::Handle;
     }
     ///State transition - sets the `access_jwt` field to Set
-    pub struct SetAccessJwt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAccessJwt<S> {}
-    impl<S: State> State for SetAccessJwt<S> {
-        type Handle = S::Handle;
-        type Did = S::Did;
-        type RefreshJwt = S::RefreshJwt;
+    pub struct SetAccessJwt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAccessJwt<St> {}
+    impl<St: State> State for SetAccessJwt<St> {
+        type Did = St::Did;
+        type RefreshJwt = St::RefreshJwt;
         type AccessJwt = Set<members::access_jwt>;
+        type Handle = St::Handle;
+    }
+    ///State transition - sets the `handle` field to Set
+    pub struct SetHandle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHandle<St> {}
+    impl<St: State> State for SetHandle<St> {
+        type Did = St::Did;
+        type RefreshJwt = St::RefreshJwt;
+        type AccessJwt = St::AccessJwt;
+        type Handle = Set<members::handle>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `handle` field
-        pub struct handle(());
         ///Marker type for the `did` field
         pub struct did(());
         ///Marker type for the `refresh_jwt` field
         pub struct refresh_jwt(());
         ///Marker type for the `access_jwt` field
         pub struct access_jwt(());
+        ///Marker type for the `handle` field
+        pub struct handle(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct AuthCallbackBuilder<'a, S: auth_callback_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct AuthCallbackBuilder<S: BosStr, St: auth_callback_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<Did<S>>, Option<S>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> AuthCallback<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> AuthCallbackBuilder<'a, auth_callback_state::Empty> {
+impl<S: BosStr> AuthCallback<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> AuthCallbackBuilder<S, auth_callback_state::Empty> {
         AuthCallbackBuilder::new()
     }
 }
 
-impl<'a> AuthCallbackBuilder<'a, auth_callback_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> AuthCallbackBuilder<S, auth_callback_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         AuthCallbackBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AuthCallbackBuilder<'a, S>
+impl<S: BosStr, St> AuthCallbackBuilder<S, St>
 where
-    S: auth_callback_state::State,
-    S::AccessJwt: auth_callback_state::IsUnset,
+    St: auth_callback_state::State,
+    St::AccessJwt: auth_callback_state::IsUnset,
 {
     /// Set the `accessJwt` field (required)
     pub fn access_jwt(
         mut self,
         value: impl Into<S>,
-    ) -> AuthCallbackBuilder<'a, auth_callback_state::SetAccessJwt<S>> {
+    ) -> AuthCallbackBuilder<S, auth_callback_state::SetAccessJwt<St>> {
         self._fields.0 = Option::Some(value.into());
         AuthCallbackBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AuthCallbackBuilder<'a, S>
+impl<S: BosStr, St> AuthCallbackBuilder<S, St>
 where
-    S: auth_callback_state::State,
-    S::Did: auth_callback_state::IsUnset,
+    St: auth_callback_state::State,
+    St::Did: auth_callback_state::IsUnset,
 {
     /// Set the `did` field (required)
     pub fn did(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> AuthCallbackBuilder<'a, auth_callback_state::SetDid<S>> {
+    ) -> AuthCallbackBuilder<S, auth_callback_state::SetDid<St>> {
         self._fields.1 = Option::Some(value.into());
         AuthCallbackBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AuthCallbackBuilder<'a, S>
+impl<S: BosStr, St> AuthCallbackBuilder<S, St>
 where
-    S: auth_callback_state::State,
-    S::Handle: auth_callback_state::IsUnset,
+    St: auth_callback_state::State,
+    St::Handle: auth_callback_state::IsUnset,
 {
     /// Set the `handle` field (required)
     pub fn handle(
         mut self,
         value: impl Into<S>,
-    ) -> AuthCallbackBuilder<'a, auth_callback_state::SetHandle<S>> {
+    ) -> AuthCallbackBuilder<S, auth_callback_state::SetHandle<St>> {
         self._fields.2 = Option::Some(value.into());
         AuthCallbackBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AuthCallbackBuilder<'a, S>
+impl<S: BosStr, St> AuthCallbackBuilder<S, St>
 where
-    S: auth_callback_state::State,
-    S::RefreshJwt: auth_callback_state::IsUnset,
+    St: auth_callback_state::State,
+    St::RefreshJwt: auth_callback_state::IsUnset,
 {
     /// Set the `refreshJwt` field (required)
     pub fn refresh_jwt(
         mut self,
         value: impl Into<S>,
-    ) -> AuthCallbackBuilder<'a, auth_callback_state::SetRefreshJwt<S>> {
+    ) -> AuthCallbackBuilder<S, auth_callback_state::SetRefreshJwt<St>> {
         self._fields.3 = Option::Some(value.into());
         AuthCallbackBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AuthCallbackBuilder<'a, S>
+impl<S: BosStr, St> AuthCallbackBuilder<S, St>
 where
-    S: auth_callback_state::State,
-    S::Handle: auth_callback_state::IsSet,
-    S::Did: auth_callback_state::IsSet,
-    S::RefreshJwt: auth_callback_state::IsSet,
-    S::AccessJwt: auth_callback_state::IsSet,
+    St: auth_callback_state::State,
+    St::Did: auth_callback_state::IsSet,
+    St::RefreshJwt: auth_callback_state::IsSet,
+    St::AccessJwt: auth_callback_state::IsSet,
+    St::Handle: auth_callback_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> AuthCallback<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> AuthCallback<S> {
         AuthCallback {
             access_jwt: self._fields.0.unwrap(),
             did: self._fields.1.unwrap(),
@@ -260,11 +260,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> AuthCallback<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> AuthCallback<S> {
         AuthCallback {
             access_jwt: self._fields.0.unwrap(),
             did: self._fields.1.unwrap(),

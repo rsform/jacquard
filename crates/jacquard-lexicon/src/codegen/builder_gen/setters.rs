@@ -19,6 +19,7 @@ pub fn generate_setters(
     schema: &BuilderSchema,
     required_fields: &[RequiredField],
     has_lifetime: bool,
+    has_type_param: bool,
     resolved: &crate::codegen::prettify::ResolvedImports,
 ) -> TokenStream {
     let builder_name = format_ident!("{}Builder", type_name);
@@ -44,6 +45,7 @@ pub fn generate_setters(
                 field_name,
                 schema,
                 has_lifetime,
+                has_type_param,
                 index,
                 resolved,
             );
@@ -59,6 +61,7 @@ pub fn generate_setters(
                 field_name,
                 schema,
                 has_lifetime,
+                has_type_param,
                 index,
                 resolved,
             );
@@ -81,10 +84,13 @@ fn generate_required_setter(
     field_name: &SmolStr,
     schema: &BuilderSchema,
     has_lifetime: bool,
+    has_type_param: bool,
     index: usize,
     resolved: &crate::codegen::prettify::ResolvedImports,
 ) -> TokenStream {
     let phantom = resolved.phantom_data();
+    let bosstr_path =
+        resolved.external_type_tokens(&crate::codegen::prettify::ExternalImport::BosStr);
     let field_snake = make_ident(&field_name.to_snake_case());
     let field_pascal = format_ident!("{}", field_name.to_pascal_case());
     let transition_type = format_ident!("Set{}", field_name.to_pascal_case());
@@ -100,8 +106,26 @@ fn generate_required_setter(
         quote! {}
     };
 
+    let s_param = if has_type_param {
+        quote! { S: #bosstr_path, }
+    } else {
+        quote! {}
+    };
+
+    let s_arg = if has_type_param {
+        quote! { S, }
+    } else {
+        quote! {}
+    };
+
     let phantom_lifetime = if has_lifetime {
         quote! { _lifetime: #phantom, }
+    } else {
+        quote! {}
+    };
+
+    let phantom_s = if has_type_param {
+        quote! { _type: #phantom, }
     } else {
         quote! {}
     };
@@ -109,21 +133,22 @@ fn generate_required_setter(
     let doc = format!(" Set the `{}` field (required)", field_name);
 
     quote! {
-        impl<#lifetime_param S> #builder_name<#lifetime_param S>
+        impl<#lifetime_param #s_param St> #builder_name<#lifetime_param #s_arg St>
         where
-            S: #state_mod_name::State,
-            S::#field_pascal: #state_mod_name::IsUnset,
+            St: #state_mod_name::State,
+            St::#field_pascal: #state_mod_name::IsUnset,
         {
             #[doc = #doc]
             pub fn #field_snake(
                 mut self,
                 value: impl Into<#rust_type>,
-            ) -> #builder_name<#lifetime_param #state_mod_name::#transition_type<S>> {
+            ) -> #builder_name<#lifetime_param #s_arg #state_mod_name::#transition_type<St>> {
                 self._fields.#index = #option_some(value.into());
                 #builder_name {
                     _state: #phantom,
                     _fields: self._fields,
                     #phantom_lifetime
+                    #phantom_s
                 }
             }
         }
@@ -140,9 +165,12 @@ fn generate_optional_setter(
     field_name: &SmolStr,
     schema: &BuilderSchema,
     has_lifetime: bool,
+    has_type_param: bool,
     index: usize,
     resolved: &crate::codegen::prettify::ResolvedImports,
 ) -> TokenStream {
+    let bosstr_path =
+        resolved.external_type_tokens(&crate::codegen::prettify::ExternalImport::BosStr);
     let field_snake = make_ident(&field_name.to_snake_case());
     let maybe_field_snake = format_ident!("maybe_{}", field_name.to_snake_case());
     let index = syn::Index::from(index);
@@ -156,6 +184,18 @@ fn generate_optional_setter(
         quote! {}
     };
 
+    let s_param = if has_type_param {
+        quote! { S: #bosstr_path, }
+    } else {
+        quote! {}
+    };
+
+    let s_arg = if has_type_param {
+        quote! { S, }
+    } else {
+        quote! {}
+    };
+
     let doc_field = format!(" Set the `{}` field (optional)", field_name);
     let doc_maybe = format!(
         " Set the `{}` field to an Option value (optional)",
@@ -163,7 +203,7 @@ fn generate_optional_setter(
     );
 
     quote! {
-        impl<#lifetime_param S: #state_mod_name::State> #builder_name<#lifetime_param S> {
+        impl<#lifetime_param #s_param St: #state_mod_name::State> #builder_name<#lifetime_param #s_arg St> {
             #[doc = #doc_field]
             pub fn #field_snake(mut self, value: impl Into<Option<#rust_type>>) -> Self {
                 self._fields.#index = value.into();

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -42,11 +42,11 @@ use crate::app_gainforest::evaluator::VerificationResult;
     rename = "app.gainforest.evaluator.evaluation",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Evaluation<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Evaluation<S: BosStr = DefaultStr> {
     ///Overall confidence in this evaluation (0-1000, where 1000 = 100.0%).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub confidence: Option<i64>,
@@ -85,11 +85,11 @@ pub struct Evaluation<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum EvaluationResult<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum EvaluationResult<S: BosStr = DefaultStr> {
     #[serde(rename = "app.gainforest.evaluator.defs#speciesIdResult")]
     SpeciesIdResult(Box<SpeciesIdResult<S>>),
     #[serde(rename = "app.gainforest.evaluator.defs#dataQualityResult")]
@@ -108,18 +108,18 @@ pub enum EvaluationResult<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct EvaluationGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct EvaluationGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Evaluation<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Evaluation<S> {
+impl<S: BosStr> Evaluation<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, EvaluationRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -132,17 +132,17 @@ pub struct EvaluationRecord;
 impl XrpcResp for EvaluationRecord {
     const NSID: &'static str = "app.gainforest.evaluator.evaluation";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = EvaluationGetRecordOutput<S>;
+    type Output<S: BosStr> = EvaluationGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<EvaluationGetRecordOutput<S>> for Evaluation<S> {
+impl<S: BosStr> From<EvaluationGetRecordOutput<S>> for Evaluation<S> {
     fn from(output: EvaluationGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Evaluation<S> {
+impl<S: BosStr> Collection for Evaluation<S> {
     const NSID: &'static str = "app.gainforest.evaluator.evaluation";
     type Record = EvaluationRecord;
 }
@@ -152,7 +152,7 @@ impl Collection for EvaluationRecord {
     type Record = EvaluationRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Evaluation<S> {
+impl<S: BosStr> LexiconSchema for Evaluation<S> {
     fn nsid() -> &'static str {
         "app.gainforest.evaluator.evaluation"
     }
@@ -241,17 +241,17 @@ pub mod evaluation_state {
         type EvaluationType = Unset;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
-        type EvaluationType = S::EvaluationType;
+        type EvaluationType = St::EvaluationType;
     }
     ///State transition - sets the `evaluation_type` field to Set
-    pub struct SetEvaluationType<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEvaluationType<S> {}
-    impl<S: State> State for SetEvaluationType<S> {
-        type CreatedAt = S::CreatedAt;
+    pub struct SetEvaluationType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetEvaluationType<St> {}
+    impl<St: State> State for SetEvaluationType<St> {
+        type CreatedAt = St::CreatedAt;
         type EvaluationType = Set<members::evaluation_type>;
     }
     /// Marker types for field names
@@ -264,9 +264,9 @@ pub mod evaluation_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct EvaluationBuilder<'a, S: evaluation_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct EvaluationBuilder<S: BosStr, St: evaluation_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<i64>,
         Option<Datetime>,
@@ -279,28 +279,28 @@ pub struct EvaluationBuilder<'a, S: evaluation_state::State> {
         Option<Vec<SubjectRef<S>>>,
         Option<AtUri<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Evaluation<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> EvaluationBuilder<'a, evaluation_state::Empty> {
+impl<S: BosStr> Evaluation<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> EvaluationBuilder<S, evaluation_state::Empty> {
         EvaluationBuilder::new()
     }
 }
 
-impl<'a> EvaluationBuilder<'a, evaluation_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> EvaluationBuilder<S, evaluation_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         EvaluationBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: evaluation_state::State> EvaluationBuilder<'a, S> {
+impl<S: BosStr, St: evaluation_state::State> EvaluationBuilder<S, St> {
     /// Set the `confidence` field (optional)
     pub fn confidence(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
@@ -313,26 +313,26 @@ impl<'a, S: evaluation_state::State> EvaluationBuilder<'a, S> {
     }
 }
 
-impl<'a, S> EvaluationBuilder<'a, S>
+impl<S: BosStr, St> EvaluationBuilder<S, St>
 where
-    S: evaluation_state::State,
-    S::CreatedAt: evaluation_state::IsUnset,
+    St: evaluation_state::State,
+    St::CreatedAt: evaluation_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> EvaluationBuilder<'a, evaluation_state::SetCreatedAt<S>> {
+    ) -> EvaluationBuilder<S, evaluation_state::SetCreatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         EvaluationBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: evaluation_state::State> EvaluationBuilder<'a, S> {
+impl<S: BosStr, St: evaluation_state::State> EvaluationBuilder<S, St> {
     /// Set the `dynamicProperties` field (optional)
     pub fn dynamic_properties(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -345,26 +345,26 @@ impl<'a, S: evaluation_state::State> EvaluationBuilder<'a, S> {
     }
 }
 
-impl<'a, S> EvaluationBuilder<'a, S>
+impl<S: BosStr, St> EvaluationBuilder<S, St>
 where
-    S: evaluation_state::State,
-    S::EvaluationType: evaluation_state::IsUnset,
+    St: evaluation_state::State,
+    St::EvaluationType: evaluation_state::IsUnset,
 {
     /// Set the `evaluationType` field (required)
     pub fn evaluation_type(
         mut self,
         value: impl Into<S>,
-    ) -> EvaluationBuilder<'a, evaluation_state::SetEvaluationType<S>> {
+    ) -> EvaluationBuilder<S, evaluation_state::SetEvaluationType<St>> {
         self._fields.3 = Option::Some(value.into());
         EvaluationBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: evaluation_state::State> EvaluationBuilder<'a, S> {
+impl<S: BosStr, St: evaluation_state::State> EvaluationBuilder<S, St> {
     /// Set the `method` field (optional)
     pub fn method(mut self, value: impl Into<Option<MethodInfo<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -377,7 +377,7 @@ impl<'a, S: evaluation_state::State> EvaluationBuilder<'a, S> {
     }
 }
 
-impl<'a, S: evaluation_state::State> EvaluationBuilder<'a, S> {
+impl<S: BosStr, St: evaluation_state::State> EvaluationBuilder<S, St> {
     /// Set the `neg` field (optional)
     pub fn neg(mut self, value: impl Into<Option<bool>>) -> Self {
         self._fields.5 = value.into();
@@ -390,7 +390,7 @@ impl<'a, S: evaluation_state::State> EvaluationBuilder<'a, S> {
     }
 }
 
-impl<'a, S: evaluation_state::State> EvaluationBuilder<'a, S> {
+impl<S: BosStr, St: evaluation_state::State> EvaluationBuilder<S, St> {
     /// Set the `result` field (optional)
     pub fn result(mut self, value: impl Into<Option<EvaluationResult<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -403,7 +403,7 @@ impl<'a, S: evaluation_state::State> EvaluationBuilder<'a, S> {
     }
 }
 
-impl<'a, S: evaluation_state::State> EvaluationBuilder<'a, S> {
+impl<S: BosStr, St: evaluation_state::State> EvaluationBuilder<S, St> {
     /// Set the `subject` field (optional)
     pub fn subject(mut self, value: impl Into<Option<SubjectRef<S>>>) -> Self {
         self._fields.7 = value.into();
@@ -416,7 +416,7 @@ impl<'a, S: evaluation_state::State> EvaluationBuilder<'a, S> {
     }
 }
 
-impl<'a, S: evaluation_state::State> EvaluationBuilder<'a, S> {
+impl<S: BosStr, St: evaluation_state::State> EvaluationBuilder<S, St> {
     /// Set the `subjects` field (optional)
     pub fn subjects(mut self, value: impl Into<Option<Vec<SubjectRef<S>>>>) -> Self {
         self._fields.8 = value.into();
@@ -429,7 +429,7 @@ impl<'a, S: evaluation_state::State> EvaluationBuilder<'a, S> {
     }
 }
 
-impl<'a, S: evaluation_state::State> EvaluationBuilder<'a, S> {
+impl<S: BosStr, St: evaluation_state::State> EvaluationBuilder<S, St> {
     /// Set the `supersedes` field (optional)
     pub fn supersedes(mut self, value: impl Into<Option<AtUri<S>>>) -> Self {
         self._fields.9 = value.into();
@@ -442,14 +442,14 @@ impl<'a, S: evaluation_state::State> EvaluationBuilder<'a, S> {
     }
 }
 
-impl<'a, S> EvaluationBuilder<'a, S>
+impl<S: BosStr, St> EvaluationBuilder<S, St>
 where
-    S: evaluation_state::State,
-    S::CreatedAt: evaluation_state::IsSet,
-    S::EvaluationType: evaluation_state::IsSet,
+    St: evaluation_state::State,
+    St::CreatedAt: evaluation_state::IsSet,
+    St::EvaluationType: evaluation_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Evaluation<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Evaluation<S> {
         Evaluation {
             confidence: self._fields.0,
             created_at: self._fields.1.unwrap(),
@@ -464,11 +464,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Evaluation<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Evaluation<S> {
         Evaluation {
             confidence: self._fields.0,
             created_at: self._fields.1.unwrap(),

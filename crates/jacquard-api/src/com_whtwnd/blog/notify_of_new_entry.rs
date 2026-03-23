@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
@@ -18,34 +18,30 @@ use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct NotifyOfNewEntry<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct NotifyOfNewEntry<S: BosStr = DefaultStr> {
     pub entry_uri: AtUri<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct NotifyOfNewEntryOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+pub struct NotifyOfNewEntryOutput<S: BosStr = DefaultStr> {
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -87,12 +83,11 @@ pub struct NotifyOfNewEntryResponse;
 impl jacquard_common::xrpc::XrpcResp for NotifyOfNewEntryResponse {
     const NSID: &'static str = "com.whtwnd.blog.notifyOfNewEntry";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = NotifyOfNewEntryOutput<S>;
+    type Output<S: BosStr> = NotifyOfNewEntryOutput<S>;
     type Err = NotifyOfNewEntryError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for NotifyOfNewEntry<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for NotifyOfNewEntry<S> {
     const NSID: &'static str = "com.whtwnd.blog.notifyOfNewEntry";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -107,7 +102,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for NotifyOfNewEntryRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = NotifyOfNewEntry<S>;
+    type Request<S: BosStr> = NotifyOfNewEntry<S>;
     type Response = NotifyOfNewEntryResponse;
 }
 
@@ -130,9 +125,9 @@ pub mod notify_of_new_entry_state {
         type EntryUri = Unset;
     }
     ///State transition - sets the `entry_uri` field to Set
-    pub struct SetEntryUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEntryUri<S> {}
-    impl<S: State> State for SetEntryUri<S> {
+    pub struct SetEntryUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetEntryUri<St> {}
+    impl<St: State> State for SetEntryUri<St> {
         type EntryUri = Set<members::entry_uri>;
     }
     /// Marker types for field names
@@ -143,67 +138,67 @@ pub mod notify_of_new_entry_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct NotifyOfNewEntryBuilder<'a, S: notify_of_new_entry_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct NotifyOfNewEntryBuilder<S: BosStr, St: notify_of_new_entry_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<AtUri<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> NotifyOfNewEntry<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> NotifyOfNewEntryBuilder<'a, notify_of_new_entry_state::Empty> {
+impl<S: BosStr> NotifyOfNewEntry<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> NotifyOfNewEntryBuilder<S, notify_of_new_entry_state::Empty> {
         NotifyOfNewEntryBuilder::new()
     }
 }
 
-impl<'a> NotifyOfNewEntryBuilder<'a, notify_of_new_entry_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> NotifyOfNewEntryBuilder<S, notify_of_new_entry_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         NotifyOfNewEntryBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> NotifyOfNewEntryBuilder<'a, S>
+impl<S: BosStr, St> NotifyOfNewEntryBuilder<S, St>
 where
-    S: notify_of_new_entry_state::State,
-    S::EntryUri: notify_of_new_entry_state::IsUnset,
+    St: notify_of_new_entry_state::State,
+    St::EntryUri: notify_of_new_entry_state::IsUnset,
 {
     /// Set the `entryUri` field (required)
     pub fn entry_uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> NotifyOfNewEntryBuilder<'a, notify_of_new_entry_state::SetEntryUri<S>> {
+    ) -> NotifyOfNewEntryBuilder<S, notify_of_new_entry_state::SetEntryUri<St>> {
         self._fields.0 = Option::Some(value.into());
         NotifyOfNewEntryBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> NotifyOfNewEntryBuilder<'a, S>
+impl<S: BosStr, St> NotifyOfNewEntryBuilder<S, St>
 where
-    S: notify_of_new_entry_state::State,
-    S::EntryUri: notify_of_new_entry_state::IsSet,
+    St: notify_of_new_entry_state::State,
+    St::EntryUri: notify_of_new_entry_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> NotifyOfNewEntry<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> NotifyOfNewEntry<S> {
         NotifyOfNewEntry {
             entry_uri: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> NotifyOfNewEntry<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> NotifyOfNewEntry<S> {
         NotifyOfNewEntry {
             entry_uri: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

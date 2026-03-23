@@ -10,41 +10,38 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Hello<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Hello<S: BosStr = DefaultStr> {
     ///(max length: 55)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub subject: Option<S>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct HelloOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct HelloOutput<S: BosStr = DefaultStr> {
     pub message: S,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -53,12 +50,11 @@ pub struct HelloResponse;
 impl jacquard_common::xrpc::XrpcResp for HelloResponse {
     const NSID: &'static str = "garden.lexicon.ngerakines.helloworld.Hello";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = HelloOutput<S>;
+    type Output<S: BosStr> = HelloOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for Hello<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Hello<S> {
     const NSID: &'static str = "garden.lexicon.ngerakines.helloworld.Hello";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = HelloResponse;
@@ -69,7 +65,7 @@ pub struct HelloRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for HelloRequest {
     const PATH: &'static str = "/xrpc/garden.lexicon.ngerakines.helloworld.Hello";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = Hello<S>;
+    type Request<S: BosStr> = Hello<S>;
     type Response = HelloResponse;
 }
 
@@ -92,32 +88,32 @@ pub mod hello_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct HelloBuilder<'a, S: hello_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct HelloBuilder<S: BosStr, St: hello_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Hello<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> HelloBuilder<'a, hello_state::Empty> {
+impl<S: BosStr> Hello<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> HelloBuilder<S, hello_state::Empty> {
         HelloBuilder::new()
     }
 }
 
-impl<'a> HelloBuilder<'a, hello_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> HelloBuilder<S, hello_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         HelloBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: hello_state::State> HelloBuilder<'a, S> {
+impl<S: BosStr, St: hello_state::State> HelloBuilder<S, St> {
     /// Set the `subject` field (optional)
     pub fn subject(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -130,12 +126,12 @@ impl<'a, S: hello_state::State> HelloBuilder<'a, S> {
     }
 }
 
-impl<'a, S> HelloBuilder<'a, S>
+impl<S: BosStr, St> HelloBuilder<S, St>
 where
-    S: hello_state::State,
+    St: hello_state::State,
 {
-    /// Build the final struct
-    pub fn build(self) -> Hello<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Hello<S> {
         Hello { subject: self._fields.0 }
     }
 }

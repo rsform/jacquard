@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -38,11 +38,11 @@ use crate::sh_weaver::notebook::Title;
     rename = "sh.weaver.notebook.page",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Page<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Page<S: BosStr = DefaultStr> {
     ///Client-declared timestamp when this was originally created.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
@@ -63,18 +63,18 @@ pub struct Page<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct PageGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct PageGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Page<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Page<S> {
+impl<S: BosStr> Page<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, PageRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -87,17 +87,17 @@ pub struct PageRecord;
 impl XrpcResp for PageRecord {
     const NSID: &'static str = "sh.weaver.notebook.page";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = PageGetRecordOutput<S>;
+    type Output<S: BosStr> = PageGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<PageGetRecordOutput<S>> for Page<S> {
+impl<S: BosStr> From<PageGetRecordOutput<S>> for Page<S> {
     fn from(output: PageGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Page<S> {
+impl<S: BosStr> Collection for Page<S> {
     const NSID: &'static str = "sh.weaver.notebook.page";
     type Record = PageRecord;
 }
@@ -107,7 +107,7 @@ impl Collection for PageRecord {
     type Record = PageRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Page<S> {
+impl<S: BosStr> LexiconSchema for Page<S> {
     fn nsid() -> &'static str {
         "sh.weaver.notebook.page"
     }
@@ -132,57 +132,57 @@ pub mod page_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Authors;
         type Notebook;
         type EntryList;
-        type Authors;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Authors = Unset;
         type Notebook = Unset;
         type EntryList = Unset;
-        type Authors = Unset;
-    }
-    ///State transition - sets the `notebook` field to Set
-    pub struct SetNotebook<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetNotebook<S> {}
-    impl<S: State> State for SetNotebook<S> {
-        type Notebook = Set<members::notebook>;
-        type EntryList = S::EntryList;
-        type Authors = S::Authors;
-    }
-    ///State transition - sets the `entry_list` field to Set
-    pub struct SetEntryList<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEntryList<S> {}
-    impl<S: State> State for SetEntryList<S> {
-        type Notebook = S::Notebook;
-        type EntryList = Set<members::entry_list>;
-        type Authors = S::Authors;
     }
     ///State transition - sets the `authors` field to Set
-    pub struct SetAuthors<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetAuthors<S> {}
-    impl<S: State> State for SetAuthors<S> {
-        type Notebook = S::Notebook;
-        type EntryList = S::EntryList;
+    pub struct SetAuthors<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAuthors<St> {}
+    impl<St: State> State for SetAuthors<St> {
         type Authors = Set<members::authors>;
+        type Notebook = St::Notebook;
+        type EntryList = St::EntryList;
+    }
+    ///State transition - sets the `notebook` field to Set
+    pub struct SetNotebook<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetNotebook<St> {}
+    impl<St: State> State for SetNotebook<St> {
+        type Authors = St::Authors;
+        type Notebook = Set<members::notebook>;
+        type EntryList = St::EntryList;
+    }
+    ///State transition - sets the `entry_list` field to Set
+    pub struct SetEntryList<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetEntryList<St> {}
+    impl<St: State> State for SetEntryList<St> {
+        type Authors = St::Authors;
+        type Notebook = St::Notebook;
+        type EntryList = Set<members::entry_list>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `authors` field
+        pub struct authors(());
         ///Marker type for the `notebook` field
         pub struct notebook(());
         ///Marker type for the `entry_list` field
         pub struct entry_list(());
-        ///Marker type for the `authors` field
-        pub struct authors(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct PageBuilder<'a, S: page_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct PageBuilder<S: BosStr, St: page_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
         Option<Vec<StrongRef<S>>>,
@@ -190,28 +190,28 @@ pub struct PageBuilder<'a, S: page_state::State> {
         Option<Tags<S>>,
         Option<Title<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Page<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> PageBuilder<'a, page_state::Empty> {
+impl<S: BosStr> Page<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> PageBuilder<S, page_state::Empty> {
         PageBuilder::new()
     }
 }
 
-impl<'a> PageBuilder<'a, page_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> PageBuilder<S, page_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         PageBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: page_state::State> PageBuilder<'a, S> {
+impl<S: BosStr, St: page_state::State> PageBuilder<S, St> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.0 = value.into();
@@ -224,45 +224,45 @@ impl<'a, S: page_state::State> PageBuilder<'a, S> {
     }
 }
 
-impl<'a, S> PageBuilder<'a, S>
+impl<S: BosStr, St> PageBuilder<S, St>
 where
-    S: page_state::State,
-    S::EntryList: page_state::IsUnset,
+    St: page_state::State,
+    St::EntryList: page_state::IsUnset,
 {
     /// Set the `entryList` field (required)
     pub fn entry_list(
         mut self,
         value: impl Into<Vec<StrongRef<S>>>,
-    ) -> PageBuilder<'a, page_state::SetEntryList<S>> {
+    ) -> PageBuilder<S, page_state::SetEntryList<St>> {
         self._fields.1 = Option::Some(value.into());
         PageBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PageBuilder<'a, S>
+impl<S: BosStr, St> PageBuilder<S, St>
 where
-    S: page_state::State,
-    S::Notebook: page_state::IsUnset,
+    St: page_state::State,
+    St::Notebook: page_state::IsUnset,
 {
     /// Set the `notebook` field (required)
     pub fn notebook(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> PageBuilder<'a, page_state::SetNotebook<S>> {
+    ) -> PageBuilder<S, page_state::SetNotebook<St>> {
         self._fields.2 = Option::Some(value.into());
         PageBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: page_state::State> PageBuilder<'a, S> {
+impl<S: BosStr, St: page_state::State> PageBuilder<S, St> {
     /// Set the `tags` field (optional)
     pub fn tags(mut self, value: impl Into<Option<Tags<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -275,7 +275,7 @@ impl<'a, S: page_state::State> PageBuilder<'a, S> {
     }
 }
 
-impl<'a, S: page_state::State> PageBuilder<'a, S> {
+impl<S: BosStr, St: page_state::State> PageBuilder<S, St> {
     /// Set the `title` field (optional)
     pub fn title(mut self, value: impl Into<Option<Title<S>>>) -> Self {
         self._fields.4 = value.into();
@@ -288,15 +288,15 @@ impl<'a, S: page_state::State> PageBuilder<'a, S> {
     }
 }
 
-impl<'a, S> PageBuilder<'a, S>
+impl<S: BosStr, St> PageBuilder<S, St>
 where
-    S: page_state::State,
-    S::Notebook: page_state::IsSet,
-    S::EntryList: page_state::IsSet,
-    S::Authors: page_state::IsSet,
+    St: page_state::State,
+    St::Authors: page_state::IsSet,
+    St::Notebook: page_state::IsSet,
+    St::EntryList: page_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Page<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Page<S> {
         Page {
             created_at: self._fields.0,
             entry_list: self._fields.1.unwrap(),
@@ -306,8 +306,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Page<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Page<S> {
         Page {
             created_at: self._fields.0,
             entry_list: self._fields.1.unwrap(),

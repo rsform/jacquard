@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -37,11 +37,11 @@ use crate::ch_indiemusi::alpha::release;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Artist<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Artist<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub artist: Option<artist::Artist<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -59,11 +59,11 @@ pub struct Artist<S: Bos<str> + AsRef<str> = DefaultStr> {
     rename = "ch.indiemusi.alpha.release",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Release<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Release<S: BosStr = DefaultStr> {
     pub artists: Vec<release::Artist<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub artwork_image: Option<BlobRef<S>>,
@@ -85,24 +85,24 @@ pub struct Release<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ReleaseGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ReleaseGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Release<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Release<S> {
+impl<S: BosStr> Release<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, ReleaseRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Artist<S> {
+impl<S: BosStr> LexiconSchema for Artist<S> {
     fn nsid() -> &'static str {
         "ch.indiemusi.alpha.release"
     }
@@ -135,17 +135,17 @@ pub struct ReleaseRecord;
 impl XrpcResp for ReleaseRecord {
     const NSID: &'static str = "ch.indiemusi.alpha.release";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ReleaseGetRecordOutput<S>;
+    type Output<S: BosStr> = ReleaseGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<ReleaseGetRecordOutput<S>> for Release<S> {
+impl<S: BosStr> From<ReleaseGetRecordOutput<S>> for Release<S> {
     fn from(output: ReleaseGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Release<S> {
+impl<S: BosStr> Collection for Release<S> {
     const NSID: &'static str = "ch.indiemusi.alpha.release";
     type Record = ReleaseRecord;
 }
@@ -155,7 +155,7 @@ impl Collection for ReleaseRecord {
     type Record = ReleaseRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Release<S> {
+impl<S: BosStr> LexiconSchema for Release<S> {
     fn nsid() -> &'static str {
         "ch.indiemusi.alpha.release"
     }
@@ -363,57 +363,57 @@ pub mod release_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
         type Recordings;
         type Artists;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
         type Recordings = Unset;
         type Artists = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type Title = Set<members::title>;
-        type Recordings = S::Recordings;
-        type Artists = S::Artists;
+        type Title = Unset;
     }
     ///State transition - sets the `recordings` field to Set
-    pub struct SetRecordings<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRecordings<S> {}
-    impl<S: State> State for SetRecordings<S> {
-        type Title = S::Title;
+    pub struct SetRecordings<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRecordings<St> {}
+    impl<St: State> State for SetRecordings<St> {
         type Recordings = Set<members::recordings>;
-        type Artists = S::Artists;
+        type Artists = St::Artists;
+        type Title = St::Title;
     }
     ///State transition - sets the `artists` field to Set
-    pub struct SetArtists<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetArtists<S> {}
-    impl<S: State> State for SetArtists<S> {
-        type Title = S::Title;
-        type Recordings = S::Recordings;
+    pub struct SetArtists<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetArtists<St> {}
+    impl<St: State> State for SetArtists<St> {
+        type Recordings = St::Recordings;
         type Artists = Set<members::artists>;
+        type Title = St::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
+        type Recordings = St::Recordings;
+        type Artists = St::Artists;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `recordings` field
         pub struct recordings(());
         ///Marker type for the `artists` field
         pub struct artists(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ReleaseBuilder<'a, S: release_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ReleaseBuilder<S: BosStr, St: release_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<release::Artist<S>>>,
         Option<BlobRef<S>>,
@@ -422,47 +422,47 @@ pub struct ReleaseBuilder<'a, S: release_state::State> {
         Option<Datetime>,
         Option<S>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Release<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ReleaseBuilder<'a, release_state::Empty> {
+impl<S: BosStr> Release<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ReleaseBuilder<S, release_state::Empty> {
         ReleaseBuilder::new()
     }
 }
 
-impl<'a> ReleaseBuilder<'a, release_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ReleaseBuilder<S, release_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ReleaseBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ReleaseBuilder<'a, S>
+impl<S: BosStr, St> ReleaseBuilder<S, St>
 where
-    S: release_state::State,
-    S::Artists: release_state::IsUnset,
+    St: release_state::State,
+    St::Artists: release_state::IsUnset,
 {
     /// Set the `artists` field (required)
     pub fn artists(
         mut self,
         value: impl Into<Vec<release::Artist<S>>>,
-    ) -> ReleaseBuilder<'a, release_state::SetArtists<S>> {
+    ) -> ReleaseBuilder<S, release_state::SetArtists<St>> {
         self._fields.0 = Option::Some(value.into());
         ReleaseBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: release_state::State> ReleaseBuilder<'a, S> {
+impl<S: BosStr, St: release_state::State> ReleaseBuilder<S, St> {
     /// Set the `artworkImage` field (optional)
     pub fn artwork_image(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.1 = value.into();
@@ -475,7 +475,7 @@ impl<'a, S: release_state::State> ReleaseBuilder<'a, S> {
     }
 }
 
-impl<'a, S: release_state::State> ReleaseBuilder<'a, S> {
+impl<S: BosStr, St: release_state::State> ReleaseBuilder<S, St> {
     /// Set the `gtin` field (optional)
     pub fn gtin(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -488,26 +488,26 @@ impl<'a, S: release_state::State> ReleaseBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ReleaseBuilder<'a, S>
+impl<S: BosStr, St> ReleaseBuilder<S, St>
 where
-    S: release_state::State,
-    S::Recordings: release_state::IsUnset,
+    St: release_state::State,
+    St::Recordings: release_state::IsUnset,
 {
     /// Set the `recordings` field (required)
     pub fn recordings(
         mut self,
         value: impl Into<Vec<Recording<S>>>,
-    ) -> ReleaseBuilder<'a, release_state::SetRecordings<S>> {
+    ) -> ReleaseBuilder<S, release_state::SetRecordings<St>> {
         self._fields.3 = Option::Some(value.into());
         ReleaseBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: release_state::State> ReleaseBuilder<'a, S> {
+impl<S: BosStr, St: release_state::State> ReleaseBuilder<S, St> {
     /// Set the `releaseDate` field (optional)
     pub fn release_date(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.4 = value.into();
@@ -520,34 +520,34 @@ impl<'a, S: release_state::State> ReleaseBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ReleaseBuilder<'a, S>
+impl<S: BosStr, St> ReleaseBuilder<S, St>
 where
-    S: release_state::State,
-    S::Title: release_state::IsUnset,
+    St: release_state::State,
+    St::Title: release_state::IsUnset,
 {
     /// Set the `title` field (required)
     pub fn title(
         mut self,
         value: impl Into<S>,
-    ) -> ReleaseBuilder<'a, release_state::SetTitle<S>> {
+    ) -> ReleaseBuilder<S, release_state::SetTitle<St>> {
         self._fields.5 = Option::Some(value.into());
         ReleaseBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ReleaseBuilder<'a, S>
+impl<S: BosStr, St> ReleaseBuilder<S, St>
 where
-    S: release_state::State,
-    S::Title: release_state::IsSet,
-    S::Recordings: release_state::IsSet,
-    S::Artists: release_state::IsSet,
+    St: release_state::State,
+    St::Recordings: release_state::IsSet,
+    St::Artists: release_state::IsSet,
+    St::Title: release_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Release<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Release<S> {
         Release {
             artists: self._fields.0.unwrap(),
             artwork_image: self._fields.1,
@@ -558,11 +558,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Release<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Release<S> {
         Release {
             artists: self._fields.0.unwrap(),
             artwork_image: self._fields.1,

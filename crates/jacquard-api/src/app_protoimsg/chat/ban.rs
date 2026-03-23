@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "app.protoimsg.chat.ban",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Ban<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Ban<S: BosStr = DefaultStr> {
     ///Timestamp of ban.
     pub created_at: Datetime,
     ///Reason for the ban.
@@ -59,18 +59,18 @@ pub struct Ban<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct BanGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct BanGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Ban<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Ban<S> {
+impl<S: BosStr> Ban<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, BanRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -83,17 +83,17 @@ pub struct BanRecord;
 impl XrpcResp for BanRecord {
     const NSID: &'static str = "app.protoimsg.chat.ban";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = BanGetRecordOutput<S>;
+    type Output<S: BosStr> = BanGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<BanGetRecordOutput<S>> for Ban<S> {
+impl<S: BosStr> From<BanGetRecordOutput<S>> for Ban<S> {
     fn from(output: BanGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Ban<S> {
+impl<S: BosStr> Collection for Ban<S> {
     const NSID: &'static str = "app.protoimsg.chat.ban";
     type Record = BanRecord;
 }
@@ -103,7 +103,7 @@ impl Collection for BanRecord {
     type Record = BanRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Ban<S> {
+impl<S: BosStr> LexiconSchema for Ban<S> {
     fn nsid() -> &'static str {
         "app.protoimsg.chat.ban"
     }
@@ -138,99 +138,99 @@ pub mod ban_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Subject;
-        type Room;
         type CreatedAt;
+        type Room;
+        type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Subject = Unset;
-        type Room = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type Subject = Set<members::subject>;
-        type Room = S::Room;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `room` field to Set
-    pub struct SetRoom<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetRoom<S> {}
-    impl<S: State> State for SetRoom<S> {
-        type Subject = S::Subject;
-        type Room = Set<members::room>;
-        type CreatedAt = S::CreatedAt;
+        type Room = Unset;
+        type Subject = Unset;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Subject = S::Subject;
-        type Room = S::Room;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
+        type Room = St::Room;
+        type Subject = St::Subject;
+    }
+    ///State transition - sets the `room` field to Set
+    pub struct SetRoom<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRoom<St> {}
+    impl<St: State> State for SetRoom<St> {
+        type CreatedAt = St::CreatedAt;
+        type Room = Set<members::room>;
+        type Subject = St::Subject;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubject<St> {}
+    impl<St: State> State for SetSubject<St> {
+        type CreatedAt = St::CreatedAt;
+        type Room = St::Room;
+        type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `subject` field
-        pub struct subject(());
-        ///Marker type for the `room` field
-        pub struct room(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `room` field
+        pub struct room(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct BanBuilder<'a, S: ban_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct BanBuilder<S: BosStr, St: ban_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<S>, Option<AtUri<S>>, Option<Did<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Ban<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> BanBuilder<'a, ban_state::Empty> {
+impl<S: BosStr> Ban<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> BanBuilder<S, ban_state::Empty> {
         BanBuilder::new()
     }
 }
 
-impl<'a> BanBuilder<'a, ban_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> BanBuilder<S, ban_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         BanBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BanBuilder<'a, S>
+impl<S: BosStr, St> BanBuilder<S, St>
 where
-    S: ban_state::State,
-    S::CreatedAt: ban_state::IsUnset,
+    St: ban_state::State,
+    St::CreatedAt: ban_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> BanBuilder<'a, ban_state::SetCreatedAt<S>> {
+    ) -> BanBuilder<S, ban_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         BanBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: ban_state::State> BanBuilder<'a, S> {
+impl<S: BosStr, St: ban_state::State> BanBuilder<S, St> {
     /// Set the `reason` field (optional)
     pub fn reason(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -243,53 +243,53 @@ impl<'a, S: ban_state::State> BanBuilder<'a, S> {
     }
 }
 
-impl<'a, S> BanBuilder<'a, S>
+impl<S: BosStr, St> BanBuilder<S, St>
 where
-    S: ban_state::State,
-    S::Room: ban_state::IsUnset,
+    St: ban_state::State,
+    St::Room: ban_state::IsUnset,
 {
     /// Set the `room` field (required)
     pub fn room(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> BanBuilder<'a, ban_state::SetRoom<S>> {
+    ) -> BanBuilder<S, ban_state::SetRoom<St>> {
         self._fields.2 = Option::Some(value.into());
         BanBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BanBuilder<'a, S>
+impl<S: BosStr, St> BanBuilder<S, St>
 where
-    S: ban_state::State,
-    S::Subject: ban_state::IsUnset,
+    St: ban_state::State,
+    St::Subject: ban_state::IsUnset,
 {
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> BanBuilder<'a, ban_state::SetSubject<S>> {
+    ) -> BanBuilder<S, ban_state::SetSubject<St>> {
         self._fields.3 = Option::Some(value.into());
         BanBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BanBuilder<'a, S>
+impl<S: BosStr, St> BanBuilder<S, St>
 where
-    S: ban_state::State,
-    S::Subject: ban_state::IsSet,
-    S::Room: ban_state::IsSet,
-    S::CreatedAt: ban_state::IsSet,
+    St: ban_state::State,
+    St::CreatedAt: ban_state::IsSet,
+    St::Room: ban_state::IsSet,
+    St::Subject: ban_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Ban<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Ban<S> {
         Ban {
             created_at: self._fields.0.unwrap(),
             reason: self._fields.1,
@@ -298,8 +298,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Ban<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Ban<S> {
         Ban {
             created_at: self._fields.0.unwrap(),
             reason: self._fields.1,

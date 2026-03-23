@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,11 +34,11 @@ use crate::net_anisota::beta::game::session;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ActivitySummary<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ActivitySummary<S: BosStr = DefaultStr> {
     ///Player's current level at the time of this session update
     #[serde(skip_serializing_if = "Option::is_none")]
     pub current_level: Option<i64>,
@@ -66,11 +66,11 @@ pub struct ActivitySummary<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GameActions<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GameActions<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub daily_rewards_claimed: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -95,11 +95,11 @@ pub struct GameActions<S: Bos<str> + AsRef<str> = DefaultStr> {
     rename = "net.anisota.beta.game.session",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Session<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Session<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub activity_summary: Option<session::ActivitySummary<S>>,
     ///Version of the client application
@@ -154,11 +154,11 @@ pub struct Session<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SessionGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SessionGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
@@ -171,11 +171,11 @@ pub struct SessionGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Metadata<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Metadata<S: BosStr = DefaultStr> {
     ///List of features used during the session
     #[serde(skip_serializing_if = "Option::is_none")]
     pub features: Option<Vec<S>>,
@@ -194,11 +194,11 @@ pub struct Metadata<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct PerformanceMetrics<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct PerformanceMetrics<S: BosStr = DefaultStr> {
     ///Average API response time in milliseconds (rounded to nearest integer)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub average_response_time: Option<i64>,
@@ -215,11 +215,11 @@ pub struct PerformanceMetrics<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SessionContext<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SessionContext<S: BosStr = DefaultStr> {
     ///How the user was authenticated
     #[serde(skip_serializing_if = "Option::is_none")]
     pub authentication_method: Option<S>,
@@ -236,13 +236,13 @@ pub struct SessionContext<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Session<S> {
+impl<S: BosStr> Session<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, SessionRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for ActivitySummary<S> {
+impl<S: BosStr> LexiconSchema for ActivitySummary<S> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.session"
     }
@@ -293,7 +293,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for ActivitySummary<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for GameActions<S> {
+impl<S: BosStr> LexiconSchema for GameActions<S> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.session"
     }
@@ -369,17 +369,17 @@ pub struct SessionRecord;
 impl XrpcResp for SessionRecord {
     const NSID: &'static str = "net.anisota.beta.game.session";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = SessionGetRecordOutput<S>;
+    type Output<S: BosStr> = SessionGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<SessionGetRecordOutput<S>> for Session<S> {
+impl<S: BosStr> From<SessionGetRecordOutput<S>> for Session<S> {
     fn from(output: SessionGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Session<S> {
+impl<S: BosStr> Collection for Session<S> {
     const NSID: &'static str = "net.anisota.beta.game.session";
     type Record = SessionRecord;
 }
@@ -389,7 +389,7 @@ impl Collection for SessionRecord {
     type Record = SessionRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Session<S> {
+impl<S: BosStr> LexiconSchema for Session<S> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.session"
     }
@@ -413,7 +413,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Session<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Metadata<S> {
+impl<S: BosStr> LexiconSchema for Metadata<S> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.session"
     }
@@ -428,7 +428,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Metadata<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for PerformanceMetrics<S> {
+impl<S: BosStr> LexiconSchema for PerformanceMetrics<S> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.session"
     }
@@ -461,7 +461,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for PerformanceMetrics<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for SessionContext<S> {
+impl<S: BosStr> LexiconSchema for SessionContext<S> {
     fn nsid() -> &'static str {
         "net.anisota.beta.game.session"
     }
@@ -935,8 +935,8 @@ pub mod session_state {
     pub trait State: sealed::Sealed {
         type StartedAt;
         type Status;
-        type Platform;
         type ClientVersion;
+        type Platform;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -944,44 +944,44 @@ pub mod session_state {
     impl State for Empty {
         type StartedAt = Unset;
         type Status = Unset;
-        type Platform = Unset;
         type ClientVersion = Unset;
+        type Platform = Unset;
     }
     ///State transition - sets the `started_at` field to Set
-    pub struct SetStartedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStartedAt<S> {}
-    impl<S: State> State for SetStartedAt<S> {
+    pub struct SetStartedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStartedAt<St> {}
+    impl<St: State> State for SetStartedAt<St> {
         type StartedAt = Set<members::started_at>;
-        type Status = S::Status;
-        type Platform = S::Platform;
-        type ClientVersion = S::ClientVersion;
+        type Status = St::Status;
+        type ClientVersion = St::ClientVersion;
+        type Platform = St::Platform;
     }
     ///State transition - sets the `status` field to Set
-    pub struct SetStatus<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStatus<S> {}
-    impl<S: State> State for SetStatus<S> {
-        type StartedAt = S::StartedAt;
+    pub struct SetStatus<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStatus<St> {}
+    impl<St: State> State for SetStatus<St> {
+        type StartedAt = St::StartedAt;
         type Status = Set<members::status>;
-        type Platform = S::Platform;
-        type ClientVersion = S::ClientVersion;
-    }
-    ///State transition - sets the `platform` field to Set
-    pub struct SetPlatform<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPlatform<S> {}
-    impl<S: State> State for SetPlatform<S> {
-        type StartedAt = S::StartedAt;
-        type Status = S::Status;
-        type Platform = Set<members::platform>;
-        type ClientVersion = S::ClientVersion;
+        type ClientVersion = St::ClientVersion;
+        type Platform = St::Platform;
     }
     ///State transition - sets the `client_version` field to Set
-    pub struct SetClientVersion<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetClientVersion<S> {}
-    impl<S: State> State for SetClientVersion<S> {
-        type StartedAt = S::StartedAt;
-        type Status = S::Status;
-        type Platform = S::Platform;
+    pub struct SetClientVersion<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetClientVersion<St> {}
+    impl<St: State> State for SetClientVersion<St> {
+        type StartedAt = St::StartedAt;
+        type Status = St::Status;
         type ClientVersion = Set<members::client_version>;
+        type Platform = St::Platform;
+    }
+    ///State transition - sets the `platform` field to Set
+    pub struct SetPlatform<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPlatform<St> {}
+    impl<St: State> State for SetPlatform<St> {
+        type StartedAt = St::StartedAt;
+        type Status = St::Status;
+        type ClientVersion = St::ClientVersion;
+        type Platform = Set<members::platform>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -990,16 +990,16 @@ pub mod session_state {
         pub struct started_at(());
         ///Marker type for the `status` field
         pub struct status(());
-        ///Marker type for the `platform` field
-        pub struct platform(());
         ///Marker type for the `client_version` field
         pub struct client_version(());
+        ///Marker type for the `platform` field
+        pub struct platform(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct SessionBuilder<'a, S: session_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct SessionBuilder<S: BosStr, St: session_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<session::ActivitySummary<S>>,
         Option<S>,
@@ -1019,18 +1019,18 @@ pub struct SessionBuilder<'a, S: session_state::State> {
         Option<S>,
         Option<Datetime>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Session<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> SessionBuilder<'a, session_state::Empty> {
+impl<S: BosStr> Session<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> SessionBuilder<S, session_state::Empty> {
         SessionBuilder::new()
     }
 }
 
-impl<'a> SessionBuilder<'a, session_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> SessionBuilder<S, session_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SessionBuilder {
             _state: PhantomData,
@@ -1053,12 +1053,12 @@ impl<'a> SessionBuilder<'a, session_state::Empty> {
                 None,
                 None,
             ),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: session_state::State> SessionBuilder<'a, S> {
+impl<S: BosStr, St: session_state::State> SessionBuilder<S, St> {
     /// Set the `activitySummary` field (optional)
     pub fn activity_summary(
         mut self,
@@ -1077,26 +1077,26 @@ impl<'a, S: session_state::State> SessionBuilder<'a, S> {
     }
 }
 
-impl<'a, S> SessionBuilder<'a, S>
+impl<S: BosStr, St> SessionBuilder<S, St>
 where
-    S: session_state::State,
-    S::ClientVersion: session_state::IsUnset,
+    St: session_state::State,
+    St::ClientVersion: session_state::IsUnset,
 {
     /// Set the `clientVersion` field (required)
     pub fn client_version(
         mut self,
         value: impl Into<S>,
-    ) -> SessionBuilder<'a, session_state::SetClientVersion<S>> {
+    ) -> SessionBuilder<S, session_state::SetClientVersion<St>> {
         self._fields.1 = Option::Some(value.into());
         SessionBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: session_state::State> SessionBuilder<'a, S> {
+impl<S: BosStr, St: session_state::State> SessionBuilder<S, St> {
     /// Set the `createdAt` field (optional)
     pub fn created_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.2 = value.into();
@@ -1109,7 +1109,7 @@ impl<'a, S: session_state::State> SessionBuilder<'a, S> {
     }
 }
 
-impl<'a, S: session_state::State> SessionBuilder<'a, S> {
+impl<S: BosStr, St: session_state::State> SessionBuilder<S, St> {
     /// Set the `duration` field (optional)
     pub fn duration(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.3 = value.into();
@@ -1122,7 +1122,7 @@ impl<'a, S: session_state::State> SessionBuilder<'a, S> {
     }
 }
 
-impl<'a, S: session_state::State> SessionBuilder<'a, S> {
+impl<S: BosStr, St: session_state::State> SessionBuilder<S, St> {
     /// Set the `endReason` field (optional)
     pub fn end_reason(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
@@ -1135,7 +1135,7 @@ impl<'a, S: session_state::State> SessionBuilder<'a, S> {
     }
 }
 
-impl<'a, S: session_state::State> SessionBuilder<'a, S> {
+impl<S: BosStr, St: session_state::State> SessionBuilder<S, St> {
     /// Set the `endedAt` field (optional)
     pub fn ended_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.5 = value.into();
@@ -1148,7 +1148,7 @@ impl<'a, S: session_state::State> SessionBuilder<'a, S> {
     }
 }
 
-impl<'a, S: session_state::State> SessionBuilder<'a, S> {
+impl<S: BosStr, St: session_state::State> SessionBuilder<S, St> {
     /// Set the `lastActivityAt` field (optional)
     pub fn last_activity_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.6 = value.into();
@@ -1161,7 +1161,7 @@ impl<'a, S: session_state::State> SessionBuilder<'a, S> {
     }
 }
 
-impl<'a, S: session_state::State> SessionBuilder<'a, S> {
+impl<S: BosStr, St: session_state::State> SessionBuilder<S, St> {
     /// Set the `metadata` field (optional)
     pub fn metadata(mut self, value: impl Into<Option<session::Metadata<S>>>) -> Self {
         self._fields.7 = value.into();
@@ -1174,7 +1174,7 @@ impl<'a, S: session_state::State> SessionBuilder<'a, S> {
     }
 }
 
-impl<'a, S: session_state::State> SessionBuilder<'a, S> {
+impl<S: BosStr, St: session_state::State> SessionBuilder<S, St> {
     /// Set the `parentSessionUri` field (optional)
     pub fn parent_session_uri(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.8 = value.into();
@@ -1187,26 +1187,26 @@ impl<'a, S: session_state::State> SessionBuilder<'a, S> {
     }
 }
 
-impl<'a, S> SessionBuilder<'a, S>
+impl<S: BosStr, St> SessionBuilder<S, St>
 where
-    S: session_state::State,
-    S::Platform: session_state::IsUnset,
+    St: session_state::State,
+    St::Platform: session_state::IsUnset,
 {
     /// Set the `platform` field (required)
     pub fn platform(
         mut self,
         value: impl Into<S>,
-    ) -> SessionBuilder<'a, session_state::SetPlatform<S>> {
+    ) -> SessionBuilder<S, session_state::SetPlatform<St>> {
         self._fields.9 = Option::Some(value.into());
         SessionBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: session_state::State> SessionBuilder<'a, S> {
+impl<S: BosStr, St: session_state::State> SessionBuilder<S, St> {
     /// Set the `relatedLogUris` field (optional)
     pub fn related_log_uris(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.10 = value.into();
@@ -1219,7 +1219,7 @@ impl<'a, S: session_state::State> SessionBuilder<'a, S> {
     }
 }
 
-impl<'a, S: session_state::State> SessionBuilder<'a, S> {
+impl<S: BosStr, St: session_state::State> SessionBuilder<S, St> {
     /// Set the `relatedProgressUris` field (optional)
     pub fn related_progress_uris(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.11 = value.into();
@@ -1232,7 +1232,7 @@ impl<'a, S: session_state::State> SessionBuilder<'a, S> {
     }
 }
 
-impl<'a, S: session_state::State> SessionBuilder<'a, S> {
+impl<S: BosStr, St: session_state::State> SessionBuilder<S, St> {
     /// Set the `relatedSessionUris` field (optional)
     pub fn related_session_uris(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.12 = value.into();
@@ -1245,7 +1245,7 @@ impl<'a, S: session_state::State> SessionBuilder<'a, S> {
     }
 }
 
-impl<'a, S: session_state::State> SessionBuilder<'a, S> {
+impl<S: BosStr, St: session_state::State> SessionBuilder<S, St> {
     /// Set the `sessionContext` field (optional)
     pub fn session_context(
         mut self,
@@ -1264,45 +1264,45 @@ impl<'a, S: session_state::State> SessionBuilder<'a, S> {
     }
 }
 
-impl<'a, S> SessionBuilder<'a, S>
+impl<S: BosStr, St> SessionBuilder<S, St>
 where
-    S: session_state::State,
-    S::StartedAt: session_state::IsUnset,
+    St: session_state::State,
+    St::StartedAt: session_state::IsUnset,
 {
     /// Set the `startedAt` field (required)
     pub fn started_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> SessionBuilder<'a, session_state::SetStartedAt<S>> {
+    ) -> SessionBuilder<S, session_state::SetStartedAt<St>> {
         self._fields.14 = Option::Some(value.into());
         SessionBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SessionBuilder<'a, S>
+impl<S: BosStr, St> SessionBuilder<S, St>
 where
-    S: session_state::State,
-    S::Status: session_state::IsUnset,
+    St: session_state::State,
+    St::Status: session_state::IsUnset,
 {
     /// Set the `status` field (required)
     pub fn status(
         mut self,
         value: impl Into<S>,
-    ) -> SessionBuilder<'a, session_state::SetStatus<S>> {
+    ) -> SessionBuilder<S, session_state::SetStatus<St>> {
         self._fields.15 = Option::Some(value.into());
         SessionBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: session_state::State> SessionBuilder<'a, S> {
+impl<S: BosStr, St: session_state::State> SessionBuilder<S, St> {
     /// Set the `updatedAt` field (optional)
     pub fn updated_at(mut self, value: impl Into<Option<Datetime>>) -> Self {
         self._fields.16 = value.into();
@@ -1315,16 +1315,16 @@ impl<'a, S: session_state::State> SessionBuilder<'a, S> {
     }
 }
 
-impl<'a, S> SessionBuilder<'a, S>
+impl<S: BosStr, St> SessionBuilder<S, St>
 where
-    S: session_state::State,
-    S::StartedAt: session_state::IsSet,
-    S::Status: session_state::IsSet,
-    S::Platform: session_state::IsSet,
-    S::ClientVersion: session_state::IsSet,
+    St: session_state::State,
+    St::StartedAt: session_state::IsSet,
+    St::Status: session_state::IsSet,
+    St::ClientVersion: session_state::IsSet,
+    St::Platform: session_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Session<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Session<S> {
         Session {
             activity_summary: self._fields.0,
             client_version: self._fields.1.unwrap(),
@@ -1346,11 +1346,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Session<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Session<S> {
         Session {
             activity_summary: self._fields.0,
             client_version: self._fields.1.unwrap(),

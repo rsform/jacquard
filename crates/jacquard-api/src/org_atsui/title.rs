@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
@@ -18,37 +18,32 @@ use serde::{Serialize, Deserialize};
 use crate::at_inlay::Response;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Title<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Title<S: BosStr = DefaultStr> {
     pub children: Data<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct TitleOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct TitleOutput<S: BosStr = DefaultStr> {
     #[serde(flatten)]
-    #[serde(borrow)]
     pub value: Response<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -57,12 +52,11 @@ pub struct TitleResponse;
 impl jacquard_common::xrpc::XrpcResp for TitleResponse {
     const NSID: &'static str = "org.atsui.Title";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = TitleOutput<S>;
+    type Output<S: BosStr> = TitleOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for Title<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for Title<S> {
     const NSID: &'static str = "org.atsui.Title";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -77,7 +71,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for TitleRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = Title<S>;
+    type Request<S: BosStr> = Title<S>;
     type Response = TitleResponse;
 }
 
@@ -100,9 +94,9 @@ pub mod title_state {
         type Children = Unset;
     }
     ///State transition - sets the `children` field to Set
-    pub struct SetChildren<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetChildren<S> {}
-    impl<S: State> State for SetChildren<S> {
+    pub struct SetChildren<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetChildren<St> {}
+    impl<St: State> State for SetChildren<St> {
         type Children = Set<members::children>;
     }
     /// Marker types for field names
@@ -113,64 +107,64 @@ pub mod title_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct TitleBuilder<'a, S: title_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct TitleBuilder<S: BosStr, St: title_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Data<S>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Title<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> TitleBuilder<'a, title_state::Empty> {
+impl<S: BosStr> Title<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> TitleBuilder<S, title_state::Empty> {
         TitleBuilder::new()
     }
 }
 
-impl<'a> TitleBuilder<'a, title_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> TitleBuilder<S, title_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         TitleBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> TitleBuilder<'a, S>
+impl<S: BosStr, St> TitleBuilder<S, St>
 where
-    S: title_state::State,
-    S::Children: title_state::IsUnset,
+    St: title_state::State,
+    St::Children: title_state::IsUnset,
 {
     /// Set the `children` field (required)
     pub fn children(
         mut self,
         value: impl Into<Data<S>>,
-    ) -> TitleBuilder<'a, title_state::SetChildren<S>> {
+    ) -> TitleBuilder<S, title_state::SetChildren<St>> {
         self._fields.0 = Option::Some(value.into());
         TitleBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> TitleBuilder<'a, S>
+impl<S: BosStr, St> TitleBuilder<S, St>
 where
-    S: title_state::State,
-    S::Children: title_state::IsSet,
+    St: title_state::State,
+    St::Children: title_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Title<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Title<S> {
         Title {
             children: self._fields.0.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Title<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Title<S> {
         Title {
             children: self._fields.0.unwrap(),
             extra_data: Some(extra_data),

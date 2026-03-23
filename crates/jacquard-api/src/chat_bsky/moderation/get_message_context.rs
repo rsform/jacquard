@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::{IntoStatic, open_union};
@@ -19,14 +19,14 @@ use crate::chat_bsky::convo::DeletedMessageView;
 use crate::chat_bsky::convo::MessageView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetMessageContext<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetMessageContext<S: BosStr = DefaultStr> {
     ///Defaults to `5`.
     #[serde(default = "_default_after")]
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -36,26 +36,22 @@ pub struct GetMessageContext<S: Bos<str> + AsRef<str> = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub before: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub convo_id: Option<S>,
-    #[serde(borrow)]
     pub message_id: S,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetMessageContextOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetMessageContextOutput<S: BosStr = DefaultStr> {
     pub messages: Vec<GetMessageContextOutputMessagesItem<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -65,11 +61,11 @@ pub struct GetMessageContextOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub enum GetMessageContextOutputMessagesItem<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum GetMessageContextOutputMessagesItem<S: BosStr = DefaultStr> {
     #[serde(rename = "chat.bsky.convo.defs#messageView")]
     MessageView(Box<MessageView<S>>),
     #[serde(rename = "chat.bsky.convo.defs#deletedMessageView")]
@@ -81,12 +77,11 @@ pub struct GetMessageContextResponse;
 impl jacquard_common::xrpc::XrpcResp for GetMessageContextResponse {
     const NSID: &'static str = "chat.bsky.moderation.getMessageContext";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetMessageContextOutput<S>;
+    type Output<S: BosStr> = GetMessageContextOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetMessageContext<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetMessageContext<S> {
     const NSID: &'static str = "chat.bsky.moderation.getMessageContext";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetMessageContextResponse;
@@ -97,7 +92,7 @@ pub struct GetMessageContextRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetMessageContextRequest {
     const PATH: &'static str = "/xrpc/chat.bsky.moderation.getMessageContext";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetMessageContext<S>;
+    type Request<S: BosStr> = GetMessageContext<S>;
     type Response = GetMessageContextResponse;
 }
 
@@ -128,9 +123,9 @@ pub mod get_message_context_state {
         type MessageId = Unset;
     }
     ///State transition - sets the `message_id` field to Set
-    pub struct SetMessageId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetMessageId<S> {}
-    impl<S: State> State for SetMessageId<S> {
+    pub struct SetMessageId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMessageId<St> {}
+    impl<St: State> State for SetMessageId<St> {
         type MessageId = Set<members::message_id>;
     }
     /// Marker types for field names
@@ -141,32 +136,32 @@ pub mod get_message_context_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetMessageContextBuilder<'a, S: get_message_context_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetMessageContextBuilder<S: BosStr, St: get_message_context_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<i64>, Option<i64>, Option<S>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetMessageContext<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetMessageContextBuilder<'a, get_message_context_state::Empty> {
+impl<S: BosStr> GetMessageContext<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetMessageContextBuilder<S, get_message_context_state::Empty> {
         GetMessageContextBuilder::new()
     }
 }
 
-impl<'a> GetMessageContextBuilder<'a, get_message_context_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetMessageContextBuilder<S, get_message_context_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetMessageContextBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: get_message_context_state::State> GetMessageContextBuilder<'a, S> {
+impl<S: BosStr, St: get_message_context_state::State> GetMessageContextBuilder<S, St> {
     /// Set the `after` field (optional)
     pub fn after(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.0 = value.into();
@@ -179,7 +174,7 @@ impl<'a, S: get_message_context_state::State> GetMessageContextBuilder<'a, S> {
     }
 }
 
-impl<'a, S: get_message_context_state::State> GetMessageContextBuilder<'a, S> {
+impl<S: BosStr, St: get_message_context_state::State> GetMessageContextBuilder<S, St> {
     /// Set the `before` field (optional)
     pub fn before(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -192,7 +187,7 @@ impl<'a, S: get_message_context_state::State> GetMessageContextBuilder<'a, S> {
     }
 }
 
-impl<'a, S: get_message_context_state::State> GetMessageContextBuilder<'a, S> {
+impl<S: BosStr, St: get_message_context_state::State> GetMessageContextBuilder<S, St> {
     /// Set the `convoId` field (optional)
     pub fn convo_id(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -205,32 +200,32 @@ impl<'a, S: get_message_context_state::State> GetMessageContextBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GetMessageContextBuilder<'a, S>
+impl<S: BosStr, St> GetMessageContextBuilder<S, St>
 where
-    S: get_message_context_state::State,
-    S::MessageId: get_message_context_state::IsUnset,
+    St: get_message_context_state::State,
+    St::MessageId: get_message_context_state::IsUnset,
 {
     /// Set the `messageId` field (required)
     pub fn message_id(
         mut self,
         value: impl Into<S>,
-    ) -> GetMessageContextBuilder<'a, get_message_context_state::SetMessageId<S>> {
+    ) -> GetMessageContextBuilder<S, get_message_context_state::SetMessageId<St>> {
         self._fields.3 = Option::Some(value.into());
         GetMessageContextBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetMessageContextBuilder<'a, S>
+impl<S: BosStr, St> GetMessageContextBuilder<S, St>
 where
-    S: get_message_context_state::State,
-    S::MessageId: get_message_context_state::IsSet,
+    St: get_message_context_state::State,
+    St::MessageId: get_message_context_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetMessageContext<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetMessageContext<S> {
         GetMessageContext {
             after: self._fields.0,
             before: self._fields.1,

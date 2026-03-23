@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::value::Data;
@@ -19,36 +19,32 @@ use serde::{Serialize, Deserialize};
 use crate::win_tomo_x::pushat::NotifyBody;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct PushNotify<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct PushNotify<S: BosStr = DefaultStr> {
     pub body: NotifyBody<S>,
     ///The DID of the target user to whom the notification will be sent.
     pub target: Did<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic, Default)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct PushNotifyOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+pub struct PushNotifyOutput<S: BosStr = DefaultStr> {
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -108,12 +104,11 @@ pub struct PushNotifyResponse;
 impl jacquard_common::xrpc::XrpcResp for PushNotifyResponse {
     const NSID: &'static str = "win.tomo-x.pushat.pushNotify";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = PushNotifyOutput<S>;
+    type Output<S: BosStr> = PushNotifyOutput<S>;
     type Err = PushNotifyError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for PushNotify<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for PushNotify<S> {
     const NSID: &'static str = "win.tomo-x.pushat.pushNotify";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -128,7 +123,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for PushNotifyRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = PushNotify<S>;
+    type Request<S: BosStr> = PushNotify<S>;
     type Response = PushNotifyResponse;
 }
 
@@ -153,17 +148,17 @@ pub mod push_notify_state {
         type Target = Unset;
     }
     ///State transition - sets the `body` field to Set
-    pub struct SetBody<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBody<S> {}
-    impl<S: State> State for SetBody<S> {
+    pub struct SetBody<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBody<St> {}
+    impl<St: State> State for SetBody<St> {
         type Body = Set<members::body>;
-        type Target = S::Target;
+        type Target = St::Target;
     }
     ///State transition - sets the `target` field to Set
-    pub struct SetTarget<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTarget<S> {}
-    impl<S: State> State for SetTarget<S> {
-        type Body = S::Body;
+    pub struct SetTarget<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTarget<St> {}
+    impl<St: State> State for SetTarget<St> {
+        type Body = St::Body;
         type Target = Set<members::target>;
     }
     /// Marker types for field names
@@ -176,88 +171,88 @@ pub mod push_notify_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct PushNotifyBuilder<'a, S: push_notify_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct PushNotifyBuilder<S: BosStr, St: push_notify_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<NotifyBody<S>>, Option<Did<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> PushNotify<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> PushNotifyBuilder<'a, push_notify_state::Empty> {
+impl<S: BosStr> PushNotify<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> PushNotifyBuilder<S, push_notify_state::Empty> {
         PushNotifyBuilder::new()
     }
 }
 
-impl<'a> PushNotifyBuilder<'a, push_notify_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> PushNotifyBuilder<S, push_notify_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         PushNotifyBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PushNotifyBuilder<'a, S>
+impl<S: BosStr, St> PushNotifyBuilder<S, St>
 where
-    S: push_notify_state::State,
-    S::Body: push_notify_state::IsUnset,
+    St: push_notify_state::State,
+    St::Body: push_notify_state::IsUnset,
 {
     /// Set the `body` field (required)
     pub fn body(
         mut self,
         value: impl Into<NotifyBody<S>>,
-    ) -> PushNotifyBuilder<'a, push_notify_state::SetBody<S>> {
+    ) -> PushNotifyBuilder<S, push_notify_state::SetBody<St>> {
         self._fields.0 = Option::Some(value.into());
         PushNotifyBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PushNotifyBuilder<'a, S>
+impl<S: BosStr, St> PushNotifyBuilder<S, St>
 where
-    S: push_notify_state::State,
-    S::Target: push_notify_state::IsUnset,
+    St: push_notify_state::State,
+    St::Target: push_notify_state::IsUnset,
 {
     /// Set the `target` field (required)
     pub fn target(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> PushNotifyBuilder<'a, push_notify_state::SetTarget<S>> {
+    ) -> PushNotifyBuilder<S, push_notify_state::SetTarget<St>> {
         self._fields.1 = Option::Some(value.into());
         PushNotifyBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PushNotifyBuilder<'a, S>
+impl<S: BosStr, St> PushNotifyBuilder<S, St>
 where
-    S: push_notify_state::State,
-    S::Body: push_notify_state::IsSet,
-    S::Target: push_notify_state::IsSet,
+    St: push_notify_state::State,
+    St::Body: push_notify_state::IsSet,
+    St::Target: push_notify_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> PushNotify<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> PushNotify<S> {
         PushNotify {
             body: self._fields.0.unwrap(),
             target: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> PushNotify<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> PushNotify<S> {
         PushNotify {
             body: self._fields.0.unwrap(),
             target: self._fields.1.unwrap(),

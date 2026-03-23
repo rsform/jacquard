@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
@@ -19,33 +19,30 @@ use serde::{Serialize, Deserialize};
 use crate::social_clippr::feed::TagView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetTags<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct GetTags<S: BosStr = DefaultStr> {
     pub uris: Vec<AtUri<S>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetTagsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetTagsOutput<S: BosStr = DefaultStr> {
     ///An array of hydrated tag views
     pub tags: Vec<TagView<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -54,12 +51,11 @@ pub struct GetTagsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetTagsResponse {
     const NSID: &'static str = "social.clippr.feed.getTags";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetTagsOutput<S>;
+    type Output<S: BosStr> = GetTagsOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetTags<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetTags<S> {
     const NSID: &'static str = "social.clippr.feed.getTags";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetTagsResponse;
@@ -70,7 +66,7 @@ pub struct GetTagsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetTagsRequest {
     const PATH: &'static str = "/xrpc/social.clippr.feed.getTags";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetTags<S>;
+    type Request<S: BosStr> = GetTags<S>;
     type Response = GetTagsResponse;
 }
 
@@ -93,9 +89,9 @@ pub mod get_tags_state {
         type Uris = Unset;
     }
     ///State transition - sets the `uris` field to Set
-    pub struct SetUris<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUris<S> {}
-    impl<S: State> State for SetUris<S> {
+    pub struct SetUris<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUris<St> {}
+    impl<St: State> State for SetUris<St> {
         type Uris = Set<members::uris>;
     }
     /// Marker types for field names
@@ -106,57 +102,57 @@ pub mod get_tags_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetTagsBuilder<'a, S: get_tags_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetTagsBuilder<S: BosStr, St: get_tags_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<AtUri<S>>>,),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetTags<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetTagsBuilder<'a, get_tags_state::Empty> {
+impl<S: BosStr> GetTags<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetTagsBuilder<S, get_tags_state::Empty> {
         GetTagsBuilder::new()
     }
 }
 
-impl<'a> GetTagsBuilder<'a, get_tags_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetTagsBuilder<S, get_tags_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetTagsBuilder {
             _state: PhantomData,
             _fields: (None,),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetTagsBuilder<'a, S>
+impl<S: BosStr, St> GetTagsBuilder<S, St>
 where
-    S: get_tags_state::State,
-    S::Uris: get_tags_state::IsUnset,
+    St: get_tags_state::State,
+    St::Uris: get_tags_state::IsUnset,
 {
     /// Set the `uris` field (required)
     pub fn uris(
         mut self,
         value: impl Into<Vec<AtUri<S>>>,
-    ) -> GetTagsBuilder<'a, get_tags_state::SetUris<S>> {
+    ) -> GetTagsBuilder<S, get_tags_state::SetUris<St>> {
         self._fields.0 = Option::Some(value.into());
         GetTagsBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetTagsBuilder<'a, S>
+impl<S: BosStr, St> GetTagsBuilder<S, St>
 where
-    S: get_tags_state::State,
-    S::Uris: get_tags_state::IsSet,
+    St: get_tags_state::State,
+    St::Uris: get_tags_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetTags<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetTags<S> {
         GetTags {
             uris: self._fields.0.unwrap(),
         }

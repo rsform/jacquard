@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -33,11 +33,11 @@ use crate::at_margin::preferences;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct LabelPreference<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct LabelPreference<S: BosStr = DefaultStr> {
     ///The label identifier (e.g. sexual, violence, spam).
     pub label: S,
     ///DID of the labeler service.
@@ -51,14 +51,14 @@ pub struct LabelPreference<S: Bos<str> + AsRef<str> = DefaultStr> {
 /// How to handle content with this label: hide, warn, or ignore.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum LabelPreferenceVisibility<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum LabelPreferenceVisibility<S: BosStr = DefaultStr> {
     Hide,
     Warn,
     Ignore,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> LabelPreferenceVisibility<S> {
+impl<S: BosStr> LabelPreferenceVisibility<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Hide => "hide",
@@ -78,19 +78,19 @@ impl<S: Bos<str> + AsRef<str>> LabelPreferenceVisibility<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for LabelPreferenceVisibility<S> {
+impl<S: BosStr> core::fmt::Display for LabelPreferenceVisibility<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for LabelPreferenceVisibility<S> {
+impl<S: BosStr> AsRef<str> for LabelPreferenceVisibility<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for LabelPreferenceVisibility<S> {
+impl<S: BosStr> Serialize for LabelPreferenceVisibility<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -99,7 +99,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for LabelPreferenceVisibility<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
 for LabelPreferenceVisibility<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
@@ -110,14 +110,18 @@ for LabelPreferenceVisibility<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for LabelPreferenceVisibility<S> {
+impl<S: BosStr + Default> Default for LabelPreferenceVisibility<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for LabelPreferenceVisibility<S> {
-    type Output = LabelPreferenceVisibility<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for LabelPreferenceVisibility<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = LabelPreferenceVisibility<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             LabelPreferenceVisibility::Hide => LabelPreferenceVisibility::Hide,
@@ -135,11 +139,11 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for LabelPreferenceVisibility<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct LabelerSubscription<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct LabelerSubscription<S: BosStr = DefaultStr> {
     ///DID of the labeler service.
     pub did: S,
     #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
@@ -154,11 +158,11 @@ pub struct LabelerSubscription<S: Bos<str> + AsRef<str> = DefaultStr> {
     rename = "at.margin.preferences",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Preferences<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Preferences<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     ///If true, do not show the confirmation modal when opening external links.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -182,24 +186,24 @@ pub struct Preferences<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct PreferencesGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct PreferencesGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Preferences<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Preferences<S> {
+impl<S: BosStr> Preferences<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, PreferencesRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for LabelPreference<S> {
+impl<S: BosStr> LexiconSchema for LabelPreference<S> {
     fn nsid() -> &'static str {
         "at.margin.preferences"
     }
@@ -214,7 +218,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for LabelPreference<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for LabelerSubscription<S> {
+impl<S: BosStr> LexiconSchema for LabelerSubscription<S> {
     fn nsid() -> &'static str {
         "at.margin.preferences"
     }
@@ -236,17 +240,17 @@ pub struct PreferencesRecord;
 impl XrpcResp for PreferencesRecord {
     const NSID: &'static str = "at.margin.preferences";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = PreferencesGetRecordOutput<S>;
+    type Output<S: BosStr> = PreferencesGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<PreferencesGetRecordOutput<S>> for Preferences<S> {
+impl<S: BosStr> From<PreferencesGetRecordOutput<S>> for Preferences<S> {
     fn from(output: PreferencesGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Preferences<S> {
+impl<S: BosStr> Collection for Preferences<S> {
     const NSID: &'static str = "at.margin.preferences";
     type Record = PreferencesRecord;
 }
@@ -256,7 +260,7 @@ impl Collection for PreferencesRecord {
     type Record = PreferencesRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Preferences<S> {
+impl<S: BosStr> LexiconSchema for Preferences<S> {
     fn nsid() -> &'static str {
         "at.margin.preferences"
     }
@@ -488,9 +492,9 @@ pub mod preferences_state {
         type CreatedAt = Unset;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
@@ -501,9 +505,9 @@ pub mod preferences_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct PreferencesBuilder<'a, S: preferences_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct PreferencesBuilder<S: BosStr, St: preferences_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
         Option<bool>,
@@ -511,47 +515,47 @@ pub struct PreferencesBuilder<'a, S: preferences_state::State> {
         Option<Vec<preferences::LabelPreference<S>>>,
         Option<Vec<preferences::LabelerSubscription<S>>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Preferences<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> PreferencesBuilder<'a, preferences_state::Empty> {
+impl<S: BosStr> Preferences<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> PreferencesBuilder<S, preferences_state::Empty> {
         PreferencesBuilder::new()
     }
 }
 
-impl<'a> PreferencesBuilder<'a, preferences_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> PreferencesBuilder<S, preferences_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         PreferencesBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> PreferencesBuilder<'a, S>
+impl<S: BosStr, St> PreferencesBuilder<S, St>
 where
-    S: preferences_state::State,
-    S::CreatedAt: preferences_state::IsUnset,
+    St: preferences_state::State,
+    St::CreatedAt: preferences_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> PreferencesBuilder<'a, preferences_state::SetCreatedAt<S>> {
+    ) -> PreferencesBuilder<S, preferences_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         PreferencesBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: preferences_state::State> PreferencesBuilder<'a, S> {
+impl<S: BosStr, St: preferences_state::State> PreferencesBuilder<S, St> {
     /// Set the `disableExternalLinkWarning` field (optional)
     pub fn disable_external_link_warning(
         mut self,
@@ -567,7 +571,7 @@ impl<'a, S: preferences_state::State> PreferencesBuilder<'a, S> {
     }
 }
 
-impl<'a, S: preferences_state::State> PreferencesBuilder<'a, S> {
+impl<S: BosStr, St: preferences_state::State> PreferencesBuilder<S, St> {
     /// Set the `externalLinkSkippedHostnames` field (optional)
     pub fn external_link_skipped_hostnames(
         mut self,
@@ -586,7 +590,7 @@ impl<'a, S: preferences_state::State> PreferencesBuilder<'a, S> {
     }
 }
 
-impl<'a, S: preferences_state::State> PreferencesBuilder<'a, S> {
+impl<S: BosStr, St: preferences_state::State> PreferencesBuilder<S, St> {
     /// Set the `labelPreferences` field (optional)
     pub fn label_preferences(
         mut self,
@@ -605,7 +609,7 @@ impl<'a, S: preferences_state::State> PreferencesBuilder<'a, S> {
     }
 }
 
-impl<'a, S: preferences_state::State> PreferencesBuilder<'a, S> {
+impl<S: BosStr, St: preferences_state::State> PreferencesBuilder<S, St> {
     /// Set the `subscribedLabelers` field (optional)
     pub fn subscribed_labelers(
         mut self,
@@ -624,13 +628,13 @@ impl<'a, S: preferences_state::State> PreferencesBuilder<'a, S> {
     }
 }
 
-impl<'a, S> PreferencesBuilder<'a, S>
+impl<S: BosStr, St> PreferencesBuilder<S, St>
 where
-    S: preferences_state::State,
-    S::CreatedAt: preferences_state::IsSet,
+    St: preferences_state::State,
+    St::CreatedAt: preferences_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Preferences<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Preferences<S> {
         Preferences {
             created_at: self._fields.0.unwrap(),
             disable_external_link_warning: self._fields.1,
@@ -640,11 +644,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Preferences<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Preferences<S> {
         Preferences {
             created_at: self._fields.0.unwrap(),
             disable_external_link_warning: self._fields.1,

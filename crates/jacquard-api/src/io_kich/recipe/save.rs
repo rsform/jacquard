@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use crate::com_atproto::repo::strong_ref::StrongRef;
     rename = "io.kich.recipe.save",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Save<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Save<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     ///Reference to the saved recipe (io.kich.recipe.recipe).
     pub subject: StrongRef<S>,
@@ -55,18 +55,18 @@ pub struct Save<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct SaveGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct SaveGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Save<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Save<S> {
+impl<S: BosStr> Save<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, SaveRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -79,17 +79,17 @@ pub struct SaveRecord;
 impl XrpcResp for SaveRecord {
     const NSID: &'static str = "io.kich.recipe.save";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = SaveGetRecordOutput<S>;
+    type Output<S: BosStr> = SaveGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<SaveGetRecordOutput<S>> for Save<S> {
+impl<S: BosStr> From<SaveGetRecordOutput<S>> for Save<S> {
     fn from(output: SaveGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Save<S> {
+impl<S: BosStr> Collection for Save<S> {
     const NSID: &'static str = "io.kich.recipe.save";
     type Record = SaveRecord;
 }
@@ -99,7 +99,7 @@ impl Collection for SaveRecord {
     type Record = SaveRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Save<S> {
+impl<S: BosStr> LexiconSchema for Save<S> {
     fn nsid() -> &'static str {
         "io.kich.recipe.save"
     }
@@ -135,17 +135,17 @@ pub mod save_state {
         type Subject = Unset;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
-        type Subject = S::Subject;
+        type Subject = St::Subject;
     }
     ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type CreatedAt = S::CreatedAt;
+    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubject<St> {}
+    impl<St: State> State for SetSubject<St> {
+        type CreatedAt = St::CreatedAt;
         type Subject = Set<members::subject>;
     }
     /// Marker types for field names
@@ -158,70 +158,70 @@ pub mod save_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct SaveBuilder<'a, S: save_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct SaveBuilder<S: BosStr, St: save_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<StrongRef<S>>, Option<StrongRef<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Save<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> SaveBuilder<'a, save_state::Empty> {
+impl<S: BosStr> Save<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> SaveBuilder<S, save_state::Empty> {
         SaveBuilder::new()
     }
 }
 
-impl<'a> SaveBuilder<'a, save_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> SaveBuilder<S, save_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SaveBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SaveBuilder<'a, S>
+impl<S: BosStr, St> SaveBuilder<S, St>
 where
-    S: save_state::State,
-    S::CreatedAt: save_state::IsUnset,
+    St: save_state::State,
+    St::CreatedAt: save_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> SaveBuilder<'a, save_state::SetCreatedAt<S>> {
+    ) -> SaveBuilder<S, save_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         SaveBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SaveBuilder<'a, S>
+impl<S: BosStr, St> SaveBuilder<S, St>
 where
-    S: save_state::State,
-    S::Subject: save_state::IsUnset,
+    St: save_state::State,
+    St::Subject: save_state::IsUnset,
 {
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
         value: impl Into<StrongRef<S>>,
-    ) -> SaveBuilder<'a, save_state::SetSubject<S>> {
+    ) -> SaveBuilder<S, save_state::SetSubject<St>> {
         self._fields.1 = Option::Some(value.into());
         SaveBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: save_state::State> SaveBuilder<'a, S> {
+impl<S: BosStr, St: save_state::State> SaveBuilder<S, St> {
     /// Set the `via` field (optional)
     pub fn via(mut self, value: impl Into<Option<StrongRef<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -234,14 +234,14 @@ impl<'a, S: save_state::State> SaveBuilder<'a, S> {
     }
 }
 
-impl<'a, S> SaveBuilder<'a, S>
+impl<S: BosStr, St> SaveBuilder<S, St>
 where
-    S: save_state::State,
-    S::CreatedAt: save_state::IsSet,
-    S::Subject: save_state::IsSet,
+    St: save_state::State,
+    St::CreatedAt: save_state::IsSet,
+    St::Subject: save_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Save<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Save<S> {
         Save {
             created_at: self._fields.0.unwrap(),
             subject: self._fields.1.unwrap(),
@@ -249,8 +249,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Save<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Save<S> {
         Save {
             created_at: self._fields.0.unwrap(),
             subject: self._fields.1.unwrap(),

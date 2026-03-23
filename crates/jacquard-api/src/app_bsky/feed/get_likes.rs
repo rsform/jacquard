@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -31,11 +31,11 @@ use crate::app_bsky::feed::get_likes;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Like<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Like<S: BosStr = DefaultStr> {
     pub actor: ProfileView<S>,
     pub created_at: Datetime,
     pub indexed_at: Datetime,
@@ -45,51 +45,46 @@ pub struct Like<S: Bos<str> + AsRef<str> = DefaultStr> {
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetLikes<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetLikes<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub cid: Option<Cid<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub cursor: Option<S>,
     ///Defaults to `50`. Min: 1. Max: 100.
     #[serde(default = "_default_limit")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub limit: Option<i64>,
-    #[serde(borrow)]
     pub uri: AtUri<S>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetLikesOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetLikesOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cursor: Option<S>,
     pub likes: Vec<get_likes::Like<S>>,
     pub uri: AtUri<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Like<S> {
+impl<S: BosStr> LexiconSchema for Like<S> {
     fn nsid() -> &'static str {
         "app.bsky.feed.getLikes"
     }
@@ -109,12 +104,11 @@ pub struct GetLikesResponse;
 impl jacquard_common::xrpc::XrpcResp for GetLikesResponse {
     const NSID: &'static str = "app.bsky.feed.getLikes";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetLikesOutput<S>;
+    type Output<S: BosStr> = GetLikesOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetLikes<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetLikes<S> {
     const NSID: &'static str = "app.bsky.feed.getLikes";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetLikesResponse;
@@ -125,7 +119,7 @@ pub struct GetLikesRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetLikesRequest {
     const PATH: &'static str = "/xrpc/app.bsky.feed.getLikes";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetLikes<S>;
+    type Request<S: BosStr> = GetLikes<S>;
     type Response = GetLikesResponse;
 }
 
@@ -139,145 +133,145 @@ pub mod like_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type IndexedAt;
         type Actor;
         type CreatedAt;
-        type IndexedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type IndexedAt = Unset;
         type Actor = Unset;
         type CreatedAt = Unset;
-        type IndexedAt = Unset;
-    }
-    ///State transition - sets the `actor` field to Set
-    pub struct SetActor<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetActor<S> {}
-    impl<S: State> State for SetActor<S> {
-        type Actor = Set<members::actor>;
-        type CreatedAt = S::CreatedAt;
-        type IndexedAt = S::IndexedAt;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Actor = S::Actor;
-        type CreatedAt = Set<members::created_at>;
-        type IndexedAt = S::IndexedAt;
     }
     ///State transition - sets the `indexed_at` field to Set
-    pub struct SetIndexedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetIndexedAt<S> {}
-    impl<S: State> State for SetIndexedAt<S> {
-        type Actor = S::Actor;
-        type CreatedAt = S::CreatedAt;
+    pub struct SetIndexedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIndexedAt<St> {}
+    impl<St: State> State for SetIndexedAt<St> {
         type IndexedAt = Set<members::indexed_at>;
+        type Actor = St::Actor;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `actor` field to Set
+    pub struct SetActor<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetActor<St> {}
+    impl<St: State> State for SetActor<St> {
+        type IndexedAt = St::IndexedAt;
+        type Actor = Set<members::actor>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type IndexedAt = St::IndexedAt;
+        type Actor = St::Actor;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `indexed_at` field
+        pub struct indexed_at(());
         ///Marker type for the `actor` field
         pub struct actor(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `indexed_at` field
-        pub struct indexed_at(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct LikeBuilder<'a, S: like_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct LikeBuilder<S: BosStr, St: like_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<ProfileView<S>>, Option<Datetime>, Option<Datetime>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Like<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> LikeBuilder<'a, like_state::Empty> {
+impl<S: BosStr> Like<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> LikeBuilder<S, like_state::Empty> {
         LikeBuilder::new()
     }
 }
 
-impl<'a> LikeBuilder<'a, like_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> LikeBuilder<S, like_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         LikeBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LikeBuilder<'a, S>
+impl<S: BosStr, St> LikeBuilder<S, St>
 where
-    S: like_state::State,
-    S::Actor: like_state::IsUnset,
+    St: like_state::State,
+    St::Actor: like_state::IsUnset,
 {
     /// Set the `actor` field (required)
     pub fn actor(
         mut self,
         value: impl Into<ProfileView<S>>,
-    ) -> LikeBuilder<'a, like_state::SetActor<S>> {
+    ) -> LikeBuilder<S, like_state::SetActor<St>> {
         self._fields.0 = Option::Some(value.into());
         LikeBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LikeBuilder<'a, S>
+impl<S: BosStr, St> LikeBuilder<S, St>
 where
-    S: like_state::State,
-    S::CreatedAt: like_state::IsUnset,
+    St: like_state::State,
+    St::CreatedAt: like_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> LikeBuilder<'a, like_state::SetCreatedAt<S>> {
+    ) -> LikeBuilder<S, like_state::SetCreatedAt<St>> {
         self._fields.1 = Option::Some(value.into());
         LikeBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LikeBuilder<'a, S>
+impl<S: BosStr, St> LikeBuilder<S, St>
 where
-    S: like_state::State,
-    S::IndexedAt: like_state::IsUnset,
+    St: like_state::State,
+    St::IndexedAt: like_state::IsUnset,
 {
     /// Set the `indexedAt` field (required)
     pub fn indexed_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> LikeBuilder<'a, like_state::SetIndexedAt<S>> {
+    ) -> LikeBuilder<S, like_state::SetIndexedAt<St>> {
         self._fields.2 = Option::Some(value.into());
         LikeBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> LikeBuilder<'a, S>
+impl<S: BosStr, St> LikeBuilder<S, St>
 where
-    S: like_state::State,
-    S::Actor: like_state::IsSet,
-    S::CreatedAt: like_state::IsSet,
-    S::IndexedAt: like_state::IsSet,
+    St: like_state::State,
+    St::IndexedAt: like_state::IsSet,
+    St::Actor: like_state::IsSet,
+    St::CreatedAt: like_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Like<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Like<S> {
         Like {
             actor: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
@@ -285,8 +279,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Like<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Like<S> {
         Like {
             actor: self._fields.0.unwrap(),
             created_at: self._fields.1.unwrap(),
@@ -429,9 +423,9 @@ pub mod get_likes_state {
         type Uri = Unset;
     }
     ///State transition - sets the `uri` field to Set
-    pub struct SetUri<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUri<S> {}
-    impl<S: State> State for SetUri<S> {
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
         type Uri = Set<members::uri>;
     }
     /// Marker types for field names
@@ -442,32 +436,32 @@ pub mod get_likes_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetLikesBuilder<'a, S: get_likes_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetLikesBuilder<S: BosStr, St: get_likes_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Cid<S>>, Option<S>, Option<i64>, Option<AtUri<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetLikes<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetLikesBuilder<'a, get_likes_state::Empty> {
+impl<S: BosStr> GetLikes<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetLikesBuilder<S, get_likes_state::Empty> {
         GetLikesBuilder::new()
     }
 }
 
-impl<'a> GetLikesBuilder<'a, get_likes_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetLikesBuilder<S, get_likes_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetLikesBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: get_likes_state::State> GetLikesBuilder<'a, S> {
+impl<S: BosStr, St: get_likes_state::State> GetLikesBuilder<S, St> {
     /// Set the `cid` field (optional)
     pub fn cid(mut self, value: impl Into<Option<Cid<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -480,7 +474,7 @@ impl<'a, S: get_likes_state::State> GetLikesBuilder<'a, S> {
     }
 }
 
-impl<'a, S: get_likes_state::State> GetLikesBuilder<'a, S> {
+impl<S: BosStr, St: get_likes_state::State> GetLikesBuilder<S, St> {
     /// Set the `cursor` field (optional)
     pub fn cursor(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -493,7 +487,7 @@ impl<'a, S: get_likes_state::State> GetLikesBuilder<'a, S> {
     }
 }
 
-impl<'a, S: get_likes_state::State> GetLikesBuilder<'a, S> {
+impl<S: BosStr, St: get_likes_state::State> GetLikesBuilder<S, St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.2 = value.into();
@@ -506,32 +500,32 @@ impl<'a, S: get_likes_state::State> GetLikesBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GetLikesBuilder<'a, S>
+impl<S: BosStr, St> GetLikesBuilder<S, St>
 where
-    S: get_likes_state::State,
-    S::Uri: get_likes_state::IsUnset,
+    St: get_likes_state::State,
+    St::Uri: get_likes_state::IsUnset,
 {
     /// Set the `uri` field (required)
     pub fn uri(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> GetLikesBuilder<'a, get_likes_state::SetUri<S>> {
+    ) -> GetLikesBuilder<S, get_likes_state::SetUri<St>> {
         self._fields.3 = Option::Some(value.into());
         GetLikesBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> GetLikesBuilder<'a, S>
+impl<S: BosStr, St> GetLikesBuilder<S, St>
 where
-    S: get_likes_state::State,
-    S::Uri: get_likes_state::IsSet,
+    St: get_likes_state::State,
+    St::Uri: get_likes_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetLikes<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetLikes<S> {
         GetLikes {
             cid: self._fields.0,
             cursor: self._fields.1,

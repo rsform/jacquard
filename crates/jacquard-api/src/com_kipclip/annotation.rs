@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "com.kipclip.annotation",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Annotation<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Annotation<S: BosStr = DefaultStr> {
     pub created_at: Datetime,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<S>,
@@ -64,18 +64,18 @@ pub struct Annotation<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct AnnotationGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct AnnotationGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Annotation<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Annotation<S> {
+impl<S: BosStr> Annotation<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, AnnotationRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -88,17 +88,17 @@ pub struct AnnotationRecord;
 impl XrpcResp for AnnotationRecord {
     const NSID: &'static str = "com.kipclip.annotation";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = AnnotationGetRecordOutput<S>;
+    type Output<S: BosStr> = AnnotationGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<AnnotationGetRecordOutput<S>> for Annotation<S> {
+impl<S: BosStr> From<AnnotationGetRecordOutput<S>> for Annotation<S> {
     fn from(output: AnnotationGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Annotation<S> {
+impl<S: BosStr> Collection for Annotation<S> {
     const NSID: &'static str = "com.kipclip.annotation";
     type Record = AnnotationRecord;
 }
@@ -108,7 +108,7 @@ impl Collection for AnnotationRecord {
     type Record = AnnotationRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Annotation<S> {
+impl<S: BosStr> LexiconSchema for Annotation<S> {
     fn nsid() -> &'static str {
         "com.kipclip.annotation"
     }
@@ -174,17 +174,17 @@ pub mod annotation_state {
         type CreatedAt = Unset;
     }
     ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
+    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubject<St> {}
+    impl<St: State> State for SetSubject<St> {
         type Subject = Set<members::subject>;
-        type CreatedAt = S::CreatedAt;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Subject = S::Subject;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Subject = St::Subject;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
@@ -197,9 +197,9 @@ pub mod annotation_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct AnnotationBuilder<'a, S: annotation_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct AnnotationBuilder<S: BosStr, St: annotation_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
         Option<S>,
@@ -209,47 +209,47 @@ pub struct AnnotationBuilder<'a, S: annotation_state::State> {
         Option<AtUri<S>>,
         Option<S>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Annotation<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> AnnotationBuilder<'a, annotation_state::Empty> {
+impl<S: BosStr> Annotation<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> AnnotationBuilder<S, annotation_state::Empty> {
         AnnotationBuilder::new()
     }
 }
 
-impl<'a> AnnotationBuilder<'a, annotation_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> AnnotationBuilder<S, annotation_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         AnnotationBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> AnnotationBuilder<'a, S>
+impl<S: BosStr, St> AnnotationBuilder<S, St>
 where
-    S: annotation_state::State,
-    S::CreatedAt: annotation_state::IsUnset,
+    St: annotation_state::State,
+    St::CreatedAt: annotation_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> AnnotationBuilder<'a, annotation_state::SetCreatedAt<S>> {
+    ) -> AnnotationBuilder<S, annotation_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         AnnotationBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: annotation_state::State> AnnotationBuilder<'a, S> {
+impl<S: BosStr, St: annotation_state::State> AnnotationBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -262,7 +262,7 @@ impl<'a, S: annotation_state::State> AnnotationBuilder<'a, S> {
     }
 }
 
-impl<'a, S: annotation_state::State> AnnotationBuilder<'a, S> {
+impl<S: BosStr, St: annotation_state::State> AnnotationBuilder<S, St> {
     /// Set the `favicon` field (optional)
     pub fn favicon(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.2 = value.into();
@@ -275,7 +275,7 @@ impl<'a, S: annotation_state::State> AnnotationBuilder<'a, S> {
     }
 }
 
-impl<'a, S: annotation_state::State> AnnotationBuilder<'a, S> {
+impl<S: BosStr, St: annotation_state::State> AnnotationBuilder<S, St> {
     /// Set the `image` field (optional)
     pub fn image(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -288,7 +288,7 @@ impl<'a, S: annotation_state::State> AnnotationBuilder<'a, S> {
     }
 }
 
-impl<'a, S: annotation_state::State> AnnotationBuilder<'a, S> {
+impl<S: BosStr, St: annotation_state::State> AnnotationBuilder<S, St> {
     /// Set the `note` field (optional)
     pub fn note(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.4 = value.into();
@@ -301,26 +301,26 @@ impl<'a, S: annotation_state::State> AnnotationBuilder<'a, S> {
     }
 }
 
-impl<'a, S> AnnotationBuilder<'a, S>
+impl<S: BosStr, St> AnnotationBuilder<S, St>
 where
-    S: annotation_state::State,
-    S::Subject: annotation_state::IsUnset,
+    St: annotation_state::State,
+    St::Subject: annotation_state::IsUnset,
 {
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
         value: impl Into<AtUri<S>>,
-    ) -> AnnotationBuilder<'a, annotation_state::SetSubject<S>> {
+    ) -> AnnotationBuilder<S, annotation_state::SetSubject<St>> {
         self._fields.5 = Option::Some(value.into());
         AnnotationBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: annotation_state::State> AnnotationBuilder<'a, S> {
+impl<S: BosStr, St: annotation_state::State> AnnotationBuilder<S, St> {
     /// Set the `title` field (optional)
     pub fn title(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.6 = value.into();
@@ -333,14 +333,14 @@ impl<'a, S: annotation_state::State> AnnotationBuilder<'a, S> {
     }
 }
 
-impl<'a, S> AnnotationBuilder<'a, S>
+impl<S: BosStr, St> AnnotationBuilder<S, St>
 where
-    S: annotation_state::State,
-    S::Subject: annotation_state::IsSet,
-    S::CreatedAt: annotation_state::IsSet,
+    St: annotation_state::State,
+    St::Subject: annotation_state::IsSet,
+    St::CreatedAt: annotation_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Annotation<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Annotation<S> {
         Annotation {
             created_at: self._fields.0.unwrap(),
             description: self._fields.1,
@@ -352,11 +352,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Annotation<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> Annotation<S> {
         Annotation {
             created_at: self._fields.0.unwrap(),
             description: self._fields.1,

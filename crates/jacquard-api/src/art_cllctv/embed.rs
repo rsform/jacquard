@@ -12,7 +12,7 @@ pub mod images;
 
 #[allow(unused_imports)]
 use alloc::collections::BTreeMap;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -31,11 +31,11 @@ use crate::art_cllctv::embed;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Tombstone<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Tombstone<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub camera: Option<embed::TombstoneCamera<S>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -53,11 +53,11 @@ pub struct Tombstone<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct TombstoneCamera<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct TombstoneCamera<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub make: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -71,11 +71,11 @@ pub struct TombstoneCamera<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct TombstoneDimensions<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct TombstoneDimensions<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub depth: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -93,11 +93,11 @@ pub struct TombstoneDimensions<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct TombstoneLens<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct TombstoneLens<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub exposure_time: Option<S>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -110,7 +110,7 @@ pub struct TombstoneLens<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Tombstone<S> {
+impl<S: BosStr> LexiconSchema for Tombstone<S> {
     fn nsid() -> &'static str {
         "art.cllctv.embed.defs"
     }
@@ -125,7 +125,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Tombstone<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for TombstoneCamera<S> {
+impl<S: BosStr> LexiconSchema for TombstoneCamera<S> {
     fn nsid() -> &'static str {
         "art.cllctv.embed.defs"
     }
@@ -140,7 +140,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for TombstoneCamera<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for TombstoneDimensions<S> {
+impl<S: BosStr> LexiconSchema for TombstoneDimensions<S> {
     fn nsid() -> &'static str {
         "art.cllctv.embed.defs"
     }
@@ -155,7 +155,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for TombstoneDimensions<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for TombstoneLens<S> {
+impl<S: BosStr> LexiconSchema for TombstoneLens<S> {
     fn nsid() -> &'static str {
         "art.cllctv.embed.defs"
     }

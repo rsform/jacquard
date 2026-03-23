@@ -10,25 +10,23 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{Bos, DefaultStr};
+use jacquard_common::{Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct RequestEmailUpdateOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct RequestEmailUpdateOutput<S: BosStr = DefaultStr> {
     pub token_required: bool,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -41,7 +39,7 @@ pub struct RequestEmailUpdateResponse;
 impl jacquard_common::xrpc::XrpcResp for RequestEmailUpdateResponse {
     const NSID: &'static str = "com.atproto.server.requestEmailUpdate";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = RequestEmailUpdateOutput<S>;
+    type Output<S: BosStr> = RequestEmailUpdateOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
@@ -60,6 +58,6 @@ impl jacquard_common::xrpc::XrpcEndpoint for RequestEmailUpdateRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = RequestEmailUpdate;
+    type Request<S: BosStr> = RequestEmailUpdate;
     type Response = RequestEmailUpdateResponse;
 }

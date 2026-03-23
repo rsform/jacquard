@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -34,11 +34,11 @@ use serde::{Serialize, Deserialize};
     rename = "dev.baileytownsend.health.workout",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Workout<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Workout<S: BosStr = DefaultStr> {
     ///Type of activity. Walking, running, weights, etc.
     pub activity: S,
     ///Active calories burned during the workout.
@@ -61,18 +61,18 @@ pub struct Workout<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct WorkoutGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct WorkoutGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Workout<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Workout<S> {
+impl<S: BosStr> Workout<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, WorkoutRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -85,17 +85,17 @@ pub struct WorkoutRecord;
 impl XrpcResp for WorkoutRecord {
     const NSID: &'static str = "dev.baileytownsend.health.workout";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = WorkoutGetRecordOutput<S>;
+    type Output<S: BosStr> = WorkoutGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<WorkoutGetRecordOutput<S>> for Workout<S> {
+impl<S: BosStr> From<WorkoutGetRecordOutput<S>> for Workout<S> {
     fn from(output: WorkoutGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Workout<S> {
+impl<S: BosStr> Collection for Workout<S> {
     const NSID: &'static str = "dev.baileytownsend.health.workout";
     type Record = WorkoutRecord;
 }
@@ -105,7 +105,7 @@ impl Collection for WorkoutRecord {
     type Record = WorkoutRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Workout<S> {
+impl<S: BosStr> LexiconSchema for Workout<S> {
     fn nsid() -> &'static str {
         "dev.baileytownsend.health.workout"
     }
@@ -131,110 +131,110 @@ pub mod workout_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Activity;
-        type CaloriesBurned;
         type StartTime;
-        type EndTime;
-        type Duration;
         type CreatedAt;
+        type EndTime;
+        type CaloriesBurned;
+        type Duration;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Activity = Unset;
-        type CaloriesBurned = Unset;
         type StartTime = Unset;
-        type EndTime = Unset;
-        type Duration = Unset;
         type CreatedAt = Unset;
+        type EndTime = Unset;
+        type CaloriesBurned = Unset;
+        type Duration = Unset;
     }
     ///State transition - sets the `activity` field to Set
-    pub struct SetActivity<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetActivity<S> {}
-    impl<S: State> State for SetActivity<S> {
+    pub struct SetActivity<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetActivity<St> {}
+    impl<St: State> State for SetActivity<St> {
         type Activity = Set<members::activity>;
-        type CaloriesBurned = S::CaloriesBurned;
-        type StartTime = S::StartTime;
-        type EndTime = S::EndTime;
-        type Duration = S::Duration;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `calories_burned` field to Set
-    pub struct SetCaloriesBurned<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCaloriesBurned<S> {}
-    impl<S: State> State for SetCaloriesBurned<S> {
-        type Activity = S::Activity;
-        type CaloriesBurned = Set<members::calories_burned>;
-        type StartTime = S::StartTime;
-        type EndTime = S::EndTime;
-        type Duration = S::Duration;
-        type CreatedAt = S::CreatedAt;
+        type StartTime = St::StartTime;
+        type CreatedAt = St::CreatedAt;
+        type EndTime = St::EndTime;
+        type CaloriesBurned = St::CaloriesBurned;
+        type Duration = St::Duration;
     }
     ///State transition - sets the `start_time` field to Set
-    pub struct SetStartTime<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStartTime<S> {}
-    impl<S: State> State for SetStartTime<S> {
-        type Activity = S::Activity;
-        type CaloriesBurned = S::CaloriesBurned;
+    pub struct SetStartTime<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStartTime<St> {}
+    impl<St: State> State for SetStartTime<St> {
+        type Activity = St::Activity;
         type StartTime = Set<members::start_time>;
-        type EndTime = S::EndTime;
-        type Duration = S::Duration;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `end_time` field to Set
-    pub struct SetEndTime<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEndTime<S> {}
-    impl<S: State> State for SetEndTime<S> {
-        type Activity = S::Activity;
-        type CaloriesBurned = S::CaloriesBurned;
-        type StartTime = S::StartTime;
-        type EndTime = Set<members::end_time>;
-        type Duration = S::Duration;
-        type CreatedAt = S::CreatedAt;
-    }
-    ///State transition - sets the `duration` field to Set
-    pub struct SetDuration<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDuration<S> {}
-    impl<S: State> State for SetDuration<S> {
-        type Activity = S::Activity;
-        type CaloriesBurned = S::CaloriesBurned;
-        type StartTime = S::StartTime;
-        type EndTime = S::EndTime;
-        type Duration = Set<members::duration>;
-        type CreatedAt = S::CreatedAt;
+        type CreatedAt = St::CreatedAt;
+        type EndTime = St::EndTime;
+        type CaloriesBurned = St::CaloriesBurned;
+        type Duration = St::Duration;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type Activity = S::Activity;
-        type CaloriesBurned = S::CaloriesBurned;
-        type StartTime = S::StartTime;
-        type EndTime = S::EndTime;
-        type Duration = S::Duration;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Activity = St::Activity;
+        type StartTime = St::StartTime;
         type CreatedAt = Set<members::created_at>;
+        type EndTime = St::EndTime;
+        type CaloriesBurned = St::CaloriesBurned;
+        type Duration = St::Duration;
+    }
+    ///State transition - sets the `end_time` field to Set
+    pub struct SetEndTime<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetEndTime<St> {}
+    impl<St: State> State for SetEndTime<St> {
+        type Activity = St::Activity;
+        type StartTime = St::StartTime;
+        type CreatedAt = St::CreatedAt;
+        type EndTime = Set<members::end_time>;
+        type CaloriesBurned = St::CaloriesBurned;
+        type Duration = St::Duration;
+    }
+    ///State transition - sets the `calories_burned` field to Set
+    pub struct SetCaloriesBurned<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCaloriesBurned<St> {}
+    impl<St: State> State for SetCaloriesBurned<St> {
+        type Activity = St::Activity;
+        type StartTime = St::StartTime;
+        type CreatedAt = St::CreatedAt;
+        type EndTime = St::EndTime;
+        type CaloriesBurned = Set<members::calories_burned>;
+        type Duration = St::Duration;
+    }
+    ///State transition - sets the `duration` field to Set
+    pub struct SetDuration<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDuration<St> {}
+    impl<St: State> State for SetDuration<St> {
+        type Activity = St::Activity;
+        type StartTime = St::StartTime;
+        type CreatedAt = St::CreatedAt;
+        type EndTime = St::EndTime;
+        type CaloriesBurned = St::CaloriesBurned;
+        type Duration = Set<members::duration>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `activity` field
         pub struct activity(());
-        ///Marker type for the `calories_burned` field
-        pub struct calories_burned(());
         ///Marker type for the `start_time` field
         pub struct start_time(());
-        ///Marker type for the `end_time` field
-        pub struct end_time(());
-        ///Marker type for the `duration` field
-        pub struct duration(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `end_time` field
+        pub struct end_time(());
+        ///Marker type for the `calories_burned` field
+        pub struct calories_burned(());
+        ///Marker type for the `duration` field
+        pub struct duration(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct WorkoutBuilder<'a, S: workout_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct WorkoutBuilder<S: BosStr, St: workout_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<S>,
         Option<i64>,
@@ -244,85 +244,85 @@ pub struct WorkoutBuilder<'a, S: workout_state::State> {
         Option<Datetime>,
         Option<Datetime>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Workout<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> WorkoutBuilder<'a, workout_state::Empty> {
+impl<S: BosStr> Workout<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> WorkoutBuilder<S, workout_state::Empty> {
         WorkoutBuilder::new()
     }
 }
 
-impl<'a> WorkoutBuilder<'a, workout_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> WorkoutBuilder<S, workout_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         WorkoutBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> WorkoutBuilder<'a, S>
+impl<S: BosStr, St> WorkoutBuilder<S, St>
 where
-    S: workout_state::State,
-    S::Activity: workout_state::IsUnset,
+    St: workout_state::State,
+    St::Activity: workout_state::IsUnset,
 {
     /// Set the `activity` field (required)
     pub fn activity(
         mut self,
         value: impl Into<S>,
-    ) -> WorkoutBuilder<'a, workout_state::SetActivity<S>> {
+    ) -> WorkoutBuilder<S, workout_state::SetActivity<St>> {
         self._fields.0 = Option::Some(value.into());
         WorkoutBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> WorkoutBuilder<'a, S>
+impl<S: BosStr, St> WorkoutBuilder<S, St>
 where
-    S: workout_state::State,
-    S::CaloriesBurned: workout_state::IsUnset,
+    St: workout_state::State,
+    St::CaloriesBurned: workout_state::IsUnset,
 {
     /// Set the `caloriesBurned` field (required)
     pub fn calories_burned(
         mut self,
         value: impl Into<i64>,
-    ) -> WorkoutBuilder<'a, workout_state::SetCaloriesBurned<S>> {
+    ) -> WorkoutBuilder<S, workout_state::SetCaloriesBurned<St>> {
         self._fields.1 = Option::Some(value.into());
         WorkoutBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> WorkoutBuilder<'a, S>
+impl<S: BosStr, St> WorkoutBuilder<S, St>
 where
-    S: workout_state::State,
-    S::CreatedAt: workout_state::IsUnset,
+    St: workout_state::State,
+    St::CreatedAt: workout_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> WorkoutBuilder<'a, workout_state::SetCreatedAt<S>> {
+    ) -> WorkoutBuilder<S, workout_state::SetCreatedAt<St>> {
         self._fields.2 = Option::Some(value.into());
         WorkoutBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: workout_state::State> WorkoutBuilder<'a, S> {
+impl<S: BosStr, St: workout_state::State> WorkoutBuilder<S, St> {
     /// Set the `distance` field (optional)
     pub fn distance(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -335,75 +335,75 @@ impl<'a, S: workout_state::State> WorkoutBuilder<'a, S> {
     }
 }
 
-impl<'a, S> WorkoutBuilder<'a, S>
+impl<S: BosStr, St> WorkoutBuilder<S, St>
 where
-    S: workout_state::State,
-    S::Duration: workout_state::IsUnset,
+    St: workout_state::State,
+    St::Duration: workout_state::IsUnset,
 {
     /// Set the `duration` field (required)
     pub fn duration(
         mut self,
         value: impl Into<S>,
-    ) -> WorkoutBuilder<'a, workout_state::SetDuration<S>> {
+    ) -> WorkoutBuilder<S, workout_state::SetDuration<St>> {
         self._fields.4 = Option::Some(value.into());
         WorkoutBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> WorkoutBuilder<'a, S>
+impl<S: BosStr, St> WorkoutBuilder<S, St>
 where
-    S: workout_state::State,
-    S::EndTime: workout_state::IsUnset,
+    St: workout_state::State,
+    St::EndTime: workout_state::IsUnset,
 {
     /// Set the `endTime` field (required)
     pub fn end_time(
         mut self,
         value: impl Into<Datetime>,
-    ) -> WorkoutBuilder<'a, workout_state::SetEndTime<S>> {
+    ) -> WorkoutBuilder<S, workout_state::SetEndTime<St>> {
         self._fields.5 = Option::Some(value.into());
         WorkoutBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> WorkoutBuilder<'a, S>
+impl<S: BosStr, St> WorkoutBuilder<S, St>
 where
-    S: workout_state::State,
-    S::StartTime: workout_state::IsUnset,
+    St: workout_state::State,
+    St::StartTime: workout_state::IsUnset,
 {
     /// Set the `startTime` field (required)
     pub fn start_time(
         mut self,
         value: impl Into<Datetime>,
-    ) -> WorkoutBuilder<'a, workout_state::SetStartTime<S>> {
+    ) -> WorkoutBuilder<S, workout_state::SetStartTime<St>> {
         self._fields.6 = Option::Some(value.into());
         WorkoutBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> WorkoutBuilder<'a, S>
+impl<S: BosStr, St> WorkoutBuilder<S, St>
 where
-    S: workout_state::State,
-    S::Activity: workout_state::IsSet,
-    S::CaloriesBurned: workout_state::IsSet,
-    S::StartTime: workout_state::IsSet,
-    S::EndTime: workout_state::IsSet,
-    S::Duration: workout_state::IsSet,
-    S::CreatedAt: workout_state::IsSet,
+    St: workout_state::State,
+    St::Activity: workout_state::IsSet,
+    St::StartTime: workout_state::IsSet,
+    St::CreatedAt: workout_state::IsSet,
+    St::EndTime: workout_state::IsSet,
+    St::CaloriesBurned: workout_state::IsSet,
+    St::Duration: workout_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Workout<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Workout<S> {
         Workout {
             activity: self._fields.0.unwrap(),
             calories_burned: self._fields.1.unwrap(),
@@ -415,11 +415,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Workout<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Workout<S> {
         Workout {
             activity: self._fields.0.unwrap(),
             calories_burned: self._fields.1.unwrap(),

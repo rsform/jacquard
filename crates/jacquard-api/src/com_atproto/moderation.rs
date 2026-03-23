@@ -7,7 +7,7 @@
 
 pub mod create_report;
 
-use jacquard_common::CowStr;
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_derive::IntoStatic;
 use serde::{Serialize, Deserialize};
 /// Appeal a previously taken moderation action
@@ -72,9 +72,7 @@ impl core::fmt::Display for ReasonSpam {
 
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ReasonType<
-    S: jacquard_common::Bos<str> + AsRef<str> = jacquard_common::DefaultStr,
-> {
+pub enum ReasonType<S: BosStr = DefaultStr> {
     ComAtprotoModerationDefsReasonSpam,
     ComAtprotoModerationDefsReasonViolation,
     ComAtprotoModerationDefsReasonMisleading,
@@ -125,7 +123,7 @@ pub enum ReasonType<
     Other(S),
 }
 
-impl<S: jacquard_common::Bos<str> + AsRef<str>> ReasonType<S> {
+impl<S: BosStr> ReasonType<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::ComAtprotoModerationDefsReasonSpam => {
@@ -421,19 +419,19 @@ impl<S: jacquard_common::Bos<str> + AsRef<str>> ReasonType<S> {
     }
 }
 
-impl<S: jacquard_common::Bos<str> + AsRef<str>> AsRef<str> for ReasonType<S> {
+impl<S: BosStr> AsRef<str> for ReasonType<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: jacquard_common::Bos<str> + AsRef<str>> core::fmt::Display for ReasonType<S> {
+impl<S: BosStr> core::fmt::Display for ReasonType<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: jacquard_common::Bos<str> + AsRef<str>> Serialize for ReasonType<S> {
+impl<S: BosStr> Serialize for ReasonType<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -442,8 +440,7 @@ impl<S: jacquard_common::Bos<str> + AsRef<str>> Serialize for ReasonType<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + jacquard_common::Bos<str> + AsRef<str>> Deserialize<'de>
-for ReasonType<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ReasonType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -453,8 +450,12 @@ for ReasonType<S> {
     }
 }
 
-impl<S: jacquard_common::Bos<str> + AsRef<str>> IntoStatic for ReasonType<S> {
-    type Output = ReasonType<jacquard_common::DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for ReasonType<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ReasonType<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             ReasonType::ComAtprotoModerationDefsReasonSpam => {
@@ -616,16 +617,14 @@ impl core::fmt::Display for ReasonViolation {
 /// Tag describing a type of subject that might be reported.
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum SubjectType<
-    S: jacquard_common::Bos<str> + AsRef<str> = jacquard_common::DefaultStr,
-> {
+pub enum SubjectType<S: BosStr = DefaultStr> {
     Account,
     Record,
     Chat,
     Other(S),
 }
 
-impl<S: jacquard_common::Bos<str> + AsRef<str>> SubjectType<S> {
+impl<S: BosStr> SubjectType<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Account => "account",
@@ -645,19 +644,19 @@ impl<S: jacquard_common::Bos<str> + AsRef<str>> SubjectType<S> {
     }
 }
 
-impl<S: jacquard_common::Bos<str> + AsRef<str>> AsRef<str> for SubjectType<S> {
+impl<S: BosStr> AsRef<str> for SubjectType<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: jacquard_common::Bos<str> + AsRef<str>> core::fmt::Display for SubjectType<S> {
+impl<S: BosStr> core::fmt::Display for SubjectType<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: jacquard_common::Bos<str> + AsRef<str>> Serialize for SubjectType<S> {
+impl<S: BosStr> Serialize for SubjectType<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -666,8 +665,7 @@ impl<S: jacquard_common::Bos<str> + AsRef<str>> Serialize for SubjectType<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + jacquard_common::Bos<str> + AsRef<str>> Deserialize<'de>
-for SubjectType<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for SubjectType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -677,8 +675,12 @@ for SubjectType<S> {
     }
 }
 
-impl<S: jacquard_common::Bos<str> + AsRef<str>> IntoStatic for SubjectType<S> {
-    type Output = SubjectType<jacquard_common::DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for SubjectType<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = SubjectType<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             SubjectType::Account => SubjectType::Account,

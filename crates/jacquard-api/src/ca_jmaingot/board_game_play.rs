@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use serde::{Serialize, Deserialize};
     rename = "ca.jmaingot.boardGamePlay",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct BoardGamePlay<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct BoardGamePlay<S: BosStr = DefaultStr> {
     ///corresponds to https://boardgamegeek.com/boardgame/<bggId> for the game
     pub bgg_id: S,
     pub name: S,
@@ -55,18 +55,18 @@ pub struct BoardGamePlay<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct BoardGamePlayGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct BoardGamePlayGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: BoardGamePlay<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> BoardGamePlay<S> {
+impl<S: BosStr> BoardGamePlay<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, BoardGamePlayRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -79,18 +79,17 @@ pub struct BoardGamePlayRecord;
 impl XrpcResp for BoardGamePlayRecord {
     const NSID: &'static str = "ca.jmaingot.boardGamePlay";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = BoardGamePlayGetRecordOutput<S>;
+    type Output<S: BosStr> = BoardGamePlayGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<BoardGamePlayGetRecordOutput<S>>
-for BoardGamePlay<S> {
+impl<S: BosStr> From<BoardGamePlayGetRecordOutput<S>> for BoardGamePlay<S> {
     fn from(output: BoardGamePlayGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for BoardGamePlay<S> {
+impl<S: BosStr> Collection for BoardGamePlay<S> {
     const NSID: &'static str = "ca.jmaingot.boardGamePlay";
     type Record = BoardGamePlayRecord;
 }
@@ -100,7 +99,7 @@ impl Collection for BoardGamePlayRecord {
     type Record = BoardGamePlayRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for BoardGamePlay<S> {
+impl<S: BosStr> LexiconSchema for BoardGamePlay<S> {
     fn nsid() -> &'static str {
         "ca.jmaingot.boardGamePlay"
     }
@@ -125,145 +124,145 @@ pub mod board_game_play_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type BggId;
-        type Name;
         type PlayedAt;
+        type Name;
+        type BggId;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type BggId = Unset;
-        type Name = Unset;
         type PlayedAt = Unset;
-    }
-    ///State transition - sets the `bgg_id` field to Set
-    pub struct SetBggId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetBggId<S> {}
-    impl<S: State> State for SetBggId<S> {
-        type BggId = Set<members::bgg_id>;
-        type Name = S::Name;
-        type PlayedAt = S::PlayedAt;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type BggId = S::BggId;
-        type Name = Set<members::name>;
-        type PlayedAt = S::PlayedAt;
+        type Name = Unset;
+        type BggId = Unset;
     }
     ///State transition - sets the `played_at` field to Set
-    pub struct SetPlayedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPlayedAt<S> {}
-    impl<S: State> State for SetPlayedAt<S> {
-        type BggId = S::BggId;
-        type Name = S::Name;
+    pub struct SetPlayedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPlayedAt<St> {}
+    impl<St: State> State for SetPlayedAt<St> {
         type PlayedAt = Set<members::played_at>;
+        type Name = St::Name;
+        type BggId = St::BggId;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type PlayedAt = St::PlayedAt;
+        type Name = Set<members::name>;
+        type BggId = St::BggId;
+    }
+    ///State transition - sets the `bgg_id` field to Set
+    pub struct SetBggId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBggId<St> {}
+    impl<St: State> State for SetBggId<St> {
+        type PlayedAt = St::PlayedAt;
+        type Name = St::Name;
+        type BggId = Set<members::bgg_id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `bgg_id` field
-        pub struct bgg_id(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `played_at` field
         pub struct played_at(());
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `bgg_id` field
+        pub struct bgg_id(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct BoardGamePlayBuilder<'a, S: board_game_play_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct BoardGamePlayBuilder<S: BosStr, St: board_game_play_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>, Option<Datetime>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> BoardGamePlay<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> BoardGamePlayBuilder<'a, board_game_play_state::Empty> {
+impl<S: BosStr> BoardGamePlay<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> BoardGamePlayBuilder<S, board_game_play_state::Empty> {
         BoardGamePlayBuilder::new()
     }
 }
 
-impl<'a> BoardGamePlayBuilder<'a, board_game_play_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> BoardGamePlayBuilder<S, board_game_play_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         BoardGamePlayBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BoardGamePlayBuilder<'a, S>
+impl<S: BosStr, St> BoardGamePlayBuilder<S, St>
 where
-    S: board_game_play_state::State,
-    S::BggId: board_game_play_state::IsUnset,
+    St: board_game_play_state::State,
+    St::BggId: board_game_play_state::IsUnset,
 {
     /// Set the `bggId` field (required)
     pub fn bgg_id(
         mut self,
         value: impl Into<S>,
-    ) -> BoardGamePlayBuilder<'a, board_game_play_state::SetBggId<S>> {
+    ) -> BoardGamePlayBuilder<S, board_game_play_state::SetBggId<St>> {
         self._fields.0 = Option::Some(value.into());
         BoardGamePlayBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BoardGamePlayBuilder<'a, S>
+impl<S: BosStr, St> BoardGamePlayBuilder<S, St>
 where
-    S: board_game_play_state::State,
-    S::Name: board_game_play_state::IsUnset,
+    St: board_game_play_state::State,
+    St::Name: board_game_play_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> BoardGamePlayBuilder<'a, board_game_play_state::SetName<S>> {
+    ) -> BoardGamePlayBuilder<S, board_game_play_state::SetName<St>> {
         self._fields.1 = Option::Some(value.into());
         BoardGamePlayBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BoardGamePlayBuilder<'a, S>
+impl<S: BosStr, St> BoardGamePlayBuilder<S, St>
 where
-    S: board_game_play_state::State,
-    S::PlayedAt: board_game_play_state::IsUnset,
+    St: board_game_play_state::State,
+    St::PlayedAt: board_game_play_state::IsUnset,
 {
     /// Set the `playedAt` field (required)
     pub fn played_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> BoardGamePlayBuilder<'a, board_game_play_state::SetPlayedAt<S>> {
+    ) -> BoardGamePlayBuilder<S, board_game_play_state::SetPlayedAt<St>> {
         self._fields.2 = Option::Some(value.into());
         BoardGamePlayBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> BoardGamePlayBuilder<'a, S>
+impl<S: BosStr, St> BoardGamePlayBuilder<S, St>
 where
-    S: board_game_play_state::State,
-    S::BggId: board_game_play_state::IsSet,
-    S::Name: board_game_play_state::IsSet,
-    S::PlayedAt: board_game_play_state::IsSet,
+    St: board_game_play_state::State,
+    St::PlayedAt: board_game_play_state::IsSet,
+    St::Name: board_game_play_state::IsSet,
+    St::BggId: board_game_play_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> BoardGamePlay<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> BoardGamePlay<S> {
         BoardGamePlay {
             bgg_id: self._fields.0.unwrap(),
             name: self._fields.1.unwrap(),
@@ -271,11 +270,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> BoardGamePlay<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> BoardGamePlay<S> {
         BoardGamePlay {
             bgg_id: self._fields.0.unwrap(),
             name: self._fields.1.unwrap(),

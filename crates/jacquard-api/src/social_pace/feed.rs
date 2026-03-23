@@ -13,7 +13,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -29,7 +29,7 @@ use serde::{Serialize, Deserialize};
 /// The type of activity being recorded. List taken from Apple Health Activities mostly
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum ActivityType<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum ActivityType<S: BosStr = DefaultStr> {
     Running,
     Walking,
     Cycling,
@@ -70,7 +70,7 @@ pub enum ActivityType<S: Bos<str> + AsRef<str> = DefaultStr> {
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> ActivityType<S> {
+impl<S: BosStr> ActivityType<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Running => "Running",
@@ -158,19 +158,19 @@ impl<S: Bos<str> + AsRef<str>> ActivityType<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for ActivityType<S> {
+impl<S: BosStr> AsRef<str> for ActivityType<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for ActivityType<S> {
+impl<S: BosStr> core::fmt::Display for ActivityType<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for ActivityType<S> {
+impl<S: BosStr> Serialize for ActivityType<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -179,8 +179,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for ActivityType<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
-for ActivityType<S> {
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de> for ActivityType<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
@@ -190,8 +189,12 @@ for ActivityType<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for ActivityType<S> {
-    type Output = ActivityType<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for ActivityType<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = ActivityType<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             ActivityType::Running => ActivityType::Running,
@@ -242,11 +245,11 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for ActivityType<S> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Split<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Split<S: BosStr = DefaultStr> {
     ///The distance covered in this split. Follows the units defined in the parent.
     pub distance: S,
     ///The duration of the split in seconds.
@@ -257,7 +260,7 @@ pub struct Split<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Split<S> {
+impl<S: BosStr> LexiconSchema for Split<S> {
     fn nsid() -> &'static str {
         "social.pace.feed.defs"
     }
@@ -295,27 +298,27 @@ pub mod split_state {
         type Order = Unset;
     }
     ///State transition - sets the `distance` field to Set
-    pub struct SetDistance<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDistance<S> {}
-    impl<S: State> State for SetDistance<S> {
+    pub struct SetDistance<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDistance<St> {}
+    impl<St: State> State for SetDistance<St> {
         type Distance = Set<members::distance>;
-        type Duration = S::Duration;
-        type Order = S::Order;
+        type Duration = St::Duration;
+        type Order = St::Order;
     }
     ///State transition - sets the `duration` field to Set
-    pub struct SetDuration<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetDuration<S> {}
-    impl<S: State> State for SetDuration<S> {
-        type Distance = S::Distance;
+    pub struct SetDuration<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDuration<St> {}
+    impl<St: State> State for SetDuration<St> {
+        type Distance = St::Distance;
         type Duration = Set<members::duration>;
-        type Order = S::Order;
+        type Order = St::Order;
     }
     ///State transition - sets the `order` field to Set
-    pub struct SetOrder<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetOrder<S> {}
-    impl<S: State> State for SetOrder<S> {
-        type Distance = S::Distance;
-        type Duration = S::Duration;
+    pub struct SetOrder<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetOrder<St> {}
+    impl<St: State> State for SetOrder<St> {
+        type Distance = St::Distance;
+        type Duration = St::Duration;
         type Order = Set<members::order>;
     }
     /// Marker types for field names
@@ -330,97 +333,97 @@ pub mod split_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct SplitBuilder<'a, S: split_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct SplitBuilder<S: BosStr, St: split_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<i64>, Option<i64>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Split<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> SplitBuilder<'a, split_state::Empty> {
+impl<S: BosStr> Split<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> SplitBuilder<S, split_state::Empty> {
         SplitBuilder::new()
     }
 }
 
-impl<'a> SplitBuilder<'a, split_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> SplitBuilder<S, split_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         SplitBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SplitBuilder<'a, S>
+impl<S: BosStr, St> SplitBuilder<S, St>
 where
-    S: split_state::State,
-    S::Distance: split_state::IsUnset,
+    St: split_state::State,
+    St::Distance: split_state::IsUnset,
 {
     /// Set the `distance` field (required)
     pub fn distance(
         mut self,
         value: impl Into<S>,
-    ) -> SplitBuilder<'a, split_state::SetDistance<S>> {
+    ) -> SplitBuilder<S, split_state::SetDistance<St>> {
         self._fields.0 = Option::Some(value.into());
         SplitBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SplitBuilder<'a, S>
+impl<S: BosStr, St> SplitBuilder<S, St>
 where
-    S: split_state::State,
-    S::Duration: split_state::IsUnset,
+    St: split_state::State,
+    St::Duration: split_state::IsUnset,
 {
     /// Set the `duration` field (required)
     pub fn duration(
         mut self,
         value: impl Into<i64>,
-    ) -> SplitBuilder<'a, split_state::SetDuration<S>> {
+    ) -> SplitBuilder<S, split_state::SetDuration<St>> {
         self._fields.1 = Option::Some(value.into());
         SplitBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SplitBuilder<'a, S>
+impl<S: BosStr, St> SplitBuilder<S, St>
 where
-    S: split_state::State,
-    S::Order: split_state::IsUnset,
+    St: split_state::State,
+    St::Order: split_state::IsUnset,
 {
     /// Set the `order` field (required)
     pub fn order(
         mut self,
         value: impl Into<i64>,
-    ) -> SplitBuilder<'a, split_state::SetOrder<S>> {
+    ) -> SplitBuilder<S, split_state::SetOrder<St>> {
         self._fields.2 = Option::Some(value.into());
         SplitBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> SplitBuilder<'a, S>
+impl<S: BosStr, St> SplitBuilder<S, St>
 where
-    S: split_state::State,
-    S::Distance: split_state::IsSet,
-    S::Duration: split_state::IsSet,
-    S::Order: split_state::IsSet,
+    St: split_state::State,
+    St::Distance: split_state::IsSet,
+    St::Duration: split_state::IsSet,
+    St::Order: split_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Split<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Split<S> {
         Split {
             distance: self._fields.0.unwrap(),
             duration: self._fields.1.unwrap(),
@@ -428,8 +431,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Split<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Split<S> {
         Split {
             distance: self._fields.0.unwrap(),
             duration: self._fields.1.unwrap(),

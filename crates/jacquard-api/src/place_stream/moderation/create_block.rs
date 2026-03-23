@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::{Did, AtUri, Cid};
 use jacquard_common::types::value::Data;
@@ -18,14 +18,14 @@ use jacquard_derive::{IntoStatic, open_union};
 use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CreateBlock<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CreateBlock<S: BosStr = DefaultStr> {
     ///Optional reason for the block.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub reason: Option<S>,
@@ -33,29 +33,25 @@ pub struct CreateBlock<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub streamer: Did<S>,
     ///The DID of the user being blocked from chat.
     pub subject: Did<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct CreateBlockOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct CreateBlockOutput<S: BosStr = DefaultStr> {
     ///The CID of the created block record.
     pub cid: Cid<S>,
     ///The AT-URI of the created block record.
     pub uri: AtUri<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -127,12 +123,11 @@ pub struct CreateBlockResponse;
 impl jacquard_common::xrpc::XrpcResp for CreateBlockResponse {
     const NSID: &'static str = "place.stream.moderation.createBlock";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = CreateBlockOutput<S>;
+    type Output<S: BosStr> = CreateBlockOutput<S>;
     type Err = CreateBlockError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for CreateBlock<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for CreateBlock<S> {
     const NSID: &'static str = "place.stream.moderation.createBlock";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
@@ -147,7 +142,7 @@ impl jacquard_common::xrpc::XrpcEndpoint for CreateBlockRequest {
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Procedure(
         "application/json",
     );
-    type Request<S: Bos<str> + AsRef<str>> = CreateBlock<S>;
+    type Request<S: BosStr> = CreateBlock<S>;
     type Response = CreateBlockResponse;
 }
 
@@ -161,66 +156,66 @@ pub mod create_block_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Subject;
         type Streamer;
+        type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Subject = Unset;
         type Streamer = Unset;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetSubject<S> {}
-    impl<S: State> State for SetSubject<S> {
-        type Subject = Set<members::subject>;
-        type Streamer = S::Streamer;
+        type Subject = Unset;
     }
     ///State transition - sets the `streamer` field to Set
-    pub struct SetStreamer<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetStreamer<S> {}
-    impl<S: State> State for SetStreamer<S> {
-        type Subject = S::Subject;
+    pub struct SetStreamer<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStreamer<St> {}
+    impl<St: State> State for SetStreamer<St> {
         type Streamer = Set<members::streamer>;
+        type Subject = St::Subject;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubject<St> {}
+    impl<St: State> State for SetSubject<St> {
+        type Streamer = St::Streamer;
+        type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `subject` field
-        pub struct subject(());
         ///Marker type for the `streamer` field
         pub struct streamer(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct CreateBlockBuilder<'a, S: create_block_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct CreateBlockBuilder<S: BosStr, St: create_block_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<Did<S>>, Option<Did<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> CreateBlock<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> CreateBlockBuilder<'a, create_block_state::Empty> {
+impl<S: BosStr> CreateBlock<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> CreateBlockBuilder<S, create_block_state::Empty> {
         CreateBlockBuilder::new()
     }
 }
 
-impl<'a> CreateBlockBuilder<'a, create_block_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> CreateBlockBuilder<S, create_block_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         CreateBlockBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: create_block_state::State> CreateBlockBuilder<'a, S> {
+impl<S: BosStr, St: create_block_state::State> CreateBlockBuilder<S, St> {
     /// Set the `reason` field (optional)
     pub fn reason(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.0 = value.into();
@@ -233,52 +228,52 @@ impl<'a, S: create_block_state::State> CreateBlockBuilder<'a, S> {
     }
 }
 
-impl<'a, S> CreateBlockBuilder<'a, S>
+impl<S: BosStr, St> CreateBlockBuilder<S, St>
 where
-    S: create_block_state::State,
-    S::Streamer: create_block_state::IsUnset,
+    St: create_block_state::State,
+    St::Streamer: create_block_state::IsUnset,
 {
     /// Set the `streamer` field (required)
     pub fn streamer(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> CreateBlockBuilder<'a, create_block_state::SetStreamer<S>> {
+    ) -> CreateBlockBuilder<S, create_block_state::SetStreamer<St>> {
         self._fields.1 = Option::Some(value.into());
         CreateBlockBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CreateBlockBuilder<'a, S>
+impl<S: BosStr, St> CreateBlockBuilder<S, St>
 where
-    S: create_block_state::State,
-    S::Subject: create_block_state::IsUnset,
+    St: create_block_state::State,
+    St::Subject: create_block_state::IsUnset,
 {
     /// Set the `subject` field (required)
     pub fn subject(
         mut self,
         value: impl Into<Did<S>>,
-    ) -> CreateBlockBuilder<'a, create_block_state::SetSubject<S>> {
+    ) -> CreateBlockBuilder<S, create_block_state::SetSubject<St>> {
         self._fields.2 = Option::Some(value.into());
         CreateBlockBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> CreateBlockBuilder<'a, S>
+impl<S: BosStr, St> CreateBlockBuilder<S, St>
 where
-    S: create_block_state::State,
-    S::Subject: create_block_state::IsSet,
-    S::Streamer: create_block_state::IsSet,
+    St: create_block_state::State,
+    St::Streamer: create_block_state::IsSet,
+    St::Subject: create_block_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> CreateBlock<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> CreateBlock<S> {
         CreateBlock {
             reason: self._fields.0,
             streamer: self._fields.1.unwrap(),
@@ -286,11 +281,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> CreateBlock<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> CreateBlock<S> {
         CreateBlock {
             reason: self._fields.0,
             streamer: self._fields.1.unwrap(),

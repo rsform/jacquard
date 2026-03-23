@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::value::Data;
 use jacquard_derive::IntoStatic;
@@ -18,16 +18,15 @@ use serde::{Serialize, Deserialize};
 use crate::sh_weaver::graph::TagView;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetTagSuggestions<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetTagSuggestions<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub existing_tags: Option<Vec<S>>,
     ///Defaults to `20`. Min: 1. Max: 50.
     #[serde(default = "_default_limit")]
@@ -35,24 +34,21 @@ pub struct GetTagSuggestions<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub limit: Option<i64>,
     ///(max length: 128)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub query: Option<S>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct GetTagSuggestionsOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct GetTagSuggestionsOutput<S: BosStr = DefaultStr> {
     pub suggestions: Vec<TagView<S>>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -61,12 +57,11 @@ pub struct GetTagSuggestionsResponse;
 impl jacquard_common::xrpc::XrpcResp for GetTagSuggestionsResponse {
     const NSID: &'static str = "sh.weaver.graph.getTagSuggestions";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = GetTagSuggestionsOutput<S>;
+    type Output<S: BosStr> = GetTagSuggestionsOutput<S>;
     type Err = jacquard_common::xrpc::GenericError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for GetTagSuggestions<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for GetTagSuggestions<S> {
     const NSID: &'static str = "sh.weaver.graph.getTagSuggestions";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = GetTagSuggestionsResponse;
@@ -77,7 +72,7 @@ pub struct GetTagSuggestionsRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for GetTagSuggestionsRequest {
     const PATH: &'static str = "/xrpc/sh.weaver.graph.getTagSuggestions";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = GetTagSuggestions<S>;
+    type Request<S: BosStr> = GetTagSuggestions<S>;
     type Response = GetTagSuggestionsResponse;
 }
 
@@ -104,32 +99,32 @@ pub mod get_tag_suggestions_state {
     pub mod members {}
 }
 
-/// Builder for constructing an instance of this type
-pub struct GetTagSuggestionsBuilder<'a, S: get_tag_suggestions_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct GetTagSuggestionsBuilder<S: BosStr, St: get_tag_suggestions_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Vec<S>>, Option<i64>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> GetTagSuggestions<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> GetTagSuggestionsBuilder<'a, get_tag_suggestions_state::Empty> {
+impl<S: BosStr> GetTagSuggestions<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> GetTagSuggestionsBuilder<S, get_tag_suggestions_state::Empty> {
         GetTagSuggestionsBuilder::new()
     }
 }
 
-impl<'a> GetTagSuggestionsBuilder<'a, get_tag_suggestions_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> GetTagSuggestionsBuilder<S, get_tag_suggestions_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         GetTagSuggestionsBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: get_tag_suggestions_state::State> GetTagSuggestionsBuilder<'a, S> {
+impl<S: BosStr, St: get_tag_suggestions_state::State> GetTagSuggestionsBuilder<S, St> {
     /// Set the `existingTags` field (optional)
     pub fn existing_tags(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.0 = value.into();
@@ -142,7 +137,7 @@ impl<'a, S: get_tag_suggestions_state::State> GetTagSuggestionsBuilder<'a, S> {
     }
 }
 
-impl<'a, S: get_tag_suggestions_state::State> GetTagSuggestionsBuilder<'a, S> {
+impl<S: BosStr, St: get_tag_suggestions_state::State> GetTagSuggestionsBuilder<S, St> {
     /// Set the `limit` field (optional)
     pub fn limit(mut self, value: impl Into<Option<i64>>) -> Self {
         self._fields.1 = value.into();
@@ -155,7 +150,7 @@ impl<'a, S: get_tag_suggestions_state::State> GetTagSuggestionsBuilder<'a, S> {
     }
 }
 
-impl<'a, S: get_tag_suggestions_state::State> GetTagSuggestionsBuilder<'a, S> {
+impl<S: BosStr, St: get_tag_suggestions_state::State> GetTagSuggestionsBuilder<S, St> {
     /// Set the `query` field (optional)
     pub fn query(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -168,12 +163,12 @@ impl<'a, S: get_tag_suggestions_state::State> GetTagSuggestionsBuilder<'a, S> {
     }
 }
 
-impl<'a, S> GetTagSuggestionsBuilder<'a, S>
+impl<S: BosStr, St> GetTagSuggestionsBuilder<S, St>
 where
-    S: get_tag_suggestions_state::State,
+    St: get_tag_suggestions_state::State,
 {
-    /// Build the final struct
-    pub fn build(self) -> GetTagSuggestions<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> GetTagSuggestions<S> {
         GetTagSuggestions {
             existing_tags: self._fields.0,
             limit: self._fields.1,

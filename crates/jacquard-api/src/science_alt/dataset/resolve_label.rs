@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 use jacquard_common::deps::smol_str::SmolStr;
 use jacquard_common::types::string::AtUri;
 use jacquard_common::types::value::Data;
@@ -19,43 +19,38 @@ use serde::{Serialize, Deserialize};
 use crate::science_alt::dataset::label::Label;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ResolveLabel<S: Bos<str> + AsRef<str> = DefaultStr> {
-    #[serde(borrow)]
+pub struct ResolveLabel<S: BosStr = DefaultStr> {
     pub handle: S,
-    #[serde(borrow)]
     pub name: S,
     ///(max length: 50)
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(borrow)]
     pub version: Option<S>,
 }
 
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, IntoStatic)]
-#[serde(rename_all = "camelCase")]
 #[serde(
+    rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ResolveLabelOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ResolveLabelOutput<S: BosStr = DefaultStr> {
     ///CID of the resolved dataset entry
     pub cid: S,
     ///The label record that was resolved
     pub label: Label<S>,
     ///AT-URI of the resolved dataset entry
     pub uri: AtUri<S>,
-    #[serde(flatten)]
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(default)]
+    #[serde(flatten, default, skip_serializing_if = "Option::is_none")]
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
@@ -107,12 +102,11 @@ pub struct ResolveLabelResponse;
 impl jacquard_common::xrpc::XrpcResp for ResolveLabelResponse {
     const NSID: &'static str = "science.alt.dataset.resolveLabel";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ResolveLabelOutput<S>;
+    type Output<S: BosStr> = ResolveLabelOutput<S>;
     type Err = ResolveLabelError;
 }
 
-impl<S: Bos<str> + AsRef<str> + Serialize> jacquard_common::xrpc::XrpcRequest
-for ResolveLabel<S> {
+impl<S: BosStr> jacquard_common::xrpc::XrpcRequest for ResolveLabel<S> {
     const NSID: &'static str = "science.alt.dataset.resolveLabel";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
     type Response = ResolveLabelResponse;
@@ -123,7 +117,7 @@ pub struct ResolveLabelRequest;
 impl jacquard_common::xrpc::XrpcEndpoint for ResolveLabelRequest {
     const PATH: &'static str = "/xrpc/science.alt.dataset.resolveLabel";
     const METHOD: jacquard_common::xrpc::XrpcMethod = jacquard_common::xrpc::XrpcMethod::Query;
-    type Request<S: Bos<str> + AsRef<str>> = ResolveLabel<S>;
+    type Request<S: BosStr> = ResolveLabel<S>;
     type Response = ResolveLabelResponse;
 }
 
@@ -137,104 +131,104 @@ pub mod resolve_label_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Handle;
         type Name;
+        type Handle;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Handle = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `handle` field to Set
-    pub struct SetHandle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetHandle<S> {}
-    impl<S: State> State for SetHandle<S> {
-        type Handle = Set<members::handle>;
-        type Name = S::Name;
+        type Handle = Unset;
     }
     ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type Handle = S::Handle;
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
         type Name = Set<members::name>;
+        type Handle = St::Handle;
+    }
+    ///State transition - sets the `handle` field to Set
+    pub struct SetHandle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHandle<St> {}
+    impl<St: State> State for SetHandle<St> {
+        type Name = St::Name;
+        type Handle = Set<members::handle>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `handle` field
-        pub struct handle(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `handle` field
+        pub struct handle(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ResolveLabelBuilder<'a, S: resolve_label_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ResolveLabelBuilder<S: BosStr, St: resolve_label_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<S>, Option<S>, Option<S>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> ResolveLabel<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ResolveLabelBuilder<'a, resolve_label_state::Empty> {
+impl<S: BosStr> ResolveLabel<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ResolveLabelBuilder<S, resolve_label_state::Empty> {
         ResolveLabelBuilder::new()
     }
 }
 
-impl<'a> ResolveLabelBuilder<'a, resolve_label_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ResolveLabelBuilder<S, resolve_label_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ResolveLabelBuilder {
             _state: PhantomData,
             _fields: (None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ResolveLabelBuilder<'a, S>
+impl<S: BosStr, St> ResolveLabelBuilder<S, St>
 where
-    S: resolve_label_state::State,
-    S::Handle: resolve_label_state::IsUnset,
+    St: resolve_label_state::State,
+    St::Handle: resolve_label_state::IsUnset,
 {
     /// Set the `handle` field (required)
     pub fn handle(
         mut self,
         value: impl Into<S>,
-    ) -> ResolveLabelBuilder<'a, resolve_label_state::SetHandle<S>> {
+    ) -> ResolveLabelBuilder<S, resolve_label_state::SetHandle<St>> {
         self._fields.0 = Option::Some(value.into());
         ResolveLabelBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ResolveLabelBuilder<'a, S>
+impl<S: BosStr, St> ResolveLabelBuilder<S, St>
 where
-    S: resolve_label_state::State,
-    S::Name: resolve_label_state::IsUnset,
+    St: resolve_label_state::State,
+    St::Name: resolve_label_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> ResolveLabelBuilder<'a, resolve_label_state::SetName<S>> {
+    ) -> ResolveLabelBuilder<S, resolve_label_state::SetName<St>> {
         self._fields.1 = Option::Some(value.into());
         ResolveLabelBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: resolve_label_state::State> ResolveLabelBuilder<'a, S> {
+impl<S: BosStr, St: resolve_label_state::State> ResolveLabelBuilder<S, St> {
     /// Set the `version` field (optional)
     pub fn version(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -247,14 +241,14 @@ impl<'a, S: resolve_label_state::State> ResolveLabelBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ResolveLabelBuilder<'a, S>
+impl<S: BosStr, St> ResolveLabelBuilder<S, St>
 where
-    S: resolve_label_state::State,
-    S::Handle: resolve_label_state::IsSet,
-    S::Name: resolve_label_state::IsSet,
+    St: resolve_label_state::State,
+    St::Name: resolve_label_state::IsSet,
+    St::Handle: resolve_label_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> ResolveLabel<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> ResolveLabel<S> {
         ResolveLabel {
             handle: self._fields.0.unwrap(),
             name: self._fields.1.unwrap(),

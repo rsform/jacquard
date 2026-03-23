@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use serde::{Serialize, Deserialize};
     rename = "app.rocksky.radio",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Radio<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Radio<S: BosStr = DefaultStr> {
     ///The date when the radio station was created.
     pub created_at: Datetime,
     ///A description of the radio station.
@@ -69,11 +69,11 @@ pub struct Radio<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct RadioGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct RadioGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
@@ -85,11 +85,11 @@ pub struct RadioGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct RadioViewBasic<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct RadioViewBasic<S: BosStr = DefaultStr> {
     ///The date and time when the radio was created.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
@@ -111,11 +111,11 @@ pub struct RadioViewBasic<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct RadioViewDetailed<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct RadioViewDetailed<S: BosStr = DefaultStr> {
     ///The date and time when the radio was created.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<Datetime>,
@@ -144,7 +144,7 @@ pub struct RadioViewDetailed<S: Bos<str> + AsRef<str> = DefaultStr> {
     pub extra_data: Option<BTreeMap<SmolStr, Data<S>>>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Radio<S> {
+impl<S: BosStr> Radio<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, RadioRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -157,17 +157,17 @@ pub struct RadioRecord;
 impl XrpcResp for RadioRecord {
     const NSID: &'static str = "app.rocksky.radio";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = RadioGetRecordOutput<S>;
+    type Output<S: BosStr> = RadioGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<RadioGetRecordOutput<S>> for Radio<S> {
+impl<S: BosStr> From<RadioGetRecordOutput<S>> for Radio<S> {
     fn from(output: RadioGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Radio<S> {
+impl<S: BosStr> Collection for Radio<S> {
     const NSID: &'static str = "app.rocksky.radio";
     type Record = RadioRecord;
 }
@@ -177,7 +177,7 @@ impl Collection for RadioRecord {
     type Record = RadioRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Radio<S> {
+impl<S: BosStr> LexiconSchema for Radio<S> {
     fn nsid() -> &'static str {
         "app.rocksky.radio"
     }
@@ -294,7 +294,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for Radio<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for RadioViewBasic<S> {
+impl<S: BosStr> LexiconSchema for RadioViewBasic<S> {
     fn nsid() -> &'static str {
         "app.rocksky.radio.defs"
     }
@@ -309,7 +309,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for RadioViewBasic<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for RadioViewDetailed<S> {
+impl<S: BosStr> LexiconSchema for RadioViewDetailed<S> {
     fn nsid() -> &'static str {
         "app.rocksky.radio.defs"
     }
@@ -334,57 +334,57 @@ pub mod radio_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Name;
         type Url;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Name = Unset;
         type Url = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type CreatedAt = Set<members::created_at>;
-        type Name = S::Name;
-        type Url = S::Url;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `name` field to Set
-    pub struct SetName<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetName<S> {}
-    impl<S: State> State for SetName<S> {
-        type CreatedAt = S::CreatedAt;
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
         type Name = Set<members::name>;
-        type Url = S::Url;
+        type Url = St::Url;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `url` field to Set
-    pub struct SetUrl<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetUrl<S> {}
-    impl<S: State> State for SetUrl<S> {
-        type CreatedAt = S::CreatedAt;
-        type Name = S::Name;
+    pub struct SetUrl<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUrl<St> {}
+    impl<St: State> State for SetUrl<St> {
+        type Name = St::Name;
         type Url = Set<members::url>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Name = St::Name;
+        type Url = St::Url;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `url` field
         pub struct url(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct RadioBuilder<'a, S: radio_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct RadioBuilder<S: BosStr, St: radio_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Datetime>,
         Option<S>,
@@ -394,47 +394,47 @@ pub struct RadioBuilder<'a, S: radio_state::State> {
         Option<UriValue<S>>,
         Option<UriValue<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Radio<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> RadioBuilder<'a, radio_state::Empty> {
+impl<S: BosStr> Radio<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> RadioBuilder<S, radio_state::Empty> {
         RadioBuilder::new()
     }
 }
 
-impl<'a> RadioBuilder<'a, radio_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> RadioBuilder<S, radio_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         RadioBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RadioBuilder<'a, S>
+impl<S: BosStr, St> RadioBuilder<S, St>
 where
-    S: radio_state::State,
-    S::CreatedAt: radio_state::IsUnset,
+    St: radio_state::State,
+    St::CreatedAt: radio_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> RadioBuilder<'a, radio_state::SetCreatedAt<S>> {
+    ) -> RadioBuilder<S, radio_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         RadioBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: radio_state::State> RadioBuilder<'a, S> {
+impl<S: BosStr, St: radio_state::State> RadioBuilder<S, St> {
     /// Set the `description` field (optional)
     pub fn description(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.1 = value.into();
@@ -447,7 +447,7 @@ impl<'a, S: radio_state::State> RadioBuilder<'a, S> {
     }
 }
 
-impl<'a, S: radio_state::State> RadioBuilder<'a, S> {
+impl<S: BosStr, St: radio_state::State> RadioBuilder<S, St> {
     /// Set the `genre` field (optional)
     pub fn genre(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.2 = value.into();
@@ -460,7 +460,7 @@ impl<'a, S: radio_state::State> RadioBuilder<'a, S> {
     }
 }
 
-impl<'a, S: radio_state::State> RadioBuilder<'a, S> {
+impl<S: BosStr, St: radio_state::State> RadioBuilder<S, St> {
     /// Set the `logo` field (optional)
     pub fn logo(mut self, value: impl Into<Option<BlobRef<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -473,45 +473,45 @@ impl<'a, S: radio_state::State> RadioBuilder<'a, S> {
     }
 }
 
-impl<'a, S> RadioBuilder<'a, S>
+impl<S: BosStr, St> RadioBuilder<S, St>
 where
-    S: radio_state::State,
-    S::Name: radio_state::IsUnset,
+    St: radio_state::State,
+    St::Name: radio_state::IsUnset,
 {
     /// Set the `name` field (required)
     pub fn name(
         mut self,
         value: impl Into<S>,
-    ) -> RadioBuilder<'a, radio_state::SetName<S>> {
+    ) -> RadioBuilder<S, radio_state::SetName<St>> {
         self._fields.4 = Option::Some(value.into());
         RadioBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> RadioBuilder<'a, S>
+impl<S: BosStr, St> RadioBuilder<S, St>
 where
-    S: radio_state::State,
-    S::Url: radio_state::IsUnset,
+    St: radio_state::State,
+    St::Url: radio_state::IsUnset,
 {
     /// Set the `url` field (required)
     pub fn url(
         mut self,
         value: impl Into<UriValue<S>>,
-    ) -> RadioBuilder<'a, radio_state::SetUrl<S>> {
+    ) -> RadioBuilder<S, radio_state::SetUrl<St>> {
         self._fields.5 = Option::Some(value.into());
         RadioBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: radio_state::State> RadioBuilder<'a, S> {
+impl<S: BosStr, St: radio_state::State> RadioBuilder<S, St> {
     /// Set the `website` field (optional)
     pub fn website(mut self, value: impl Into<Option<UriValue<S>>>) -> Self {
         self._fields.6 = value.into();
@@ -524,15 +524,15 @@ impl<'a, S: radio_state::State> RadioBuilder<'a, S> {
     }
 }
 
-impl<'a, S> RadioBuilder<'a, S>
+impl<S: BosStr, St> RadioBuilder<S, St>
 where
-    S: radio_state::State,
-    S::CreatedAt: radio_state::IsSet,
-    S::Name: radio_state::IsSet,
-    S::Url: radio_state::IsSet,
+    St: radio_state::State,
+    St::Name: radio_state::IsSet,
+    St::Url: radio_state::IsSet,
+    St::CreatedAt: radio_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Radio<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Radio<S> {
         Radio {
             created_at: self._fields.0.unwrap(),
             description: self._fields.1,
@@ -544,8 +544,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Radio<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Radio<S> {
         Radio {
             created_at: self._fields.0.unwrap(),
             description: self._fields.1,

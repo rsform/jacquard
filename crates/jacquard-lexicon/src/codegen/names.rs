@@ -1,6 +1,6 @@
 use super::CodeGenerator;
-use super::nsid_utils::NsidPath;
 use super::utils::{namespace_prefix, sanitize_name, sanitize_name_cow};
+use crate::ref_utils::NsidPath;
 use heck::{ToPascalCase, ToSnakeCase};
 
 impl<'c> CodeGenerator<'c> {

@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -35,11 +35,11 @@ use crate::app_gainforest::evaluator::service;
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct EvaluationTypeDefinition<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct EvaluationTypeDefinition<S: BosStr = DefaultStr> {
     ///The evaluation type identifier (must match an entry in evaluationTypes).
     pub identifier: S,
     ///Human-readable names and descriptions in various languages.
@@ -60,11 +60,11 @@ pub struct EvaluationTypeDefinition<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct EvaluationTypeLocale<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct EvaluationTypeLocale<S: BosStr = DefaultStr> {
     ///Longer description of what this evaluation type does.
     pub description: S,
     ///Language code (BCP-47, e.g., 'en', 'pt-BR').
@@ -81,11 +81,11 @@ pub struct EvaluationTypeLocale<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct EvaluatorPolicies<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct EvaluatorPolicies<S: BosStr = DefaultStr> {
     ///Whether this evaluator requires user subscription ('subscription') or processes all matching records ('open').
     #[serde(skip_serializing_if = "Option::is_none")]
     pub access_model: Option<EvaluatorPoliciesAccessModel<S>>,
@@ -104,13 +104,13 @@ pub struct EvaluatorPolicies<S: Bos<str> + AsRef<str> = DefaultStr> {
 /// Whether this evaluator requires user subscription ('subscription') or processes all matching records ('open').
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum EvaluatorPoliciesAccessModel<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub enum EvaluatorPoliciesAccessModel<S: BosStr = DefaultStr> {
     Open,
     Subscription,
     Other(S),
 }
 
-impl<S: Bos<str> + AsRef<str>> EvaluatorPoliciesAccessModel<S> {
+impl<S: BosStr> EvaluatorPoliciesAccessModel<S> {
     pub fn as_str(&self) -> &str {
         match self {
             Self::Open => "open",
@@ -128,19 +128,19 @@ impl<S: Bos<str> + AsRef<str>> EvaluatorPoliciesAccessModel<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> core::fmt::Display for EvaluatorPoliciesAccessModel<S> {
+impl<S: BosStr> core::fmt::Display for EvaluatorPoliciesAccessModel<S> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.as_str())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> AsRef<str> for EvaluatorPoliciesAccessModel<S> {
+impl<S: BosStr> AsRef<str> for EvaluatorPoliciesAccessModel<S> {
     fn as_ref(&self) -> &str {
         self.as_str()
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Serialize for EvaluatorPoliciesAccessModel<S> {
+impl<S: BosStr> Serialize for EvaluatorPoliciesAccessModel<S> {
     fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
         Ser: serde::Serializer,
@@ -149,7 +149,7 @@ impl<S: Bos<str> + AsRef<str>> Serialize for EvaluatorPoliciesAccessModel<S> {
     }
 }
 
-impl<'de, S: Deserialize<'de> + Bos<str> + AsRef<str>> Deserialize<'de>
+impl<'de, S: Deserialize<'de> + BosStr> Deserialize<'de>
 for EvaluatorPoliciesAccessModel<S> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
@@ -160,14 +160,18 @@ for EvaluatorPoliciesAccessModel<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str> + Default> Default for EvaluatorPoliciesAccessModel<S> {
+impl<S: BosStr + Default> Default for EvaluatorPoliciesAccessModel<S> {
     fn default() -> Self {
         Self::Other(Default::default())
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> IntoStatic for EvaluatorPoliciesAccessModel<S> {
-    type Output = EvaluatorPoliciesAccessModel<DefaultStr>;
+impl<S: BosStr> jacquard_common::IntoStatic for EvaluatorPoliciesAccessModel<S>
+where
+    S: BosStr + jacquard_common::IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = EvaluatorPoliciesAccessModel<S::Output>;
     fn into_static(self) -> Self::Output {
         match self {
             EvaluatorPoliciesAccessModel::Open => EvaluatorPoliciesAccessModel::Open,
@@ -189,11 +193,11 @@ impl<S: Bos<str> + AsRef<str>> IntoStatic for EvaluatorPoliciesAccessModel<S> {
     rename = "app.gainforest.evaluator.service",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Service<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Service<S: BosStr = DefaultStr> {
     ///Timestamp of when this evaluator service was declared.
     pub created_at: Datetime,
     ///The evaluator's policies including supported evaluation types and access model.
@@ -208,24 +212,24 @@ pub struct Service<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ServiceGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ServiceGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Service<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Service<S> {
+impl<S: BosStr> Service<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, ServiceRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for EvaluationTypeDefinition<S> {
+impl<S: BosStr> LexiconSchema for EvaluationTypeDefinition<S> {
     fn nsid() -> &'static str {
         "app.gainforest.evaluator.service"
     }
@@ -276,7 +280,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for EvaluationTypeDefinition<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for EvaluationTypeLocale<S> {
+impl<S: BosStr> LexiconSchema for EvaluationTypeLocale<S> {
     fn nsid() -> &'static str {
         "app.gainforest.evaluator.service"
     }
@@ -330,7 +334,7 @@ impl<S: Bos<str> + AsRef<str>> LexiconSchema for EvaluationTypeLocale<S> {
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for EvaluatorPolicies<S> {
+impl<S: BosStr> LexiconSchema for EvaluatorPolicies<S> {
     fn nsid() -> &'static str {
         "app.gainforest.evaluator.service"
     }
@@ -395,17 +399,17 @@ pub struct ServiceRecord;
 impl XrpcResp for ServiceRecord {
     const NSID: &'static str = "app.gainforest.evaluator.service";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ServiceGetRecordOutput<S>;
+    type Output<S: BosStr> = ServiceGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<ServiceGetRecordOutput<S>> for Service<S> {
+impl<S: BosStr> From<ServiceGetRecordOutput<S>> for Service<S> {
     fn from(output: ServiceGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Service<S> {
+impl<S: BosStr> Collection for Service<S> {
     const NSID: &'static str = "app.gainforest.evaluator.service";
     type Record = ServiceRecord;
 }
@@ -415,7 +419,7 @@ impl Collection for ServiceRecord {
     type Record = ServiceRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Service<S> {
+impl<S: BosStr> LexiconSchema for Service<S> {
     fn nsid() -> &'static str {
         "app.gainforest.evaluator.service"
     }
@@ -716,9 +720,9 @@ pub mod evaluator_policies_state {
         type EvaluationTypes = Unset;
     }
     ///State transition - sets the `evaluation_types` field to Set
-    pub struct SetEvaluationTypes<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetEvaluationTypes<S> {}
-    impl<S: State> State for SetEvaluationTypes<S> {
+    pub struct SetEvaluationTypes<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetEvaluationTypes<St> {}
+    impl<St: State> State for SetEvaluationTypes<St> {
         type EvaluationTypes = Set<members::evaluation_types>;
     }
     /// Marker types for field names
@@ -729,37 +733,37 @@ pub mod evaluator_policies_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct EvaluatorPoliciesBuilder<'a, S: evaluator_policies_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct EvaluatorPoliciesBuilder<S: BosStr, St: evaluator_policies_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<EvaluatorPoliciesAccessModel<S>>,
         Option<Vec<service::EvaluationTypeDefinition<S>>>,
         Option<Vec<S>>,
         Option<Vec<S>>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> EvaluatorPolicies<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> EvaluatorPoliciesBuilder<'a, evaluator_policies_state::Empty> {
+impl<S: BosStr> EvaluatorPolicies<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> EvaluatorPoliciesBuilder<S, evaluator_policies_state::Empty> {
         EvaluatorPoliciesBuilder::new()
     }
 }
 
-impl<'a> EvaluatorPoliciesBuilder<'a, evaluator_policies_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> EvaluatorPoliciesBuilder<S, evaluator_policies_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         EvaluatorPoliciesBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: evaluator_policies_state::State> EvaluatorPoliciesBuilder<'a, S> {
+impl<S: BosStr, St: evaluator_policies_state::State> EvaluatorPoliciesBuilder<S, St> {
     /// Set the `accessModel` field (optional)
     pub fn access_model(
         mut self,
@@ -778,7 +782,7 @@ impl<'a, S: evaluator_policies_state::State> EvaluatorPoliciesBuilder<'a, S> {
     }
 }
 
-impl<'a, S: evaluator_policies_state::State> EvaluatorPoliciesBuilder<'a, S> {
+impl<S: BosStr, St: evaluator_policies_state::State> EvaluatorPoliciesBuilder<S, St> {
     /// Set the `evaluationTypeDefinitions` field (optional)
     pub fn evaluation_type_definitions(
         mut self,
@@ -797,26 +801,26 @@ impl<'a, S: evaluator_policies_state::State> EvaluatorPoliciesBuilder<'a, S> {
     }
 }
 
-impl<'a, S> EvaluatorPoliciesBuilder<'a, S>
+impl<S: BosStr, St> EvaluatorPoliciesBuilder<S, St>
 where
-    S: evaluator_policies_state::State,
-    S::EvaluationTypes: evaluator_policies_state::IsUnset,
+    St: evaluator_policies_state::State,
+    St::EvaluationTypes: evaluator_policies_state::IsUnset,
 {
     /// Set the `evaluationTypes` field (required)
     pub fn evaluation_types(
         mut self,
         value: impl Into<Vec<S>>,
-    ) -> EvaluatorPoliciesBuilder<'a, evaluator_policies_state::SetEvaluationTypes<S>> {
+    ) -> EvaluatorPoliciesBuilder<S, evaluator_policies_state::SetEvaluationTypes<St>> {
         self._fields.2 = Option::Some(value.into());
         EvaluatorPoliciesBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: evaluator_policies_state::State> EvaluatorPoliciesBuilder<'a, S> {
+impl<S: BosStr, St: evaluator_policies_state::State> EvaluatorPoliciesBuilder<S, St> {
     /// Set the `subjectCollections` field (optional)
     pub fn subject_collections(mut self, value: impl Into<Option<Vec<S>>>) -> Self {
         self._fields.3 = value.into();
@@ -829,13 +833,13 @@ impl<'a, S: evaluator_policies_state::State> EvaluatorPoliciesBuilder<'a, S> {
     }
 }
 
-impl<'a, S> EvaluatorPoliciesBuilder<'a, S>
+impl<S: BosStr, St> EvaluatorPoliciesBuilder<S, St>
 where
-    S: evaluator_policies_state::State,
-    S::EvaluationTypes: evaluator_policies_state::IsSet,
+    St: evaluator_policies_state::State,
+    St::EvaluationTypes: evaluator_policies_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> EvaluatorPolicies<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> EvaluatorPolicies<S> {
         EvaluatorPolicies {
             access_model: self._fields.0,
             evaluation_type_definitions: self._fields.1,
@@ -844,11 +848,11 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
+    /// Build the final struct with custom extra_data.
     pub fn build_with_data(
         self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> EvaluatorPolicies<'a> {
+        extra_data: BTreeMap<SmolStr, Data<S>>,
+    ) -> EvaluatorPolicies<S> {
         EvaluatorPolicies {
             access_model: self._fields.0,
             evaluation_type_definitions: self._fields.1,
@@ -880,17 +884,17 @@ pub mod service_state {
         type Policies = Unset;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
-        type Policies = S::Policies;
+        type Policies = St::Policies;
     }
     ///State transition - sets the `policies` field to Set
-    pub struct SetPolicies<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetPolicies<S> {}
-    impl<S: State> State for SetPolicies<S> {
-        type CreatedAt = S::CreatedAt;
+    pub struct SetPolicies<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPolicies<St> {}
+    impl<St: State> State for SetPolicies<St> {
+        type CreatedAt = St::CreatedAt;
         type Policies = Set<members::policies>;
     }
     /// Marker types for field names
@@ -903,88 +907,85 @@ pub mod service_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ServiceBuilder<'a, S: service_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ServiceBuilder<S: BosStr, St: service_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (Option<Datetime>, Option<service::EvaluatorPolicies<S>>),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Service<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ServiceBuilder<'a, service_state::Empty> {
+impl<S: BosStr> Service<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ServiceBuilder<S, service_state::Empty> {
         ServiceBuilder::new()
     }
 }
 
-impl<'a> ServiceBuilder<'a, service_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ServiceBuilder<S, service_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ServiceBuilder {
             _state: PhantomData,
             _fields: (None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ServiceBuilder<'a, S>
+impl<S: BosStr, St> ServiceBuilder<S, St>
 where
-    S: service_state::State,
-    S::CreatedAt: service_state::IsUnset,
+    St: service_state::State,
+    St::CreatedAt: service_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ServiceBuilder<'a, service_state::SetCreatedAt<S>> {
+    ) -> ServiceBuilder<S, service_state::SetCreatedAt<St>> {
         self._fields.0 = Option::Some(value.into());
         ServiceBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ServiceBuilder<'a, S>
+impl<S: BosStr, St> ServiceBuilder<S, St>
 where
-    S: service_state::State,
-    S::Policies: service_state::IsUnset,
+    St: service_state::State,
+    St::Policies: service_state::IsUnset,
 {
     /// Set the `policies` field (required)
     pub fn policies(
         mut self,
         value: impl Into<service::EvaluatorPolicies<S>>,
-    ) -> ServiceBuilder<'a, service_state::SetPolicies<S>> {
+    ) -> ServiceBuilder<S, service_state::SetPolicies<St>> {
         self._fields.1 = Option::Some(value.into());
         ServiceBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ServiceBuilder<'a, S>
+impl<S: BosStr, St> ServiceBuilder<S, St>
 where
-    S: service_state::State,
-    S::CreatedAt: service_state::IsSet,
-    S::Policies: service_state::IsSet,
+    St: service_state::State,
+    St::CreatedAt: service_state::IsSet,
+    St::Policies: service_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Service<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Service<S> {
         Service {
             created_at: self._fields.0.unwrap(),
             policies: self._fields.1.unwrap(),
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(
-        self,
-        extra_data: BTreeMap<SmolStr, Data<'a>>,
-    ) -> Service<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Service<S> {
         Service {
             created_at: self._fields.0.unwrap(),
             policies: self._fields.1.unwrap(),

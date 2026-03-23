@@ -10,7 +10,7 @@ use alloc::collections::BTreeMap;
 
 #[allow(unused_imports)]
 use core::marker::PhantomData;
-use jacquard_common::{CowStr, Bos, DefaultStr};
+use jacquard_common::{CowStr, Bos, BosStr, DefaultStr, FromStaticStr};
 
 #[allow(unused_imports)]
 use jacquard_common::deps::codegen::unicode_segmentation::UnicodeSegmentation;
@@ -36,11 +36,11 @@ use serde::{Serialize, Deserialize};
     rename = "blue.skytalk.talk.thread",
     tag = "$type",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct Thread<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct Thread<S: BosStr = DefaultStr> {
     ///Optional attached media (image or audio)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub blobs: Option<Vec<BlobRef<S>>>,
@@ -63,18 +63,18 @@ pub struct Thread<S: Bos<str> + AsRef<str> = DefaultStr> {
 #[serde(
     rename_all = "camelCase",
     bound(
-        serialize = "S: Serialize + Bos<str> + AsRef<str>",
-        deserialize = "S: Deserialize<'de> + Bos<str> + AsRef<str>"
+        serialize = "S: Serialize + BosStr",
+        deserialize = "S: Deserialize<'de> + BosStr"
     )
 )]
-pub struct ThreadGetRecordOutput<S: Bos<str> + AsRef<str> = DefaultStr> {
+pub struct ThreadGetRecordOutput<S: BosStr = DefaultStr> {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cid: Option<Cid<S>>,
     pub uri: AtUri<S>,
     pub value: Thread<S>,
 }
 
-impl<S: Bos<str> + AsRef<str>> Thread<S> {
+impl<S: BosStr> Thread<S> {
     pub fn uri(uri: S) -> Result<RecordUri<S, ThreadRecord>, UriError> {
         RecordUri::try_from_uri(AtUri::new(uri)?)
     }
@@ -87,17 +87,17 @@ pub struct ThreadRecord;
 impl XrpcResp for ThreadRecord {
     const NSID: &'static str = "blue.skytalk.talk.thread";
     const ENCODING: &'static str = "application/json";
-    type Output<S: Bos<str> + AsRef<str>> = ThreadGetRecordOutput<S>;
+    type Output<S: BosStr> = ThreadGetRecordOutput<S>;
     type Err = RecordError;
 }
 
-impl<S: Bos<str> + AsRef<str>> From<ThreadGetRecordOutput<S>> for Thread<S> {
+impl<S: BosStr> From<ThreadGetRecordOutput<S>> for Thread<S> {
     fn from(output: ThreadGetRecordOutput<S>) -> Self {
         output.value
     }
 }
 
-impl<S: Bos<str> + AsRef<str>> Collection for Thread<S> {
+impl<S: BosStr> Collection for Thread<S> {
     const NSID: &'static str = "blue.skytalk.talk.thread";
     type Record = ThreadRecord;
 }
@@ -107,7 +107,7 @@ impl Collection for ThreadRecord {
     type Record = ThreadRecord;
 }
 
-impl<S: Bos<str> + AsRef<str>> LexiconSchema for Thread<S> {
+impl<S: BosStr> LexiconSchema for Thread<S> {
     fn nsid() -> &'static str {
         "blue.skytalk.talk.thread"
     }
@@ -201,27 +201,27 @@ pub mod thread_state {
         type CreatedAt = Unset;
     }
     ///State transition - sets the `channel_id` field to Set
-    pub struct SetChannelId<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetChannelId<S> {}
-    impl<S: State> State for SetChannelId<S> {
+    pub struct SetChannelId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetChannelId<St> {}
+    impl<St: State> State for SetChannelId<St> {
         type ChannelId = Set<members::channel_id>;
-        type Title = S::Title;
-        type CreatedAt = S::CreatedAt;
+        type Title = St::Title;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `title` field to Set
-    pub struct SetTitle<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetTitle<S> {}
-    impl<S: State> State for SetTitle<S> {
-        type ChannelId = S::ChannelId;
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
+        type ChannelId = St::ChannelId;
         type Title = Set<members::title>;
-        type CreatedAt = S::CreatedAt;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<S: State = Empty>(PhantomData<fn() -> S>);
-    impl<S: State> sealed::Sealed for SetCreatedAt<S> {}
-    impl<S: State> State for SetCreatedAt<S> {
-        type ChannelId = S::ChannelId;
-        type Title = S::Title;
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type ChannelId = St::ChannelId;
+        type Title = St::Title;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
@@ -236,9 +236,9 @@ pub mod thread_state {
     }
 }
 
-/// Builder for constructing an instance of this type
-pub struct ThreadBuilder<'a, S: thread_state::State> {
-    _state: PhantomData<fn() -> S>,
+/// Builder for constructing an instance of this type.
+pub struct ThreadBuilder<S: BosStr, St: thread_state::State> {
+    _state: PhantomData<fn() -> St>,
     _fields: (
         Option<Vec<BlobRef<S>>>,
         Option<S>,
@@ -246,28 +246,28 @@ pub struct ThreadBuilder<'a, S: thread_state::State> {
         Option<S>,
         Option<S>,
     ),
-    _lifetime: PhantomData<&'a ()>,
+    _type: PhantomData<fn() -> S>,
 }
 
-impl<'a> Thread<'a> {
-    /// Create a new builder for this type
-    pub fn new() -> ThreadBuilder<'a, thread_state::Empty> {
+impl<S: BosStr> Thread<S> {
+    /// Create a new builder for this type.
+    pub fn new() -> ThreadBuilder<S, thread_state::Empty> {
         ThreadBuilder::new()
     }
 }
 
-impl<'a> ThreadBuilder<'a, thread_state::Empty> {
-    /// Create a new builder with all fields unset
+impl<S: BosStr> ThreadBuilder<S, thread_state::Empty> {
+    /// Create a new builder with all fields unset.
     pub fn new() -> Self {
         ThreadBuilder {
             _state: PhantomData,
             _fields: (None, None, None, None, None),
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: thread_state::State> ThreadBuilder<'a, S> {
+impl<S: BosStr, St: thread_state::State> ThreadBuilder<S, St> {
     /// Set the `blobs` field (optional)
     pub fn blobs(mut self, value: impl Into<Option<Vec<BlobRef<S>>>>) -> Self {
         self._fields.0 = value.into();
@@ -280,45 +280,45 @@ impl<'a, S: thread_state::State> ThreadBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ThreadBuilder<'a, S>
+impl<S: BosStr, St> ThreadBuilder<S, St>
 where
-    S: thread_state::State,
-    S::ChannelId: thread_state::IsUnset,
+    St: thread_state::State,
+    St::ChannelId: thread_state::IsUnset,
 {
     /// Set the `channelId` field (required)
     pub fn channel_id(
         mut self,
         value: impl Into<S>,
-    ) -> ThreadBuilder<'a, thread_state::SetChannelId<S>> {
+    ) -> ThreadBuilder<S, thread_state::SetChannelId<St>> {
         self._fields.1 = Option::Some(value.into());
         ThreadBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ThreadBuilder<'a, S>
+impl<S: BosStr, St> ThreadBuilder<S, St>
 where
-    S: thread_state::State,
-    S::CreatedAt: thread_state::IsUnset,
+    St: thread_state::State,
+    St::CreatedAt: thread_state::IsUnset,
 {
     /// Set the `createdAt` field (required)
     pub fn created_at(
         mut self,
         value: impl Into<Datetime>,
-    ) -> ThreadBuilder<'a, thread_state::SetCreatedAt<S>> {
+    ) -> ThreadBuilder<S, thread_state::SetCreatedAt<St>> {
         self._fields.2 = Option::Some(value.into());
         ThreadBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S: thread_state::State> ThreadBuilder<'a, S> {
+impl<S: BosStr, St: thread_state::State> ThreadBuilder<S, St> {
     /// Set the `text` field (optional)
     pub fn text(mut self, value: impl Into<Option<S>>) -> Self {
         self._fields.3 = value.into();
@@ -331,34 +331,34 @@ impl<'a, S: thread_state::State> ThreadBuilder<'a, S> {
     }
 }
 
-impl<'a, S> ThreadBuilder<'a, S>
+impl<S: BosStr, St> ThreadBuilder<S, St>
 where
-    S: thread_state::State,
-    S::Title: thread_state::IsUnset,
+    St: thread_state::State,
+    St::Title: thread_state::IsUnset,
 {
     /// Set the `title` field (required)
     pub fn title(
         mut self,
         value: impl Into<S>,
-    ) -> ThreadBuilder<'a, thread_state::SetTitle<S>> {
+    ) -> ThreadBuilder<S, thread_state::SetTitle<St>> {
         self._fields.4 = Option::Some(value.into());
         ThreadBuilder {
             _state: PhantomData,
             _fields: self._fields,
-            _lifetime: PhantomData,
+            _type: PhantomData,
         }
     }
 }
 
-impl<'a, S> ThreadBuilder<'a, S>
+impl<S: BosStr, St> ThreadBuilder<S, St>
 where
-    S: thread_state::State,
-    S::ChannelId: thread_state::IsSet,
-    S::Title: thread_state::IsSet,
-    S::CreatedAt: thread_state::IsSet,
+    St: thread_state::State,
+    St::ChannelId: thread_state::IsSet,
+    St::Title: thread_state::IsSet,
+    St::CreatedAt: thread_state::IsSet,
 {
-    /// Build the final struct
-    pub fn build(self) -> Thread<'a> {
+    /// Build the final struct.
+    pub fn build(self) -> Thread<S> {
         Thread {
             blobs: self._fields.0,
             channel_id: self._fields.1.unwrap(),
@@ -368,8 +368,8 @@ where
             extra_data: Default::default(),
         }
     }
-    /// Build the final struct with custom extra_data
-    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<'a>>) -> Thread<'a> {
+    /// Build the final struct with custom extra_data.
+    pub fn build_with_data(self, extra_data: BTreeMap<SmolStr, Data<S>>) -> Thread<S> {
         Thread {
             blobs: self._fields.0,
             channel_id: self._fields.1.unwrap(),
