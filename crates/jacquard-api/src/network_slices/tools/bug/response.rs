@@ -232,51 +232,51 @@ pub mod response_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Status;
         type CreatedAt;
         type Bug;
+        type Status;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Status = Unset;
         type CreatedAt = Unset;
         type Bug = Unset;
-    }
-    ///State transition - sets the `status` field to Set
-    pub struct SetStatus<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetStatus<St> {}
-    impl<St: State> State for SetStatus<St> {
-        type Status = Set<members::status>;
-        type CreatedAt = St::CreatedAt;
-        type Bug = St::Bug;
+        type Status = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Status = St::Status;
         type CreatedAt = Set<members::created_at>;
         type Bug = St::Bug;
+        type Status = St::Status;
     }
     ///State transition - sets the `bug` field to Set
     pub struct SetBug<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetBug<St> {}
     impl<St: State> State for SetBug<St> {
-        type Status = St::Status;
         type CreatedAt = St::CreatedAt;
         type Bug = Set<members::bug>;
+        type Status = St::Status;
+    }
+    ///State transition - sets the `status` field to Set
+    pub struct SetStatus<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStatus<St> {}
+    impl<St: State> State for SetStatus<St> {
+        type CreatedAt = St::CreatedAt;
+        type Bug = St::Bug;
+        type Status = Set<members::status>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `status` field
-        pub struct status(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `bug` field
         pub struct bug(());
+        ///Marker type for the `status` field
+        pub struct status(());
     }
 }
 
@@ -397,9 +397,9 @@ where
 impl<S: BosStr, St> ResponseBuilder<S, St>
 where
     St: response_state::State,
-    St::Status: response_state::IsSet,
     St::CreatedAt: response_state::IsSet,
     St::Bug: response_state::IsSet,
+    St::Status: response_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Response<S> {

@@ -162,67 +162,67 @@ pub mod note_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type LastUpdated;
+        type CreatedAt;
         type Content;
         type Title;
-        type CreatedAt;
-        type LastUpdated;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type LastUpdated = Unset;
+        type CreatedAt = Unset;
         type Content = Unset;
         type Title = Unset;
-        type CreatedAt = Unset;
-        type LastUpdated = Unset;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetContent<St> {}
-    impl<St: State> State for SetContent<St> {
-        type Content = Set<members::content>;
-        type Title = St::Title;
-        type CreatedAt = St::CreatedAt;
-        type LastUpdated = St::LastUpdated;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTitle<St> {}
-    impl<St: State> State for SetTitle<St> {
-        type Content = St::Content;
-        type Title = Set<members::title>;
-        type CreatedAt = St::CreatedAt;
-        type LastUpdated = St::LastUpdated;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type Content = St::Content;
-        type Title = St::Title;
-        type CreatedAt = Set<members::created_at>;
-        type LastUpdated = St::LastUpdated;
     }
     ///State transition - sets the `last_updated` field to Set
     pub struct SetLastUpdated<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetLastUpdated<St> {}
     impl<St: State> State for SetLastUpdated<St> {
+        type LastUpdated = Set<members::last_updated>;
+        type CreatedAt = St::CreatedAt;
         type Content = St::Content;
         type Title = St::Title;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type LastUpdated = St::LastUpdated;
+        type CreatedAt = Set<members::created_at>;
+        type Content = St::Content;
+        type Title = St::Title;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetContent<St> {}
+    impl<St: State> State for SetContent<St> {
+        type LastUpdated = St::LastUpdated;
         type CreatedAt = St::CreatedAt;
-        type LastUpdated = Set<members::last_updated>;
+        type Content = Set<members::content>;
+        type Title = St::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
+        type LastUpdated = St::LastUpdated;
+        type CreatedAt = St::CreatedAt;
+        type Content = St::Content;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `last_updated` field
+        pub struct last_updated(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `content` field
         pub struct content(());
         ///Marker type for the `title` field
         pub struct title(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `last_updated` field
-        pub struct last_updated(());
     }
 }
 
@@ -377,10 +377,10 @@ where
 impl<S: BosStr, St> NoteBuilder<S, St>
 where
     St: note_state::State,
+    St::LastUpdated: note_state::IsSet,
+    St::CreatedAt: note_state::IsSet,
     St::Content: note_state::IsSet,
     St::Title: note_state::IsSet,
-    St::CreatedAt: note_state::IsSet,
-    St::LastUpdated: note_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Note<S> {

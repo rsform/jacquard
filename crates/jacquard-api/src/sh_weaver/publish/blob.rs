@@ -166,37 +166,37 @@ pub mod blob_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Upload;
         type Path;
+        type Upload;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Upload = Unset;
         type Path = Unset;
-    }
-    ///State transition - sets the `upload` field to Set
-    pub struct SetUpload<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUpload<St> {}
-    impl<St: State> State for SetUpload<St> {
-        type Upload = Set<members::upload>;
-        type Path = St::Path;
+        type Upload = Unset;
     }
     ///State transition - sets the `path` field to Set
     pub struct SetPath<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPath<St> {}
     impl<St: State> State for SetPath<St> {
-        type Upload = St::Upload;
         type Path = Set<members::path>;
+        type Upload = St::Upload;
+    }
+    ///State transition - sets the `upload` field to Set
+    pub struct SetUpload<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUpload<St> {}
+    impl<St: State> State for SetUpload<St> {
+        type Path = St::Path;
+        type Upload = Set<members::upload>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `upload` field
-        pub struct upload(());
         ///Marker type for the `path` field
         pub struct path(());
+        ///Marker type for the `upload` field
+        pub struct upload(());
     }
 }
 
@@ -266,8 +266,8 @@ where
 impl<S: BosStr, St> BlobBuilder<S, St>
 where
     St: blob_state::State,
-    St::Upload: blob_state::IsSet,
     St::Path: blob_state::IsSet,
+    St::Upload: blob_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Blob<S> {

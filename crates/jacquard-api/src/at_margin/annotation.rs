@@ -1348,37 +1348,37 @@ pub mod annotation_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Target;
         type CreatedAt;
+        type Target;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Target = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `target` field to Set
-    pub struct SetTarget<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTarget<St> {}
-    impl<St: State> State for SetTarget<St> {
-        type Target = Set<members::target>;
-        type CreatedAt = St::CreatedAt;
+        type Target = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Target = St::Target;
         type CreatedAt = Set<members::created_at>;
+        type Target = St::Target;
+    }
+    ///State transition - sets the `target` field to Set
+    pub struct SetTarget<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTarget<St> {}
+    impl<St: State> State for SetTarget<St> {
+        type CreatedAt = St::CreatedAt;
+        type Target = Set<members::target>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `target` field
-        pub struct target(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `target` field
+        pub struct target(());
     }
 }
 
@@ -1541,8 +1541,8 @@ where
 impl<S: BosStr, St> AnnotationBuilder<S, St>
 where
     St: annotation_state::State,
-    St::Target: annotation_state::IsSet,
     St::CreatedAt: annotation_state::IsSet,
+    St::Target: annotation_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Annotation<S> {
@@ -1587,37 +1587,37 @@ pub mod range_selector_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type StartSelector;
         type EndSelector;
+        type StartSelector;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type StartSelector = Unset;
         type EndSelector = Unset;
-    }
-    ///State transition - sets the `start_selector` field to Set
-    pub struct SetStartSelector<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetStartSelector<St> {}
-    impl<St: State> State for SetStartSelector<St> {
-        type StartSelector = Set<members::start_selector>;
-        type EndSelector = St::EndSelector;
+        type StartSelector = Unset;
     }
     ///State transition - sets the `end_selector` field to Set
     pub struct SetEndSelector<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetEndSelector<St> {}
     impl<St: State> State for SetEndSelector<St> {
-        type StartSelector = St::StartSelector;
         type EndSelector = Set<members::end_selector>;
+        type StartSelector = St::StartSelector;
+    }
+    ///State transition - sets the `start_selector` field to Set
+    pub struct SetStartSelector<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStartSelector<St> {}
+    impl<St: State> State for SetStartSelector<St> {
+        type EndSelector = St::EndSelector;
+        type StartSelector = Set<members::start_selector>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `start_selector` field
-        pub struct start_selector(());
         ///Marker type for the `end_selector` field
         pub struct end_selector(());
+        ///Marker type for the `start_selector` field
+        pub struct start_selector(());
     }
 }
 
@@ -1704,8 +1704,8 @@ impl<S: BosStr, St: range_selector_state::State> RangeSelectorBuilder<S, St> {
 impl<S: BosStr, St> RangeSelectorBuilder<S, St>
 where
     St: range_selector_state::State,
-    St::StartSelector: range_selector_state::IsSet,
     St::EndSelector: range_selector_state::IsSet,
+    St::StartSelector: range_selector_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> RangeSelector<S> {

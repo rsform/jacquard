@@ -117,6 +117,10 @@ pub mod at_podping;
 pub mod at_unthread;
 
 
+#[cfg(feature = "at_youandme")]
+pub mod at_youandme;
+
+
 #[cfg(feature = "beauty_cybernetic")]
 pub mod beauty_cybernetic;
 
@@ -280,6 +284,10 @@ pub mod dev_fudgeu;
 
 #[cfg(feature = "dev_kanad")]
 pub mod dev_kanad;
+
+
+#[cfg(feature = "dev_keytrace")]
+pub mod dev_keytrace;
 
 
 #[cfg(feature = "dev_ocbwoy3")]
@@ -658,6 +666,10 @@ pub mod tech_manos;
 pub mod tech_tokimeki;
 
 
+#[cfg(feature = "to_atpr")]
+pub mod to_atpr;
+
+
 #[cfg(feature = "tools_ozone")]
 pub mod tools_ozone;
 
@@ -684,6 +696,10 @@ pub mod us_polhem;
 
 #[cfg(feature = "win_tomo_x")]
 pub mod win_tomo_x;
+
+
+#[cfg(feature = "world_ptah")]
+pub mod world_ptah;
 
 
 #[cfg(feature = "xyz_atpoke")]

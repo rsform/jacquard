@@ -931,37 +931,37 @@ pub mod checkin_image_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Thumb;
         type Fullsize;
+        type Thumb;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Thumb = Unset;
         type Fullsize = Unset;
-    }
-    ///State transition - sets the `thumb` field to Set
-    pub struct SetThumb<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetThumb<St> {}
-    impl<St: State> State for SetThumb<St> {
-        type Thumb = Set<members::thumb>;
-        type Fullsize = St::Fullsize;
+        type Thumb = Unset;
     }
     ///State transition - sets the `fullsize` field to Set
     pub struct SetFullsize<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetFullsize<St> {}
     impl<St: State> State for SetFullsize<St> {
-        type Thumb = St::Thumb;
         type Fullsize = Set<members::fullsize>;
+        type Thumb = St::Thumb;
+    }
+    ///State transition - sets the `thumb` field to Set
+    pub struct SetThumb<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetThumb<St> {}
+    impl<St: State> State for SetThumb<St> {
+        type Fullsize = St::Fullsize;
+        type Thumb = Set<members::thumb>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `thumb` field
-        pub struct thumb(());
         ///Marker type for the `fullsize` field
         pub struct fullsize(());
+        ///Marker type for the `thumb` field
+        pub struct thumb(());
     }
 }
 
@@ -1044,8 +1044,8 @@ where
 impl<S: BosStr, St> CheckinImageBuilder<S, St>
 where
     St: checkin_image_state::State,
-    St::Thumb: checkin_image_state::IsSet,
     St::Fullsize: checkin_image_state::IsSet,
+    St::Thumb: checkin_image_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> CheckinImage<S> {
@@ -1080,67 +1080,67 @@ pub mod checkin_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Geo;
-        type Address;
         type Text;
         type CreatedAt;
+        type Address;
+        type Geo;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Geo = Unset;
-        type Address = Unset;
         type Text = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `geo` field to Set
-    pub struct SetGeo<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetGeo<St> {}
-    impl<St: State> State for SetGeo<St> {
-        type Geo = Set<members::geo>;
-        type Address = St::Address;
-        type Text = St::Text;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `address` field to Set
-    pub struct SetAddress<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetAddress<St> {}
-    impl<St: State> State for SetAddress<St> {
-        type Geo = St::Geo;
-        type Address = Set<members::address>;
-        type Text = St::Text;
-        type CreatedAt = St::CreatedAt;
+        type Address = Unset;
+        type Geo = Unset;
     }
     ///State transition - sets the `text` field to Set
     pub struct SetText<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetText<St> {}
     impl<St: State> State for SetText<St> {
-        type Geo = St::Geo;
-        type Address = St::Address;
         type Text = Set<members::text>;
         type CreatedAt = St::CreatedAt;
+        type Address = St::Address;
+        type Geo = St::Geo;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Geo = St::Geo;
-        type Address = St::Address;
         type Text = St::Text;
         type CreatedAt = Set<members::created_at>;
+        type Address = St::Address;
+        type Geo = St::Geo;
+    }
+    ///State transition - sets the `address` field to Set
+    pub struct SetAddress<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAddress<St> {}
+    impl<St: State> State for SetAddress<St> {
+        type Text = St::Text;
+        type CreatedAt = St::CreatedAt;
+        type Address = Set<members::address>;
+        type Geo = St::Geo;
+    }
+    ///State transition - sets the `geo` field to Set
+    pub struct SetGeo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetGeo<St> {}
+    impl<St: State> State for SetGeo<St> {
+        type Text = St::Text;
+        type CreatedAt = St::CreatedAt;
+        type Address = St::Address;
+        type Geo = Set<members::geo>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `geo` field
-        pub struct geo(());
-        ///Marker type for the `address` field
-        pub struct address(());
         ///Marker type for the `text` field
         pub struct text(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `address` field
+        pub struct address(());
+        ///Marker type for the `geo` field
+        pub struct geo(());
     }
 }
 
@@ -1323,10 +1323,10 @@ where
 impl<S: BosStr, St> CheckinBuilder<S, St>
 where
     St: checkin_state::State,
-    St::Geo: checkin_state::IsSet,
-    St::Address: checkin_state::IsSet,
     St::Text: checkin_state::IsSet,
     St::CreatedAt: checkin_state::IsSet,
+    St::Address: checkin_state::IsSet,
+    St::Geo: checkin_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Checkin<S> {

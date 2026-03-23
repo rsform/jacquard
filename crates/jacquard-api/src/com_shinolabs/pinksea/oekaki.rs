@@ -228,37 +228,37 @@ pub mod image_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Blob;
         type ImageLink;
+        type Blob;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Blob = Unset;
         type ImageLink = Unset;
-    }
-    ///State transition - sets the `blob` field to Set
-    pub struct SetBlob<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetBlob<St> {}
-    impl<St: State> State for SetBlob<St> {
-        type Blob = Set<members::blob>;
-        type ImageLink = St::ImageLink;
+        type Blob = Unset;
     }
     ///State transition - sets the `image_link` field to Set
     pub struct SetImageLink<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetImageLink<St> {}
     impl<St: State> State for SetImageLink<St> {
-        type Blob = St::Blob;
         type ImageLink = Set<members::image_link>;
+        type Blob = St::Blob;
+    }
+    ///State transition - sets the `blob` field to Set
+    pub struct SetBlob<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBlob<St> {}
+    impl<St: State> State for SetBlob<St> {
+        type ImageLink = St::ImageLink;
+        type Blob = Set<members::blob>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `blob` field
-        pub struct blob(());
         ///Marker type for the `image_link` field
         pub struct image_link(());
+        ///Marker type for the `blob` field
+        pub struct blob(());
     }
 }
 
@@ -328,8 +328,8 @@ where
 impl<S: BosStr, St> ImageBuilder<S, St>
 where
     St: image_state::State,
-    St::Blob: image_state::IsSet,
     St::ImageLink: image_state::IsSet,
+    St::Blob: image_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Image<S> {

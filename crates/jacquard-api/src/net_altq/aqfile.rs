@@ -554,37 +554,37 @@ pub mod file_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Size;
         type Name;
+        type Size;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Size = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `size` field to Set
-    pub struct SetSize<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSize<St> {}
-    impl<St: State> State for SetSize<St> {
-        type Size = Set<members::size>;
-        type Name = St::Name;
+        type Size = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetName<St> {}
     impl<St: State> State for SetName<St> {
-        type Size = St::Size;
         type Name = Set<members::name>;
+        type Size = St::Size;
+    }
+    ///State transition - sets the `size` field to Set
+    pub struct SetSize<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSize<St> {}
+    impl<St: State> State for SetSize<St> {
+        type Name = St::Name;
+        type Size = Set<members::size>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `size` field
-        pub struct size(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `size` field
+        pub struct size(());
     }
 }
 
@@ -680,8 +680,8 @@ where
 impl<S: BosStr, St> FileBuilder<S, St>
 where
     St: file_state::State,
-    St::Size: file_state::IsSet,
     St::Name: file_state::IsSet,
+    St::Size: file_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> File<S> {

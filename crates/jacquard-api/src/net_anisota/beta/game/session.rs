@@ -894,67 +894,67 @@ pub mod session_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type StartedAt;
         type Platform;
-        type Status;
+        type StartedAt;
         type ClientVersion;
+        type Status;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type StartedAt = Unset;
         type Platform = Unset;
-        type Status = Unset;
+        type StartedAt = Unset;
         type ClientVersion = Unset;
-    }
-    ///State transition - sets the `started_at` field to Set
-    pub struct SetStartedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetStartedAt<St> {}
-    impl<St: State> State for SetStartedAt<St> {
-        type StartedAt = Set<members::started_at>;
-        type Platform = St::Platform;
-        type Status = St::Status;
-        type ClientVersion = St::ClientVersion;
+        type Status = Unset;
     }
     ///State transition - sets the `platform` field to Set
     pub struct SetPlatform<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPlatform<St> {}
     impl<St: State> State for SetPlatform<St> {
-        type StartedAt = St::StartedAt;
         type Platform = Set<members::platform>;
-        type Status = St::Status;
-        type ClientVersion = St::ClientVersion;
-    }
-    ///State transition - sets the `status` field to Set
-    pub struct SetStatus<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetStatus<St> {}
-    impl<St: State> State for SetStatus<St> {
         type StartedAt = St::StartedAt;
-        type Platform = St::Platform;
-        type Status = Set<members::status>;
         type ClientVersion = St::ClientVersion;
+        type Status = St::Status;
+    }
+    ///State transition - sets the `started_at` field to Set
+    pub struct SetStartedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStartedAt<St> {}
+    impl<St: State> State for SetStartedAt<St> {
+        type Platform = St::Platform;
+        type StartedAt = Set<members::started_at>;
+        type ClientVersion = St::ClientVersion;
+        type Status = St::Status;
     }
     ///State transition - sets the `client_version` field to Set
     pub struct SetClientVersion<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetClientVersion<St> {}
     impl<St: State> State for SetClientVersion<St> {
-        type StartedAt = St::StartedAt;
         type Platform = St::Platform;
-        type Status = St::Status;
+        type StartedAt = St::StartedAt;
         type ClientVersion = Set<members::client_version>;
+        type Status = St::Status;
+    }
+    ///State transition - sets the `status` field to Set
+    pub struct SetStatus<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStatus<St> {}
+    impl<St: State> State for SetStatus<St> {
+        type Platform = St::Platform;
+        type StartedAt = St::StartedAt;
+        type ClientVersion = St::ClientVersion;
+        type Status = Set<members::status>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `started_at` field
-        pub struct started_at(());
         ///Marker type for the `platform` field
         pub struct platform(());
-        ///Marker type for the `status` field
-        pub struct status(());
+        ///Marker type for the `started_at` field
+        pub struct started_at(());
         ///Marker type for the `client_version` field
         pub struct client_version(());
+        ///Marker type for the `status` field
+        pub struct status(());
     }
 }
 
@@ -1279,10 +1279,10 @@ impl<S: BosStr, St: session_state::State> SessionBuilder<S, St> {
 impl<S: BosStr, St> SessionBuilder<S, St>
 where
     St: session_state::State,
-    St::StartedAt: session_state::IsSet,
     St::Platform: session_state::IsSet,
-    St::Status: session_state::IsSet,
+    St::StartedAt: session_state::IsSet,
     St::ClientVersion: session_state::IsSet,
+    St::Status: session_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Session<S> {

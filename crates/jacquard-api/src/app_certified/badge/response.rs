@@ -209,51 +209,51 @@ pub mod response_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type BadgeAward;
         type Response;
         type CreatedAt;
-        type BadgeAward;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type BadgeAward = Unset;
         type Response = Unset;
         type CreatedAt = Unset;
-        type BadgeAward = Unset;
-    }
-    ///State transition - sets the `response` field to Set
-    pub struct SetResponse<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetResponse<St> {}
-    impl<St: State> State for SetResponse<St> {
-        type Response = Set<members::response>;
-        type CreatedAt = St::CreatedAt;
-        type BadgeAward = St::BadgeAward;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type Response = St::Response;
-        type CreatedAt = Set<members::created_at>;
-        type BadgeAward = St::BadgeAward;
     }
     ///State transition - sets the `badge_award` field to Set
     pub struct SetBadgeAward<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetBadgeAward<St> {}
     impl<St: State> State for SetBadgeAward<St> {
+        type BadgeAward = Set<members::badge_award>;
         type Response = St::Response;
         type CreatedAt = St::CreatedAt;
-        type BadgeAward = Set<members::badge_award>;
+    }
+    ///State transition - sets the `response` field to Set
+    pub struct SetResponse<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetResponse<St> {}
+    impl<St: State> State for SetResponse<St> {
+        type BadgeAward = St::BadgeAward;
+        type Response = Set<members::response>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type BadgeAward = St::BadgeAward;
+        type Response = St::Response;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `badge_award` field
+        pub struct badge_award(());
         ///Marker type for the `response` field
         pub struct response(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `badge_award` field
-        pub struct badge_award(());
     }
 }
 
@@ -360,9 +360,9 @@ impl<S: BosStr, St: response_state::State> ResponseBuilder<S, St> {
 impl<S: BosStr, St> ResponseBuilder<S, St>
 where
     St: response_state::State,
+    St::BadgeAward: response_state::IsSet,
     St::Response: response_state::IsSet,
     St::CreatedAt: response_state::IsSet,
-    St::BadgeAward: response_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Response<S> {

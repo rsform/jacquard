@@ -111,37 +111,37 @@ pub mod entry_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Book;
         type Contents;
+        type Book;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Book = Unset;
         type Contents = Unset;
-    }
-    ///State transition - sets the `book` field to Set
-    pub struct SetBook<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetBook<St> {}
-    impl<St: State> State for SetBook<St> {
-        type Book = Set<members::book>;
-        type Contents = St::Contents;
+        type Book = Unset;
     }
     ///State transition - sets the `contents` field to Set
     pub struct SetContents<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetContents<St> {}
     impl<St: State> State for SetContents<St> {
-        type Book = St::Book;
         type Contents = Set<members::contents>;
+        type Book = St::Book;
+    }
+    ///State transition - sets the `book` field to Set
+    pub struct SetBook<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBook<St> {}
+    impl<St: State> State for SetBook<St> {
+        type Contents = St::Contents;
+        type Book = Set<members::book>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `book` field
-        pub struct book(());
         ///Marker type for the `contents` field
         pub struct contents(());
+        ///Marker type for the `book` field
+        pub struct book(());
     }
 }
 
@@ -211,8 +211,8 @@ where
 impl<S: BosStr, St> EntryBuilder<S, St>
 where
     St: entry_state::State,
-    St::Book: entry_state::IsSet,
     St::Contents: entry_state::IsSet,
+    St::Book: entry_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Entry<S> {

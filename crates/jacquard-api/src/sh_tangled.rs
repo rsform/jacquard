@@ -15,3 +15,4 @@ pub mod public_key;
 pub mod repo;
 pub mod spindle;
 pub mod string;
+pub mod sync;

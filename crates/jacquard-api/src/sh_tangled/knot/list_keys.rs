@@ -253,49 +253,49 @@ pub mod public_key_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
         type Key;
+        type Did;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
         type Key = Unset;
+        type Did = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDid<St> {}
-    impl<St: State> State for SetDid<St> {
-        type Did = Set<members::did>;
-        type Key = St::Key;
-        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `key` field to Set
     pub struct SetKey<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetKey<St> {}
     impl<St: State> State for SetKey<St> {
-        type Did = St::Did;
         type Key = Set<members::key>;
+        type Did = St::Did;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
+        type Key = St::Key;
+        type Did = Set<members::did>;
         type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Did = St::Did;
         type Key = St::Key;
+        type Did = St::Did;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `key` field
         pub struct key(());
+        ///Marker type for the `did` field
+        pub struct did(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -386,8 +386,8 @@ where
 impl<S: BosStr, St> PublicKeyBuilder<S, St>
 where
     St: public_key_state::State,
-    St::Did: public_key_state::IsSet,
     St::Key: public_key_state::IsSet,
+    St::Did: public_key_state::IsSet,
     St::CreatedAt: public_key_state::IsSet,
 {
     /// Build the final struct.

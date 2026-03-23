@@ -213,9 +213,9 @@ pub mod receipt_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type To;
-        type Currency;
         type Amount;
         type From;
+        type Currency;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
@@ -223,9 +223,9 @@ pub mod receipt_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type To = Unset;
-        type Currency = Unset;
         type Amount = Unset;
         type From = Unset;
+        type Currency = Unset;
         type CreatedAt = Unset;
     }
     ///State transition - sets the `to` field to Set
@@ -233,19 +233,9 @@ pub mod receipt_state {
     impl<St: State> sealed::Sealed for SetTo<St> {}
     impl<St: State> State for SetTo<St> {
         type To = Set<members::to>;
+        type Amount = St::Amount;
+        type From = St::From;
         type Currency = St::Currency;
-        type Amount = St::Amount;
-        type From = St::From;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `currency` field to Set
-    pub struct SetCurrency<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCurrency<St> {}
-    impl<St: State> State for SetCurrency<St> {
-        type To = St::To;
-        type Currency = Set<members::currency>;
-        type Amount = St::Amount;
-        type From = St::From;
         type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `amount` field to Set
@@ -253,9 +243,9 @@ pub mod receipt_state {
     impl<St: State> sealed::Sealed for SetAmount<St> {}
     impl<St: State> State for SetAmount<St> {
         type To = St::To;
-        type Currency = St::Currency;
         type Amount = Set<members::amount>;
         type From = St::From;
+        type Currency = St::Currency;
         type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `from` field to Set
@@ -263,9 +253,19 @@ pub mod receipt_state {
     impl<St: State> sealed::Sealed for SetFrom<St> {}
     impl<St: State> State for SetFrom<St> {
         type To = St::To;
-        type Currency = St::Currency;
         type Amount = St::Amount;
         type From = Set<members::from>;
+        type Currency = St::Currency;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `currency` field to Set
+    pub struct SetCurrency<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCurrency<St> {}
+    impl<St: State> State for SetCurrency<St> {
+        type To = St::To;
+        type Amount = St::Amount;
+        type From = St::From;
+        type Currency = Set<members::currency>;
         type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
@@ -273,9 +273,9 @@ pub mod receipt_state {
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
         type To = St::To;
-        type Currency = St::Currency;
         type Amount = St::Amount;
         type From = St::From;
+        type Currency = St::Currency;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
@@ -283,12 +283,12 @@ pub mod receipt_state {
     pub mod members {
         ///Marker type for the `to` field
         pub struct to(());
-        ///Marker type for the `currency` field
-        pub struct currency(());
         ///Marker type for the `amount` field
         pub struct amount(());
         ///Marker type for the `from` field
         pub struct from(());
+        ///Marker type for the `currency` field
+        pub struct currency(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -508,9 +508,9 @@ impl<S: BosStr, St> ReceiptBuilder<S, St>
 where
     St: receipt_state::State,
     St::To: receipt_state::IsSet,
-    St::Currency: receipt_state::IsSet,
     St::Amount: receipt_state::IsSet,
     St::From: receipt_state::IsSet,
+    St::Currency: receipt_state::IsSet,
     St::CreatedAt: receipt_state::IsSet,
 {
     /// Build the final struct.

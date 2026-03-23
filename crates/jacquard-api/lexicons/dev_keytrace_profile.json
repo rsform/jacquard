@@ -1,0 +1,30 @@
+{
+  "lexicon": 1,
+  "id": "dev.keytrace.profile",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Keytrace profile settings. Singleton record stored in the user's ATProto repo.",
+      "key": "literal:self",
+      "record": {
+        "type": "object",
+        "properties": {
+          "bio": {
+            "type": "string",
+            "description": "Bio or description shown on the keytrace profile page.",
+            "maxGraphemes": 1024
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "displayName": {
+            "type": "string",
+            "description": "Display name override for the keytrace profile. Falls back to Bluesky display name if absent.",
+            "maxGraphemes": 128
+          }
+        }
+      }
+    }
+  }
+}

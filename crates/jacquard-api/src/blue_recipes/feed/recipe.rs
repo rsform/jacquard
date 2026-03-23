@@ -472,51 +472,51 @@ pub mod recipe_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Steps;
-        type Ingredients;
         type Title;
+        type Ingredients;
+        type Steps;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Steps = Unset;
-        type Ingredients = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `steps` field to Set
-    pub struct SetSteps<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSteps<St> {}
-    impl<St: State> State for SetSteps<St> {
-        type Steps = Set<members::steps>;
-        type Ingredients = St::Ingredients;
-        type Title = St::Title;
-    }
-    ///State transition - sets the `ingredients` field to Set
-    pub struct SetIngredients<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetIngredients<St> {}
-    impl<St: State> State for SetIngredients<St> {
-        type Steps = St::Steps;
-        type Ingredients = Set<members::ingredients>;
-        type Title = St::Title;
+        type Ingredients = Unset;
+        type Steps = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTitle<St> {}
     impl<St: State> State for SetTitle<St> {
-        type Steps = St::Steps;
-        type Ingredients = St::Ingredients;
         type Title = Set<members::title>;
+        type Ingredients = St::Ingredients;
+        type Steps = St::Steps;
+    }
+    ///State transition - sets the `ingredients` field to Set
+    pub struct SetIngredients<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIngredients<St> {}
+    impl<St: State> State for SetIngredients<St> {
+        type Title = St::Title;
+        type Ingredients = Set<members::ingredients>;
+        type Steps = St::Steps;
+    }
+    ///State transition - sets the `steps` field to Set
+    pub struct SetSteps<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSteps<St> {}
+    impl<St: State> State for SetSteps<St> {
+        type Title = St::Title;
+        type Ingredients = St::Ingredients;
+        type Steps = Set<members::steps>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `steps` field
-        pub struct steps(());
-        ///Marker type for the `ingredients` field
-        pub struct ingredients(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `ingredients` field
+        pub struct ingredients(());
+        ///Marker type for the `steps` field
+        pub struct steps(());
     }
 }
 
@@ -679,9 +679,9 @@ where
 impl<S: BosStr, St> RecipeBuilder<S, St>
 where
     St: recipe_state::State,
-    St::Steps: recipe_state::IsSet,
-    St::Ingredients: recipe_state::IsSet,
     St::Title: recipe_state::IsSet,
+    St::Ingredients: recipe_state::IsSet,
+    St::Steps: recipe_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Recipe<S> {

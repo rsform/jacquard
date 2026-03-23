@@ -583,67 +583,67 @@ pub mod settings_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Interval;
         type Avatars;
         type Enabled;
         type Mode;
+        type Interval;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Interval = Unset;
         type Avatars = Unset;
         type Enabled = Unset;
         type Mode = Unset;
-    }
-    ///State transition - sets the `interval` field to Set
-    pub struct SetInterval<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetInterval<St> {}
-    impl<St: State> State for SetInterval<St> {
-        type Interval = Set<members::interval>;
-        type Avatars = St::Avatars;
-        type Enabled = St::Enabled;
-        type Mode = St::Mode;
+        type Interval = Unset;
     }
     ///State transition - sets the `avatars` field to Set
     pub struct SetAvatars<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetAvatars<St> {}
     impl<St: State> State for SetAvatars<St> {
-        type Interval = St::Interval;
         type Avatars = Set<members::avatars>;
         type Enabled = St::Enabled;
         type Mode = St::Mode;
+        type Interval = St::Interval;
     }
     ///State transition - sets the `enabled` field to Set
     pub struct SetEnabled<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetEnabled<St> {}
     impl<St: State> State for SetEnabled<St> {
-        type Interval = St::Interval;
         type Avatars = St::Avatars;
         type Enabled = Set<members::enabled>;
         type Mode = St::Mode;
+        type Interval = St::Interval;
     }
     ///State transition - sets the `mode` field to Set
     pub struct SetMode<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetMode<St> {}
     impl<St: State> State for SetMode<St> {
-        type Interval = St::Interval;
         type Avatars = St::Avatars;
         type Enabled = St::Enabled;
         type Mode = Set<members::mode>;
+        type Interval = St::Interval;
+    }
+    ///State transition - sets the `interval` field to Set
+    pub struct SetInterval<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetInterval<St> {}
+    impl<St: State> State for SetInterval<St> {
+        type Avatars = St::Avatars;
+        type Enabled = St::Enabled;
+        type Mode = St::Mode;
+        type Interval = Set<members::interval>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `interval` field
-        pub struct interval(());
         ///Marker type for the `avatars` field
         pub struct avatars(());
         ///Marker type for the `enabled` field
         pub struct enabled(());
         ///Marker type for the `mode` field
         pub struct mode(());
+        ///Marker type for the `interval` field
+        pub struct interval(());
     }
 }
 
@@ -756,10 +756,10 @@ where
 impl<S: BosStr, St> SettingsBuilder<S, St>
 where
     St: settings_state::State,
-    St::Interval: settings_state::IsSet,
     St::Avatars: settings_state::IsSet,
     St::Enabled: settings_state::IsSet,
     St::Mode: settings_state::IsSet,
+    St::Interval: settings_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Settings<S> {

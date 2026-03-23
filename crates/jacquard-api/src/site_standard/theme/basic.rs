@@ -61,65 +61,65 @@ pub mod basic_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Background;
         type Foreground;
         type Accent;
+        type Background;
         type AccentForeground;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Background = Unset;
         type Foreground = Unset;
         type Accent = Unset;
+        type Background = Unset;
         type AccentForeground = Unset;
-    }
-    ///State transition - sets the `background` field to Set
-    pub struct SetBackground<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetBackground<St> {}
-    impl<St: State> State for SetBackground<St> {
-        type Background = Set<members::background>;
-        type Foreground = St::Foreground;
-        type Accent = St::Accent;
-        type AccentForeground = St::AccentForeground;
     }
     ///State transition - sets the `foreground` field to Set
     pub struct SetForeground<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetForeground<St> {}
     impl<St: State> State for SetForeground<St> {
-        type Background = St::Background;
         type Foreground = Set<members::foreground>;
         type Accent = St::Accent;
+        type Background = St::Background;
         type AccentForeground = St::AccentForeground;
     }
     ///State transition - sets the `accent` field to Set
     pub struct SetAccent<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetAccent<St> {}
     impl<St: State> State for SetAccent<St> {
-        type Background = St::Background;
         type Foreground = St::Foreground;
         type Accent = Set<members::accent>;
+        type Background = St::Background;
+        type AccentForeground = St::AccentForeground;
+    }
+    ///State transition - sets the `background` field to Set
+    pub struct SetBackground<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBackground<St> {}
+    impl<St: State> State for SetBackground<St> {
+        type Foreground = St::Foreground;
+        type Accent = St::Accent;
+        type Background = Set<members::background>;
         type AccentForeground = St::AccentForeground;
     }
     ///State transition - sets the `accent_foreground` field to Set
     pub struct SetAccentForeground<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetAccentForeground<St> {}
     impl<St: State> State for SetAccentForeground<St> {
-        type Background = St::Background;
         type Foreground = St::Foreground;
         type Accent = St::Accent;
+        type Background = St::Background;
         type AccentForeground = Set<members::accent_foreground>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `background` field
-        pub struct background(());
         ///Marker type for the `foreground` field
         pub struct foreground(());
         ///Marker type for the `accent` field
         pub struct accent(());
+        ///Marker type for the `background` field
+        pub struct background(());
         ///Marker type for the `accent_foreground` field
         pub struct accent_foreground(());
     }
@@ -229,9 +229,9 @@ where
 impl<S: BosStr, St> BasicBuilder<S, St>
 where
     St: basic_state::State,
-    St::Background: basic_state::IsSet,
     St::Foreground: basic_state::IsSet,
     St::Accent: basic_state::IsSet,
+    St::Background: basic_state::IsSet,
     St::AccentForeground: basic_state::IsSet,
 {
     /// Build the final struct.

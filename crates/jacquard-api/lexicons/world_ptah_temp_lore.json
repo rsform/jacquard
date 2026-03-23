@@ -1,0 +1,94 @@
+{
+  "lexicon": 1,
+  "id": "world.ptah.temp.lore",
+  "description": "A lore record in The Ptah Protocol. The world's history book — the accumulated narrative of what has happened. This is what separates the protocol from a game or a social feed. Games have scores. Social feeds have posts. A world has history.",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "The Shabaka Stone of the world. It preserves what happened. It cannot be erased. It names who made it. It is the theological text of a world that anyone can read and nobody can alter.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "title",
+          "creatorDID",
+          "worldReference",
+          "createdAt"
+        ],
+        "properties": {
+          "authorshipRecord": {
+            "type": "string",
+            "description": "Permanent link to the creator. Provenance travels with every piece of history.",
+            "format": "did"
+          },
+          "canonicalStatus": {
+            "type": "string",
+            "description": "The canonical standing of this lore within its world.",
+            "knownValues": [
+              "world.ptah.temp.defs#canonicalStatusOfficial",
+              "world.ptah.temp.defs#canonicalStatusCommunity",
+              "world.ptah.temp.defs#canonicalStatusApocryphal"
+            ]
+          },
+          "characters": {
+            "type": "array",
+            "description": "AT URIs of the character records involved in this lore.",
+            "items": {
+              "type": "string",
+              "format": "at-uri"
+            }
+          },
+          "content": {
+            "type": "string",
+            "description": "The actual narrative. The history.",
+            "maxLength": 102400,
+            "maxGraphemes": 10000
+          },
+          "contributionType": {
+            "type": "string",
+            "description": "Whether this lore was written by the world originator or a community contributor.",
+            "knownValues": [
+              "originator",
+              "community"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Real-world timestamp of creation.",
+            "format": "datetime"
+          },
+          "creatorDID": {
+            "type": "string",
+            "description": "Who authored this lore entry.",
+            "format": "did"
+          },
+          "sourceReferences": {
+            "type": "array",
+            "description": "AT URIs of the action and event records this lore was generated from. Lore does not appear from nowhere — it traces back to things that actually happened. This is the most important field in this record.",
+            "items": {
+              "type": "string",
+              "format": "at-uri"
+            }
+          },
+          "timelinePosition": {
+            "type": "string",
+            "description": "Where this sits in the world's chronology. In-world time, era, epoch, cycle — whatever the world uses.",
+            "maxLength": 2560,
+            "maxGraphemes": 256
+          },
+          "title": {
+            "type": "string",
+            "description": "The name of this piece of lore.",
+            "maxLength": 640,
+            "maxGraphemes": 64
+          },
+          "worldReference": {
+            "type": "string",
+            "description": "The AT URI of the world this lore belongs to.",
+            "format": "at-uri"
+          }
+        }
+      }
+    }
+  }
+}

@@ -137,37 +137,37 @@ pub mod delete_gate_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type GateUri;
         type Streamer;
+        type GateUri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type GateUri = Unset;
         type Streamer = Unset;
-    }
-    ///State transition - sets the `gate_uri` field to Set
-    pub struct SetGateUri<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetGateUri<St> {}
-    impl<St: State> State for SetGateUri<St> {
-        type GateUri = Set<members::gate_uri>;
-        type Streamer = St::Streamer;
+        type GateUri = Unset;
     }
     ///State transition - sets the `streamer` field to Set
     pub struct SetStreamer<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetStreamer<St> {}
     impl<St: State> State for SetStreamer<St> {
-        type GateUri = St::GateUri;
         type Streamer = Set<members::streamer>;
+        type GateUri = St::GateUri;
+    }
+    ///State transition - sets the `gate_uri` field to Set
+    pub struct SetGateUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetGateUri<St> {}
+    impl<St: State> State for SetGateUri<St> {
+        type Streamer = St::Streamer;
+        type GateUri = Set<members::gate_uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `gate_uri` field
-        pub struct gate_uri(());
         ///Marker type for the `streamer` field
         pub struct streamer(());
+        ///Marker type for the `gate_uri` field
+        pub struct gate_uri(());
     }
 }
 
@@ -237,8 +237,8 @@ where
 impl<S: BosStr, St> DeleteGateBuilder<S, St>
 where
     St: delete_gate_state::State,
-    St::GateUri: delete_gate_state::IsSet,
     St::Streamer: delete_gate_state::IsSet,
+    St::GateUri: delete_gate_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> DeleteGate<S> {

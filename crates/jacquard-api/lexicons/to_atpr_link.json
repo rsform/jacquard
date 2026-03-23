@@ -1,0 +1,29 @@
+{
+  "lexicon": 1,
+  "id": "to.atpr.link",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A shortened URL mapping",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "url",
+          "updatedAt"
+        ],
+        "properties": {
+          "updatedAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "maxLength": 2048
+          }
+        }
+      }
+    }
+  }
+}

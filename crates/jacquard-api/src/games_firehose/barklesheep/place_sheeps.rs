@@ -243,50 +243,50 @@ pub mod sheep_placement_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Horizontal;
-        type Start;
         type Type;
+        type Start;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Horizontal = Unset;
-        type Start = Unset;
         type Type = Unset;
+        type Start = Unset;
     }
     ///State transition - sets the `horizontal` field to Set
     pub struct SetHorizontal<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetHorizontal<St> {}
     impl<St: State> State for SetHorizontal<St> {
         type Horizontal = Set<members::horizontal>;
+        type Type = St::Type;
         type Start = St::Start;
-        type Type = St::Type;
-    }
-    ///State transition - sets the `start` field to Set
-    pub struct SetStart<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetStart<St> {}
-    impl<St: State> State for SetStart<St> {
-        type Horizontal = St::Horizontal;
-        type Start = Set<members::start>;
-        type Type = St::Type;
     }
     ///State transition - sets the `type` field to Set
     pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetType<St> {}
     impl<St: State> State for SetType<St> {
         type Horizontal = St::Horizontal;
-        type Start = St::Start;
         type Type = Set<members::r#type>;
+        type Start = St::Start;
+    }
+    ///State transition - sets the `start` field to Set
+    pub struct SetStart<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStart<St> {}
+    impl<St: State> State for SetStart<St> {
+        type Horizontal = St::Horizontal;
+        type Type = St::Type;
+        type Start = Set<members::start>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `horizontal` field
         pub struct horizontal(());
-        ///Marker type for the `start` field
-        pub struct start(());
         ///Marker type for the `type` field
         pub struct r#type(());
+        ///Marker type for the `start` field
+        pub struct start(());
     }
 }
 
@@ -376,8 +376,8 @@ impl<S: BosStr, St> SheepPlacementBuilder<S, St>
 where
     St: sheep_placement_state::State,
     St::Horizontal: sheep_placement_state::IsSet,
-    St::Start: sheep_placement_state::IsSet,
     St::Type: sheep_placement_state::IsSet,
+    St::Start: sheep_placement_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> SheepPlacement<S> {

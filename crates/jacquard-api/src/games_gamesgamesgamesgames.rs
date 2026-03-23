@@ -3267,37 +3267,37 @@ pub mod actor_credit_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
         type Credits;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
         type Credits = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUri<St> {}
-    impl<St: State> State for SetUri<St> {
-        type Uri = Set<members::uri>;
-        type Credits = St::Credits;
+        type Uri = Unset;
     }
     ///State transition - sets the `credits` field to Set
     pub struct SetCredits<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCredits<St> {}
     impl<St: State> State for SetCredits<St> {
-        type Uri = St::Uri;
         type Credits = Set<members::credits>;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Credits = St::Credits;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `credits` field
         pub struct credits(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
@@ -3398,8 +3398,8 @@ where
 impl<S: BosStr, St> ActorCreditViewBuilder<S, St>
 where
     St: actor_credit_view_state::State,
-    St::Uri: actor_credit_view_state::IsSet,
     St::Credits: actor_credit_view_state::IsSet,
+    St::Uri: actor_credit_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ActorCreditView<S> {
@@ -5177,37 +5177,37 @@ pub mod actor_profile_detail_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
         type Did;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUri<St> {}
-    impl<St: State> State for SetUri<St> {
-        type Uri = Set<members::uri>;
-        type Did = St::Did;
+        type Uri = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDid<St> {}
     impl<St: State> State for SetDid<St> {
-        type Uri = St::Uri;
         type Did = Set<members::did>;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Did = St::Did;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
@@ -5416,8 +5416,8 @@ impl<
 impl<S: BosStr, St> ActorProfileDetailViewBuilder<S, St>
 where
     St: actor_profile_detail_view_state::State,
-    St::Uri: actor_profile_detail_view_state::IsSet,
     St::Did: actor_profile_detail_view_state::IsSet,
+    St::Uri: actor_profile_detail_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ActorProfileDetailView<S> {
@@ -5947,37 +5947,37 @@ pub mod engine_summary_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Uri;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Name = Set<members::name>;
-        type Uri = St::Uri;
+        type Name = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUri<St> {}
     impl<St: State> State for SetUri<St> {
-        type Name = St::Name;
         type Uri = Set<members::uri>;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Uri = St::Uri;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -6060,8 +6060,8 @@ where
 impl<S: BosStr, St> EngineSummaryViewBuilder<S, St>
 where
     St: engine_summary_view_state::State,
-    St::Name: engine_summary_view_state::IsSet,
     St::Uri: engine_summary_view_state::IsSet,
+    St::Name: engine_summary_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> EngineSummaryView<S> {
@@ -6096,51 +6096,51 @@ pub mod game_detail_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Name;
         type CreatedAt;
         type Uri;
-        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Name = Unset;
         type CreatedAt = Unset;
         type Uri = Unset;
-        type Name = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type Uri = St::Uri;
-        type Name = St::Name;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUri<St> {}
-    impl<St: State> State for SetUri<St> {
-        type CreatedAt = St::CreatedAt;
-        type Uri = Set<members::uri>;
-        type Name = St::Name;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetName<St> {}
     impl<St: State> State for SetName<St> {
+        type Name = Set<members::name>;
         type CreatedAt = St::CreatedAt;
         type Uri = St::Uri;
-        type Name = Set<members::name>;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Name = St::Name;
+        type CreatedAt = Set<members::created_at>;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Name = St::Name;
+        type CreatedAt = St::CreatedAt;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `uri` field
         pub struct uri(());
-        ///Marker type for the `name` field
-        pub struct name(());
     }
 }
 
@@ -6714,9 +6714,9 @@ impl<S: BosStr, St: game_detail_view_state::State> GameDetailViewBuilder<S, St> 
 impl<S: BosStr, St> GameDetailViewBuilder<S, St>
 where
     St: game_detail_view_state::State,
+    St::Name: game_detail_view_state::IsSet,
     St::CreatedAt: game_detail_view_state::IsSet,
     St::Uri: game_detail_view_state::IsSet,
-    St::Name: game_detail_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> GameDetailView<S> {
@@ -7145,51 +7145,51 @@ pub mod game_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ApplicationType;
         type Uri;
         type Name;
+        type ApplicationType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ApplicationType = Unset;
         type Uri = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `application_type` field to Set
-    pub struct SetApplicationType<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetApplicationType<St> {}
-    impl<St: State> State for SetApplicationType<St> {
-        type ApplicationType = Set<members::application_type>;
-        type Uri = St::Uri;
-        type Name = St::Name;
+        type ApplicationType = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUri<St> {}
     impl<St: State> State for SetUri<St> {
-        type ApplicationType = St::ApplicationType;
         type Uri = Set<members::uri>;
         type Name = St::Name;
+        type ApplicationType = St::ApplicationType;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetName<St> {}
     impl<St: State> State for SetName<St> {
-        type ApplicationType = St::ApplicationType;
         type Uri = St::Uri;
         type Name = Set<members::name>;
+        type ApplicationType = St::ApplicationType;
+    }
+    ///State transition - sets the `application_type` field to Set
+    pub struct SetApplicationType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetApplicationType<St> {}
+    impl<St: State> State for SetApplicationType<St> {
+        type Uri = St::Uri;
+        type Name = St::Name;
+        type ApplicationType = Set<members::application_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `application_type` field
-        pub struct application_type(());
         ///Marker type for the `uri` field
         pub struct uri(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `application_type` field
+        pub struct application_type(());
     }
 }
 
@@ -7424,9 +7424,9 @@ impl<S: BosStr, St: game_view_state::State> GameViewBuilder<S, St> {
 impl<S: BosStr, St> GameViewBuilder<S, St>
 where
     St: game_view_state::State,
-    St::ApplicationType: game_view_state::IsSet,
     St::Uri: game_view_state::IsSet,
     St::Name: game_view_state::IsSet,
+    St::ApplicationType: game_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> GameView<S> {
@@ -7474,37 +7474,37 @@ pub mod org_credit_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Roles;
         type Uri;
+        type Roles;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Roles = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `roles` field to Set
-    pub struct SetRoles<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRoles<St> {}
-    impl<St: State> State for SetRoles<St> {
-        type Roles = Set<members::roles>;
-        type Uri = St::Uri;
+        type Roles = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUri<St> {}
     impl<St: State> State for SetUri<St> {
-        type Roles = St::Roles;
         type Uri = Set<members::uri>;
+        type Roles = St::Roles;
+    }
+    ///State transition - sets the `roles` field to Set
+    pub struct SetRoles<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRoles<St> {}
+    impl<St: State> State for SetRoles<St> {
+        type Uri = St::Uri;
+        type Roles = Set<members::roles>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `roles` field
-        pub struct roles(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `roles` field
+        pub struct roles(());
     }
 }
 
@@ -7605,8 +7605,8 @@ where
 impl<S: BosStr, St> OrgCreditViewBuilder<S, St>
 where
     St: org_credit_view_state::State,
-    St::Roles: org_credit_view_state::IsSet,
     St::Uri: org_credit_view_state::IsSet,
+    St::Roles: org_credit_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> OrgCreditView<S> {
@@ -7643,37 +7643,37 @@ pub mod org_profile_detail_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
         type Did;
+        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUri<St> {}
-    impl<St: State> State for SetUri<St> {
-        type Uri = Set<members::uri>;
-        type Did = St::Did;
+        type Uri = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDid<St> {}
     impl<St: State> State for SetDid<St> {
-        type Uri = St::Uri;
         type Did = Set<members::did>;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Did = St::Did;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
     }
 }
 
@@ -7971,8 +7971,8 @@ impl<
 impl<S: BosStr, St> OrgProfileDetailViewBuilder<S, St>
 where
     St: org_profile_detail_view_state::State,
-    St::Uri: org_profile_detail_view_state::IsSet,
     St::Did: org_profile_detail_view_state::IsSet,
+    St::Uri: org_profile_detail_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> OrgProfileDetailView<S> {
@@ -8027,37 +8027,37 @@ pub mod org_profile_summary_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
         type Uri;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDid<St> {}
-    impl<St: State> State for SetDid<St> {
-        type Did = Set<members::did>;
-        type Uri = St::Uri;
+        type Did = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUri<St> {}
     impl<St: State> State for SetUri<St> {
-        type Did = St::Did;
         type Uri = Set<members::uri>;
+        type Did = St::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
+        type Uri = St::Uri;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
@@ -8165,8 +8165,8 @@ where
 impl<S: BosStr, St> OrgProfileSummaryViewBuilder<S, St>
 where
     St: org_profile_summary_view_state::State,
-    St::Did: org_profile_summary_view_state::IsSet,
     St::Uri: org_profile_summary_view_state::IsSet,
+    St::Did: org_profile_summary_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> OrgProfileSummaryView<S> {
@@ -8540,49 +8540,49 @@ pub mod profile_summary_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Uri;
         type ProfileType;
+        type Uri;
         type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Uri = Unset;
         type ProfileType = Unset;
+        type Uri = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUri<St> {}
-    impl<St: State> State for SetUri<St> {
-        type Uri = Set<members::uri>;
-        type ProfileType = St::ProfileType;
-        type Did = St::Did;
     }
     ///State transition - sets the `profile_type` field to Set
     pub struct SetProfileType<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetProfileType<St> {}
     impl<St: State> State for SetProfileType<St> {
-        type Uri = St::Uri;
         type ProfileType = Set<members::profile_type>;
+        type Uri = St::Uri;
+        type Did = St::Did;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type ProfileType = St::ProfileType;
+        type Uri = Set<members::uri>;
         type Did = St::Did;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDid<St> {}
     impl<St: State> State for SetDid<St> {
-        type Uri = St::Uri;
         type ProfileType = St::ProfileType;
+        type Uri = St::Uri;
         type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `uri` field
-        pub struct uri(());
         ///Marker type for the `profile_type` field
         pub struct profile_type(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
         ///Marker type for the `did` field
         pub struct did(());
     }
@@ -8705,8 +8705,8 @@ where
 impl<S: BosStr, St> ProfileSummaryViewBuilder<S, St>
 where
     St: profile_summary_view_state::State,
-    St::Uri: profile_summary_view_state::IsSet,
     St::ProfileType: profile_summary_view_state::IsSet,
+    St::Uri: profile_summary_view_state::IsSet,
     St::Did: profile_summary_view_state::IsSet,
 {
     /// Build the final struct.

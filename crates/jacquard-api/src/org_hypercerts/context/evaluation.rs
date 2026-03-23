@@ -232,51 +232,51 @@ pub mod evaluation_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Evaluators;
         type Summary;
         type CreatedAt;
-        type Evaluators;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Evaluators = Unset;
         type Summary = Unset;
         type CreatedAt = Unset;
-        type Evaluators = Unset;
-    }
-    ///State transition - sets the `summary` field to Set
-    pub struct SetSummary<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSummary<St> {}
-    impl<St: State> State for SetSummary<St> {
-        type Summary = Set<members::summary>;
-        type CreatedAt = St::CreatedAt;
-        type Evaluators = St::Evaluators;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type Summary = St::Summary;
-        type CreatedAt = Set<members::created_at>;
-        type Evaluators = St::Evaluators;
     }
     ///State transition - sets the `evaluators` field to Set
     pub struct SetEvaluators<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetEvaluators<St> {}
     impl<St: State> State for SetEvaluators<St> {
+        type Evaluators = Set<members::evaluators>;
         type Summary = St::Summary;
         type CreatedAt = St::CreatedAt;
-        type Evaluators = Set<members::evaluators>;
+    }
+    ///State transition - sets the `summary` field to Set
+    pub struct SetSummary<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSummary<St> {}
+    impl<St: State> State for SetSummary<St> {
+        type Evaluators = St::Evaluators;
+        type Summary = Set<members::summary>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Evaluators = St::Evaluators;
+        type Summary = St::Summary;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `evaluators` field
+        pub struct evaluators(());
         ///Marker type for the `summary` field
         pub struct summary(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `evaluators` field
-        pub struct evaluators(());
     }
 }
 
@@ -445,9 +445,9 @@ where
 impl<S: BosStr, St> EvaluationBuilder<S, St>
 where
     St: evaluation_state::State,
+    St::Evaluators: evaluation_state::IsSet,
     St::Summary: evaluation_state::IsSet,
     St::CreatedAt: evaluation_state::IsSet,
-    St::Evaluators: evaluation_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Evaluation<S> {
@@ -669,50 +669,50 @@ pub mod score_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Max;
-        type Min;
         type Value;
+        type Min;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Max = Unset;
-        type Min = Unset;
         type Value = Unset;
+        type Min = Unset;
     }
     ///State transition - sets the `max` field to Set
     pub struct SetMax<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetMax<St> {}
     impl<St: State> State for SetMax<St> {
         type Max = Set<members::max>;
+        type Value = St::Value;
         type Min = St::Min;
-        type Value = St::Value;
-    }
-    ///State transition - sets the `min` field to Set
-    pub struct SetMin<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetMin<St> {}
-    impl<St: State> State for SetMin<St> {
-        type Max = St::Max;
-        type Min = Set<members::min>;
-        type Value = St::Value;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetValue<St> {}
     impl<St: State> State for SetValue<St> {
         type Max = St::Max;
-        type Min = St::Min;
         type Value = Set<members::value>;
+        type Min = St::Min;
+    }
+    ///State transition - sets the `min` field to Set
+    pub struct SetMin<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMin<St> {}
+    impl<St: State> State for SetMin<St> {
+        type Max = St::Max;
+        type Value = St::Value;
+        type Min = Set<members::min>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `max` field
         pub struct max(());
-        ///Marker type for the `min` field
-        pub struct min(());
         ///Marker type for the `value` field
         pub struct value(());
+        ///Marker type for the `min` field
+        pub struct min(());
     }
 }
 
@@ -802,8 +802,8 @@ impl<S: BosStr, St> ScoreBuilder<S, St>
 where
     St: score_state::State,
     St::Max: score_state::IsSet,
-    St::Min: score_state::IsSet,
     St::Value: score_state::IsSet,
+    St::Min: score_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Score<S> {

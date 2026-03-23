@@ -124,37 +124,37 @@ pub mod resolve_notebook_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Actor;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Actor = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Name = Set<members::name>;
-        type Actor = St::Actor;
+        type Name = Unset;
     }
     ///State transition - sets the `actor` field to Set
     pub struct SetActor<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetActor<St> {}
     impl<St: State> State for SetActor<St> {
-        type Name = St::Name;
         type Actor = Set<members::actor>;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Actor = St::Actor;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `actor` field
         pub struct actor(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -250,8 +250,8 @@ where
 impl<S: BosStr, St> ResolveNotebookBuilder<S, St>
 where
     St: resolve_notebook_state::State,
-    St::Name: resolve_notebook_state::IsSet,
     St::Actor: resolve_notebook_state::IsSet,
+    St::Name: resolve_notebook_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ResolveNotebook<S> {

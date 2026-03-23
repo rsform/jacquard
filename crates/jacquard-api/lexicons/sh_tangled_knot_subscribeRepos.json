@@ -1,0 +1,96 @@
+{
+  "lexicon": 1,
+  "id": "sh.tangled.knot.subscribeRepos",
+  "defs": {
+    "gitSync1": {
+      "type": "object",
+      "required": [
+        "seq",
+        "did"
+      ],
+      "properties": {
+        "did": {
+          "type": "string",
+          "description": "Repository DID identifier",
+          "format": "did"
+        },
+        "seq": {
+          "type": "integer",
+          "description": "The stream sequence number of this message."
+        }
+      }
+    },
+    "gitSync2": {
+      "type": "object",
+      "required": [
+        "seq",
+        "repo"
+      ],
+      "properties": {
+        "did": {
+          "type": "string",
+          "description": "Repository AT-URI identifier",
+          "format": "at-uri"
+        },
+        "seq": {
+          "type": "integer",
+          "description": "The stream sequence number of this message."
+        }
+      }
+    },
+    "identity": {
+      "type": "object",
+      "required": [
+        "seq",
+        "did",
+        "time"
+      ],
+      "properties": {
+        "did": {
+          "type": "string",
+          "description": "Repository DID identifier",
+          "format": "did"
+        },
+        "seq": {
+          "type": "integer",
+          "description": "The stream sequence number of this message."
+        },
+        "time": {
+          "type": "string",
+          "format": "datetime"
+        }
+      }
+    },
+    "main": {
+      "type": "subscription",
+      "description": "Repository event stream, aka Firehose endpoint. Outputs repo commits with diff data, and identity update events, for all repositories on the current server. See the atproto specifications for details around stream sequencing, repo versioning, CAR diff format, and more. Public and does not require auth; implemented by PDS and Relay.",
+      "parameters": {
+        "type": "params",
+        "properties": {
+          "cursor": {
+            "type": "integer",
+            "description": "The last known event seq number to backfill from."
+          }
+        }
+      },
+      "message": {
+        "schema": {
+          "type": "union",
+          "refs": [
+            "#identity",
+            "gitRefUpdate"
+          ]
+        }
+      },
+      "errors": [
+        {
+          "name": "FutureCursor"
+        },
+        {
+          "description": "If the consumer of the stream can not keep up with events, and a backlog gets too large, the server will drop the connection.",
+          "name": "ConsumerTooSlow"
+        }
+      ]
+    }
+  }
+}

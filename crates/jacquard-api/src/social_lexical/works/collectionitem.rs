@@ -116,51 +116,51 @@ pub mod collectionitem_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type List;
         type Work;
         type CreatedAt;
+        type List;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type List = Unset;
         type Work = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `list` field to Set
-    pub struct SetList<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetList<St> {}
-    impl<St: State> State for SetList<St> {
-        type List = Set<members::list>;
-        type Work = St::Work;
-        type CreatedAt = St::CreatedAt;
+        type List = Unset;
     }
     ///State transition - sets the `work` field to Set
     pub struct SetWork<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetWork<St> {}
     impl<St: State> State for SetWork<St> {
-        type List = St::List;
         type Work = Set<members::work>;
         type CreatedAt = St::CreatedAt;
+        type List = St::List;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type List = St::List;
         type Work = St::Work;
         type CreatedAt = Set<members::created_at>;
+        type List = St::List;
+    }
+    ///State transition - sets the `list` field to Set
+    pub struct SetList<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetList<St> {}
+    impl<St: State> State for SetList<St> {
+        type Work = St::Work;
+        type CreatedAt = St::CreatedAt;
+        type List = Set<members::list>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `list` field
-        pub struct list(());
         ///Marker type for the `work` field
         pub struct work(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `list` field
+        pub struct list(());
     }
 }
 
@@ -249,9 +249,9 @@ where
 impl<S: BosStr, St> CollectionitemBuilder<S, St>
 where
     St: collectionitem_state::State,
-    St::List: collectionitem_state::IsSet,
     St::Work: collectionitem_state::IsSet,
     St::CreatedAt: collectionitem_state::IsSet,
+    St::List: collectionitem_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Collectionitem<S> {

@@ -1,0 +1,86 @@
+{
+  "lexicon": 1,
+  "id": "world.ptah.temp.contribution",
+  "description": "A contribution record in The Ptah Protocol. The permission and attribution layer — governs how someone who did not create a world adds something to it, and ensures that addition is attributed, traceable, and governed by whatever rules the world originator set.",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A deed of addition. Imhotep — the most famous architect in history, deified as the Son of Ptah. Every contributor to a world is an Imhotep. They build within the tradition of the master. Their work is attributed. The lineage is unbroken.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "contributorDID",
+          "worldReference",
+          "createdAt"
+        ],
+        "properties": {
+          "attributionChain": {
+            "type": "array",
+            "description": "An array tracing every hand this contribution passed through. AT URIs of prior contribution records or DIDs. This is the Carryforward logic expressed at the protocol layer.",
+            "items": {
+              "type": "string",
+              "format": "at-uri"
+            }
+          },
+          "canonicalStatus": {
+            "type": "string",
+            "description": "The canonical standing of this contribution within the world.",
+            "knownValues": [
+              "world.ptah.temp.defs#canonicalStatusOfficial",
+              "world.ptah.temp.defs#canonicalStatusCommunity",
+              "world.ptah.temp.defs#canonicalStatusApocryphal"
+            ]
+          },
+          "contributionType": {
+            "type": "string",
+            "description": "What kind of contribution and which record type it links to.",
+            "maxLength": 640,
+            "maxGraphemes": 64,
+            "knownValues": [
+              "character",
+              "role",
+              "action",
+              "event",
+              "lore",
+              "location"
+            ]
+          },
+          "contributorDID": {
+            "type": "string",
+            "description": "Who is making the contribution.",
+            "format": "did"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp of the contribution.",
+            "format": "datetime"
+          },
+          "originatorApproval": {
+            "type": "string",
+            "description": "The approval status of this contribution.",
+            "knownValues": [
+              "approved",
+              "preApproved",
+              "communityCanon"
+            ]
+          },
+          "publicDomainCompliance": {
+            "type": "boolean",
+            "description": "Whether this contribution complies with public domain sourcing requirements. Relevant for catalog worlds."
+          },
+          "recordReference": {
+            "type": "string",
+            "description": "The AT URI of the primary record being contributed. The Contribution record is the anchor of attribution — not the exhaustive list of every record the contributor touched. The full scope is discoverable via DID query across record types.",
+            "format": "at-uri"
+          },
+          "worldReference": {
+            "type": "string",
+            "description": "The AT URI of the world being contributed to.",
+            "format": "at-uri"
+          }
+        }
+      }
+    }
+  }
+}

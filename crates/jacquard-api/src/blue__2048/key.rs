@@ -94,37 +94,37 @@ pub mod key_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Key;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Key = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type Key = St::Key;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `key` field to Set
     pub struct SetKey<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetKey<St> {}
     impl<St: State> State for SetKey<St> {
-        type CreatedAt = St::CreatedAt;
         type Key = Set<members::key>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Key = St::Key;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `key` field
         pub struct key(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -191,8 +191,8 @@ where
 impl<S: BosStr, St> KeyBuilder<S, St>
 where
     St: key_state::State,
-    St::CreatedAt: key_state::IsSet,
     St::Key: key_state::IsSet,
+    St::CreatedAt: key_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Key<S> {
@@ -329,51 +329,51 @@ pub mod signature_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Signature;
-        type CreatedAt;
         type AtUri;
+        type CreatedAt;
+        type Signature;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Signature = Unset;
-        type CreatedAt = Unset;
         type AtUri = Unset;
-    }
-    ///State transition - sets the `signature` field to Set
-    pub struct SetSignature<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSignature<St> {}
-    impl<St: State> State for SetSignature<St> {
-        type Signature = Set<members::signature>;
-        type CreatedAt = St::CreatedAt;
-        type AtUri = St::AtUri;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type Signature = St::Signature;
-        type CreatedAt = Set<members::created_at>;
-        type AtUri = St::AtUri;
+        type CreatedAt = Unset;
+        type Signature = Unset;
     }
     ///State transition - sets the `at_uri` field to Set
     pub struct SetAtUri<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetAtUri<St> {}
     impl<St: State> State for SetAtUri<St> {
-        type Signature = St::Signature;
-        type CreatedAt = St::CreatedAt;
         type AtUri = Set<members::at_uri>;
+        type CreatedAt = St::CreatedAt;
+        type Signature = St::Signature;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type AtUri = St::AtUri;
+        type CreatedAt = Set<members::created_at>;
+        type Signature = St::Signature;
+    }
+    ///State transition - sets the `signature` field to Set
+    pub struct SetSignature<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSignature<St> {}
+    impl<St: State> State for SetSignature<St> {
+        type AtUri = St::AtUri;
+        type CreatedAt = St::CreatedAt;
+        type Signature = Set<members::signature>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `signature` field
-        pub struct signature(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `at_uri` field
         pub struct at_uri(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `signature` field
+        pub struct signature(());
     }
 }
 
@@ -462,9 +462,9 @@ where
 impl<S: BosStr, St> SignatureRefBuilder<S, St>
 where
     St: signature_ref_state::State,
-    St::Signature: signature_ref_state::IsSet,
-    St::CreatedAt: signature_ref_state::IsSet,
     St::AtUri: signature_ref_state::IsSet,
+    St::CreatedAt: signature_ref_state::IsSet,
+    St::Signature: signature_ref_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> SignatureRef<S> {

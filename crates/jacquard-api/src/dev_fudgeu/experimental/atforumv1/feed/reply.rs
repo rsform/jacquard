@@ -126,51 +126,51 @@ pub mod reply_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Content;
         type Root;
         type CreatedAt;
+        type Content;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Content = Unset;
         type Root = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetContent<St> {}
-    impl<St: State> State for SetContent<St> {
-        type Content = Set<members::content>;
-        type Root = St::Root;
-        type CreatedAt = St::CreatedAt;
+        type Content = Unset;
     }
     ///State transition - sets the `root` field to Set
     pub struct SetRoot<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRoot<St> {}
     impl<St: State> State for SetRoot<St> {
-        type Content = St::Content;
         type Root = Set<members::root>;
         type CreatedAt = St::CreatedAt;
+        type Content = St::Content;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Content = St::Content;
         type Root = St::Root;
         type CreatedAt = Set<members::created_at>;
+        type Content = St::Content;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetContent<St> {}
+    impl<St: State> State for SetContent<St> {
+        type Root = St::Root;
+        type CreatedAt = St::CreatedAt;
+        type Content = Set<members::content>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `content` field
-        pub struct content(());
         ///Marker type for the `root` field
         pub struct root(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `content` field
+        pub struct content(());
     }
 }
 
@@ -272,9 +272,9 @@ impl<S: BosStr, St: reply_state::State> ReplyBuilder<S, St> {
 impl<S: BosStr, St> ReplyBuilder<S, St>
 where
     St: reply_state::State,
-    St::Content: reply_state::IsSet,
     St::Root: reply_state::IsSet,
     St::CreatedAt: reply_state::IsSet,
+    St::Content: reply_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Reply<S> {

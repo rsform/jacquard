@@ -130,50 +130,50 @@ pub mod comment_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CreatedAt;
-        type Episode;
         type Text;
+        type Episode;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CreatedAt = Unset;
-        type Episode = Unset;
         type Text = Unset;
+        type Episode = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
+        type Text = St::Text;
         type Episode = St::Episode;
-        type Text = St::Text;
-    }
-    ///State transition - sets the `episode` field to Set
-    pub struct SetEpisode<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetEpisode<St> {}
-    impl<St: State> State for SetEpisode<St> {
-        type CreatedAt = St::CreatedAt;
-        type Episode = Set<members::episode>;
-        type Text = St::Text;
     }
     ///State transition - sets the `text` field to Set
     pub struct SetText<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetText<St> {}
     impl<St: State> State for SetText<St> {
         type CreatedAt = St::CreatedAt;
-        type Episode = St::Episode;
         type Text = Set<members::text>;
+        type Episode = St::Episode;
+    }
+    ///State transition - sets the `episode` field to Set
+    pub struct SetEpisode<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetEpisode<St> {}
+    impl<St: State> State for SetEpisode<St> {
+        type CreatedAt = St::CreatedAt;
+        type Text = St::Text;
+        type Episode = Set<members::episode>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `episode` field
-        pub struct episode(());
         ///Marker type for the `text` field
         pub struct text(());
+        ///Marker type for the `episode` field
+        pub struct episode(());
     }
 }
 
@@ -276,8 +276,8 @@ impl<S: BosStr, St> CommentBuilder<S, St>
 where
     St: comment_state::State,
     St::CreatedAt: comment_state::IsSet,
-    St::Episode: comment_state::IsSet,
     St::Text: comment_state::IsSet,
+    St::Episode: comment_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Comment<S> {

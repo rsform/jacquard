@@ -129,49 +129,49 @@ pub mod log_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Ionosphere;
         type CreatedAt;
+        type Ionosphere;
         type Item;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Ionosphere = Unset;
         type CreatedAt = Unset;
+        type Ionosphere = Unset;
         type Item = Unset;
-    }
-    ///State transition - sets the `ionosphere` field to Set
-    pub struct SetIonosphere<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetIonosphere<St> {}
-    impl<St: State> State for SetIonosphere<St> {
-        type Ionosphere = Set<members::ionosphere>;
-        type CreatedAt = St::CreatedAt;
-        type Item = St::Item;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Ionosphere = St::Ionosphere;
         type CreatedAt = Set<members::created_at>;
+        type Ionosphere = St::Ionosphere;
+        type Item = St::Item;
+    }
+    ///State transition - sets the `ionosphere` field to Set
+    pub struct SetIonosphere<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIonosphere<St> {}
+    impl<St: State> State for SetIonosphere<St> {
+        type CreatedAt = St::CreatedAt;
+        type Ionosphere = Set<members::ionosphere>;
         type Item = St::Item;
     }
     ///State transition - sets the `item` field to Set
     pub struct SetItem<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetItem<St> {}
     impl<St: State> State for SetItem<St> {
-        type Ionosphere = St::Ionosphere;
         type CreatedAt = St::CreatedAt;
+        type Ionosphere = St::Ionosphere;
         type Item = Set<members::item>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `ionosphere` field
-        pub struct ionosphere(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `ionosphere` field
+        pub struct ionosphere(());
         ///Marker type for the `item` field
         pub struct item(());
     }
@@ -275,8 +275,8 @@ impl<S: BosStr, St: log_state::State> LogBuilder<S, St> {
 impl<S: BosStr, St> LogBuilder<S, St>
 where
     St: log_state::State,
-    St::Ionosphere: log_state::IsSet,
     St::CreatedAt: log_state::IsSet,
+    St::Ionosphere: log_state::IsSet,
     St::Item: log_state::IsSet,
 {
     /// Build the final struct.

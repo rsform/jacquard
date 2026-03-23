@@ -1210,37 +1210,37 @@ pub mod draft_embed_caption_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Lang;
         type Content;
+        type Lang;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Lang = Unset;
         type Content = Unset;
-    }
-    ///State transition - sets the `lang` field to Set
-    pub struct SetLang<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetLang<St> {}
-    impl<St: State> State for SetLang<St> {
-        type Lang = Set<members::lang>;
-        type Content = St::Content;
+        type Lang = Unset;
     }
     ///State transition - sets the `content` field to Set
     pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetContent<St> {}
     impl<St: State> State for SetContent<St> {
-        type Lang = St::Lang;
         type Content = Set<members::content>;
+        type Lang = St::Lang;
+    }
+    ///State transition - sets the `lang` field to Set
+    pub struct SetLang<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLang<St> {}
+    impl<St: State> State for SetLang<St> {
+        type Content = St::Content;
+        type Lang = Set<members::lang>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `lang` field
-        pub struct lang(());
         ///Marker type for the `content` field
         pub struct content(());
+        ///Marker type for the `lang` field
+        pub struct lang(());
     }
 }
 
@@ -1310,8 +1310,8 @@ where
 impl<S: BosStr, St> DraftEmbedCaptionBuilder<S, St>
 where
     St: draft_embed_caption_state::State,
-    St::Lang: draft_embed_caption_state::IsSet,
     St::Content: draft_embed_caption_state::IsSet,
+    St::Lang: draft_embed_caption_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> DraftEmbedCaption<S> {
@@ -1799,67 +1799,67 @@ pub mod draft_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Id;
         type CreatedAt;
-        type UpdatedAt;
+        type Id;
         type Draft;
+        type UpdatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Id = Unset;
         type CreatedAt = Unset;
-        type UpdatedAt = Unset;
+        type Id = Unset;
         type Draft = Unset;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetId<St> {}
-    impl<St: State> State for SetId<St> {
-        type Id = Set<members::id>;
-        type CreatedAt = St::CreatedAt;
-        type UpdatedAt = St::UpdatedAt;
-        type Draft = St::Draft;
+        type UpdatedAt = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Id = St::Id;
         type CreatedAt = Set<members::created_at>;
-        type UpdatedAt = St::UpdatedAt;
-        type Draft = St::Draft;
-    }
-    ///State transition - sets the `updated_at` field to Set
-    pub struct SetUpdatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUpdatedAt<St> {}
-    impl<St: State> State for SetUpdatedAt<St> {
         type Id = St::Id;
-        type CreatedAt = St::CreatedAt;
-        type UpdatedAt = Set<members::updated_at>;
         type Draft = St::Draft;
+        type UpdatedAt = St::UpdatedAt;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetId<St> {}
+    impl<St: State> State for SetId<St> {
+        type CreatedAt = St::CreatedAt;
+        type Id = Set<members::id>;
+        type Draft = St::Draft;
+        type UpdatedAt = St::UpdatedAt;
     }
     ///State transition - sets the `draft` field to Set
     pub struct SetDraft<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDraft<St> {}
     impl<St: State> State for SetDraft<St> {
-        type Id = St::Id;
         type CreatedAt = St::CreatedAt;
-        type UpdatedAt = St::UpdatedAt;
+        type Id = St::Id;
         type Draft = Set<members::draft>;
+        type UpdatedAt = St::UpdatedAt;
+    }
+    ///State transition - sets the `updated_at` field to Set
+    pub struct SetUpdatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUpdatedAt<St> {}
+    impl<St: State> State for SetUpdatedAt<St> {
+        type CreatedAt = St::CreatedAt;
+        type Id = St::Id;
+        type Draft = St::Draft;
+        type UpdatedAt = Set<members::updated_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `id` field
-        pub struct id(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `updated_at` field
-        pub struct updated_at(());
+        ///Marker type for the `id` field
+        pub struct id(());
         ///Marker type for the `draft` field
         pub struct draft(());
+        ///Marker type for the `updated_at` field
+        pub struct updated_at(());
     }
 }
 
@@ -1967,10 +1967,10 @@ where
 impl<S: BosStr, St> DraftViewBuilder<S, St>
 where
     St: draft_view_state::State,
-    St::Id: draft_view_state::IsSet,
     St::CreatedAt: draft_view_state::IsSet,
-    St::UpdatedAt: draft_view_state::IsSet,
+    St::Id: draft_view_state::IsSet,
     St::Draft: draft_view_state::IsSet,
+    St::UpdatedAt: draft_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> DraftView<S> {
@@ -2007,37 +2007,37 @@ pub mod draft_with_id_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Draft;
         type Id;
+        type Draft;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Draft = Unset;
         type Id = Unset;
-    }
-    ///State transition - sets the `draft` field to Set
-    pub struct SetDraft<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDraft<St> {}
-    impl<St: State> State for SetDraft<St> {
-        type Draft = Set<members::draft>;
-        type Id = St::Id;
+        type Draft = Unset;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetId<St> {}
     impl<St: State> State for SetId<St> {
-        type Draft = St::Draft;
         type Id = Set<members::id>;
+        type Draft = St::Draft;
+    }
+    ///State transition - sets the `draft` field to Set
+    pub struct SetDraft<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDraft<St> {}
+    impl<St: State> State for SetDraft<St> {
+        type Id = St::Id;
+        type Draft = Set<members::draft>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `draft` field
-        pub struct draft(());
         ///Marker type for the `id` field
         pub struct id(());
+        ///Marker type for the `draft` field
+        pub struct draft(());
     }
 }
 
@@ -2107,8 +2107,8 @@ where
 impl<S: BosStr, St> DraftWithIdBuilder<S, St>
 where
     St: draft_with_id_state::State,
-    St::Draft: draft_with_id_state::IsSet,
     St::Id: draft_with_id_state::IsSet,
+    St::Draft: draft_with_id_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> DraftWithId<S> {

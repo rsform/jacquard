@@ -240,50 +240,50 @@ pub mod report_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type BeaconUri;
-        type Reason;
         type CreatedAt;
+        type Reason;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type BeaconUri = Unset;
-        type Reason = Unset;
         type CreatedAt = Unset;
+        type Reason = Unset;
     }
     ///State transition - sets the `beacon_uri` field to Set
     pub struct SetBeaconUri<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetBeaconUri<St> {}
     impl<St: State> State for SetBeaconUri<St> {
         type BeaconUri = Set<members::beacon_uri>;
+        type CreatedAt = St::CreatedAt;
         type Reason = St::Reason;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `reason` field to Set
-    pub struct SetReason<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetReason<St> {}
-    impl<St: State> State for SetReason<St> {
-        type BeaconUri = St::BeaconUri;
-        type Reason = Set<members::reason>;
-        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
         type BeaconUri = St::BeaconUri;
-        type Reason = St::Reason;
         type CreatedAt = Set<members::created_at>;
+        type Reason = St::Reason;
+    }
+    ///State transition - sets the `reason` field to Set
+    pub struct SetReason<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetReason<St> {}
+    impl<St: State> State for SetReason<St> {
+        type BeaconUri = St::BeaconUri;
+        type CreatedAt = St::CreatedAt;
+        type Reason = Set<members::reason>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `beacon_uri` field
         pub struct beacon_uri(());
-        ///Marker type for the `reason` field
-        pub struct reason(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `reason` field
+        pub struct reason(());
     }
 }
 
@@ -386,8 +386,8 @@ impl<S: BosStr, St> ReportBuilder<S, St>
 where
     St: report_state::State,
     St::BeaconUri: report_state::IsSet,
-    St::Reason: report_state::IsSet,
     St::CreatedAt: report_state::IsSet,
+    St::Reason: report_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Report<S> {

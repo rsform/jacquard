@@ -107,37 +107,37 @@ pub mod life_event_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
         type StartDate;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
         type StartDate = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTitle<St> {}
-    impl<St: State> State for SetTitle<St> {
-        type Title = Set<members::title>;
-        type StartDate = St::StartDate;
+        type Title = Unset;
     }
     ///State transition - sets the `start_date` field to Set
     pub struct SetStartDate<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetStartDate<St> {}
     impl<St: State> State for SetStartDate<St> {
-        type Title = St::Title;
         type StartDate = Set<members::start_date>;
+        type Title = St::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
+        type StartDate = St::StartDate;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `start_date` field
         pub struct start_date(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
@@ -233,8 +233,8 @@ where
 impl<S: BosStr, St> LifeEventBuilder<S, St>
 where
     St: life_event_state::State,
-    St::Title: life_event_state::IsSet,
     St::StartDate: life_event_state::IsSet,
+    St::Title: life_event_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> LifeEvent<S> {

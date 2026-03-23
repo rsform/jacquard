@@ -126,49 +126,49 @@ pub mod videos_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Id;
         type Title;
+        type Id;
         type Creator;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Id = Unset;
         type Title = Unset;
+        type Id = Unset;
         type Creator = Unset;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetId<St> {}
-    impl<St: State> State for SetId<St> {
-        type Id = Set<members::id>;
-        type Title = St::Title;
-        type Creator = St::Creator;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTitle<St> {}
     impl<St: State> State for SetTitle<St> {
-        type Id = St::Id;
         type Title = Set<members::title>;
+        type Id = St::Id;
+        type Creator = St::Creator;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetId<St> {}
+    impl<St: State> State for SetId<St> {
+        type Title = St::Title;
+        type Id = Set<members::id>;
         type Creator = St::Creator;
     }
     ///State transition - sets the `creator` field to Set
     pub struct SetCreator<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreator<St> {}
     impl<St: State> State for SetCreator<St> {
-        type Id = St::Id;
         type Title = St::Title;
+        type Id = St::Id;
         type Creator = Set<members::creator>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `id` field
-        pub struct id(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `id` field
+        pub struct id(());
         ///Marker type for the `creator` field
         pub struct creator(());
     }
@@ -259,8 +259,8 @@ where
 impl<S: BosStr, St> VideosBuilder<S, St>
 where
     St: videos_state::State,
-    St::Id: videos_state::IsSet,
     St::Title: videos_state::IsSet,
+    St::Id: videos_state::IsSet,
     St::Creator: videos_state::IsSet,
 {
     /// Build the final struct.

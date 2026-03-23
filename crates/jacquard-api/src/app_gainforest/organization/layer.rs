@@ -121,67 +121,67 @@ pub mod layer_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Uri;
-        type Name;
         type Type;
+        type Name;
+        type Uri;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Uri = Unset;
-        type Name = Unset;
         type Type = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type Uri = St::Uri;
-        type Name = St::Name;
-        type Type = St::Type;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUri<St> {}
-    impl<St: State> State for SetUri<St> {
-        type CreatedAt = St::CreatedAt;
-        type Uri = Set<members::uri>;
-        type Name = St::Name;
-        type Type = St::Type;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type CreatedAt = St::CreatedAt;
-        type Uri = St::Uri;
-        type Name = Set<members::name>;
-        type Type = St::Type;
+        type Name = Unset;
+        type Uri = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `type` field to Set
     pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetType<St> {}
     impl<St: State> State for SetType<St> {
-        type CreatedAt = St::CreatedAt;
-        type Uri = St::Uri;
-        type Name = St::Name;
         type Type = Set<members::r#type>;
+        type Name = St::Name;
+        type Uri = St::Uri;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Type = St::Type;
+        type Name = Set<members::name>;
+        type Uri = St::Uri;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Type = St::Type;
+        type Name = St::Name;
+        type Uri = Set<members::uri>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Type = St::Type;
+        type Name = St::Name;
+        type Uri = St::Uri;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `type` field
         pub struct r#type(());
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -302,10 +302,10 @@ where
 impl<S: BosStr, St> LayerBuilder<S, St>
 where
     St: layer_state::State,
-    St::CreatedAt: layer_state::IsSet,
-    St::Uri: layer_state::IsSet,
-    St::Name: layer_state::IsSet,
     St::Type: layer_state::IsSet,
+    St::Name: layer_state::IsSet,
+    St::Uri: layer_state::IsSet,
+    St::CreatedAt: layer_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Layer<S> {

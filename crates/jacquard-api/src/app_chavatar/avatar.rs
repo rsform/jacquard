@@ -156,37 +156,37 @@ pub mod avatar_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Avatar;
         type CreatedAt;
+        type Avatar;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Avatar = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `avatar` field to Set
-    pub struct SetAvatar<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetAvatar<St> {}
-    impl<St: State> State for SetAvatar<St> {
-        type Avatar = Set<members::avatar>;
-        type CreatedAt = St::CreatedAt;
+        type Avatar = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Avatar = St::Avatar;
         type CreatedAt = Set<members::created_at>;
+        type Avatar = St::Avatar;
+    }
+    ///State transition - sets the `avatar` field to Set
+    pub struct SetAvatar<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAvatar<St> {}
+    impl<St: State> State for SetAvatar<St> {
+        type CreatedAt = St::CreatedAt;
+        type Avatar = Set<members::avatar>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `avatar` field
-        pub struct avatar(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `avatar` field
+        pub struct avatar(());
     }
 }
 
@@ -256,8 +256,8 @@ where
 impl<S: BosStr, St> AvatarBuilder<S, St>
 where
     St: avatar_state::State,
-    St::Avatar: avatar_state::IsSet,
     St::CreatedAt: avatar_state::IsSet,
+    St::Avatar: avatar_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Avatar<S> {

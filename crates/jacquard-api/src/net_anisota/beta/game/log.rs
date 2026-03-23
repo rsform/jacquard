@@ -1078,49 +1078,49 @@ pub mod log_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Timestamp;
         type SessionId;
+        type Timestamp;
         type EventType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Timestamp = Unset;
         type SessionId = Unset;
+        type Timestamp = Unset;
         type EventType = Unset;
-    }
-    ///State transition - sets the `timestamp` field to Set
-    pub struct SetTimestamp<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTimestamp<St> {}
-    impl<St: State> State for SetTimestamp<St> {
-        type Timestamp = Set<members::timestamp>;
-        type SessionId = St::SessionId;
-        type EventType = St::EventType;
     }
     ///State transition - sets the `session_id` field to Set
     pub struct SetSessionId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSessionId<St> {}
     impl<St: State> State for SetSessionId<St> {
-        type Timestamp = St::Timestamp;
         type SessionId = Set<members::session_id>;
+        type Timestamp = St::Timestamp;
+        type EventType = St::EventType;
+    }
+    ///State transition - sets the `timestamp` field to Set
+    pub struct SetTimestamp<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTimestamp<St> {}
+    impl<St: State> State for SetTimestamp<St> {
+        type SessionId = St::SessionId;
+        type Timestamp = Set<members::timestamp>;
         type EventType = St::EventType;
     }
     ///State transition - sets the `event_type` field to Set
     pub struct SetEventType<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetEventType<St> {}
     impl<St: State> State for SetEventType<St> {
-        type Timestamp = St::Timestamp;
         type SessionId = St::SessionId;
+        type Timestamp = St::Timestamp;
         type EventType = Set<members::event_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `timestamp` field
-        pub struct timestamp(());
         ///Marker type for the `session_id` field
         pub struct session_id(());
+        ///Marker type for the `timestamp` field
+        pub struct timestamp(());
         ///Marker type for the `event_type` field
         pub struct event_type(());
     }
@@ -1408,8 +1408,8 @@ where
 impl<S: BosStr, St> LogBuilder<S, St>
 where
     St: log_state::State,
-    St::Timestamp: log_state::IsSet,
     St::SessionId: log_state::IsSet,
+    St::Timestamp: log_state::IsSet,
     St::EventType: log_state::IsSet,
 {
     /// Build the final struct.

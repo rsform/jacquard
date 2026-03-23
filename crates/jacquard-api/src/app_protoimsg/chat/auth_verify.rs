@@ -114,37 +114,37 @@ pub mod auth_verify_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Nonce;
         type CreatedAt;
+        type Nonce;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Nonce = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `nonce` field to Set
-    pub struct SetNonce<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetNonce<St> {}
-    impl<St: State> State for SetNonce<St> {
-        type Nonce = Set<members::nonce>;
-        type CreatedAt = St::CreatedAt;
+        type Nonce = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Nonce = St::Nonce;
         type CreatedAt = Set<members::created_at>;
+        type Nonce = St::Nonce;
+    }
+    ///State transition - sets the `nonce` field to Set
+    pub struct SetNonce<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetNonce<St> {}
+    impl<St: State> State for SetNonce<St> {
+        type CreatedAt = St::CreatedAt;
+        type Nonce = Set<members::nonce>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `nonce` field
-        pub struct nonce(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `nonce` field
+        pub struct nonce(());
     }
 }
 
@@ -214,8 +214,8 @@ where
 impl<S: BosStr, St> AuthVerifyBuilder<S, St>
 where
     St: auth_verify_state::State,
-    St::Nonce: auth_verify_state::IsSet,
     St::CreatedAt: auth_verify_state::IsSet,
+    St::Nonce: auth_verify_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> AuthVerify<S> {

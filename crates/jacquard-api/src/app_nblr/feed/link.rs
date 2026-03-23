@@ -115,51 +115,51 @@ pub mod link_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Uri;
         type Collection;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Uri = Unset;
         type Collection = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type Uri = St::Uri;
-        type Collection = St::Collection;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUri<St> {}
     impl<St: State> State for SetUri<St> {
-        type CreatedAt = St::CreatedAt;
         type Uri = Set<members::uri>;
         type Collection = St::Collection;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `collection` field to Set
     pub struct SetCollection<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCollection<St> {}
     impl<St: State> State for SetCollection<St> {
-        type CreatedAt = St::CreatedAt;
         type Uri = St::Uri;
         type Collection = Set<members::collection>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Uri = St::Uri;
+        type Collection = St::Collection;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `uri` field
         pub struct uri(());
         ///Marker type for the `collection` field
         pub struct collection(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -248,9 +248,9 @@ where
 impl<S: BosStr, St> LinkBuilder<S, St>
 where
     St: link_state::State,
-    St::CreatedAt: link_state::IsSet,
     St::Uri: link_state::IsSet,
     St::Collection: link_state::IsSet,
+    St::CreatedAt: link_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Link<S> {

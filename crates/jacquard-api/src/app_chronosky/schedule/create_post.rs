@@ -226,37 +226,37 @@ pub mod create_post_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ScheduledAt;
         type Posts;
+        type ScheduledAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ScheduledAt = Unset;
         type Posts = Unset;
-    }
-    ///State transition - sets the `scheduled_at` field to Set
-    pub struct SetScheduledAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetScheduledAt<St> {}
-    impl<St: State> State for SetScheduledAt<St> {
-        type ScheduledAt = Set<members::scheduled_at>;
-        type Posts = St::Posts;
+        type ScheduledAt = Unset;
     }
     ///State transition - sets the `posts` field to Set
     pub struct SetPosts<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPosts<St> {}
     impl<St: State> State for SetPosts<St> {
-        type ScheduledAt = St::ScheduledAt;
         type Posts = Set<members::posts>;
+        type ScheduledAt = St::ScheduledAt;
+    }
+    ///State transition - sets the `scheduled_at` field to Set
+    pub struct SetScheduledAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetScheduledAt<St> {}
+    impl<St: State> State for SetScheduledAt<St> {
+        type Posts = St::Posts;
+        type ScheduledAt = Set<members::scheduled_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `scheduled_at` field
-        pub struct scheduled_at(());
         ///Marker type for the `posts` field
         pub struct posts(());
+        ///Marker type for the `scheduled_at` field
+        pub struct scheduled_at(());
     }
 }
 
@@ -377,8 +377,8 @@ impl<S: BosStr, St: create_post_state::State> CreatePostBuilder<S, St> {
 impl<S: BosStr, St> CreatePostBuilder<S, St>
 where
     St: create_post_state::State,
-    St::ScheduledAt: create_post_state::IsSet,
     St::Posts: create_post_state::IsSet,
+    St::ScheduledAt: create_post_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> CreatePost<S> {

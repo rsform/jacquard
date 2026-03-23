@@ -174,103 +174,103 @@ pub mod question_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Tags;
-        type Title;
         type Forum;
         type IsOpen;
         type Content;
+        type Tags;
+        type Title;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Tags = Unset;
-        type Title = Unset;
         type Forum = Unset;
         type IsOpen = Unset;
         type Content = Unset;
+        type Tags = Unset;
+        type Title = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `tags` field to Set
-    pub struct SetTags<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTags<St> {}
-    impl<St: State> State for SetTags<St> {
-        type Tags = Set<members::tags>;
-        type Title = St::Title;
-        type Forum = St::Forum;
-        type IsOpen = St::IsOpen;
-        type Content = St::Content;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTitle<St> {}
-    impl<St: State> State for SetTitle<St> {
-        type Tags = St::Tags;
-        type Title = Set<members::title>;
-        type Forum = St::Forum;
-        type IsOpen = St::IsOpen;
-        type Content = St::Content;
-        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `forum` field to Set
     pub struct SetForum<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetForum<St> {}
     impl<St: State> State for SetForum<St> {
-        type Tags = St::Tags;
-        type Title = St::Title;
         type Forum = Set<members::forum>;
         type IsOpen = St::IsOpen;
         type Content = St::Content;
+        type Tags = St::Tags;
+        type Title = St::Title;
         type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `is_open` field to Set
     pub struct SetIsOpen<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetIsOpen<St> {}
     impl<St: State> State for SetIsOpen<St> {
-        type Tags = St::Tags;
-        type Title = St::Title;
         type Forum = St::Forum;
         type IsOpen = Set<members::is_open>;
         type Content = St::Content;
+        type Tags = St::Tags;
+        type Title = St::Title;
         type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `content` field to Set
     pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetContent<St> {}
     impl<St: State> State for SetContent<St> {
-        type Tags = St::Tags;
-        type Title = St::Title;
         type Forum = St::Forum;
         type IsOpen = St::IsOpen;
         type Content = Set<members::content>;
+        type Tags = St::Tags;
+        type Title = St::Title;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `tags` field to Set
+    pub struct SetTags<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTags<St> {}
+    impl<St: State> State for SetTags<St> {
+        type Forum = St::Forum;
+        type IsOpen = St::IsOpen;
+        type Content = St::Content;
+        type Tags = Set<members::tags>;
+        type Title = St::Title;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
+        type Forum = St::Forum;
+        type IsOpen = St::IsOpen;
+        type Content = St::Content;
+        type Tags = St::Tags;
+        type Title = Set<members::title>;
         type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Tags = St::Tags;
-        type Title = St::Title;
         type Forum = St::Forum;
         type IsOpen = St::IsOpen;
         type Content = St::Content;
+        type Tags = St::Tags;
+        type Title = St::Title;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `tags` field
-        pub struct tags(());
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `forum` field
         pub struct forum(());
         ///Marker type for the `is_open` field
         pub struct is_open(());
         ///Marker type for the `content` field
         pub struct content(());
+        ///Marker type for the `tags` field
+        pub struct tags(());
+        ///Marker type for the `title` field
+        pub struct title(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -439,11 +439,11 @@ impl<S: BosStr, St: question_state::State> QuestionBuilder<S, St> {
 impl<S: BosStr, St> QuestionBuilder<S, St>
 where
     St: question_state::State,
-    St::Tags: question_state::IsSet,
-    St::Title: question_state::IsSet,
     St::Forum: question_state::IsSet,
     St::IsOpen: question_state::IsSet,
     St::Content: question_state::IsSet,
+    St::Tags: question_state::IsSet,
+    St::Title: question_state::IsSet,
     St::CreatedAt: question_state::IsSet,
 {
     /// Build the final struct.

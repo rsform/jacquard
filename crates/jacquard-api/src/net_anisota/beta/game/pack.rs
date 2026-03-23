@@ -233,67 +233,67 @@ pub mod pack_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type TotalOpens;
-        type LastOpenTime;
         type Streak;
+        type LastOpenTime;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type TotalOpens = Unset;
-        type LastOpenTime = Unset;
         type Streak = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type TotalOpens = St::TotalOpens;
-        type LastOpenTime = St::LastOpenTime;
-        type Streak = St::Streak;
+        type LastOpenTime = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `total_opens` field to Set
     pub struct SetTotalOpens<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTotalOpens<St> {}
     impl<St: State> State for SetTotalOpens<St> {
-        type CreatedAt = St::CreatedAt;
         type TotalOpens = Set<members::total_opens>;
+        type Streak = St::Streak;
         type LastOpenTime = St::LastOpenTime;
-        type Streak = St::Streak;
-    }
-    ///State transition - sets the `last_open_time` field to Set
-    pub struct SetLastOpenTime<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetLastOpenTime<St> {}
-    impl<St: State> State for SetLastOpenTime<St> {
         type CreatedAt = St::CreatedAt;
-        type TotalOpens = St::TotalOpens;
-        type LastOpenTime = Set<members::last_open_time>;
-        type Streak = St::Streak;
     }
     ///State transition - sets the `streak` field to Set
     pub struct SetStreak<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetStreak<St> {}
     impl<St: State> State for SetStreak<St> {
-        type CreatedAt = St::CreatedAt;
         type TotalOpens = St::TotalOpens;
-        type LastOpenTime = St::LastOpenTime;
         type Streak = Set<members::streak>;
+        type LastOpenTime = St::LastOpenTime;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `last_open_time` field to Set
+    pub struct SetLastOpenTime<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLastOpenTime<St> {}
+    impl<St: State> State for SetLastOpenTime<St> {
+        type TotalOpens = St::TotalOpens;
+        type Streak = St::Streak;
+        type LastOpenTime = Set<members::last_open_time>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type TotalOpens = St::TotalOpens;
+        type Streak = St::Streak;
+        type LastOpenTime = St::LastOpenTime;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `total_opens` field
         pub struct total_opens(());
-        ///Marker type for the `last_open_time` field
-        pub struct last_open_time(());
         ///Marker type for the `streak` field
         pub struct streak(());
+        ///Marker type for the `last_open_time` field
+        pub struct last_open_time(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -454,10 +454,10 @@ where
 impl<S: BosStr, St> PackBuilder<S, St>
 where
     St: pack_state::State,
-    St::CreatedAt: pack_state::IsSet,
     St::TotalOpens: pack_state::IsSet,
-    St::LastOpenTime: pack_state::IsSet,
     St::Streak: pack_state::IsSet,
+    St::LastOpenTime: pack_state::IsSet,
+    St::CreatedAt: pack_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Pack<S> {

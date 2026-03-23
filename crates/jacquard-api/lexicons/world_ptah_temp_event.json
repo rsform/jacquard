@@ -1,0 +1,125 @@
+{
+  "lexicon": 1,
+  "id": "world.ptah.temp.event",
+  "description": "An event record in The Ptah Protocol. Where competition becomes history. A tournament, battle, gathering, or any occasion where people compete or convene inside a world.",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A boxing match program combined with a history book entry. Before the fight it is a schedule. After the fight it is a permanent record. Ptah-Seker-Osiris — creation, shadow, rebirth. The event holds all three phases simultaneously.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "creatorDID",
+          "worldReference",
+          "createdAt"
+        ],
+        "properties": {
+          "completedAt": {
+            "type": "string",
+            "description": "Timestamp of when the event concluded.",
+            "format": "datetime"
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp of event creation.",
+            "format": "datetime"
+          },
+          "creatorDID": {
+            "type": "string",
+            "description": "Who organized this event.",
+            "format": "did"
+          },
+          "eventType": {
+            "type": "string",
+            "description": "What kind of event. Open-ended.",
+            "maxLength": 640,
+            "maxGraphemes": 64,
+            "knownValues": [
+              "tournament",
+              "battle",
+              "gathering",
+              "contest",
+              "ritual"
+            ]
+          },
+          "format": {
+            "type": "string",
+            "description": "The competitive or structural format of the event.",
+            "maxLength": 640,
+            "maxGraphemes": 64,
+            "knownValues": [
+              "bracket",
+              "roundRobin",
+              "openChallenge",
+              "singleElimination"
+            ]
+          },
+          "locationReference": {
+            "type": "string",
+            "description": "The AT URI of the location where this event happened.",
+            "format": "at-uri"
+          },
+          "loreStatus": {
+            "type": "string",
+            "description": "The narrative standing of this event in the world's timeline.",
+            "knownValues": [
+              "world.ptah.temp.defs#canonicalStatusOfficial",
+              "world.ptah.temp.defs#canonicalStatusCommunity",
+              "pending"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "description": "What this event is called.",
+            "maxLength": 640,
+            "maxGraphemes": 64
+          },
+          "participants": {
+            "type": "array",
+            "description": "AT URIs of the character records participating. Not people — characters.",
+            "items": {
+              "type": "string",
+              "format": "at-uri"
+            }
+          },
+          "result": {
+            "type": "string",
+            "description": "The outcome. Populated when status moves to completed.",
+            "maxLength": 10240,
+            "maxGraphemes": 1024
+          },
+          "stakes": {
+            "type": "string",
+            "description": "What is at risk or being contested.",
+            "maxLength": 10240,
+            "maxGraphemes": 1024
+          },
+          "status": {
+            "type": "string",
+            "description": "The current phase of the event.",
+            "knownValues": [
+              "upcoming",
+              "active",
+              "completed"
+            ]
+          },
+          "witnesses": {
+            "type": "array",
+            "description": "AT URIs of individual witness action records. Each witness action is a real record created by a real DID at a real timestamp. Witnessing is a verifiable technical contribution, not just a tally.",
+            "items": {
+              "type": "string",
+              "format": "at-uri"
+            }
+          },
+          "worldReference": {
+            "type": "string",
+            "description": "The AT URI of the world this event occurred in.",
+            "format": "at-uri"
+          }
+        }
+      }
+    }
+  }
+}

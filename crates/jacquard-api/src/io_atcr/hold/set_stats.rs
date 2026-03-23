@@ -139,37 +139,37 @@ pub mod set_stats_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Repository;
         type OwnerDid;
+        type Repository;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Repository = Unset;
         type OwnerDid = Unset;
-    }
-    ///State transition - sets the `repository` field to Set
-    pub struct SetRepository<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRepository<St> {}
-    impl<St: State> State for SetRepository<St> {
-        type Repository = Set<members::repository>;
-        type OwnerDid = St::OwnerDid;
+        type Repository = Unset;
     }
     ///State transition - sets the `owner_did` field to Set
     pub struct SetOwnerDid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetOwnerDid<St> {}
     impl<St: State> State for SetOwnerDid<St> {
-        type Repository = St::Repository;
         type OwnerDid = Set<members::owner_did>;
+        type Repository = St::Repository;
+    }
+    ///State transition - sets the `repository` field to Set
+    pub struct SetRepository<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRepository<St> {}
+    impl<St: State> State for SetRepository<St> {
+        type OwnerDid = St::OwnerDid;
+        type Repository = Set<members::repository>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `repository` field
-        pub struct repository(());
         ///Marker type for the `owner_did` field
         pub struct owner_did(());
+        ///Marker type for the `repository` field
+        pub struct repository(());
     }
 }
 
@@ -298,8 +298,8 @@ where
 impl<S: BosStr, St> SetStatsBuilder<S, St>
 where
     St: set_stats_state::State,
-    St::Repository: set_stats_state::IsSet,
     St::OwnerDid: set_stats_state::IsSet,
+    St::Repository: set_stats_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> SetStats<S> {

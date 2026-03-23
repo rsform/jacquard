@@ -1,0 +1,101 @@
+{
+  "lexicon": 1,
+  "id": "world.ptah.temp.role",
+  "description": "A role record in The Ptah Protocol. The template that sits between the World and the Character. A shared identity that multiple Character instances can embody. Hamlet is a Role — each performance of Hamlet is a Character instance.",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A stage role vs a performance of that role. The Opening of the Mouth was performed on a type of figure — the Role is the type. The Character instance is the specific statue that gets its mouth opened.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "creatorDID",
+          "worldReference",
+          "createdAt"
+        ],
+        "properties": {
+          "authorshipRecord": {
+            "type": "string",
+            "description": "Permanent link to the role's creator. Provenance travels.",
+            "format": "did"
+          },
+          "canonicalCharacterReference": {
+            "type": "string",
+            "description": "The AT URI of the single Character record designated as the authoritative expression of this role. When present, this is the canonical instance.",
+            "format": "at-uri"
+          },
+          "canonicalReferencePolicy": {
+            "type": "string",
+            "description": "Governs how the canonicalCharacterReference behaves over time.",
+            "knownValues": [
+              "fixed",
+              "updatable",
+              "community"
+            ]
+          },
+          "canonicalStatus": {
+            "type": "string",
+            "description": "The canonical standing of this role within its world.",
+            "knownValues": [
+              "world.ptah.temp.defs#canonicalStatusOfficial",
+              "world.ptah.temp.defs#canonicalStatusCommunity",
+              "world.ptah.temp.defs#canonicalStatusApocryphal"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp of role creation.",
+            "format": "datetime"
+          },
+          "creatorDID": {
+            "type": "string",
+            "description": "Who defined this role in the protocol.",
+            "format": "did"
+          },
+          "description": {
+            "type": "string",
+            "description": "What this role is in the world's context — its narrative function, its archetypal weight.",
+            "maxLength": 10240,
+            "maxGraphemes": 1024
+          },
+          "instancePolicy": {
+            "type": "string",
+            "description": "How instances of this role are governed.",
+            "knownValues": [
+              "openInstance",
+              "approvedInstance",
+              "singleInstance"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "description": "What this role is called.",
+            "maxLength": 640,
+            "maxGraphemes": 64
+          },
+          "sourceReference": {
+            "type": "string",
+            "description": "If sourceType is publicDomain, the specific source material.",
+            "maxLength": 10240,
+            "maxGraphemes": 1024
+          },
+          "sourceType": {
+            "type": "string",
+            "description": "The intellectual property origin of this role.",
+            "knownValues": [
+              "world.ptah.temp.defs#sourceTypeOriginalIP",
+              "world.ptah.temp.defs#sourceTypePublicDomain"
+            ]
+          },
+          "worldReference": {
+            "type": "string",
+            "description": "The AT URI of the world record this role exists in.",
+            "format": "at-uri"
+          }
+        }
+      }
+    }
+  }
+}

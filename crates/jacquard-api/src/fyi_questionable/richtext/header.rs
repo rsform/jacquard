@@ -105,37 +105,37 @@ pub mod header_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Level;
         type Plaintext;
+        type Level;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Level = Unset;
         type Plaintext = Unset;
-    }
-    ///State transition - sets the `level` field to Set
-    pub struct SetLevel<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetLevel<St> {}
-    impl<St: State> State for SetLevel<St> {
-        type Level = Set<members::level>;
-        type Plaintext = St::Plaintext;
+        type Level = Unset;
     }
     ///State transition - sets the `plaintext` field to Set
     pub struct SetPlaintext<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPlaintext<St> {}
     impl<St: State> State for SetPlaintext<St> {
-        type Level = St::Level;
         type Plaintext = Set<members::plaintext>;
+        type Level = St::Level;
+    }
+    ///State transition - sets the `level` field to Set
+    pub struct SetLevel<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLevel<St> {}
+    impl<St: State> State for SetLevel<St> {
+        type Plaintext = St::Plaintext;
+        type Level = Set<members::level>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `level` field
-        pub struct level(());
         ///Marker type for the `plaintext` field
         pub struct plaintext(());
+        ///Marker type for the `level` field
+        pub struct level(());
     }
 }
 
@@ -218,8 +218,8 @@ where
 impl<S: BosStr, St> HeaderBuilder<S, St>
 where
     St: header_state::State,
-    St::Level: header_state::IsSet,
     St::Plaintext: header_state::IsSet,
+    St::Level: header_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Header<S> {

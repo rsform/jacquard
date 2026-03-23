@@ -138,51 +138,51 @@ pub mod profile_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Content;
-        type UpdatedAt;
         type Heading;
+        type UpdatedAt;
+        type Content;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Content = Unset;
-        type UpdatedAt = Unset;
         type Heading = Unset;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetContent<St> {}
-    impl<St: State> State for SetContent<St> {
-        type Content = Set<members::content>;
-        type UpdatedAt = St::UpdatedAt;
-        type Heading = St::Heading;
-    }
-    ///State transition - sets the `updated_at` field to Set
-    pub struct SetUpdatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUpdatedAt<St> {}
-    impl<St: State> State for SetUpdatedAt<St> {
-        type Content = St::Content;
-        type UpdatedAt = Set<members::updated_at>;
-        type Heading = St::Heading;
+        type UpdatedAt = Unset;
+        type Content = Unset;
     }
     ///State transition - sets the `heading` field to Set
     pub struct SetHeading<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetHeading<St> {}
     impl<St: State> State for SetHeading<St> {
-        type Content = St::Content;
-        type UpdatedAt = St::UpdatedAt;
         type Heading = Set<members::heading>;
+        type UpdatedAt = St::UpdatedAt;
+        type Content = St::Content;
+    }
+    ///State transition - sets the `updated_at` field to Set
+    pub struct SetUpdatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUpdatedAt<St> {}
+    impl<St: State> State for SetUpdatedAt<St> {
+        type Heading = St::Heading;
+        type UpdatedAt = Set<members::updated_at>;
+        type Content = St::Content;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetContent<St> {}
+    impl<St: State> State for SetContent<St> {
+        type Heading = St::Heading;
+        type UpdatedAt = St::UpdatedAt;
+        type Content = Set<members::content>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `content` field
-        pub struct content(());
-        ///Marker type for the `updated_at` field
-        pub struct updated_at(());
         ///Marker type for the `heading` field
         pub struct heading(());
+        ///Marker type for the `updated_at` field
+        pub struct updated_at(());
+        ///Marker type for the `content` field
+        pub struct content(());
     }
 }
 
@@ -271,9 +271,9 @@ where
 impl<S: BosStr, St> ProfileBuilder<S, St>
 where
     St: profile_state::State,
-    St::Content: profile_state::IsSet,
-    St::UpdatedAt: profile_state::IsSet,
     St::Heading: profile_state::IsSet,
+    St::UpdatedAt: profile_state::IsSet,
+    St::Content: profile_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Profile<S> {

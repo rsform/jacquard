@@ -6926,37 +6926,37 @@ pub mod custom_stat_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Value;
         type Name;
+        type Value;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Value = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `value` field to Set
-    pub struct SetValue<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetValue<St> {}
-    impl<St: State> State for SetValue<St> {
-        type Value = Set<members::value>;
-        type Name = St::Name;
+        type Value = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetName<St> {}
     impl<St: State> State for SetName<St> {
-        type Value = St::Value;
         type Name = Set<members::name>;
+        type Value = St::Value;
+    }
+    ///State transition - sets the `value` field to Set
+    pub struct SetValue<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetValue<St> {}
+    impl<St: State> State for SetValue<St> {
+        type Name = St::Name;
+        type Value = Set<members::value>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `value` field
-        pub struct value(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `value` field
+        pub struct value(());
     }
 }
 
@@ -7065,8 +7065,8 @@ where
 impl<S: BosStr, St> CustomStatBuilder<S, St>
 where
     St: custom_stat_state::State,
-    St::Value: custom_stat_state::IsSet,
     St::Name: custom_stat_state::IsSet,
+    St::Value: custom_stat_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> CustomStat<S> {
@@ -7105,37 +7105,37 @@ pub mod dcc_cleric_spell_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Level;
         type Name;
+        type Level;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Level = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `level` field to Set
-    pub struct SetLevel<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetLevel<St> {}
-    impl<St: State> State for SetLevel<St> {
-        type Level = Set<members::level>;
-        type Name = St::Name;
+        type Level = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetName<St> {}
     impl<St: State> State for SetName<St> {
-        type Level = St::Level;
         type Name = Set<members::name>;
+        type Level = St::Level;
+    }
+    ///State transition - sets the `level` field to Set
+    pub struct SetLevel<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLevel<St> {}
+    impl<St: State> State for SetLevel<St> {
+        type Name = St::Name;
+        type Level = Set<members::level>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `level` field
-        pub struct level(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `level` field
+        pub struct level(());
     }
 }
 
@@ -7231,8 +7231,8 @@ impl<S: BosStr, St: dcc_cleric_spell_state::State> DccClericSpellBuilder<S, St> 
 impl<S: BosStr, St> DccClericSpellBuilder<S, St>
 where
     St: dcc_cleric_spell_state::State,
-    St::Level: dcc_cleric_spell_state::IsSet,
     St::Name: dcc_cleric_spell_state::IsSet,
+    St::Level: dcc_cleric_spell_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> DccClericSpell<S> {
@@ -7658,37 +7658,37 @@ pub mod spellslot_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Total;
         type Level;
+        type Total;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Total = Unset;
         type Level = Unset;
-    }
-    ///State transition - sets the `total` field to Set
-    pub struct SetTotal<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTotal<St> {}
-    impl<St: State> State for SetTotal<St> {
-        type Total = Set<members::total>;
-        type Level = St::Level;
+        type Total = Unset;
     }
     ///State transition - sets the `level` field to Set
     pub struct SetLevel<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetLevel<St> {}
     impl<St: State> State for SetLevel<St> {
-        type Total = St::Total;
         type Level = Set<members::level>;
+        type Total = St::Total;
+    }
+    ///State transition - sets the `total` field to Set
+    pub struct SetTotal<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTotal<St> {}
+    impl<St: State> State for SetTotal<St> {
+        type Level = St::Level;
+        type Total = Set<members::total>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `total` field
-        pub struct total(());
         ///Marker type for the `level` field
         pub struct level(());
+        ///Marker type for the `total` field
+        pub struct total(());
     }
 }
 
@@ -7771,8 +7771,8 @@ impl<S: BosStr, St: spellslot_state::State> SpellslotBuilder<S, St> {
 impl<S: BosStr, St> SpellslotBuilder<S, St>
 where
     St: spellslot_state::State,
-    St::Total: spellslot_state::IsSet,
     St::Level: spellslot_state::IsSet,
+    St::Total: spellslot_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Spellslot<S> {

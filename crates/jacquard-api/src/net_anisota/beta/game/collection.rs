@@ -293,67 +293,67 @@ pub mod collection_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Quantity;
         type AcquiredAt;
-        type CreatedAt;
+        type Quantity;
         type SpecimenId;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Quantity = Unset;
         type AcquiredAt = Unset;
-        type CreatedAt = Unset;
+        type Quantity = Unset;
         type SpecimenId = Unset;
-    }
-    ///State transition - sets the `quantity` field to Set
-    pub struct SetQuantity<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetQuantity<St> {}
-    impl<St: State> State for SetQuantity<St> {
-        type Quantity = Set<members::quantity>;
-        type AcquiredAt = St::AcquiredAt;
-        type CreatedAt = St::CreatedAt;
-        type SpecimenId = St::SpecimenId;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `acquired_at` field to Set
     pub struct SetAcquiredAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetAcquiredAt<St> {}
     impl<St: State> State for SetAcquiredAt<St> {
-        type Quantity = St::Quantity;
         type AcquiredAt = Set<members::acquired_at>;
-        type CreatedAt = St::CreatedAt;
-        type SpecimenId = St::SpecimenId;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
         type Quantity = St::Quantity;
-        type AcquiredAt = St::AcquiredAt;
-        type CreatedAt = Set<members::created_at>;
         type SpecimenId = St::SpecimenId;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `quantity` field to Set
+    pub struct SetQuantity<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetQuantity<St> {}
+    impl<St: State> State for SetQuantity<St> {
+        type AcquiredAt = St::AcquiredAt;
+        type Quantity = Set<members::quantity>;
+        type SpecimenId = St::SpecimenId;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `specimen_id` field to Set
     pub struct SetSpecimenId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSpecimenId<St> {}
     impl<St: State> State for SetSpecimenId<St> {
-        type Quantity = St::Quantity;
         type AcquiredAt = St::AcquiredAt;
-        type CreatedAt = St::CreatedAt;
+        type Quantity = St::Quantity;
         type SpecimenId = Set<members::specimen_id>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type AcquiredAt = St::AcquiredAt;
+        type Quantity = St::Quantity;
+        type SpecimenId = St::SpecimenId;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `quantity` field
-        pub struct quantity(());
         ///Marker type for the `acquired_at` field
         pub struct acquired_at(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
+        ///Marker type for the `quantity` field
+        pub struct quantity(());
         ///Marker type for the `specimen_id` field
         pub struct specimen_id(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -678,10 +678,10 @@ impl<S: BosStr, St: collection_state::State> CollectionBuilder<S, St> {
 impl<S: BosStr, St> CollectionBuilder<S, St>
 where
     St: collection_state::State,
-    St::Quantity: collection_state::IsSet,
     St::AcquiredAt: collection_state::IsSet,
-    St::CreatedAt: collection_state::IsSet,
+    St::Quantity: collection_state::IsSet,
     St::SpecimenId: collection_state::IsSet,
+    St::CreatedAt: collection_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Collection<S> {

@@ -119,49 +119,49 @@ pub mod permission_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Moderator;
         type Permissions;
+        type Moderator;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Moderator = Unset;
         type Permissions = Unset;
+        type Moderator = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `moderator` field to Set
-    pub struct SetModerator<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetModerator<St> {}
-    impl<St: State> State for SetModerator<St> {
-        type Moderator = Set<members::moderator>;
-        type Permissions = St::Permissions;
-        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `permissions` field to Set
     pub struct SetPermissions<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPermissions<St> {}
     impl<St: State> State for SetPermissions<St> {
-        type Moderator = St::Moderator;
         type Permissions = Set<members::permissions>;
+        type Moderator = St::Moderator;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `moderator` field to Set
+    pub struct SetModerator<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetModerator<St> {}
+    impl<St: State> State for SetModerator<St> {
+        type Permissions = St::Permissions;
+        type Moderator = Set<members::moderator>;
         type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Moderator = St::Moderator;
         type Permissions = St::Permissions;
+        type Moderator = St::Moderator;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `moderator` field
-        pub struct moderator(());
         ///Marker type for the `permissions` field
         pub struct permissions(());
+        ///Marker type for the `moderator` field
+        pub struct moderator(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -265,8 +265,8 @@ where
 impl<S: BosStr, St> PermissionBuilder<S, St>
 where
     St: permission_state::State,
-    St::Moderator: permission_state::IsSet,
     St::Permissions: permission_state::IsSet,
+    St::Moderator: permission_state::IsSet,
     St::CreatedAt: permission_state::IsSet,
 {
     /// Build the final struct.

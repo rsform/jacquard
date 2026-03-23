@@ -520,37 +520,37 @@ pub mod modlist_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Active;
         type Users;
+        type Active;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Active = Unset;
         type Users = Unset;
-    }
-    ///State transition - sets the `active` field to Set
-    pub struct SetActive<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetActive<St> {}
-    impl<St: State> State for SetActive<St> {
-        type Active = Set<members::active>;
-        type Users = St::Users;
+        type Active = Unset;
     }
     ///State transition - sets the `users` field to Set
     pub struct SetUsers<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUsers<St> {}
     impl<St: State> State for SetUsers<St> {
-        type Active = St::Active;
         type Users = Set<members::users>;
+        type Active = St::Active;
+    }
+    ///State transition - sets the `active` field to Set
+    pub struct SetActive<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetActive<St> {}
+    impl<St: State> State for SetActive<St> {
+        type Users = St::Users;
+        type Active = Set<members::active>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `active` field
-        pub struct active(());
         ///Marker type for the `users` field
         pub struct users(());
+        ///Marker type for the `active` field
+        pub struct active(());
     }
 }
 
@@ -620,8 +620,8 @@ where
 impl<S: BosStr, St> ModlistRefBuilder<S, St>
 where
     St: modlist_ref_state::State,
-    St::Active: modlist_ref_state::IsSet,
     St::Users: modlist_ref_state::IsSet,
+    St::Active: modlist_ref_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ModlistRef<S> {

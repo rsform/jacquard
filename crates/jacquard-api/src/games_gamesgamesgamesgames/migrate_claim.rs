@@ -195,37 +195,37 @@ pub mod migrate_claim_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ClaimReview;
         type Claim;
+        type ClaimReview;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ClaimReview = Unset;
         type Claim = Unset;
-    }
-    ///State transition - sets the `claim_review` field to Set
-    pub struct SetClaimReview<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetClaimReview<St> {}
-    impl<St: State> State for SetClaimReview<St> {
-        type ClaimReview = Set<members::claim_review>;
-        type Claim = St::Claim;
+        type ClaimReview = Unset;
     }
     ///State transition - sets the `claim` field to Set
     pub struct SetClaim<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetClaim<St> {}
     impl<St: State> State for SetClaim<St> {
-        type ClaimReview = St::ClaimReview;
         type Claim = Set<members::claim>;
+        type ClaimReview = St::ClaimReview;
+    }
+    ///State transition - sets the `claim_review` field to Set
+    pub struct SetClaimReview<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetClaimReview<St> {}
+    impl<St: State> State for SetClaimReview<St> {
+        type Claim = St::Claim;
+        type ClaimReview = Set<members::claim_review>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `claim_review` field
-        pub struct claim_review(());
         ///Marker type for the `claim` field
         pub struct claim(());
+        ///Marker type for the `claim_review` field
+        pub struct claim_review(());
     }
 }
 
@@ -295,8 +295,8 @@ where
 impl<S: BosStr, St> MigrateClaimBuilder<S, St>
 where
     St: migrate_claim_state::State,
-    St::ClaimReview: migrate_claim_state::IsSet,
     St::Claim: migrate_claim_state::IsSet,
+    St::ClaimReview: migrate_claim_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> MigrateClaim<S> {
@@ -329,37 +329,37 @@ pub mod migration_result_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Status;
         type GameUri;
+        type Status;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Status = Unset;
         type GameUri = Unset;
-    }
-    ///State transition - sets the `status` field to Set
-    pub struct SetStatus<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetStatus<St> {}
-    impl<St: State> State for SetStatus<St> {
-        type Status = Set<members::status>;
-        type GameUri = St::GameUri;
+        type Status = Unset;
     }
     ///State transition - sets the `game_uri` field to Set
     pub struct SetGameUri<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetGameUri<St> {}
     impl<St: State> State for SetGameUri<St> {
-        type Status = St::Status;
         type GameUri = Set<members::game_uri>;
+        type Status = St::Status;
+    }
+    ///State transition - sets the `status` field to Set
+    pub struct SetStatus<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStatus<St> {}
+    impl<St: State> State for SetStatus<St> {
+        type GameUri = St::GameUri;
+        type Status = Set<members::status>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `status` field
-        pub struct status(());
         ///Marker type for the `game_uri` field
         pub struct game_uri(());
+        ///Marker type for the `status` field
+        pub struct status(());
     }
 }
 
@@ -460,8 +460,8 @@ where
 impl<S: BosStr, St> MigrationResultBuilder<S, St>
 where
     St: migration_result_state::State,
-    St::Status: migration_result_state::IsSet,
     St::GameUri: migration_result_state::IsSet,
+    St::Status: migration_result_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> MigrationResult<S> {

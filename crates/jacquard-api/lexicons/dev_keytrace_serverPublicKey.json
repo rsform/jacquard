@@ -1,0 +1,41 @@
+{
+  "lexicon": 1,
+  "id": "dev.keytrace.serverPublicKey",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A signing key for claim attestations. It effectively hosts a JWK on a user's ATProto repo.",
+      "key": "any",
+      "record": {
+        "type": "object",
+        "required": [
+          "publicJwk",
+          "validFrom",
+          "validUntil"
+        ],
+        "properties": {
+          "comment": {
+            "type": "string",
+            "description": "Optional comment or description.",
+            "maxGraphemes": 512
+          },
+          "publicJwk": {
+            "type": "string",
+            "description": "JWK public key as a JSON string (RFC 7517 format)",
+            "maxLength": 512
+          },
+          "validFrom": {
+            "type": "string",
+            "description": "Datetime from which this key is valid (ISO 8601).",
+            "format": "datetime"
+          },
+          "validUntil": {
+            "type": "string",
+            "description": "Datetime until which this key is valid (ISO 8601).",
+            "format": "datetime"
+          }
+        }
+      }
+    }
+  }
+}

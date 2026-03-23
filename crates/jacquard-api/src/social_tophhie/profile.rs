@@ -601,37 +601,37 @@ pub mod pds_preferences_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ShowOnHomepage;
         type AccessibilityScoring;
+        type ShowOnHomepage;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ShowOnHomepage = Unset;
         type AccessibilityScoring = Unset;
-    }
-    ///State transition - sets the `show_on_homepage` field to Set
-    pub struct SetShowOnHomepage<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetShowOnHomepage<St> {}
-    impl<St: State> State for SetShowOnHomepage<St> {
-        type ShowOnHomepage = Set<members::show_on_homepage>;
-        type AccessibilityScoring = St::AccessibilityScoring;
+        type ShowOnHomepage = Unset;
     }
     ///State transition - sets the `accessibility_scoring` field to Set
     pub struct SetAccessibilityScoring<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetAccessibilityScoring<St> {}
     impl<St: State> State for SetAccessibilityScoring<St> {
-        type ShowOnHomepage = St::ShowOnHomepage;
         type AccessibilityScoring = Set<members::accessibility_scoring>;
+        type ShowOnHomepage = St::ShowOnHomepage;
+    }
+    ///State transition - sets the `show_on_homepage` field to Set
+    pub struct SetShowOnHomepage<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetShowOnHomepage<St> {}
+    impl<St: State> State for SetShowOnHomepage<St> {
+        type AccessibilityScoring = St::AccessibilityScoring;
+        type ShowOnHomepage = Set<members::show_on_homepage>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `show_on_homepage` field
-        pub struct show_on_homepage(());
         ///Marker type for the `accessibility_scoring` field
         pub struct accessibility_scoring(());
+        ///Marker type for the `show_on_homepage` field
+        pub struct show_on_homepage(());
     }
 }
 
@@ -701,8 +701,8 @@ where
 impl<S: BosStr, St> PdsPreferencesBuilder<S, St>
 where
     St: pds_preferences_state::State,
-    St::ShowOnHomepage: pds_preferences_state::IsSet,
     St::AccessibilityScoring: pds_preferences_state::IsSet,
+    St::ShowOnHomepage: pds_preferences_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> PdsPreferences<S> {

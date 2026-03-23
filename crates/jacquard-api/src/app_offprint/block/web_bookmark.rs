@@ -146,37 +146,37 @@ pub mod web_bookmark_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Href;
         type Title;
+        type Href;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Href = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `href` field to Set
-    pub struct SetHref<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetHref<St> {}
-    impl<St: State> State for SetHref<St> {
-        type Href = Set<members::href>;
-        type Title = St::Title;
+        type Href = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTitle<St> {}
     impl<St: State> State for SetTitle<St> {
-        type Href = St::Href;
         type Title = Set<members::title>;
+        type Href = St::Href;
+    }
+    ///State transition - sets the `href` field to Set
+    pub struct SetHref<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHref<St> {}
+    impl<St: State> State for SetHref<St> {
+        type Title = St::Title;
+        type Href = Set<members::href>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `href` field
-        pub struct href(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `href` field
+        pub struct href(());
     }
 }
 
@@ -285,8 +285,8 @@ where
 impl<S: BosStr, St> WebBookmarkBuilder<S, St>
 where
     St: web_bookmark_state::State,
-    St::Href: web_bookmark_state::IsSet,
     St::Title: web_bookmark_state::IsSet,
+    St::Href: web_bookmark_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> WebBookmark<S> {

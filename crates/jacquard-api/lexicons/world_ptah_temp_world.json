@@ -1,0 +1,112 @@
+{
+  "lexicon": 1,
+  "id": "world.ptah.temp.world",
+  "description": "A world record in The Ptah Protocol. The foundational record — everything else references it. A world must exist before characters, events, or lore can exist inside it.",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "The deed. Establishes that a world exists, who created it, and what its basic properties are. Ptah conceives the world in his heart — this record is that conception made permanent.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "creatorDID",
+          "createdAt"
+        ],
+        "properties": {
+          "canonicalStatus": {
+            "type": "string",
+            "description": "Whether this world is open for contribution, controlled by the originator, or governed by community consensus.",
+            "knownValues": [
+              "world.ptah.temp.defs#canonicalStatusOfficial",
+              "world.ptah.temp.defs#canonicalStatusCommunity",
+              "world.ptah.temp.defs#canonicalStatusApocryphal"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp of world creation.",
+            "format": "datetime"
+          },
+          "creatorDID": {
+            "type": "string",
+            "description": "The permanent identity of whoever seeded this world. This never changes.",
+            "format": "did"
+          },
+          "description": {
+            "type": "string",
+            "description": "What kind of world this is, in plain language.",
+            "maxLength": 10240,
+            "maxGraphemes": 1024
+          },
+          "governanceMode": {
+            "type": "string",
+            "description": "The constitutional posture of the world. Signals how contributions and canon are governed before anyone contributes.",
+            "knownValues": [
+              "sandbox",
+              "governed",
+              "constitutional"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "description": "What the world is called.",
+            "maxLength": 640,
+            "maxGraphemes": 64
+          },
+          "renderingHints": {
+            "type": "ref",
+            "description": "Loose metadata telling visual rendering layers what kind of world this is — tone, era, genre, aesthetic.",
+            "ref": "#renderingHints"
+          },
+          "sourceReference": {
+            "type": "string",
+            "description": "If sourceType is publicDomain, the specific source material this world is derived from.",
+            "maxLength": 10240,
+            "maxGraphemes": 1024
+          },
+          "sourceType": {
+            "type": "string",
+            "description": "The intellectual property origin of this world.",
+            "knownValues": [
+              "world.ptah.temp.defs#sourceTypeOriginalIP",
+              "world.ptah.temp.defs#sourceTypePublicDomain",
+              "world.ptah.temp.defs#sourceTypeCollaborativeCommons"
+            ]
+          }
+        }
+      }
+    },
+    "renderingHints": {
+      "type": "object",
+      "description": "Visual and tonal metadata for rendering layers. The world has to feel like something before anything has happened in it yet.",
+      "properties": {
+        "aesthetic": {
+          "type": "string",
+          "description": "Visual texture, materials, atmosphere.",
+          "maxLength": 2560,
+          "maxGraphemes": 256
+        },
+        "era": {
+          "type": "string",
+          "description": "The temporal setting or period.",
+          "maxLength": 2560,
+          "maxGraphemes": 256
+        },
+        "genre": {
+          "type": "string",
+          "description": "The narrative genre.",
+          "maxLength": 2560,
+          "maxGraphemes": 256
+        },
+        "tone": {
+          "type": "string",
+          "description": "The emotional register of the world.",
+          "maxLength": 2560,
+          "maxGraphemes": 256
+        }
+      }
+    }
+  }
+}

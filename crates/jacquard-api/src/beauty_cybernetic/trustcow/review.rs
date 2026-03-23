@@ -245,50 +245,50 @@ pub mod review_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Transaction;
-        type CreatedAt;
         type Rating;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Transaction = Unset;
-        type CreatedAt = Unset;
         type Rating = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `transaction` field to Set
     pub struct SetTransaction<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTransaction<St> {}
     impl<St: State> State for SetTransaction<St> {
         type Transaction = Set<members::transaction>;
+        type Rating = St::Rating;
         type CreatedAt = St::CreatedAt;
-        type Rating = St::Rating;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type Transaction = St::Transaction;
-        type CreatedAt = Set<members::created_at>;
-        type Rating = St::Rating;
     }
     ///State transition - sets the `rating` field to Set
     pub struct SetRating<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRating<St> {}
     impl<St: State> State for SetRating<St> {
         type Transaction = St::Transaction;
-        type CreatedAt = St::CreatedAt;
         type Rating = Set<members::rating>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Transaction = St::Transaction;
+        type Rating = St::Rating;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `transaction` field
         pub struct transaction(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `rating` field
         pub struct rating(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -427,8 +427,8 @@ impl<S: BosStr, St> ReviewBuilder<S, St>
 where
     St: review_state::State,
     St::Transaction: review_state::IsSet,
-    St::CreatedAt: review_state::IsSet,
     St::Rating: review_state::IsSet,
+    St::CreatedAt: review_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Review<S> {

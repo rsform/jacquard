@@ -231,51 +231,51 @@ pub mod emit_event_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Event;
         type Subject;
         type CreatedBy;
-        type Event;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Event = Unset;
         type Subject = Unset;
         type CreatedBy = Unset;
-        type Event = Unset;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSubject<St> {}
-    impl<St: State> State for SetSubject<St> {
-        type Subject = Set<members::subject>;
-        type CreatedBy = St::CreatedBy;
-        type Event = St::Event;
-    }
-    ///State transition - sets the `created_by` field to Set
-    pub struct SetCreatedBy<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedBy<St> {}
-    impl<St: State> State for SetCreatedBy<St> {
-        type Subject = St::Subject;
-        type CreatedBy = Set<members::created_by>;
-        type Event = St::Event;
     }
     ///State transition - sets the `event` field to Set
     pub struct SetEvent<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetEvent<St> {}
     impl<St: State> State for SetEvent<St> {
+        type Event = Set<members::event>;
         type Subject = St::Subject;
         type CreatedBy = St::CreatedBy;
-        type Event = Set<members::event>;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubject<St> {}
+    impl<St: State> State for SetSubject<St> {
+        type Event = St::Event;
+        type Subject = Set<members::subject>;
+        type CreatedBy = St::CreatedBy;
+    }
+    ///State transition - sets the `created_by` field to Set
+    pub struct SetCreatedBy<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedBy<St> {}
+    impl<St: State> State for SetCreatedBy<St> {
+        type Event = St::Event;
+        type Subject = St::Subject;
+        type CreatedBy = Set<members::created_by>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `event` field
+        pub struct event(());
         ///Marker type for the `subject` field
         pub struct subject(());
         ///Marker type for the `created_by` field
         pub struct created_by(());
-        ///Marker type for the `event` field
-        pub struct event(());
     }
 }
 
@@ -410,9 +410,9 @@ impl<S: BosStr, St: emit_event_state::State> EmitEventBuilder<S, St> {
 impl<S: BosStr, St> EmitEventBuilder<S, St>
 where
     St: emit_event_state::State,
+    St::Event: emit_event_state::IsSet,
     St::Subject: emit_event_state::IsSet,
     St::CreatedBy: emit_event_state::IsSet,
-    St::Event: emit_event_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> EmitEvent<S> {

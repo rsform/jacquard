@@ -1786,37 +1786,37 @@ pub mod profile_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Handle;
         type Did;
+        type Handle;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Handle = Unset;
         type Did = Unset;
-    }
-    ///State transition - sets the `handle` field to Set
-    pub struct SetHandle<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetHandle<St> {}
-    impl<St: State> State for SetHandle<St> {
-        type Handle = Set<members::handle>;
-        type Did = St::Did;
+        type Handle = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDid<St> {}
     impl<St: State> State for SetDid<St> {
-        type Handle = St::Handle;
         type Did = Set<members::did>;
+        type Handle = St::Handle;
+    }
+    ///State transition - sets the `handle` field to Set
+    pub struct SetHandle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHandle<St> {}
+    impl<St: State> State for SetHandle<St> {
+        type Did = St::Did;
+        type Handle = Set<members::handle>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `handle` field
-        pub struct handle(());
         ///Marker type for the `did` field
         pub struct did(());
+        ///Marker type for the `handle` field
+        pub struct handle(());
     }
 }
 
@@ -2132,8 +2132,8 @@ impl<S: BosStr, St: profile_view_state::State> ProfileViewBuilder<S, St> {
 impl<S: BosStr, St> ProfileViewBuilder<S, St>
 where
     St: profile_view_state::State,
-    St::Handle: profile_view_state::IsSet,
     St::Did: profile_view_state::IsSet,
+    St::Handle: profile_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ProfileView<S> {
@@ -2198,37 +2198,37 @@ pub mod profile_view_basic_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
         type Handle;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
         type Handle = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDid<St> {}
-    impl<St: State> State for SetDid<St> {
-        type Did = Set<members::did>;
-        type Handle = St::Handle;
+        type Did = Unset;
     }
     ///State transition - sets the `handle` field to Set
     pub struct SetHandle<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetHandle<St> {}
     impl<St: State> State for SetHandle<St> {
-        type Did = St::Did;
         type Handle = Set<members::handle>;
+        type Did = St::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
+        type Handle = St::Handle;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `handle` field
         pub struct handle(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
@@ -2385,8 +2385,8 @@ impl<S: BosStr, St: profile_view_basic_state::State> ProfileViewBasicBuilder<S, 
 impl<S: BosStr, St> ProfileViewBasicBuilder<S, St>
 where
     St: profile_view_basic_state::State,
-    St::Did: profile_view_basic_state::IsSet,
     St::Handle: profile_view_basic_state::IsSet,
+    St::Did: profile_view_basic_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ProfileViewBasic<S> {
@@ -2562,50 +2562,50 @@ pub mod tangled_profile_view_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Did;
-        type Bluesky;
         type Handle;
+        type Bluesky;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Did = Unset;
-        type Bluesky = Unset;
         type Handle = Unset;
+        type Bluesky = Unset;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDid<St> {}
     impl<St: State> State for SetDid<St> {
         type Did = Set<members::did>;
+        type Handle = St::Handle;
         type Bluesky = St::Bluesky;
-        type Handle = St::Handle;
-    }
-    ///State transition - sets the `bluesky` field to Set
-    pub struct SetBluesky<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetBluesky<St> {}
-    impl<St: State> State for SetBluesky<St> {
-        type Did = St::Did;
-        type Bluesky = Set<members::bluesky>;
-        type Handle = St::Handle;
     }
     ///State transition - sets the `handle` field to Set
     pub struct SetHandle<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetHandle<St> {}
     impl<St: State> State for SetHandle<St> {
         type Did = St::Did;
-        type Bluesky = St::Bluesky;
         type Handle = Set<members::handle>;
+        type Bluesky = St::Bluesky;
+    }
+    ///State transition - sets the `bluesky` field to Set
+    pub struct SetBluesky<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBluesky<St> {}
+    impl<St: State> State for SetBluesky<St> {
+        type Did = St::Did;
+        type Handle = St::Handle;
+        type Bluesky = Set<members::bluesky>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `did` field
         pub struct did(());
-        ///Marker type for the `bluesky` field
-        pub struct bluesky(());
         ///Marker type for the `handle` field
         pub struct handle(());
+        ///Marker type for the `bluesky` field
+        pub struct bluesky(());
     }
 }
 
@@ -2772,8 +2772,8 @@ impl<S: BosStr, St> TangledProfileViewBuilder<S, St>
 where
     St: tangled_profile_view_state::State,
     St::Did: tangled_profile_view_state::IsSet,
-    St::Bluesky: tangled_profile_view_state::IsSet,
     St::Handle: tangled_profile_view_state::IsSet,
+    St::Bluesky: tangled_profile_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> TangledProfileView<S> {

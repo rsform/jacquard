@@ -472,37 +472,37 @@ pub mod profile_link_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Link;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Link = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Name = Set<members::name>;
-        type Link = St::Link;
+        type Name = Unset;
     }
     ///State transition - sets the `link` field to Set
     pub struct SetLink<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetLink<St> {}
     impl<St: State> State for SetLink<St> {
-        type Name = St::Name;
         type Link = Set<members::link>;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Link = St::Link;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `link` field
         pub struct link(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -572,8 +572,8 @@ where
 impl<S: BosStr, St> ProfileLinkBuilder<S, St>
 where
     St: profile_link_state::State,
-    St::Name: profile_link_state::IsSet,
     St::Link: profile_link_state::IsSet,
+    St::Name: profile_link_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ProfileLink<S> {

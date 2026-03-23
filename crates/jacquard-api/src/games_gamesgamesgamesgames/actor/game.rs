@@ -395,51 +395,51 @@ pub mod game_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Platform;
         type CreatedAt;
         type Game;
+        type Platform;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Platform = Unset;
         type CreatedAt = Unset;
         type Game = Unset;
-    }
-    ///State transition - sets the `platform` field to Set
-    pub struct SetPlatform<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPlatform<St> {}
-    impl<St: State> State for SetPlatform<St> {
-        type Platform = Set<members::platform>;
-        type CreatedAt = St::CreatedAt;
-        type Game = St::Game;
+        type Platform = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Platform = St::Platform;
         type CreatedAt = Set<members::created_at>;
         type Game = St::Game;
+        type Platform = St::Platform;
     }
     ///State transition - sets the `game` field to Set
     pub struct SetGame<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetGame<St> {}
     impl<St: State> State for SetGame<St> {
-        type Platform = St::Platform;
         type CreatedAt = St::CreatedAt;
         type Game = Set<members::game>;
+        type Platform = St::Platform;
+    }
+    ///State transition - sets the `platform` field to Set
+    pub struct SetPlatform<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPlatform<St> {}
+    impl<St: State> State for SetPlatform<St> {
+        type CreatedAt = St::CreatedAt;
+        type Game = St::Game;
+        type Platform = Set<members::platform>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `platform` field
-        pub struct platform(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `game` field
         pub struct game(());
+        ///Marker type for the `platform` field
+        pub struct platform(());
     }
 }
 
@@ -552,9 +552,9 @@ impl<S: BosStr, St: game_state::State> GameBuilder<S, St> {
 impl<S: BosStr, St> GameBuilder<S, St>
 where
     St: game_state::State,
-    St::Platform: game_state::IsSet,
     St::CreatedAt: game_state::IsSet,
     St::Game: game_state::IsSet,
+    St::Platform: game_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Game<S> {

@@ -111,37 +111,37 @@ pub mod steps_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Steps;
         type CreatedAt;
+        type Steps;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Steps = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `steps` field to Set
-    pub struct SetSteps<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSteps<St> {}
-    impl<St: State> State for SetSteps<St> {
-        type Steps = Set<members::steps>;
-        type CreatedAt = St::CreatedAt;
+        type Steps = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Steps = St::Steps;
         type CreatedAt = Set<members::created_at>;
+        type Steps = St::Steps;
+    }
+    ///State transition - sets the `steps` field to Set
+    pub struct SetSteps<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSteps<St> {}
+    impl<St: State> State for SetSteps<St> {
+        type CreatedAt = St::CreatedAt;
+        type Steps = Set<members::steps>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `steps` field
-        pub struct steps(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `steps` field
+        pub struct steps(());
     }
 }
 
@@ -211,8 +211,8 @@ where
 impl<S: BosStr, St> StepsBuilder<S, St>
 where
     St: steps_state::State,
-    St::Steps: steps_state::IsSet,
     St::CreatedAt: steps_state::IsSet,
+    St::Steps: steps_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Steps<S> {

@@ -116,51 +116,51 @@ pub mod allowlist_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Subject;
         type CreatedAt;
         type Room;
+        type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Subject = Unset;
         type CreatedAt = Unset;
         type Room = Unset;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSubject<St> {}
-    impl<St: State> State for SetSubject<St> {
-        type Subject = Set<members::subject>;
-        type CreatedAt = St::CreatedAt;
-        type Room = St::Room;
+        type Subject = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Subject = St::Subject;
         type CreatedAt = Set<members::created_at>;
         type Room = St::Room;
+        type Subject = St::Subject;
     }
     ///State transition - sets the `room` field to Set
     pub struct SetRoom<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRoom<St> {}
     impl<St: State> State for SetRoom<St> {
-        type Subject = St::Subject;
         type CreatedAt = St::CreatedAt;
         type Room = Set<members::room>;
+        type Subject = St::Subject;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubject<St> {}
+    impl<St: State> State for SetSubject<St> {
+        type CreatedAt = St::CreatedAt;
+        type Room = St::Room;
+        type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `subject` field
-        pub struct subject(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `room` field
         pub struct room(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
     }
 }
 
@@ -249,9 +249,9 @@ where
 impl<S: BosStr, St> AllowlistBuilder<S, St>
 where
     St: allowlist_state::State,
-    St::Subject: allowlist_state::IsSet,
     St::CreatedAt: allowlist_state::IsSet,
     St::Room: allowlist_state::IsSet,
+    St::Subject: allowlist_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Allowlist<S> {

@@ -472,50 +472,50 @@ pub mod event_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type EventDate;
-        type EventId;
         type CreatedAt;
+        type EventId;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type EventDate = Unset;
-        type EventId = Unset;
         type CreatedAt = Unset;
+        type EventId = Unset;
     }
     ///State transition - sets the `event_date` field to Set
     pub struct SetEventDate<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetEventDate<St> {}
     impl<St: State> State for SetEventDate<St> {
         type EventDate = Set<members::event_date>;
+        type CreatedAt = St::CreatedAt;
         type EventId = St::EventId;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `event_id` field to Set
-    pub struct SetEventId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetEventId<St> {}
-    impl<St: State> State for SetEventId<St> {
-        type EventDate = St::EventDate;
-        type EventId = Set<members::event_id>;
-        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
         type EventDate = St::EventDate;
-        type EventId = St::EventId;
         type CreatedAt = Set<members::created_at>;
+        type EventId = St::EventId;
+    }
+    ///State transition - sets the `event_id` field to Set
+    pub struct SetEventId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetEventId<St> {}
+    impl<St: State> State for SetEventId<St> {
+        type EventDate = St::EventDate;
+        type CreatedAt = St::CreatedAt;
+        type EventId = Set<members::event_id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `event_date` field
         pub struct event_date(());
-        ///Marker type for the `event_id` field
-        pub struct event_id(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `event_id` field
+        pub struct event_id(());
     }
 }
 
@@ -976,8 +976,8 @@ impl<S: BosStr, St> EventBuilder<S, St>
 where
     St: event_state::State,
     St::EventDate: event_state::IsSet,
-    St::EventId: event_state::IsSet,
     St::CreatedAt: event_state::IsSet,
+    St::EventId: event_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Event<S> {

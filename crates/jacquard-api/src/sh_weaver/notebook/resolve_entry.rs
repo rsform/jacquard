@@ -125,51 +125,51 @@ pub mod resolve_entry_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Entry;
-        type Actor;
         type Notebook;
+        type Actor;
+        type Entry;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Entry = Unset;
-        type Actor = Unset;
         type Notebook = Unset;
-    }
-    ///State transition - sets the `entry` field to Set
-    pub struct SetEntry<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetEntry<St> {}
-    impl<St: State> State for SetEntry<St> {
-        type Entry = Set<members::entry>;
-        type Actor = St::Actor;
-        type Notebook = St::Notebook;
-    }
-    ///State transition - sets the `actor` field to Set
-    pub struct SetActor<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetActor<St> {}
-    impl<St: State> State for SetActor<St> {
-        type Entry = St::Entry;
-        type Actor = Set<members::actor>;
-        type Notebook = St::Notebook;
+        type Actor = Unset;
+        type Entry = Unset;
     }
     ///State transition - sets the `notebook` field to Set
     pub struct SetNotebook<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetNotebook<St> {}
     impl<St: State> State for SetNotebook<St> {
-        type Entry = St::Entry;
-        type Actor = St::Actor;
         type Notebook = Set<members::notebook>;
+        type Actor = St::Actor;
+        type Entry = St::Entry;
+    }
+    ///State transition - sets the `actor` field to Set
+    pub struct SetActor<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetActor<St> {}
+    impl<St: State> State for SetActor<St> {
+        type Notebook = St::Notebook;
+        type Actor = Set<members::actor>;
+        type Entry = St::Entry;
+    }
+    ///State transition - sets the `entry` field to Set
+    pub struct SetEntry<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetEntry<St> {}
+    impl<St: State> State for SetEntry<St> {
+        type Notebook = St::Notebook;
+        type Actor = St::Actor;
+        type Entry = Set<members::entry>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `entry` field
-        pub struct entry(());
-        ///Marker type for the `actor` field
-        pub struct actor(());
         ///Marker type for the `notebook` field
         pub struct notebook(());
+        ///Marker type for the `actor` field
+        pub struct actor(());
+        ///Marker type for the `entry` field
+        pub struct entry(());
     }
 }
 
@@ -258,9 +258,9 @@ where
 impl<S: BosStr, St> ResolveEntryBuilder<S, St>
 where
     St: resolve_entry_state::State,
-    St::Entry: resolve_entry_state::IsSet,
-    St::Actor: resolve_entry_state::IsSet,
     St::Notebook: resolve_entry_state::IsSet,
+    St::Actor: resolve_entry_state::IsSet,
+    St::Entry: resolve_entry_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ResolveEntry<S> {

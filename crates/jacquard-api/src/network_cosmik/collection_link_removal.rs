@@ -119,50 +119,50 @@ pub mod collection_link_removal_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type RemovedAt;
-        type RemovedLink;
         type Collection;
+        type RemovedLink;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type RemovedAt = Unset;
-        type RemovedLink = Unset;
         type Collection = Unset;
+        type RemovedLink = Unset;
     }
     ///State transition - sets the `removed_at` field to Set
     pub struct SetRemovedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRemovedAt<St> {}
     impl<St: State> State for SetRemovedAt<St> {
         type RemovedAt = Set<members::removed_at>;
+        type Collection = St::Collection;
         type RemovedLink = St::RemovedLink;
-        type Collection = St::Collection;
-    }
-    ///State transition - sets the `removed_link` field to Set
-    pub struct SetRemovedLink<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRemovedLink<St> {}
-    impl<St: State> State for SetRemovedLink<St> {
-        type RemovedAt = St::RemovedAt;
-        type RemovedLink = Set<members::removed_link>;
-        type Collection = St::Collection;
     }
     ///State transition - sets the `collection` field to Set
     pub struct SetCollection<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCollection<St> {}
     impl<St: State> State for SetCollection<St> {
         type RemovedAt = St::RemovedAt;
-        type RemovedLink = St::RemovedLink;
         type Collection = Set<members::collection>;
+        type RemovedLink = St::RemovedLink;
+    }
+    ///State transition - sets the `removed_link` field to Set
+    pub struct SetRemovedLink<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRemovedLink<St> {}
+    impl<St: State> State for SetRemovedLink<St> {
+        type RemovedAt = St::RemovedAt;
+        type Collection = St::Collection;
+        type RemovedLink = Set<members::removed_link>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `removed_at` field
         pub struct removed_at(());
-        ///Marker type for the `removed_link` field
-        pub struct removed_link(());
         ///Marker type for the `collection` field
         pub struct collection(());
+        ///Marker type for the `removed_link` field
+        pub struct removed_link(());
     }
 }
 
@@ -267,8 +267,8 @@ impl<S: BosStr, St> CollectionLinkRemovalBuilder<S, St>
 where
     St: collection_link_removal_state::State,
     St::RemovedAt: collection_link_removal_state::IsSet,
-    St::RemovedLink: collection_link_removal_state::IsSet,
     St::Collection: collection_link_removal_state::IsSet,
+    St::RemovedLink: collection_link_removal_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> CollectionLinkRemoval<S> {

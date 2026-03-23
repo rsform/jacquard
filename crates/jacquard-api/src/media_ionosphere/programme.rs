@@ -208,51 +208,51 @@ pub mod programme_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Language;
         type Name;
         type Ionosphere;
-        type Language;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Language = Unset;
         type Name = Unset;
         type Ionosphere = Unset;
-        type Language = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Name = Set<members::name>;
-        type Ionosphere = St::Ionosphere;
-        type Language = St::Language;
-    }
-    ///State transition - sets the `ionosphere` field to Set
-    pub struct SetIonosphere<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetIonosphere<St> {}
-    impl<St: State> State for SetIonosphere<St> {
-        type Name = St::Name;
-        type Ionosphere = Set<members::ionosphere>;
-        type Language = St::Language;
     }
     ///State transition - sets the `language` field to Set
     pub struct SetLanguage<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetLanguage<St> {}
     impl<St: State> State for SetLanguage<St> {
+        type Language = Set<members::language>;
         type Name = St::Name;
         type Ionosphere = St::Ionosphere;
-        type Language = Set<members::language>;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Language = St::Language;
+        type Name = Set<members::name>;
+        type Ionosphere = St::Ionosphere;
+    }
+    ///State transition - sets the `ionosphere` field to Set
+    pub struct SetIonosphere<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIonosphere<St> {}
+    impl<St: State> State for SetIonosphere<St> {
+        type Language = St::Language;
+        type Name = St::Name;
+        type Ionosphere = Set<members::ionosphere>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `language` field
+        pub struct language(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `ionosphere` field
         pub struct ionosphere(());
-        ///Marker type for the `language` field
-        pub struct language(());
     }
 }
 
@@ -463,9 +463,9 @@ impl<S: BosStr, St: programme_state::State> ProgrammeBuilder<S, St> {
 impl<S: BosStr, St> ProgrammeBuilder<S, St>
 where
     St: programme_state::State,
+    St::Language: programme_state::IsSet,
     St::Name: programme_state::IsSet,
     St::Ionosphere: programme_state::IsSet,
-    St::Language: programme_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Programme<S> {

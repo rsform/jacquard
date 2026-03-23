@@ -232,51 +232,51 @@ pub mod tab_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Label;
-        type Content;
         type Key;
+        type Content;
+        type Label;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Label = Unset;
-        type Content = Unset;
         type Key = Unset;
-    }
-    ///State transition - sets the `label` field to Set
-    pub struct SetLabel<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetLabel<St> {}
-    impl<St: State> State for SetLabel<St> {
-        type Label = Set<members::label>;
-        type Content = St::Content;
-        type Key = St::Key;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetContent<St> {}
-    impl<St: State> State for SetContent<St> {
-        type Label = St::Label;
-        type Content = Set<members::content>;
-        type Key = St::Key;
+        type Content = Unset;
+        type Label = Unset;
     }
     ///State transition - sets the `key` field to Set
     pub struct SetKey<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetKey<St> {}
     impl<St: State> State for SetKey<St> {
-        type Label = St::Label;
-        type Content = St::Content;
         type Key = Set<members::key>;
+        type Content = St::Content;
+        type Label = St::Label;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetContent<St> {}
+    impl<St: State> State for SetContent<St> {
+        type Key = St::Key;
+        type Content = Set<members::content>;
+        type Label = St::Label;
+    }
+    ///State transition - sets the `label` field to Set
+    pub struct SetLabel<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLabel<St> {}
+    impl<St: State> State for SetLabel<St> {
+        type Key = St::Key;
+        type Content = St::Content;
+        type Label = Set<members::label>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `label` field
-        pub struct label(());
-        ///Marker type for the `content` field
-        pub struct content(());
         ///Marker type for the `key` field
         pub struct key(());
+        ///Marker type for the `content` field
+        pub struct content(());
+        ///Marker type for the `label` field
+        pub struct label(());
     }
 }
 
@@ -362,9 +362,9 @@ where
 impl<S: BosStr, St> TabBuilder<S, St>
 where
     St: tab_state::State,
-    St::Label: tab_state::IsSet,
-    St::Content: tab_state::IsSet,
     St::Key: tab_state::IsSet,
+    St::Content: tab_state::IsSet,
+    St::Label: tab_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Tab<S> {

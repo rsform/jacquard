@@ -114,50 +114,50 @@ pub mod collection_stats_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Collection;
-        type UniqueActors;
         type RecordCount;
+        type UniqueActors;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Collection = Unset;
-        type UniqueActors = Unset;
         type RecordCount = Unset;
+        type UniqueActors = Unset;
     }
     ///State transition - sets the `collection` field to Set
     pub struct SetCollection<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCollection<St> {}
     impl<St: State> State for SetCollection<St> {
         type Collection = Set<members::collection>;
+        type RecordCount = St::RecordCount;
         type UniqueActors = St::UniqueActors;
-        type RecordCount = St::RecordCount;
-    }
-    ///State transition - sets the `unique_actors` field to Set
-    pub struct SetUniqueActors<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUniqueActors<St> {}
-    impl<St: State> State for SetUniqueActors<St> {
-        type Collection = St::Collection;
-        type UniqueActors = Set<members::unique_actors>;
-        type RecordCount = St::RecordCount;
     }
     ///State transition - sets the `record_count` field to Set
     pub struct SetRecordCount<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRecordCount<St> {}
     impl<St: State> State for SetRecordCount<St> {
         type Collection = St::Collection;
-        type UniqueActors = St::UniqueActors;
         type RecordCount = Set<members::record_count>;
+        type UniqueActors = St::UniqueActors;
+    }
+    ///State transition - sets the `unique_actors` field to Set
+    pub struct SetUniqueActors<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUniqueActors<St> {}
+    impl<St: State> State for SetUniqueActors<St> {
+        type Collection = St::Collection;
+        type RecordCount = St::RecordCount;
+        type UniqueActors = Set<members::unique_actors>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `collection` field
         pub struct collection(());
-        ///Marker type for the `unique_actors` field
-        pub struct unique_actors(());
         ///Marker type for the `record_count` field
         pub struct record_count(());
+        ///Marker type for the `unique_actors` field
+        pub struct unique_actors(());
     }
 }
 
@@ -247,8 +247,8 @@ impl<S: BosStr, St> CollectionStatsBuilder<S, St>
 where
     St: collection_stats_state::State,
     St::Collection: collection_stats_state::IsSet,
-    St::UniqueActors: collection_stats_state::IsSet,
     St::RecordCount: collection_stats_state::IsSet,
+    St::UniqueActors: collection_stats_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> CollectionStats<S> {

@@ -179,67 +179,67 @@ pub mod definition_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
-        type Scope;
         type ValueType;
+        type Name;
         type CreatedAt;
+        type Scope;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
-        type Scope = Unset;
         type ValueType = Unset;
+        type Name = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Name = Set<members::name>;
-        type Scope = St::Scope;
-        type ValueType = St::ValueType;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `scope` field to Set
-    pub struct SetScope<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetScope<St> {}
-    impl<St: State> State for SetScope<St> {
-        type Name = St::Name;
-        type Scope = Set<members::scope>;
-        type ValueType = St::ValueType;
-        type CreatedAt = St::CreatedAt;
+        type Scope = Unset;
     }
     ///State transition - sets the `value_type` field to Set
     pub struct SetValueType<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetValueType<St> {}
     impl<St: State> State for SetValueType<St> {
-        type Name = St::Name;
-        type Scope = St::Scope;
         type ValueType = Set<members::value_type>;
+        type Name = St::Name;
         type CreatedAt = St::CreatedAt;
+        type Scope = St::Scope;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type ValueType = St::ValueType;
+        type Name = Set<members::name>;
+        type CreatedAt = St::CreatedAt;
+        type Scope = St::Scope;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Name = St::Name;
-        type Scope = St::Scope;
         type ValueType = St::ValueType;
+        type Name = St::Name;
         type CreatedAt = Set<members::created_at>;
+        type Scope = St::Scope;
+    }
+    ///State transition - sets the `scope` field to Set
+    pub struct SetScope<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetScope<St> {}
+    impl<St: State> State for SetScope<St> {
+        type ValueType = St::ValueType;
+        type Name = St::Name;
+        type CreatedAt = St::CreatedAt;
+        type Scope = Set<members::scope>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
-        ///Marker type for the `scope` field
-        pub struct scope(());
         ///Marker type for the `value_type` field
         pub struct value_type(());
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `scope` field
+        pub struct scope(());
     }
 }
 
@@ -380,10 +380,10 @@ where
 impl<S: BosStr, St> DefinitionBuilder<S, St>
 where
     St: definition_state::State,
-    St::Name: definition_state::IsSet,
-    St::Scope: definition_state::IsSet,
     St::ValueType: definition_state::IsSet,
+    St::Name: definition_state::IsSet,
     St::CreatedAt: definition_state::IsSet,
+    St::Scope: definition_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Definition<S> {

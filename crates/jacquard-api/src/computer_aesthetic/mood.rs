@@ -127,49 +127,49 @@ pub mod mood_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type When;
         type Mood;
+        type When;
         type Ref;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type When = Unset;
         type Mood = Unset;
+        type When = Unset;
         type Ref = Unset;
-    }
-    ///State transition - sets the `when` field to Set
-    pub struct SetWhen<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetWhen<St> {}
-    impl<St: State> State for SetWhen<St> {
-        type When = Set<members::when>;
-        type Mood = St::Mood;
-        type Ref = St::Ref;
     }
     ///State transition - sets the `mood` field to Set
     pub struct SetMood<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetMood<St> {}
     impl<St: State> State for SetMood<St> {
-        type When = St::When;
         type Mood = Set<members::mood>;
+        type When = St::When;
+        type Ref = St::Ref;
+    }
+    ///State transition - sets the `when` field to Set
+    pub struct SetWhen<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetWhen<St> {}
+    impl<St: State> State for SetWhen<St> {
+        type Mood = St::Mood;
+        type When = Set<members::when>;
         type Ref = St::Ref;
     }
     ///State transition - sets the `ref` field to Set
     pub struct SetRef<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRef<St> {}
     impl<St: State> State for SetRef<St> {
-        type When = St::When;
         type Mood = St::Mood;
+        type When = St::When;
         type Ref = Set<members::r#ref>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `when` field
-        pub struct when(());
         ///Marker type for the `mood` field
         pub struct mood(());
+        ///Marker type for the `when` field
+        pub struct when(());
         ///Marker type for the `ref` field
         pub struct r#ref(());
     }
@@ -260,8 +260,8 @@ where
 impl<S: BosStr, St> MoodBuilder<S, St>
 where
     St: mood_state::State,
-    St::When: mood_state::IsSet,
     St::Mood: mood_state::IsSet,
+    St::When: mood_state::IsSet,
     St::Ref: mood_state::IsSet,
 {
     /// Build the final struct.

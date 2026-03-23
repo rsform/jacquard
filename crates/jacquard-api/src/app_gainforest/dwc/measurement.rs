@@ -264,67 +264,67 @@ pub mod measurement_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
         type OccurrenceRef;
         type MeasurementType;
         type MeasurementValue;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
         type OccurrenceRef = Unset;
         type MeasurementType = Unset;
         type MeasurementValue = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `occurrence_ref` field to Set
-    pub struct SetOccurrenceRef<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetOccurrenceRef<St> {}
-    impl<St: State> State for SetOccurrenceRef<St> {
-        type OccurrenceRef = Set<members::occurrence_ref>;
-        type MeasurementType = St::MeasurementType;
-        type MeasurementValue = St::MeasurementValue;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `measurement_type` field to Set
-    pub struct SetMeasurementType<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetMeasurementType<St> {}
-    impl<St: State> State for SetMeasurementType<St> {
-        type OccurrenceRef = St::OccurrenceRef;
-        type MeasurementType = Set<members::measurement_type>;
-        type MeasurementValue = St::MeasurementValue;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `measurement_value` field to Set
-    pub struct SetMeasurementValue<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetMeasurementValue<St> {}
-    impl<St: State> State for SetMeasurementValue<St> {
-        type OccurrenceRef = St::OccurrenceRef;
-        type MeasurementType = St::MeasurementType;
-        type MeasurementValue = Set<members::measurement_value>;
-        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
+        type CreatedAt = Set<members::created_at>;
         type OccurrenceRef = St::OccurrenceRef;
         type MeasurementType = St::MeasurementType;
         type MeasurementValue = St::MeasurementValue;
-        type CreatedAt = Set<members::created_at>;
+    }
+    ///State transition - sets the `occurrence_ref` field to Set
+    pub struct SetOccurrenceRef<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetOccurrenceRef<St> {}
+    impl<St: State> State for SetOccurrenceRef<St> {
+        type CreatedAt = St::CreatedAt;
+        type OccurrenceRef = Set<members::occurrence_ref>;
+        type MeasurementType = St::MeasurementType;
+        type MeasurementValue = St::MeasurementValue;
+    }
+    ///State transition - sets the `measurement_type` field to Set
+    pub struct SetMeasurementType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMeasurementType<St> {}
+    impl<St: State> State for SetMeasurementType<St> {
+        type CreatedAt = St::CreatedAt;
+        type OccurrenceRef = St::OccurrenceRef;
+        type MeasurementType = Set<members::measurement_type>;
+        type MeasurementValue = St::MeasurementValue;
+    }
+    ///State transition - sets the `measurement_value` field to Set
+    pub struct SetMeasurementValue<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMeasurementValue<St> {}
+    impl<St: State> State for SetMeasurementValue<St> {
+        type CreatedAt = St::CreatedAt;
+        type OccurrenceRef = St::OccurrenceRef;
+        type MeasurementType = St::MeasurementType;
+        type MeasurementValue = Set<members::measurement_value>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `occurrence_ref` field
         pub struct occurrence_ref(());
         ///Marker type for the `measurement_type` field
         pub struct measurement_type(());
         ///Marker type for the `measurement_value` field
         pub struct measurement_value(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
@@ -562,10 +562,10 @@ where
 impl<S: BosStr, St> MeasurementBuilder<S, St>
 where
     St: measurement_state::State,
+    St::CreatedAt: measurement_state::IsSet,
     St::OccurrenceRef: measurement_state::IsSet,
     St::MeasurementType: measurement_state::IsSet,
     St::MeasurementValue: measurement_state::IsSet,
-    St::CreatedAt: measurement_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Measurement<S> {

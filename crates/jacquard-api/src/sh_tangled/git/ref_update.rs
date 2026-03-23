@@ -708,37 +708,37 @@ pub mod individual_language_size_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Size;
         type Lang;
+        type Size;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Size = Unset;
         type Lang = Unset;
-    }
-    ///State transition - sets the `size` field to Set
-    pub struct SetSize<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSize<St> {}
-    impl<St: State> State for SetSize<St> {
-        type Size = Set<members::size>;
-        type Lang = St::Lang;
+        type Size = Unset;
     }
     ///State transition - sets the `lang` field to Set
     pub struct SetLang<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetLang<St> {}
     impl<St: State> State for SetLang<St> {
-        type Size = St::Size;
         type Lang = Set<members::lang>;
+        type Size = St::Size;
+    }
+    ///State transition - sets the `size` field to Set
+    pub struct SetSize<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSize<St> {}
+    impl<St: State> State for SetSize<St> {
+        type Lang = St::Lang;
+        type Size = Set<members::size>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `size` field
-        pub struct size(());
         ///Marker type for the `lang` field
         pub struct lang(());
+        ///Marker type for the `size` field
+        pub struct size(());
     }
 }
 
@@ -814,8 +814,8 @@ where
 impl<S: BosStr, St> IndividualLanguageSizeBuilder<S, St>
 where
     St: individual_language_size_state::State,
-    St::Size: individual_language_size_state::IsSet,
     St::Lang: individual_language_size_state::IsSet,
+    St::Size: individual_language_size_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> IndividualLanguageSize<S> {
@@ -848,127 +848,127 @@ pub mod ref_update_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Meta;
         type Ref;
         type RepoDid;
-        type RepoName;
-        type OldSha;
         type NewSha;
+        type Meta;
         type CommitterDid;
+        type OldSha;
+        type RepoName;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Meta = Unset;
         type Ref = Unset;
         type RepoDid = Unset;
-        type RepoName = Unset;
-        type OldSha = Unset;
         type NewSha = Unset;
+        type Meta = Unset;
         type CommitterDid = Unset;
-    }
-    ///State transition - sets the `meta` field to Set
-    pub struct SetMeta<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetMeta<St> {}
-    impl<St: State> State for SetMeta<St> {
-        type Meta = Set<members::meta>;
-        type Ref = St::Ref;
-        type RepoDid = St::RepoDid;
-        type RepoName = St::RepoName;
-        type OldSha = St::OldSha;
-        type NewSha = St::NewSha;
-        type CommitterDid = St::CommitterDid;
+        type OldSha = Unset;
+        type RepoName = Unset;
     }
     ///State transition - sets the `ref` field to Set
     pub struct SetRef<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRef<St> {}
     impl<St: State> State for SetRef<St> {
-        type Meta = St::Meta;
         type Ref = Set<members::r#ref>;
         type RepoDid = St::RepoDid;
-        type RepoName = St::RepoName;
-        type OldSha = St::OldSha;
         type NewSha = St::NewSha;
+        type Meta = St::Meta;
         type CommitterDid = St::CommitterDid;
+        type OldSha = St::OldSha;
+        type RepoName = St::RepoName;
     }
     ///State transition - sets the `repo_did` field to Set
     pub struct SetRepoDid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRepoDid<St> {}
     impl<St: State> State for SetRepoDid<St> {
-        type Meta = St::Meta;
         type Ref = St::Ref;
         type RepoDid = Set<members::repo_did>;
-        type RepoName = St::RepoName;
-        type OldSha = St::OldSha;
         type NewSha = St::NewSha;
-        type CommitterDid = St::CommitterDid;
-    }
-    ///State transition - sets the `repo_name` field to Set
-    pub struct SetRepoName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRepoName<St> {}
-    impl<St: State> State for SetRepoName<St> {
         type Meta = St::Meta;
-        type Ref = St::Ref;
-        type RepoDid = St::RepoDid;
-        type RepoName = Set<members::repo_name>;
+        type CommitterDid = St::CommitterDid;
         type OldSha = St::OldSha;
-        type NewSha = St::NewSha;
-        type CommitterDid = St::CommitterDid;
-    }
-    ///State transition - sets the `old_sha` field to Set
-    pub struct SetOldSha<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetOldSha<St> {}
-    impl<St: State> State for SetOldSha<St> {
-        type Meta = St::Meta;
-        type Ref = St::Ref;
-        type RepoDid = St::RepoDid;
         type RepoName = St::RepoName;
-        type OldSha = Set<members::old_sha>;
-        type NewSha = St::NewSha;
-        type CommitterDid = St::CommitterDid;
     }
     ///State transition - sets the `new_sha` field to Set
     pub struct SetNewSha<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetNewSha<St> {}
     impl<St: State> State for SetNewSha<St> {
-        type Meta = St::Meta;
         type Ref = St::Ref;
         type RepoDid = St::RepoDid;
-        type RepoName = St::RepoName;
-        type OldSha = St::OldSha;
         type NewSha = Set<members::new_sha>;
+        type Meta = St::Meta;
         type CommitterDid = St::CommitterDid;
+        type OldSha = St::OldSha;
+        type RepoName = St::RepoName;
+    }
+    ///State transition - sets the `meta` field to Set
+    pub struct SetMeta<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMeta<St> {}
+    impl<St: State> State for SetMeta<St> {
+        type Ref = St::Ref;
+        type RepoDid = St::RepoDid;
+        type NewSha = St::NewSha;
+        type Meta = Set<members::meta>;
+        type CommitterDid = St::CommitterDid;
+        type OldSha = St::OldSha;
+        type RepoName = St::RepoName;
     }
     ///State transition - sets the `committer_did` field to Set
     pub struct SetCommitterDid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCommitterDid<St> {}
     impl<St: State> State for SetCommitterDid<St> {
-        type Meta = St::Meta;
         type Ref = St::Ref;
         type RepoDid = St::RepoDid;
-        type RepoName = St::RepoName;
-        type OldSha = St::OldSha;
         type NewSha = St::NewSha;
+        type Meta = St::Meta;
         type CommitterDid = Set<members::committer_did>;
+        type OldSha = St::OldSha;
+        type RepoName = St::RepoName;
+    }
+    ///State transition - sets the `old_sha` field to Set
+    pub struct SetOldSha<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetOldSha<St> {}
+    impl<St: State> State for SetOldSha<St> {
+        type Ref = St::Ref;
+        type RepoDid = St::RepoDid;
+        type NewSha = St::NewSha;
+        type Meta = St::Meta;
+        type CommitterDid = St::CommitterDid;
+        type OldSha = Set<members::old_sha>;
+        type RepoName = St::RepoName;
+    }
+    ///State transition - sets the `repo_name` field to Set
+    pub struct SetRepoName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRepoName<St> {}
+    impl<St: State> State for SetRepoName<St> {
+        type Ref = St::Ref;
+        type RepoDid = St::RepoDid;
+        type NewSha = St::NewSha;
+        type Meta = St::Meta;
+        type CommitterDid = St::CommitterDid;
+        type OldSha = St::OldSha;
+        type RepoName = Set<members::repo_name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `meta` field
-        pub struct meta(());
         ///Marker type for the `ref` field
         pub struct r#ref(());
         ///Marker type for the `repo_did` field
         pub struct repo_did(());
-        ///Marker type for the `repo_name` field
-        pub struct repo_name(());
-        ///Marker type for the `old_sha` field
-        pub struct old_sha(());
         ///Marker type for the `new_sha` field
         pub struct new_sha(());
+        ///Marker type for the `meta` field
+        pub struct meta(());
         ///Marker type for the `committer_did` field
         pub struct committer_did(());
+        ///Marker type for the `old_sha` field
+        pub struct old_sha(());
+        ///Marker type for the `repo_name` field
+        pub struct repo_name(());
     }
 }
 
@@ -1141,13 +1141,13 @@ where
 impl<S: BosStr, St> RefUpdateBuilder<S, St>
 where
     St: ref_update_state::State,
-    St::Meta: ref_update_state::IsSet,
     St::Ref: ref_update_state::IsSet,
     St::RepoDid: ref_update_state::IsSet,
-    St::RepoName: ref_update_state::IsSet,
-    St::OldSha: ref_update_state::IsSet,
     St::NewSha: ref_update_state::IsSet,
+    St::Meta: ref_update_state::IsSet,
     St::CommitterDid: ref_update_state::IsSet,
+    St::OldSha: ref_update_state::IsSet,
+    St::RepoName: ref_update_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> RefUpdate<S> {

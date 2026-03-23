@@ -342,37 +342,37 @@ pub mod card_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Content;
         type Type;
+        type Content;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Content = Unset;
         type Type = Unset;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetContent<St> {}
-    impl<St: State> State for SetContent<St> {
-        type Content = Set<members::content>;
-        type Type = St::Type;
+        type Content = Unset;
     }
     ///State transition - sets the `type` field to Set
     pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetType<St> {}
     impl<St: State> State for SetType<St> {
-        type Content = St::Content;
         type Type = Set<members::r#type>;
+        type Content = St::Content;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetContent<St> {}
+    impl<St: State> State for SetContent<St> {
+        type Type = St::Type;
+        type Content = Set<members::content>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `content` field
-        pub struct content(());
         ///Marker type for the `type` field
         pub struct r#type(());
+        ///Marker type for the `content` field
+        pub struct content(());
     }
 }
 
@@ -515,8 +515,8 @@ impl<S: BosStr, St: card_state::State> CardBuilder<S, St> {
 impl<S: BosStr, St> CardBuilder<S, St>
 where
     St: card_state::State,
-    St::Content: card_state::IsSet,
     St::Type: card_state::IsSet,
+    St::Content: card_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Card<S> {

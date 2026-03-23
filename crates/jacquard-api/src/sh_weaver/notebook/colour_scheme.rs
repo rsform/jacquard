@@ -405,51 +405,51 @@ pub mod colour_scheme_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Variant;
         type Name;
         type Colours;
+        type Variant;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Variant = Unset;
         type Name = Unset;
         type Colours = Unset;
-    }
-    ///State transition - sets the `variant` field to Set
-    pub struct SetVariant<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetVariant<St> {}
-    impl<St: State> State for SetVariant<St> {
-        type Variant = Set<members::variant>;
-        type Name = St::Name;
-        type Colours = St::Colours;
+        type Variant = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetName<St> {}
     impl<St: State> State for SetName<St> {
-        type Variant = St::Variant;
         type Name = Set<members::name>;
         type Colours = St::Colours;
+        type Variant = St::Variant;
     }
     ///State transition - sets the `colours` field to Set
     pub struct SetColours<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetColours<St> {}
     impl<St: State> State for SetColours<St> {
-        type Variant = St::Variant;
         type Name = St::Name;
         type Colours = Set<members::colours>;
+        type Variant = St::Variant;
+    }
+    ///State transition - sets the `variant` field to Set
+    pub struct SetVariant<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetVariant<St> {}
+    impl<St: State> State for SetVariant<St> {
+        type Name = St::Name;
+        type Colours = St::Colours;
+        type Variant = Set<members::variant>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `variant` field
-        pub struct variant(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `colours` field
         pub struct colours(());
+        ///Marker type for the `variant` field
+        pub struct variant(());
     }
 }
 
@@ -538,9 +538,9 @@ where
 impl<S: BosStr, St> ColourSchemeBuilder<S, St>
 where
     St: colour_scheme_state::State,
-    St::Variant: colour_scheme_state::IsSet,
     St::Name: colour_scheme_state::IsSet,
     St::Colours: colour_scheme_state::IsSet,
+    St::Variant: colour_scheme_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ColourScheme<S> {

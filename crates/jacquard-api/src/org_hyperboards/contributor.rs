@@ -130,37 +130,37 @@ pub mod contributor_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type ContributorRef;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type ContributorRef = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type ContributorRef = St::ContributorRef;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `contributor_ref` field to Set
     pub struct SetContributorRef<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetContributorRef<St> {}
     impl<St: State> State for SetContributorRef<St> {
-        type CreatedAt = St::CreatedAt;
         type ContributorRef = Set<members::contributor_ref>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type ContributorRef = St::ContributorRef;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `contributor_ref` field
         pub struct contributor_ref(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -303,8 +303,8 @@ impl<S: BosStr, St: contributor_state::State> ContributorBuilder<S, St> {
 impl<S: BosStr, St> ContributorBuilder<S, St>
 where
     St: contributor_state::State,
-    St::CreatedAt: contributor_state::IsSet,
     St::ContributorRef: contributor_state::IsSet,
+    St::CreatedAt: contributor_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Contributor<S> {

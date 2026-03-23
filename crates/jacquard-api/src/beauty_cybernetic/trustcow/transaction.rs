@@ -158,67 +158,67 @@ pub mod transaction_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ServiceConsumer;
+        type CreatedAt;
         type TransactionId;
         type ServiceProvider;
-        type CreatedAt;
+        type ServiceConsumer;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ServiceConsumer = Unset;
+        type CreatedAt = Unset;
         type TransactionId = Unset;
         type ServiceProvider = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `service_consumer` field to Set
-    pub struct SetServiceConsumer<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetServiceConsumer<St> {}
-    impl<St: State> State for SetServiceConsumer<St> {
-        type ServiceConsumer = Set<members::service_consumer>;
-        type TransactionId = St::TransactionId;
-        type ServiceProvider = St::ServiceProvider;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `transaction_id` field to Set
-    pub struct SetTransactionId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTransactionId<St> {}
-    impl<St: State> State for SetTransactionId<St> {
-        type ServiceConsumer = St::ServiceConsumer;
-        type TransactionId = Set<members::transaction_id>;
-        type ServiceProvider = St::ServiceProvider;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `service_provider` field to Set
-    pub struct SetServiceProvider<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetServiceProvider<St> {}
-    impl<St: State> State for SetServiceProvider<St> {
-        type ServiceConsumer = St::ServiceConsumer;
-        type TransactionId = St::TransactionId;
-        type ServiceProvider = Set<members::service_provider>;
-        type CreatedAt = St::CreatedAt;
+        type ServiceConsumer = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type ServiceConsumer = St::ServiceConsumer;
+        type CreatedAt = Set<members::created_at>;
         type TransactionId = St::TransactionId;
         type ServiceProvider = St::ServiceProvider;
-        type CreatedAt = Set<members::created_at>;
+        type ServiceConsumer = St::ServiceConsumer;
+    }
+    ///State transition - sets the `transaction_id` field to Set
+    pub struct SetTransactionId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTransactionId<St> {}
+    impl<St: State> State for SetTransactionId<St> {
+        type CreatedAt = St::CreatedAt;
+        type TransactionId = Set<members::transaction_id>;
+        type ServiceProvider = St::ServiceProvider;
+        type ServiceConsumer = St::ServiceConsumer;
+    }
+    ///State transition - sets the `service_provider` field to Set
+    pub struct SetServiceProvider<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetServiceProvider<St> {}
+    impl<St: State> State for SetServiceProvider<St> {
+        type CreatedAt = St::CreatedAt;
+        type TransactionId = St::TransactionId;
+        type ServiceProvider = Set<members::service_provider>;
+        type ServiceConsumer = St::ServiceConsumer;
+    }
+    ///State transition - sets the `service_consumer` field to Set
+    pub struct SetServiceConsumer<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetServiceConsumer<St> {}
+    impl<St: State> State for SetServiceConsumer<St> {
+        type CreatedAt = St::CreatedAt;
+        type TransactionId = St::TransactionId;
+        type ServiceProvider = St::ServiceProvider;
+        type ServiceConsumer = Set<members::service_consumer>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `service_consumer` field
-        pub struct service_consumer(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `transaction_id` field
         pub struct transaction_id(());
         ///Marker type for the `service_provider` field
         pub struct service_provider(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
+        ///Marker type for the `service_consumer` field
+        pub struct service_consumer(());
     }
 }
 
@@ -373,10 +373,10 @@ where
 impl<S: BosStr, St> TransactionBuilder<S, St>
 where
     St: transaction_state::State,
-    St::ServiceConsumer: transaction_state::IsSet,
+    St::CreatedAt: transaction_state::IsSet,
     St::TransactionId: transaction_state::IsSet,
     St::ServiceProvider: transaction_state::IsSet,
-    St::CreatedAt: transaction_state::IsSet,
+    St::ServiceConsumer: transaction_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Transaction<S> {

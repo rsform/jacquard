@@ -697,37 +697,37 @@ pub mod response_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Node;
         type Cache;
+        type Node;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Node = Unset;
         type Cache = Unset;
-    }
-    ///State transition - sets the `node` field to Set
-    pub struct SetNode<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetNode<St> {}
-    impl<St: State> State for SetNode<St> {
-        type Node = Set<members::node>;
-        type Cache = St::Cache;
+        type Node = Unset;
     }
     ///State transition - sets the `cache` field to Set
     pub struct SetCache<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCache<St> {}
     impl<St: State> State for SetCache<St> {
-        type Node = St::Node;
         type Cache = Set<members::cache>;
+        type Node = St::Node;
+    }
+    ///State transition - sets the `node` field to Set
+    pub struct SetNode<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetNode<St> {}
+    impl<St: State> State for SetNode<St> {
+        type Cache = St::Cache;
+        type Node = Set<members::node>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `node` field
-        pub struct node(());
         ///Marker type for the `cache` field
         pub struct cache(());
+        ///Marker type for the `node` field
+        pub struct node(());
     }
 }
 
@@ -797,8 +797,8 @@ where
 impl<S: BosStr, St> ResponseBuilder<S, St>
 where
     St: response_state::State,
-    St::Node: response_state::IsSet,
     St::Cache: response_state::IsSet,
+    St::Node: response_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Response<S> {

@@ -343,67 +343,67 @@ pub mod book_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
-        type HiveId;
         type Authors;
         type CreatedAt;
+        type HiveId;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
-        type HiveId = Unset;
         type Authors = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTitle<St> {}
-    impl<St: State> State for SetTitle<St> {
-        type Title = Set<members::title>;
-        type HiveId = St::HiveId;
-        type Authors = St::Authors;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `hive_id` field to Set
-    pub struct SetHiveId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetHiveId<St> {}
-    impl<St: State> State for SetHiveId<St> {
-        type Title = St::Title;
-        type HiveId = Set<members::hive_id>;
-        type Authors = St::Authors;
-        type CreatedAt = St::CreatedAt;
+        type HiveId = Unset;
+        type Title = Unset;
     }
     ///State transition - sets the `authors` field to Set
     pub struct SetAuthors<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetAuthors<St> {}
     impl<St: State> State for SetAuthors<St> {
-        type Title = St::Title;
-        type HiveId = St::HiveId;
         type Authors = Set<members::authors>;
         type CreatedAt = St::CreatedAt;
+        type HiveId = St::HiveId;
+        type Title = St::Title;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Title = St::Title;
-        type HiveId = St::HiveId;
         type Authors = St::Authors;
         type CreatedAt = Set<members::created_at>;
+        type HiveId = St::HiveId;
+        type Title = St::Title;
+    }
+    ///State transition - sets the `hive_id` field to Set
+    pub struct SetHiveId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHiveId<St> {}
+    impl<St: State> State for SetHiveId<St> {
+        type Authors = St::Authors;
+        type CreatedAt = St::CreatedAt;
+        type HiveId = Set<members::hive_id>;
+        type Title = St::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
+        type Authors = St::Authors;
+        type CreatedAt = St::CreatedAt;
+        type HiveId = St::HiveId;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
-        ///Marker type for the `hive_id` field
-        pub struct hive_id(());
         ///Marker type for the `authors` field
         pub struct authors(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `hive_id` field
+        pub struct hive_id(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
@@ -614,10 +614,10 @@ where
 impl<S: BosStr, St> BookBuilder<S, St>
 where
     St: book_state::State,
-    St::Title: book_state::IsSet,
-    St::HiveId: book_state::IsSet,
     St::Authors: book_state::IsSet,
     St::CreatedAt: book_state::IsSet,
+    St::HiveId: book_state::IsSet,
+    St::Title: book_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Book<S> {

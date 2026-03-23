@@ -115,51 +115,51 @@ pub mod board_game_play_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type PlayedAt;
         type Name;
         type BggId;
-        type PlayedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type PlayedAt = Unset;
         type Name = Unset;
         type BggId = Unset;
-        type PlayedAt = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Name = Set<members::name>;
-        type BggId = St::BggId;
-        type PlayedAt = St::PlayedAt;
-    }
-    ///State transition - sets the `bgg_id` field to Set
-    pub struct SetBggId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetBggId<St> {}
-    impl<St: State> State for SetBggId<St> {
-        type Name = St::Name;
-        type BggId = Set<members::bgg_id>;
-        type PlayedAt = St::PlayedAt;
     }
     ///State transition - sets the `played_at` field to Set
     pub struct SetPlayedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPlayedAt<St> {}
     impl<St: State> State for SetPlayedAt<St> {
+        type PlayedAt = Set<members::played_at>;
         type Name = St::Name;
         type BggId = St::BggId;
-        type PlayedAt = Set<members::played_at>;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type PlayedAt = St::PlayedAt;
+        type Name = Set<members::name>;
+        type BggId = St::BggId;
+    }
+    ///State transition - sets the `bgg_id` field to Set
+    pub struct SetBggId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBggId<St> {}
+    impl<St: State> State for SetBggId<St> {
+        type PlayedAt = St::PlayedAt;
+        type Name = St::Name;
+        type BggId = Set<members::bgg_id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `played_at` field
+        pub struct played_at(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `bgg_id` field
         pub struct bgg_id(());
-        ///Marker type for the `played_at` field
-        pub struct played_at(());
     }
 }
 
@@ -248,9 +248,9 @@ where
 impl<S: BosStr, St> BoardGamePlayBuilder<S, St>
 where
     St: board_game_play_state::State,
+    St::PlayedAt: board_game_play_state::IsSet,
     St::Name: board_game_play_state::IsSet,
     St::BggId: board_game_play_state::IsSet,
-    St::PlayedAt: board_game_play_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> BoardGamePlay<S> {

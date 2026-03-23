@@ -170,8 +170,8 @@ pub mod create_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
         type Tags;
+        type Title;
         type Visibility;
         type Images;
     }
@@ -179,26 +179,26 @@ pub mod create_item_state {
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
         type Tags = Unset;
+        type Title = Unset;
         type Visibility = Unset;
         type Images = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTitle<St> {}
-    impl<St: State> State for SetTitle<St> {
-        type Title = Set<members::title>;
-        type Tags = St::Tags;
-        type Visibility = St::Visibility;
-        type Images = St::Images;
     }
     ///State transition - sets the `tags` field to Set
     pub struct SetTags<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTags<St> {}
     impl<St: State> State for SetTags<St> {
-        type Title = St::Title;
         type Tags = Set<members::tags>;
+        type Title = St::Title;
+        type Visibility = St::Visibility;
+        type Images = St::Images;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
+        type Tags = St::Tags;
+        type Title = Set<members::title>;
         type Visibility = St::Visibility;
         type Images = St::Images;
     }
@@ -206,8 +206,8 @@ pub mod create_item_state {
     pub struct SetVisibility<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetVisibility<St> {}
     impl<St: State> State for SetVisibility<St> {
-        type Title = St::Title;
         type Tags = St::Tags;
+        type Title = St::Title;
         type Visibility = Set<members::visibility>;
         type Images = St::Images;
     }
@@ -215,18 +215,18 @@ pub mod create_item_state {
     pub struct SetImages<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetImages<St> {}
     impl<St: State> State for SetImages<St> {
-        type Title = St::Title;
         type Tags = St::Tags;
+        type Title = St::Title;
         type Visibility = St::Visibility;
         type Images = Set<members::images>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `tags` field
         pub struct tags(());
+        ///Marker type for the `title` field
+        pub struct title(());
         ///Marker type for the `visibility` field
         pub struct visibility(());
         ///Marker type for the `images` field
@@ -399,8 +399,8 @@ where
 impl<S: BosStr, St> CreateItemBuilder<S, St>
 where
     St: create_item_state::State,
-    St::Title: create_item_state::IsSet,
     St::Tags: create_item_state::IsSet,
+    St::Title: create_item_state::IsSet,
     St::Visibility: create_item_state::IsSet,
     St::Images: create_item_state::IsSet,
 {

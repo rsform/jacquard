@@ -1,0 +1,131 @@
+{
+  "lexicon": 1,
+  "id": "world.ptah.temp.character",
+  "description": "A character record in The Ptah Protocol. A person, creature, or entity that exists inside a specific world. The character is not the user — the character is the world's inhabitant.",
+  "defs": {
+    "characterProperties": {
+      "type": "object",
+      "description": "Flexible key-value properties for any kind of world. All fields optional — worlds define what matters.",
+      "properties": {
+        "abilities": {
+          "type": "string",
+          "description": "Notable abilities or powers.",
+          "maxLength": 2560,
+          "maxGraphemes": 256
+        },
+        "affiliation": {
+          "type": "string",
+          "maxLength": 640,
+          "maxGraphemes": 64
+        },
+        "age": {
+          "type": "string",
+          "maxLength": 640,
+          "maxGraphemes": 64
+        },
+        "role": {
+          "type": "string",
+          "description": "Narrative or social role within the world.",
+          "maxLength": 640,
+          "maxGraphemes": 64
+        },
+        "species": {
+          "type": "string",
+          "maxLength": 640,
+          "maxGraphemes": 64
+        }
+      }
+    },
+    "main": {
+      "type": "record",
+      "description": "A birth certificate crossed with a passport. Ptah speaks the name and the thing exists — the character exists because it was named and the naming is permanent.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": [
+          "name",
+          "creatorDID",
+          "worldReference",
+          "createdAt"
+        ],
+        "properties": {
+          "authorshipRecord": {
+            "type": "string",
+            "description": "Permanent, immutable link back to the creator. This never changes even if the character gets contributed to, built on, or rendered a thousand different ways.",
+            "format": "did"
+          },
+          "canonicalStatus": {
+            "type": "string",
+            "description": "The canonical standing of this character within its world.",
+            "knownValues": [
+              "world.ptah.temp.defs#canonicalStatusOfficial",
+              "world.ptah.temp.defs#canonicalStatusCommunity",
+              "world.ptah.temp.defs#canonicalStatusApocryphal"
+            ]
+          },
+          "controlType": {
+            "type": "string",
+            "description": "How control of this character is governed. Solves the Ghost Character problem in public domain worlds.",
+            "knownValues": [
+              "exclusive",
+              "open",
+              "delegated"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp of character creation.",
+            "format": "datetime"
+          },
+          "creatorDID": {
+            "type": "string",
+            "description": "Who created this character. This never changes — it is the provenance that travels.",
+            "format": "did"
+          },
+          "description": {
+            "type": "string",
+            "description": "Who this character is, in plain language.",
+            "maxLength": 10240,
+            "maxGraphemes": 1024
+          },
+          "name": {
+            "type": "string",
+            "description": "What the character is called.",
+            "maxLength": 640,
+            "maxGraphemes": 64
+          },
+          "originType": {
+            "type": "string",
+            "description": "The intellectual property origin of this character.",
+            "knownValues": [
+              "world.ptah.temp.defs#sourceTypeOriginalIP",
+              "world.ptah.temp.defs#sourceTypePublicDomain",
+              "contributed"
+            ]
+          },
+          "properties": {
+            "type": "ref",
+            "description": "Flexible fields — species, age, role, affiliation, abilities. Open-ended so any kind of world can use the same record type.",
+            "ref": "#characterProperties"
+          },
+          "roleReference": {
+            "type": "string",
+            "description": "The AT URI of the Role record this character is an instance of. If present, this character is a specific performance of a shared role rather than a wholly original character.",
+            "format": "at-uri"
+          },
+          "sourceReference": {
+            "type": "string",
+            "description": "If originType is publicDomain, the specific source.",
+            "maxLength": 10240,
+            "maxGraphemes": 1024
+          },
+          "worldReference": {
+            "type": "string",
+            "description": "The AT URI of the world record this character belongs to.",
+            "format": "at-uri"
+          }
+        }
+      }
+    }
+  }
+}

@@ -7,6 +7,10 @@
 
 pub mod list_keys;
 pub mod member;
+
+
+#[cfg(feature = "streaming")]
+pub mod subscribe_repos;
 pub mod version;
 
 

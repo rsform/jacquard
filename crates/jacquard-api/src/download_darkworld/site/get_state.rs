@@ -194,23 +194,67 @@ pub mod output_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type FavoriteGames;
+        type TitleColors;
+        type UseSusieProphecy;
+        type FavoriteArtists;
         type FavoriteDeltaruneCharacters;
         type FavoriteAlbums;
-        type FavoriteArtists;
-        type UseSusieProphecy;
-        type TitleColors;
-        type FavoriteGames;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type FavoriteGames = Unset;
+        type TitleColors = Unset;
+        type UseSusieProphecy = Unset;
+        type FavoriteArtists = Unset;
         type FavoriteDeltaruneCharacters = Unset;
         type FavoriteAlbums = Unset;
-        type FavoriteArtists = Unset;
-        type UseSusieProphecy = Unset;
-        type TitleColors = Unset;
-        type FavoriteGames = Unset;
+    }
+    ///State transition - sets the `favorite_games` field to Set
+    pub struct SetFavoriteGames<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetFavoriteGames<St> {}
+    impl<St: State> State for SetFavoriteGames<St> {
+        type FavoriteGames = Set<members::favorite_games>;
+        type TitleColors = St::TitleColors;
+        type UseSusieProphecy = St::UseSusieProphecy;
+        type FavoriteArtists = St::FavoriteArtists;
+        type FavoriteDeltaruneCharacters = St::FavoriteDeltaruneCharacters;
+        type FavoriteAlbums = St::FavoriteAlbums;
+    }
+    ///State transition - sets the `title_colors` field to Set
+    pub struct SetTitleColors<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitleColors<St> {}
+    impl<St: State> State for SetTitleColors<St> {
+        type FavoriteGames = St::FavoriteGames;
+        type TitleColors = Set<members::title_colors>;
+        type UseSusieProphecy = St::UseSusieProphecy;
+        type FavoriteArtists = St::FavoriteArtists;
+        type FavoriteDeltaruneCharacters = St::FavoriteDeltaruneCharacters;
+        type FavoriteAlbums = St::FavoriteAlbums;
+    }
+    ///State transition - sets the `use_susie_prophecy` field to Set
+    pub struct SetUseSusieProphecy<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUseSusieProphecy<St> {}
+    impl<St: State> State for SetUseSusieProphecy<St> {
+        type FavoriteGames = St::FavoriteGames;
+        type TitleColors = St::TitleColors;
+        type UseSusieProphecy = Set<members::use_susie_prophecy>;
+        type FavoriteArtists = St::FavoriteArtists;
+        type FavoriteDeltaruneCharacters = St::FavoriteDeltaruneCharacters;
+        type FavoriteAlbums = St::FavoriteAlbums;
+    }
+    ///State transition - sets the `favorite_artists` field to Set
+    pub struct SetFavoriteArtists<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetFavoriteArtists<St> {}
+    impl<St: State> State for SetFavoriteArtists<St> {
+        type FavoriteGames = St::FavoriteGames;
+        type TitleColors = St::TitleColors;
+        type UseSusieProphecy = St::UseSusieProphecy;
+        type FavoriteArtists = Set<members::favorite_artists>;
+        type FavoriteDeltaruneCharacters = St::FavoriteDeltaruneCharacters;
+        type FavoriteAlbums = St::FavoriteAlbums;
     }
     ///State transition - sets the `favorite_deltarune_characters` field to Set
     pub struct SetFavoriteDeltaruneCharacters<St: State = Empty>(
@@ -218,83 +262,39 @@ pub mod output_state {
     );
     impl<St: State> sealed::Sealed for SetFavoriteDeltaruneCharacters<St> {}
     impl<St: State> State for SetFavoriteDeltaruneCharacters<St> {
+        type FavoriteGames = St::FavoriteGames;
+        type TitleColors = St::TitleColors;
+        type UseSusieProphecy = St::UseSusieProphecy;
+        type FavoriteArtists = St::FavoriteArtists;
         type FavoriteDeltaruneCharacters = Set<members::favorite_deltarune_characters>;
         type FavoriteAlbums = St::FavoriteAlbums;
-        type FavoriteArtists = St::FavoriteArtists;
-        type UseSusieProphecy = St::UseSusieProphecy;
-        type TitleColors = St::TitleColors;
-        type FavoriteGames = St::FavoriteGames;
     }
     ///State transition - sets the `favorite_albums` field to Set
     pub struct SetFavoriteAlbums<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetFavoriteAlbums<St> {}
     impl<St: State> State for SetFavoriteAlbums<St> {
+        type FavoriteGames = St::FavoriteGames;
+        type TitleColors = St::TitleColors;
+        type UseSusieProphecy = St::UseSusieProphecy;
+        type FavoriteArtists = St::FavoriteArtists;
         type FavoriteDeltaruneCharacters = St::FavoriteDeltaruneCharacters;
         type FavoriteAlbums = Set<members::favorite_albums>;
-        type FavoriteArtists = St::FavoriteArtists;
-        type UseSusieProphecy = St::UseSusieProphecy;
-        type TitleColors = St::TitleColors;
-        type FavoriteGames = St::FavoriteGames;
-    }
-    ///State transition - sets the `favorite_artists` field to Set
-    pub struct SetFavoriteArtists<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetFavoriteArtists<St> {}
-    impl<St: State> State for SetFavoriteArtists<St> {
-        type FavoriteDeltaruneCharacters = St::FavoriteDeltaruneCharacters;
-        type FavoriteAlbums = St::FavoriteAlbums;
-        type FavoriteArtists = Set<members::favorite_artists>;
-        type UseSusieProphecy = St::UseSusieProphecy;
-        type TitleColors = St::TitleColors;
-        type FavoriteGames = St::FavoriteGames;
-    }
-    ///State transition - sets the `use_susie_prophecy` field to Set
-    pub struct SetUseSusieProphecy<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUseSusieProphecy<St> {}
-    impl<St: State> State for SetUseSusieProphecy<St> {
-        type FavoriteDeltaruneCharacters = St::FavoriteDeltaruneCharacters;
-        type FavoriteAlbums = St::FavoriteAlbums;
-        type FavoriteArtists = St::FavoriteArtists;
-        type UseSusieProphecy = Set<members::use_susie_prophecy>;
-        type TitleColors = St::TitleColors;
-        type FavoriteGames = St::FavoriteGames;
-    }
-    ///State transition - sets the `title_colors` field to Set
-    pub struct SetTitleColors<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTitleColors<St> {}
-    impl<St: State> State for SetTitleColors<St> {
-        type FavoriteDeltaruneCharacters = St::FavoriteDeltaruneCharacters;
-        type FavoriteAlbums = St::FavoriteAlbums;
-        type FavoriteArtists = St::FavoriteArtists;
-        type UseSusieProphecy = St::UseSusieProphecy;
-        type TitleColors = Set<members::title_colors>;
-        type FavoriteGames = St::FavoriteGames;
-    }
-    ///State transition - sets the `favorite_games` field to Set
-    pub struct SetFavoriteGames<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetFavoriteGames<St> {}
-    impl<St: State> State for SetFavoriteGames<St> {
-        type FavoriteDeltaruneCharacters = St::FavoriteDeltaruneCharacters;
-        type FavoriteAlbums = St::FavoriteAlbums;
-        type FavoriteArtists = St::FavoriteArtists;
-        type UseSusieProphecy = St::UseSusieProphecy;
-        type TitleColors = St::TitleColors;
-        type FavoriteGames = Set<members::favorite_games>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `favorite_games` field
+        pub struct favorite_games(());
+        ///Marker type for the `title_colors` field
+        pub struct title_colors(());
+        ///Marker type for the `use_susie_prophecy` field
+        pub struct use_susie_prophecy(());
+        ///Marker type for the `favorite_artists` field
+        pub struct favorite_artists(());
         ///Marker type for the `favorite_deltarune_characters` field
         pub struct favorite_deltarune_characters(());
         ///Marker type for the `favorite_albums` field
         pub struct favorite_albums(());
-        ///Marker type for the `favorite_artists` field
-        pub struct favorite_artists(());
-        ///Marker type for the `use_susie_prophecy` field
-        pub struct use_susie_prophecy(());
-        ///Marker type for the `title_colors` field
-        pub struct title_colors(());
-        ///Marker type for the `favorite_games` field
-        pub struct favorite_games(());
     }
 }
 
@@ -447,12 +447,12 @@ where
 impl<S: BosStr, St> OutputBuilder<S, St>
 where
     St: output_state::State,
+    St::FavoriteGames: output_state::IsSet,
+    St::TitleColors: output_state::IsSet,
+    St::UseSusieProphecy: output_state::IsSet,
+    St::FavoriteArtists: output_state::IsSet,
     St::FavoriteDeltaruneCharacters: output_state::IsSet,
     St::FavoriteAlbums: output_state::IsSet,
-    St::FavoriteArtists: output_state::IsSet,
-    St::UseSusieProphecy: output_state::IsSet,
-    St::TitleColors: output_state::IsSet,
-    St::FavoriteGames: output_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Output<S> {

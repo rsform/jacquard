@@ -141,37 +141,37 @@ pub mod testing_polis_poll_v1_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Topic;
         type CreatedAt;
+        type Topic;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Topic = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `topic` field to Set
-    pub struct SetTopic<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTopic<St> {}
-    impl<St: State> State for SetTopic<St> {
-        type Topic = Set<members::topic>;
-        type CreatedAt = St::CreatedAt;
+        type Topic = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Topic = St::Topic;
         type CreatedAt = Set<members::created_at>;
+        type Topic = St::Topic;
+    }
+    ///State transition - sets the `topic` field to Set
+    pub struct SetTopic<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTopic<St> {}
+    impl<St: State> State for SetTopic<St> {
+        type CreatedAt = St::CreatedAt;
+        type Topic = Set<members::topic>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `topic` field
-        pub struct topic(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `topic` field
+        pub struct topic(());
     }
 }
 
@@ -273,8 +273,8 @@ where
 impl<S: BosStr, St> TestingPolisPollV1Builder<S, St>
 where
     St: testing_polis_poll_v1_state::State,
-    St::Topic: testing_polis_poll_v1_state::IsSet,
     St::CreatedAt: testing_polis_poll_v1_state::IsSet,
+    St::Topic: testing_polis_poll_v1_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> TestingPolisPollV1<S> {

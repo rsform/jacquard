@@ -113,37 +113,37 @@ pub mod genre_with_count_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Count;
         type Genre;
+        type Count;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Count = Unset;
         type Genre = Unset;
-    }
-    ///State transition - sets the `count` field to Set
-    pub struct SetCount<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCount<St> {}
-    impl<St: State> State for SetCount<St> {
-        type Count = Set<members::count>;
-        type Genre = St::Genre;
+        type Count = Unset;
     }
     ///State transition - sets the `genre` field to Set
     pub struct SetGenre<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetGenre<St> {}
     impl<St: State> State for SetGenre<St> {
-        type Count = St::Count;
         type Genre = Set<members::genre>;
+        type Count = St::Count;
+    }
+    ///State transition - sets the `count` field to Set
+    pub struct SetCount<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCount<St> {}
+    impl<St: State> State for SetCount<St> {
+        type Genre = St::Genre;
+        type Count = Set<members::count>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `count` field
-        pub struct count(());
         ///Marker type for the `genre` field
         pub struct genre(());
+        ///Marker type for the `count` field
+        pub struct count(());
     }
 }
 
@@ -213,8 +213,8 @@ where
 impl<S: BosStr, St> GenreWithCountBuilder<S, St>
 where
     St: genre_with_count_state::State,
-    St::Count: genre_with_count_state::IsSet,
     St::Genre: genre_with_count_state::IsSet,
+    St::Count: genre_with_count_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> GenreWithCount<S> {

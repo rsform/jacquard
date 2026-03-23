@@ -141,49 +141,49 @@ pub mod request_response_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Request;
         type CreatedAt;
+        type Request;
         type Post;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Request = Unset;
         type CreatedAt = Unset;
+        type Request = Unset;
         type Post = Unset;
-    }
-    ///State transition - sets the `request` field to Set
-    pub struct SetRequest<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRequest<St> {}
-    impl<St: State> State for SetRequest<St> {
-        type Request = Set<members::request>;
-        type CreatedAt = St::CreatedAt;
-        type Post = St::Post;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Request = St::Request;
         type CreatedAt = Set<members::created_at>;
+        type Request = St::Request;
+        type Post = St::Post;
+    }
+    ///State transition - sets the `request` field to Set
+    pub struct SetRequest<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRequest<St> {}
+    impl<St: State> State for SetRequest<St> {
+        type CreatedAt = St::CreatedAt;
+        type Request = Set<members::request>;
         type Post = St::Post;
     }
     ///State transition - sets the `post` field to Set
     pub struct SetPost<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPost<St> {}
     impl<St: State> State for SetPost<St> {
-        type Request = St::Request;
         type CreatedAt = St::CreatedAt;
+        type Request = St::Request;
         type Post = Set<members::post>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `request` field
-        pub struct request(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `request` field
+        pub struct request(());
         ///Marker type for the `post` field
         pub struct post(());
     }
@@ -287,8 +287,8 @@ where
 impl<S: BosStr, St> RequestResponseBuilder<S, St>
 where
     St: request_response_state::State,
-    St::Request: request_response_state::IsSet,
     St::CreatedAt: request_response_state::IsSet,
+    St::Request: request_response_state::IsSet,
     St::Post: request_response_state::IsSet,
 {
     /// Build the final struct.

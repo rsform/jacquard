@@ -9,6 +9,7 @@ pub mod actor;
 pub mod boundary;
 pub mod enrollment;
 pub mod feed;
+pub mod identity;
 pub mod repo;
 pub mod sync;
 
@@ -191,51 +192,51 @@ pub mod source_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Subject;
         type Vary;
         type Service;
-        type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Subject = Unset;
         type Vary = Unset;
         type Service = Unset;
-        type Subject = Unset;
-    }
-    ///State transition - sets the `vary` field to Set
-    pub struct SetVary<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetVary<St> {}
-    impl<St: State> State for SetVary<St> {
-        type Vary = Set<members::vary>;
-        type Service = St::Service;
-        type Subject = St::Subject;
-    }
-    ///State transition - sets the `service` field to Set
-    pub struct SetService<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetService<St> {}
-    impl<St: State> State for SetService<St> {
-        type Vary = St::Vary;
-        type Service = Set<members::service>;
-        type Subject = St::Subject;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSubject<St> {}
     impl<St: State> State for SetSubject<St> {
+        type Subject = Set<members::subject>;
         type Vary = St::Vary;
         type Service = St::Service;
-        type Subject = Set<members::subject>;
+    }
+    ///State transition - sets the `vary` field to Set
+    pub struct SetVary<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetVary<St> {}
+    impl<St: State> State for SetVary<St> {
+        type Subject = St::Subject;
+        type Vary = Set<members::vary>;
+        type Service = St::Service;
+    }
+    ///State transition - sets the `service` field to Set
+    pub struct SetService<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetService<St> {}
+    impl<St: State> State for SetService<St> {
+        type Subject = St::Subject;
+        type Vary = St::Vary;
+        type Service = Set<members::service>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `subject` field
+        pub struct subject(());
         ///Marker type for the `vary` field
         pub struct vary(());
         ///Marker type for the `service` field
         pub struct service(());
-        ///Marker type for the `subject` field
-        pub struct subject(());
     }
 }
 
@@ -328,9 +329,9 @@ where
 impl<S: BosStr, St> SourceBuilder<S, St>
 where
     St: source_state::State,
+    St::Subject: source_state::IsSet,
     St::Vary: source_state::IsSet,
     St::Service: source_state::IsSet,
-    St::Subject: source_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Source<S> {

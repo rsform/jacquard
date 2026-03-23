@@ -338,85 +338,85 @@ pub mod progress_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Level;
-        type XpToNextLevel;
         type CreatedAt;
-        type TotalXp;
+        type Level;
         type ProgressPercentage;
+        type XpToNextLevel;
+        type TotalXp;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Level = Unset;
-        type XpToNextLevel = Unset;
         type CreatedAt = Unset;
-        type TotalXp = Unset;
+        type Level = Unset;
         type ProgressPercentage = Unset;
-    }
-    ///State transition - sets the `level` field to Set
-    pub struct SetLevel<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetLevel<St> {}
-    impl<St: State> State for SetLevel<St> {
-        type Level = Set<members::level>;
-        type XpToNextLevel = St::XpToNextLevel;
-        type CreatedAt = St::CreatedAt;
-        type TotalXp = St::TotalXp;
-        type ProgressPercentage = St::ProgressPercentage;
-    }
-    ///State transition - sets the `xp_to_next_level` field to Set
-    pub struct SetXpToNextLevel<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetXpToNextLevel<St> {}
-    impl<St: State> State for SetXpToNextLevel<St> {
-        type Level = St::Level;
-        type XpToNextLevel = Set<members::xp_to_next_level>;
-        type CreatedAt = St::CreatedAt;
-        type TotalXp = St::TotalXp;
-        type ProgressPercentage = St::ProgressPercentage;
+        type XpToNextLevel = Unset;
+        type TotalXp = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Level = St::Level;
-        type XpToNextLevel = St::XpToNextLevel;
         type CreatedAt = Set<members::created_at>;
-        type TotalXp = St::TotalXp;
-        type ProgressPercentage = St::ProgressPercentage;
-    }
-    ///State transition - sets the `total_xp` field to Set
-    pub struct SetTotalXp<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTotalXp<St> {}
-    impl<St: State> State for SetTotalXp<St> {
         type Level = St::Level;
-        type XpToNextLevel = St::XpToNextLevel;
-        type CreatedAt = St::CreatedAt;
-        type TotalXp = Set<members::total_xp>;
         type ProgressPercentage = St::ProgressPercentage;
+        type XpToNextLevel = St::XpToNextLevel;
+        type TotalXp = St::TotalXp;
+    }
+    ///State transition - sets the `level` field to Set
+    pub struct SetLevel<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLevel<St> {}
+    impl<St: State> State for SetLevel<St> {
+        type CreatedAt = St::CreatedAt;
+        type Level = Set<members::level>;
+        type ProgressPercentage = St::ProgressPercentage;
+        type XpToNextLevel = St::XpToNextLevel;
+        type TotalXp = St::TotalXp;
     }
     ///State transition - sets the `progress_percentage` field to Set
     pub struct SetProgressPercentage<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetProgressPercentage<St> {}
     impl<St: State> State for SetProgressPercentage<St> {
-        type Level = St::Level;
-        type XpToNextLevel = St::XpToNextLevel;
         type CreatedAt = St::CreatedAt;
-        type TotalXp = St::TotalXp;
+        type Level = St::Level;
         type ProgressPercentage = Set<members::progress_percentage>;
+        type XpToNextLevel = St::XpToNextLevel;
+        type TotalXp = St::TotalXp;
+    }
+    ///State transition - sets the `xp_to_next_level` field to Set
+    pub struct SetXpToNextLevel<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetXpToNextLevel<St> {}
+    impl<St: State> State for SetXpToNextLevel<St> {
+        type CreatedAt = St::CreatedAt;
+        type Level = St::Level;
+        type ProgressPercentage = St::ProgressPercentage;
+        type XpToNextLevel = Set<members::xp_to_next_level>;
+        type TotalXp = St::TotalXp;
+    }
+    ///State transition - sets the `total_xp` field to Set
+    pub struct SetTotalXp<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTotalXp<St> {}
+    impl<St: State> State for SetTotalXp<St> {
+        type CreatedAt = St::CreatedAt;
+        type Level = St::Level;
+        type ProgressPercentage = St::ProgressPercentage;
+        type XpToNextLevel = St::XpToNextLevel;
+        type TotalXp = Set<members::total_xp>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `level` field
-        pub struct level(());
-        ///Marker type for the `xp_to_next_level` field
-        pub struct xp_to_next_level(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `total_xp` field
-        pub struct total_xp(());
+        ///Marker type for the `level` field
+        pub struct level(());
         ///Marker type for the `progress_percentage` field
         pub struct progress_percentage(());
+        ///Marker type for the `xp_to_next_level` field
+        pub struct xp_to_next_level(());
+        ///Marker type for the `total_xp` field
+        pub struct total_xp(());
     }
 }
 
@@ -705,11 +705,11 @@ where
 impl<S: BosStr, St> ProgressBuilder<S, St>
 where
     St: progress_state::State,
-    St::Level: progress_state::IsSet,
-    St::XpToNextLevel: progress_state::IsSet,
     St::CreatedAt: progress_state::IsSet,
-    St::TotalXp: progress_state::IsSet,
+    St::Level: progress_state::IsSet,
     St::ProgressPercentage: progress_state::IsSet,
+    St::XpToNextLevel: progress_state::IsSet,
+    St::TotalXp: progress_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Progress<S> {

@@ -187,51 +187,51 @@ pub mod language_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Size;
         type Percentage;
         type Name;
-        type Size;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Size = Unset;
         type Percentage = Unset;
         type Name = Unset;
-        type Size = Unset;
-    }
-    ///State transition - sets the `percentage` field to Set
-    pub struct SetPercentage<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPercentage<St> {}
-    impl<St: State> State for SetPercentage<St> {
-        type Percentage = Set<members::percentage>;
-        type Name = St::Name;
-        type Size = St::Size;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Percentage = St::Percentage;
-        type Name = Set<members::name>;
-        type Size = St::Size;
     }
     ///State transition - sets the `size` field to Set
     pub struct SetSize<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSize<St> {}
     impl<St: State> State for SetSize<St> {
+        type Size = Set<members::size>;
         type Percentage = St::Percentage;
         type Name = St::Name;
-        type Size = Set<members::size>;
+    }
+    ///State transition - sets the `percentage` field to Set
+    pub struct SetPercentage<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPercentage<St> {}
+    impl<St: State> State for SetPercentage<St> {
+        type Size = St::Size;
+        type Percentage = Set<members::percentage>;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Size = St::Size;
+        type Percentage = St::Percentage;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `size` field
+        pub struct size(());
         ///Marker type for the `percentage` field
         pub struct percentage(());
         ///Marker type for the `name` field
         pub struct name(());
-        ///Marker type for the `size` field
-        pub struct size(());
     }
 }
 
@@ -366,9 +366,9 @@ where
 impl<S: BosStr, St> LanguageBuilder<S, St>
 where
     St: language_state::State,
+    St::Size: language_state::IsSet,
     St::Percentage: language_state::IsSet,
     St::Name: language_state::IsSet,
-    St::Size: language_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Language<S> {

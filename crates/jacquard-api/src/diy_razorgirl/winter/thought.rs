@@ -239,51 +239,51 @@ pub mod thought_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Content;
         type Kind;
         type CreatedAt;
+        type Content;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Content = Unset;
         type Kind = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetContent<St> {}
-    impl<St: State> State for SetContent<St> {
-        type Content = Set<members::content>;
-        type Kind = St::Kind;
-        type CreatedAt = St::CreatedAt;
+        type Content = Unset;
     }
     ///State transition - sets the `kind` field to Set
     pub struct SetKind<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetKind<St> {}
     impl<St: State> State for SetKind<St> {
-        type Content = St::Content;
         type Kind = Set<members::kind>;
         type CreatedAt = St::CreatedAt;
+        type Content = St::Content;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Content = St::Content;
         type Kind = St::Kind;
         type CreatedAt = Set<members::created_at>;
+        type Content = St::Content;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetContent<St> {}
+    impl<St: State> State for SetContent<St> {
+        type Kind = St::Kind;
+        type CreatedAt = St::CreatedAt;
+        type Content = Set<members::content>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `content` field
-        pub struct content(());
         ///Marker type for the `kind` field
         pub struct kind(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `content` field
+        pub struct content(());
     }
 }
 
@@ -418,9 +418,9 @@ impl<S: BosStr, St: thought_state::State> ThoughtBuilder<S, St> {
 impl<S: BosStr, St> ThoughtBuilder<S, St>
 where
     St: thought_state::State,
-    St::Content: thought_state::IsSet,
     St::Kind: thought_state::IsSet,
     St::CreatedAt: thought_state::IsSet,
+    St::Content: thought_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Thought<S> {

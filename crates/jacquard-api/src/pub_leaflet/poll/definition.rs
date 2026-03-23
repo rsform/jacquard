@@ -186,37 +186,37 @@ pub mod definition_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Options;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Options = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Name = Set<members::name>;
-        type Options = St::Options;
+        type Name = Unset;
     }
     ///State transition - sets the `options` field to Set
     pub struct SetOptions<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetOptions<St> {}
     impl<St: State> State for SetOptions<St> {
-        type Name = St::Name;
         type Options = Set<members::options>;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Options = St::Options;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `options` field
         pub struct options(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -299,8 +299,8 @@ where
 impl<S: BosStr, St> DefinitionBuilder<S, St>
 where
     St: definition_state::State,
-    St::Name: definition_state::IsSet,
     St::Options: definition_state::IsSet,
+    St::Name: definition_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Definition<S> {

@@ -262,66 +262,66 @@ pub mod popfeed_review_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CreatedAt;
-        type Did;
         type Rating;
         type Uri;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CreatedAt = Unset;
-        type Did = Unset;
         type Rating = Unset;
         type Uri = Unset;
+        type Did = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
+        type Rating = St::Rating;
+        type Uri = St::Uri;
         type Did = St::Did;
-        type Rating = St::Rating;
-        type Uri = St::Uri;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDid<St> {}
-    impl<St: State> State for SetDid<St> {
-        type CreatedAt = St::CreatedAt;
-        type Did = Set<members::did>;
-        type Rating = St::Rating;
-        type Uri = St::Uri;
     }
     ///State transition - sets the `rating` field to Set
     pub struct SetRating<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRating<St> {}
     impl<St: State> State for SetRating<St> {
         type CreatedAt = St::CreatedAt;
-        type Did = St::Did;
         type Rating = Set<members::rating>;
         type Uri = St::Uri;
+        type Did = St::Did;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUri<St> {}
     impl<St: State> State for SetUri<St> {
         type CreatedAt = St::CreatedAt;
-        type Did = St::Did;
         type Rating = St::Rating;
         type Uri = Set<members::uri>;
+        type Did = St::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
+        type CreatedAt = St::CreatedAt;
+        type Rating = St::Rating;
+        type Uri = St::Uri;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `rating` field
         pub struct rating(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
@@ -505,9 +505,9 @@ impl<S: BosStr, St> PopfeedReviewBuilder<S, St>
 where
     St: popfeed_review_state::State,
     St::CreatedAt: popfeed_review_state::IsSet,
-    St::Did: popfeed_review_state::IsSet,
     St::Rating: popfeed_review_state::IsSet,
     St::Uri: popfeed_review_state::IsSet,
+    St::Did: popfeed_review_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> PopfeedReview<S> {

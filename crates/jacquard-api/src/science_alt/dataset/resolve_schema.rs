@@ -118,37 +118,37 @@ pub mod resolve_schema_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type SchemaId;
         type Handle;
+        type SchemaId;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type SchemaId = Unset;
         type Handle = Unset;
-    }
-    ///State transition - sets the `schema_id` field to Set
-    pub struct SetSchemaId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSchemaId<St> {}
-    impl<St: State> State for SetSchemaId<St> {
-        type SchemaId = Set<members::schema_id>;
-        type Handle = St::Handle;
+        type SchemaId = Unset;
     }
     ///State transition - sets the `handle` field to Set
     pub struct SetHandle<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetHandle<St> {}
     impl<St: State> State for SetHandle<St> {
-        type SchemaId = St::SchemaId;
         type Handle = Set<members::handle>;
+        type SchemaId = St::SchemaId;
+    }
+    ///State transition - sets the `schema_id` field to Set
+    pub struct SetSchemaId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSchemaId<St> {}
+    impl<St: State> State for SetSchemaId<St> {
+        type Handle = St::Handle;
+        type SchemaId = Set<members::schema_id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `schema_id` field
-        pub struct schema_id(());
         ///Marker type for the `handle` field
         pub struct handle(());
+        ///Marker type for the `schema_id` field
+        pub struct schema_id(());
     }
 }
 
@@ -231,8 +231,8 @@ impl<S: BosStr, St: resolve_schema_state::State> ResolveSchemaBuilder<S, St> {
 impl<S: BosStr, St> ResolveSchemaBuilder<S, St>
 where
     St: resolve_schema_state::State,
-    St::SchemaId: resolve_schema_state::IsSet,
     St::Handle: resolve_schema_state::IsSet,
+    St::SchemaId: resolve_schema_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ResolveSchema<S> {

@@ -165,67 +165,67 @@ pub mod tangled_string_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Filename;
+        type Description;
         type Contents;
         type CreatedAt;
-        type Description;
+        type Filename;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Filename = Unset;
+        type Description = Unset;
         type Contents = Unset;
         type CreatedAt = Unset;
-        type Description = Unset;
-    }
-    ///State transition - sets the `filename` field to Set
-    pub struct SetFilename<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetFilename<St> {}
-    impl<St: State> State for SetFilename<St> {
-        type Filename = Set<members::filename>;
-        type Contents = St::Contents;
-        type CreatedAt = St::CreatedAt;
-        type Description = St::Description;
-    }
-    ///State transition - sets the `contents` field to Set
-    pub struct SetContents<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetContents<St> {}
-    impl<St: State> State for SetContents<St> {
-        type Filename = St::Filename;
-        type Contents = Set<members::contents>;
-        type CreatedAt = St::CreatedAt;
-        type Description = St::Description;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type Filename = St::Filename;
-        type Contents = St::Contents;
-        type CreatedAt = Set<members::created_at>;
-        type Description = St::Description;
+        type Filename = Unset;
     }
     ///State transition - sets the `description` field to Set
     pub struct SetDescription<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDescription<St> {}
     impl<St: State> State for SetDescription<St> {
-        type Filename = St::Filename;
+        type Description = Set<members::description>;
         type Contents = St::Contents;
         type CreatedAt = St::CreatedAt;
-        type Description = Set<members::description>;
+        type Filename = St::Filename;
+    }
+    ///State transition - sets the `contents` field to Set
+    pub struct SetContents<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetContents<St> {}
+    impl<St: State> State for SetContents<St> {
+        type Description = St::Description;
+        type Contents = Set<members::contents>;
+        type CreatedAt = St::CreatedAt;
+        type Filename = St::Filename;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Description = St::Description;
+        type Contents = St::Contents;
+        type CreatedAt = Set<members::created_at>;
+        type Filename = St::Filename;
+    }
+    ///State transition - sets the `filename` field to Set
+    pub struct SetFilename<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetFilename<St> {}
+    impl<St: State> State for SetFilename<St> {
+        type Description = St::Description;
+        type Contents = St::Contents;
+        type CreatedAt = St::CreatedAt;
+        type Filename = Set<members::filename>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `filename` field
-        pub struct filename(());
+        ///Marker type for the `description` field
+        pub struct description(());
         ///Marker type for the `contents` field
         pub struct contents(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `description` field
-        pub struct description(());
+        ///Marker type for the `filename` field
+        pub struct filename(());
     }
 }
 
@@ -333,10 +333,10 @@ where
 impl<S: BosStr, St> TangledStringBuilder<S, St>
 where
     St: tangled_string_state::State,
-    St::Filename: tangled_string_state::IsSet,
+    St::Description: tangled_string_state::IsSet,
     St::Contents: tangled_string_state::IsSet,
     St::CreatedAt: tangled_string_state::IsSet,
-    St::Description: tangled_string_state::IsSet,
+    St::Filename: tangled_string_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> TangledString<S> {

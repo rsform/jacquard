@@ -273,65 +273,65 @@ pub mod show_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
         type Schedule;
         type Artist;
-        type CreatedAt;
         type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
         type Schedule = Unset;
         type Artist = Unset;
-        type CreatedAt = Unset;
         type Title = Unset;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type CreatedAt = Set<members::created_at>;
+        type Schedule = St::Schedule;
+        type Artist = St::Artist;
+        type Title = St::Title;
     }
     ///State transition - sets the `schedule` field to Set
     pub struct SetSchedule<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSchedule<St> {}
     impl<St: State> State for SetSchedule<St> {
+        type CreatedAt = St::CreatedAt;
         type Schedule = Set<members::schedule>;
         type Artist = St::Artist;
-        type CreatedAt = St::CreatedAt;
         type Title = St::Title;
     }
     ///State transition - sets the `artist` field to Set
     pub struct SetArtist<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetArtist<St> {}
     impl<St: State> State for SetArtist<St> {
+        type CreatedAt = St::CreatedAt;
         type Schedule = St::Schedule;
         type Artist = Set<members::artist>;
-        type CreatedAt = St::CreatedAt;
-        type Title = St::Title;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type Schedule = St::Schedule;
-        type Artist = St::Artist;
-        type CreatedAt = Set<members::created_at>;
         type Title = St::Title;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTitle<St> {}
     impl<St: State> State for SetTitle<St> {
+        type CreatedAt = St::CreatedAt;
         type Schedule = St::Schedule;
         type Artist = St::Artist;
-        type CreatedAt = St::CreatedAt;
         type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `schedule` field
         pub struct schedule(());
         ///Marker type for the `artist` field
         pub struct artist(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `title` field
         pub struct title(());
     }
@@ -474,9 +474,9 @@ where
 impl<S: BosStr, St> ShowBuilder<S, St>
 where
     St: show_state::State,
+    St::CreatedAt: show_state::IsSet,
     St::Schedule: show_state::IsSet,
     St::Artist: show_state::IsSet,
-    St::CreatedAt: show_state::IsSet,
     St::Title: show_state::IsSet,
 {
     /// Build the final struct.

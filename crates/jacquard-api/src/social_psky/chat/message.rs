@@ -144,37 +144,37 @@ pub mod message_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Content;
         type Room;
+        type Content;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Content = Unset;
         type Room = Unset;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetContent<St> {}
-    impl<St: State> State for SetContent<St> {
-        type Content = Set<members::content>;
-        type Room = St::Room;
+        type Content = Unset;
     }
     ///State transition - sets the `room` field to Set
     pub struct SetRoom<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRoom<St> {}
     impl<St: State> State for SetRoom<St> {
-        type Content = St::Content;
         type Room = Set<members::room>;
+        type Content = St::Content;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetContent<St> {}
+    impl<St: State> State for SetContent<St> {
+        type Room = St::Room;
+        type Content = Set<members::content>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `content` field
-        pub struct content(());
         ///Marker type for the `room` field
         pub struct room(());
+        ///Marker type for the `content` field
+        pub struct content(());
     }
 }
 
@@ -270,8 +270,8 @@ where
 impl<S: BosStr, St> MessageBuilder<S, St>
 where
     St: message_state::State,
-    St::Content: message_state::IsSet,
     St::Room: message_state::IsSet,
+    St::Content: message_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Message<S> {

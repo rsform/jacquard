@@ -1,0 +1,37 @@
+{
+  "lexicon": 1,
+  "id": "world.ptah.temp.declaration",
+  "description": "A signaling record indicating that an account is participating in The Ptah Protocol. One per account, fixed record key. The AppView uses this record to discover and enumerate participating accounts across the network.",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Declaration of participation in The Ptah Protocol. Create this record to signal that your account is active in the Ptah ecosystem. Delete it to deactivate.",
+      "key": "literal:self",
+      "record": {
+        "type": "object",
+        "required": [
+          "createdAt"
+        ],
+        "properties": {
+          "createdAt": {
+            "type": "string",
+            "description": "Timestamp of when this account first declared participation.",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "description": "Short description of the participant's role or interests in the Ptah ecosystem.",
+            "maxLength": 2560,
+            "maxGraphemes": 256
+          },
+          "displayName": {
+            "type": "string",
+            "description": "Human-readable name for this participant. Not a character name — the person behind the characters.",
+            "maxLength": 640,
+            "maxGraphemes": 64
+          }
+        }
+      }
+    }
+  }
+}

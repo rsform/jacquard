@@ -166,37 +166,37 @@ pub mod create_webhook_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Events;
         type Url;
+        type Events;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Events = Unset;
         type Url = Unset;
-    }
-    ///State transition - sets the `events` field to Set
-    pub struct SetEvents<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetEvents<St> {}
-    impl<St: State> State for SetEvents<St> {
-        type Events = Set<members::events>;
-        type Url = St::Url;
+        type Events = Unset;
     }
     ///State transition - sets the `url` field to Set
     pub struct SetUrl<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUrl<St> {}
     impl<St: State> State for SetUrl<St> {
-        type Events = St::Events;
         type Url = Set<members::url>;
+        type Events = St::Events;
+    }
+    ///State transition - sets the `events` field to Set
+    pub struct SetEvents<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetEvents<St> {}
+    impl<St: State> State for SetEvents<St> {
+        type Url = St::Url;
+        type Events = Set<members::events>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `events` field
-        pub struct events(());
         ///Marker type for the `url` field
         pub struct url(());
+        ///Marker type for the `events` field
+        pub struct events(());
     }
 }
 
@@ -367,8 +367,8 @@ where
 impl<S: BosStr, St> CreateWebhookBuilder<S, St>
 where
     St: create_webhook_state::State,
-    St::Events: create_webhook_state::IsSet,
     St::Url: create_webhook_state::IsSet,
+    St::Events: create_webhook_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> CreateWebhook<S> {

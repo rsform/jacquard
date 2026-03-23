@@ -123,37 +123,37 @@ pub mod room_gate_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Room;
         type CreatedAt;
+        type Room;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Room = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `room` field to Set
-    pub struct SetRoom<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRoom<St> {}
-    impl<St: State> State for SetRoom<St> {
-        type Room = Set<members::room>;
-        type CreatedAt = St::CreatedAt;
+        type Room = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Room = St::Room;
         type CreatedAt = Set<members::created_at>;
+        type Room = St::Room;
+    }
+    ///State transition - sets the `room` field to Set
+    pub struct SetRoom<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRoom<St> {}
+    impl<St: State> State for SetRoom<St> {
+        type CreatedAt = St::CreatedAt;
+        type Room = Set<members::room>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `room` field
-        pub struct room(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `room` field
+        pub struct room(());
     }
 }
 
@@ -236,8 +236,8 @@ where
 impl<S: BosStr, St> RoomGateBuilder<S, St>
 where
     St: room_gate_state::State,
-    St::Room: room_gate_state::IsSet,
     St::CreatedAt: room_gate_state::IsSet,
+    St::Room: room_gate_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> RoomGate<S> {

@@ -913,49 +913,49 @@ pub mod normal_container_id_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Peer;
         type Counter;
+        type Peer;
         type ContainerType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Peer = Unset;
         type Counter = Unset;
+        type Peer = Unset;
         type ContainerType = Unset;
-    }
-    ///State transition - sets the `peer` field to Set
-    pub struct SetPeer<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPeer<St> {}
-    impl<St: State> State for SetPeer<St> {
-        type Peer = Set<members::peer>;
-        type Counter = St::Counter;
-        type ContainerType = St::ContainerType;
     }
     ///State transition - sets the `counter` field to Set
     pub struct SetCounter<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCounter<St> {}
     impl<St: State> State for SetCounter<St> {
-        type Peer = St::Peer;
         type Counter = Set<members::counter>;
+        type Peer = St::Peer;
+        type ContainerType = St::ContainerType;
+    }
+    ///State transition - sets the `peer` field to Set
+    pub struct SetPeer<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPeer<St> {}
+    impl<St: State> State for SetPeer<St> {
+        type Counter = St::Counter;
+        type Peer = Set<members::peer>;
         type ContainerType = St::ContainerType;
     }
     ///State transition - sets the `container_type` field to Set
     pub struct SetContainerType<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetContainerType<St> {}
     impl<St: State> State for SetContainerType<St> {
-        type Peer = St::Peer;
         type Counter = St::Counter;
+        type Peer = St::Peer;
         type ContainerType = Set<members::container_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `peer` field
-        pub struct peer(());
         ///Marker type for the `counter` field
         pub struct counter(());
+        ///Marker type for the `peer` field
+        pub struct peer(());
         ///Marker type for the `container_type` field
         pub struct container_type(());
     }
@@ -1046,8 +1046,8 @@ where
 impl<S: BosStr, St> NormalContainerIdBuilder<S, St>
 where
     St: normal_container_id_state::State,
-    St::Peer: normal_container_id_state::IsSet,
     St::Counter: normal_container_id_state::IsSet,
+    St::Peer: normal_container_id_state::IsSet,
     St::ContainerType: normal_container_id_state::IsSet,
 {
     /// Build the final struct.

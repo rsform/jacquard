@@ -114,37 +114,37 @@ pub mod request_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Slice;
         type CreatedAt;
+        type Slice;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Slice = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `slice` field to Set
-    pub struct SetSlice<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSlice<St> {}
-    impl<St: State> State for SetSlice<St> {
-        type Slice = Set<members::slice>;
-        type CreatedAt = St::CreatedAt;
+        type Slice = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Slice = St::Slice;
         type CreatedAt = Set<members::created_at>;
+        type Slice = St::Slice;
+    }
+    ///State transition - sets the `slice` field to Set
+    pub struct SetSlice<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSlice<St> {}
+    impl<St: State> State for SetSlice<St> {
+        type CreatedAt = St::CreatedAt;
+        type Slice = Set<members::slice>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `slice` field
-        pub struct slice(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `slice` field
+        pub struct slice(());
     }
 }
 
@@ -214,8 +214,8 @@ where
 impl<S: BosStr, St> RequestBuilder<S, St>
 where
     St: request_state::State,
-    St::Slice: request_state::IsSet,
     St::CreatedAt: request_state::IsSet,
+    St::Slice: request_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Request<S> {

@@ -155,37 +155,37 @@ pub mod tag_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Repository;
         type Tag;
+        type Repository;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Repository = Unset;
         type Tag = Unset;
-    }
-    ///State transition - sets the `repository` field to Set
-    pub struct SetRepository<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRepository<St> {}
-    impl<St: State> State for SetRepository<St> {
-        type Repository = Set<members::repository>;
-        type Tag = St::Tag;
+        type Repository = Unset;
     }
     ///State transition - sets the `tag` field to Set
     pub struct SetTag<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTag<St> {}
     impl<St: State> State for SetTag<St> {
-        type Repository = St::Repository;
         type Tag = Set<members::tag>;
+        type Repository = St::Repository;
+    }
+    ///State transition - sets the `repository` field to Set
+    pub struct SetRepository<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRepository<St> {}
+    impl<St: State> State for SetRepository<St> {
+        type Tag = St::Tag;
+        type Repository = Set<members::repository>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `repository` field
-        pub struct repository(());
         ///Marker type for the `tag` field
         pub struct tag(());
+        ///Marker type for the `repository` field
+        pub struct repository(());
     }
 }
 
@@ -291,8 +291,8 @@ impl<S: BosStr, St: tag_state::State> TagBuilder<S, St> {
 impl<S: BosStr, St> TagBuilder<S, St>
 where
     St: tag_state::State,
-    St::Repository: tag_state::IsSet,
     St::Tag: tag_state::IsSet,
+    St::Repository: tag_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Tag<S> {

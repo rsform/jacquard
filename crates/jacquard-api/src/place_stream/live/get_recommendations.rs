@@ -106,37 +106,37 @@ pub mod livestream_recommendation_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
         type Source;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
         type Source = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDid<St> {}
-    impl<St: State> State for SetDid<St> {
-        type Did = Set<members::did>;
-        type Source = St::Source;
+        type Did = Unset;
     }
     ///State transition - sets the `source` field to Set
     pub struct SetSource<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSource<St> {}
     impl<St: State> State for SetSource<St> {
-        type Did = St::Did;
         type Source = Set<members::source>;
+        type Did = St::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
+        type Source = St::Source;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `source` field
         pub struct source(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
@@ -220,8 +220,8 @@ where
 impl<S: BosStr, St> LivestreamRecommendationBuilder<S, St>
 where
     St: livestream_recommendation_state::State,
-    St::Did: livestream_recommendation_state::IsSet,
     St::Source: livestream_recommendation_state::IsSet,
+    St::Did: livestream_recommendation_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> LivestreamRecommendation<S> {

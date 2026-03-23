@@ -165,37 +165,37 @@ pub mod diff_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Doc;
         type Root;
+        type Doc;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Doc = Unset;
         type Root = Unset;
-    }
-    ///State transition - sets the `doc` field to Set
-    pub struct SetDoc<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDoc<St> {}
-    impl<St: State> State for SetDoc<St> {
-        type Doc = Set<members::doc>;
-        type Root = St::Root;
+        type Doc = Unset;
     }
     ///State transition - sets the `root` field to Set
     pub struct SetRoot<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRoot<St> {}
     impl<St: State> State for SetRoot<St> {
-        type Doc = St::Doc;
         type Root = Set<members::root>;
+        type Doc = St::Doc;
+    }
+    ///State transition - sets the `doc` field to Set
+    pub struct SetDoc<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDoc<St> {}
+    impl<St: State> State for SetDoc<St> {
+        type Root = St::Root;
+        type Doc = Set<members::doc>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `doc` field
-        pub struct doc(());
         ///Marker type for the `root` field
         pub struct root(());
+        ///Marker type for the `doc` field
+        pub struct doc(());
     }
 }
 
@@ -324,8 +324,8 @@ impl<S: BosStr, St: diff_state::State> DiffBuilder<S, St> {
 impl<S: BosStr, St> DiffBuilder<S, St>
 where
     St: diff_state::State,
-    St::Doc: diff_state::IsSet,
     St::Root: diff_state::IsSet,
+    St::Doc: diff_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Diff<S> {
