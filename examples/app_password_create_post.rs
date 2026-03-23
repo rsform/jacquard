@@ -29,7 +29,7 @@ async fn main() -> miette::Result<()> {
     let agent: Agent<_> = Agent::from(session);
 
     // Create a simple text post using the Agent convenience method
-    let post = Post::new()
+    let post = Post::<SmolStr>::new()
         .text(args.text)
         .created_at(Datetime::now())
         .build();

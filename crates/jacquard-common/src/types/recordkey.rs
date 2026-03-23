@@ -105,6 +105,13 @@ impl<T: RecordKeyType> RecordKey<T> {
     }
 }
 
+impl<S: Bos<str> + AsRef<str>> RecordKey<Rkey<S>> {
+    /// Borrow as a `RecordKey<Rkey<&str>>`, analogous to `Uri::borrow()`.
+    pub fn borrow(&self) -> RecordKey<Rkey<&str>> {
+        RecordKey(self.0.borrow())
+    }
+}
+
 /// AT Protocol record key (generic "any" type)
 ///
 /// Record keys uniquely identify records within a collection. This is the catch-all
@@ -163,6 +170,15 @@ impl<S: Bos<str>> Rkey<S> {
     /// The caller must ensure the rkey is valid.
     pub unsafe fn unchecked(rkey: S) -> Self {
         Rkey(rkey)
+    }
+
+    /// Borrow as an `Rkey<&str>`, analogous to `Uri::borrow()`.
+    pub fn borrow(&self) -> Rkey<&str>
+    where
+        S: AsRef<str>,
+    {
+        // SAFETY: self is already validated.
+        unsafe { Rkey::unchecked(self.0.as_ref()) }
     }
 }
 

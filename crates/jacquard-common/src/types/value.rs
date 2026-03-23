@@ -4,7 +4,6 @@ use crate::{
 };
 use alloc::boxed::Box;
 use alloc::collections::BTreeMap;
-use alloc::string::ToString;
 use alloc::vec::Vec;
 use bytes::Bytes;
 use core::convert::Infallible;
@@ -874,15 +873,11 @@ where
 /// # Ok(())
 /// # }
 /// ```
-pub fn to_data<'s, T, S>(value: &T) -> Result<Data<S>, convert::ConversionError>
+pub fn to_data<'s, T>(value: &T) -> Result<Data<SmolStr>, serde_impl::RawDataSerializerError>
 where
     T: serde::Serialize,
-    S: Bos<str> + AsRef<str> + serde::Serialize + From<CowStr<'s>>,
 {
-    let raw = to_raw_data(value).map_err(|e| convert::ConversionError::InvalidRawData {
-        message: e.to_string(),
-    })?;
-    raw.try_into()
+    value.serialize(serde_impl::DataSerializer)
 }
 
 /// Parse and traverse a path through nested Data structures

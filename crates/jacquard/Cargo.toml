@@ -12,7 +12,7 @@ exclude.workspace = true
 license.workspace = true
 
 [features]
-default = ["api_full", "dns", "loopback", "derive", "cache"]
+default = ["api_full", "dns", "loopback", "derive", "cache", "websocket"]
 derive = ["dep:jacquard-derive"]
 # Minimal API bindings
 api = ["jacquard-api/minimal"]

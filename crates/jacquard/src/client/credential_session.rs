@@ -5,15 +5,17 @@ use jacquard_api::com_atproto::server::{
 };
 use jacquard_common::{
     AuthorizationToken, CowStr, IntoStatic,
+    bos::BosStr,
     deps::fluent_uri::Uri,
     error::{AuthError, ClientError, XrpcResult},
     http_client::HttpClient,
     session::SessionStore,
     types::{did::Did, string::Handle},
-    xrpc::{
-        CallOptions, Response, XrpcClient, XrpcError, XrpcExt, XrpcRequest, XrpcResp, XrpcResponse,
-    },
+    xrpc::{CallOptions, Response, XrpcClient, XrpcExt, XrpcRequest, XrpcResp, XrpcResponse},
 };
+#[cfg(feature = "streaming")]
+use serde::Serialize;
+use smol_str::SmolStr;
 use tokio::sync::RwLock;
 
 use crate::client::AtpSession;
@@ -29,7 +31,7 @@ use jacquard_common::xrpc::XrpcSubscription;
 
 /// Storage key for app‑password sessions: `(account DID, session id)`.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct SessionKey(pub Did<'static>, pub CowStr<'static>);
+pub struct SessionKey(pub Did, pub SmolStr);
 
 /// Stateful client for app‑password based sessions.
 ///
@@ -128,14 +130,14 @@ where
     }
 
     /// Current access token (Bearer), if logged in.
-    pub async fn access_token(&self) -> Option<AuthorizationToken<'_>> {
+    pub async fn access_token(&self) -> Option<AuthorizationToken> {
         let key = self.key.read().await.clone()?;
         let session = self.store.get(&key).await;
         session.map(|session| AuthorizationToken::Bearer(session.access_jwt))
     }
 
     /// Current refresh token (Bearer), if logged in.
-    pub async fn refresh_token(&self) -> Option<AuthorizationToken<'_>> {
+    pub async fn refresh_token(&self) -> Option<AuthorizationToken> {
         let key = self.key.read().await.clone()?;
         let session = self.store.get(&key).await;
         session.map(|session| AuthorizationToken::Bearer(session.refresh_jwt))
@@ -148,7 +150,7 @@ where
     T: HttpClient,
 {
     /// Refresh the active session by calling `com.atproto.server.refreshSession`.
-    pub async fn refresh(&self) -> std::result::Result<AuthorizationToken<'_>, ClientError> {
+    pub async fn refresh(&self) -> std::result::Result<AuthorizationToken, ClientError> {
         let key = self
             .key
             .read()
@@ -161,7 +163,7 @@ where
         opts.auth = session.map(|s| AuthorizationToken::Bearer(s.refresh_jwt));
         let response = self
             .client
-            .xrpc(endpoint)
+            .xrpc(endpoint.borrow())
             .with_options(opts)
             .send(&RefreshSession)
             .await?;
@@ -227,10 +229,13 @@ where
             let resp = self.client.resolve_did_doc(&did).await.map_err(|e| {
                 ClientError::from(e).with_context("DID document resolution failed during login")
             })?;
-            resp.into_owned()?.pds_endpoint().ok_or_else(|| {
-                ClientError::invalid_request("missing PDS endpoint")
-                    .with_help("DID document must include a PDS service endpoint")
-            })?
+            resp.into_owned()?
+                .pds_endpoint()
+                .map(|u| u.to_owned())
+                .ok_or_else(|| {
+                    ClientError::invalid_request("missing PDS endpoint")
+                        .with_help("DID document must include a PDS service endpoint")
+                })?
         } else if identifier.as_ref().contains("@") && !identifier.as_ref().starts_with("@") {
             // we're going to assume its an email
             pds.ok_or_else(|| {
@@ -250,10 +255,13 @@ where
             let resp = self.client.resolve_did_doc(&did).await.map_err(|e| {
                 ClientError::from(e).with_context("DID document resolution failed during login")
             })?;
-            resp.into_owned()?.pds_endpoint().ok_or_else(|| {
-                ClientError::invalid_request("missing PDS endpoint")
-                    .with_help("DID document must include a PDS service endpoint")
-            })?
+            resp.into_owned()?
+                .pds_endpoint()
+                .map(|u| u.to_owned())
+                .ok_or_else(|| {
+                    ClientError::invalid_request("missing PDS endpoint")
+                        .with_help("DID document must include a PDS service endpoint")
+                })?
         };
 
         // Build and send createSession
@@ -267,7 +275,7 @@ where
 
         let resp = self
             .client
-            .xrpc(pds.clone())
+            .xrpc(pds.borrow())
             .with_options(self.options.read().await.clone())
             .send(&req)
             .await?;
@@ -279,7 +287,7 @@ where
         let session = AtpSession::from(out);
 
         let sid = session_id.unwrap_or_else(|| CowStr::new_static("session"));
-        let key = SessionKey(session.did.clone(), sid.into_static());
+        let key = SessionKey(session.did.clone().convert::<SmolStr>(), SmolStr::from(sid));
         self.store
             .set(key.clone(), session.clone())
             .await
@@ -301,7 +309,7 @@ where
     /// Restore a previously persisted app-password session and set base endpoint.
     pub async fn restore(
         &self,
-        did: Did<'_>,
+        did: Did,
         session_id: CowStr<'_>,
     ) -> std::result::Result<(), ClientError>
     where
@@ -312,7 +320,7 @@ where
             tracing::info_span!("credential_session_restore", did = %did, session_id = %session_id)
                 .entered();
 
-        let key = SessionKey(did.clone().into_static(), session_id.clone().into_static());
+        let key = SessionKey(did.clone(), SmolStr::from(session_id.clone()));
         let Some(sess) = self.store.get(&key).await else {
             return Err(ClientError::auth(AuthError::NotAuthenticated));
         };
@@ -326,10 +334,13 @@ where
         }
         .unwrap_or({
             let resp = self.client.resolve_did_doc(&did).await?;
-            resp.into_owned()?.pds_endpoint().ok_or_else(|| {
-                ClientError::invalid_request("missing PDS endpoint")
-                    .with_help("DID document must include a PDS service endpoint")
-            })?
+            resp.into_owned()?
+                .pds_endpoint()
+                .map(|u| u.to_owned())
+                .ok_or_else(|| {
+                    ClientError::invalid_request("missing PDS endpoint")
+                        .with_help("DID document must include a PDS service endpoint")
+                })?
         });
 
         // Activate
@@ -338,7 +349,13 @@ where
         *self.endpoint.write().await = Some(pds_uri.clone());
         // ensure store has the session (no-op if it existed)
         self.store
-            .set(SessionKey(sess.did.clone(), session_id.into_static()), sess)
+            .set(
+                SessionKey(
+                    sess.did.clone().convert::<SmolStr>(),
+                    SmolStr::from(session_id),
+                ),
+                sess,
+            )
             .await?;
         if let Some(file_store) =
             (&*self.store as &dyn Any).downcast_ref::<crate::client::token::FileAuthStore>()
@@ -351,13 +368,13 @@ where
     /// Switch to a different stored session (and refresh endpoint/PDS).
     pub async fn switch_session(
         &self,
-        did: Did<'_>,
+        did: Did,
         session_id: CowStr<'_>,
     ) -> std::result::Result<(), ClientError>
     where
         S: Any + 'static,
     {
-        let key = SessionKey(did.clone().into_static(), session_id.into_static());
+        let key = SessionKey(did.clone(), SmolStr::from(session_id));
         if self.store.get(&key).await.is_none() {
             return Err(ClientError::auth(AuthError::NotAuthenticated));
         }
@@ -371,10 +388,13 @@ where
         }
         .unwrap_or({
             let resp = self.client.resolve_did_doc(&did).await?;
-            resp.into_owned()?.pds_endpoint().ok_or_else(|| {
-                ClientError::invalid_request("missing PDS endpoint")
-                    .with_help("DID document must include a PDS service endpoint")
-            })?
+            resp.into_owned()?
+                .pds_endpoint()
+                .map(|u| u.to_owned())
+                .ok_or_else(|| {
+                    ClientError::invalid_request("missing PDS endpoint")
+                        .with_help("DID document must include a PDS service endpoint")
+                })?
         });
         *self.key.write().await = Some(key.clone());
         let pds_uri = jacquard_common::xrpc::normalize_base_uri(pds);
@@ -445,7 +465,7 @@ where
 
     async fn send<R>(&self, request: R) -> XrpcResult<XrpcResponse<R>>
     where
-        R: XrpcRequest + Send + Sync,
+        R: XrpcRequest + Send + Sync + serde::Serialize,
         <R as XrpcRequest>::Response: Send + Sync,
     {
         let opts = self.options.read().await.clone();
@@ -458,7 +478,7 @@ where
         mut opts: CallOptions<'_>,
     ) -> XrpcResult<XrpcResponse<R>>
     where
-        R: XrpcRequest + Send + Sync,
+        R: XrpcRequest + Send + Sync + serde::Serialize,
         <R as XrpcRequest>::Response: Send + Sync,
     {
         let base_uri = self.base_uri().await;
@@ -466,7 +486,7 @@ where
         opts.auth = auth;
         let resp = self
             .client
-            .xrpc(base_uri.clone())
+            .xrpc(base_uri.borrow())
             .with_options(opts.clone())
             .send(&request)
             .await;
@@ -475,7 +495,7 @@ where
             let auth = self.refresh().await?;
             opts.auth = Some(auth);
             self.client
-                .xrpc(base_uri)
+                .xrpc(base_uri.borrow())
                 .with_options(opts)
                 .send(&request)
                 .await
@@ -496,10 +516,7 @@ fn is_expired<R: XrpcResp>(response: &XrpcResult<Response<R>>) -> bool {
         {
             true
         }
-        Ok(resp) => match resp.parse() {
-            Err(XrpcError::Auth(AuthError::TokenExpired)) => true,
-            _ => false,
-        },
+        Ok(_) => false,
         _ => false,
     }
 }
@@ -561,7 +578,7 @@ where
         request: R,
     ) -> core::result::Result<jacquard_common::xrpc::StreamingResponse, jacquard_common::StreamError>
     where
-        R: XrpcRequest + Send + Sync,
+        R: XrpcRequest + Send + Sync + Serialize,
         <R as XrpcRequest>::Response: Send + Sync,
     {
         use jacquard_common::{StreamError, xrpc::build_http_request};
@@ -570,7 +587,7 @@ where
         let mut opts = self.options.read().await.clone();
         opts.auth = self.access_token().await;
 
-        let http_request = build_http_request(&base_uri, &request, &opts)
+        let http_request = build_http_request(&base_uri.borrow(), &request, &opts)
             .map_err(|e| StreamError::protocol(e.to_string()))?;
 
         let response = self
@@ -588,7 +605,7 @@ where
             let auth = self.refresh().await.map_err(StreamError::transport)?;
             opts.auth = Some(auth);
 
-            let http_request = build_http_request(&base_uri, &request, &opts)
+            let http_request = build_http_request(&base_uri.borrow(), &request, &opts)
                 .map_err(|e| StreamError::protocol(e.to_string()))?;
 
             let response = self
@@ -603,18 +620,19 @@ where
         }
     }
 
-    async fn stream<Str>(
+    async fn stream<Str, B>(
         &self,
-        stream: jacquard_common::xrpc::streaming::XrpcProcedureSend<Str::Frame<'static>>,
+        stream: jacquard_common::xrpc::streaming::XrpcProcedureSend<Str::Frame<B>>,
     ) -> core::result::Result<
         jacquard_common::xrpc::streaming::XrpcResponseStream<
-            <<Str as jacquard_common::xrpc::streaming::XrpcProcedureStream>::Response as jacquard_common::xrpc::streaming::XrpcStreamResp>::Frame<'static>,
+            <<Str as jacquard_common::xrpc::streaming::XrpcProcedureStream>::Response as jacquard_common::xrpc::streaming::XrpcStreamResp>::Frame<B>,
         >,
         jacquard_common::StreamError,
     >
     where
+        B: BosStr + 'static,
         Str: jacquard_common::xrpc::streaming::XrpcProcedureStream + 'static,
-        <<Str as jacquard_common::xrpc::streaming::XrpcProcedureStream>::Response as jacquard_common::xrpc::streaming::XrpcStreamResp>::Frame<'static>: jacquard_common::xrpc::streaming::XrpcStreamResp,
+        <<Str as jacquard_common::xrpc::streaming::XrpcProcedureStream>::Response as jacquard_common::xrpc::streaming::XrpcStreamResp>::Frame<B>: jacquard_common::xrpc::streaming::XrpcStreamResp,
     {
         use jacquard_common::StreamError;
         use n0_future::TryStreamExt;
@@ -633,10 +651,10 @@ where
             use jacquard_common::AuthorizationToken;
             let hv = match token {
                 AuthorizationToken::Bearer(t) => {
-                    http::HeaderValue::from_str(&format!("Bearer {}", t.as_ref()))
+                    http::HeaderValue::from_str(&format!("Bearer {}", t.as_str()))
                 }
                 AuthorizationToken::Dpop(t) => {
-                    http::HeaderValue::from_str(&format!("DPoP {}", t.as_ref()))
+                    http::HeaderValue::from_str(&format!("DPoP {}", t.as_str()))
                 }
             }
             .map_err(|e| StreamError::protocol(format!("Invalid authorization token: {}", e)))?;
@@ -692,10 +710,10 @@ where
                 use jacquard_common::AuthorizationToken;
                 let hv = match token {
                     AuthorizationToken::Bearer(t) => {
-                        http::HeaderValue::from_str(&format!("Bearer {}", t.as_ref()))
+                        http::HeaderValue::from_str(&format!("Bearer {}", t.as_str()))
                     }
                     AuthorizationToken::Dpop(t) => {
-                        http::HeaderValue::from_str(&format!("DPoP {}", t.as_ref()))
+                        http::HeaderValue::from_str(&format!("DPoP {}", t.as_str()))
                     }
                 }
                 .map_err(|e| {
@@ -733,13 +751,13 @@ where
                 .map_err(StreamError::transport)?;
             let (resp_parts, resp_body) = response.into_parts();
             Ok(
-                jacquard_common::xrpc::streaming::XrpcResponseStream::from_typed_parts(
+                jacquard_common::xrpc::streaming::XrpcResponseStream::from_typed_parts::<B>(
                     resp_parts, resp_body,
                 ),
             )
         } else {
             Ok(
-                jacquard_common::xrpc::streaming::XrpcResponseStream::from_typed_parts(
+                jacquard_common::xrpc::streaming::XrpcResponseStream::from_typed_parts::<B>(
                     resp_parts, resp_body,
                 ),
             )
@@ -757,16 +775,40 @@ where
         self.client.options()
     }
 
-    fn resolve_handle(
+    #[cfg(not(target_arch = "wasm32"))]
+    fn resolve_handle<Str: BosStr + Sync>(
         &self,
-        handle: &Handle<'_>,
-    ) -> impl Future<Output = Result<Did<'static>, IdentityError>> {
+        handle: &Handle<Str>,
+    ) -> impl Future<Output = Result<Did, IdentityError>>
+    where
+        Self: Sync,
+    {
         async { self.client.resolve_handle(handle).await }
     }
 
-    fn resolve_did_doc(
+    #[cfg(target_arch = "wasm32")]
+    fn resolve_handle<Str: BosStr + Sync>(
         &self,
-        did: &Did<'_>,
+        handle: &Handle<Str>,
+    ) -> impl Future<Output = Result<Did, IdentityError>> {
+        async { self.client.resolve_handle(handle).await }
+    }
+
+    #[cfg(not(target_arch = "wasm32"))]
+    fn resolve_did_doc<Str: BosStr + Sync>(
+        &self,
+        did: &Did<Str>,
+    ) -> impl Future<Output = Result<DidDocResponse, IdentityError>>
+    where
+        Self: Sync,
+    {
+        async { self.client.resolve_did_doc(did).await }
+    }
+
+    #[cfg(target_arch = "wasm32")]
+    fn resolve_did_doc<Str: BosStr + Sync>(
+        &self,
+        did: &Did<Str>,
     ) -> impl Future<Output = Result<DidDocResponse, IdentityError>> {
         async { self.client.resolve_did_doc(did).await }
     }
@@ -813,8 +855,8 @@ where
         let mut opts = jacquard_common::xrpc::SubscriptionOptions::default();
         if let Some(token) = self.access_token().await {
             let auth_value = match token {
-                AuthorizationToken::Bearer(t) => format!("Bearer {}", t.as_ref()),
-                AuthorizationToken::Dpop(t) => format!("DPoP {}", t.as_ref()),
+                AuthorizationToken::Bearer(t) => format!("Bearer {}", t.as_str()),
+                AuthorizationToken::Dpop(t) => format!("DPoP {}", t.as_str()),
             };
             opts.headers
                 .push((CowStr::from("Authorization"), CowStr::from(auth_value)));
@@ -827,7 +869,7 @@ where
         params: &Sub,
     ) -> Result<jacquard_common::xrpc::SubscriptionStream<Sub::Stream>, Self::Error>
     where
-        Sub: XrpcSubscription + Send + Sync,
+        Sub: XrpcSubscription + Send + Sync + serde::Serialize,
     {
         let opts = self.subscription_opts().await;
         self.subscribe_with_opts(params, opts).await
@@ -839,7 +881,7 @@ where
         opts: jacquard_common::xrpc::SubscriptionOptions<'_>,
     ) -> Result<jacquard_common::xrpc::SubscriptionStream<Sub::Stream>, Self::Error>
     where
-        Sub: XrpcSubscription + Send + Sync,
+        Sub: XrpcSubscription + Send + Sync + serde::Serialize,
     {
         use jacquard_common::xrpc::SubscriptionExt;
         let base = self.base_uri().await;

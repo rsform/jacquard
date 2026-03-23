@@ -248,7 +248,7 @@ impl Error for GenericError {}
 #[derive(Debug, Default, Clone)]
 pub struct CallOptions<'a> {
     /// Optional Authorization to apply (`Bearer` or `DPoP`).
-    pub auth: Option<AuthorizationToken<'a>>,
+    pub auth: Option<AuthorizationToken<SmolStr>>,
     /// `atproto-proxy` header value.
     pub atproto_proxy: Option<CowStr<'a>>,
     /// `atproto-accept-labelers` header values.
@@ -397,20 +397,19 @@ pub trait XrpcStreamingClient: XrpcClient + HttpClientExt {
 
     /// Stream an XRPC procedure call and its response
     #[cfg(not(target_arch = "wasm32"))]
-    fn stream<S>(
+    fn stream<S, B>(
         &self,
-        stream: XrpcProcedureSend<S::Frame<'static>>,
+        stream: XrpcProcedureSend<S::Frame<B>>,
     ) -> impl Future<
         Output = Result<
-            XrpcResponseStream<
-                <<S as XrpcProcedureStream>::Response as XrpcStreamResp>::Frame<'static>,
-            >,
+            XrpcResponseStream<<<S as XrpcProcedureStream>::Response as XrpcStreamResp>::Frame<B>>,
             StreamError,
         >,
     >
     where
+        B: BosStr + 'static,
         S: XrpcProcedureStream + 'static,
-        <<S as XrpcProcedureStream>::Response as XrpcStreamResp>::Frame<'static>: XrpcStreamResp,
+        <<S as XrpcProcedureStream>::Response as XrpcStreamResp>::Frame<B>: XrpcStreamResp,
         Self: Sync;
 
     /// Stream an XRPC procedure call and its response
@@ -460,7 +459,7 @@ pub struct XrpcCall<'a, C: HttpClient> {
 
 impl<'a, C: HttpClient> XrpcCall<'a, C> {
     /// Apply Authorization to this call.
-    pub fn auth(mut self, token: AuthorizationToken<'a>) -> Self {
+    pub fn auth(mut self, token: AuthorizationToken<SmolStr>) -> Self {
         self.opts.auth = Some(token);
         self
     }
@@ -662,9 +661,9 @@ where
     if let Some(token) = &opts.auth {
         let hv = match token {
             AuthorizationToken::Bearer(t) => {
-                HeaderValue::from_str(&format!("Bearer {}", t.as_ref()))
+                HeaderValue::from_str(&format!("Bearer {}", t.as_str()))
             }
-            AuthorizationToken::Dpop(t) => HeaderValue::from_str(&format!("DPoP {}", t.as_ref())),
+            AuthorizationToken::Dpop(t) => HeaderValue::from_str(&format!("DPoP {}", t.as_str())),
         }
         .map_err(|e| ClientError::invalid_request(format!("Invalid authorization token: {}", e)))?;
         builder = builder.header(Header::Authorization, hv);
@@ -1044,13 +1043,14 @@ impl<'a, C: HttpClient + HttpClientExt> XrpcCall<'a, C> {
     ///
     /// Useful for streaming upload of large payloads, or for "pipe-through" operations
     /// where you are processing a large payload.
-    pub async fn stream<S>(
+    pub async fn stream<S, B>(
         self,
-        stream: XrpcProcedureSend<S::Frame<'static>>,
-    ) -> Result<XrpcResponseStream<<S::Response as XrpcStreamResp>::Frame<'static>>, StreamError>
+        stream: XrpcProcedureSend<S::Frame<B>>,
+    ) -> Result<XrpcResponseStream<<S::Response as XrpcStreamResp>::Frame<B>>, StreamError>
     where
         S: XrpcProcedureStream + 'static,
-        <<S as XrpcProcedureStream>::Response as XrpcStreamResp>::Frame<'static>: XrpcStreamResp,
+        B: BosStr + 'static,
+        <<S as XrpcProcedureStream>::Response as XrpcStreamResp>::Frame<B>: XrpcStreamResp,
     {
         use alloc::boxed::Box;
         use futures::TryStreamExt;
@@ -1064,10 +1064,10 @@ impl<'a, C: HttpClient + HttpClientExt> XrpcCall<'a, C> {
         if let Some(token) = &self.opts.auth {
             let hv = match token {
                 AuthorizationToken::Bearer(t) => {
-                    HeaderValue::from_str(&format!("Bearer {}", t.as_ref()))
+                    HeaderValue::from_str(&format!("Bearer {}", t.as_str()))
                 }
                 AuthorizationToken::Dpop(t) => {
-                    HeaderValue::from_str(&format!("DPoP {}", t.as_ref()))
+                    HeaderValue::from_str(&format!("DPoP {}", t.as_str()))
                 }
             }
             .map_err(|e| StreamError::protocol(format!("Invalid authorization token: {}", e)))?;
@@ -1108,8 +1108,8 @@ impl<'a, C: HttpClient + HttpClientExt> XrpcCall<'a, C> {
         let (parts, body) = resp.into_parts();
 
         Ok(XrpcResponseStream::<
-            <<S as XrpcProcedureStream>::Response as XrpcStreamResp>::Frame<'static>,
-        >::from_typed_parts(parts, body))
+            <<S as XrpcProcedureStream>::Response as XrpcStreamResp>::Frame<B>,
+        >::from_typed_parts::<B>(parts, body))
     }
 }
 

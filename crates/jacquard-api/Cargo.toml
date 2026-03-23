@@ -30,7 +30,7 @@ non_snake_case = "allow"
 unused_imports = "allow"
 
 [features]
-default = [ "minimal", "std", "streaming"]
+default = [ "minimal", "std"]
 std = ["serde/std", "jacquard-common/std"]
 minimal =  [ "com_atproto", "com_bad_example"]
 bluesky = [ "com_atproto", "app_bsky", "chat_bsky", "tools_ozone", "minimal"]

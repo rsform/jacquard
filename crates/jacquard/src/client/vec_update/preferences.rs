@@ -1,7 +1,6 @@
 use jacquard_api::app_bsky::actor::PreferencesItem;
 use jacquard_api::app_bsky::actor::get_preferences::{GetPreferences, GetPreferencesOutput};
 use jacquard_api::app_bsky::actor::put_preferences::PutPreferences;
-use jacquard_common::IntoStatic;
 
 /// VecUpdate implementation for Bluesky actor preferences.
 ///
@@ -35,28 +34,22 @@ pub struct PreferencesUpdate;
 
 impl super::VecUpdate for PreferencesUpdate {
     type GetRequest = GetPreferences;
-    type PutRequest = PutPreferences<'static>;
-    type Item = PreferencesItem<'static>;
+    type PutRequest = PutPreferences;
+    type Item = PreferencesItem;
 
     fn build_get() -> Self::GetRequest {
         GetPreferences
     }
 
-    fn extract_vec<'s>(
-        output: GetPreferencesOutput<'s>,
-    ) -> Vec<<Self::Item as IntoStatic>::Output> {
-        output
-            .preferences
-            .into_iter()
-            .map(|p| p.into_static())
-            .collect()
+    fn extract_vec(output: GetPreferencesOutput) -> Vec<Self::Item> {
+        output.preferences
     }
 
-    fn build_put(items: Vec<<Self::Item as IntoStatic>::Output>) -> Self::PutRequest {
+    fn build_put(items: Vec<Self::Item>) -> Self::PutRequest {
         PutPreferences::new().preferences(items).build()
     }
 
-    fn matches<'s>(a: &'s Self::Item, b: &'s Self::Item) -> bool {
+    fn matches(a: &Self::Item, b: &Self::Item) -> bool {
         // Match preferences by enum variant discriminant
         std::mem::discriminant(a) == std::mem::discriminant(b)
     }

@@ -22,7 +22,7 @@ pub struct AgentError {
     url: Option<SmolStr>,
     details: Option<SmolStr>,
     location: Option<SmolStr>,
-    xrpc: Option<Data<'static>>,
+    xrpc: Option<Data>,
 }
 
 impl std::fmt::Display for AgentError {
@@ -78,11 +78,11 @@ pub enum AgentErrorKind {
     #[diagnostic(code(jacquard::agent::record_operation))]
     RecordOperation {
         /// The repository DID
-        repo: Did<'static>,
+        repo: Did,
         /// The collection NSID
-        collection: Nsid<'static>,
+        collection: Nsid,
         /// The record key
-        rkey: RecordKey<Rkey<'static>>,
+        rkey: RecordKey<Rkey>,
     },
 
     /// Multi-step operation failed at sub-step (e.g., get failed in update_record)
@@ -206,37 +206,27 @@ impl AgentError {
     /// Add XRPC error data to this error for observability
     pub fn with_xrpc<E>(mut self, xrpc: XrpcError<E>) -> Self
     where
-        E: std::error::Error + jacquard_common::IntoStatic + serde::Serialize,
+        E: std::error::Error + serde::Serialize,
     {
         use jacquard_common::types::value::to_data;
-        // Attempt to serialize XrpcError to Data for observability
-        if let Ok(data) = to_data(&xrpc) {
-            self.xrpc = Some(data.into_static());
+        // Attempt to serialize XrpcError to Data for observability.
+        if let Ok(data) = to_data::<_>(&xrpc) {
+            self.xrpc = Some(data);
         }
         self
     }
 
-    /// Create an XRPC error with attached error data for observability
+    /// Create an XRPC error with attached error data for observability.
     pub fn xrpc<E>(error: XrpcError<E>) -> Self
     where
-        E: std::error::Error + jacquard_common::IntoStatic + serde::Serialize + Send + Sync,
-        <E as IntoStatic>::Output: IntoStatic + std::error::Error + Send + Sync,
+        E: std::error::Error + serde::Serialize + Send + Sync + 'static,
     {
         use jacquard_common::types::value::to_data;
-        // Attempt to serialize XrpcError to Data for observability
-        if let Ok(data) = to_data(&error) {
-            let mut error = Self::new(
-                AgentErrorKind::XrpcError,
-                Some(Box::new(error.into_static())),
-            );
-            error.xrpc = Some(data.into_static());
-            error
-        } else {
-            Self::new(
-                AgentErrorKind::XrpcError,
-                Some(Box::new(error.into_static())),
-            )
-        }
+        // Attempt to serialize XrpcError to Data for observability.
+        let xrpc = to_data::<_>(&error).ok();
+        let mut err = Self::new(AgentErrorKind::XrpcError, Some(Box::new(error)));
+        err.xrpc = xrpc;
+        err
     }
 
     // Constructors
@@ -259,9 +249,9 @@ impl AgentError {
 
     /// Create a record operation error
     pub fn record_operation(
-        repo: Did<'static>,
-        collection: Nsid<'static>,
-        rkey: RecordKey<Rkey<'static>>,
+        repo: Did,
+        collection: Nsid,
+        rkey: RecordKey<Rkey>,
         source: impl std::error::Error + Send + Sync + 'static,
     ) -> Self {
         Self::new(

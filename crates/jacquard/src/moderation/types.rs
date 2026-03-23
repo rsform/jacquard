@@ -1,23 +1,28 @@
 use jacquard_api::com_atproto::label::{LabelValue, LabelValueDefinition};
-use jacquard_common::CowStr;
+use jacquard_common::bos::{BosStr, DefaultStr};
 use jacquard_common::types::string::Did;
+use smol_str::SmolStr;
 use std::collections::HashMap;
+use std::hash::Hash;
 
 /// User's moderation preferences
 ///
 /// Specifies how the user wants to respond to different label values,
 /// both globally and per-labeler.
+///
+/// HashMap keys are owned `SmolStr` values so that lookups remain efficient
+/// without needing a generic string type parameter on this struct.
 #[derive(Debug, Clone)]
-pub struct ModerationPrefs<'a> {
+pub struct ModerationPrefs {
     /// Whether adult content is enabled for this user
     pub adult_content_enabled: bool,
     /// Global label preferences (label value -> preference)
-    pub labels: HashMap<CowStr<'a>, LabelPref>,
+    pub labels: HashMap<SmolStr, LabelPref>,
     /// Per-labeler overrides (labeler DID -> label value -> preference)
-    pub labelers: HashMap<Did<'a>, HashMap<CowStr<'a>, LabelPref>>,
+    pub labelers: HashMap<Did, HashMap<SmolStr, LabelPref>>,
 }
 
-impl Default for ModerationPrefs<'_> {
+impl Default for ModerationPrefs {
     fn default() -> Self {
         Self {
             adult_content_enabled: false,
@@ -42,25 +47,37 @@ pub enum LabelPref {
 ///
 /// Maps labeler DIDs to their published label value definitions.
 /// These definitions describe what labels mean, their severity, and default settings.
-#[derive(Debug, Clone, Default)]
-pub struct LabelerDefs<'a> {
+///
+/// The type parameter `S` must satisfy `Hash + Eq` in addition to `BosStr` because
+/// `Did<S>` is used as a `HashMap` key.
+#[derive(Debug, Clone)]
+pub struct LabelerDefs<S: BosStr + Hash + Eq = DefaultStr> {
     /// Labeler DID -> label value definitions
-    pub defs: HashMap<Did<'a>, Vec<LabelValueDefinition<'a>>>,
+    pub defs: HashMap<Did<S>, Vec<LabelValueDefinition<S>>>,
 }
 
-impl<'a> LabelerDefs<'a> {
+/// Manual `Default` impl to avoid the derive macro adding an unnecessary `S: Default` bound.
+impl<S: BosStr + Hash + Eq> Default for LabelerDefs<S> {
+    fn default() -> Self {
+        Self {
+            defs: HashMap::new(),
+        }
+    }
+}
+
+impl<S: BosStr + Hash + Eq> LabelerDefs<S> {
     /// Create an empty set of labeler definitions
     pub fn new() -> Self {
         Self::default()
     }
 
     /// Add definitions for a labeler
-    pub fn insert(&mut self, did: Did<'a>, definitions: Vec<LabelValueDefinition<'a>>) {
+    pub fn insert(&mut self, did: Did<S>, definitions: Vec<LabelValueDefinition<S>>) {
         self.defs.insert(did, definitions);
     }
 
     /// Get definitions for a specific labeler
-    pub fn get(&self, did: &Did<'_>) -> Option<&[LabelValueDefinition<'a>]> {
+    pub fn get(&self, did: &Did<impl BosStr>) -> Option<&[LabelValueDefinition<S>]> {
         self.defs
             .iter()
             .find(|(k, _)| k.as_ref() == did.as_ref())
@@ -70,9 +87,9 @@ impl<'a> LabelerDefs<'a> {
     /// Find a label definition by labeler and identifier
     pub fn find_def(
         &self,
-        labeler: &Did<'_>,
+        labeler: &Did<impl BosStr>,
         identifier: &str,
-    ) -> Option<&LabelValueDefinition<'a>> {
+    ) -> Option<&LabelValueDefinition<S>> {
         self.defs
             .iter()
             .find(|(k, _)| k.as_ref() == labeler.as_ref())
@@ -97,7 +114,7 @@ pub struct ModerationDecision {
     /// Whether user override is allowed (false for legal takedowns)
     pub no_override: bool,
     /// Which labels caused this decision
-    pub causes: Vec<LabelCause<'static>>,
+    pub causes: Vec<LabelCause>,
 }
 
 impl ModerationDecision {
@@ -125,12 +142,15 @@ pub enum Blur {
 }
 
 /// Information about a label that contributed to a moderation decision
+///
+/// Uses `DefaultStr` (`SmolStr`) as the backing type, since causes are always
+/// constructed at the point of moderation with owned values.
 #[derive(Debug, Clone)]
-pub struct LabelCause<'a> {
+pub struct LabelCause<S: BosStr = DefaultStr> {
     /// The label value that triggered this
-    pub label: LabelValue<'a>,
+    pub label: LabelValue<S>,
     /// Which labeler applied this label
-    pub source: Did<'a>,
+    pub source: Did<S>,
     /// What the label is targeting
     pub target: LabelTarget,
 }

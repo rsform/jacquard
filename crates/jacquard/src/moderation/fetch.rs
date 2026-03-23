@@ -1,3 +1,5 @@
+use std::convert::From;
+
 use super::LabelerDefs;
 use crate::client::{AgentError, AgentSessionExt, CollectionErr, CollectionOutput};
 use crate::moderation::labeled::LabeledRecord;
@@ -8,28 +10,28 @@ use jacquard_api::app_bsky::labeler::{
     service::Service,
 };
 use jacquard_api::com_atproto::label::{Label, query_labels::QueryLabels};
-use jacquard_common::cowstr::ToCowStr;
+use jacquard_common::BosStr;
+use jacquard_common::bos::DefaultStr;
 use jacquard_common::error::ClientError;
 use jacquard_common::types::collection::Collection;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::uri::RecordUri;
-use jacquard_common::xrpc::{XrpcClient, XrpcError};
-use jacquard_common::{CowStr, IntoStatic};
-use std::convert::From;
+use jacquard_common::xrpc::{XrpcClient, XrpcError, XrpcResp};
+use smol_str::SmolStr;
 
 /// Fetch labeler definitions from Bluesky's AppView (or a compatible one)
 #[cfg(feature = "api_bluesky")]
 pub async fn fetch_labeler_defs(
     client: &(impl XrpcClient + Sync),
-    dids: Vec<Did<'_>>,
-) -> Result<LabelerDefs<'static>, ClientError> {
+    dids: Vec<Did>,
+) -> Result<LabelerDefs, ClientError> {
     #[cfg(feature = "tracing")]
     let _span = tracing::debug_span!("fetch_labeler_defs", count = dids.len()).entered();
 
     let request = GetServices::new().dids(dids).detailed(true).build();
 
     let response = client.send(request).await?;
-    let output: GetServicesOutput<'static> = response.into_output().map_err(|e| match e {
+    let output: GetServicesOutput = response.into_output().map_err(|e| match e {
         XrpcError::Auth(auth) => ClientError::auth(auth),
         XrpcError::Generic(g) => ClientError::decode(g.to_string()),
         XrpcError::Decode(e) => ClientError::decode(format!("{:?}", e)),
@@ -46,11 +48,8 @@ pub async fn fetch_labeler_defs(
             GetServicesOutputViewsItem::LabelerViewDetailed(detailed) => {
                 if let Some(label_value_definitions) = &detailed.policies.label_value_definitions {
                     defs.insert(
-                        detailed.creator.did.clone().into_static(),
-                        label_value_definitions
-                            .iter()
-                            .map(|d| d.clone().into_static())
-                            .collect(),
+                        detailed.creator.did.clone(),
+                        label_value_definitions.clone(),
                     );
                 }
             }
@@ -77,8 +76,8 @@ pub async fn fetch_labeler_defs(
 #[cfg(feature = "api_bluesky")]
 pub async fn fetch_labeler_defs_direct(
     client: &(impl AgentSessionExt + Sync),
-    dids: Vec<Did<'_>>,
-) -> Result<LabelerDefs<'static>, AgentError> {
+    dids: Vec<Did>,
+) -> Result<LabelerDefs, AgentError> {
     #[cfg(feature = "tracing")]
     let _span = tracing::debug_span!("fetch_labeler_defs_direct", count = dids.len()).entered();
 
@@ -91,10 +90,10 @@ pub async fn fetch_labeler_defs_direct(
         })?;
 
         let output = client.fetch_record(&record_uri).await?;
-        let service: Service<'static> = output.value;
+        let service: Service = output.value;
 
         if let Some(label_value_definitions) = service.policies.label_value_definitions {
-            defs.insert(did.into_static(), label_value_definitions);
+            defs.insert(did, label_value_definitions);
         }
     }
 
@@ -114,10 +113,10 @@ pub async fn fetch_labeler_defs_direct(
 /// on labelers to tail their output, and index them alongside the data your app cares about.
 pub async fn fetch_labels(
     client: &impl AgentSessionExt,
-    uri_patterns: Vec<CowStr<'_>>,
-    sources: Vec<Did<'_>>,
-    cursor: Option<CowStr<'_>>,
-) -> Result<(Vec<Label<'static>>, Option<CowStr<'static>>), AgentError> {
+    uri_patterns: Vec<SmolStr>,
+    sources: Vec<Did>,
+    cursor: Option<SmolStr>,
+) -> Result<(Vec<Label>, Option<SmolStr>), AgentError> {
     #[cfg(feature = "tracing")]
     let _span = tracing::debug_span!("fetch_labels", count = sources.len()).entered();
 
@@ -147,19 +146,20 @@ pub async fn fetch_labels(
 ///
 /// In practice if you are running an app server, you should call [`subscribeLabels`](https://tangled.org/@nonbinary.computer/jacquard/blob/main/crates/jacquard-api/src/com_atproto/label/subscribe_labels.rs)
 /// on labelers to tail their output, and index them alongside the data your app cares about.
-pub async fn fetch_labeled_record<R>(
+pub async fn fetch_labeled_record<R, S>(
     client: &impl AgentSessionExt,
-    record_uri: &RecordUri<'_, R>,
-    sources: Vec<Did<'_>>,
-) -> Result<LabeledRecord<'static, R>, AgentError>
+    record_uri: &RecordUri<S, R>,
+    sources: Vec<Did>,
+) -> Result<LabeledRecord<DefaultStr, R>, AgentError>
 where
-    R: Collection + From<CollectionOutput<'static, R>>,
-    for<'a> CollectionOutput<'a, R>: IntoStatic<Output = CollectionOutput<'static, R>>,
-    for<'a> CollectionErr<'a, R>: IntoStatic<Output = CollectionErr<'static, R>> + Send + Sync,
+    R: Collection + From<<<R as Collection>::Record as XrpcResp>::Output<smol_str::SmolStr>>,
+    S: BosStr + Sync,
+    CollectionOutput<R>: serde::de::DeserializeOwned,
+    CollectionErr<R>: Send + Sync + 'static,
 {
     let record: R = client.fetch_record(record_uri).await?.into();
-    let (labels, _) =
-        fetch_labels(client, vec![record_uri.as_uri().to_cowstr()], sources, None).await?;
+    let uri_pattern = SmolStr::new(record_uri.as_uri().as_str());
+    let (labels, _) = fetch_labels(client, vec![uri_pattern], sources, None).await?;
 
     Ok(LabeledRecord { record, labels })
 }

@@ -7,7 +7,7 @@ use jacquard::client::Agent;
 use jacquard::deps::fluent_uri::Uri;
 use jacquard::types::did::Did;
 use jacquard::xrpc::XrpcClient;
-use jacquard::{CowStr, IntoStatic};
+use jacquard::{BosStr, IntoStatic};
 use jacquard_common::http_client::HttpClient;
 use jacquard_oauth::atproto::AtprotoClientMetadata;
 use jacquard_oauth::client::OAuthSession;
@@ -16,6 +16,7 @@ use jacquard_oauth::scopes::Scope;
 use jacquard_oauth::session::SessionRegistry;
 use jacquard_oauth::session::{ClientData, ClientSessionData, DpopClientData};
 use jacquard_oauth::types::{OAuthAuthorizationServerMetadata, OAuthTokenType, TokenSet};
+use smol_str::SmolStr;
 use tokio::sync::Mutex;
 
 #[derive(Clone, Default)]
@@ -53,15 +54,15 @@ impl jacquard::identity::resolver::IdentityResolver for MockClient {
             LazyLock::new(jacquard::identity::resolver::ResolverOptions::default);
         &OPTS
     }
-    async fn resolve_handle(
+    async fn resolve_handle<S: BosStr>(
         &self,
-        _handle: &jacquard::types::string::Handle<'_>,
-    ) -> std::result::Result<Did<'static>, jacquard::identity::resolver::IdentityError> {
+        _handle: &jacquard::types::string::Handle<S>,
+    ) -> std::result::Result<Did, jacquard::identity::resolver::IdentityError> {
         Ok(Did::new_static("did:plc:alice").unwrap())
     }
-    async fn resolve_did_doc(
+    async fn resolve_did_doc<S: BosStr>(
         &self,
-        _did: &Did<'_>,
+        _did: &Did<S>,
     ) -> std::result::Result<
         jacquard::identity::resolver::DidDocResponse,
         jacquard::identity::resolver::IdentityError,
@@ -85,45 +86,41 @@ impl jacquard::identity::resolver::IdentityResolver for MockClient {
 impl OAuthResolver for MockClient {
     async fn get_authorization_server_metadata(
         &self,
-        issuer: &CowStr<'_>,
-    ) -> Result<OAuthAuthorizationServerMetadata<'static>, jacquard_oauth::resolver::ResolverError>
-    {
+        issuer: &str,
+    ) -> Result<OAuthAuthorizationServerMetadata, jacquard_oauth::resolver::ResolverError> {
         // Return minimal metadata with supported auth method "none" and DPoP support
         let mut md = OAuthAuthorizationServerMetadata::default();
-        md.issuer = jacquard::CowStr::from(issuer.as_str());
-        md.token_endpoint = jacquard::CowStr::from(format!("{}/token", issuer));
-        md.authorization_endpoint = jacquard::CowStr::from(format!("{}/authorize", issuer));
+        md.issuer = SmolStr::from(issuer);
+        md.token_endpoint = SmolStr::from(format!("{}/token", issuer));
+        md.authorization_endpoint = SmolStr::from(format!("{}/authorize", issuer));
         md.require_pushed_authorization_requests = Some(true);
-        md.pushed_authorization_request_endpoint =
-            Some(jacquard::CowStr::from(format!("{}/par", issuer)));
-        md.token_endpoint_auth_methods_supported = Some(vec![jacquard::CowStr::from("none")]);
-        md.dpop_signing_alg_values_supported = Some(vec![jacquard::CowStr::from("ES256")]);
+        md.pushed_authorization_request_endpoint = Some(SmolStr::from(format!("{}/par", issuer)));
+        md.token_endpoint_auth_methods_supported = Some(vec![SmolStr::from("none")]);
+        md.dpop_signing_alg_values_supported = Some(vec![SmolStr::from("ES256")]);
         use jacquard::IntoStatic;
         Ok(md.into_static())
     }
 
     async fn get_resource_server_metadata(
         &self,
-        _pds: &CowStr<'_>,
-    ) -> Result<OAuthAuthorizationServerMetadata<'static>, jacquard_oauth::resolver::ResolverError>
-    {
+        _pds: &str,
+    ) -> Result<OAuthAuthorizationServerMetadata, jacquard_oauth::resolver::ResolverError> {
         // Return metadata pointing to the same issuer as above
         let mut md = OAuthAuthorizationServerMetadata::default();
-        md.issuer = jacquard::CowStr::from("https://issuer");
-        md.token_endpoint = jacquard::CowStr::from("https://issuer/token");
-        md.authorization_endpoint = jacquard::CowStr::from("https://issuer/authorize");
+        md.issuer = SmolStr::from("https://issuer");
+        md.token_endpoint = SmolStr::from("https://issuer/token");
+        md.authorization_endpoint = SmolStr::from("https://issuer/authorize");
         md.require_pushed_authorization_requests = Some(true);
-        md.pushed_authorization_request_endpoint =
-            Some(jacquard::CowStr::from("https://issuer/par"));
-        md.token_endpoint_auth_methods_supported = Some(vec![jacquard::CowStr::from("none")]);
-        md.dpop_signing_alg_values_supported = Some(vec![jacquard::CowStr::from("ES256")]);
+        md.pushed_authorization_request_endpoint = Some(SmolStr::from("https://issuer/par"));
+        md.token_endpoint_auth_methods_supported = Some(vec![SmolStr::from("none")]);
+        md.dpop_signing_alg_values_supported = Some(vec![SmolStr::from("ES256")]);
         Ok(md.into_static())
     }
 
-    async fn verify_issuer(
+    async fn verify_issuer<S: BosStr>(
         &self,
-        _server_metadata: &OAuthAuthorizationServerMetadata<'_>,
-        _sub: &Did<'_>,
+        _server_metadata: &OAuthAuthorizationServerMetadata,
+        _sub: &Did<S>,
     ) -> Result<jacquard::deps::fluent_uri::Uri<String>, jacquard_oauth::resolver::ResolverError>
     {
         Ok(jacquard::deps::fluent_uri::Uri::parse("https://pds")
@@ -220,25 +217,24 @@ async fn oauth_xrpc_invalid_token_triggers_refresh_and_retries() {
     use jacquard::IntoStatic;
     let session_data = ClientSessionData {
         account_did: Did::new_static("did:plc:alice").unwrap(),
-        session_id: jacquard::CowStr::from("state"),
+        session_id: SmolStr::from("state"),
         host_url: Uri::parse("https://pds").expect("valid uri").to_owned(),
-        authserver_url: CowStr::new_static("https://issuer"),
-        authserver_token_endpoint: jacquard::CowStr::from("https://issuer/token"),
+        authserver_url: SmolStr::new_static("https://issuer"),
+        authserver_token_endpoint: SmolStr::from("https://issuer/token"),
         authserver_revocation_endpoint: None,
         scopes: vec![Scope::Atproto],
         dpop_data: DpopClientData {
-            dpop_key: jacquard_oauth::utils::generate_key(&[jacquard::CowStr::from("ES256")])
-                .unwrap(),
-            dpop_authserver_nonce: jacquard::CowStr::from(""),
-            dpop_host_nonce: jacquard::CowStr::from(""),
+            dpop_key: jacquard_oauth::utils::generate_key(&[SmolStr::from("ES256")]).unwrap(),
+            dpop_authserver_nonce: SmolStr::from(""),
+            dpop_host_nonce: SmolStr::from(""),
         },
         token_set: TokenSet {
-            iss: jacquard::CowStr::from("https://issuer"),
+            iss: SmolStr::from("https://issuer"),
             sub: Did::new_static("did:plc:alice").unwrap(),
-            aud: jacquard::CowStr::from("https://pds"),
+            aud: SmolStr::from("https://pds"),
             scope: None,
-            refresh_token: Some(jacquard::CowStr::from("rt1")),
-            access_token: jacquard::CowStr::from("atk1"),
+            refresh_token: Some(SmolStr::from("rt1")),
+            access_token: SmolStr::from("atk1"),
             token_type: OAuthTokenType::DPoP,
             expires_at: None,
         },
@@ -249,25 +245,24 @@ async fn oauth_xrpc_invalid_token_triggers_refresh_and_retries() {
     // Seed the store so refresh can load the session
     let data_store = ClientSessionData {
         account_did: Did::new_static("did:plc:alice").unwrap(),
-        session_id: jacquard::CowStr::from("state"),
+        session_id: SmolStr::from("state"),
         host_url: Uri::parse("https://pds").expect("valid uri").to_owned(),
-        authserver_url: CowStr::new_static("https://issuer"),
-        authserver_token_endpoint: jacquard::CowStr::from("https://issuer/token"),
+        authserver_url: SmolStr::new_static("https://issuer"),
+        authserver_token_endpoint: SmolStr::from("https://issuer/token"),
         authserver_revocation_endpoint: None,
         scopes: vec![Scope::Atproto],
         dpop_data: DpopClientData {
-            dpop_key: jacquard_oauth::utils::generate_key(&[jacquard::CowStr::from("ES256")])
-                .unwrap(),
-            dpop_authserver_nonce: jacquard::CowStr::from(""),
-            dpop_host_nonce: jacquard::CowStr::from(""),
+            dpop_key: jacquard_oauth::utils::generate_key(&[SmolStr::from("ES256")]).unwrap(),
+            dpop_authserver_nonce: SmolStr::from(""),
+            dpop_host_nonce: SmolStr::from(""),
         },
         token_set: TokenSet {
-            iss: jacquard::CowStr::from("https://issuer"),
+            iss: SmolStr::from("https://issuer"),
             sub: Did::new_static("did:plc:alice").unwrap(),
-            aud: jacquard::CowStr::from("https://pds"),
+            aud: SmolStr::from("https://pds"),
             scope: None,
-            refresh_token: Some(jacquard::CowStr::from("rt1")),
-            access_token: jacquard::CowStr::from("atk1"),
+            refresh_token: Some(SmolStr::from("rt1")),
+            access_token: SmolStr::from("atk1"),
             token_type: OAuthTokenType::DPoP,
             expires_at: None,
         },
@@ -351,25 +346,24 @@ async fn oauth_xrpc_invalid_token_body_triggers_refresh_and_retries() {
     use jacquard::IntoStatic;
     let session_data = ClientSessionData {
         account_did: Did::new_static("did:plc:alice").unwrap(),
-        session_id: jacquard::CowStr::from("state"),
+        session_id: SmolStr::new_static("state"),
         host_url: Uri::parse("https://pds").expect("valid uri").to_owned(),
-        authserver_url: CowStr::new_static("https://issuer"),
-        authserver_token_endpoint: jacquard::CowStr::from("https://issuer/token"),
+        authserver_url: SmolStr::new_static("https://issuer"),
+        authserver_token_endpoint: SmolStr::from("https://issuer/token"),
         authserver_revocation_endpoint: None,
         scopes: vec![Scope::Atproto],
         dpop_data: DpopClientData {
-            dpop_key: jacquard_oauth::utils::generate_key(&[jacquard::CowStr::from("ES256")])
-                .unwrap(),
-            dpop_authserver_nonce: jacquard::CowStr::from(""),
-            dpop_host_nonce: jacquard::CowStr::from(""),
+            dpop_key: jacquard_oauth::utils::generate_key(&[SmolStr::from("ES256")]).unwrap(),
+            dpop_authserver_nonce: SmolStr::from(""),
+            dpop_host_nonce: SmolStr::from(""),
         },
         token_set: TokenSet {
-            iss: jacquard::CowStr::from("https://issuer"),
+            iss: SmolStr::from("https://issuer"),
             sub: Did::new_static("did:plc:alice").unwrap(),
-            aud: jacquard::CowStr::from("https://pds"),
+            aud: SmolStr::from("https://pds"),
             scope: None,
-            refresh_token: Some(jacquard::CowStr::from("rt1")),
-            access_token: jacquard::CowStr::from("atk1"),
+            refresh_token: Some(SmolStr::from("rt1")),
+            access_token: SmolStr::from("atk1"),
             token_type: OAuthTokenType::DPoP,
             expires_at: None,
         },

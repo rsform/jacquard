@@ -72,6 +72,15 @@ impl<S: Bos<str>> Nsid<S> {
     pub unsafe fn unchecked(nsid: S) -> Self {
         Nsid(nsid)
     }
+
+    /// Borrow as an `Nsid<&str>`, analogous to `Uri::borrow()`.
+    pub fn borrow(&self) -> Nsid<&str>
+    where
+        S: AsRef<str>,
+    {
+        // SAFETY: self is already validated.
+        unsafe { Nsid::unchecked(self.0.as_ref()) }
+    }
 }
 
 impl<S: Bos<str> + AsRef<str>> Nsid<S> {

@@ -25,7 +25,7 @@
 //! ```ignore
 //! # use jacquard::moderation::*;
 //! # use jacquard_api::app_bsky::feed::PostView;
-//! # fn example(post: &PostView<'_>, prefs: &ModerationPrefs<'_>, defs: &LabelerDefs<'_>) {
+//! # fn example(post: &PostView, prefs: &ModerationPrefs, defs: &LabelerDefs) {
 //! let decision = moderate(post, prefs, defs, &[]);
 //! if decision.filter {
 //!     // hide the post

@@ -7,9 +7,10 @@
 use crate::api::app_bsky::richtext::facet::Facet;
 #[cfg(feature = "api_bluesky")]
 use crate::api::com_atproto::repo::strong_ref::StrongRef;
-use crate::common::CowStr;
 #[cfg(feature = "api_bluesky")]
 use crate::types::aturi::AtUri;
+#[cfg(feature = "api_bluesky")]
+use jacquard_common::BosStr;
 use jacquard_common::IntoStatic;
 #[cfg(feature = "api_bluesky")]
 use jacquard_common::http_client::HttpClient;
@@ -24,6 +25,9 @@ use jacquard_identity::resolver::IdentityResolver;
 use regex::{Captures, Regex};
 #[cfg(target_family = "wasm")]
 use regex_lite::{Captures, Regex};
+#[cfg(feature = "api_bluesky")]
+use smol_str::{SmolStr, ToSmolStr, format_smolstr};
+use std::borrow::Cow;
 use std::marker::PhantomData;
 use std::ops::Range;
 use std::sync::LazyLock;
@@ -86,15 +90,15 @@ pub struct Unresolved;
 /// Rich text with facets (mentions, links, tags)
 #[derive(Debug, Clone)]
 #[cfg(feature = "api_bluesky")]
-pub struct RichText<'a> {
+pub struct RichText {
     /// The text content
-    pub text: CowStr<'a>,
+    pub text: SmolStr,
     /// Facets (mentions, links, tags)
-    pub facets: Option<Vec<Facet<'a>>>,
+    pub facets: Option<Vec<Facet<SmolStr>>>,
 }
 
 #[cfg(feature = "api_bluesky")]
-impl RichText<'static> {
+impl RichText {
     /// Entry point for parsing text with automatic facet detection
     ///
     /// Uses default embed domains (bsky.app, deer.social) for at-URI extraction.
@@ -111,42 +115,42 @@ impl RichText<'static> {
 /// Detected embed candidate from URL or at-URI
 #[derive(Debug, Clone)]
 #[cfg(feature = "api_bluesky")]
-pub enum EmbedCandidate<'a> {
+pub enum EmbedCandidate<S: BosStr> {
     /// Bluesky record (post, list, starterpack, feed)
     Record {
         /// The at:// URI identifying the record
-        at_uri: AtUri<'a>,
+        at_uri: AtUri<S>,
         /// Strong reference (repo + CID) if resolved
-        strong_ref: Option<StrongRef<'a>>,
+        strong_ref: Option<StrongRef<S>>,
     },
     /// External link embed
     External {
         /// The URL
-        url: CowStr<'a>,
+        url: S,
         /// OpenGraph metadata if fetched
-        metadata: Option<ExternalMetadata<'a>>,
+        metadata: Option<ExternalMetadata<S>>,
     },
 }
 
 /// External embed metadata (OpenGraph)
 #[derive(Debug, Clone)]
 #[cfg(feature = "api_bluesky")]
-pub struct ExternalMetadata<'a> {
+pub struct ExternalMetadata<S> {
     /// Page title
-    pub title: CowStr<'a>,
+    pub title: S,
     /// Page description
-    pub description: CowStr<'a>,
+    pub description: S,
     /// Thumbnail URL
-    pub thumbnail: Option<CowStr<'a>>,
+    pub thumbnail: Option<S>,
 }
 
 /// Rich text builder supporting both parsing and manual construction
 #[derive(Debug)]
 pub struct RichTextBuilder<State> {
-    text: String,
+    text: SmolStr,
     facet_candidates: Vec<FacetCandidate>,
     #[cfg(feature = "api_bluesky")]
-    embed_candidates: Option<Vec<EmbedCandidate<'static>>>,
+    embed_candidates: Option<Vec<EmbedCandidate<SmolStr>>>,
     _state: PhantomData<State>,
 }
 
@@ -171,7 +175,7 @@ enum FacetCandidate {
         /// Range in text including @ symbol
         range: Range<usize>,
         /// DID when provided, otherwise resolved later
-        did: Option<Did<'static>>,
+        did: Option<Did>,
     },
     /// Plain URL link
     /// Range points to URL in text, normalize at build time
@@ -198,39 +202,37 @@ enum FacetCandidate {
 ///
 /// And normalizes all newline variants (\r\n, \r, \n) to \n, while collapsing
 /// runs of newlines and invisible chars to at most two newlines.
-fn sanitize_text(text: &str) -> String {
-    SANITIZE_NEWLINES_REGEX
-        .replace_all(text, |caps: &Captures| {
-            let matched = caps.get(0).unwrap().as_str();
+fn sanitize_text(text: &str) -> Cow<'_, str> {
+    SANITIZE_NEWLINES_REGEX.replace_all(text, |caps: &Captures| {
+        let matched = caps.get(0).unwrap().as_str();
 
-            // Count newline sequences, treating \r\n as one unit
-            let mut newline_sequences = 0;
-            let mut chars = matched.chars().peekable();
+        // Count newline sequences, treating \r\n as one unit
+        let mut newline_sequences = 0;
+        let mut chars = matched.chars().peekable();
 
-            while let Some(c) = chars.next() {
-                if c == '\r' {
-                    // Check if followed by \n
-                    if chars.peek() == Some(&'\n') {
-                        chars.next(); // consume the \n
-                    }
-                    newline_sequences += 1;
-                } else if c == '\n' {
-                    newline_sequences += 1;
+        while let Some(c) = chars.next() {
+            if c == '\r' {
+                // Check if followed by \n
+                if chars.peek() == Some(&'\n') {
+                    chars.next(); // consume the \n
                 }
-                // Skip invisible chars (they don't increment count)
+                newline_sequences += 1;
+            } else if c == '\n' {
+                newline_sequences += 1;
             }
+            // Skip invisible chars (they don't increment count)
+        }
 
-            if newline_sequences == 0 {
-                // Only invisible chars, remove them
-                ""
-            } else if newline_sequences == 1 {
-                "\n"
-            } else {
-                // Multiple newlines, collapse to \n\n (paragraph break)
-                "\n\n"
-            }
-        })
-        .to_string()
+        if newline_sequences == 0 {
+            // Only invisible chars, remove them
+            ""
+        } else if newline_sequences == 1 {
+            "\n"
+        } else {
+            // Multiple newlines, collapse to \n\n (paragraph break)
+            "\n\n"
+        }
+    })
 }
 
 /// Entry point for parsing text with automatic facet detection
@@ -301,7 +303,7 @@ pub fn parse_with_domains(
     facet_candidates.extend(tag_facets);
 
     RichTextBuilder {
-        text: text_processed,
+        text: text_processed.to_smolstr(),
         facet_candidates,
         embed_candidates: if embed_candidates.is_empty() {
             None
@@ -347,7 +349,7 @@ impl RichTextBuilder<Resolved> {
     /// Entry point for manual richtext construction
     pub fn builder() -> Self {
         RichTextBuilder {
-            text: String::new(),
+            text: SmolStr::new_static(""),
             facet_candidates: Vec::new(),
             #[cfg(feature = "api_bluesky")]
             embed_candidates: None,
@@ -381,18 +383,18 @@ impl RichTextBuilder<Resolved> {
     }
 }
 
-impl<S> RichTextBuilder<S> {
+impl<St> RichTextBuilder<St> {
     /// Set the text content
     pub fn text(mut self, text: impl AsRef<str>) -> Self {
-        self.text = sanitize_text(text.as_ref());
+        self.text = sanitize_text(text.as_ref()).to_smolstr();
         self
     }
 
     /// Add a mention facet with a resolved DID (requires explicit range)
-    pub fn mention(mut self, did: &Did<'_>, range: Range<usize>) -> Self {
+    pub fn mention(mut self, did: &Did, range: Range<usize>) -> Self {
         self.facet_candidates.push(FacetCandidate::Mention {
             range,
-            did: Some(did.clone().into_static()),
+            did: Some(did.clone()),
         });
         self
     }
@@ -433,11 +435,7 @@ impl<S> RichTextBuilder<S> {
 
     #[cfg(feature = "api_bluesky")]
     /// Add a record embed candidate
-    pub fn embed_record(
-        mut self,
-        at_uri: AtUri<'static>,
-        strong_ref: Option<StrongRef<'static>>,
-    ) -> Self {
+    pub fn embed_record(mut self, at_uri: AtUri, strong_ref: Option<StrongRef>) -> Self {
         self.embed_candidates
             .get_or_insert_with(Vec::new)
             .push(EmbedCandidate::Record { at_uri, strong_ref });
@@ -448,8 +446,8 @@ impl<S> RichTextBuilder<S> {
     /// Add an external embed candidate
     pub fn embed_external(
         mut self,
-        url: impl Into<CowStr<'static>>,
-        metadata: Option<ExternalMetadata<'static>>,
+        url: impl Into<SmolStr>,
+        metadata: Option<ExternalMetadata<SmolStr>>,
     ) -> Self {
         self.embed_candidates
             .get_or_insert_with(Vec::new)
@@ -617,12 +615,12 @@ fn detect_tags(text: &str) -> Vec<FacetCandidate> {
 
 /// Classifies a URL or at-URI as an embed candidate
 #[cfg(feature = "api_bluesky")]
-fn classify_embed(url: &str, embed_domains: &[&str]) -> Option<EmbedCandidate<'static>> {
+fn classify_embed<'s>(url: &'s str, embed_domains: &[&str]) -> Option<EmbedCandidate<SmolStr>> {
     // Check if it's an at:// URI
     if url.starts_with("at://") {
-        if let Ok(at_uri) = AtUri::new(url) {
+        if let Ok(at_uri) = AtUri::new(url.to_smolstr()) {
             return Some(EmbedCandidate::Record {
-                at_uri: at_uri.into_static(),
+                at_uri: at_uri,
                 strong_ref: None,
             });
         }
@@ -640,7 +638,7 @@ fn classify_embed(url: &str, embed_domains: &[&str]) -> Option<EmbedCandidate<'s
 
         // Otherwise, it's an external embed
         return Some(EmbedCandidate::External {
-            url: CowStr::from(url.to_string()),
+            url: url.to_smolstr(),
             metadata: None,
         });
     }
@@ -659,7 +657,7 @@ fn classify_embed(url: &str, embed_domains: &[&str]) -> Option<EmbedCandidate<'s
 ///
 /// Only works for domains in the provided `embed_domains` list.
 #[cfg(feature = "api_bluesky")]
-pub fn extract_at_uri_from_url(url: &str, embed_domains: &[&str]) -> Option<AtUri<'static>> {
+pub fn extract_at_uri_from_url<'s>(url: &'s str, embed_domains: &[&str]) -> Option<AtUri<SmolStr>> {
     // Parse URL
     use jacquard_common::deps::fluent_uri::Uri;
 
@@ -677,26 +675,26 @@ pub fn extract_at_uri_from_url(url: &str, embed_domains: &[&str]) -> Option<AtUr
     let at_uri_str = match segments.as_slice() {
         // Known shortcuts
         ["profile", actor, "post", rkey] => {
-            format!("at://{}/app.bsky.feed.post/{}", actor, rkey)
+            format_smolstr!("at://{}/app.bsky.feed.post/{}", actor, rkey)
         }
         ["profile", actor, "lists", rkey] => {
-            format!("at://{}/app.bsky.graph.list/{}", actor, rkey)
+            format_smolstr!("at://{}/app.bsky.graph.list/{}", actor, rkey)
         }
         ["profile", actor, "feed", rkey] => {
-            format!("at://{}/app.bsky.feed.generator/{}", actor, rkey)
+            format_smolstr!("at://{}/app.bsky.feed.generator/{}", actor, rkey)
         }
         ["starter-pack", actor, rkey] => {
-            format!("at://{}/app.bsky.graph.starterpack/{}", actor, rkey)
+            format_smolstr!("at://{}/app.bsky.graph.starterpack/{}", actor, rkey)
         }
         // Generic pattern: /profile/{actor}/{collection}/{rkey}
         // Accept if collection looks like it could be an NSID (contains dots)
         ["profile", actor, collection, rkey] if collection.contains('.') => {
-            format!("at://{}/{}/{}", actor, collection, rkey)
+            format_smolstr!("at://{}/{}/{}", actor, collection, rkey)
         }
         _ => return None,
     };
 
-    AtUri::new(&at_uri_str).ok().map(|u| u.into_static())
+    AtUri::new(at_uri_str).ok()
 }
 
 /// Errors that can occur during richtext building
@@ -738,10 +736,10 @@ pub enum RichTextError {
 #[cfg(feature = "api_bluesky")]
 impl RichTextBuilder<Resolved> {
     /// Build the richtext (sync - all facets must be resolved)
-    pub fn build(self) -> Result<RichText<'static>, RichTextError> {
+    pub fn build(self) -> Result<RichText, RichTextError> {
         if self.facet_candidates.is_empty() {
             return Ok(RichText {
-                text: CowStr::from(self.text),
+                text: self.text,
                 facets: None,
             });
         }
@@ -836,7 +834,7 @@ impl RichTextBuilder<Resolved> {
                         .trim_start_matches('＃');
 
                     let feature = FacetFeaturesItem::Tag(Box::new(Tag {
-                        tag: CowStr::from(tag.to_smolstr()),
+                        tag: tag.to_smolstr(),
                         extra_data: None,
                     }));
                     (range, feature)
@@ -871,7 +869,7 @@ impl RichTextBuilder<Resolved> {
         }
 
         Ok(RichText {
-            text: CowStr::from(self.text),
+            text: self.text,
             facets: Some(facets.into_static()),
         })
     }
@@ -880,7 +878,7 @@ impl RichTextBuilder<Resolved> {
 #[cfg(feature = "api_bluesky")]
 impl RichTextBuilder<Unresolved> {
     /// Build richtext, resolving handles to DIDs using the provided resolver
-    pub async fn build_async<R>(self, resolver: &R) -> Result<RichText<'static>, RichTextError>
+    pub async fn build_async<R>(self, resolver: &R) -> Result<RichText, RichTextError>
     where
         R: IdentityResolver + Sync,
     {
@@ -890,7 +888,7 @@ impl RichTextBuilder<Unresolved> {
 
         if self.facet_candidates.is_empty() {
             return Ok(RichText {
-                text: CowStr::from(self.text),
+                text: self.text,
                 facets: None,
             });
         }
@@ -989,7 +987,7 @@ impl RichTextBuilder<Unresolved> {
                         .trim_start_matches('＃');
 
                     let feature = FacetFeaturesItem::Tag(Box::new(Tag {
-                        tag: CowStr::from(tag.to_smolstr()),
+                        tag: tag.to_smolstr(),
                         extra_data: None,
                     }));
                     (range, feature)
@@ -1024,7 +1022,7 @@ impl RichTextBuilder<Unresolved> {
         }
 
         Ok(RichText {
-            text: CowStr::from(self.text),
+            text: self.text,
             facets: Some(facets.into_static()),
         })
     }
@@ -1035,7 +1033,7 @@ impl RichTextBuilder<Unresolved> {
     pub async fn build_with_embeds_async<C>(
         mut self,
         client: &C,
-    ) -> Result<(RichText<'static>, Option<Vec<EmbedCandidate<'static>>>), RichTextError>
+    ) -> Result<(RichText, Option<Vec<EmbedCandidate<SmolStr>>>), RichTextError>
     where
         C: HttpClient + IdentityResolver + Sync,
     {
@@ -1046,7 +1044,7 @@ impl RichTextBuilder<Unresolved> {
         let richtext = self.build_async(client).await?;
 
         // Now resolve embed candidates
-        let mut resolved_embeds = Vec::new();
+        let mut resolved_embeds: Vec<EmbedCandidate<SmolStr>> = Vec::new();
 
         for candidate in embed_candidates {
             match candidate {
@@ -1089,7 +1087,7 @@ impl RichTextBuilder<Unresolved> {
 pub async fn fetch_opengraph_metadata<C>(
     client: &C,
     url: &str,
-) -> Result<Option<ExternalMetadata<'static>>, Box<dyn std::error::Error + Send + Sync>>
+) -> Result<Option<ExternalMetadata<SmolStr>>, Box<dyn std::error::Error + Send + Sync>>
 where
     C: HttpClient,
 {
@@ -1114,21 +1112,18 @@ where
     if let Some(og) = info {
         // Extract title, description, and thumbnail
 
-        use jacquard_common::cowstr::ToCowStr;
-        let title = og.properties.get("title").map(|s| s.to_cowstr());
+        let title = og.properties.get("title").map(|s| s.to_smolstr());
 
-        let description = og.properties.get("description").map(|s| s.to_cowstr());
+        let description = og.properties.get("description").map(|s| s.to_smolstr());
 
-        let thumbnail = og.images.first().map(|img| CowStr::from(img.url.clone()));
+        let thumbnail = og.images.first().map(|img| SmolStr::from(img.url.clone()));
 
         // Only return metadata if we have at least a title
         if let Some(title) = title {
             return Ok(Some(ExternalMetadata {
-                title: title.into_static(),
-                description: description
-                    .unwrap_or_else(|| CowStr::new_static(""))
-                    .into_static(),
-                thumbnail: thumbnail.into_static(),
+                title: title,
+                description: description.unwrap_or_else(|| SmolStr::new_static("")),
+                thumbnail: thumbnail,
             }));
         }
     }

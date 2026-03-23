@@ -57,7 +57,7 @@ use axum::{
     response::{IntoResponse, Response},
 };
 use jacquard::{
-    IntoStatic,
+    BosStr, IntoStatic,
     xrpc::{XrpcEndpoint, XrpcError, XrpcMethod, XrpcRequest},
 };
 use serde_json::json;
@@ -66,13 +66,14 @@ use serde_json::json;
 ///
 /// Deserializes incoming requests based on the endpoint's method type (Query or Procedure)
 /// and returns the owned (`'static`) request type ready for handler logic.
-pub struct ExtractXrpc<E: XrpcEndpoint>(pub E::Request<'static>);
+pub struct ExtractXrpc<E: XrpcEndpoint, S: BosStr>(pub E::Request<S>);
 
-impl<S, R> FromRequest<S> for ExtractXrpc<R>
+impl<S, R, B> FromRequest<S> for ExtractXrpc<R, B>
 where
-    S: Send + Sync,
+    S: BosStr + Send + Sync,
+    B: BosStr,
     R: XrpcEndpoint,
-    for<'a> R::Request<'a>: IntoStatic<Output = R::Request<'static>>,
+    R::Request<S>: IntoStatic<Output = R::Request<B>>,
 {
     type Rejection = Response;
 
@@ -102,8 +103,8 @@ where
                 XrpcMethod::Query => {
                     if let Some(path_query) = req.uri().path_and_query() {
                         let query = path_query.query().unwrap_or("");
-                        let value: R::Request<'_> =
-                            serde_html_form::from_str::<R::Request<'_>>(query).map_err(|e| {
+                        let value: R::Request<S> =
+                            serde_html_form::from_str::<R::Request<S>>(query).map_err(|e| {
                                 (
                                     StatusCode::BAD_REQUEST,
                                     Json(json!({

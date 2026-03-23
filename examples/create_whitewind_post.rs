@@ -45,11 +45,11 @@ async fn main() -> miette::Result<()> {
     // Create a WhiteWind blog entry
     // The content field accepts markdown
     let entry = Entry {
-        title: Some(CowStr::from(args.title)),
-        subtitle: args.subtitle.map(CowStr::from),
-        content: CowStr::from(args.content),
+        title: Some(args.title),
+        subtitle: args.subtitle,
+        content: args.content,
         created_at: Some(Datetime::now()),
-        visibility: Some(CowStr::from("url")), // "url" = public with link, "author" = public on profile
+        visibility: Some(String::from("url")), // "url" = public with link, "author" = public on profile
         theme: None,
         ogp: None,
         blobs: None,

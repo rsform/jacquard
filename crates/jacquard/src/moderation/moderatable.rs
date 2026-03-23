@@ -1,4 +1,5 @@
 use super::{LabelerDefs, ModerationDecision, ModerationPrefs, moderate};
+use jacquard_common::bos::BosStr;
 use jacquard_common::types::string::Did;
 
 /// Trait for composite types that contain multiple labeled items
@@ -13,7 +14,7 @@ use jacquard_common::types::string::Did;
 /// ```ignore
 /// # use jacquard::moderation::*;
 /// # use jacquard_api::app_bsky::feed::FeedViewPost;
-/// # fn example(feed_post: &FeedViewPost<'_>, prefs: &ModerationPrefs<'_>, defs: &LabelerDefs<'_>) {
+/// # fn example(feed_post: &FeedViewPost, prefs: &ModerationPrefs, defs: &LabelerDefs) {
 /// for (tag, decision) in feed_post.moderate_all(prefs, defs, &[]) {
 ///     match tag {
 ///         "post" if decision.filter => println!("Hide post content"),
@@ -23,16 +24,16 @@ use jacquard_common::types::string::Did;
 /// }
 /// # }
 /// ```
-pub trait Moderateable<'a> {
+pub trait Moderateable<S: BosStr> {
     /// Apply moderation to all labeled parts of this item
     ///
     /// Returns a vector of (tag, decision) tuples where the tag identifies
     /// which part of the composite item the decision applies to.
     fn moderate_all(
-        &'a self,
-        prefs: &ModerationPrefs<'_>,
-        defs: &LabelerDefs<'_>,
-        accepted_labelers: &[Did<'_>],
+        &self,
+        prefs: &ModerationPrefs,
+        defs: &LabelerDefs,
+        accepted_labelers: &[Did],
     ) -> Vec<(&'static str, ModerationDecision)>;
 }
 
@@ -40,13 +41,15 @@ pub trait Moderateable<'a> {
 ///
 /// Provides convenience methods for filtering and mapping moderation decisions
 /// over collections.
-pub trait ModeratableIterExt<'a, T: Moderateable<'a> + 'a>: Iterator<Item = &'a T> + Sized {
+pub trait ModeratableIterExt<'a, S: BosStr, T: Moderateable<S> + 'a>:
+    Iterator<Item = &'a T> + Sized
+{
     /// Map each item to a tuple of (item, decision)
     fn with_moderation(
         self,
-        prefs: &'a ModerationPrefs<'_>,
-        defs: &'a LabelerDefs<'_>,
-        accepted_labelers: &'a [Did<'_>],
+        prefs: &'a ModerationPrefs,
+        defs: &'a LabelerDefs,
+        accepted_labelers: &'a [Did],
     ) -> impl Iterator<Item = (&'a T, Vec<(&'static str, ModerationDecision)>)> {
         self.map(move |item| {
             let scoped_decisions = item.moderate_all(prefs, defs, accepted_labelers);
@@ -57,9 +60,9 @@ pub trait ModeratableIterExt<'a, T: Moderateable<'a> + 'a>: Iterator<Item = &'a 
     /// Filter out items that should be hidden
     fn filter_moderated(
         self,
-        prefs: &'a ModerationPrefs<'_>,
-        defs: &'a LabelerDefs<'_>,
-        accepted_labelers: &'a [Did<'_>],
+        prefs: &'a ModerationPrefs,
+        defs: &'a LabelerDefs,
+        accepted_labelers: &'a [Did],
     ) -> impl Iterator<Item = &'a T> {
         self.filter(move |item| {
             let scoped_decisions = item.moderate_all(prefs, defs, accepted_labelers);
@@ -68,20 +71,24 @@ pub trait ModeratableIterExt<'a, T: Moderateable<'a> + 'a>: Iterator<Item = &'a 
     }
 }
 
-impl<'a, T: Moderateable<'a> + 'a, I: Iterator<Item = &'a T>> ModeratableIterExt<'a, T> for I {}
+impl<'a, S: BosStr, T: Moderateable<S> + 'a, I: Iterator<Item = &'a T>>
+    ModeratableIterExt<'a, S, T> for I
+{
+}
 
 // Implementations for common Bluesky types
 #[cfg(feature = "api_bluesky")]
 mod bluesky_impls {
     use super::*;
     use jacquard_api::app_bsky::feed::{FeedViewPost, ReplyRefParent, ReplyRefRoot};
+    use jacquard_common::bos::DefaultStr;
 
-    impl<'a> Moderateable<'a> for FeedViewPost<'a> {
+    impl Moderateable<DefaultStr> for FeedViewPost {
         fn moderate_all(
-            &'a self,
-            prefs: &ModerationPrefs<'_>,
-            defs: &LabelerDefs<'_>,
-            accepted_labelers: &[Did<'_>],
+            &self,
+            prefs: &ModerationPrefs,
+            defs: &LabelerDefs,
+            accepted_labelers: &[Did],
         ) -> Vec<(&'static str, ModerationDecision)> {
             let mut decisions = vec![
                 ("post", moderate(&self.post, prefs, defs, accepted_labelers)),

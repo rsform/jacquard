@@ -39,6 +39,7 @@ use axum::{
     response::IntoResponse,
     routing::get,
 };
+use jacquard::deps::smol_str::SmolStr;
 use jacquard_common::types::did_doc::DidDocument;
 
 /// Create a router that serves a DID document at `/.well-known/did.json`
@@ -58,7 +59,7 @@ use jacquard_common::types::did_doc::DidDocument;
 ///     .merge(did_web_router(did_doc));
 /// # }
 /// ```
-pub fn did_web_router(did_doc: DidDocument<'static>) -> Router {
+pub fn did_web_router(did_doc: DidDocument<SmolStr>) -> Router {
     Router::new().route(
         "/.well-known/did.json",
         get(move || async move {

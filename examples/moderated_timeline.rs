@@ -122,7 +122,7 @@ async fn main() -> miette::Result<()> {
             clean += 1;
         }
 
-        let text = from_data::<Post>(&post.record)
+        let text = from_data::<Post, _>(&post.record)
             .inspect_err(|e| println!("error: {e}"))
             .ok()
             .map(|p| p.text.to_string())
@@ -132,14 +132,14 @@ async fn main() -> miette::Result<()> {
             if let ReplyRefParent::PostView(parent) = &reply.parent {
                 if let ReplyRefRoot::PostView(root) = &reply.root {
                     if root.uri != parent.uri {
-                        let root_text = from_data::<Post>(&root.record)
+                        let root_text = from_data::<Post, _>(&root.record)
                             .ok()
                             .map(|p| p.text.to_string())
                             .unwrap_or_else(|| "<no text>".to_string());
                         println!("@{}:\n{}", root.author.handle, root_text);
                     }
                 }
-                let parent_text = from_data::<Post>(&parent.record)
+                let parent_text = from_data::<Post, _>(&parent.record)
                     .ok()
                     .map(|p| p.text.to_string())
                     .unwrap_or_else(|| "<no text>".to_string());

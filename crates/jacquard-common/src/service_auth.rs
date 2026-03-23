@@ -144,8 +144,8 @@ pub struct ServiceAuthClaims<'a> {
     pub jti: Option<CowStr<'a>>,
 
     /// Lexicon method NSID (method binding)
-    #[serde(borrow, skip_serializing_if = "Option::is_none")]
-    pub lxm: Option<Nsid<CowStr<'a>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub lxm: Option<Nsid>,
 }
 
 impl<'a> IntoStatic for ServiceAuthClaims<'a> {
@@ -169,7 +169,7 @@ impl<'a> ServiceAuthClaims<'a> {
     /// Checks:
     /// - Audience matches expected DID
     /// - Token is not expired
-    pub fn validate(&self, expected_aud: &Did) -> Result<(), ServiceAuthError> {
+    pub fn validate(&self, expected_aud: &Did<&str>) -> Result<(), ServiceAuthError> {
         // Check audience
         if self.aud.as_str() != expected_aud.as_str() {
             return Err(ServiceAuthError::AudienceMismatch {
@@ -456,10 +456,10 @@ mod tests {
             lxm: None,
         };
 
-        let expected_aud = Did::new_static("did:web:example.com").unwrap();
+        let expected_aud = Did::new("did:web:example.com").unwrap();
         assert!(claims.validate(&expected_aud).is_ok());
 
-        let wrong_aud = Did::new_static("did:web:wrong.com").unwrap();
+        let wrong_aud = Did::new("did:web:wrong.com").unwrap();
         assert!(matches!(
             claims.validate(&wrong_aud),
             Err(ServiceAuthError::AudienceMismatch { .. })

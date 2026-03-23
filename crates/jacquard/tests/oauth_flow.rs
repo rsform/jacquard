@@ -5,7 +5,9 @@ use bytes::Bytes;
 use http::{Response as HttpResponse, StatusCode};
 use jacquard::client::Agent;
 use jacquard::xrpc::XrpcClient;
-use jacquard::{CowStr, IntoStatic};
+use jacquard::BosStr;
+use jacquard::IntoStatic;
+use smol_str::SmolStr;
 use jacquard_common::http_client::HttpClient;
 use jacquard_oauth::atproto::AtprotoClientMetadata;
 use jacquard_oauth::authstore::ClientAuthStore;
@@ -45,18 +47,18 @@ impl jacquard::identity::resolver::IdentityResolver for MockClient {
             LazyLock::new(jacquard::identity::resolver::ResolverOptions::default);
         &OPTS
     }
-    async fn resolve_handle(
+    async fn resolve_handle<S: BosStr + Sync>(
         &self,
-        _handle: &jacquard::types::string::Handle<'_>,
+        _handle: &jacquard::types::string::Handle<S>,
     ) -> std::result::Result<
-        jacquard::types::did::Did<'static>,
+        jacquard::types::did::Did,
         jacquard::identity::resolver::IdentityError,
     > {
         Ok(jacquard::types::did::Did::new_static("did:plc:alice").unwrap())
     }
-    async fn resolve_did_doc(
+    async fn resolve_did_doc<S: BosStr + Sync>(
         &self,
-        _did: &jacquard::types::did::Did<'_>,
+        _did: &jacquard::types::did::Did<S>,
     ) -> std::result::Result<
         jacquard::identity::resolver::DidDocResponse,
         jacquard::identity::resolver::IdentityError,
@@ -217,7 +219,7 @@ async fn oauth_end_to_end_mock_flow() {
     std::fs::write(&path, "{}").unwrap();
     let store = jacquard::client::FileAuthStore::new(&path);
 
-    let client_data: ClientData<'static> = ClientData {
+    let client_data: ClientData<_> = ClientData {
         keyset: None,
         config: AtprotoClientMetadata::new_localhost(None, Some(vec![Scope::Atproto])),
     };
@@ -237,9 +239,10 @@ async fn oauth_end_to_end_mock_flow() {
         keyset: None,
     };
     let login_hint = identity.map(|_| jacquard::CowStr::from("alice.bsky.social"));
-    let auth_req = jacquard_oauth::request::par(client.as_ref(), login_hint, None, &metadata, None)
-        .await
-        .unwrap();
+    let auth_req =
+        jacquard_oauth::request::par(client.as_ref(), login_hint, None, &mut metadata, None)
+            .await
+            .unwrap();
     // Construct authorization URL as OAuthClient::start_auth would do
     #[derive(serde::Serialize)]
     struct Parameters<'s> {
@@ -251,7 +254,7 @@ async fn oauth_end_to_end_mock_flow() {
         metadata.server_metadata.authorization_endpoint,
         serde_html_form::to_string(Parameters {
             client_id: metadata.client_metadata.client_id.clone(),
-            request_uri: auth_req.request_uri.clone(),
+            request_uri: jacquard::CowStr::Owned(auth_req.request_uri.clone()),
         })
         .unwrap()
     );
@@ -270,10 +273,10 @@ async fn oauth_end_to_end_mock_flow() {
     use jacquard_oauth::types::CallbackParams;
     let session = oauth
         .callback(CallbackParams {
-            code: jacquard::CowStr::from("code123"),
+            code: SmolStr::from("code123"),
             state: Some(state.clone()),
             // Callback compares exact string with metadata.issuer. Must match exactly.
-            iss: Some(jacquard::CowStr::from("https://issuer")),
+            iss: Some(SmolStr::from("https://issuer")),
         })
         .await
         .unwrap();

@@ -1631,6 +1631,342 @@ impl serde::ser::Error for RawDataSerializerError {
 }
 
 /// Serializer that produces RawData values
+pub struct DataSerializer;
+
+impl serde::Serializer for DataSerializer {
+    type Ok = Data<SmolStr>;
+    type Error = RawDataSerializerError;
+
+    type SerializeSeq = DataSeqSerializer;
+    type SerializeTuple = DataSeqSerializer;
+    type SerializeTupleStruct = DataSeqSerializer;
+    type SerializeTupleVariant = DataSeqSerializer;
+    type SerializeMap = DataMapSerializer;
+    type SerializeStruct = DataMapSerializer;
+    type SerializeStructVariant = DataMapSerializer;
+
+    fn serialize_bool(self, v: bool) -> Result<Self::Ok, Self::Error> {
+        Ok(Data::Boolean(v))
+    }
+
+    fn serialize_i8(self, v: i8) -> Result<Self::Ok, Self::Error> {
+        Ok(Data::Integer(v as i64))
+    }
+
+    fn serialize_i16(self, v: i16) -> Result<Self::Ok, Self::Error> {
+        Ok(Data::Integer(v as i64))
+    }
+
+    fn serialize_i32(self, v: i32) -> Result<Self::Ok, Self::Error> {
+        Ok(Data::Integer(v as i64))
+    }
+
+    fn serialize_i64(self, v: i64) -> Result<Self::Ok, Self::Error> {
+        Ok(Data::Integer(v as i64))
+    }
+
+    fn serialize_u8(self, v: u8) -> Result<Self::Ok, Self::Error> {
+        Ok(Data::Integer(v as i64))
+    }
+
+    fn serialize_u16(self, v: u16) -> Result<Self::Ok, Self::Error> {
+        Ok(Data::Integer(v as i64))
+    }
+
+    fn serialize_u32(self, v: u32) -> Result<Self::Ok, Self::Error> {
+        Ok(Data::Integer(v as i64))
+    }
+
+    fn serialize_u64(self, v: u64) -> Result<Self::Ok, Self::Error> {
+        Ok(Data::Integer((v as i128 % (i64::MAX as i128)) as i64))
+    }
+
+    fn serialize_f32(self, v: f32) -> Result<Self::Ok, Self::Error> {
+        Ok(Data::InvalidNumber(SmolStr::from(v.to_string())))
+    }
+
+    fn serialize_f64(self, v: f64) -> Result<Self::Ok, Self::Error> {
+        Ok(Data::InvalidNumber(SmolStr::from(v.to_string())))
+    }
+
+    fn serialize_char(self, v: char) -> Result<Self::Ok, Self::Error> {
+        Ok(Data::String(AtprotoStr::String(v.to_smolstr())))
+    }
+
+    fn serialize_str(self, v: &str) -> Result<Self::Ok, Self::Error> {
+        Ok(Data::String(parse_string(v).convert()))
+    }
+
+    fn serialize_bytes(self, v: &[u8]) -> Result<Self::Ok, Self::Error> {
+        Ok(Data::Bytes(Bytes::copy_from_slice(v)))
+    }
+
+    fn serialize_none(self) -> Result<Self::Ok, Self::Error> {
+        Ok(Data::Null)
+    }
+
+    fn serialize_some<T: ?Sized>(self, value: &T) -> Result<Self::Ok, Self::Error>
+    where
+        T: Serialize,
+    {
+        value.serialize(self)
+    }
+
+    fn serialize_unit(self) -> Result<Self::Ok, Self::Error> {
+        Ok(Data::Null)
+    }
+
+    fn serialize_unit_struct(self, _name: &'static str) -> Result<Self::Ok, Self::Error> {
+        Ok(Data::Null)
+    }
+
+    fn serialize_unit_variant(
+        self,
+        _name: &'static str,
+        _variant_index: u32,
+        variant: &'static str,
+    ) -> Result<Self::Ok, Self::Error> {
+        Ok(Data::String(AtprotoStr::String(SmolStr::new_static(
+            variant,
+        ))))
+    }
+
+    fn serialize_newtype_struct<T: ?Sized>(
+        self,
+        _name: &'static str,
+        value: &T,
+    ) -> Result<Self::Ok, Self::Error>
+    where
+        T: Serialize,
+    {
+        value.serialize(self)
+    }
+
+    fn serialize_newtype_variant<T: ?Sized>(
+        self,
+        _name: &'static str,
+        _variant_index: u32,
+        variant: &'static str,
+        value: &T,
+    ) -> Result<Self::Ok, Self::Error>
+    where
+        T: Serialize,
+    {
+        let mut map = BTreeMap::new();
+        map.insert(variant.to_smolstr(), value.serialize(DataSerializer)?);
+        Ok(Data::Object(map.into()))
+    }
+
+    fn serialize_seq(self, len: Option<usize>) -> Result<Self::SerializeSeq, Self::Error> {
+        Ok(DataSeqSerializer {
+            items: Vec::with_capacity(len.unwrap_or(0)),
+        })
+    }
+
+    fn serialize_tuple(self, len: usize) -> Result<Self::SerializeTuple, Self::Error> {
+        self.serialize_seq(Some(len))
+    }
+
+    fn serialize_tuple_struct(
+        self,
+        _name: &'static str,
+        len: usize,
+    ) -> Result<Self::SerializeTupleStruct, Self::Error> {
+        self.serialize_seq(Some(len))
+    }
+
+    fn serialize_tuple_variant(
+        self,
+        _name: &'static str,
+        _variant_index: u32,
+        _variant: &'static str,
+        len: usize,
+    ) -> Result<Self::SerializeTupleVariant, Self::Error> {
+        self.serialize_seq(Some(len))
+    }
+
+    fn serialize_map(self, _len: Option<usize>) -> Result<Self::SerializeMap, Self::Error> {
+        Ok(DataMapSerializer {
+            map: BTreeMap::new(),
+            next_key: None,
+        })
+    }
+
+    fn serialize_struct(
+        self,
+        _name: &'static str,
+        len: usize,
+    ) -> Result<Self::SerializeStruct, Self::Error> {
+        self.serialize_map(Some(len))
+    }
+
+    fn serialize_struct_variant(
+        self,
+        _name: &'static str,
+        _variant_index: u32,
+        _variant: &'static str,
+        len: usize,
+    ) -> Result<Self::SerializeStructVariant, Self::Error> {
+        self.serialize_map(Some(len))
+    }
+}
+
+/// Sequence serializer accumulator
+pub struct RawDataSeqSerializer {
+    items: Vec<RawData<'static>>,
+}
+
+impl serde::ser::SerializeSeq for RawDataSeqSerializer {
+    type Ok = RawData<'static>;
+    type Error = RawDataSerializerError;
+
+    fn serialize_element<T: ?Sized>(&mut self, value: &T) -> Result<(), Self::Error>
+    where
+        T: Serialize,
+    {
+        self.items.push(value.serialize(RawDataSerializer)?);
+        Ok(())
+    }
+
+    fn end(self) -> Result<Self::Ok, Self::Error> {
+        Ok(RawData::Array(self.items))
+    }
+}
+
+impl serde::ser::SerializeTuple for RawDataSeqSerializer {
+    type Ok = RawData<'static>;
+    type Error = RawDataSerializerError;
+
+    fn serialize_element<T: ?Sized>(&mut self, value: &T) -> Result<(), Self::Error>
+    where
+        T: Serialize,
+    {
+        serde::ser::SerializeSeq::serialize_element(self, value)
+    }
+
+    fn end(self) -> Result<Self::Ok, Self::Error> {
+        serde::ser::SerializeSeq::end(self)
+    }
+}
+
+impl serde::ser::SerializeTupleStruct for RawDataSeqSerializer {
+    type Ok = RawData<'static>;
+    type Error = RawDataSerializerError;
+
+    fn serialize_field<T: ?Sized>(&mut self, value: &T) -> Result<(), Self::Error>
+    where
+        T: Serialize,
+    {
+        serde::ser::SerializeSeq::serialize_element(self, value)
+    }
+
+    fn end(self) -> Result<Self::Ok, Self::Error> {
+        serde::ser::SerializeSeq::end(self)
+    }
+}
+
+impl serde::ser::SerializeTupleVariant for RawDataSeqSerializer {
+    type Ok = RawData<'static>;
+    type Error = RawDataSerializerError;
+
+    fn serialize_field<T: ?Sized>(&mut self, value: &T) -> Result<(), Self::Error>
+    where
+        T: Serialize,
+    {
+        serde::ser::SerializeSeq::serialize_element(self, value)
+    }
+
+    fn end(self) -> Result<Self::Ok, Self::Error> {
+        serde::ser::SerializeSeq::end(self)
+    }
+}
+
+/// Map serializer accumulator
+pub struct RawDataMapSerializer {
+    map: BTreeMap<SmolStr, RawData<'static>>,
+    next_key: Option<SmolStr>,
+}
+
+impl serde::ser::SerializeMap for RawDataMapSerializer {
+    type Ok = RawData<'static>;
+    type Error = RawDataSerializerError;
+
+    fn serialize_key<T: ?Sized>(&mut self, key: &T) -> Result<(), Self::Error>
+    where
+        T: Serialize,
+    {
+        let key_data = key.serialize(RawDataSerializer)?;
+        match key_data {
+            RawData::String(s) => {
+                self.next_key = Some(s.to_smolstr());
+                Ok(())
+            }
+            _ => Err(RawDataSerializerError::Message(
+                "map keys must be strings".to_string(),
+            )),
+        }
+    }
+
+    fn serialize_value<T: ?Sized>(&mut self, value: &T) -> Result<(), Self::Error>
+    where
+        T: Serialize,
+    {
+        let key = self
+            .next_key
+            .take()
+            .ok_or_else(|| RawDataSerializerError::Message("missing key".to_string()))?;
+        self.map.insert(key, value.serialize(RawDataSerializer)?);
+        Ok(())
+    }
+
+    fn end(self) -> Result<Self::Ok, Self::Error> {
+        Ok(RawData::Object(self.map))
+    }
+}
+
+impl serde::ser::SerializeStruct for RawDataMapSerializer {
+    type Ok = RawData<'static>;
+    type Error = RawDataSerializerError;
+
+    fn serialize_field<T: ?Sized>(
+        &mut self,
+        key: &'static str,
+        value: &T,
+    ) -> Result<(), Self::Error>
+    where
+        T: Serialize,
+    {
+        self.map
+            .insert(key.to_smolstr(), value.serialize(RawDataSerializer)?);
+        Ok(())
+    }
+
+    fn end(self) -> Result<Self::Ok, Self::Error> {
+        Ok(RawData::Object(self.map))
+    }
+}
+
+impl serde::ser::SerializeStructVariant for RawDataMapSerializer {
+    type Ok = RawData<'static>;
+    type Error = RawDataSerializerError;
+
+    fn serialize_field<T: ?Sized>(
+        &mut self,
+        key: &'static str,
+        value: &T,
+    ) -> Result<(), Self::Error>
+    where
+        T: Serialize,
+    {
+        serde::ser::SerializeStruct::serialize_field(self, key, value)
+    }
+
+    fn end(self) -> Result<Self::Ok, Self::Error> {
+        serde::ser::SerializeStruct::end(self)
+    }
+}
+
+/// Serializer that produces RawData values
 pub struct RawDataSerializer;
 
 impl serde::Serializer for RawDataSerializer {
@@ -1814,29 +2150,29 @@ impl serde::Serializer for RawDataSerializer {
 }
 
 /// Sequence serializer accumulator
-pub struct RawDataSeqSerializer {
-    items: Vec<RawData<'static>>,
+pub struct DataSeqSerializer {
+    items: Vec<Data<SmolStr>>,
 }
 
-impl serde::ser::SerializeSeq for RawDataSeqSerializer {
-    type Ok = RawData<'static>;
+impl serde::ser::SerializeSeq for DataSeqSerializer {
+    type Ok = Data<SmolStr>;
     type Error = RawDataSerializerError;
 
     fn serialize_element<T: ?Sized>(&mut self, value: &T) -> Result<(), Self::Error>
     where
         T: Serialize,
     {
-        self.items.push(value.serialize(RawDataSerializer)?);
+        self.items.push(value.serialize(DataSerializer)?);
         Ok(())
     }
 
     fn end(self) -> Result<Self::Ok, Self::Error> {
-        Ok(RawData::Array(self.items))
+        Ok(Data::Array(self.items.into()))
     }
 }
 
-impl serde::ser::SerializeTuple for RawDataSeqSerializer {
-    type Ok = RawData<'static>;
+impl serde::ser::SerializeTuple for DataSeqSerializer {
+    type Ok = Data<SmolStr>;
     type Error = RawDataSerializerError;
 
     fn serialize_element<T: ?Sized>(&mut self, value: &T) -> Result<(), Self::Error>
@@ -1851,8 +2187,8 @@ impl serde::ser::SerializeTuple for RawDataSeqSerializer {
     }
 }
 
-impl serde::ser::SerializeTupleStruct for RawDataSeqSerializer {
-    type Ok = RawData<'static>;
+impl serde::ser::SerializeTupleStruct for DataSeqSerializer {
+    type Ok = Data<SmolStr>;
     type Error = RawDataSerializerError;
 
     fn serialize_field<T: ?Sized>(&mut self, value: &T) -> Result<(), Self::Error>
@@ -1867,8 +2203,8 @@ impl serde::ser::SerializeTupleStruct for RawDataSeqSerializer {
     }
 }
 
-impl serde::ser::SerializeTupleVariant for RawDataSeqSerializer {
-    type Ok = RawData<'static>;
+impl serde::ser::SerializeTupleVariant for DataSeqSerializer {
+    type Ok = Data<SmolStr>;
     type Error = RawDataSerializerError;
 
     fn serialize_field<T: ?Sized>(&mut self, value: &T) -> Result<(), Self::Error>
@@ -1884,13 +2220,13 @@ impl serde::ser::SerializeTupleVariant for RawDataSeqSerializer {
 }
 
 /// Map serializer accumulator
-pub struct RawDataMapSerializer {
-    map: BTreeMap<SmolStr, RawData<'static>>,
+pub struct DataMapSerializer {
+    map: BTreeMap<SmolStr, Data<SmolStr>>,
     next_key: Option<SmolStr>,
 }
 
-impl serde::ser::SerializeMap for RawDataMapSerializer {
-    type Ok = RawData<'static>;
+impl serde::ser::SerializeMap for DataMapSerializer {
+    type Ok = Data<SmolStr>;
     type Error = RawDataSerializerError;
 
     fn serialize_key<T: ?Sized>(&mut self, key: &T) -> Result<(), Self::Error>
@@ -1917,17 +2253,17 @@ impl serde::ser::SerializeMap for RawDataMapSerializer {
             .next_key
             .take()
             .ok_or_else(|| RawDataSerializerError::Message("missing key".to_string()))?;
-        self.map.insert(key, value.serialize(RawDataSerializer)?);
+        self.map.insert(key, value.serialize(DataSerializer)?);
         Ok(())
     }
 
     fn end(self) -> Result<Self::Ok, Self::Error> {
-        Ok(RawData::Object(self.map))
+        Ok(Data::Object(self.map.into()))
     }
 }
 
-impl serde::ser::SerializeStruct for RawDataMapSerializer {
-    type Ok = RawData<'static>;
+impl serde::ser::SerializeStruct for DataMapSerializer {
+    type Ok = Data<SmolStr>;
     type Error = RawDataSerializerError;
 
     fn serialize_field<T: ?Sized>(
@@ -1939,17 +2275,17 @@ impl serde::ser::SerializeStruct for RawDataMapSerializer {
         T: Serialize,
     {
         self.map
-            .insert(key.to_smolstr(), value.serialize(RawDataSerializer)?);
+            .insert(key.to_smolstr(), value.serialize(DataSerializer)?);
         Ok(())
     }
 
     fn end(self) -> Result<Self::Ok, Self::Error> {
-        Ok(RawData::Object(self.map))
+        Ok(Data::Object(self.map.into()))
     }
 }
 
-impl serde::ser::SerializeStructVariant for RawDataMapSerializer {
-    type Ok = RawData<'static>;
+impl serde::ser::SerializeStructVariant for DataMapSerializer {
+    type Ok = Data<SmolStr>;
     type Error = RawDataSerializerError;
 
     fn serialize_field<T: ?Sized>(

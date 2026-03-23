@@ -37,7 +37,7 @@ async fn main() -> miette::Result<()> {
     // Use the streaming `.download()` method with the generated API parameter struct
     let output: StreamingResponse = agent
         .download(GetBlob {
-            did: Did::new_owned(args.did)?,
+            did: Did::new(args.did)?,
             cid: Cid::str(&args.cid),
         })
         .await?;

@@ -212,9 +212,9 @@ pub type Lazy<T> = std::sync::LazyLock<T>;
 #[cfg(not(feature = "std"))]
 pub use spin::Lazy;
 
+pub use bos::{BorrowOrShare, Bos, BosStr, DefaultStr, FromStaticStr};
 pub use cowstr::CowStr;
 pub use into_static::IntoStatic;
-pub use bos::{Bos, BorrowOrShare, BosStr, DefaultStr, FromStaticStr};
 
 /// A copy-on-write immutable string type that uses [`smol_str::SmolStr`] for
 /// the "owned" variant.
@@ -266,16 +266,20 @@ pub use types::value::*;
 
 /// Authorization token types for XRPC requests.
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum AuthorizationToken<'s> {
+pub enum AuthorizationToken<S: BosStr = DefaultStr> {
     /// Bearer token (access JWT, refresh JWT to refresh the session)
-    Bearer(CowStr<'s>),
+    Bearer(S),
     /// DPoP token (proof-of-possession) for OAuth
-    Dpop(CowStr<'s>),
+    Dpop(S),
 }
 
-impl<'s> IntoStatic for AuthorizationToken<'s> {
-    type Output = AuthorizationToken<'static>;
-    fn into_static(self) -> AuthorizationToken<'static> {
+impl<S: BosStr> IntoStatic for AuthorizationToken<S>
+where
+    S: IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = AuthorizationToken<S::Output>;
+    fn into_static(self) -> AuthorizationToken<S::Output> {
         match self {
             AuthorizationToken::Bearer(token) => AuthorizationToken::Bearer(token.into_static()),
             AuthorizationToken::Dpop(token) => AuthorizationToken::Dpop(token.into_static()),

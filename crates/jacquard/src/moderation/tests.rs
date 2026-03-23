@@ -8,9 +8,9 @@ use jacquard_api::com_atproto::label::{
     Label, LabelValueDefinition, LabelValueDefinitionBlurs, LabelValueDefinitionDefaultSetting,
     LabelValueDefinitionSeverity,
 };
-use jacquard_common::CowStr;
 use jacquard_common::types::string::{Datetime, Did, UriValue};
 use serde::Deserialize;
+use smol_str::SmolStr;
 
 const LABELER_SERVICES_JSON: &str = include_str!("labeler_services.json");
 const POSTS_JSON: &str = include_str!("posts.json");
@@ -25,7 +25,7 @@ fn test_parse_labeler_services() {
 
 #[test]
 fn test_build_labeler_defs_from_services() {
-    let services: GetServicesOutput<'static> =
+    let services: GetServicesOutput =
         serde_json::from_str(LABELER_SERVICES_JSON).expect("failed to parse");
 
     let mut defs = LabelerDefs::new();
@@ -52,7 +52,7 @@ fn test_moderate_with_default_hide() {
 
     // Create a label definition with defaultSetting: "hide"
     let spam_def = LabelValueDefinition {
-        identifier: CowStr::from("spam"),
+        identifier: SmolStr::new("spam"),
         blurs: LabelValueDefinitionBlurs::Content,
         severity: LabelValueDefinitionSeverity::Inform,
         default_setting: Some(LabelValueDefinitionDefaultSetting::Hide),
@@ -65,11 +65,11 @@ fn test_moderate_with_default_hide() {
 
     // Create a mock labeled item
     struct MockLabeled {
-        labels: Vec<Label<'static>>,
+        labels: Vec<Label>,
     }
 
-    impl<'a> Labeled<'a> for MockLabeled {
-        fn labels(&self) -> &[Label<'a>] {
+    impl Labeled<SmolStr> for MockLabeled {
+        fn labels(&self) -> &[Label<SmolStr>] {
             &self.labels
         }
     }
@@ -79,7 +79,7 @@ fn test_moderate_with_default_hide() {
             src: labeler_did.clone(),
             uri: UriValue::new_owned("at://did:plc:test/app.bsky.feed.post/abc123").unwrap(),
             cid: None,
-            val: CowStr::from("spam"),
+            val: SmolStr::new("spam"),
             neg: None,
             cts: Datetime::now(),
             exp: None,
@@ -104,7 +104,7 @@ fn test_moderate_with_user_preference() {
     let labeler_did = Did::new_static("did:plc:test").unwrap();
 
     let def = LabelValueDefinition {
-        identifier: CowStr::from("test-label"),
+        identifier: SmolStr::new("test-label"),
         blurs: LabelValueDefinitionBlurs::Content,
         severity: LabelValueDefinitionSeverity::Alert,
         default_setting: Some(LabelValueDefinitionDefaultSetting::Hide),
@@ -116,11 +116,11 @@ fn test_moderate_with_user_preference() {
     defs.insert(labeler_did.clone(), vec![def]);
 
     struct MockLabeled {
-        labels: Vec<Label<'static>>,
+        labels: Vec<Label>,
     }
 
-    impl<'a> Labeled<'a> for MockLabeled {
-        fn labels(&self) -> &[Label<'a>] {
+    impl Labeled<SmolStr> for MockLabeled {
+        fn labels(&self) -> &[Label<SmolStr>] {
             &self.labels
         }
     }
@@ -129,7 +129,7 @@ fn test_moderate_with_user_preference() {
         labels: vec![Label {
             src: labeler_did.clone(),
             uri: UriValue::new_owned("at://did:plc:test/app.bsky.feed.post/abc").unwrap(),
-            val: CowStr::from("test-label"),
+            val: SmolStr::new("test-label"),
             neg: None,
             cts: Datetime::now(),
             exp: None,
@@ -144,7 +144,7 @@ fn test_moderate_with_user_preference() {
     let mut prefs = ModerationPrefs::default();
     prefs
         .labels
-        .insert(CowStr::from("test-label"), LabelPref::Ignore);
+        .insert(SmolStr::new("test-label"), LabelPref::Ignore);
 
     let decision = moderate(&item, &prefs, &defs, &[labeler_did]);
 
@@ -160,11 +160,11 @@ fn test_label_target_detection() {
     let labeler_did = Did::new_static("did:plc:test").unwrap();
 
     struct MockLabeled {
-        labels: Vec<Label<'static>>,
+        labels: Vec<Label>,
     }
 
-    impl<'a> Labeled<'a> for MockLabeled {
-        fn labels(&self) -> &[Label<'a>] {
+    impl Labeled<SmolStr> for MockLabeled {
+        fn labels(&self) -> &[Label<SmolStr>] {
             &self.labels
         }
     }
@@ -174,7 +174,7 @@ fn test_label_target_detection() {
         labels: vec![Label {
             src: labeler_did.clone(),
             uri: UriValue::new_owned("did:plc:someuser").unwrap(),
-            val: CowStr::from("test"),
+            val: SmolStr::new("test"),
             neg: None,
             cts: Datetime::now(),
             exp: None,
@@ -198,7 +198,7 @@ fn test_label_target_detection() {
         labels: vec![Label {
             src: labeler_did.clone(),
             uri: UriValue::new_owned("at://did:plc:someuser/app.bsky.feed.post/abc123").unwrap(),
-            val: CowStr::from("test"),
+            val: SmolStr::new("test"),
             neg: None,
             cts: Datetime::now(),
             exp: None,
@@ -223,7 +223,7 @@ fn test_blur_media_vs_content() {
 
     // Media blur
     let media_def = LabelValueDefinition {
-        identifier: CowStr::from("media-label"),
+        identifier: SmolStr::new("media-label"),
         blurs: LabelValueDefinitionBlurs::Media,
         severity: LabelValueDefinitionSeverity::Alert,
         default_setting: Some(LabelValueDefinitionDefaultSetting::Warn),
@@ -234,7 +234,7 @@ fn test_blur_media_vs_content() {
 
     // Content blur
     let content_def = LabelValueDefinition {
-        identifier: CowStr::from("content-label"),
+        identifier: SmolStr::new("content-label"),
         blurs: LabelValueDefinitionBlurs::Content,
         severity: LabelValueDefinitionSeverity::Alert,
         default_setting: Some(LabelValueDefinitionDefaultSetting::Warn),
@@ -246,11 +246,11 @@ fn test_blur_media_vs_content() {
     defs.insert(labeler_did.clone(), vec![media_def, content_def]);
 
     struct MockLabeled {
-        labels: Vec<Label<'static>>,
+        labels: Vec<Label>,
     }
 
-    impl<'a> Labeled<'a> for MockLabeled {
-        fn labels(&self) -> &[Label<'a>] {
+    impl Labeled<SmolStr> for MockLabeled {
+        fn labels(&self) -> &[Label<SmolStr>] {
             &self.labels
         }
     }
@@ -260,7 +260,7 @@ fn test_blur_media_vs_content() {
         labels: vec![Label {
             src: labeler_did.clone(),
             uri: UriValue::new_owned("at://did:plc:test/app.bsky.feed.post/abc").unwrap(),
-            val: CowStr::from("media-label"),
+            val: SmolStr::new("media-label"),
             neg: None,
             cts: Datetime::now(),
             exp: None,
@@ -281,7 +281,7 @@ fn test_blur_media_vs_content() {
         labels: vec![Label {
             src: labeler_did.clone(),
             uri: UriValue::new_owned("at://did:plc:test/app.bsky.feed.post/xyz").unwrap(),
-            val: CowStr::from("content-label"),
+            val: SmolStr::new("content-label"),
             neg: None,
             cts: Datetime::now(),
             exp: None,
@@ -303,7 +303,7 @@ fn test_adult_only_labels_require_adult_content_enabled() {
     let labeler_did = Did::new_static("did:plc:test").unwrap();
 
     let adult_def = LabelValueDefinition {
-        identifier: CowStr::from("adult-label"),
+        identifier: SmolStr::new("adult-label"),
         blurs: LabelValueDefinitionBlurs::Content,
         severity: LabelValueDefinitionSeverity::Alert,
         default_setting: Some(LabelValueDefinitionDefaultSetting::Warn),
@@ -315,11 +315,11 @@ fn test_adult_only_labels_require_adult_content_enabled() {
     defs.insert(labeler_did.clone(), vec![adult_def]);
 
     struct MockLabeled {
-        labels: Vec<Label<'static>>,
+        labels: Vec<Label>,
     }
 
-    impl<'a> Labeled<'a> for MockLabeled {
-        fn labels(&self) -> &[Label<'a>] {
+    impl Labeled<SmolStr> for MockLabeled {
+        fn labels(&self) -> &[Label<SmolStr>] {
             &self.labels
         }
     }
@@ -328,7 +328,7 @@ fn test_adult_only_labels_require_adult_content_enabled() {
         labels: vec![Label {
             src: labeler_did.clone(),
             uri: UriValue::new_owned("at://did:plc:test/app.bsky.feed.post/abc").unwrap(),
-            val: CowStr::from("adult-label"),
+            val: SmolStr::new("adult-label"),
             neg: None,
             cts: Datetime::now(),
             exp: None,
@@ -364,11 +364,11 @@ fn test_negation_labels() {
     let labeler_did = Did::new_static("did:plc:test").unwrap();
 
     struct MockLabeled {
-        labels: Vec<Label<'static>>,
+        labels: Vec<Label>,
     }
 
-    impl<'a> Labeled<'a> for MockLabeled {
-        fn labels(&self) -> &[Label<'a>] {
+    impl Labeled<SmolStr> for MockLabeled {
+        fn labels(&self) -> &[Label<SmolStr>] {
             &self.labels
         }
     }
@@ -379,7 +379,7 @@ fn test_negation_labels() {
             Label {
                 src: labeler_did.clone(),
                 uri: UriValue::new_owned("at://did:plc:test/app.bsky.feed.post/abc").unwrap(),
-                val: CowStr::from("test-label"),
+                val: SmolStr::new("test-label"),
                 neg: None,
                 cts: Datetime::now(),
                 exp: None,
@@ -391,7 +391,7 @@ fn test_negation_labels() {
             Label {
                 src: labeler_did.clone(),
                 uri: UriValue::new_owned("at://did:plc:test/app.bsky.feed.post/abc").unwrap(),
-                val: CowStr::from("test-label"),
+                val: SmolStr::new("test-label"),
                 neg: Some(true), // negation
                 cts: Datetime::now(),
                 exp: None,
@@ -422,11 +422,11 @@ fn test_moderate_all() {
     let labeler_did = Did::new_static("did:plc:test").unwrap();
 
     struct MockLabeled {
-        labels: Vec<Label<'static>>,
+        labels: Vec<Label>,
     }
 
-    impl<'a> Labeled<'a> for MockLabeled {
-        fn labels(&self) -> &[Label<'a>] {
+    impl Labeled<SmolStr> for MockLabeled {
+        fn labels(&self) -> &[Label<SmolStr>] {
             &self.labels
         }
     }
@@ -437,7 +437,7 @@ fn test_moderate_all() {
             labels: vec![Label {
                 src: labeler_did.clone(),
                 uri: UriValue::new_owned("at://did:plc:test/app.bsky.feed.post/abc").unwrap(),
-                val: CowStr::from("porn"),
+                val: SmolStr::new("porn"),
                 neg: None,
                 cts: Datetime::now(),
                 exp: None,
@@ -466,7 +466,7 @@ fn test_moderate_all() {
 #[test]
 fn test_end_to_end_feed_moderation() {
     // Parse labeler services and build definitions
-    let services: GetServicesOutput<'static> =
+    let services: GetServicesOutput =
         serde_json::from_str(LABELER_SERVICES_JSON).expect("failed to parse labeler services");
 
     let mut defs = LabelerDefs::new();
@@ -487,12 +487,11 @@ fn test_end_to_end_feed_moderation() {
 
     // Parse posts
     #[derive(Deserialize)]
-    struct FeedResponse<'a> {
-        #[serde(borrow)]
-        feed: Vec<FeedViewPost<'a>>,
+    struct FeedResponse {
+        feed: Vec<FeedViewPost>,
     }
 
-    let feed_responses: Vec<FeedResponse<'static>> =
+    let feed_responses: Vec<FeedResponse> =
         serde_json::from_str(POSTS_JSON).expect("failed to parse posts");
 
     // Combine all feeds to test
@@ -557,7 +556,7 @@ fn test_end_to_end_feed_moderation() {
                     "Post {} has {} labels: {:?}",
                     i,
                     labels.len(),
-                    labels.iter().map(|l| l.val.as_ref()).collect::<Vec<_>>()
+                    labels.iter().map(|l| l.val.as_str()).collect::<Vec<&str>>()
                 );
             }
         }
@@ -587,7 +586,8 @@ fn test_end_to_end_feed_moderation() {
     println!("Labeler definitions: {}", defs.defs.len());
 
     // Print all unique labels found and their default settings
-    let mut all_labels_found = std::collections::HashSet::new();
+    let mut all_labels_found: std::collections::HashSet<(&str, &str)> =
+        std::collections::HashSet::new();
     for feed_post in &all_posts {
         for label in feed_post.post.labels() {
             all_labels_found.insert((label.val.as_ref(), label.src.as_ref()));
@@ -660,7 +660,7 @@ fn test_end_to_end_feed_moderation() {
 #[test]
 fn test_moderatable_trait() {
     // Test the Moderatable trait on FeedViewPost
-    let services: GetServicesOutput<'static> =
+    let services: GetServicesOutput =
         serde_json::from_str(LABELER_SERVICES_JSON).expect("failed to parse labeler services");
 
     let mut defs = LabelerDefs::new();
@@ -678,12 +678,11 @@ fn test_moderatable_trait() {
     }
 
     #[derive(Deserialize)]
-    struct FeedResponse<'a> {
-        #[serde(borrow)]
-        feed: Vec<FeedViewPost<'a>>,
+    struct FeedResponse {
+        feed: Vec<FeedViewPost>,
     }
 
-    let feed_responses: Vec<FeedResponse<'static>> =
+    let feed_responses: Vec<FeedResponse> =
         serde_json::from_str(POSTS_JSON).expect("failed to parse posts");
 
     let prefs = ModerationPrefs::default();
@@ -694,7 +693,9 @@ fn test_moderatable_trait() {
         .flat_map(|r| &r.feed)
         .find(|p| {
             p.post.labels().iter().any(|l| {
-                l.val.as_ref() == "porn" || l.val.as_ref() == "sexual" || l.val.as_ref() == "nudity"
+                AsRef::<str>::as_ref(&l.val) == "porn"
+                    || AsRef::<str>::as_ref(&l.val) == "sexual"
+                    || AsRef::<str>::as_ref(&l.val) == "nudity"
             })
         })
         .expect("should find at least one porn/sexual/nudity labeled post");
@@ -702,7 +703,11 @@ fn test_moderatable_trait() {
     let post_labels = labeled_post.post.labels();
     println!("Testing post with {} labels:", post_labels.len());
     for label in post_labels {
-        println!("  {} from {}", label.val.as_ref(), label.src.as_ref());
+        println!(
+            "  {} from {}",
+            AsRef::<str>::as_ref(&label.val),
+            AsRef::<str>::as_ref(&label.src)
+        );
     }
 
     // Use the Moderateable trait with empty accepted_labelers to trust all labels

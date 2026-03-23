@@ -564,24 +564,22 @@ where
     ///
     /// The token may be stale if it has expired; use [`OAuthSession::refresh`] or
     /// rely on the automatic refresh performed by `send_with_opts` to obtain a fresh one.
-    pub async fn access_token(&self) -> AuthorizationToken<'static> {
-        AuthorizationToken::Dpop(CowStr::Owned(
-            self.data.read().await.token_set.access_token.clone(),
-        ))
+    pub async fn access_token(&self) -> AuthorizationToken<SmolStr> {
+        AuthorizationToken::Dpop(self.data.read().await.token_set.access_token.clone())
     }
 
     /// Return the current refresh token for this session, if one is present.
     ///
     /// Not all authorization servers issue refresh tokens. When `None` is returned,
     /// the session cannot be silently renewed and the user must re-authenticate.
-    pub async fn refresh_token(&self) -> Option<AuthorizationToken<'static>> {
+    pub async fn refresh_token(&self) -> Option<AuthorizationToken<SmolStr>> {
         self.data
             .read()
             .await
             .token_set
             .refresh_token
             .clone()
-            .map(|t| AuthorizationToken::Dpop(CowStr::Owned(t)))
+            .map(|t| AuthorizationToken::Dpop(t))
     }
 
     /// Derive an unauthenticated [`OAuthClient`] that shares the same registry and resolver.
@@ -653,15 +651,14 @@ where
     /// The actual token exchange is serialized per `(DID, session_id)` pair via a `Mutex` inside
     /// the registry, so concurrent refresh attempts will not result in duplicate token exchanges.
     #[cfg_attr(feature = "tracing", tracing::instrument(level = "debug", skip_all))]
-    pub async fn refresh(&self) -> Result<AuthorizationToken<'static>> {
+    pub async fn refresh(&self) -> Result<AuthorizationToken<SmolStr>> {
         // Read identifiers without holding the lock across await
         let (did, sid) = {
             let data = self.data.read().await;
             (data.account_did.clone(), data.session_id.clone())
         };
         let refreshed = self.registry.as_ref().get(&did, &sid, true).await?;
-        let token =
-            AuthorizationToken::Dpop(CowStr::Owned(refreshed.token_set.access_token.clone()));
+        let token = AuthorizationToken::Dpop(refreshed.token_set.access_token.clone());
         // Write back updated session
         *self.data.write().await = refreshed.clone().into_static();
         // Store in the registry
@@ -899,18 +896,19 @@ where
         }
     }
 
-    async fn stream<Str>(
+    async fn stream<Str, B>(
         &self,
-        stream: jacquard_common::xrpc::streaming::XrpcProcedureSend<Str::Frame<'static>>,
+        stream: jacquard_common::xrpc::streaming::XrpcProcedureSend<Str::Frame<B>>,
     ) -> core::result::Result<
         jacquard_common::xrpc::streaming::XrpcResponseStream<
-            <<Str as jacquard_common::xrpc::streaming::XrpcProcedureStream>::Response as jacquard_common::xrpc::streaming::XrpcStreamResp>::Frame<'static>,
+            <<Str as jacquard_common::xrpc::streaming::XrpcProcedureStream>::Response as jacquard_common::xrpc::streaming::XrpcStreamResp>::Frame<B>,
         >,
         jacquard_common::StreamError,
     >
     where
         Str: jacquard_common::xrpc::streaming::XrpcProcedureStream + 'static,
-        <<Str as jacquard_common::xrpc::streaming::XrpcProcedureStream>::Response as jacquard_common::xrpc::streaming::XrpcStreamResp>::Frame<'static>: jacquard_common::xrpc::streaming::XrpcStreamResp,
+        <<Str as jacquard_common::xrpc::streaming::XrpcProcedureStream>::Response as jacquard_common::xrpc::streaming::XrpcStreamResp>::Frame<B>: jacquard_common::xrpc::streaming::XrpcStreamResp,
+        B: BosStr + 'static,
     {
         use jacquard_common::StreamError;
         use n0_future::TryStreamExt;
@@ -929,10 +927,10 @@ where
             use jacquard_common::AuthorizationToken;
             let hv = match token {
                 AuthorizationToken::Bearer(t) => {
-                    http::HeaderValue::from_str(&format!("Bearer {}", t.as_ref()))
+                    http::HeaderValue::from_str(&format!("Bearer {}", t.as_str()))
                 }
                 AuthorizationToken::Dpop(t) => {
-                    http::HeaderValue::from_str(&format!("DPoP {}", t.as_ref()))
+                    http::HeaderValue::from_str(&format!("DPoP {}", t.as_str()))
                 }
             }
             .map_err(|e| StreamError::protocol(format!("Invalid authorization token: {}", e)))?;
@@ -977,7 +975,7 @@ where
             Ok(response) => {
                 let (resp_parts, resp_body) = response.into_parts();
                 Ok(
-                    jacquard_common::xrpc::streaming::XrpcResponseStream::from_typed_parts(
+                    jacquard_common::xrpc::streaming::XrpcResponseStream::from_typed_parts::<B>(
                         resp_parts, resp_body,
                     ),
                 )
@@ -1071,8 +1069,8 @@ where
         let mut opts = jacquard_common::xrpc::SubscriptionOptions::default();
         let token = self.access_token().await;
         let auth_value = match token {
-            AuthorizationToken::Bearer(t) => format!("Bearer {}", t.as_ref()),
-            AuthorizationToken::Dpop(t) => format!("DPoP {}", t.as_ref()),
+            AuthorizationToken::Bearer(t) => format!("Bearer {}", t.as_str()),
+            AuthorizationToken::Dpop(t) => format!("DPoP {}", t.as_str()),
         };
         opts.headers
             .push((CowStr::from("Authorization"), CowStr::from(auth_value)));

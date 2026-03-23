@@ -1,15 +1,19 @@
 use jacquard_api::com_atproto::label::{Label, SelfLabels};
+use jacquard_common::bos::{BosStr, DefaultStr};
 
 /// Trait for content that has labels attached
 ///
 /// Implemented by types that can be moderated based on their labels.
 /// This includes both labels from labeler services and self-labels applied by authors.
-pub trait Labeled<'a> {
+///
+/// The type parameter `S` is the backing string type used by the label types.
+/// In most concrete cases this will be `DefaultStr` (`SmolStr`).
+pub trait Labeled<S: BosStr = DefaultStr> {
     /// Get the labels applied to this content by labeler services
-    fn labels(&self) -> &[Label<'a>];
+    fn labels(&self) -> &[Label<S>];
 
     /// Get self-labels applied by the content author
-    fn self_labels(&'a self) -> Option<SelfLabels<'a>> {
+    fn self_labels(&self) -> Option<SelfLabels<S>> {
         None
     }
 }
@@ -17,15 +21,15 @@ pub trait Labeled<'a> {
 /// Record with applied labels
 ///
 /// Exists as a bare minimum RecordView type primarily for testing/demonstration.
-pub struct LabeledRecord<'a, C> {
+pub struct LabeledRecord<S: BosStr = DefaultStr, C = ()> {
     /// The record we grabbed labels for
     pub record: C,
     /// The labels applied to the record
-    pub labels: Vec<Label<'a>>,
+    pub labels: Vec<Label<S>>,
 }
 
-impl<'a, C> Labeled<'a> for LabeledRecord<'a, C> {
-    fn labels(&self) -> &[Label<'a>] {
+impl<S: BosStr, C> Labeled<S> for LabeledRecord<S, C> {
+    fn labels(&self) -> &[Label<S>] {
         &self.labels
     }
 }
@@ -43,93 +47,96 @@ mod bluesky_impls {
     };
     use jacquard_common::from_data;
 
-    impl<'a> Labeled<'a> for PostView<'a> {
-        fn labels(&self) -> &[Label<'a>] {
+    impl<S: BosStr> Labeled<S> for PostView<S>
+    where
+        S: for<'de> serde::Deserialize<'de> + for<'de> core::convert::From<&'de str>,
+    {
+        fn labels(&self) -> &[Label<S>] {
             self.labels.as_deref().unwrap_or(&[])
         }
 
-        fn self_labels(&'a self) -> Option<SelfLabels<'a>> {
-            let post = from_data::<Post<'a>>(&self.record).ok()?;
+        fn self_labels(&self) -> Option<SelfLabels<S>> {
+            let post = from_data::<Post<S>, S>(&self.record).ok()?;
             post.labels
         }
     }
 
-    impl<'a> Labeled<'a> for ProfileView<'a> {
-        fn labels(&self) -> &[Label<'a>] {
+    impl<S: BosStr> Labeled<S> for ProfileView<S> {
+        fn labels(&self) -> &[Label<S>] {
             self.labels.as_deref().unwrap_or(&[])
         }
     }
 
-    impl<'a> Labeled<'a> for ProfileViewBasic<'a> {
-        fn labels(&self) -> &[Label<'a>] {
+    impl<S: BosStr> Labeled<S> for ProfileViewBasic<S> {
+        fn labels(&self) -> &[Label<S>] {
             self.labels.as_deref().unwrap_or(&[])
         }
     }
 
-    impl<'a> Labeled<'a> for ProfileViewDetailed<'a> {
-        fn labels(&self) -> &[Label<'a>] {
+    impl<S: BosStr> Labeled<S> for ProfileViewDetailed<S> {
+        fn labels(&self) -> &[Label<S>] {
             self.labels.as_deref().unwrap_or(&[])
         }
     }
 
-    impl<'a> Labeled<'a> for Post<'a> {
-        fn labels(&self) -> &[Label<'a>] {
+    impl<S: BosStr + Clone> Labeled<S> for Post<S> {
+        fn labels(&self) -> &[Label<S>] {
             &[]
         }
 
-        fn self_labels(&self) -> Option<SelfLabels<'a>> {
+        fn self_labels(&self) -> Option<SelfLabels<S>> {
             self.labels.clone()
         }
     }
 
-    impl<'a> Labeled<'a> for Profile<'a> {
-        fn labels(&self) -> &[Label<'a>] {
+    impl<S: BosStr + Clone> Labeled<S> for Profile<S> {
+        fn labels(&self) -> &[Label<S>] {
             &[]
         }
 
-        fn self_labels(&self) -> Option<SelfLabels<'a>> {
+        fn self_labels(&self) -> Option<SelfLabels<S>> {
             self.labels.clone()
         }
     }
 
-    impl<'a> Labeled<'a> for Generator<'a> {
-        fn labels(&self) -> &[Label<'a>] {
+    impl<S: BosStr + Clone> Labeled<S> for Generator<S> {
+        fn labels(&self) -> &[Label<S>] {
             &[]
         }
 
-        fn self_labels(&'a self) -> Option<SelfLabels<'a>> {
+        fn self_labels(&self) -> Option<SelfLabels<S>> {
             self.labels.clone()
         }
     }
 
-    impl<'a> Labeled<'a> for List<'a> {
-        fn labels(&self) -> &[Label<'a>] {
+    impl<S: BosStr + Clone> Labeled<S> for List<S> {
+        fn labels(&self) -> &[Label<S>] {
             &[]
         }
 
-        fn self_labels(&'a self) -> Option<SelfLabels<'a>> {
+        fn self_labels(&self) -> Option<SelfLabels<S>> {
             self.labels.clone()
         }
     }
 
-    impl<'a> Labeled<'a> for Service<'a> {
-        fn labels(&self) -> &[Label<'a>] {
+    impl<S: BosStr + Clone> Labeled<S> for Service<S> {
+        fn labels(&self) -> &[Label<S>] {
             &[]
         }
 
-        fn self_labels(&'a self) -> Option<SelfLabels<'a>> {
+        fn self_labels(&self) -> Option<SelfLabels<S>> {
             self.labels.clone()
         }
     }
 
-    impl<'a> Labeled<'a> for ListView<'a> {
-        fn labels(&self) -> &[Label<'a>] {
+    impl<S: BosStr> Labeled<S> for ListView<S> {
+        fn labels(&self) -> &[Label<S>] {
             self.labels.as_deref().unwrap_or(&[])
         }
     }
 
-    impl<'a> Labeled<'a> for Notification<'a> {
-        fn labels(&self) -> &[Label<'a>] {
+    impl<S: BosStr> Labeled<S> for Notification<S> {
+        fn labels(&self) -> &[Label<S>] {
             self.labels.as_deref().unwrap_or(&[])
         }
     }
@@ -146,22 +153,22 @@ mod anisota_impls {
 
     use jacquard_api::net_anisota::feed::{draft::Draft, post::Post};
 
-    impl<'a> Labeled<'a> for Post<'a> {
-        fn labels(&self) -> &[Label<'a>] {
+    impl<S: BosStr + Clone> Labeled<S> for Post<S> {
+        fn labels(&self) -> &[Label<S>] {
             &[]
         }
 
-        fn self_labels(&self) -> Option<SelfLabels<'a>> {
+        fn self_labels(&self) -> Option<SelfLabels<S>> {
             self.labels.clone()
         }
     }
 
-    impl<'a> Labeled<'a> for Draft<'a> {
-        fn labels(&self) -> &[Label<'a>] {
+    impl<S: BosStr + Clone> Labeled<S> for Draft<S> {
+        fn labels(&self) -> &[Label<S>] {
             &[]
         }
 
-        fn self_labels(&self) -> Option<SelfLabels<'a>> {
+        fn self_labels(&self) -> Option<SelfLabels<S>> {
             self.labels.clone()
         }
     }
@@ -175,24 +182,24 @@ mod social_grain_impls {
         gallery::{Gallery, GalleryView},
     };
 
-    impl<'a> Labeled<'a> for ProfileView<'a> {
-        fn labels(&self) -> &[Label<'a>] {
+    impl<S: BosStr> Labeled<S> for ProfileView<S> {
+        fn labels(&self) -> &[Label<S>] {
             self.labels.as_deref().unwrap_or(&[])
         }
     }
 
-    impl<'a> Labeled<'a> for GalleryView<'a> {
-        fn labels(&self) -> &[Label<'a>] {
+    impl<S: BosStr> Labeled<S> for GalleryView<S> {
+        fn labels(&self) -> &[Label<S>] {
             self.labels.as_deref().unwrap_or(&[])
         }
     }
 
-    impl<'a> Labeled<'a> for Gallery<'a> {
-        fn labels(&self) -> &[Label<'a>] {
+    impl<S: BosStr + Clone> Labeled<S> for Gallery<S> {
+        fn labels(&self) -> &[Label<S>] {
             &[]
         }
 
-        fn self_labels(&self) -> Option<SelfLabels<'a>> {
+        fn self_labels(&self) -> Option<SelfLabels<S>> {
             self.labels.clone()
         }
     }

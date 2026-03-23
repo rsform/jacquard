@@ -3,7 +3,7 @@
 use bytes::Bytes;
 use jacquard_api::com_atproto::repo::import_repo::ImportRepo;
 use jacquard_common::{
-    StreamError,
+    BosStr, StreamError,
     xrpc::streaming::{XrpcProcedureStream, XrpcStreamResp},
 };
 use serde::{Deserialize, Serialize};
@@ -15,20 +15,20 @@ impl XrpcProcedureStream for ImportRepoStream {
     const NSID: &'static str = "com.atproto.repo.importRepo";
     const ENCODING: &'static str = "application/vnd.ipld.car";
 
-    type Frame<'de> = Bytes;
+    type Frame<S: BosStr> = Bytes;
     type Request = ImportRepo;
     type Response = ImportRepoStreamResponse;
 
-    fn encode_frame<'de>(data: Self::Frame<'de>) -> Result<Bytes, StreamError>
+    fn encode_frame<S: BosStr>(data: Self::Frame<S>) -> Result<Bytes, StreamError>
     where
-        Self::Frame<'de>: Serialize,
+        Self::Frame<S>: Serialize,
     {
         Ok(data)
     }
 
-    fn decode_frame<'de>(frame: &'de [u8]) -> Result<Self::Frame<'de>, StreamError>
+    fn decode_frame<'de, S: BosStr>(frame: &'de [u8]) -> Result<Self::Frame<S>, StreamError>
     where
-        Self::Frame<'de>: Deserialize<'de>,
+        Self::Frame<S>: Deserialize<'de>,
     {
         Ok(Bytes::copy_from_slice(frame))
     }
@@ -41,18 +41,18 @@ impl XrpcStreamResp for ImportRepoStreamResponse {
     const NSID: &'static str = "com.atproto.repo.importRepo";
     const ENCODING: &'static str = "application/json";
 
-    type Frame<'de> = ();
+    type Frame<S: BosStr> = ();
 
-    fn encode_frame<'de>(_data: Self::Frame<'de>) -> Result<Bytes, StreamError>
+    fn encode_frame<S: BosStr>(_data: Self::Frame<S>) -> Result<Bytes, StreamError>
     where
-        Self::Frame<'de>: Serialize,
+        Self::Frame<S>: Serialize,
     {
         Ok(Bytes::new())
     }
 
-    fn decode_frame<'de>(_frame: &'de [u8]) -> Result<Self::Frame<'de>, StreamError>
+    fn decode_frame<'de, S: BosStr>(_frame: &'de [u8]) -> Result<Self::Frame<S>, StreamError>
     where
-        Self::Frame<'de>: Deserialize<'de>,
+        Self::Frame<S>: Deserialize<'de>,
     {
         Ok(())
     }
@@ -65,18 +65,18 @@ impl XrpcStreamResp for GetRepoStream {
     const NSID: &'static str = "com.atproto.sync.getRepo";
     const ENCODING: &'static str = "application/vnd.ipld.car";
 
-    type Frame<'de> = Bytes;
+    type Frame<S: BosStr> = Bytes;
 
-    fn encode_frame<'de>(data: Self::Frame<'de>) -> Result<Bytes, StreamError>
+    fn encode_frame<S: BosStr>(data: Self::Frame<S>) -> Result<Bytes, StreamError>
     where
-        Self::Frame<'de>: Serialize,
+        Self::Frame<S>: Serialize,
     {
         Ok(data)
     }
 
-    fn decode_frame<'de>(frame: &'de [u8]) -> Result<Self::Frame<'de>, StreamError>
+    fn decode_frame<'de, S: BosStr>(frame: &'de [u8]) -> Result<Self::Frame<S>, StreamError>
     where
-        Self::Frame<'de>: Deserialize<'de>,
+        Self::Frame<S>: Deserialize<'de>,
     {
         Ok(Bytes::copy_from_slice(frame))
     }

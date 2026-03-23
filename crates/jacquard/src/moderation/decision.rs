@@ -3,8 +3,9 @@ use super::{
     ModerationPrefs,
 };
 use jacquard_api::com_atproto::label::{Label, LabelValue};
-use jacquard_common::IntoStatic;
+use jacquard_common::bos::BosStr;
 use jacquard_common::types::string::{Datetime, Did};
+use smol_str::SmolStr;
 
 /// Apply moderation logic to a single piece of content
 ///
@@ -16,18 +17,18 @@ use jacquard_common::types::string::{Datetime, Did};
 /// ```ignore
 /// # use jacquard::moderation::*;
 /// # use jacquard_api::app_bsky::feed::PostView;
-/// # fn example(post: &PostView<'_>, prefs: &ModerationPrefs<'_>, defs: &LabelerDefs<'_>) {
+/// # fn example(post: &PostView, prefs: &ModerationPrefs, defs: &LabelerDefs) {
 /// let decision = moderate(post, prefs, defs, &[]);
 /// if decision.filter {
 ///     println!("This post should be hidden");
 /// }
 /// # }
 /// ```
-pub fn moderate<'a, T: Labeled<'a>>(
-    item: &'a T,
-    prefs: &ModerationPrefs<'_>,
-    defs: &LabelerDefs<'_>,
-    accepted_labelers: &[Did<'_>],
+pub fn moderate<S: BosStr, T: Labeled<S>>(
+    item: &T,
+    prefs: &ModerationPrefs,
+    defs: &LabelerDefs,
+    accepted_labelers: &[Did],
 ) -> ModerationDecision {
     let mut decision = ModerationDecision::none();
     let now = Datetime::now();
@@ -41,15 +42,21 @@ pub fn moderate<'a, T: Labeled<'a>>(
             }
         }
 
-        // Skip labels from untrusted labelers (if acceptance list is provided)
-        if !accepted_labelers.is_empty() && !accepted_labelers.contains(&label.src) {
+        // Skip labels from untrusted labelers (if acceptance list is provided).
+        // Compare by string since label.src may use a different backing type.
+        if !accepted_labelers.is_empty()
+            && !accepted_labelers
+                .iter()
+                .any(|d| d.as_ref() == label.src.as_ref())
+        {
             continue;
         }
 
         // Handle negation labels (remove previous causes)
         if label.neg.unwrap_or(false) {
             decision.causes.retain(|cause| {
-                !(cause.label.as_str() == label.val.as_ref() && cause.source == label.src)
+                !(cause.label.as_str() == label.val.as_ref()
+                    && cause.source.as_ref() == label.src.as_ref())
             });
             continue;
         }
@@ -60,18 +67,18 @@ pub fn moderate<'a, T: Labeled<'a>>(
     // Process self-labels
     if let Some(self_labels) = item.self_labels() {
         for self_label in self_labels.values {
-            // Self-labels don't have a source DID, so we'll use a placeholder approach
-            // In practice, self-labels are usually just used for adult content marking
+            // Self-labels don't have a source DID, so we'll use a placeholder approach.
+            // In practice, self-labels are usually just used for adult content marking.
 
             // Check user preference for this label
             let pref = prefs
                 .labels
                 .iter()
-                .find(|(k, _)| k.as_ref() == self_label.val.as_ref())
+                .find(|(k, _)| k.as_str() == self_label.val.as_ref())
                 .map(|(_, v)| v);
 
             // For self-labels, we generally respect them as warnings/info
-            // unless user has explicitly set a preference
+            // unless user has explicitly set a preference.
             match pref {
                 Some(LabelPref::Hide) => {
                     decision.filter = true;
@@ -94,29 +101,32 @@ pub fn moderate<'a, T: Labeled<'a>>(
 }
 
 /// Apply a single label to a moderation decision
-fn apply_label(
-    label: &Label<'_>,
-    prefs: &ModerationPrefs<'_>,
-    defs: &LabelerDefs<'_>,
+fn apply_label<S: BosStr>(
+    label: &Label<S>,
+    prefs: &ModerationPrefs,
+    defs: &LabelerDefs,
     decision: &mut ModerationDecision,
 ) {
     let label_val = label.val.as_ref();
 
-    // Get user preference (per-labeler override first, then global)
+    // Get user preference (per-labeler override first, then global).
+    // Use string comparison since label.src may use a different backing type than
+    // the Did<SmolStr> keys in prefs.labelers.
     let pref = prefs
         .labelers
-        .get(&label.src)
-        .and_then(|labeler_prefs| {
+        .iter()
+        .find(|(k, _)| k.as_str() == label.src.as_ref())
+        .and_then(|(_, labeler_prefs)| {
             labeler_prefs
                 .iter()
-                .find(|(k, _)| k.as_ref() == label_val)
+                .find(|(k, _)| k.as_str() == label_val)
                 .map(|(_, v)| v)
         })
         .or_else(|| {
             prefs
                 .labels
                 .iter()
-                .find(|(k, _)| k.as_ref() == label_val)
+                .find(|(k, _)| k.as_str() == label_val)
                 .map(|(_, v)| v)
         });
 
@@ -129,8 +139,9 @@ fn apply_label(
             decision.filter = true;
             decision.no_override = true;
             decision.causes.push(LabelCause {
-                label: LabelValue::from(label_val).into_static(),
-                source: label.src.clone().into_static(),
+                label: LabelValue::from_value(SmolStr::new(label_val)),
+                source: Did::new_owned(label.src.as_ref())
+                    .expect("label.src must be a valid DID"),
                 target: determine_target(label),
             });
             return;
@@ -142,8 +153,9 @@ fn apply_label(
         Some(LabelPref::Hide) => {
             decision.filter = true;
             decision.causes.push(LabelCause {
-                label: LabelValue::from(label_val).into_static(),
-                source: label.src.clone().into_static(),
+                label: LabelValue::from_value(SmolStr::new(label_val)),
+                source: Did::new_owned(label.src.as_ref())
+                    .expect("label.src must be a valid DID"),
                 target: determine_target(label),
             });
         }
@@ -161,9 +173,9 @@ fn apply_label(
 }
 
 /// Apply warning-level moderation based on label definition
-fn apply_warning(
-    label: &Label<'_>,
-    def: Option<&jacquard_api::com_atproto::label::LabelValueDefinition<'_>>,
+fn apply_warning<S: BosStr>(
+    label: &Label<S>,
+    def: Option<&jacquard_api::com_atproto::label::LabelValueDefinition>,
     decision: &mut ModerationDecision,
 ) {
     let label_val = label.val.as_ref();
@@ -203,16 +215,16 @@ fn apply_warning(
     }
 
     decision.causes.push(LabelCause {
-        label: LabelValue::from(label_val).into_static(),
-        source: label.src.clone().into_static(),
+        label: LabelValue::from_value(SmolStr::new(label_val)),
+        source: Did::new_owned(label.src.as_ref()).expect("label.src must be a valid DID"),
         target: determine_target(label),
     });
 }
 
 /// Apply default moderation when user has no preference
-fn apply_default(
-    label: &Label<'_>,
-    def: Option<&jacquard_api::com_atproto::label::LabelValueDefinition<'_>>,
+fn apply_default<S: BosStr>(
+    label: &Label<S>,
+    def: Option<&jacquard_api::com_atproto::label::LabelValueDefinition>,
     decision: &mut ModerationDecision,
 ) {
     let label_val = label.val.as_ref();
@@ -224,8 +236,9 @@ fn apply_default(
                 "hide" => {
                     decision.filter = true;
                     decision.causes.push(LabelCause {
-                        label: LabelValue::from(label_val).into_static(),
-                        source: label.src.clone().into_static(),
+                        label: LabelValue::from_value(SmolStr::new(label_val)),
+                        source: Did::new_owned(label.src.as_ref())
+                            .expect("label.src must be a valid DID"),
                         target: determine_target(label),
                     });
                     return;
@@ -247,8 +260,9 @@ fn apply_default(
                 decision.filter = true;
                 decision.no_override = true;
                 decision.causes.push(LabelCause {
-                    label: LabelValue::from(label_val).into_static(),
-                    source: label.src.clone().into_static(),
+                    label: LabelValue::from_value(SmolStr::new(label_val)),
+                    source: Did::new_owned(label.src.as_ref())
+                        .expect("label.src must be a valid DID"),
                     target: determine_target(label),
                 });
             }
@@ -267,8 +281,9 @@ fn apply_default(
             "porn" | "nsfl" => {
                 decision.filter = true;
                 decision.causes.push(LabelCause {
-                    label: LabelValue::from(label_val).into_static(),
-                    source: label.src.clone().into_static(),
+                    label: LabelValue::from_value(SmolStr::new(label_val)),
+                    source: Did::new_owned(label.src.as_ref())
+                        .expect("label.src must be a valid DID"),
                     target: determine_target(label),
                 });
             }
@@ -279,8 +294,9 @@ fn apply_default(
                 // Unknown label - default to informational
                 decision.inform = true;
                 decision.causes.push(LabelCause {
-                    label: LabelValue::from(label_val).into_static(),
-                    source: label.src.clone().into_static(),
+                    label: LabelValue::from_value(SmolStr::new(label_val)),
+                    source: Did::new_owned(label.src.as_ref())
+                        .expect("label.src must be a valid DID"),
                     target: determine_target(label),
                 });
             }
@@ -289,15 +305,13 @@ fn apply_default(
 }
 
 /// Determine whether a label targets an account or content
-fn determine_target(label: &Label<'_>) -> LabelTarget {
+fn determine_target<S: BosStr>(label: &Label<S>) -> LabelTarget {
     // Try to parse as a DID - this handles both:
     // - Bare DIDs: did:plc:xyz
     // - at:// URIs with only DID authority: at://did:plc:xyz
     // If it parses successfully, it's account-level.
     // If it fails, it must be a full URI with collection/rkey, so content-level.
-    use jacquard_common::types::string::Did;
-
-    if Did::new(label.uri.as_ref()).is_ok() {
+    if Did::<SmolStr>::new_owned(label.uri.as_ref()).is_ok() {
         LabelTarget::Account
     } else {
         LabelTarget::Content
@@ -313,7 +327,7 @@ fn determine_target(label: &Label<'_>) -> LabelTarget {
 /// ```ignore
 /// # use jacquard::moderation::*;
 /// # use jacquard_api::app_bsky::feed::PostView;
-/// # fn example(posts: &[PostView<'_>], prefs: &ModerationPrefs<'_>, defs: &LabelerDefs<'_>) {
+/// # fn example(posts: &[PostView], prefs: &ModerationPrefs, defs: &LabelerDefs) {
 /// let results = moderate_all(posts, prefs, defs, &[]);
 /// for (post, decision) in results {
 ///     if decision.filter {
@@ -322,11 +336,11 @@ fn determine_target(label: &Label<'_>) -> LabelTarget {
 /// }
 /// # }
 /// ```
-pub fn moderate_all<'a, T: Labeled<'a>>(
+pub fn moderate_all<'a, S: BosStr, T: Labeled<S>>(
     items: &'a [T],
-    prefs: &ModerationPrefs<'_>,
-    defs: &LabelerDefs<'_>,
-    accepted_labelers: &[Did<'_>],
+    prefs: &ModerationPrefs,
+    defs: &LabelerDefs,
+    accepted_labelers: &[Did],
 ) -> Vec<(&'a T, ModerationDecision)> {
     items
         .iter()
@@ -338,26 +352,33 @@ pub fn moderate_all<'a, T: Labeled<'a>>(
 ///
 /// Provides convenience methods for filtering and mapping moderation decisions
 /// over collections.
-pub trait ModerationIterExt<'a, T: Labeled<'a> + 'a>: Iterator<Item = &'a T> + Sized {
+pub trait ModerationIterExt<'a, S: BosStr, T: Labeled<S> + 'a>:
+    Iterator<Item = &'a T> + Sized
+{
     /// Map each item to a tuple of (item, decision)
     fn with_moderation(
         self,
-        prefs: &'a ModerationPrefs<'_>,
-        defs: &'a LabelerDefs<'_>,
-        accepted_labelers: &'a [Did<'_>],
+        prefs: &'a ModerationPrefs,
+        defs: &'a LabelerDefs,
+        accepted_labelers: &'a [Did],
     ) -> impl Iterator<Item = (&'a T, ModerationDecision)> {
-        self.map(move |item| (item, moderate(item, prefs, defs, accepted_labelers)))
+        self.map(move |item| (item, moderate::<S, T>(item, prefs, defs, accepted_labelers)))
     }
 
     /// Filter out items that should be hidden
     fn filter_moderated(
         self,
-        prefs: &'a ModerationPrefs<'_>,
-        defs: &'a LabelerDefs<'_>,
-        accepted_labelers: &'a [Did<'_>],
+        prefs: &'a ModerationPrefs,
+        defs: &'a LabelerDefs,
+        accepted_labelers: &'a [Did],
     ) -> impl Iterator<Item = &'a T> {
-        self.filter(move |item| !moderate(*item, prefs, defs, accepted_labelers).filter)
+        self.filter(move |item| {
+            !moderate::<S, T>(*item, prefs, defs, accepted_labelers).filter
+        })
     }
 }
 
-impl<'a, T: Labeled<'a> + 'a, I: Iterator<Item = &'a T>> ModerationIterExt<'a, T> for I {}
+impl<'a, S: BosStr, T: Labeled<S> + 'a, I: Iterator<Item = &'a T>>
+    ModerationIterExt<'a, S, T> for I
+{
+}

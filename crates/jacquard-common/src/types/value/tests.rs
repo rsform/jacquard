@@ -2,7 +2,7 @@ use crate::cowstr::ToCowStr;
 
 use super::*;
 use core::str::FromStr;
-use std::string::String;
+use std::string::{String, ToString};
 
 /// Canonicalize JSON by sorting object keys recursively
 fn canonicalize_json(value: &serde_json::Value) -> serde_json::Value {

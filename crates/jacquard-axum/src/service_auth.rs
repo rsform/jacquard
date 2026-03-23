@@ -66,7 +66,7 @@ pub trait ServiceAuth {
     type Resolver: IdentityResolver;
 
     /// Get the service DID (expected audience)
-    fn service_did(&self) -> &Did<'_>;
+    fn service_did(&self) -> Did<&str>;
 
     /// Get a reference to the identity resolver
     fn resolver(&self) -> &Self::Resolver;
@@ -81,7 +81,7 @@ pub trait ServiceAuth {
 /// by the `ExtractServiceAuth` extractor.
 pub struct ServiceAuthConfig<R> {
     /// The DID of your service (the expected audience)
-    service_did: Did<'static>,
+    service_did: Did,
     /// Identity resolver for fetching DID documents
     resolver: Arc<R>,
     /// Whether to require the `lxm` (method binding) field
@@ -103,7 +103,7 @@ impl<R: IdentityResolver> ServiceAuthConfig<R> {
     ///
     /// This enables `lxm` (method binding). If you need backward compatibility,
     /// use `ServiceAuthConfig::new_legacy()`
-    pub fn new(service_did: Did<'static>, resolver: R) -> Self {
+    pub fn new(service_did: Did, resolver: R) -> Self {
         Self {
             service_did,
             resolver: Arc::new(resolver),
@@ -114,7 +114,7 @@ impl<R: IdentityResolver> ServiceAuthConfig<R> {
     /// Create a new service auth config.
     ///
     /// `lxm` (method binding) is disabled for backwards compatibility
-    pub fn new_legacy(service_did: Did<'static>, resolver: R) -> Self {
+    pub fn new_legacy(service_did: Did, resolver: R) -> Self {
         Self {
             service_did,
             resolver: Arc::new(resolver),
@@ -132,8 +132,8 @@ impl<R: IdentityResolver> ServiceAuthConfig<R> {
     }
 
     /// Get the service DID.
-    pub fn service_did(&self) -> &Did<'static> {
-        &self.service_did
+    pub fn service_did(&self) -> Did<&str> {
+        self.service_did.borrow()
     }
 
     /// Get a reference to the identity resolver.
@@ -145,8 +145,8 @@ impl<R: IdentityResolver> ServiceAuthConfig<R> {
 impl<R: IdentityResolver> ServiceAuth for ServiceAuthConfig<R> {
     type Resolver = R;
 
-    fn service_did(&self) -> &Did<'_> {
-        &self.service_did
+    fn service_did(&self) -> Did<&str> {
+        self.service_did.borrow()
     }
 
     fn resolver(&self) -> &Self::Resolver {
@@ -165,29 +165,29 @@ impl<R: IdentityResolver> ServiceAuth for ServiceAuthConfig<R> {
 #[derive(Debug, Clone, jacquard_derive::IntoStatic)]
 pub struct VerifiedServiceAuth<'a> {
     /// The authenticated user's DID (from `iss` claim)
-    did: Did<'a>,
+    did: Did,
     /// The audience (should match your service DID)
-    aud: Did<'a>,
+    aud: Did,
     /// The lexicon method NSID, if present
-    lxm: Option<Nsid<'a>>,
+    lxm: Option<Nsid>,
     /// JWT ID (nonce), if present
     jti: Option<CowStr<'a>>,
 }
 
 impl<'a> VerifiedServiceAuth<'a> {
     /// Get the authenticated user's DID.
-    pub fn did(&self) -> &Did<'a> {
-        &self.did
+    pub fn did(&self) -> Did<&str> {
+        self.did.borrow()
     }
 
     /// Get the audience (your service DID).
-    pub fn aud(&self) -> &Did<'a> {
-        &self.aud
+    pub fn aud(&self) -> Did<&str> {
+        self.aud.borrow()
     }
 
     /// Get the lexicon method NSID, if present.
-    pub fn lxm(&self) -> Option<&Nsid<'a>> {
-        self.lxm.as_ref()
+    pub fn lxm(&self) -> Option<Nsid<&str>> {
+        self.lxm.as_ref().map(|l| l.borrow())
     }
 
     /// Get the JWT ID (nonce), if present.
@@ -310,14 +310,14 @@ pub enum ServiceAuthError {
     /// DID resolution failed
     #[error("failed to resolve DID {did}: {source}")]
     DidResolutionFailed {
-        did: Did<'static>,
+        did: Did,
         #[source]
         source: Box<dyn std::error::Error + Send + Sync>,
     },
 
     /// No valid signing key found in DID document
     #[error("no valid signing key found in DID document for {0}")]
-    NoSigningKey(Did<'static>),
+    NoSigningKey(Did),
 
     /// Method binding required but missing
     #[error("lxm (method binding) is required but missing from token")]
@@ -445,7 +445,7 @@ where
             service_auth::verify_signature(&parsed, &signing_key)?;
 
             // Now validate claims (audience, expiration, etc.)
-            claims.validate(state.service_did())?;
+            claims.validate(&state.service_did())?;
 
             // Check method binding if required
             if state.require_lxm() && claims.lxm.is_none() {
@@ -549,7 +549,7 @@ where
 ///
 /// This looks for a key with type "atproto" or the first available key
 /// if no atproto-specific key is found.
-fn extract_signing_key(methods: &[VerificationMethod]) -> Option<PublicKey> {
+fn extract_signing_key(methods: &[VerificationMethod<SmolStr>]) -> Option<PublicKey> {
     // First try to find an atproto-specific key
     let atproto_method = methods
         .iter()

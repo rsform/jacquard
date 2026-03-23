@@ -95,6 +95,15 @@ impl<S: Bos<str>> Handle<S> {
     pub unsafe fn unchecked(handle: S) -> Self {
         Handle(handle)
     }
+
+    /// Borrow as a `Handle<&str>`, analogous to `Uri::borrow()`.
+    pub fn borrow(&self) -> Handle<&str>
+    where
+        S: AsRef<str>,
+    {
+        // SAFETY: self is already validated.
+        unsafe { Handle::unchecked(self.0.as_ref()) }
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -359,11 +368,15 @@ mod tests {
         assert!(Handle::<&str>::new("@alice.test").is_err());
         assert!(Handle::<&str>::new("at://alice.test").is_err());
         assert_eq!(
-            Handle::<SmolStr>::new_owned("@alice.test").unwrap().as_str(),
+            Handle::<SmolStr>::new_owned("@alice.test")
+                .unwrap()
+                .as_str(),
             "alice.test"
         );
         assert_eq!(
-            Handle::<SmolStr>::new_owned("at://alice.test").unwrap().as_str(),
+            Handle::<SmolStr>::new_owned("at://alice.test")
+                .unwrap()
+                .as_str(),
             "alice.test"
         );
         assert_eq!(

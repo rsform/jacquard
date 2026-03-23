@@ -164,6 +164,15 @@ impl<S: Bos<str>> Did<S> {
     pub fn convert<B: Bos<str> + From<S>>(self) -> Did<B> {
         Did(B::from(self.0))
     }
+
+    /// Borrow as a `Did<&str>`, analogous to `Uri::borrow()`.
+    pub fn borrow(&self) -> Did<&str>
+    where
+        S: AsRef<str>,
+    {
+        // SAFETY: self is already validated.
+        unsafe { Did::unchecked(self.0.as_ref()) }
+    }
 }
 
 impl<S: Bos<str> + FromStr> FromStr for Did<S> {
