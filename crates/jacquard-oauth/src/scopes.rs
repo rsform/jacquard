@@ -21,29 +21,31 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::fmt;
+use std::marker::PhantomData;
 use std::str::FromStr;
 
+use jacquard_common::bos::{BosStr, DefaultStr};
 use jacquard_common::types::did::Did;
 use jacquard_common::types::nsid::Nsid;
 use jacquard_common::types::string::AtStrError;
-use jacquard_common::{CowStr, IntoStatic};
+use jacquard_common::{Bos, FromStaticStr, IntoStatic};
 use serde::de::Visitor;
 use serde::{Deserialize, Serialize};
-use smol_str::{SmolStr, ToSmolStr};
+use smol_str::{SmolStr, SmolStrBuilder, ToSmolStr, format_smolstr};
 
 /// Represents an AT Protocol OAuth scope
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum Scope<'s> {
+pub enum Scope<S: BosStr = DefaultStr> {
     /// Account scope for accessing account information
     Account(AccountScope),
     /// Identity scope for accessing identity information
     Identity(IdentityScope),
     /// Blob scope for blob operations with mime type constraints
-    Blob(BlobScope<'s>),
+    Blob(BlobScope<S>),
     /// Repository scope for collection operations
-    Repo(RepoScope<'s>),
+    Repo(RepoScope<S>),
     /// RPC scope for method access
-    Rpc(RpcScope<'s>),
+    Rpc(RpcScope<S>),
     /// AT Protocol scope - required to indicate that other AT Protocol scopes will be used
     Atproto,
     /// Transition scope for migration operations
@@ -56,24 +58,31 @@ pub enum Scope<'s> {
     Email,
 }
 
-impl Serialize for Scope<'_> {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+impl<S: BosStr + Ord> Serialize for Scope<S> {
+    fn serialize<Ser>(&self, serializer: Ser) -> Result<Ser::Ok, Ser::Error>
     where
-        S: serde::Serializer,
+        Ser: serde::Serializer,
     {
         serializer.serialize_str(&self.to_string_normalized())
     }
 }
 
-impl<'de> Deserialize<'de> for Scope<'_> {
+impl<'de, S> Deserialize<'de> for Scope<S>
+where
+    S: BosStr + Ord + Deserialize<'de> + FromStr,
+    <S as FromStr>::Err: core::fmt::Debug,
+{
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: serde::Deserializer<'de>,
     {
-        struct ScopeVisitor;
+        struct ScopeVisitor<St: BosStr + Ord + FromStr>(PhantomData<St>);
 
-        impl Visitor<'_> for ScopeVisitor {
-            type Value = Scope<'static>;
+        impl<St: BosStr + Ord + FromStr> Visitor<'_> for ScopeVisitor<St>
+        where
+            <St as FromStr>::Err: core::fmt::Debug,
+        {
+            type Value = Scope<St>;
 
             fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
                 write!(formatter, "a scope string")
@@ -82,17 +91,20 @@ impl<'de> Deserialize<'de> for Scope<'_> {
             where
                 E: serde::de::Error,
             {
-                Scope::parse(v)
-                    .map(|s| s.into_static())
-                    .map_err(|e| serde::de::Error::custom(format!("{:?}", e)))
+                Scope::parse(v).map_err(|e| serde::de::Error::custom(format!("{:?}", e)))
             }
         }
-        deserializer.deserialize_str(ScopeVisitor)
+        deserializer
+            .deserialize_str(ScopeVisitor(PhantomData))
+            .map(|scope| scope)
     }
 }
 
-impl IntoStatic for Scope<'_> {
-    type Output = Scope<'static>;
+impl<S: BosStr + Ord + IntoStatic> IntoStatic for Scope<S>
+where
+    S::Output: BosStr + Ord,
+{
+    type Output = Scope<S::Output>;
 
     fn into_static(self) -> Self::Output {
         match self {
@@ -159,13 +171,26 @@ pub enum TransitionScope {
 
 /// Blob scope with mime type constraints
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct BlobScope<'s> {
+pub struct BlobScope<S: BosStr = DefaultStr> {
     /// Accepted mime types
-    pub accept: BTreeSet<MimePattern<'s>>,
+    pub accept: BTreeSet<MimePattern<S>>,
 }
 
-impl IntoStatic for BlobScope<'_> {
-    type Output = BlobScope<'static>;
+impl<S: BosStr + AsRef<str> + Ord> BlobScope<S> {
+    /// Convert to a `BlobScope` with a different backing type.
+    pub fn convert<B: Bos<str> + From<S> + AsRef<str> + FromStaticStr + Ord>(self) -> BlobScope<B> {
+        BlobScope {
+            accept: self.accept.into_iter().map(|p| p.convert()).collect(),
+        }
+    }
+}
+
+impl<S: BosStr + IntoStatic> IntoStatic for BlobScope<S>
+where
+    S::Output: BosStr,
+    MimePattern<S::Output>: Ord,
+{
+    type Output = BlobScope<S::Output>;
 
     fn into_static(self) -> Self::Output {
         BlobScope {
@@ -176,17 +201,31 @@ impl IntoStatic for BlobScope<'_> {
 
 /// MIME type pattern for blob scope
 #[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
-pub enum MimePattern<'s> {
+pub enum MimePattern<S: BosStr = DefaultStr> {
     /// Match all types
     All,
     /// Match all subtypes of a type (e.g., "image/*")
-    TypeWildcard(CowStr<'s>),
+    TypeWildcard(S),
     /// Exact mime type match
-    Exact(CowStr<'s>),
+    Exact(S),
 }
 
-impl IntoStatic for MimePattern<'_> {
-    type Output = MimePattern<'static>;
+impl<S: BosStr> MimePattern<S> {
+    /// Convert to a `MimePattern` with a different backing type.
+    pub fn convert<B: Bos<str> + From<S> + AsRef<str> + FromStaticStr>(self) -> MimePattern<B> {
+        match self {
+            MimePattern::All => MimePattern::All,
+            MimePattern::TypeWildcard(s) => MimePattern::TypeWildcard(s.into()),
+            MimePattern::Exact(s) => MimePattern::Exact(s.into()),
+        }
+    }
+}
+
+impl<S: BosStr + IntoStatic> IntoStatic for MimePattern<S>
+where
+    S::Output: BosStr,
+{
+    type Output = MimePattern<S::Output>;
 
     fn into_static(self) -> Self::Output {
         match self {
@@ -199,15 +238,28 @@ impl IntoStatic for MimePattern<'_> {
 
 /// Repository scope with collection and action constraints
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct RepoScope<'s> {
+pub struct RepoScope<S: BosStr = DefaultStr> {
     /// Collection NSID or wildcard
-    pub collection: RepoCollection<'s>,
+    pub collection: RepoCollection<S>,
     /// Allowed actions
     pub actions: BTreeSet<RepoAction>,
 }
 
-impl IntoStatic for RepoScope<'_> {
-    type Output = RepoScope<'static>;
+impl<S: BosStr + Ord> RepoScope<S> {
+    /// Convert to a `RepoScope` with a different backing type.
+    pub fn convert<B: Bos<str> + From<S> + AsRef<str> + FromStaticStr + Ord>(self) -> RepoScope<B> {
+        RepoScope {
+            collection: self.collection.convert(),
+            actions: self.actions,
+        }
+    }
+}
+
+impl<S: BosStr + IntoStatic> IntoStatic for RepoScope<S>
+where
+    S::Output: BosStr,
+{
+    type Output = RepoScope<S::Output>;
 
     fn into_static(self) -> Self::Output {
         RepoScope {
@@ -219,15 +271,28 @@ impl IntoStatic for RepoScope<'_> {
 
 /// Repository collection identifier
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum RepoCollection<'s> {
+pub enum RepoCollection<S: BosStr = DefaultStr> {
     /// All collections (wildcard)
     All,
     /// Specific collection NSID
-    Nsid(Nsid<'s>),
+    Nsid(Nsid<S>),
 }
 
-impl IntoStatic for RepoCollection<'_> {
-    type Output = RepoCollection<'static>;
+impl<S: BosStr> RepoCollection<S> {
+    /// Convert to an `Nsid` with a different backing type.
+    pub fn convert<B: Bos<str> + From<S> + AsRef<str> + FromStaticStr>(self) -> RepoCollection<B> {
+        match self {
+            RepoCollection::All => RepoCollection::All,
+            RepoCollection::Nsid(nsid) => RepoCollection::Nsid(nsid.convert()),
+        }
+    }
+}
+
+impl<S: BosStr + IntoStatic> IntoStatic for RepoCollection<S>
+where
+    S::Output: BosStr,
+{
+    type Output = RepoCollection<S::Output>;
 
     fn into_static(self) -> Self::Output {
         match self {
@@ -250,15 +315,30 @@ pub enum RepoAction {
 
 /// RPC scope with lexicon method and audience constraints
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct RpcScope<'s> {
+pub struct RpcScope<S: BosStr = DefaultStr> {
     /// Lexicon methods (NSIDs or wildcard)
-    pub lxm: BTreeSet<RpcLexicon<'s>>,
+    pub lxm: BTreeSet<RpcLexicon<S>>,
     /// Audiences (DIDs or wildcard)
-    pub aud: BTreeSet<RpcAudience<'s>>,
+    pub aud: BTreeSet<RpcAudience<S>>,
 }
 
-impl IntoStatic for RpcScope<'_> {
-    type Output = RpcScope<'static>;
+impl<S: BosStr + Ord> RpcScope<S> {
+    /// Convert to a `RpcScope` with a different backing type.
+    pub fn convert<B: Bos<str> + From<S> + AsRef<str> + FromStaticStr + Ord>(self) -> RpcScope<B> {
+        RpcScope {
+            lxm: self.lxm.into_iter().map(|s| s.convert()).collect(),
+            aud: self.aud.into_iter().map(|s| s.convert()).collect(),
+        }
+    }
+}
+
+impl<S: BosStr + IntoStatic> IntoStatic for RpcScope<S>
+where
+    S::Output: BosStr,
+    RpcLexicon<S::Output>: Ord,
+    RpcAudience<S::Output>: Ord,
+{
+    type Output = RpcScope<S::Output>;
 
     fn into_static(self) -> Self::Output {
         RpcScope {
@@ -270,15 +350,28 @@ impl IntoStatic for RpcScope<'_> {
 
 /// RPC lexicon identifier
 #[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
-pub enum RpcLexicon<'s> {
+pub enum RpcLexicon<S: BosStr = DefaultStr> {
     /// All lexicons (wildcard)
     All,
     /// Specific lexicon NSID
-    Nsid(Nsid<'s>),
+    Nsid(Nsid<S>),
 }
 
-impl IntoStatic for RpcLexicon<'_> {
-    type Output = RpcLexicon<'static>;
+impl<S: BosStr> RpcLexicon<S> {
+    /// Convert to an `Nsid` with a different backing type.
+    pub fn convert<B: Bos<str> + From<S> + AsRef<str> + FromStaticStr>(self) -> RpcLexicon<B> {
+        match self {
+            RpcLexicon::All => RpcLexicon::All,
+            RpcLexicon::Nsid(nsid) => RpcLexicon::Nsid(nsid.convert()),
+        }
+    }
+}
+
+impl<S: BosStr + IntoStatic> IntoStatic for RpcLexicon<S>
+where
+    S::Output: BosStr,
+{
+    type Output = RpcLexicon<S::Output>;
 
     fn into_static(self) -> Self::Output {
         match self {
@@ -290,15 +383,28 @@ impl IntoStatic for RpcLexicon<'_> {
 
 /// RPC audience identifier
 #[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
-pub enum RpcAudience<'s> {
+pub enum RpcAudience<S: BosStr = DefaultStr> {
     /// All audiences (wildcard)
     All,
     /// Specific DID
-    Did(Did<'s>),
+    Did(Did<S>),
 }
 
-impl IntoStatic for RpcAudience<'_> {
-    type Output = RpcAudience<'static>;
+impl<S: BosStr> RpcAudience<S> {
+    /// Convert to an `Nsid` with a different backing type.
+    pub fn convert<B: Bos<str> + From<S> + AsRef<str> + FromStaticStr>(self) -> RpcAudience<B> {
+        match self {
+            RpcAudience::All => RpcAudience::All,
+            RpcAudience::Did(did) => RpcAudience::Did(did.convert()),
+        }
+    }
+}
+
+impl<S: BosStr + IntoStatic> IntoStatic for RpcAudience<S>
+where
+    S::Output: BosStr,
+{
+    type Output = RpcAudience<S::Output>;
 
     fn into_static(self) -> Self::Output {
         match self {
@@ -308,7 +414,23 @@ impl IntoStatic for RpcAudience<'_> {
     }
 }
 
-impl<'s> Scope<'s> {
+impl<S: BosStr + Ord> Scope<S> {
+    /// Convert to a `Scope` with a different backing type.
+    pub fn convert<B: Bos<str> + From<S> + AsRef<str> + FromStaticStr + Ord>(self) -> Scope<B> {
+        match self {
+            Scope::Account(scope) => Scope::Account(scope),
+            Scope::Identity(scope) => Scope::Identity(scope),
+            Scope::Blob(scope) => Scope::Blob(scope.convert()),
+            Scope::Repo(scope) => Scope::Repo(scope.convert()),
+            Scope::Rpc(scope) => Scope::Rpc(scope.convert()),
+            Scope::Atproto => Scope::Atproto,
+            Scope::Transition(scope) => Scope::Transition(scope),
+            Scope::OpenId => Scope::OpenId,
+            Scope::Profile => Scope::Profile,
+            Scope::Email => Scope::Email,
+        }
+    }
+
     /// Parse multiple space-separated scopes from a string
     ///
     /// # Examples
@@ -317,7 +439,11 @@ impl<'s> Scope<'s> {
     /// let scopes = Scope::parse_multiple("atproto repo:*").unwrap();
     /// assert_eq!(scopes.len(), 2);
     /// ```
-    pub fn parse_multiple(s: &'s str) -> Result<Vec<Self>, ParseError> {
+    pub fn parse_multiple<'a>(s: &'a str) -> Result<Vec<Self>, ParseError>
+    where
+        S: FromStr,
+        <S as FromStr>::Err: core::fmt::Debug,
+    {
         if s.trim().is_empty() {
             return Ok(Vec::new());
         }
@@ -342,7 +468,11 @@ impl<'s> Scope<'s> {
     /// let scopes = Scope::parse_multiple_reduced("atproto repo:app.bsky.feed.post repo:*").unwrap();
     /// assert_eq!(scopes.len(), 2); // atproto and repo:*
     /// ```
-    pub fn parse_multiple_reduced(s: &'s str) -> Result<Vec<Self>, ParseError> {
+    pub fn parse_multiple_reduced<'a>(s: &'a str) -> Result<Vec<Self>, ParseError>
+    where
+        S: FromStr,
+        <S as FromStr>::Err: core::fmt::Debug,
+    {
         let all_scopes = Self::parse_multiple(s)?;
 
         if all_scopes.is_empty() {
@@ -403,18 +533,25 @@ impl<'s> Scope<'s> {
     /// let result = Scope::serialize_multiple(&scopes);
     /// assert_eq!(result, "account:email atproto repo:*");
     /// ```
-    pub fn serialize_multiple(scopes: &[Self]) -> CowStr<'static> {
+    pub fn serialize_multiple(scopes: &[Self]) -> SmolStr {
         if scopes.is_empty() {
-            return CowStr::default();
+            return SmolStr::new_static("");
         }
 
-        let mut serialized: Vec<String> = scopes
+        let mut serialized: Vec<SmolStr> = scopes
             .iter()
             .map(|scope| scope.to_string_normalized())
             .collect();
 
         serialized.sort();
-        serialized.join(" ").into()
+        let mut builder = SmolStrBuilder::new();
+        for (i, scope) in serialized.iter().enumerate() {
+            if i > 0 {
+                builder.push_str(" ");
+            }
+            builder.push_str(scope);
+        }
+        builder.finish()
     }
 
     /// Remove a scope from a list of scopes
@@ -435,7 +572,10 @@ impl<'s> Scope<'s> {
     /// assert_eq!(result.len(), 2);
     /// assert!(!result.contains(&to_remove));
     /// ```
-    pub fn remove_scope(scopes: &[Self], scope_to_remove: &Self) -> Vec<Self> {
+    pub fn remove_scope(scopes: &[Self], scope_to_remove: &Self) -> Vec<Self>
+    where
+        S: Clone,
+    {
         scopes
             .iter()
             .filter(|s| *s != scope_to_remove)
@@ -444,7 +584,11 @@ impl<'s> Scope<'s> {
     }
 
     /// Parse a scope from a string
-    pub fn parse(s: &'s str) -> Result<Self, ParseError> {
+    pub fn parse<'a>(s: &'a str) -> Result<Self, ParseError>
+    where
+        S: FromStr,
+        <S as FromStr>::Err: core::fmt::Debug,
+    {
         // Determine the prefix first by checking for known prefixes
         let prefixes = [
             "account",
@@ -500,7 +644,7 @@ impl<'s> Scope<'s> {
         }
     }
 
-    fn parse_account(suffix: Option<&'s str>) -> Result<Self, ParseError> {
+    fn parse_account(suffix: Option<&str>) -> Result<Self, ParseError> {
         let (resource_str, params) = match suffix {
             Some(s) => {
                 if let Some(pos) = s.find('?') {
@@ -538,7 +682,7 @@ impl<'s> Scope<'s> {
         Ok(Scope::Account(AccountScope { resource, action }))
     }
 
-    fn parse_identity(suffix: Option<&'s str>) -> Result<Self, ParseError> {
+    fn parse_identity(suffix: Option<&str>) -> Result<Self, ParseError> {
         let scope = match suffix {
             Some("handle") => IdentityScope::Handle,
             Some("*") => IdentityScope::All,
@@ -549,15 +693,19 @@ impl<'s> Scope<'s> {
         Ok(Scope::Identity(scope))
     }
 
-    fn parse_blob(suffix: Option<&'s str>) -> Result<Self, ParseError> {
-        let mut accept = BTreeSet::new();
+    fn parse_blob<'a>(suffix: Option<&'a str>) -> Result<Self, ParseError>
+    where
+        S: FromStr,
+        <S as FromStr>::Err: core::fmt::Debug,
+    {
+        let mut accept: BTreeSet<MimePattern<S>> = BTreeSet::new();
 
         match suffix {
             Some(s) if s.starts_with('?') => {
                 let params = parse_query_string(&s[1..]);
                 if let Some(values) = params.get("accept") {
                     for value in values {
-                        accept.insert(MimePattern::from_str(value)?);
+                        accept.insert(MimePattern::from_str(*value)?);
                     }
                 }
             }
@@ -576,7 +724,10 @@ impl<'s> Scope<'s> {
         Ok(Scope::Blob(BlobScope { accept }))
     }
 
-    fn parse_repo(suffix: Option<&'s str>) -> Result<Self, ParseError> {
+    fn parse_repo<'a>(suffix: Option<&'a str>) -> Result<Self, ParseError>
+    where
+        S: FromStr,
+    {
         let (collection_str, params) = match suffix {
             Some(s) => {
                 if let Some(pos) = s.find('?') {
@@ -590,7 +741,7 @@ impl<'s> Scope<'s> {
 
         let collection = match collection_str {
             Some("*") | None => RepoCollection::All,
-            Some(nsid) => RepoCollection::Nsid(Nsid::new(nsid)?),
+            Some(nsid) => RepoCollection::Nsid(Nsid::from_str(nsid)?),
         };
 
         let mut actions = BTreeSet::new();
@@ -631,7 +782,10 @@ impl<'s> Scope<'s> {
         }))
     }
 
-    fn parse_rpc(suffix: Option<&'s str>) -> Result<Self, ParseError> {
+    fn parse_rpc<'a>(suffix: Option<&'a str>) -> Result<Self, ParseError>
+    where
+        S: FromStr,
+    {
         let mut lxm = BTreeSet::new();
         let mut aud = BTreeSet::new();
 
@@ -645,20 +799,20 @@ impl<'s> Scope<'s> {
 
                 if let Some(values) = params.get("lxm") {
                     for value in values {
-                        if value.as_ref() == "*" {
+                        if *value == "*" {
                             lxm.insert(RpcLexicon::All);
                         } else {
-                            lxm.insert(RpcLexicon::Nsid(Nsid::new(value)?.into_static()));
+                            lxm.insert(RpcLexicon::Nsid(Nsid::from_str(*value)?));
                         }
                     }
                 }
 
                 if let Some(values) = params.get("aud") {
                     for value in values {
-                        if value.as_ref() == "*" {
+                        if *value == "*" {
                             aud.insert(RpcAudience::All);
                         } else {
-                            aud.insert(RpcAudience::Did(Did::new(value)?.into_static()));
+                            aud.insert(RpcAudience::Did(Did::from_str(*value)?));
                         }
                     }
                 }
@@ -669,19 +823,19 @@ impl<'s> Scope<'s> {
                     let nsid = &s[..pos];
                     let params = parse_query_string(&s[pos + 1..]);
 
-                    lxm.insert(RpcLexicon::Nsid(Nsid::new(nsid)?.into_static()));
+                    lxm.insert(RpcLexicon::Nsid(Nsid::from_str(nsid)?));
 
                     if let Some(values) = params.get("aud") {
                         for value in values {
-                            if value.as_ref() == "*" {
+                            if *value == "*" {
                                 aud.insert(RpcAudience::All);
                             } else {
-                                aud.insert(RpcAudience::Did(Did::new(value)?.into_static()));
+                                aud.insert(RpcAudience::Did(Did::from_str(*value)?));
                             }
                         }
                     }
                 } else {
-                    lxm.insert(RpcLexicon::Nsid(Nsid::new(s)?.into_static()));
+                    lxm.insert(RpcLexicon::Nsid(Nsid::from_str(s)?));
                 }
             }
             None => {}
@@ -743,9 +897,11 @@ impl<'s> Scope<'s> {
         }
         Ok(Scope::Email)
     }
+}
 
+impl<S: BosStr + Ord> Scope<S> {
     /// Convert the scope to its normalized string representation
-    pub fn to_string_normalized(&self) -> String {
+    pub fn to_string_normalized(&self) -> SmolStr {
         match self {
             Scope::Account(scope) => {
                 let resource = match scope.resource {
@@ -755,36 +911,42 @@ impl<'s> Scope<'s> {
                 };
 
                 match scope.action {
-                    AccountAction::Read => format!("account:{}", resource),
-                    AccountAction::Manage => format!("account:{}?action=manage", resource),
+                    AccountAction::Read => format_smolstr!("account:{}", resource),
+                    AccountAction::Manage => format_smolstr!("account:{}?action=manage", resource),
                 }
             }
             Scope::Identity(scope) => match scope {
-                IdentityScope::Handle => "identity:handle".to_string(),
-                IdentityScope::All => "identity:*".to_string(),
+                IdentityScope::Handle => "identity:handle".to_smolstr(),
+                IdentityScope::All => "identity:*".to_smolstr(),
             },
             Scope::Blob(scope) => {
                 if scope.accept.len() == 1 {
                     if let Some(pattern) = scope.accept.iter().next() {
                         match pattern {
-                            MimePattern::All => "blob:*/*".to_string(),
-                            MimePattern::TypeWildcard(t) => format!("blob:{}/*", t),
-                            MimePattern::Exact(mime) => format!("blob:{}", mime),
+                            MimePattern::All => "blob:*/*".to_smolstr(),
+                            MimePattern::TypeWildcard(t) => {
+                                format_smolstr!("blob:{}/*", t.as_ref())
+                            }
+                            MimePattern::Exact(mime) => format_smolstr!("blob:{}", mime.as_ref()),
                         }
                     } else {
-                        "blob:*/*".to_string()
+                        "blob:*/*".to_smolstr()
                     }
                 } else {
                     let mut params = Vec::new();
                     for pattern in &scope.accept {
                         match pattern {
-                            MimePattern::All => params.push("accept=*/*".to_string()),
-                            MimePattern::TypeWildcard(t) => params.push(format!("accept={}/*", t)),
-                            MimePattern::Exact(mime) => params.push(format!("accept={}", mime)),
+                            MimePattern::All => params.push("accept=*/*".to_smolstr()),
+                            MimePattern::TypeWildcard(t) => {
+                                params.push(format_smolstr!("accept={}/*", t.as_ref()))
+                            }
+                            MimePattern::Exact(mime) => {
+                                params.push(format_smolstr!("accept={}", mime.as_ref()))
+                            }
                         }
                     }
                     params.sort();
-                    format!("blob?{}", params.join("&"))
+                    format_smolstr!("blob?{}", params.join("&"))
                 }
             }
             Scope::Repo(scope) => {
@@ -794,7 +956,7 @@ impl<'s> Scope<'s> {
                 };
 
                 if scope.actions.len() == 3 {
-                    format!("repo:{}", collection)
+                    format_smolstr!("repo:{}", collection)
                 } else {
                     let mut params = Vec::new();
                     for action in &scope.actions {
@@ -804,7 +966,7 @@ impl<'s> Scope<'s> {
                             RepoAction::Delete => params.push("action=delete"),
                         }
                     }
-                    format!("repo:{}?{}", collection, params.join("&"))
+                    format_smolstr!("repo:{}?{}", collection, params.join("&"))
                 }
             }
             Scope::Rpc(scope) => {
@@ -813,58 +975,58 @@ impl<'s> Scope<'s> {
                     && scope.aud.len() == 1
                     && scope.aud.contains(&RpcAudience::All)
                 {
-                    "rpc:*".to_string()
+                    "rpc:*".to_smolstr()
                 } else if scope.lxm.len() == 1
                     && scope.aud.len() == 1
                     && scope.aud.contains(&RpcAudience::All)
                 {
                     if let Some(lxm) = scope.lxm.iter().next() {
                         match lxm {
-                            RpcLexicon::All => "rpc:*".to_string(),
-                            RpcLexicon::Nsid(nsid) => format!("rpc:{}", nsid),
+                            RpcLexicon::All => "rpc:*".to_smolstr(),
+                            RpcLexicon::Nsid(nsid) => format_smolstr!("rpc:{}", nsid),
                         }
                     } else {
-                        "rpc:*".to_string()
+                        "rpc:*".to_smolstr()
                     }
                 } else {
                     let mut params = Vec::new();
 
                     for lxm in &scope.lxm {
                         match lxm {
-                            RpcLexicon::All => params.push("lxm=*".to_string()),
-                            RpcLexicon::Nsid(nsid) => params.push(format!("lxm={}", nsid)),
+                            RpcLexicon::All => params.push("lxm=*".to_smolstr()),
+                            RpcLexicon::Nsid(nsid) => params.push(format_smolstr!("lxm={}", nsid)),
                         }
                     }
 
                     for aud in &scope.aud {
                         match aud {
-                            RpcAudience::All => params.push("aud=*".to_string()),
-                            RpcAudience::Did(did) => params.push(format!("aud={}", did)),
+                            RpcAudience::All => params.push("aud=*".to_smolstr()),
+                            RpcAudience::Did(did) => params.push(format_smolstr!("aud={}", did)),
                         }
                     }
 
                     params.sort();
 
                     if params.is_empty() {
-                        "rpc:*".to_string()
+                        "rpc:*".to_smolstr()
                     } else {
-                        format!("rpc?{}", params.join("&"))
+                        format_smolstr!("rpc?{}", params.join("&"))
                     }
                 }
             }
-            Scope::Atproto => "atproto".to_string(),
+            Scope::Atproto => "atproto".to_smolstr(),
             Scope::Transition(scope) => match scope {
-                TransitionScope::Generic => "transition:generic".to_string(),
-                TransitionScope::Email => "transition:email".to_string(),
+                TransitionScope::Generic => "transition:generic".to_smolstr(),
+                TransitionScope::Email => "transition:email".to_smolstr(),
             },
-            Scope::OpenId => "openid".to_string(),
-            Scope::Profile => "profile".to_string(),
-            Scope::Email => "email".to_string(),
+            Scope::OpenId => "openid".to_smolstr(),
+            Scope::Profile => "profile".to_smolstr(),
+            Scope::Email => "email".to_smolstr(),
         }
     }
 
     /// Check if this scope grants the permissions of another scope
-    pub fn grants(&self, other: &Scope) -> bool {
+    pub fn grants<T: BosStr>(&self, other: &Scope<T>) -> bool {
         match (self, other) {
             // Atproto only grants itself (it's a required scope, not a permission grant)
             (Scope::Atproto, Scope::Atproto) => true,
@@ -916,7 +1078,8 @@ impl<'s> Scope<'s> {
                 let collection_match = match (&a.collection, &b.collection) {
                     (RepoCollection::All, _) => true,
                     (RepoCollection::Nsid(a_nsid), RepoCollection::Nsid(b_nsid)) => {
-                        a_nsid == b_nsid
+                        // Compare as strings to support cross-type-parameter equality.
+                        a_nsid.as_ref() == b_nsid.as_ref()
                     }
                     _ => false,
                 };
@@ -928,21 +1091,29 @@ impl<'s> Scope<'s> {
                 b.actions.is_subset(&a.actions) || a.actions.len() == 3
             }
             (Scope::Rpc(a), Scope::Rpc(b)) => {
-                let lxm_match = if a.lxm.contains(&RpcLexicon::All) {
+                let lxm_match = if a.lxm.iter().any(|l| matches!(l, RpcLexicon::All)) {
                     true
                 } else {
                     b.lxm.iter().all(|b_lxm| match b_lxm {
                         RpcLexicon::All => false,
-                        RpcLexicon::Nsid(_) => a.lxm.contains(b_lxm),
+                        // Compare as strings to support cross-type-parameter equality.
+                        RpcLexicon::Nsid(b_nsid) => a.lxm.iter().any(|a_lxm| match a_lxm {
+                            RpcLexicon::All => false,
+                            RpcLexicon::Nsid(a_nsid) => a_nsid.as_ref() == b_nsid.as_ref(),
+                        }),
                     })
                 };
 
-                let aud_match = if a.aud.contains(&RpcAudience::All) {
+                let aud_match = if a.aud.iter().any(|a| matches!(a, RpcAudience::All)) {
                     true
                 } else {
                     b.aud.iter().all(|b_aud| match b_aud {
                         RpcAudience::All => false,
-                        RpcAudience::Did(_) => a.aud.contains(b_aud),
+                        // Compare as strings to support cross-type-parameter equality.
+                        RpcAudience::Did(b_did) => a.aud.iter().any(|a_aud| match a_aud {
+                            RpcAudience::All => false,
+                            RpcAudience::Did(a_did) => a_did.as_ref() == b_did.as_ref(),
+                        }),
                     })
                 };
 
@@ -953,59 +1124,66 @@ impl<'s> Scope<'s> {
     }
 }
 
-impl MimePattern<'_> {
-    fn grants(&self, other: &MimePattern) -> bool {
+impl<S: BosStr> MimePattern<S> {
+    fn grants<T: BosStr>(&self, other: &MimePattern<T>) -> bool {
         match (self, other) {
             (MimePattern::All, _) => true,
             (MimePattern::TypeWildcard(a_type), MimePattern::TypeWildcard(b_type)) => {
-                a_type == b_type
+                // Compare as strings to support cross-type-parameter equality.
+                a_type.as_ref() == b_type.as_ref()
             }
-            (MimePattern::TypeWildcard(a_type), MimePattern::Exact(b_mime)) => {
-                b_mime.starts_with(&format!("{}/", a_type))
-            }
-            (MimePattern::Exact(a), MimePattern::Exact(b)) => a == b,
+            (MimePattern::TypeWildcard(a_type), MimePattern::Exact(b_mime)) => b_mime
+                .as_ref()
+                .starts_with(&format!("{}/", a_type.as_ref())),
+            (MimePattern::Exact(a), MimePattern::Exact(b)) => a.as_ref() == b.as_ref(),
             _ => false,
         }
     }
 }
 
-impl FromStr for MimePattern<'_> {
+impl<S: BosStr + FromStr> FromStr for MimePattern<S>
+where
+    <S as FromStr>::Err: core::fmt::Debug,
+{
     type Err = ParseError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         if s == "*/*" {
             Ok(MimePattern::All)
         } else if let Some(stripped) = s.strip_suffix("/*") {
-            Ok(MimePattern::TypeWildcard(CowStr::Owned(
-                stripped.to_smolstr(),
-            )))
+            Ok(MimePattern::TypeWildcard(S::from_str(stripped).unwrap()))
         } else if s.contains('/') {
-            Ok(MimePattern::Exact(CowStr::Owned(s.to_smolstr())))
+            Ok(MimePattern::Exact(S::from_str(s).unwrap()))
         } else {
             Err(ParseError::InvalidMimeType(s.to_string()))
         }
     }
 }
 
-impl FromStr for Scope<'_> {
-    type Err = ParseError;
+impl<'a, S: BosStr + From<&'a str>> TryFrom<&'a str> for MimePattern<S> {
+    type Error = ParseError;
 
-    fn from_str(s: &str) -> Result<Scope<'static>, Self::Err> {
-        match Scope::parse(s) {
-            Ok(parsed) => Ok(parsed.into_static()),
-            Err(e) => Err(e),
+    fn try_from(s: &'a str) -> Result<Self, Self::Error> {
+        if s == "*/*" {
+            Ok(MimePattern::All)
+        } else if let Some(stripped) = s.strip_suffix("/*") {
+            Ok(MimePattern::TypeWildcard(S::from(stripped)))
+        } else if s.contains('/') {
+            Ok(MimePattern::Exact(S::from(s)))
+        } else {
+            Err(ParseError::InvalidMimeType(s.to_string()))
         }
     }
 }
 
-impl fmt::Display for Scope<'_> {
+impl<S: BosStr + Ord> fmt::Display for Scope<S> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self.to_string_normalized())
     }
 }
 
 /// Parse a query string into a map of keys to lists of values
-fn parse_query_string(query: &str) -> BTreeMap<SmolStr, Vec<CowStr<'static>>> {
+fn parse_query_string(query: &str) -> BTreeMap<SmolStr, Vec<&str>> {
     let mut params = BTreeMap::new();
 
     for pair in query.split('&') {
@@ -1015,7 +1193,7 @@ fn parse_query_string(query: &str) -> BTreeMap<SmolStr, Vec<CowStr<'static>>> {
             params
                 .entry(key.to_smolstr())
                 .or_insert_with(Vec::new)
-                .push(CowStr::Owned(value.to_smolstr()));
+                .push(value);
         }
     }
 
@@ -1059,7 +1237,7 @@ mod tests {
 
     #[test]
     fn test_account_scope_parsing() {
-        let scope = Scope::parse("account:email").unwrap();
+        let scope: Scope = Scope::parse("account:email").unwrap();
         assert_eq!(
             scope,
             Scope::Account(AccountScope {
@@ -1068,7 +1246,7 @@ mod tests {
             })
         );
 
-        let scope = Scope::parse("account:repo?action=manage").unwrap();
+        let scope: Scope = Scope::parse("account:repo?action=manage").unwrap();
         assert_eq!(
             scope,
             Scope::Account(AccountScope {
@@ -1077,7 +1255,7 @@ mod tests {
             })
         );
 
-        let scope = Scope::parse("account:status?action=read").unwrap();
+        let scope: Scope = Scope::parse("account:status?action=read").unwrap();
         assert_eq!(
             scope,
             Scope::Account(AccountScope {
@@ -1089,40 +1267,40 @@ mod tests {
 
     #[test]
     fn test_identity_scope_parsing() {
-        let scope = Scope::parse("identity:handle").unwrap();
+        let scope: Scope = Scope::parse("identity:handle").unwrap();
         assert_eq!(scope, Scope::Identity(IdentityScope::Handle));
 
-        let scope = Scope::parse("identity:*").unwrap();
+        let scope: Scope = Scope::parse("identity:*").unwrap();
         assert_eq!(scope, Scope::Identity(IdentityScope::All));
     }
 
     #[test]
     fn test_blob_scope_parsing() {
-        let scope = Scope::parse("blob:*/*").unwrap();
+        let scope: Scope = Scope::parse("blob:*/*").unwrap();
         let mut accept = BTreeSet::new();
         accept.insert(MimePattern::All);
         assert_eq!(scope, Scope::Blob(BlobScope { accept }));
 
-        let scope = Scope::parse("blob:image/png").unwrap();
+        let scope: Scope<SmolStr> = Scope::parse("blob:image/png").unwrap();
         let mut accept = BTreeSet::new();
-        accept.insert(MimePattern::Exact(CowStr::new_static("image/png")));
+        accept.insert(MimePattern::Exact(SmolStr::new_static("image/png")));
         assert_eq!(scope, Scope::Blob(BlobScope { accept }));
 
         let scope = Scope::parse("blob?accept=image/png&accept=image/jpeg").unwrap();
         let mut accept = BTreeSet::new();
-        accept.insert(MimePattern::Exact(CowStr::new_static("image/png")));
-        accept.insert(MimePattern::Exact(CowStr::new_static("image/jpeg")));
+        accept.insert(MimePattern::Exact(SmolStr::new_static("image/png")));
+        accept.insert(MimePattern::Exact(SmolStr::new_static("image/jpeg")));
         assert_eq!(scope, Scope::Blob(BlobScope { accept }));
 
         let scope = Scope::parse("blob:image/*").unwrap();
         let mut accept = BTreeSet::new();
-        accept.insert(MimePattern::TypeWildcard(CowStr::new_static("image")));
+        accept.insert(MimePattern::TypeWildcard(SmolStr::new_static("image")));
         assert_eq!(scope, Scope::Blob(BlobScope { accept }));
     }
 
     #[test]
     fn test_repo_scope_parsing() {
-        let scope = Scope::parse("repo:*?action=create").unwrap();
+        let scope: Scope<SmolStr> = Scope::parse("repo:*?action=create").unwrap();
         let mut actions = BTreeSet::new();
         actions.insert(RepoAction::Create);
         assert_eq!(
@@ -1133,19 +1311,20 @@ mod tests {
             })
         );
 
-        let scope = Scope::parse("repo:app.bsky.feed.post?action=create&action=update").unwrap();
+        let scope: Scope =
+            Scope::parse("repo:app.bsky.feed.post?action=create&action=update").unwrap();
         let mut actions = BTreeSet::new();
         actions.insert(RepoAction::Create);
         actions.insert(RepoAction::Update);
         assert_eq!(
             scope,
             Scope::Repo(RepoScope {
-                collection: RepoCollection::Nsid(Nsid::new_static("app.bsky.feed.post").unwrap()),
+                collection: RepoCollection::Nsid(Nsid::new_owned("app.bsky.feed.post").unwrap()),
                 actions,
             })
         );
 
-        let scope = Scope::parse("repo:app.bsky.feed.post").unwrap();
+        let scope: Scope = Scope::parse("repo:app.bsky.feed.post").unwrap();
         let mut actions = BTreeSet::new();
         actions.insert(RepoAction::Create);
         actions.insert(RepoAction::Update);
@@ -1153,7 +1332,7 @@ mod tests {
         assert_eq!(
             scope,
             Scope::Repo(RepoScope {
-                collection: RepoCollection::Nsid(Nsid::new_static("app.bsky.feed.post").unwrap()),
+                collection: RepoCollection::Nsid(Nsid::new_owned("app.bsky.feed.post").unwrap()),
                 actions,
             })
         );
@@ -1161,14 +1340,14 @@ mod tests {
 
     #[test]
     fn test_rpc_scope_parsing() {
-        let scope = Scope::parse("rpc:*").unwrap();
+        let scope: Scope = Scope::parse("rpc:*").unwrap();
         let mut lxm = BTreeSet::new();
         let mut aud = BTreeSet::new();
         lxm.insert(RpcLexicon::All);
         aud.insert(RpcAudience::All);
         assert_eq!(scope, Scope::Rpc(RpcScope { lxm, aud }));
 
-        let scope = Scope::parse("rpc:com.example.service").unwrap();
+        let scope: Scope<SmolStr> = Scope::parse("rpc:com.example.service").unwrap();
         let mut lxm = BTreeSet::new();
         let mut aud = BTreeSet::new();
         lxm.insert(RpcLexicon::Nsid(
@@ -1177,31 +1356,31 @@ mod tests {
         aud.insert(RpcAudience::All);
         assert_eq!(scope, Scope::Rpc(RpcScope { lxm, aud }));
 
-        let scope =
+        let scope: Scope =
             Scope::parse("rpc:com.example.service?aud=did:plc:yfvwmnlztr4dwkb7hwz55r2g").unwrap();
         let mut lxm = BTreeSet::new();
         let mut aud = BTreeSet::new();
         lxm.insert(RpcLexicon::Nsid(
-            Nsid::new_static("com.example.service").unwrap(),
+            Nsid::new_owned("com.example.service").unwrap(),
         ));
         aud.insert(RpcAudience::Did(
-            Did::new_static("did:plc:yfvwmnlztr4dwkb7hwz55r2g").unwrap(),
+            Did::new_owned("did:plc:yfvwmnlztr4dwkb7hwz55r2g").unwrap(),
         ));
         assert_eq!(scope, Scope::Rpc(RpcScope { lxm, aud }));
 
-        let scope =
+        let scope: Scope =
             Scope::parse("rpc?lxm=com.example.method1&lxm=com.example.method2&aud=did:plc:yfvwmnlztr4dwkb7hwz55r2g")
                 .unwrap();
         let mut lxm = BTreeSet::new();
         let mut aud = BTreeSet::new();
         lxm.insert(RpcLexicon::Nsid(
-            Nsid::new_static("com.example.method1").unwrap(),
+            Nsid::new_owned("com.example.method1").unwrap(),
         ));
         lxm.insert(RpcLexicon::Nsid(
-            Nsid::new_static("com.example.method2").unwrap(),
+            Nsid::new_owned("com.example.method2").unwrap(),
         ));
         aud.insert(RpcAudience::Did(
-            Did::new_static("did:plc:yfvwmnlztr4dwkb7hwz55r2g").unwrap(),
+            Did::new_owned("did:plc:yfvwmnlztr4dwkb7hwz55r2g").unwrap(),
         ));
         assert_eq!(scope, Scope::Rpc(RpcScope { lxm, aud }));
     }
@@ -1226,16 +1405,16 @@ mod tests {
         ];
 
         for (input, expected) in tests {
-            let scope = Scope::parse(input).unwrap();
+            let scope: Scope = Scope::parse(input).unwrap();
             assert_eq!(scope.to_string_normalized(), expected);
         }
     }
 
     #[test]
     fn test_account_scope_grants() {
-        let manage = Scope::parse("account:email?action=manage").unwrap();
-        let read = Scope::parse("account:email?action=read").unwrap();
-        let other_read = Scope::parse("account:repo?action=read").unwrap();
+        let manage: Scope = Scope::parse("account:email?action=manage").unwrap();
+        let read: Scope = Scope::parse("account:email?action=read").unwrap();
+        let other_read: Scope = Scope::parse("account:repo?action=read").unwrap();
 
         assert!(manage.grants(&read));
         assert!(manage.grants(&manage));
@@ -1246,8 +1425,8 @@ mod tests {
 
     #[test]
     fn test_identity_scope_grants() {
-        let all = Scope::parse("identity:*").unwrap();
-        let handle = Scope::parse("identity:handle").unwrap();
+        let all: Scope = Scope::parse("identity:*").unwrap();
+        let handle: Scope = Scope::parse("identity:handle").unwrap();
 
         assert!(all.grants(&handle));
         assert!(all.grants(&all));
@@ -1257,10 +1436,10 @@ mod tests {
 
     #[test]
     fn test_blob_scope_grants() {
-        let all = Scope::parse("blob:*/*").unwrap();
-        let image_all = Scope::parse("blob:image/*").unwrap();
-        let image_png = Scope::parse("blob:image/png").unwrap();
-        let text_plain = Scope::parse("blob:text/plain").unwrap();
+        let all: Scope = Scope::parse("blob:*/*").unwrap();
+        let image_all: Scope = Scope::parse("blob:image/*").unwrap();
+        let image_png: Scope = Scope::parse("blob:image/png").unwrap();
+        let text_plain: Scope = Scope::parse("blob:text/plain").unwrap();
 
         assert!(all.grants(&image_all));
         assert!(all.grants(&image_png));
@@ -1272,11 +1451,12 @@ mod tests {
 
     #[test]
     fn test_repo_scope_grants() {
-        let all_all = Scope::parse("repo:*").unwrap();
-        let all_create = Scope::parse("repo:*?action=create").unwrap();
-        let specific_all = Scope::parse("repo:app.bsky.feed.post").unwrap();
-        let specific_create = Scope::parse("repo:app.bsky.feed.post?action=create").unwrap();
-        let other_create = Scope::parse("repo:pub.leaflet.publication?action=create").unwrap();
+        let all_all: Scope = Scope::parse("repo:*").unwrap();
+        let all_create: Scope = Scope::parse("repo:*?action=create").unwrap();
+        let specific_all: Scope = Scope::parse("repo:app.bsky.feed.post").unwrap();
+        let specific_create: Scope = Scope::parse("repo:app.bsky.feed.post?action=create").unwrap();
+        let other_create: Scope =
+            Scope::parse("repo:pub.leaflet.publication?action=create").unwrap();
 
         assert!(all_all.grants(&all_create));
         assert!(all_all.grants(&specific_all));
@@ -1290,9 +1470,10 @@ mod tests {
 
     #[test]
     fn test_rpc_scope_grants() {
-        let all = Scope::parse("rpc:*").unwrap();
-        let specific_lxm = Scope::parse("rpc:com.example.service").unwrap();
-        let specific_both = Scope::parse("rpc:com.example.service?aud=did:example:123").unwrap();
+        let all: Scope = Scope::parse("rpc:*").unwrap();
+        let specific_lxm: Scope = Scope::parse("rpc:com.example.service").unwrap();
+        let specific_both: Scope =
+            Scope::parse("rpc:com.example.service?aud=did:example:123").unwrap();
 
         assert!(all.grants(&specific_lxm));
         assert!(all.grants(&specific_both));
@@ -1303,8 +1484,8 @@ mod tests {
 
     #[test]
     fn test_cross_scope_grants() {
-        let account = Scope::parse("account:email").unwrap();
-        let identity = Scope::parse("identity:handle").unwrap();
+        let account: Scope = Scope::parse("account:email").unwrap();
+        let identity: Scope = Scope::parse("identity:handle").unwrap();
 
         assert!(!account.grants(&identity));
         assert!(!identity.grants(&account));
@@ -1313,30 +1494,32 @@ mod tests {
     #[test]
     fn test_parse_errors() {
         assert!(matches!(
-            Scope::parse("unknown:test"),
+            Scope::<SmolStr>::parse("unknown:test"),
             Err(ParseError::UnknownPrefix(_))
         ));
 
         assert!(matches!(
-            Scope::parse("account"),
+            Scope::<SmolStr>::parse("account"),
             Err(ParseError::MissingResource)
         ));
 
         assert!(matches!(
-            Scope::parse("account:invalid"),
+            Scope::<SmolStr>::parse("account:invalid"),
             Err(ParseError::InvalidResource(_))
         ));
 
         assert!(matches!(
-            Scope::parse("account:email?action=invalid"),
+            Scope::<SmolStr>::parse("account:email?action=invalid"),
             Err(ParseError::InvalidAction(_))
         ));
     }
 
     #[test]
     fn test_query_parameter_sorting() {
-        let scope =
-            Scope::parse("blob?accept=image/png&accept=application/pdf&accept=image/jpeg").unwrap();
+        let scope = Scope::<SmolStr>::parse(
+            "blob?accept=image/png&accept=application/pdf&accept=image/jpeg",
+        )
+        .unwrap();
         let normalized = scope.to_string_normalized();
         assert!(normalized.contains("accept=application/pdf"));
         assert!(normalized.contains("accept=image/jpeg"));
@@ -1350,7 +1533,7 @@ mod tests {
 
     #[test]
     fn test_repo_action_wildcard() {
-        let scope = Scope::parse("repo:app.bsky.feed.post?action=*").unwrap();
+        let scope = Scope::<SmolStr>::parse("repo:app.bsky.feed.post?action=*").unwrap();
         let mut actions = BTreeSet::new();
         actions.insert(RepoAction::Create);
         actions.insert(RepoAction::Update);
@@ -1358,7 +1541,7 @@ mod tests {
         assert_eq!(
             scope,
             Scope::Repo(RepoScope {
-                collection: RepoCollection::Nsid(Nsid::new_static("app.bsky.feed.post").unwrap()),
+                collection: RepoCollection::Nsid(Nsid::new_owned("app.bsky.feed.post").unwrap()),
                 actions,
             })
         );
@@ -1366,15 +1549,15 @@ mod tests {
 
     #[test]
     fn test_multiple_blob_accepts() {
-        let scope = Scope::parse("blob?accept=image/*&accept=text/plain").unwrap();
-        assert!(scope.grants(&Scope::parse("blob:image/png").unwrap()));
-        assert!(scope.grants(&Scope::parse("blob:text/plain").unwrap()));
-        assert!(!scope.grants(&Scope::parse("blob:application/json").unwrap()));
+        let scope = Scope::<SmolStr>::parse("blob?accept=image/*&accept=text/plain").unwrap();
+        assert!(scope.grants(&Scope::<SmolStr>::parse("blob:image/png").unwrap()));
+        assert!(scope.grants(&Scope::<SmolStr>::parse("blob:text/plain").unwrap()));
+        assert!(!scope.grants(&Scope::<SmolStr>::parse("blob:application/json").unwrap()));
     }
 
     #[test]
     fn test_rpc_default_wildcards() {
-        let scope = Scope::parse("rpc").unwrap();
+        let scope = Scope::<SmolStr>::parse("rpc").unwrap();
         let mut lxm = BTreeSet::new();
         let mut aud = BTreeSet::new();
         lxm.insert(RpcLexicon::All);
@@ -1384,44 +1567,44 @@ mod tests {
 
     #[test]
     fn test_atproto_scope_parsing() {
-        let scope = Scope::parse("atproto").unwrap();
+        let scope = Scope::<SmolStr>::parse("atproto").unwrap();
         assert_eq!(scope, Scope::Atproto);
 
         // Atproto should not accept suffixes
-        assert!(Scope::parse("atproto:something").is_err());
-        assert!(Scope::parse("atproto?param=value").is_err());
+        assert!(Scope::<SmolStr>::parse("atproto:something").is_err());
+        assert!(Scope::<SmolStr>::parse("atproto?param=value").is_err());
     }
 
     #[test]
     fn test_transition_scope_parsing() {
-        let scope = Scope::parse("transition:generic").unwrap();
+        let scope = Scope::<SmolStr>::parse("transition:generic").unwrap();
         assert_eq!(scope, Scope::Transition(TransitionScope::Generic));
 
-        let scope = Scope::parse("transition:email").unwrap();
+        let scope = Scope::<SmolStr>::parse("transition:email").unwrap();
         assert_eq!(scope, Scope::Transition(TransitionScope::Email));
 
         // Test invalid transition types
         assert!(matches!(
-            Scope::parse("transition:invalid"),
+            Scope::<SmolStr>::parse("transition:invalid"),
             Err(ParseError::InvalidResource(_))
         ));
 
         // Test missing suffix
         assert!(matches!(
-            Scope::parse("transition"),
+            Scope::<SmolStr>::parse("transition"),
             Err(ParseError::MissingResource)
         ));
 
         // Test transition doesn't accept query parameters
         assert!(matches!(
-            Scope::parse("transition:generic?param=value"),
+            Scope::<SmolStr>::parse("transition:generic?param=value"),
             Err(ParseError::InvalidResource(_))
         ));
     }
 
     #[test]
     fn test_atproto_scope_normalization() {
-        let scope = Scope::parse("atproto").unwrap();
+        let scope = Scope::<SmolStr>::parse("atproto").unwrap();
         assert_eq!(scope.to_string_normalized(), "atproto");
     }
 
@@ -1433,21 +1616,21 @@ mod tests {
         ];
 
         for (input, expected) in tests {
-            let scope = Scope::parse(input).unwrap();
+            let scope = Scope::<SmolStr>::parse(input).unwrap();
             assert_eq!(scope.to_string_normalized(), expected);
         }
     }
 
     #[test]
     fn test_atproto_scope_grants() {
-        let atproto = Scope::parse("atproto").unwrap();
-        let account = Scope::parse("account:email").unwrap();
-        let identity = Scope::parse("identity:handle").unwrap();
-        let blob = Scope::parse("blob:image/png").unwrap();
-        let repo = Scope::parse("repo:app.bsky.feed.post").unwrap();
-        let rpc = Scope::parse("rpc:com.example.service").unwrap();
-        let transition_generic = Scope::parse("transition:generic").unwrap();
-        let transition_email = Scope::parse("transition:email").unwrap();
+        let atproto = Scope::<SmolStr>::parse("atproto").unwrap();
+        let account = Scope::<SmolStr>::parse("account:email").unwrap();
+        let identity = Scope::<SmolStr>::parse("identity:handle").unwrap();
+        let blob = Scope::<SmolStr>::parse("blob:image/png").unwrap();
+        let repo = Scope::<SmolStr>::parse("repo:app.bsky.feed.post").unwrap();
+        let rpc = Scope::<SmolStr>::parse("rpc:com.example.service").unwrap();
+        let transition_generic = Scope::<SmolStr>::parse("transition:generic").unwrap();
+        let transition_email = Scope::<SmolStr>::parse("transition:email").unwrap();
 
         // Atproto only grants itself (it's a required scope, not a permission grant)
         assert!(atproto.grants(&atproto));
@@ -1471,9 +1654,9 @@ mod tests {
 
     #[test]
     fn test_transition_scope_grants() {
-        let transition_generic = Scope::parse("transition:generic").unwrap();
-        let transition_email = Scope::parse("transition:email").unwrap();
-        let account = Scope::parse("account:email").unwrap();
+        let transition_generic = Scope::<SmolStr>::parse("transition:generic").unwrap();
+        let transition_email = Scope::<SmolStr>::parse("transition:email").unwrap();
+        let account = Scope::<SmolStr>::parse("account:email").unwrap();
 
         // Transition scopes only grant themselves
         assert!(transition_generic.grants(&transition_generic));
@@ -1493,7 +1676,7 @@ mod tests {
     #[test]
     fn test_parse_multiple() {
         // Test parsing multiple scopes
-        let scopes = Scope::parse_multiple("atproto repo:*").unwrap();
+        let scopes = Scope::<SmolStr>::parse_multiple("atproto repo:*").unwrap();
         assert_eq!(scopes.len(), 2);
         assert_eq!(scopes[0], Scope::Atproto);
         assert_eq!(
@@ -1511,46 +1694,49 @@ mod tests {
         );
 
         // Test with more scopes
-        let scopes = Scope::parse_multiple("account:email identity:handle blob:image/png").unwrap();
+        let scopes =
+            Scope::<SmolStr>::parse_multiple("account:email identity:handle blob:image/png")
+                .unwrap();
         assert_eq!(scopes.len(), 3);
         assert!(matches!(scopes[0], Scope::Account(_)));
         assert!(matches!(scopes[1], Scope::Identity(_)));
         assert!(matches!(scopes[2], Scope::Blob(_)));
 
         // Test with complex scopes
-        let scopes = Scope::parse_multiple(
+        let scopes = Scope::<SmolStr>::parse_multiple(
             "account:email?action=manage repo:app.bsky.feed.post?action=create transition:email",
         )
         .unwrap();
         assert_eq!(scopes.len(), 3);
 
         // Test empty string
-        let scopes = Scope::parse_multiple("").unwrap();
+        let scopes = Scope::<SmolStr>::parse_multiple("").unwrap();
         assert_eq!(scopes.len(), 0);
 
         // Test whitespace only
-        let scopes = Scope::parse_multiple("   ").unwrap();
+        let scopes = Scope::<SmolStr>::parse_multiple("   ").unwrap();
         assert_eq!(scopes.len(), 0);
 
         // Test with extra whitespace
-        let scopes = Scope::parse_multiple("  atproto   repo:*  ").unwrap();
+        let scopes = Scope::<SmolStr>::parse_multiple("  atproto   repo:*  ").unwrap();
         assert_eq!(scopes.len(), 2);
 
         // Test single scope
-        let scopes = Scope::parse_multiple("atproto").unwrap();
+        let scopes = Scope::<SmolStr>::parse_multiple("atproto").unwrap();
         assert_eq!(scopes.len(), 1);
         assert_eq!(scopes[0], Scope::Atproto);
 
         // Test error propagation
-        assert!(Scope::parse_multiple("atproto invalid:scope").is_err());
-        assert!(Scope::parse_multiple("account:invalid repo:*").is_err());
+        assert!(Scope::<SmolStr>::parse_multiple("atproto invalid:scope").is_err());
+        assert!(Scope::<SmolStr>::parse_multiple("account:invalid repo:*").is_err());
     }
 
     #[test]
     fn test_parse_multiple_reduced() {
         // Test repo scope reduction - wildcard grants specific
         let scopes =
-            Scope::parse_multiple_reduced("atproto repo:app.bsky.feed.post repo:*").unwrap();
+            Scope::<SmolStr>::parse_multiple_reduced("atproto repo:app.bsky.feed.post repo:*")
+                .unwrap();
         assert_eq!(scopes.len(), 2);
         assert!(scopes.contains(&Scope::Atproto));
         assert!(scopes.contains(&Scope::Repo(RepoScope {
@@ -1566,7 +1752,8 @@ mod tests {
 
         // Test reverse order - should get same result
         let scopes =
-            Scope::parse_multiple_reduced("atproto repo:* repo:app.bsky.feed.post").unwrap();
+            Scope::<SmolStr>::parse_multiple_reduced("atproto repo:* repo:app.bsky.feed.post")
+                .unwrap();
         assert_eq!(scopes.len(), 2);
         assert!(scopes.contains(&Scope::Atproto));
         assert!(scopes.contains(&Scope::Repo(RepoScope {
@@ -1582,7 +1769,8 @@ mod tests {
 
         // Test account scope reduction - manage grants read
         let scopes =
-            Scope::parse_multiple_reduced("account:email account:email?action=manage").unwrap();
+            Scope::<SmolStr>::parse_multiple_reduced("account:email account:email?action=manage")
+                .unwrap();
         assert_eq!(scopes.len(), 1);
         assert_eq!(
             scopes[0],
@@ -1593,24 +1781,29 @@ mod tests {
         );
 
         // Test identity scope reduction - wildcard grants specific
-        let scopes = Scope::parse_multiple_reduced("identity:handle identity:*").unwrap();
+        let scopes =
+            Scope::<SmolStr>::parse_multiple_reduced("identity:handle identity:*").unwrap();
         assert_eq!(scopes.len(), 1);
         assert_eq!(scopes[0], Scope::Identity(IdentityScope::All));
 
         // Test blob scope reduction - wildcard grants specific
-        let scopes = Scope::parse_multiple_reduced("blob:image/png blob:image/* blob:*/*").unwrap();
+        let scopes =
+            Scope::<SmolStr>::parse_multiple_reduced("blob:image/png blob:image/* blob:*/*")
+                .unwrap();
         assert_eq!(scopes.len(), 1);
         let mut accept = BTreeSet::new();
         accept.insert(MimePattern::All);
         assert_eq!(scopes[0], Scope::Blob(BlobScope { accept }));
 
         // Test no reduction needed - different scope types
-        let scopes =
-            Scope::parse_multiple_reduced("account:email identity:handle blob:image/png").unwrap();
+        let scopes = Scope::<SmolStr>::parse_multiple_reduced(
+            "account:email identity:handle blob:image/png",
+        )
+        .unwrap();
         assert_eq!(scopes.len(), 3);
 
         // Test repo action reduction
-        let scopes = Scope::parse_multiple_reduced(
+        let scopes = Scope::<SmolStr>::parse_multiple_reduced(
             "repo:app.bsky.feed.post?action=create repo:app.bsky.feed.post",
         )
         .unwrap();
@@ -1618,7 +1811,7 @@ mod tests {
         assert_eq!(
             scopes[0],
             Scope::Repo(RepoScope {
-                collection: RepoCollection::Nsid(Nsid::new_static("app.bsky.feed.post").unwrap()),
+                collection: RepoCollection::Nsid(Nsid::new_owned("app.bsky.feed.post").unwrap()),
                 actions: {
                     let mut actions = BTreeSet::new();
                     actions.insert(RepoAction::Create);
@@ -1630,7 +1823,7 @@ mod tests {
         );
 
         // Test RPC scope reduction
-        let scopes = Scope::parse_multiple_reduced(
+        let scopes = Scope::<SmolStr>::parse_multiple_reduced(
             "rpc:com.example.service?aud=did:example:123 rpc:com.example.service rpc:*",
         )
         .unwrap();
@@ -1652,22 +1845,24 @@ mod tests {
         );
 
         // Test duplicate removal
-        let scopes = Scope::parse_multiple_reduced("atproto atproto atproto").unwrap();
+        let scopes = Scope::<SmolStr>::parse_multiple_reduced("atproto atproto atproto").unwrap();
         assert_eq!(scopes.len(), 1);
         assert_eq!(scopes[0], Scope::Atproto);
 
         // Test transition scopes - only grant themselves
-        let scopes = Scope::parse_multiple_reduced("transition:generic transition:email").unwrap();
+        let scopes =
+            Scope::<SmolStr>::parse_multiple_reduced("transition:generic transition:email")
+                .unwrap();
         assert_eq!(scopes.len(), 2);
         assert!(scopes.contains(&Scope::Transition(TransitionScope::Generic)));
         assert!(scopes.contains(&Scope::Transition(TransitionScope::Email)));
 
         // Test empty input
-        let scopes = Scope::parse_multiple_reduced("").unwrap();
+        let scopes = Scope::<SmolStr>::parse_multiple_reduced("").unwrap();
         assert_eq!(scopes.len(), 0);
 
         // Test complex scenario with multiple reductions
-        let scopes = Scope::parse_multiple_reduced(
+        let scopes = Scope::<SmolStr>::parse_multiple_reduced(
             "account:email?action=manage account:email account:repo account:repo?action=read identity:* identity:handle"
         ).unwrap();
         assert_eq!(scopes.len(), 3);
@@ -1683,7 +1878,8 @@ mod tests {
         assert!(scopes.contains(&Scope::Identity(IdentityScope::All)));
 
         // Test that atproto doesn't grant other scopes (per recent change)
-        let scopes = Scope::parse_multiple_reduced("atproto account:email repo:*").unwrap();
+        let scopes =
+            Scope::<SmolStr>::parse_multiple_reduced("atproto account:email repo:*").unwrap();
         assert_eq!(scopes.len(), 3);
         assert!(scopes.contains(&Scope::Atproto));
         assert!(scopes.contains(&Scope::Account(AccountScope {
@@ -1705,46 +1901,46 @@ mod tests {
     #[test]
     fn test_openid_connect_scope_parsing() {
         // Test OpenID scope
-        let scope = Scope::parse("openid").unwrap();
+        let scope = Scope::<SmolStr>::parse("openid").unwrap();
         assert_eq!(scope, Scope::OpenId);
 
         // Test Profile scope
-        let scope = Scope::parse("profile").unwrap();
+        let scope = Scope::<SmolStr>::parse("profile").unwrap();
         assert_eq!(scope, Scope::Profile);
 
         // Test Email scope
-        let scope = Scope::parse("email").unwrap();
+        let scope = Scope::<SmolStr>::parse("email").unwrap();
         assert_eq!(scope, Scope::Email);
 
         // Test that they don't accept suffixes
-        assert!(Scope::parse("openid:something").is_err());
-        assert!(Scope::parse("profile:something").is_err());
-        assert!(Scope::parse("email:something").is_err());
+        assert!(Scope::<SmolStr>::parse("openid:something").is_err());
+        assert!(Scope::<SmolStr>::parse("profile:something").is_err());
+        assert!(Scope::<SmolStr>::parse("email:something").is_err());
 
         // Test that they don't accept query parameters
-        assert!(Scope::parse("openid?param=value").is_err());
-        assert!(Scope::parse("profile?param=value").is_err());
-        assert!(Scope::parse("email?param=value").is_err());
+        assert!(Scope::<SmolStr>::parse("openid?param=value").is_err());
+        assert!(Scope::<SmolStr>::parse("profile?param=value").is_err());
+        assert!(Scope::<SmolStr>::parse("email?param=value").is_err());
     }
 
     #[test]
     fn test_openid_connect_scope_normalization() {
-        let scope = Scope::parse("openid").unwrap();
+        let scope = Scope::<SmolStr>::parse("openid").unwrap();
         assert_eq!(scope.to_string_normalized(), "openid");
 
-        let scope = Scope::parse("profile").unwrap();
+        let scope = Scope::<SmolStr>::parse("profile").unwrap();
         assert_eq!(scope.to_string_normalized(), "profile");
 
-        let scope = Scope::parse("email").unwrap();
+        let scope = Scope::<SmolStr>::parse("email").unwrap();
         assert_eq!(scope.to_string_normalized(), "email");
     }
 
     #[test]
     fn test_openid_connect_scope_grants() {
-        let openid = Scope::parse("openid").unwrap();
-        let profile = Scope::parse("profile").unwrap();
-        let email = Scope::parse("email").unwrap();
-        let account = Scope::parse("account:email").unwrap();
+        let openid = Scope::<SmolStr>::parse("openid").unwrap();
+        let profile = Scope::<SmolStr>::parse("profile").unwrap();
+        let email = Scope::<SmolStr>::parse("email").unwrap();
+        let account = Scope::<SmolStr>::parse("account:email").unwrap();
 
         // OpenID Connect scopes only grant themselves
         assert!(openid.grants(&openid));
@@ -1770,7 +1966,7 @@ mod tests {
 
     #[test]
     fn test_parse_multiple_with_openid_connect() {
-        let scopes = Scope::parse_multiple("openid profile email atproto").unwrap();
+        let scopes = Scope::<SmolStr>::parse_multiple("openid profile email atproto").unwrap();
         assert_eq!(scopes.len(), 4);
         assert_eq!(scopes[0], Scope::OpenId);
         assert_eq!(scopes[1], Scope::Profile);
@@ -1778,7 +1974,8 @@ mod tests {
         assert_eq!(scopes[3], Scope::Atproto);
 
         // Test with mixed scopes
-        let scopes = Scope::parse_multiple("openid account:email profile repo:*").unwrap();
+        let scopes =
+            Scope::<SmolStr>::parse_multiple("openid account:email profile repo:*").unwrap();
         assert_eq!(scopes.len(), 4);
         assert!(scopes.contains(&Scope::OpenId));
         assert!(scopes.contains(&Scope::Profile));
@@ -1787,14 +1984,15 @@ mod tests {
     #[test]
     fn test_parse_multiple_reduced_with_openid_connect() {
         // OpenID Connect scopes don't grant each other, so no reduction
-        let scopes = Scope::parse_multiple_reduced("openid profile email openid").unwrap();
+        let scopes =
+            Scope::<SmolStr>::parse_multiple_reduced("openid profile email openid").unwrap();
         assert_eq!(scopes.len(), 3);
         assert!(scopes.contains(&Scope::OpenId));
         assert!(scopes.contains(&Scope::Profile));
         assert!(scopes.contains(&Scope::Email));
 
         // Mixed with other scopes
-        let scopes = Scope::parse_multiple_reduced(
+        let scopes = Scope::<SmolStr>::parse_multiple_reduced(
             "openid account:email account:email?action=manage profile",
         )
         .unwrap();
@@ -1815,11 +2013,11 @@ mod tests {
 
         // Test single scope
         let scopes = vec![Scope::Atproto];
-        assert_eq!(Scope::serialize_multiple(&scopes), "atproto");
+        assert_eq!(Scope::<SmolStr>::serialize_multiple(&scopes), "atproto");
 
         // Test multiple scopes - should be sorted alphabetically
         let scopes = vec![
-            Scope::parse("repo:*").unwrap(),
+            Scope::<SmolStr>::parse("repo:*").unwrap(),
             Scope::Atproto,
             Scope::parse("account:email").unwrap(),
         ];
@@ -1830,7 +2028,7 @@ mod tests {
 
         // Test that sorting is consistent regardless of input order
         let scopes = vec![
-            Scope::parse("identity:handle").unwrap(),
+            Scope::<SmolStr>::parse("identity:handle").unwrap(),
             Scope::parse("blob:image/png").unwrap(),
             Scope::parse("account:repo?action=manage").unwrap(),
         ];
@@ -1842,13 +2040,13 @@ mod tests {
         // Test with OpenID Connect scopes
         let scopes = vec![Scope::Email, Scope::OpenId, Scope::Profile, Scope::Atproto];
         assert_eq!(
-            Scope::serialize_multiple(&scopes),
+            Scope::<SmolStr>::serialize_multiple(&scopes),
             "atproto email openid profile"
         );
 
         // Test with complex scopes including query parameters
         let scopes = vec![
-            Scope::parse("rpc:com.example.service?aud=did:plc:yfvwmnlztr4dwkb7hwz55r2g&lxm=com.example.method")
+            Scope::<SmolStr>::parse("rpc:com.example.service?aud=did:plc:yfvwmnlztr4dwkb7hwz55r2g&lxm=com.example.method")
                 .unwrap(),
             Scope::parse("repo:app.bsky.feed.post?action=create&action=update").unwrap(),
             Scope::parse("blob:image/*?accept=image/png&accept=image/jpeg").unwrap(),
@@ -1869,7 +2067,7 @@ mod tests {
             Scope::Atproto,
         ];
         assert_eq!(
-            Scope::serialize_multiple(&scopes),
+            Scope::<&str>::serialize_multiple(&scopes),
             "atproto transition:email transition:generic"
         );
 
@@ -1877,7 +2075,7 @@ mod tests {
         let scopes = vec![
             Scope::Atproto,
             Scope::Atproto,
-            Scope::parse("account:email").unwrap(),
+            Scope::<SmolStr>::parse("account:email").unwrap(),
         ];
         assert_eq!(
             Scope::serialize_multiple(&scopes),
@@ -1885,7 +2083,8 @@ mod tests {
         );
 
         // Test normalization is preserved in serialization
-        let scopes = vec![Scope::parse("blob?accept=image/png&accept=image/jpeg").unwrap()];
+        let scopes =
+            vec![Scope::<SmolStr>::parse("blob?accept=image/png&accept=image/jpeg").unwrap()];
         // Should normalize query parameters alphabetically
         assert_eq!(
             Scope::serialize_multiple(&scopes),
@@ -1897,13 +2096,13 @@ mod tests {
     fn test_serialize_multiple_roundtrip() {
         // Test that parse_multiple and serialize_multiple are inverses (when sorted)
         let original = "account:email atproto blob:image/png identity:handle repo:*";
-        let scopes = Scope::parse_multiple(original).unwrap();
+        let scopes = Scope::<SmolStr>::parse_multiple(original).unwrap();
         let serialized = Scope::serialize_multiple(&scopes);
         assert_eq!(serialized, original);
 
         // Test with complex scopes
         let original = "account:repo?action=manage blob?accept=image/jpeg&accept=image/png rpc:*";
-        let scopes = Scope::parse_multiple(original).unwrap();
+        let scopes = Scope::<SmolStr>::parse_multiple(original).unwrap();
         let serialized = Scope::serialize_multiple(&scopes);
         // Parse again to verify it's valid
         let reparsed = Scope::parse_multiple(&serialized).unwrap();
@@ -1911,7 +2110,7 @@ mod tests {
 
         // Test with OpenID Connect scopes
         let original = "email openid profile";
-        let scopes = Scope::parse_multiple(original).unwrap();
+        let scopes = Scope::<SmolStr>::parse_multiple(original).unwrap();
         let serialized = Scope::serialize_multiple(&scopes);
         assert_eq!(serialized, original);
     }
@@ -1920,7 +2119,7 @@ mod tests {
     fn test_remove_scope() {
         // Test removing a scope that exists
         let scopes = vec![
-            Scope::parse("repo:*").unwrap(),
+            Scope::<SmolStr>::parse("repo:*").unwrap(),
             Scope::Atproto,
             Scope::parse("account:email").unwrap(),
         ];
@@ -1933,7 +2132,7 @@ mod tests {
 
         // Test removing a scope that doesn't exist
         let scopes = vec![
-            Scope::parse("repo:*").unwrap(),
+            Scope::<SmolStr>::parse("repo:*").unwrap(),
             Scope::parse("account:email").unwrap(),
         ];
         let to_remove = Scope::parse("identity:handle").unwrap();
@@ -1950,7 +2149,7 @@ mod tests {
         // Test removing all instances of a duplicate scope
         let scopes = vec![
             Scope::Atproto,
-            Scope::parse("account:email").unwrap(),
+            Scope::<SmolStr>::parse("account:email").unwrap(),
             Scope::Atproto,
             Scope::parse("repo:*").unwrap(),
             Scope::Atproto,
@@ -1964,7 +2163,7 @@ mod tests {
 
         // Test removing complex scopes with query parameters
         let scopes = vec![
-            Scope::parse("account:email?action=manage").unwrap(),
+            Scope::<SmolStr>::parse("account:email?action=manage").unwrap(),
             Scope::parse("blob?accept=image/png&accept=image/jpeg").unwrap(),
             Scope::parse("rpc:com.example.service?aud=did:example:123").unwrap(),
         ];
@@ -1976,7 +2175,7 @@ mod tests {
         // Test with OpenID Connect scopes
         let scopes = vec![Scope::OpenId, Scope::Profile, Scope::Email, Scope::Atproto];
         let to_remove = Scope::Profile;
-        let result = Scope::remove_scope(&scopes, &to_remove);
+        let result = Scope::<&str>::remove_scope(&scopes, &to_remove);
         assert_eq!(result.len(), 3);
         assert!(!result.contains(&to_remove));
         assert!(result.contains(&Scope::OpenId));
@@ -1990,7 +2189,7 @@ mod tests {
             Scope::Atproto,
         ];
         let to_remove = Scope::Transition(TransitionScope::Email);
-        let result = Scope::remove_scope(&scopes, &to_remove);
+        let result = Scope::<&str>::remove_scope(&scopes, &to_remove);
         assert_eq!(result.len(), 2);
         assert!(!result.contains(&to_remove));
         assert!(result.contains(&Scope::Transition(TransitionScope::Generic)));
@@ -1998,7 +2197,7 @@ mod tests {
 
         // Test that only exact matches are removed
         let scopes = vec![
-            Scope::parse("account:email").unwrap(),
+            Scope::<SmolStr>::parse("account:email").unwrap(),
             Scope::parse("account:email?action=manage").unwrap(),
             Scope::parse("account:repo").unwrap(),
         ];

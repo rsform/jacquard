@@ -3,10 +3,9 @@ use std::future::Future;
 
 use crate::types::{OAuthAuthorizationServerMetadata, OAuthProtectedResourceMetadata};
 use http::{Request, StatusCode};
-use jacquard_common::CowStr;
+#[cfg(not(target_arch = "wasm32"))]
+use jacquard_common::BosStr;
 use jacquard_common::IntoStatic;
-#[allow(unused_imports)]
-use jacquard_common::cowstr::ToCowStr;
 use jacquard_common::deps::fluent_uri::Uri;
 use jacquard_common::types::did_doc::DidDocument;
 use jacquard_common::types::ident::AtIdentifier;
@@ -96,7 +95,7 @@ pub enum ResolverErrorKind {
         code(jacquard_oauth::resolver::unsupported_did_method),
         help("supported DID methods: did:web, did:plc")
     )]
-    UnsupportedDidMethod(Did<'static>),
+    UnsupportedDidMethod(Did),
 
     /// HTTP transport error
     #[error("transport error")]
@@ -245,7 +244,7 @@ impl ResolverError {
     }
 
     /// Create an unsupported DID method error
-    pub fn unsupported_did_method(did: Did<'static>) -> Self {
+    pub fn unsupported_did_method(did: Did) -> Self {
         Self::new(ResolverErrorKind::UnsupportedDidMethod(did), None)
     }
 
@@ -319,47 +318,46 @@ impl From<jacquard_common::deps::fluent_uri::ParseError> for ResolverError {
 // }
 
 #[cfg(not(target_arch = "wasm32"))]
-async fn verify_issuer_impl<T: OAuthResolver + Sync + ?Sized>(
+async fn verify_issuer_impl<S: BosStr, T: OAuthResolver + Sync + ?Sized>(
     resolver: &T,
-    server_metadata: &OAuthAuthorizationServerMetadata<'_>,
-    sub: &Did<'_>,
+    server_metadata: &OAuthAuthorizationServerMetadata,
+    sub: &Did<S>,
 ) -> Result<Uri<String>> {
     let (metadata, identity) = resolver.resolve_from_identity(sub.as_str()).await?;
-    if metadata.issuer != server_metadata.issuer {
+    if metadata.issuer.as_str() != server_metadata.issuer.as_str() {
         return Err(ResolverError::authorization_server_metadata(
             "issuer mismatch",
         ));
     }
     Ok(identity
         .pds_endpoint()
-        .ok_or_else(|| ResolverError::did_document(smol_str::format_smolstr!("{:?}", identity)))?)
+        .ok_or_else(|| ResolverError::did_document(smol_str::format_smolstr!("{:?}", identity)))?
+        .to_owned())
 }
 
 #[cfg(target_arch = "wasm32")]
-async fn verify_issuer_impl<T: OAuthResolver + ?Sized>(
+async fn verify_issuer_impl<S: BosStr, T: OAuthResolver + ?Sized>(
     resolver: &T,
-    server_metadata: &OAuthAuthorizationServerMetadata<'_>,
-    sub: &Did<'_>,
+    server_metadata: &OAuthAuthorizationServerMetadata,
+    sub: &Did<S>,
 ) -> Result<Uri<String>> {
     let (metadata, identity) = resolver.resolve_from_identity(sub.as_str()).await?;
-    if metadata.issuer != server_metadata.issuer {
+    if metadata.issuer.as_str() != server_metadata.issuer.as_str() {
         return Err(ResolverError::authorization_server_metadata(
             "issuer mismatch",
         ));
     }
     Ok(identity
         .pds_endpoint()
-        .ok_or_else(|| ResolverError::did_document(smol_str::format_smolstr!("{:?}", identity)))?)
+        .ok_or_else(|| ResolverError::did_document(smol_str::format_smolstr!("{:?}", identity)))?
+        .to_owned())
 }
 
 #[cfg(not(target_arch = "wasm32"))]
 async fn resolve_oauth_impl<T: OAuthResolver + Sync + ?Sized>(
     resolver: &T,
     input: &str,
-) -> Result<(
-    OAuthAuthorizationServerMetadata<'static>,
-    Option<DidDocument<'static>>,
-)> {
+) -> Result<(OAuthAuthorizationServerMetadata, Option<DidDocument>)> {
     // Allow using an entryway, or PDS url, directly as login input (e.g.
     // when the user forgot their handle, or when the handle does not
     // resolve to a DID)
@@ -370,10 +368,7 @@ async fn resolve_oauth_impl<T: OAuthResolver + Sync + ?Sized>(
                 err.with_context("failed to parse service URL")
             })?
             .to_owned();
-        (
-            resolver.resolve_from_service(&uri.as_str().into()).await?,
-            None,
-        )
+        (resolver.resolve_from_service(uri.as_str()).await?, None)
     } else {
         let (metadata, identity) = resolver.resolve_from_identity(input).await?;
         (metadata, Some(identity))
@@ -384,10 +379,7 @@ async fn resolve_oauth_impl<T: OAuthResolver + Sync + ?Sized>(
 async fn resolve_oauth_impl<T: OAuthResolver + ?Sized>(
     resolver: &T,
     input: &str,
-) -> Result<(
-    OAuthAuthorizationServerMetadata<'static>,
-    Option<DidDocument<'static>>,
-)> {
+) -> Result<(OAuthAuthorizationServerMetadata, Option<DidDocument>)> {
     // Allow using an entryway, or PDS url, directly as login input (e.g.
     // when the user forgot their handle, or when the handle does not
     // resolve to a DID)
@@ -398,10 +390,7 @@ async fn resolve_oauth_impl<T: OAuthResolver + ?Sized>(
                 err.with_context("failed to parse service URL")
             })?
             .to_owned();
-        (
-            resolver.resolve_from_service(&uri.as_str().into()).await?,
-            None,
-        )
+        (resolver.resolve_from_service(uri.as_str()).await?, None)
     } else {
         let (metadata, identity) = resolver.resolve_from_identity(input).await?;
         (metadata, Some(identity))
@@ -411,8 +400,8 @@ async fn resolve_oauth_impl<T: OAuthResolver + ?Sized>(
 #[cfg(not(target_arch = "wasm32"))]
 async fn resolve_from_service_impl<T: OAuthResolver + Sync + ?Sized>(
     resolver: &T,
-    input: &CowStr<'_>,
-) -> Result<OAuthAuthorizationServerMetadata<'static>> {
+    input: &str,
+) -> Result<OAuthAuthorizationServerMetadata> {
     // Assume first that input is a PDS URL (as required by ATPROTO)
     if let Ok(metadata) = resolver.get_resource_server_metadata(input).await {
         return Ok(metadata);
@@ -424,8 +413,8 @@ async fn resolve_from_service_impl<T: OAuthResolver + Sync + ?Sized>(
 #[cfg(target_arch = "wasm32")]
 async fn resolve_from_service_impl<T: OAuthResolver + ?Sized>(
     resolver: &T,
-    input: &CowStr<'_>,
-) -> Result<OAuthAuthorizationServerMetadata<'static>> {
+    input: &str,
+) -> Result<OAuthAuthorizationServerMetadata> {
     // Assume first that input is a PDS URL (as required by ATPROTO)
     if let Ok(metadata) = resolver.get_resource_server_metadata(input).await {
         return Ok(metadata);
@@ -438,19 +427,12 @@ async fn resolve_from_service_impl<T: OAuthResolver + ?Sized>(
 async fn resolve_from_identity_impl<T: OAuthResolver + Sync + ?Sized>(
     resolver: &T,
     input: &str,
-) -> Result<(
-    OAuthAuthorizationServerMetadata<'static>,
-    DidDocument<'static>,
-)> {
+) -> Result<(OAuthAuthorizationServerMetadata, DidDocument)> {
     let actor = AtIdentifier::new(input)
         .map_err(|e| ResolverError::at_identifier(smol_str::format_smolstr!("{:?}", e)))?;
     let identity = resolver.resolve_ident_owned(&actor).await?;
     if let Some(pds) = &identity.pds_endpoint() {
-        use jacquard_common::cowstr::ToCowStr;
-
-        let metadata = resolver
-            .get_resource_server_metadata(&pds.to_cowstr())
-            .await?;
+        let metadata = resolver.get_resource_server_metadata(pds.as_str()).await?;
         Ok((metadata, identity))
     } else {
         Err(ResolverError::did_document("Did doc lacking pds"))
@@ -461,17 +443,12 @@ async fn resolve_from_identity_impl<T: OAuthResolver + Sync + ?Sized>(
 async fn resolve_from_identity_impl<T: OAuthResolver + ?Sized>(
     resolver: &T,
     input: &str,
-) -> Result<(
-    OAuthAuthorizationServerMetadata<'static>,
-    DidDocument<'static>,
-)> {
+) -> Result<(OAuthAuthorizationServerMetadata, DidDocument)> {
     let actor = AtIdentifier::new(input)
         .map_err(|e| ResolverError::at_identifier(smol_str::format_smolstr!("{:?}", e)))?;
     let identity = resolver.resolve_ident_owned(&actor).await?;
     if let Some(pds) = &identity.pds_endpoint() {
-        let metadata = resolver
-            .get_resource_server_metadata(&pds.to_cowstr())
-            .await?;
+        let metadata = resolver.get_resource_server_metadata(pds.as_str()).await?;
         Ok((metadata, identity))
     } else {
         Err(ResolverError::did_document("Did doc lacking pds"))
@@ -481,28 +458,28 @@ async fn resolve_from_identity_impl<T: OAuthResolver + ?Sized>(
 #[cfg(not(target_arch = "wasm32"))]
 async fn get_authorization_server_metadata_impl<T: HttpClient + Sync + ?Sized>(
     client: &T,
-    issuer: &CowStr<'_>,
-) -> Result<OAuthAuthorizationServerMetadata<'static>> {
+    issuer: &str,
+) -> Result<OAuthAuthorizationServerMetadata> {
     let mut md = resolve_authorization_server(client, issuer).await?;
-    md.issuer = issuer.clone().into_static();
+    md.issuer = SmolStr::from(issuer);
     Ok(md)
 }
 
 #[cfg(target_arch = "wasm32")]
 async fn get_authorization_server_metadata_impl<T: HttpClient + ?Sized>(
     client: &T,
-    issuer: &CowStr<'_>,
-) -> Result<OAuthAuthorizationServerMetadata<'static>> {
+    issuer: &str,
+) -> Result<OAuthAuthorizationServerMetadata> {
     let mut md = resolve_authorization_server(client, issuer).await?;
-    md.issuer = issuer.clone().into_static();
+    md.issuer = SmolStr::from(issuer);
     Ok(md)
 }
 
 #[cfg(not(target_arch = "wasm32"))]
 async fn get_resource_server_metadata_impl<T: OAuthResolver + Sync + ?Sized>(
     resolver: &T,
-    pds: &CowStr<'_>,
-) -> Result<OAuthAuthorizationServerMetadata<'static>> {
+    pds: &str,
+) -> Result<OAuthAuthorizationServerMetadata> {
     let rs_metadata = resolve_protected_resource_info(resolver, pds).await?;
     // ATPROTO requires one, and only one, authorization server entry
     // > That document MUST contain a single item in the authorization_servers array.
@@ -524,14 +501,19 @@ async fn get_resource_server_metadata_impl<T: OAuthResolver + Sync + ?Sized>(
             ));
         }
     };
-    let as_metadata = resolver.get_authorization_server_metadata(issuer).await?;
+    let as_metadata = resolver
+        .get_authorization_server_metadata(issuer.as_ref())
+        .await?;
     // https://datatracker.ietf.org/doc/html/draft-ietf-oauth-resource-metadata-08#name-authorization-server-metada
     if let Some(protected_resources) = &as_metadata.protected_resources {
         let resource_url = rs_metadata
             .resource
             .strip_suffix('/')
             .unwrap_or(rs_metadata.resource.as_str());
-        if !protected_resources.contains(&CowStr::Borrowed(resource_url)) {
+        if !protected_resources
+            .iter()
+            .any(|s| s.as_str() == resource_url)
+        {
             return Err(ResolverError::authorization_server_metadata(
                 smol_str::format_smolstr!(
                     "pds {pds}, resource {0} not protected by issuer: {issuer}, protected resources: {1:?}",
@@ -559,8 +541,8 @@ async fn get_resource_server_metadata_impl<T: OAuthResolver + Sync + ?Sized>(
 #[cfg(target_arch = "wasm32")]
 async fn get_resource_server_metadata_impl<T: OAuthResolver + ?Sized>(
     resolver: &T,
-    pds: &CowStr<'_>,
-) -> Result<OAuthAuthorizationServerMetadata<'static>> {
+    pds: &str,
+) -> Result<OAuthAuthorizationServerMetadata> {
     let rs_metadata = resolve_protected_resource_info(resolver, pds).await?;
     // ATPROTO requires one, and only one, authorization server entry
     // > That document MUST contain a single item in the authorization_servers array.
@@ -582,14 +564,19 @@ async fn get_resource_server_metadata_impl<T: OAuthResolver + ?Sized>(
             ));
         }
     };
-    let as_metadata = resolver.get_authorization_server_metadata(issuer).await?;
+    let as_metadata = resolver
+        .get_authorization_server_metadata(issuer.as_ref())
+        .await?;
     // https://datatracker.ietf.org/doc/html/draft-ietf-oauth-resource-metadata-08#name-authorization-server-metada
     if let Some(protected_resources) = &as_metadata.protected_resources {
         let resource_url = rs_metadata
             .resource
             .strip_suffix('/')
             .unwrap_or(rs_metadata.resource.as_str());
-        if !protected_resources.contains(&CowStr::Borrowed(resource_url)) {
+        if !protected_resources
+            .iter()
+            .any(|s| s.as_str() == resource_url)
+        {
             return Err(ResolverError::authorization_server_metadata(
                 smol_str::format_smolstr!(
                     "pds {pds}, resource {0} not protected by issuer: {issuer}, protected resources: {1:?}",
@@ -628,10 +615,10 @@ async fn get_resource_server_metadata_impl<T: OAuthResolver + ?Sized>(
 pub trait OAuthResolver: IdentityResolver + HttpClient {
     /// Verify that the authorization server in `server_metadata` is the correct issuer for `sub`.
     #[cfg(not(target_arch = "wasm32"))]
-    fn verify_issuer(
+    fn verify_issuer<S: BosStr + Sync>(
         &self,
-        server_metadata: &OAuthAuthorizationServerMetadata<'_>,
-        sub: &Did<'_>,
+        server_metadata: &OAuthAuthorizationServerMetadata,
+        sub: &Did<S>,
     ) -> impl Future<Output = Result<Uri<String>>> + Send
     where
         Self: Sync,
@@ -641,10 +628,10 @@ pub trait OAuthResolver: IdentityResolver + HttpClient {
 
     /// Verify that the authorization server in `server_metadata` is the correct issuer for `sub`.
     #[cfg(target_arch = "wasm32")]
-    fn verify_issuer(
+    fn verify_issuer<S: BosStr>(
         &self,
-        server_metadata: &OAuthAuthorizationServerMetadata<'_>,
-        sub: &Did<'_>,
+        server_metadata: &OAuthAuthorizationServerMetadata,
+        sub: &Did<S>,
     ) -> impl Future<Output = Result<Uri<String>>> {
         verify_issuer_impl(self, server_metadata, sub)
     }
@@ -659,12 +646,7 @@ pub trait OAuthResolver: IdentityResolver + HttpClient {
     fn resolve_oauth(
         &self,
         input: &str,
-    ) -> impl Future<
-        Output = Result<(
-            OAuthAuthorizationServerMetadata<'static>,
-            Option<DidDocument<'static>>,
-        )>,
-    > + Send
+    ) -> impl Future<Output = Result<(OAuthAuthorizationServerMetadata, Option<DidDocument>)>> + Send
     where
         Self: Sync,
     {
@@ -681,12 +663,7 @@ pub trait OAuthResolver: IdentityResolver + HttpClient {
     fn resolve_oauth(
         &self,
         input: &str,
-    ) -> impl Future<
-        Output = Result<(
-            OAuthAuthorizationServerMetadata<'static>,
-            Option<DidDocument<'static>>,
-        )>,
-    > {
+    ) -> impl Future<Output = Result<(OAuthAuthorizationServerMetadata, Option<DidDocument>)>> {
         resolve_oauth_impl(self, input)
     }
 
@@ -697,8 +674,8 @@ pub trait OAuthResolver: IdentityResolver + HttpClient {
     #[cfg(not(target_arch = "wasm32"))]
     fn resolve_from_service(
         &self,
-        input: &CowStr<'_>,
-    ) -> impl Future<Output = Result<OAuthAuthorizationServerMetadata<'static>>> + Send
+        input: &str,
+    ) -> impl Future<Output = Result<OAuthAuthorizationServerMetadata>> + Send
     where
         Self: Sync,
     {
@@ -712,8 +689,8 @@ pub trait OAuthResolver: IdentityResolver + HttpClient {
     #[cfg(target_arch = "wasm32")]
     fn resolve_from_service(
         &self,
-        input: &CowStr<'_>,
-    ) -> impl Future<Output = Result<OAuthAuthorizationServerMetadata<'static>>> {
+        input: &str,
+    ) -> impl Future<Output = Result<OAuthAuthorizationServerMetadata>> {
         resolve_from_service_impl(self, input)
     }
 
@@ -722,12 +699,7 @@ pub trait OAuthResolver: IdentityResolver + HttpClient {
     fn resolve_from_identity(
         &self,
         input: &str,
-    ) -> impl Future<
-        Output = Result<(
-            OAuthAuthorizationServerMetadata<'static>,
-            DidDocument<'static>,
-        )>,
-    > + Send
+    ) -> impl Future<Output = Result<(OAuthAuthorizationServerMetadata, DidDocument)>> + Send
     where
         Self: Sync,
     {
@@ -739,12 +711,7 @@ pub trait OAuthResolver: IdentityResolver + HttpClient {
     fn resolve_from_identity(
         &self,
         input: &str,
-    ) -> impl Future<
-        Output = Result<(
-            OAuthAuthorizationServerMetadata<'static>,
-            DidDocument<'static>,
-        )>,
-    > {
+    ) -> impl Future<Output = Result<(OAuthAuthorizationServerMetadata, DidDocument)>> {
         resolve_from_identity_impl(self, input)
     }
 
@@ -755,8 +722,8 @@ pub trait OAuthResolver: IdentityResolver + HttpClient {
     #[cfg(not(target_arch = "wasm32"))]
     fn get_authorization_server_metadata(
         &self,
-        issuer: &CowStr<'_>,
-    ) -> impl Future<Output = Result<OAuthAuthorizationServerMetadata<'static>>> + Send
+        issuer: &str,
+    ) -> impl Future<Output = Result<OAuthAuthorizationServerMetadata>> + Send
     where
         Self: Sync,
     {
@@ -770,8 +737,8 @@ pub trait OAuthResolver: IdentityResolver + HttpClient {
     #[cfg(target_arch = "wasm32")]
     fn get_authorization_server_metadata(
         &self,
-        issuer: &CowStr<'_>,
-    ) -> impl Future<Output = Result<OAuthAuthorizationServerMetadata<'static>>> {
+        issuer: &str,
+    ) -> impl Future<Output = Result<OAuthAuthorizationServerMetadata>> {
         get_authorization_server_metadata_impl(self, issuer)
     }
 
@@ -779,8 +746,8 @@ pub trait OAuthResolver: IdentityResolver + HttpClient {
     #[cfg(not(target_arch = "wasm32"))]
     fn get_resource_server_metadata(
         &self,
-        pds: &CowStr<'_>,
-    ) -> impl Future<Output = Result<OAuthAuthorizationServerMetadata<'static>>> + Send
+        pds: &str,
+    ) -> impl Future<Output = Result<OAuthAuthorizationServerMetadata>> + Send
     where
         Self: Sync,
     {
@@ -791,8 +758,8 @@ pub trait OAuthResolver: IdentityResolver + HttpClient {
     #[cfg(target_arch = "wasm32")]
     fn get_resource_server_metadata(
         &self,
-        pds: &CowStr<'_>,
-    ) -> impl Future<Output = Result<OAuthAuthorizationServerMetadata<'static>>> {
+        pds: &str,
+    ) -> impl Future<Output = Result<OAuthAuthorizationServerMetadata>> {
         get_resource_server_metadata_impl(self, pds)
     }
 }
@@ -803,8 +770,8 @@ pub trait OAuthResolver: IdentityResolver + HttpClient {
 /// this prevents a compromised server from claiming to be a different issuer.
 pub async fn resolve_authorization_server<T: HttpClient + ?Sized>(
     client: &T,
-    server: &CowStr<'_>,
-) -> Result<OAuthAuthorizationServerMetadata<'static>> {
+    server: &str,
+) -> Result<OAuthAuthorizationServerMetadata> {
     let url = format!(
         "{}/.well-known/oauth-authorization-server",
         server.trim_end_matches("/")
@@ -821,7 +788,7 @@ pub async fn resolve_authorization_server<T: HttpClient + ?Sized>(
     if res.status() == StatusCode::OK {
         let metadata = serde_json::from_slice::<OAuthAuthorizationServerMetadata>(res.body())?;
         // https://datatracker.ietf.org/doc/html/rfc8414#section-3.3
-        if metadata.issuer == server.as_str() {
+        if metadata.issuer.as_str() == server {
             Ok(metadata.into_static())
         } else {
             Err(ResolverError::authorization_server_metadata(
@@ -839,8 +806,8 @@ pub async fn resolve_authorization_server<T: HttpClient + ?Sized>(
 /// that the metadata belongs to the PDS we queried and not a different resource.
 pub async fn resolve_protected_resource_info<T: HttpClient + ?Sized>(
     client: &T,
-    server: &CowStr<'_>,
-) -> Result<OAuthProtectedResourceMetadata<'static>> {
+    server: &str,
+) -> Result<OAuthProtectedResourceMetadata> {
     let url = format!(
         "{}/.well-known/oauth-protected-resource",
         server.trim_end_matches("/")
@@ -857,7 +824,7 @@ pub async fn resolve_protected_resource_info<T: HttpClient + ?Sized>(
     if res.status() == StatusCode::OK {
         let metadata = serde_json::from_slice::<OAuthProtectedResourceMetadata>(res.body())?;
         // https://datatracker.ietf.org/doc/html/rfc8414#section-3.3
-        if metadata.resource == server.as_str() {
+        if metadata.resource.as_str() == server {
             Ok(metadata.into_static())
         } else {
             Err(ResolverError::authorization_server_metadata(
@@ -878,7 +845,7 @@ mod tests {
 
     use super::*;
     use http::{Request as HttpRequest, Response as HttpResponse, StatusCode};
-    use jacquard_common::http_client::HttpClient;
+    use jacquard_common::{CowStr, http_client::HttpClient};
     use tokio::sync::Mutex;
 
     #[derive(Default, Clone)]

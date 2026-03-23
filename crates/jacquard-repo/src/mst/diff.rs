@@ -1,8 +1,10 @@
 //! MST diff calculation
 
 use std::collections::BTreeMap;
+use std::convert::{From, Infallible};
 use std::future::Future;
 use std::pin::Pin;
+use std::str::FromStr;
 
 use super::cursor::{CursorPosition, MstCursor};
 use super::tree::Mst;
@@ -13,6 +15,8 @@ use crate::mst::NodeEntry;
 use crate::storage::BlockStore;
 use bytes::Bytes;
 use cid::Cid as IpldCid;
+use jacquard_api::com_atproto::sync::subscribe_repos::RepoOpAction;
+use jacquard_common::BosStr;
 use jacquard_common::types::cid::CidLink;
 use smol_str::SmolStr;
 
@@ -160,14 +164,14 @@ impl MstDiff {
     ///
     /// Returns operations in the format used by `com.atproto.sync.subscribeRepos`.
     /// All update/delete operations include prev CIDs for sync v1.1 validation.
-    pub fn to_repo_ops(&self) -> Vec<RepoOp<'_>> {
+    pub fn to_repo_ops<'s, S: BosStr + FromStr<Err = Infallible>>(&'s self) -> Vec<RepoOp<S>> {
         let mut ops = Vec::with_capacity(self.op_count());
 
         // Add creates
         for (key, cid) in &self.creates {
             ops.push(RepoOp {
-                action: "create".into(),
-                path: key.as_str().into(),
+                action: RepoOpAction::from_value(S::from_static("create")),
+                path: S::from_str(key.as_str()).unwrap(),
                 cid: Some(CidLink::from(*cid)),
                 prev: None,
                 extra_data: None,
@@ -177,8 +181,8 @@ impl MstDiff {
         // Add updates
         for (key, new_cid, old_cid) in &self.updates {
             ops.push(RepoOp {
-                action: "update".into(),
-                path: key.as_str().into(),
+                action: RepoOpAction::from_value(S::from_static("update")),
+                path: S::from_str(key.as_str()).unwrap(),
                 cid: Some(CidLink::from(*new_cid)),
                 prev: Some(CidLink::from(*old_cid)),
                 extra_data: None,
@@ -188,8 +192,8 @@ impl MstDiff {
         // Add deletes
         for (key, old_cid) in &self.deletes {
             ops.push(RepoOp {
-                action: "delete".into(),
-                path: key.as_str().into(),
+                action: RepoOpAction::from_value(S::from_static("delete")),
+                path: S::from_str(key.as_str()).unwrap(),
                 cid: None, // null for deletes
                 prev: Some(CidLink::from(*old_cid)),
                 extra_data: None,

@@ -1,4 +1,5 @@
-use jacquard_common::{CowStr, IntoStatic, types::string::Language};
+use jacquard_common::bos::{BosStr, DefaultStr};
+use jacquard_common::{IntoStatic, types::string::Language};
 use serde::{Deserialize, Serialize};
 
 /// Authorization server metadata, as returned from the
@@ -7,67 +8,67 @@ use serde::{Deserialize, Serialize};
 /// Defined by [RFC 8414](https://datatracker.ietf.org/doc/html/rfc8414#section-2)
 /// with extensions from OpenID Connect Discovery, RFC 9126 (PAR), RFC 9207,
 /// RFC 9449 (DPoP), and the ATProto client ID metadata document draft.
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default)]
-pub struct OAuthAuthorizationServerMetadata<'s> {
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(bound(deserialize = "S: serde::Deserialize<'de> + BosStr"))]
+pub struct OAuthAuthorizationServerMetadata<S: BosStr = DefaultStr> {
     /// The issuer identifier URL of the authorization server.
     ///
     /// <https://datatracker.ietf.org/doc/html/rfc8414#section-2>
-    #[serde(borrow)]
-    pub issuer: CowStr<'s>,
+    pub issuer: S,
     /// The URL of the authorization endpoint.
-    pub authorization_endpoint: CowStr<'s>, // optional?
+    pub authorization_endpoint: S, // optional?
     /// The URL of the token endpoint.
-    pub token_endpoint: CowStr<'s>, // optional?
+    pub token_endpoint: S, // optional?
     /// URL of the authorization server's JWK Set document.
-    pub jwks_uri: Option<CowStr<'s>>,
+    pub jwks_uri: Option<S>,
     /// URL of the dynamic client registration endpoint, if supported.
-    pub registration_endpoint: Option<CowStr<'s>>,
+    pub registration_endpoint: Option<S>,
     /// List of OAuth 2.0 scope values the server supports.
-    pub scopes_supported: Vec<CowStr<'s>>,
+    pub scopes_supported: Vec<S>,
     /// List of OAuth 2.0 response type values the server supports.
-    pub response_types_supported: Vec<CowStr<'s>>,
+    pub response_types_supported: Vec<S>,
     /// List of OAuth 2.0 response mode values the server supports.
-    pub response_modes_supported: Option<Vec<CowStr<'s>>>,
+    pub response_modes_supported: Option<Vec<S>>,
     /// List of OAuth 2.0 grant type values the server supports.
-    pub grant_types_supported: Option<Vec<CowStr<'s>>>,
+    pub grant_types_supported: Option<Vec<S>>,
     /// List of client authentication methods supported at the token endpoint.
-    pub token_endpoint_auth_methods_supported: Option<Vec<CowStr<'s>>>,
+    pub token_endpoint_auth_methods_supported: Option<Vec<S>>,
     /// List of JWS signing algorithms supported for token endpoint auth.
-    pub token_endpoint_auth_signing_alg_values_supported: Option<Vec<CowStr<'s>>>,
+    pub token_endpoint_auth_signing_alg_values_supported: Option<Vec<S>>,
     /// URL of a page with human-readable information about the server.
-    pub service_documentation: Option<CowStr<'s>>,
+    pub service_documentation: Option<S>,
     /// BCP 47 language tags for UI locales the server supports.
     pub ui_locales_supported: Option<Vec<Language>>,
     /// URL of the authorization server's privacy policy.
-    pub op_policy_uri: Option<CowStr<'s>>,
+    pub op_policy_uri: Option<S>,
     /// URL of the authorization server's terms of service.
-    pub op_tos_uri: Option<CowStr<'s>>,
+    pub op_tos_uri: Option<S>,
     /// URL of the token revocation endpoint (RFC 7009).
-    pub revocation_endpoint: Option<CowStr<'s>>,
+    pub revocation_endpoint: Option<S>,
     /// List of client authentication methods supported at the revocation endpoint.
-    pub revocation_endpoint_auth_methods_supported: Option<Vec<CowStr<'s>>>,
+    pub revocation_endpoint_auth_methods_supported: Option<Vec<S>>,
     /// List of JWS signing algorithms supported for revocation endpoint auth.
-    pub revocation_endpoint_auth_signing_alg_values_supported: Option<Vec<CowStr<'s>>>,
+    pub revocation_endpoint_auth_signing_alg_values_supported: Option<Vec<S>>,
     /// URL of the token introspection endpoint (RFC 7662).
-    pub introspection_endpoint: Option<CowStr<'s>>,
+    pub introspection_endpoint: Option<S>,
     /// List of client authentication methods supported at the introspection endpoint.
-    pub introspection_endpoint_auth_methods_supported: Option<Vec<CowStr<'s>>>,
+    pub introspection_endpoint_auth_methods_supported: Option<Vec<S>>,
     /// List of JWS signing algorithms supported for introspection endpoint auth.
-    pub introspection_endpoint_auth_signing_alg_values_supported: Option<Vec<CowStr<'s>>>,
+    pub introspection_endpoint_auth_signing_alg_values_supported: Option<Vec<S>>,
     /// PKCE code challenge methods supported by the server.
-    pub code_challenge_methods_supported: Option<Vec<CowStr<'s>>>,
+    pub code_challenge_methods_supported: Option<Vec<S>>,
 
     /// Subject identifier types supported (`public` or `pairwise`).
     ///
     /// <https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderMetadata>
-    pub subject_types_supported: Option<Vec<CowStr<'s>>>,
+    pub subject_types_supported: Option<Vec<S>>,
     /// If `true`, clients must pre-register `request_uri` values.
     pub require_request_uri_registration: Option<bool>,
 
     /// URL of the Pushed Authorization Request (PAR) endpoint (RFC 9126).
     ///
     /// <https://datatracker.ietf.org/doc/html/rfc9126#section-5>
-    pub pushed_authorization_request_endpoint: Option<CowStr<'s>>,
+    pub pushed_authorization_request_endpoint: Option<S>,
     /// If `true`, all authorization requests must use PAR.
     pub require_pushed_authorization_requests: Option<bool>,
 
@@ -79,7 +80,7 @@ pub struct OAuthAuthorizationServerMetadata<'s> {
     /// DPoP JWS signing algorithms supported by this server (RFC 9449).
     ///
     /// <https://datatracker.ietf.org/doc/html/rfc9449#section-5.1>
-    pub dpop_signing_alg_values_supported: Option<Vec<CowStr<'s>>>,
+    pub dpop_signing_alg_values_supported: Option<Vec<S>>,
 
     /// If `true`, the server supports the ATProto client ID metadata document extension.
     ///
@@ -89,7 +90,44 @@ pub struct OAuthAuthorizationServerMetadata<'s> {
     /// Protected resources associated with this authorization server.
     ///
     /// <https://datatracker.ietf.org/doc/html/draft-ietf-oauth-resource-metadata-08#name-authorization-server-metada>
-    pub protected_resources: Option<Vec<CowStr<'s>>>,
+    pub protected_resources: Option<Vec<S>>,
+}
+
+impl<S: BosStr> Default for OAuthAuthorizationServerMetadata<S> {
+    fn default() -> Self {
+        OAuthAuthorizationServerMetadata {
+            issuer: S::from_static(""),
+            authorization_endpoint: S::from_static(""),
+            token_endpoint: S::from_static(""),
+            jwks_uri: None,
+            registration_endpoint: None,
+            scopes_supported: Vec::new(),
+            response_types_supported: Vec::new(),
+            response_modes_supported: None,
+            grant_types_supported: None,
+            token_endpoint_auth_methods_supported: None,
+            token_endpoint_auth_signing_alg_values_supported: None,
+            service_documentation: None,
+            ui_locales_supported: None,
+            op_policy_uri: None,
+            op_tos_uri: None,
+            revocation_endpoint: None,
+            revocation_endpoint_auth_methods_supported: None,
+            revocation_endpoint_auth_signing_alg_values_supported: None,
+            introspection_endpoint: None,
+            introspection_endpoint_auth_methods_supported: None,
+            introspection_endpoint_auth_signing_alg_values_supported: None,
+            code_challenge_methods_supported: None,
+            subject_types_supported: None,
+            require_request_uri_registration: None,
+            pushed_authorization_request_endpoint: None,
+            require_pushed_authorization_requests: None,
+            authorization_response_iss_parameter_supported: None,
+            dpop_signing_alg_values_supported: None,
+            client_id_metadata_document_supported: None,
+            protected_resources: None,
+        }
+    }
 }
 
 /// Protected resource metadata, returned from `.well-known/oauth-protected-resource`.
@@ -97,50 +135,72 @@ pub struct OAuthAuthorizationServerMetadata<'s> {
 /// Allows clients to discover which authorization servers protect a given resource
 /// and what scopes and bearer methods are accepted. Defined by
 /// [draft-ietf-oauth-resource-metadata](https://datatracker.ietf.org/doc/draft-ietf-oauth-resource-metadata/).
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Default)]
-pub struct OAuthProtectedResourceMetadata<'s> {
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(bound(deserialize = "S: serde::Deserialize<'de> + BosStr"))]
+pub struct OAuthProtectedResourceMetadata<S: BosStr = DefaultStr> {
     /// The URL of the protected resource itself.
-    #[serde(borrow)]
-    pub resource: CowStr<'s>,
+    pub resource: S,
     /// URLs of authorization servers that can issue tokens for this resource.
-    pub authorization_servers: Option<Vec<CowStr<'s>>>,
+    pub authorization_servers: Option<Vec<S>>,
     /// URL of the resource server's JWK Set document.
-    pub jwks_uri: Option<CowStr<'s>>,
+    pub jwks_uri: Option<S>,
     /// List of OAuth 2.0 scope values the resource server supports.
-    pub scopes_supported: Vec<CowStr<'s>>,
+    pub scopes_supported: Vec<S>,
     /// Bearer token presentation methods supported (`header`, `body`, `query`).
-    pub bearer_methods_supported: Option<Vec<CowStr<'s>>>,
+    pub bearer_methods_supported: Option<Vec<S>>,
     /// JWS signing algorithms supported for resource-bound tokens.
-    pub resource_signing_alg_values_supported: Option<Vec<CowStr<'s>>>,
+    pub resource_signing_alg_values_supported: Option<Vec<S>>,
     /// URL of a page with human-readable information about the resource.
-    pub resource_documentation: Option<CowStr<'s>>,
+    pub resource_documentation: Option<S>,
     /// URL of the resource server's privacy policy.
-    pub resource_policy_uri: Option<CowStr<'s>>,
+    pub resource_policy_uri: Option<S>,
     /// URL of the resource server's terms of service.
-    pub resource_tos_uri: Option<CowStr<'s>>,
+    pub resource_tos_uri: Option<S>,
 }
 
-impl IntoStatic for OAuthProtectedResourceMetadata<'_> {
-    type Output = OAuthProtectedResourceMetadata<'static>;
-    fn into_static(self) -> Self::Output {
+impl<S: BosStr> Default for OAuthProtectedResourceMetadata<S> {
+    fn default() -> Self {
         OAuthProtectedResourceMetadata {
-            resource: self.resource.into_static(),
-            authorization_servers: self.authorization_servers.into_static(),
-            jwks_uri: self.jwks_uri.map(|v| v.into_static()),
-            scopes_supported: self.scopes_supported.into_static(),
-            bearer_methods_supported: self.bearer_methods_supported.map(|v| v.into_static()),
-            resource_signing_alg_values_supported: self
-                .resource_signing_alg_values_supported
-                .map(|v| v.into_static()),
-            resource_documentation: self.resource_documentation.map(|v| v.into_static()),
-            resource_policy_uri: self.resource_policy_uri.map(|v| v.into_static()),
-            resource_tos_uri: self.resource_tos_uri.map(|v| v.into_static()),
+            resource: S::from_static(""),
+            authorization_servers: None,
+            jwks_uri: None,
+            scopes_supported: Vec::new(),
+            bearer_methods_supported: None,
+            resource_signing_alg_values_supported: None,
+            resource_documentation: None,
+            resource_policy_uri: None,
+            resource_tos_uri: None,
         }
     }
 }
 
-impl IntoStatic for OAuthAuthorizationServerMetadata<'_> {
-    type Output = OAuthAuthorizationServerMetadata<'static>;
+impl<S: BosStr + IntoStatic> IntoStatic for OAuthProtectedResourceMetadata<S>
+where
+    S::Output: BosStr,
+{
+    type Output = OAuthProtectedResourceMetadata<S::Output>;
+    fn into_static(self) -> Self::Output {
+        OAuthProtectedResourceMetadata {
+            resource: self.resource.into_static(),
+            authorization_servers: self.authorization_servers.into_static(),
+            jwks_uri: self.jwks_uri.into_static(),
+            scopes_supported: self.scopes_supported.into_static(),
+            bearer_methods_supported: self.bearer_methods_supported.into_static(),
+            resource_signing_alg_values_supported: self
+                .resource_signing_alg_values_supported
+                .into_static(),
+            resource_documentation: self.resource_documentation.into_static(),
+            resource_policy_uri: self.resource_policy_uri.into_static(),
+            resource_tos_uri: self.resource_tos_uri.into_static(),
+        }
+    }
+}
+
+impl<S: BosStr + IntoStatic> IntoStatic for OAuthAuthorizationServerMetadata<S>
+where
+    S::Output: BosStr,
+{
+    type Output = OAuthAuthorizationServerMetadata<S::Output>;
     fn into_static(self) -> Self::Output {
         OAuthAuthorizationServerMetadata {
             issuer: self.issuer.into_static(),
@@ -178,20 +238,15 @@ impl IntoStatic for OAuthAuthorizationServerMetadata<'_> {
                 .into_static(),
             code_challenge_methods_supported: self.code_challenge_methods_supported.into_static(),
             subject_types_supported: self.subject_types_supported.into_static(),
-            require_request_uri_registration: self.require_request_uri_registration.into_static(),
+            require_request_uri_registration: self.require_request_uri_registration,
             pushed_authorization_request_endpoint: self
                 .pushed_authorization_request_endpoint
                 .into_static(),
-            require_pushed_authorization_requests: self
-                .require_pushed_authorization_requests
-                .into_static(),
+            require_pushed_authorization_requests: self.require_pushed_authorization_requests,
             authorization_response_iss_parameter_supported: self
-                .authorization_response_iss_parameter_supported
-                .into_static(),
+                .authorization_response_iss_parameter_supported,
             dpop_signing_alg_values_supported: self.dpop_signing_alg_values_supported.into_static(),
-            client_id_metadata_document_supported: self
-                .client_id_metadata_document_supported
-                .into_static(),
+            client_id_metadata_document_supported: self.client_id_metadata_document_supported,
             protected_resources: self.protected_resources.into_static(),
         }
     }

@@ -166,23 +166,7 @@ impl<S: Bos<str>> Did<S> {
     }
 }
 
-impl FromStr for Did {
-    type Err = AtStrError;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        Self::new_owned(s)
-    }
-}
-
-impl FromStr for Did<CowStr<'static>> {
-    type Err = AtStrError;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        Self::new_owned(s)
-    }
-}
-
-impl FromStr for Did<String> {
+impl<S: Bos<str> + FromStr> FromStr for Did<S> {
     type Err = AtStrError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {

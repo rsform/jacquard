@@ -10,15 +10,17 @@ use crate::mst::{Mst, RecordWriteOp};
 use crate::storage::BlockStore;
 use bytes::Bytes;
 use cid::Cid as IpldCid;
-use jacquard_common::IntoStatic;
+use jacquard_common::BosStr;
 use jacquard_common::types::cid::CidLink;
 use jacquard_common::types::recordkey::RecordKeyType;
 use jacquard_common::types::string::{Datetime, Did, Nsid, RecordKey, Tid};
 use jacquard_common::types::tid::Ticker;
 use smol_str::format_smolstr;
 use std::collections::BTreeMap;
+use std::convert::Infallible;
 use std::fmt::{self, Display, Formatter};
 use std::path::Path;
+use std::str::FromStr;
 use std::sync::Arc;
 
 /// Commit data for repository updates
@@ -65,21 +67,21 @@ impl CommitData {
     ///
     /// Converts this commit into a `FirehoseCommit` with `prev_data` field
     /// and relevant blocks for inductive validation.
-    pub async fn to_firehose_commit(
+    pub async fn to_firehose_commit<S: BosStr + Clone>(
         &self,
-        repo: &Did<'_>,
+        repo: &Did<S>,
         seq: i64,
         time: Datetime,
-        ops: Vec<RepoOp<'static>>,
-        blobs: Vec<CidLink<'static>>,
-    ) -> Result<FirehoseCommit<'static>> {
+        ops: Vec<RepoOp<S>>,
+        blobs: Vec<CidLink<S>>,
+    ) -> Result<FirehoseCommit<S>> {
         let mut proof_blocks = self.blocks.clone();
         proof_blocks.append(&mut self.relevant_blocks.clone());
         // Convert relevant blocks to CAR format
         let blocks_car = crate::car::write_car_bytes(self.cid, proof_blocks).await?;
 
         Ok(FirehoseCommit {
-            repo: repo.clone().into_static(),
+            repo: repo.clone(),
             rev: self.rev.clone(),
             seq,
             since: Some(self.since.clone().unwrap_or_else(|| self.rev.clone())),
@@ -124,18 +126,21 @@ impl CommitData {
 /// # Ok(())
 /// # }
 /// ```
-pub struct Repository<S: BlockStore> {
-    mst: Mst<S>,
-    storage: Arc<S>,
-    commit: Commit<'static>,
+pub struct Repository<S: BosStr, BS: BlockStore> {
+    mst: Mst<BS>,
+    storage: Arc<BS>,
+    commit: Commit<S>,
     commit_cid: IpldCid,
 }
 
-impl<S: BlockStore + Sync + 'static> Repository<S> {
+impl<S, BS: BlockStore + Sync + 'static> Repository<S, BS>
+where
+    S: BosStr + Clone + serde::Serialize + serde::de::DeserializeOwned + FromStr<Err = Infallible>,
+{
     /// Create repository from existing components
     ///
     /// Static constructor for when you already have the MST, commit, and CID.
-    pub fn new(storage: Arc<S>, mst: Mst<S>, commit: Commit<'static>, commit_cid: IpldCid) -> Self {
+    pub fn new(storage: Arc<BS>, mst: Mst<BS>, commit: Commit<S>, commit_cid: IpldCid) -> Self {
         Self {
             storage,
             mst,
@@ -145,7 +150,7 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
     }
 
     /// Load repository from commit CID
-    pub async fn from_commit(storage: Arc<S>, commit_cid: &IpldCid) -> Result<Self> {
+    pub async fn from_commit(storage: Arc<BS>, commit_cid: &IpldCid) -> Result<Self> {
         let commit_bytes = storage
             .get(commit_cid)
             .await?
@@ -154,7 +159,7 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
                     .with_help("Commit must be applied to storage before loading repository - use apply_commit() or ensure commit is persisted")
             })?;
 
-        let commit = Commit::from_cbor(&commit_bytes)?;
+        let commit = Commit::<S>::from_cbor(&commit_bytes)?;
         let mst_root = commit.data();
 
         let mst = Mst::load(storage.clone(), *mst_root, None);
@@ -162,7 +167,7 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
         Ok(Self {
             mst,
             storage,
-            commit: commit.into_static(),
+            commit: commit,
             commit_cid: *commit_cid,
         })
     }
@@ -174,10 +179,10 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
     ///
     /// This does NOT persist to storage - use `create_from_commit` or `create` for that.
     pub async fn format_init_commit<K>(
-        storage: Arc<S>,
-        did: Did<'static>,
+        storage: Arc<BS>,
+        did: Did<S>,
         signing_key: &K,
-        initial_writes: Option<&[RecordWriteOp<'_>]>,
+        initial_writes: Option<&[RecordWriteOp<'_, S>]>,
     ) -> Result<CommitData>
     where
         K: SigningKey,
@@ -240,7 +245,7 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
     /// Create repository from CommitData
     ///
     /// Applies the commit to storage and loads the repository from it.
-    pub async fn create_from_commit(storage: Arc<S>, commit_data: CommitData) -> Result<Self> {
+    pub async fn create_from_commit(storage: Arc<BS>, commit_data: CommitData) -> Result<Self> {
         let commit_cid = commit_data.cid;
         storage.apply_commit(commit_data).await?;
         Self::from_commit(storage, &commit_cid).await
@@ -250,10 +255,10 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
     ///
     /// Convenience method that formats an initial commit and applies it to storage.
     pub async fn create<K>(
-        storage: Arc<S>,
-        did: Did<'static>,
+        storage: Arc<BS>,
+        did: Did<S>,
         signing_key: &K,
-        initial_writes: Option<&[RecordWriteOp<'_>]>,
+        initial_writes: Option<&[RecordWriteOp<'_, S>]>,
     ) -> Result<Self>
     where
         K: SigningKey,
@@ -266,7 +271,7 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
     /// Get a record by collection and rkey
     pub async fn get_record<T: RecordKeyType>(
         &self,
-        collection: &Nsid<'_>,
+        collection: &Nsid<S>,
         rkey: &RecordKey<T>,
     ) -> Result<Option<IpldCid>> {
         let key = format!("{}/{}", collection.as_ref(), rkey.as_ref());
@@ -276,7 +281,7 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
     /// Create a record (error if exists)
     pub async fn create_record<T: RecordKeyType>(
         &mut self,
-        collection: &Nsid<'_>,
+        collection: &Nsid<S>,
         rkey: &RecordKey<T>,
         record_cid: IpldCid,
     ) -> Result<()> {
@@ -293,7 +298,7 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
     /// Update a record (error if not exists, returns previous CID)
     pub async fn update_record<T: RecordKeyType>(
         &mut self,
-        collection: &Nsid<'_>,
+        collection: &Nsid<S>,
         rkey: &RecordKey<T>,
         record_cid: IpldCid,
     ) -> Result<IpldCid> {
@@ -312,7 +317,7 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
     /// Delete a record (error if not exists, returns deleted CID)
     pub async fn delete_record<T: RecordKeyType>(
         &mut self,
-        collection: &Nsid<'_>,
+        collection: &Nsid<S>,
         rkey: &RecordKey<T>,
     ) -> Result<IpldCid> {
         let key = format!("{}/{}", collection.as_ref(), rkey.as_ref());
@@ -359,13 +364,14 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
     /// Returns `(ops, CommitData)` - ops are needed for `to_firehose_commit()`.
     pub async fn create_commit<K>(
         &mut self,
-        ops: &[RecordWriteOp<'_>],
-        did: &Did<'_>,
+        ops: &[RecordWriteOp<'_, S>],
+        did: &Did<S>,
         prev: Option<IpldCid>,
         signing_key: &K,
-    ) -> Result<(Vec<RepoOp<'static>>, CommitData)>
+    ) -> Result<(Vec<RepoOp<S>>, CommitData)>
     where
         K: SigningKey,
+        S: FromStr<Err = Infallible>,
     {
         // Step 1: Apply all write operations to build new MST and collect leaf blocks
         let mut updated_tree = self.mst.clone();
@@ -463,11 +469,7 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
         let diff = self.mst.diff(&updated_tree).await?;
 
         // Step 3: Extract everything we need from diff
-        let repo_ops = diff
-            .to_repo_ops()
-            .into_iter()
-            .map(|op| op.into_static())
-            .collect();
+        let repo_ops = diff.to_repo_ops().into_iter().collect();
 
         // Step 4: Build blocks and relevant_blocks collections using diff tracking
         //
@@ -506,8 +508,8 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
 
         // Step 5: Create and sign commit
         let rev = Ticker::new().next(Some(self.commit.rev.clone()));
-        let commit = Commit::new_unsigned(did.clone().into_static(), data, rev.clone(), prev)
-            .sign(signing_key)?;
+        let commit =
+            Commit::new_unsigned(did.clone(), data, rev.clone(), prev).sign(signing_key)?;
 
         let commit_cbor = commit.to_cbor()?;
         let commit_cid = crate::mst::util::compute_cid(&commit_cbor)?;
@@ -555,9 +557,9 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
                 RepoError::not_found("commit block", &commit_cid)
                     .with_help("Commit block should have been persisted by apply_commit() - this indicates a storage inconsistency")
             })?;
-        let commit = Commit::from_cbor(&commit_bytes)?;
+        let commit = Commit::<S>::from_cbor(&commit_bytes)?;
 
-        self.commit = commit.into_static();
+        self.commit = commit;
         self.commit_cid = commit_cid;
 
         // Reload MST from new root
@@ -573,10 +575,10 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
     /// record operations (e.g., `create_record()`, `update_record()`, `delete_record()`).
     pub async fn commit<K>(
         &mut self,
-        did: &Did<'_>,
+        did: &Did<S>,
         prev: Option<IpldCid>,
         signing_key: &K,
-    ) -> Result<(Vec<RepoOp<'static>>, IpldCid)>
+    ) -> Result<(Vec<RepoOp<S>>, IpldCid)>
     where
         K: SigningKey,
     {
@@ -590,17 +592,17 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
     }
 
     /// Get the underlying MST
-    pub fn mst(&self) -> &Mst<S> {
+    pub fn mst(&self) -> &Mst<BS> {
         &self.mst
     }
 
     /// Get reference to the storage
-    pub fn storage(&self) -> &Arc<S> {
+    pub fn storage(&self) -> &Arc<BS> {
         &self.storage
     }
 
     /// Get the current commit
-    pub fn current_commit(&self) -> &Commit<'static> {
+    pub fn current_commit(&self) -> &Commit<S> {
         &self.commit
     }
 
@@ -610,20 +612,20 @@ impl<S: BlockStore + Sync + 'static> Repository<S> {
     }
 
     /// Get the DID from the current commit
-    pub fn did(&self) -> &Did<'_> {
+    pub fn did(&self) -> &Did<S> {
         self.commit.did()
     }
 }
 
-impl<S: BlockStore> Display for Repository<S> {
+impl<S: BosStr, BS: BlockStore> Display for Repository<S, BS> {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         use crate::mst::tree::short_cid;
 
         writeln!(f, "Repository {{")?;
-        writeln!(f, "  DID: {}", self.commit.did())?;
+        writeln!(f, "  DID: {}", self.commit.did)?;
         writeln!(f, "  Commit: {}", short_cid(&self.commit_cid))?;
         writeln!(f, "  Rev: {}", self.commit.rev)?;
-        writeln!(f, "  Data: {}", short_cid(self.commit.data()))?;
+        writeln!(f, "  Data: {}", short_cid(&self.commit.data))?;
         writeln!(f, "  MST:")?;
 
         // Format MST with indentation
@@ -642,10 +644,13 @@ mod tests {
 
     use super::*;
     use crate::storage::MemoryBlockStore;
-    use jacquard_common::types::{
-        crypto::{KeyCodec, PublicKey},
-        recordkey::Rkey,
-        value::RawData,
+    use jacquard_common::{
+        IntoStatic,
+        types::{
+            crypto::{KeyCodec, PublicKey},
+            recordkey::Rkey,
+            value::RawData,
+        },
     };
     use smol_str::SmolStr;
 
@@ -676,7 +681,9 @@ mod tests {
         record
     }
 
-    async fn create_test_repo(storage: Arc<MemoryBlockStore>) -> Repository<MemoryBlockStore> {
+    async fn create_test_repo(
+        storage: Arc<MemoryBlockStore>,
+    ) -> Repository<SmolStr, MemoryBlockStore> {
         let did = Did::new("did:plc:test").unwrap();
         let signing_key = k256::ecdsa::SigningKey::random(&mut rand::rngs::OsRng);
 
@@ -701,8 +708,8 @@ mod tests {
         let storage = Arc::new(MemoryBlockStore::new());
         let mut repo = create_test_repo(storage.clone()).await;
 
-        let collection = Nsid::new("app.bsky.feed.post").unwrap();
-        let rkey = RecordKey(Rkey::new("abc123").unwrap());
+        let collection = Nsid::new("app.bsky.feed.post").unwrap().into_static();
+        let rkey = RecordKey(Rkey::new("abc123").unwrap()).into_static();
 
         let ops = vec![RecordWriteOp::Create {
             collection: collection.clone().into_static(),
@@ -710,7 +717,7 @@ mod tests {
             record: make_test_record(1),
         }];
 
-        let did = Did::new("did:plc:test").unwrap();
+        let did = Did::new("did:plc:test").unwrap().into_static();
         let signing_key = k256::ecdsa::SigningKey::random(&mut rand::rngs::OsRng);
         let (repo_ops, commit_data) = repo
             .create_commit(
@@ -738,8 +745,8 @@ mod tests {
         let storage = Arc::new(MemoryBlockStore::new());
         let mut repo = create_test_repo(storage).await;
 
-        let collection = Nsid::new("app.bsky.feed.post").unwrap();
-        let rkey = RecordKey(Rkey::new("abc123").unwrap());
+        let collection = Nsid::new("app.bsky.feed.post").unwrap().into_static();
+        let rkey = RecordKey(Rkey::new("abc123").unwrap()).into_static();
         let cid = make_test_cid(1);
 
         repo.create_record(&collection, &rkey, cid).await.unwrap();
@@ -755,8 +762,8 @@ mod tests {
         let storage = Arc::new(MemoryBlockStore::new());
         let mut repo = create_test_repo(storage).await;
 
-        let collection = Nsid::new("app.bsky.feed.post").unwrap();
-        let rkey = RecordKey(Rkey::new("abc123").unwrap());
+        let collection = Nsid::new("app.bsky.feed.post").unwrap().into_static();
+        let rkey = RecordKey(Rkey::new("abc123").unwrap()).into_static();
         let cid1 = make_test_cid(1);
         let cid2 = make_test_cid(2);
 
@@ -774,8 +781,8 @@ mod tests {
         let storage = Arc::new(MemoryBlockStore::new());
         let mut repo = create_test_repo(storage).await;
 
-        let collection = Nsid::new("app.bsky.feed.post").unwrap();
-        let rkey = RecordKey(Rkey::new("abc123").unwrap());
+        let collection = Nsid::new("app.bsky.feed.post").unwrap().into_static();
+        let rkey = RecordKey(Rkey::new("abc123").unwrap()).into_static();
         let cid = make_test_cid(1);
 
         let result = repo.update_record(&collection, &rkey, cid).await;
@@ -787,8 +794,8 @@ mod tests {
         let storage = Arc::new(MemoryBlockStore::new());
         let mut repo = create_test_repo(storage).await;
 
-        let collection = Nsid::new("app.bsky.feed.post").unwrap();
-        let rkey = RecordKey(Rkey::new("abc123").unwrap());
+        let collection = Nsid::new("app.bsky.feed.post").unwrap().into_static();
+        let rkey = RecordKey(Rkey::new("abc123").unwrap()).into_static();
         let cid = make_test_cid(1);
 
         repo.create_record(&collection, &rkey, cid).await.unwrap();
@@ -805,8 +812,8 @@ mod tests {
         let storage = Arc::new(MemoryBlockStore::new());
         let mut repo = create_test_repo(storage).await;
 
-        let collection = Nsid::new("app.bsky.feed.post").unwrap();
-        let rkey = RecordKey(Rkey::new("abc123").unwrap());
+        let collection = Nsid::new("app.bsky.feed.post").unwrap().into_static();
+        let rkey = RecordKey(Rkey::new("abc123").unwrap()).into_static();
 
         let result = repo.delete_record(&collection, &rkey).await;
         assert!(result.is_err());
@@ -817,8 +824,8 @@ mod tests {
         let storage = Arc::new(MemoryBlockStore::new());
         let mut repo = create_test_repo(storage.clone()).await;
 
-        let collection = Nsid::new("app.bsky.feed.post").unwrap();
-        let rkey = RecordKey(Rkey::new("abc123").unwrap());
+        let collection = Nsid::new("app.bsky.feed.post").unwrap().into_static();
+        let rkey = RecordKey(Rkey::new("abc123").unwrap()).into_static();
         let cid = make_test_cid(1);
 
         repo.create_record(&collection, &rkey, cid).await.unwrap();
@@ -827,7 +834,7 @@ mod tests {
         repo.mst.persist().await.unwrap();
 
         // Create commit (need a signing key for this test)
-        let did = Did::new("did:plc:test").unwrap();
+        let did = Did::new("did:plc:test").unwrap().into_static();
         let signing_key = k256::ecdsa::SigningKey::random(&mut rand::rngs::OsRng);
         let (_, commit_cid) = repo.commit(&did, None, &signing_key).await.unwrap();
 
@@ -843,14 +850,14 @@ mod tests {
         let storage = Arc::new(MemoryBlockStore::new());
         let mut repo = create_test_repo(storage.clone()).await;
 
-        let collection = Nsid::new("app.bsky.feed.post").unwrap();
-        let rkey = RecordKey(Rkey::new("abc123").unwrap());
+        let collection = Nsid::new("app.bsky.feed.post").unwrap().into_static();
+        let rkey = RecordKey(Rkey::new("abc123").unwrap()).into_static();
         let cid = make_test_cid(1);
 
         repo.create_record(&collection, &rkey, cid).await.unwrap();
         repo.mst.persist().await.unwrap();
 
-        let did = Did::new("did:plc:test").unwrap();
+        let did = Did::new("did:plc:test").unwrap().into_static();
         let signing_key = k256::ecdsa::SigningKey::random(&mut rand::rngs::OsRng);
         let (_, commit_cid) = repo.commit(&did, None, &signing_key).await.unwrap();
 
@@ -860,7 +867,7 @@ mod tests {
 
         // Verify commit can be deserialized
         let bytes = commit_bytes.unwrap();
-        let commit = Commit::from_cbor(&bytes).unwrap();
+        let commit = Commit::<SmolStr>::from_cbor(&bytes).unwrap();
         assert_eq!(commit.did().as_ref(), did.as_ref());
         let root_cid = repo.mst.root().await.unwrap();
         assert_eq!(commit.data(), &root_cid);
@@ -871,8 +878,8 @@ mod tests {
         let storage = Arc::new(MemoryBlockStore::new());
         let mut repo = create_test_repo(storage.clone()).await;
 
-        let collection = Nsid::new("app.bsky.feed.post").unwrap();
-        let rkey = RecordKey(Rkey::new("test1").unwrap());
+        let collection = Nsid::new("app.bsky.feed.post").unwrap().into_static();
+        let rkey = RecordKey(Rkey::new("test1").unwrap()).into_static();
         let cid1 = make_test_cid(1);
         let cid2 = make_test_cid(2);
 
@@ -899,14 +906,15 @@ mod tests {
         let storage = Arc::new(MemoryBlockStore::new());
         let mut repo = create_test_repo(storage.clone()).await;
 
-        let collection = Nsid::new("app.bsky.feed.post").unwrap();
+        let collection = Nsid::new("app.bsky.feed.post").unwrap().into_static();
         let mut ticker = Ticker::new();
 
         // Add 100 records
         let mut records = Vec::new();
         for i in 0..100 {
             let tid_str = ticker.next(None).into_static();
-            let rkey = RecordKey(Rkey::from_str(tid_str.as_str()).unwrap());
+            let rkey: RecordKey<Rkey<SmolStr>> =
+                RecordKey(Rkey::<SmolStr>::from_str(tid_str.as_str()).unwrap()).into_static();
             let cid = make_test_cid((i % 256) as u8);
             repo.create_record(&collection, &rkey, cid).await.unwrap();
             records.push((rkey, cid));
@@ -946,14 +954,14 @@ mod tests {
         let storage = Arc::new(MemoryBlockStore::new());
         let mut repo = create_test_repo(storage.clone()).await;
 
-        let collection = Nsid::new("app.bsky.feed.post").unwrap();
-        let rkey = RecordKey(Rkey::new("abc123").unwrap());
+        let collection = Nsid::new("app.bsky.feed.post").unwrap().into_static();
+        let rkey = RecordKey(Rkey::new("abc123").unwrap()).into_static();
         let cid = make_test_cid(1);
 
         repo.create_record(&collection, &rkey, cid).await.unwrap();
         repo.mst.persist().await.unwrap();
 
-        let did = Did::new("did:plc:test").unwrap();
+        let did = Did::new("did:plc:test").unwrap().into_static();
         let signing_key = k256::ecdsa::SigningKey::random(&mut rand::rngs::OsRng);
 
         // Get public key from signing key
@@ -968,7 +976,7 @@ mod tests {
 
         // Load commit and verify signature
         let commit_bytes = storage.get(&commit_cid).await.unwrap().unwrap();
-        let commit = Commit::from_cbor(&commit_bytes).unwrap();
+        let commit = Commit::<SmolStr>::from_cbor(&commit_bytes).unwrap();
 
         // Signature verification should succeed
         commit.verify(&pubkey).unwrap();
@@ -979,14 +987,18 @@ mod tests {
         let storage = Arc::new(MemoryBlockStore::new());
         let mut repo = create_test_repo(storage.clone()).await;
 
-        let collection = Nsid::new("app.bsky.feed.post").unwrap();
-        let did = Did::new("did:plc:test").unwrap();
+        let collection = Nsid::new("app.bsky.feed.post").unwrap().into_static();
+        let did = Did::new("did:plc:test").unwrap().into_static();
         let signing_key = k256::ecdsa::SigningKey::random(&mut rand::rngs::OsRng);
 
         // Add some records and commit
         let mut records = Vec::new();
         for i in 0..10 {
-            let rkey = RecordKey(Rkey::from_str(&format!("record{}", i)).unwrap());
+            let rkey: RecordKey<Rkey<SmolStr>> = RecordKey(
+                Rkey::<SmolStr>::from_str(&format!("record{}", i))
+                    .unwrap()
+                    .into_static(),
+            );
             let cid = make_test_cid(i as u8);
             repo.create_record(&collection, &rkey, cid).await.unwrap();
             records.push((rkey, cid));
@@ -1021,11 +1033,11 @@ mod tests {
         let storage = Arc::new(MemoryBlockStore::new());
         let mut repo = create_test_repo(storage.clone()).await;
 
-        let collection = Nsid::new("app.bsky.feed.post").unwrap();
-        let rkey1 = RecordKey(Rkey::new("test1").unwrap());
-        let rkey2 = RecordKey(Rkey::new("test2").unwrap());
+        let collection = Nsid::new("app.bsky.feed.post").unwrap().into_static();
+        let rkey1 = RecordKey(Rkey::new("test1").unwrap()).into_static();
+        let rkey2 = RecordKey(Rkey::new("test2").unwrap()).into_static();
 
-        let did = Did::new("did:plc:test").unwrap();
+        let did = Did::new("did:plc:test").unwrap().into_static();
         let signing_key = k256::ecdsa::SigningKey::random(&mut rand::rngs::OsRng);
 
         // Create records with actual data
@@ -1085,9 +1097,9 @@ mod tests {
         let storage = Arc::new(MemoryBlockStore::new());
         let mut repo = create_test_repo(storage.clone()).await;
 
-        let collection = Nsid::new("app.bsky.feed.post").unwrap();
-        let rkey1 = RecordKey(Rkey::new("post1").unwrap());
-        let rkey2 = RecordKey(Rkey::new("post2").unwrap());
+        let collection = Nsid::new("app.bsky.feed.post").unwrap().into_static();
+        let rkey1 = RecordKey(Rkey::new("post1").unwrap()).into_static();
+        let rkey2 = RecordKey(Rkey::new("post2").unwrap()).into_static();
 
         // Create records with actual data
         let ops = vec![
@@ -1104,7 +1116,7 @@ mod tests {
         ];
 
         // Format commit
-        let did = Did::new("did:plc:test").unwrap();
+        let did = Did::new("did:plc:test").unwrap().into_static();
         let signing_key = k256::ecdsa::SigningKey::random(&mut rand::rngs::OsRng);
         let (repo_ops, commit_data) = repo
             .create_commit(
@@ -1159,14 +1171,14 @@ mod tests {
         let storage = Arc::new(MemoryBlockStore::new());
         let mut repo = create_test_repo(storage.clone()).await;
 
-        let collection = Nsid::new("app.bsky.feed.post").unwrap();
+        let collection = Nsid::new("app.bsky.feed.post").unwrap().into_static();
 
         // Pre-populate with some records
-        let rkey1 = RecordKey(Rkey::new("existing1").unwrap());
-        let rkey2 = RecordKey(Rkey::new("existing2").unwrap());
-        let rkey3 = RecordKey(Rkey::new("existing3").unwrap());
+        let rkey1 = RecordKey(Rkey::new("existing1").unwrap()).into_static();
+        let rkey2 = RecordKey(Rkey::new("existing2").unwrap()).into_static();
+        let rkey3 = RecordKey(Rkey::new("existing3").unwrap()).into_static();
 
-        let did = Did::new("did:plc:test").unwrap();
+        let did = Did::new("did:plc:test").unwrap().into_static();
         let signing_key = k256::ecdsa::SigningKey::random(&mut rand::rngs::OsRng);
 
         let create_ops = vec![
@@ -1203,7 +1215,7 @@ mod tests {
         repo.apply_commit(commit_data).await.unwrap();
 
         // Batch operation: create new, update existing, delete existing
-        let new_rkey = RecordKey(Rkey::new("new1").unwrap());
+        let new_rkey = RecordKey(Rkey::new("new1").unwrap()).into_static();
         let ops = vec![
             RecordWriteOp::Create {
                 collection: collection.clone(),

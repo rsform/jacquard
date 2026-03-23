@@ -8,6 +8,7 @@ use crate::storage::BlockStore;
 use bytes::Bytes;
 use cid::Cid as IpldCid;
 use core::fmt;
+use jacquard_common::BosStr;
 use jacquard_common::types::recordkey::Rkey;
 use jacquard_common::types::string::{Nsid, RecordKey};
 use jacquard_common::types::value::RawData;
@@ -63,13 +64,13 @@ pub enum WriteOp {
 /// needs to be serialized and stored. The data is a generic IPLD map
 /// (similar to rsky's `RepoRecord = BTreeMap<String, Lex>`).
 #[derive(Debug, Clone, PartialEq)]
-pub enum RecordWriteOp<'a> {
+pub enum RecordWriteOp<'a, S: BosStr> {
     /// Create new record with data
     Create {
         /// Collection NSID
-        collection: Nsid<'a>,
+        collection: Nsid<S>,
         /// Record key
-        rkey: RecordKey<Rkey<'a>>,
+        rkey: RecordKey<Rkey<S>>,
         /// Record data (will be serialized to DAG-CBOR and CID computed)
         record: std::collections::BTreeMap<SmolStr, RawData<'a>>,
     },
@@ -77,9 +78,9 @@ pub enum RecordWriteOp<'a> {
     /// Update existing record with new data
     Update {
         /// Collection NSID
-        collection: Nsid<'a>,
+        collection: Nsid<S>,
         /// Record key
-        rkey: RecordKey<Rkey<'a>>,
+        rkey: RecordKey<Rkey<S>>,
         /// New record data
         record: std::collections::BTreeMap<SmolStr, RawData<'a>>,
         /// Previous CID (optional for validation)
@@ -89,17 +90,17 @@ pub enum RecordWriteOp<'a> {
     /// Delete record
     Delete {
         /// Collection NSID
-        collection: Nsid<'a>,
+        collection: Nsid<S>,
         /// Record key
-        rkey: RecordKey<Rkey<'a>>,
+        rkey: RecordKey<Rkey<S>>,
         /// Previous CID (optional for validation)
         prev: Option<IpldCid>,
     },
 }
 
-impl<'a> RecordWriteOp<'a> {
+impl<'a, S: BosStr> RecordWriteOp<'a, S> {
     /// Get the collection NSID for this operation
-    pub fn collection(&self) -> &Nsid<'a> {
+    pub fn collection(&self) -> &Nsid<S> {
         match self {
             RecordWriteOp::Create { collection, .. } => collection,
             RecordWriteOp::Update { collection, .. } => collection,
@@ -108,7 +109,7 @@ impl<'a> RecordWriteOp<'a> {
     }
 
     /// Get the record key for this operation
-    pub fn rkey(&self) -> &RecordKey<Rkey<'a>> {
+    pub fn rkey(&self) -> &RecordKey<Rkey<S>> {
         match self {
             RecordWriteOp::Create { rkey, .. } => rkey,
             RecordWriteOp::Update { rkey, .. } => rkey,

@@ -336,7 +336,7 @@ pub trait XrpcClient: HttpClient {
     #[cfg(not(target_arch = "wasm32"))]
     fn send<R>(&self, request: R) -> impl Future<Output = XrpcResult<XrpcResponse<R>>>
     where
-        R: XrpcRequest + Send + Sync,
+        R: XrpcRequest + Send + Sync + serde::Serialize,
         <R as XrpcRequest>::Response: Send + Sync,
         Self: Sync;
 
@@ -344,7 +344,7 @@ pub trait XrpcClient: HttpClient {
     #[cfg(target_arch = "wasm32")]
     fn send<R>(&self, request: R) -> impl Future<Output = XrpcResult<XrpcResponse<R>>>
     where
-        R: XrpcRequest + Send + Sync,
+        R: XrpcRequest + Send + Sync + serde::Serialize,
         <R as XrpcRequest>::Response: Send + Sync;
 
     /// Send an XRPC request and parse the response
@@ -355,7 +355,7 @@ pub trait XrpcClient: HttpClient {
         opts: CallOptions<'_>,
     ) -> impl Future<Output = XrpcResult<XrpcResponse<R>>>
     where
-        R: XrpcRequest + Send + Sync,
+        R: XrpcRequest + Send + Sync + serde::Serialize,
         <R as XrpcRequest>::Response: Send + Sync,
         Self: Sync;
 
@@ -367,7 +367,7 @@ pub trait XrpcClient: HttpClient {
         opts: CallOptions<'_>,
     ) -> impl Future<Output = XrpcResult<XrpcResponse<R>>>
     where
-        R: XrpcRequest + Send + Sync,
+        R: XrpcRequest + Send + Sync + serde::Serialize,
         <R as XrpcRequest>::Response: Send + Sync;
 }
 
@@ -381,7 +381,7 @@ pub trait XrpcStreamingClient: XrpcClient + HttpClientExt {
         request: R,
     ) -> impl Future<Output = Result<StreamingResponse, StreamError>> + Send
     where
-        R: XrpcRequest + Send + Sync,
+        R: XrpcRequest + Send + Sync + serde::Serialize,
         <R as XrpcRequest>::Response: Send + Sync,
         Self: Sync;
 
@@ -392,7 +392,7 @@ pub trait XrpcStreamingClient: XrpcClient + HttpClientExt {
         request: R,
     ) -> impl Future<Output = Result<StreamingResponse, StreamError>>
     where
-        R: XrpcRequest + Send + Sync,
+        R: XrpcRequest + Send + Sync + serde::Serialize,
         <R as XrpcRequest>::Response: Send + Sync;
 
     /// Stream an XRPC procedure call and its response

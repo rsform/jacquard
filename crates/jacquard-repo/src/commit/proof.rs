@@ -22,9 +22,9 @@ use crate::error::ProofError;
 use crate::mst::Mst;
 use crate::storage::MemoryBlockStore;
 use cid::Cid as IpldCid;
-use jacquard_common::CowStr;
 use jacquard_common::types::string::Did;
-use smol_str::format_smolstr;
+use jacquard_common::{BosStr, CowStr};
+use smol_str::{SmolStr, format_smolstr};
 use std::sync::Arc;
 
 /// A claim about a record's CID at a specific path
@@ -88,12 +88,15 @@ pub struct VerifyProofsOutput<'a> {
 /// let result = verify_proofs(car_bytes, claims, did, pubkey).await?;
 /// assert_eq!(result.verified.len(), 2); // Both claims verified
 /// ```
-pub async fn verify_proofs<'a>(
+pub async fn verify_proofs<'a, 'de, S>(
     car_bytes: &[u8],
     claims: Vec<RecordClaim<'a>>,
-    did: &Did<'_>,
+    did: &Did<S>,
     pubkey: &jacquard_common::types::crypto::PublicKey<'_>,
-) -> Result<VerifyProofsOutput<'a>, ProofError> {
+) -> Result<VerifyProofsOutput<'a>, ProofError>
+where
+    S: BosStr + Clone + serde::Serialize + serde::Deserialize<'de>,
+{
     // 1. Parse CAR file
     let parsed =
         crate::car::parse_car_bytes(car_bytes)
@@ -113,7 +116,7 @@ pub async fn verify_proofs<'a>(
         .map_err(|_| ProofError::CommitNotFound)?
         .ok_or(ProofError::CommitNotFound)?;
 
-    let commit = super::Commit::from_cbor(&commit_bytes).map_err(|e| {
+    let commit = super::Commit::<SmolStr>::from_cbor(&commit_bytes).map_err(|e| {
         ProofError::CommitDeserializeFailed {
             source: Box::new(e),
         }

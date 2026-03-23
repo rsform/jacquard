@@ -3,11 +3,11 @@ use std::sync::Arc;
 
 use dashmap::DashMap;
 use jacquard_common::{
-    IntoStatic,
+    bos::BosStr,
     session::{SessionStore, SessionStoreError},
     types::did::Did,
 };
-use smol_str::{SmolStr, ToSmolStr, format_smolstr};
+use smol_str::{SmolStr, format_smolstr};
 
 use crate::session::{AuthRequestData, ClientSessionData};
 
@@ -20,22 +20,22 @@ use crate::session::{AuthRequestData, ClientSessionData};
 #[cfg_attr(not(target_arch = "wasm32"), trait_variant::make(Send))]
 pub trait ClientAuthStore {
     /// Retrieve an active session for the given DID and session identifier, if one exists.
-    fn get_session(
+    fn get_session<D: BosStr + Send + Sync>(
         &self,
-        did: &Did<'_>,
+        did: &Did<D>,
         session_id: &str,
-    ) -> impl Future<Output = Result<Option<ClientSessionData<'_>>, SessionStoreError>>;
+    ) -> impl Future<Output = Result<Option<ClientSessionData>, SessionStoreError>>;
 
     /// Insert or update a session, replacing any existing entry for the same DID and session ID.
     fn upsert_session(
         &self,
-        session: ClientSessionData<'_>,
+        session: ClientSessionData,
     ) -> impl Future<Output = Result<(), SessionStoreError>>;
 
     /// Delete the session for the given DID and session identifier.
-    fn delete_session(
+    fn delete_session<D: BosStr + Send + Sync>(
         &self,
-        did: &Did<'_>,
+        did: &Did<D>,
         session_id: &str,
     ) -> impl Future<Output = Result<(), SessionStoreError>>;
 
@@ -43,12 +43,12 @@ pub trait ClientAuthStore {
     fn get_auth_req_info(
         &self,
         state: &str,
-    ) -> impl Future<Output = Result<Option<AuthRequestData<'_>>, SessionStoreError>>;
+    ) -> impl Future<Output = Result<Option<AuthRequestData>, SessionStoreError>>;
 
     /// Persist authorization request data so it can be retrieved after the OAuth redirect.
     fn save_auth_req_info(
         &self,
-        auth_req_info: &AuthRequestData<'_>,
+        auth_req_info: &AuthRequestData,
     ) -> impl Future<Output = Result<(), SessionStoreError>>;
 
     /// Remove authorization request data after the callback has been handled.
@@ -61,8 +61,8 @@ pub trait ClientAuthStore {
 /// An in-memory implementation of [`ClientAuthStore`], suitable for testing and single-process
 /// deployments where session persistence across restarts is not required.
 pub struct MemoryAuthStore {
-    sessions: DashMap<SmolStr, ClientSessionData<'static>>,
-    auth_reqs: DashMap<SmolStr, AuthRequestData<'static>>,
+    sessions: DashMap<SmolStr, ClientSessionData>,
+    auth_reqs: DashMap<SmolStr, AuthRequestData>,
 }
 
 impl MemoryAuthStore {
@@ -76,27 +76,24 @@ impl MemoryAuthStore {
 }
 
 impl ClientAuthStore for MemoryAuthStore {
-    async fn get_session(
+    async fn get_session<D: BosStr + Send + Sync>(
         &self,
-        did: &Did<'_>,
+        did: &Did<D>,
         session_id: &str,
-    ) -> Result<Option<ClientSessionData<'_>>, SessionStoreError> {
+    ) -> Result<Option<ClientSessionData>, SessionStoreError> {
         let key = format_smolstr!("{}_{}", did, session_id);
         Ok(self.sessions.get(&key).map(|v| v.clone()))
     }
 
-    async fn upsert_session(
-        &self,
-        session: ClientSessionData<'_>,
-    ) -> Result<(), SessionStoreError> {
+    async fn upsert_session(&self, session: ClientSessionData) -> Result<(), SessionStoreError> {
         let key = format_smolstr!("{}_{}", session.account_did, session.session_id);
-        self.sessions.insert(key, session.into_static());
+        self.sessions.insert(key, session);
         Ok(())
     }
 
-    async fn delete_session(
+    async fn delete_session<D: BosStr + Send + Sync>(
         &self,
-        did: &Did<'_>,
+        did: &Did<D>,
         session_id: &str,
     ) -> Result<(), SessionStoreError> {
         let key = format_smolstr!("{}_{}", did, session_id);
@@ -107,18 +104,16 @@ impl ClientAuthStore for MemoryAuthStore {
     async fn get_auth_req_info(
         &self,
         state: &str,
-    ) -> Result<Option<AuthRequestData<'_>>, SessionStoreError> {
+    ) -> Result<Option<AuthRequestData>, SessionStoreError> {
         Ok(self.auth_reqs.get(state).map(|v| v.clone()))
     }
 
     async fn save_auth_req_info(
         &self,
-        auth_req_info: &AuthRequestData<'_>,
+        auth_req_info: &AuthRequestData,
     ) -> Result<(), SessionStoreError> {
-        self.auth_reqs.insert(
-            auth_req_info.state.clone().to_smolstr(),
-            auth_req_info.clone().into_static(),
-        );
+        self.auth_reqs
+            .insert(auth_req_info.state.clone(), auth_req_info.clone());
         Ok(())
     }
 
@@ -128,29 +123,26 @@ impl ClientAuthStore for MemoryAuthStore {
     }
 }
 
-impl<T: ClientAuthStore + Send + Sync>
-    SessionStore<(Did<'static>, SmolStr), ClientSessionData<'static>> for Arc<T>
-{
+impl<T: ClientAuthStore + Send + Sync> SessionStore<(Did, SmolStr), ClientSessionData> for Arc<T> {
     /// Get the current session if present.
-    async fn get(&self, key: &(Did<'static>, SmolStr)) -> Option<ClientSessionData<'static>> {
+    async fn get(&self, key: &(Did, SmolStr)) -> Option<ClientSessionData> {
         let (did, session_id) = key;
         self.as_ref()
             .get_session(did, session_id)
             .await
             .ok()
             .flatten()
-            .into_static()
     }
     /// Persist the given session.
     async fn set(
         &self,
-        _key: (Did<'static>, SmolStr),
-        session: ClientSessionData<'static>,
+        _key: (Did, SmolStr),
+        session: ClientSessionData,
     ) -> Result<(), SessionStoreError> {
         self.as_ref().upsert_session(session).await
     }
     /// Delete the given session.
-    async fn del(&self, key: &(Did<'static>, SmolStr)) -> Result<(), SessionStoreError> {
+    async fn del(&self, key: &(Did, SmolStr)) -> Result<(), SessionStoreError> {
         let (did, session_id) = key;
         self.as_ref().delete_session(did, session_id).await
     }

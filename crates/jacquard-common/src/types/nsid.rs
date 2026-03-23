@@ -138,23 +138,7 @@ impl<S: Bos<str>> Nsid<S> {
     }
 }
 
-impl FromStr for Nsid {
-    type Err = AtStrError;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        Self::new_owned(s)
-    }
-}
-
-impl FromStr for Nsid<CowStr<'static>> {
-    type Err = AtStrError;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        Self::new_owned(s)
-    }
-}
-
-impl FromStr for Nsid<String> {
+impl<S: Bos<str> + FromStr> FromStr for Nsid<S> {
     type Err = AtStrError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {

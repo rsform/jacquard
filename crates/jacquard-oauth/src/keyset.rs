@@ -1,10 +1,10 @@
 use crate::jose::jws::RegisteredHeader;
 use crate::jose::jwt::Claims;
 use crate::jose::signing;
-use jacquard_common::CowStr;
 use jose_jwa::{Algorithm, Signing};
 use jose_jwk::{Class, EcCurves, OkpCurves, crypto};
 use jose_jwk::{Jwk, JwkSet, Key};
+use smol_str::{SmolStr, ToSmolStr};
 use std::collections::HashSet;
 use thiserror::Error;
 
@@ -87,7 +87,7 @@ impl Keyset {
     /// Signs a JWT with the best available key that matches one of the requested algorithms.
     ///
     /// Returns [`Error::NotFound`] if no key in the keyset supports any of the given algorithms.
-    pub fn create_jwt(&self, algs: &[Signing], claims: Claims) -> Result<CowStr<'static>> {
+    pub fn create_jwt(&self, algs: &[Signing], claims: Claims<&str>) -> Result<SmolStr> {
         let Some(jwk) = self.find_key(algs, Class::Signing) else {
             return Err(Error::NotFound(algs.to_vec()));
         };
@@ -116,8 +116,8 @@ impl Keyset {
         None
     }
 
-    fn create_jwt_with_key(&self, key: &Jwk, claims: Claims) -> Result<CowStr<'static>> {
-        let kid = key.prm.kid.clone().unwrap();
+    fn create_jwt_with_key(&self, key: &Jwk, claims: Claims<&str>) -> Result<SmolStr> {
+        let kid = key.prm.kid.as_ref().unwrap().to_smolstr();
         match &key.key {
             Key::Ec(ec) => {
                 let d = ec.d.as_ref().ok_or(Error::MissingPrivateKey)?;
@@ -127,7 +127,7 @@ impl Keyset {
                         let signing_key = p256::ecdsa::SigningKey::from_bytes(d_bytes.into())
                             .map_err(|e| Error::InvalidKey(e.to_string()))?;
                         let mut header = RegisteredHeader::from(Algorithm::Signing(Signing::Es256));
-                        header.kid = Some(kid.into());
+                        header.kid = Some(kid);
                         Ok(signing::create_signed_jwt_es256(
                             signing_key,
                             header.into(),
@@ -137,8 +137,9 @@ impl Keyset {
                     EcCurves::P384 => {
                         let signing_key = p384::ecdsa::SigningKey::from_bytes(d_bytes.into())
                             .map_err(|e| Error::InvalidKey(e.to_string()))?;
-                        let mut header = RegisteredHeader::from(Algorithm::Signing(Signing::Es384));
-                        header.kid = Some(kid.into());
+                        let mut header: RegisteredHeader<&str> =
+                            RegisteredHeader::from(Algorithm::Signing(Signing::Es384));
+                        header.kid = Some(kid.as_str());
                         Ok(signing::create_signed_jwt_es384(
                             signing_key,
                             header.into(),
@@ -148,9 +149,9 @@ impl Keyset {
                     EcCurves::P256K => {
                         let signing_key = k256::ecdsa::SigningKey::from_bytes(d_bytes.into())
                             .map_err(|e| Error::InvalidKey(e.to_string()))?;
-                        let mut header =
+                        let mut header: RegisteredHeader<&str> =
                             RegisteredHeader::from(Algorithm::Signing(Signing::Es256K));
-                        header.kid = Some(kid.into());
+                        header.kid = Some(kid.as_str());
                         Ok(signing::create_signed_jwt_es256k(
                             signing_key,
                             header.into(),
@@ -166,8 +167,9 @@ impl Keyset {
                     let d_bytes: &[u8] = d.as_ref();
                     let signing_key = ed25519_dalek::SigningKey::try_from(d_bytes)
                         .map_err(|e| Error::InvalidKey(e.to_string()))?;
-                    let mut header = RegisteredHeader::from(Algorithm::Signing(Signing::EdDsa));
-                    header.kid = Some(kid.into());
+                    let mut header: RegisteredHeader<&str> =
+                        RegisteredHeader::from(Algorithm::Signing(Signing::EdDsa));
+                    header.kid = Some(kid.as_str());
                     Ok(signing::create_signed_jwt_eddsa(
                         signing_key,
                         header.into(),

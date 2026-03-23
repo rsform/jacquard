@@ -1,4 +1,5 @@
-use jacquard_common::{CowStr, IntoStatic};
+use jacquard_common::IntoStatic;
+use jacquard_common::bos::{BosStr, DefaultStr};
 use serde::{Deserialize, Serialize};
 
 /// The `response_type` parameter for an OAuth 2.0 authorization request.
@@ -51,18 +52,18 @@ pub enum AuthorizationCodeChallengeMethod {
 /// authorization server before redirecting the user, improving security by keeping
 /// parameters out of the browser URL.
 #[derive(Serialize, Deserialize, Debug)]
-pub struct ParParameters<'a> {
+#[serde(bound(deserialize = "S: serde::Deserialize<'de> + BosStr"))]
+pub struct ParParameters<S: BosStr = DefaultStr> {
     /// The response type to request (e.g. `code`).
     ///
     /// <https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.1>
     pub response_type: AuthorizationResponseType,
     /// The redirect URI where the authorization response will be sent.
-    #[serde(borrow)]
-    pub redirect_uri: CowStr<'a>,
+    pub redirect_uri: S,
     /// An opaque CSRF state value to be echoed back in the callback.
-    pub state: CowStr<'a>,
+    pub state: S,
     /// Space-separated list of requested scopes.
-    pub scope: Option<CowStr<'a>>,
+    pub scope: Option<S>,
     /// How the authorization response parameters are delivered to the client.
     ///
     /// <https://openid.net/specs/oauth-v2-multiple-response-types-1_0.html#ResponseModes>
@@ -70,15 +71,15 @@ pub struct ParParameters<'a> {
     /// The PKCE code challenge derived from the code verifier.
     ///
     /// <https://datatracker.ietf.org/doc/html/rfc7636#section-4.3>
-    pub code_challenge: CowStr<'a>,
+    pub code_challenge: S,
     /// The method used to derive the code challenge.
     pub code_challenge_method: AuthorizationCodeChallengeMethod,
     /// Hint to pre-fill the login form with a handle or email.
     ///
     /// <https://openid.net/specs/openid-connect-core-1_0.html#AuthRequest>
-    pub login_hint: Option<CowStr<'a>>,
+    pub login_hint: Option<S>,
     /// Prompt hint controlling authorization server UI behavior.
-    pub prompt: Option<CowStr<'a>>,
+    pub prompt: Option<S>,
 }
 
 /// The `grant_type` parameter for a token endpoint request.
@@ -93,34 +94,34 @@ pub enum TokenGrantType {
 
 /// Parameters for exchanging an authorization code for tokens (RFC 6749 §4.1.3).
 #[derive(Serialize, Deserialize)]
-pub struct TokenRequestParameters<'a> {
+#[serde(bound(deserialize = "S: serde::Deserialize<'de> + BosStr"))]
+pub struct TokenRequestParameters<S: BosStr = DefaultStr> {
     /// Must be `authorization_code` for the authorization code grant.
     ///
     /// <https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.3>
     pub grant_type: TokenGrantType,
     /// The authorization code received from the authorization server.
-    #[serde(borrow)]
-    pub code: CowStr<'a>,
+    pub code: S,
     /// The redirect URI used in the original authorization request.
-    pub redirect_uri: CowStr<'a>,
+    pub redirect_uri: S,
     /// The PKCE code verifier that was used to generate the code challenge (RFC 7636 §4.5).
     ///
     /// <https://datatracker.ietf.org/doc/html/rfc7636#section-4.5>
-    pub code_verifier: CowStr<'a>,
+    pub code_verifier: S,
 }
 
 /// Parameters for refreshing an access token using a refresh token (RFC 6749 §6).
 #[derive(Serialize, Deserialize)]
-pub struct RefreshRequestParameters<'a> {
+#[serde(bound(deserialize = "S: serde::Deserialize<'de> + BosStr"))]
+pub struct RefreshRequestParameters<S: BosStr = DefaultStr> {
     /// Must be `refresh_token` for the refresh grant.
     ///
     /// <https://datatracker.ietf.org/doc/html/rfc6749#section-6>
     pub grant_type: TokenGrantType,
     /// The refresh token previously issued to the client.
-    #[serde(borrow)]
-    pub refresh_token: CowStr<'a>,
+    pub refresh_token: S,
     /// Optional scope to request; must not exceed the originally granted scope.
-    pub scope: Option<CowStr<'a>>,
+    pub scope: Option<S>,
 }
 
 /// Parameters for a token revocation request (RFC 7009 §2.1).
@@ -130,16 +131,19 @@ pub struct RefreshRequestParameters<'a> {
 ///
 /// <https://datatracker.ietf.org/doc/html/rfc7009#section-2.1>
 #[derive(Serialize, Deserialize)]
-pub struct RevocationRequestParameters<'a> {
+#[serde(bound(deserialize = "S: serde::Deserialize<'de> + BosStr"))]
+pub struct RevocationRequestParameters<S: BosStr = DefaultStr> {
     /// The token to be revoked.
-    #[serde(borrow)]
-    pub token: CowStr<'a>,
+    pub token: S,
     // ?
     // pub token_type_hint: Option<String>,
 }
 
-impl IntoStatic for RevocationRequestParameters<'_> {
-    type Output = RevocationRequestParameters<'static>;
+impl<S: BosStr + IntoStatic> IntoStatic for RevocationRequestParameters<S>
+where
+    S::Output: BosStr,
+{
+    type Output = RevocationRequestParameters<S::Output>;
 
     fn into_static(self) -> Self::Output {
         Self::Output {
@@ -148,8 +152,11 @@ impl IntoStatic for RevocationRequestParameters<'_> {
     }
 }
 
-impl IntoStatic for TokenRequestParameters<'_> {
-    type Output = TokenRequestParameters<'static>;
+impl<S: BosStr + IntoStatic> IntoStatic for TokenRequestParameters<S>
+where
+    S::Output: BosStr,
+{
+    type Output = TokenRequestParameters<S::Output>;
 
     fn into_static(self) -> Self::Output {
         Self::Output {
@@ -161,20 +168,26 @@ impl IntoStatic for TokenRequestParameters<'_> {
     }
 }
 
-impl IntoStatic for RefreshRequestParameters<'_> {
-    type Output = RefreshRequestParameters<'static>;
+impl<S: BosStr + IntoStatic> IntoStatic for RefreshRequestParameters<S>
+where
+    S::Output: BosStr,
+{
+    type Output = RefreshRequestParameters<S::Output>;
 
     fn into_static(self) -> Self::Output {
         Self::Output {
             grant_type: self.grant_type,
             refresh_token: self.refresh_token.into_static(),
-            scope: self.scope.map(CowStr::into_static),
+            scope: self.scope.into_static(),
         }
     }
 }
 
-impl IntoStatic for ParParameters<'_> {
-    type Output = ParParameters<'static>;
+impl<S: BosStr + IntoStatic> IntoStatic for ParParameters<S>
+where
+    S::Output: BosStr,
+{
+    type Output = ParParameters<S::Output>;
 
     fn into_static(self) -> Self::Output {
         Self::Output {

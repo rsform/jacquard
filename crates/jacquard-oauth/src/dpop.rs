@@ -5,14 +5,14 @@ use std::future::Future;
 use base64::{Engine as _, engine::general_purpose::URL_SAFE_NO_PAD};
 use chrono::Utc;
 use http::{Request, Response, header::InvalidHeaderValue};
-use jacquard_common::{CowStr, IntoStatic, cowstr::ToCowStr, http_client::HttpClient};
+use jacquard_common::http_client::HttpClient;
 use jacquard_identity::JacquardResolver;
 use jose_jwa::{Algorithm, Signing};
 use jose_jwk::{Jwk, Key, crypto};
 use p256::ecdsa::SigningKey;
 use rand::{RngCore, SeedableRng};
 use sha2::Digest;
-use smol_str::SmolStr;
+use smol_str::{SmolStr, ToSmolStr};
 
 use crate::{
     jose::{
@@ -461,33 +461,31 @@ impl<'r, C: HttpClient, N: DpopDataSource> DpopCall<'r, C, N> {
     }
 }
 
-/// Extract authorization hash from request headers
-fn extract_ath(headers: &http::HeaderMap) -> Option<CowStr<'static>> {
+/// Extract authorization hash from request headers.
+fn extract_ath(headers: &http::HeaderMap) -> Option<SmolStr> {
     headers
         .get("authorization")
         .filter(|v| v.to_str().is_ok_and(|s| s.starts_with("DPoP ")))
         .map(|auth| {
-            URL_SAFE_NO_PAD
-                .encode(sha2::Sha256::digest(&auth.as_bytes()[5..]))
-                .into()
+            SmolStr::new(URL_SAFE_NO_PAD.encode(sha2::Sha256::digest(&auth.as_bytes()[5..])))
         })
 }
 
-/// Get nonce from data source based on target
-fn get_nonce<N: DpopDataSource>(data_source: &N, is_to_auth_server: bool) -> Option<CowStr<'_>> {
+/// Get nonce from data source based on target, returning an owned copy of the current nonce.
+///
+/// Returning an owned `SmolStr` rather than a borrow ensures callers can later take a
+/// mutable reference to the data source (e.g., to call `store_nonce`) without violating
+/// Rust's aliasing rules.
+fn get_nonce<N: DpopDataSource>(data_source: &N, is_to_auth_server: bool) -> Option<SmolStr> {
     if is_to_auth_server {
-        data_source.authserver_nonce()
+        data_source.authserver_nonce().map(SmolStr::new)
     } else {
-        data_source.host_nonce()
+        data_source.host_nonce().map(SmolStr::new)
     }
 }
 
-/// Store nonce in data source based on target
-fn store_nonce<N: DpopDataSource>(
-    data_source: &mut N,
-    is_to_auth_server: bool,
-    nonce: CowStr<'static>,
-) {
+/// Store nonce in data source based on target.
+fn store_nonce<N: DpopDataSource>(data_source: &mut N, is_to_auth_server: bool, nonce: SmolStr) {
     if is_to_auth_server {
         data_source.set_authserver_nonce(nonce);
     } else {
@@ -515,34 +513,34 @@ where
     } else {
         DpopTarget::ResourceServer
     };
-    let uri = request.uri().clone();
-    let method = request.method().to_cowstr().into_static();
-    let url_str: SmolStr = uri.to_cowstr().as_ref().into();
-    let uri = uri.to_cowstr();
+    let method = request.method().to_smolstr();
+    let uri = request.uri().to_smolstr();
     let ath = extract_ath(request.headers());
 
     let init_nonce = get_nonce(data_source, is_to_auth_server);
     let init_proof = build_dpop_proof(
         data_source.key(),
-        method.clone(),
-        uri.clone(),
-        init_nonce.clone(),
-        ath.clone(),
+        &method,
+        &uri,
+        init_nonce.as_deref(),
+        ath.as_deref(),
     )?;
-    request.headers_mut().insert("DPoP", init_proof.parse()?);
+    request
+        .headers_mut()
+        .insert("DPoP", init_proof.as_str().parse()?);
     let response = client
         .send_http(request.clone())
         .await
-        .map_err(|e| DpopError::transport(target, url_str.clone(), e))?;
+        .map_err(|e| DpopError::transport(target, uri.clone(), e))?;
 
-    let next_nonce = response
+    let next_nonce: Option<SmolStr> = response
         .headers()
         .get("dpop-nonce")
         .and_then(|v| v.to_str().ok())
-        .map(|c| CowStr::copy_from_str(c));
+        .map(SmolStr::new);
     match &next_nonce {
-        Some(s) if next_nonce != init_nonce => {
-            store_nonce(data_source, is_to_auth_server, s.clone());
+        Some(_) if next_nonce.as_deref() != init_nonce.as_deref() => {
+            store_nonce(data_source, is_to_auth_server, next_nonce.clone().unwrap());
         }
         _ => {
             return Ok(response);
@@ -552,12 +550,20 @@ where
     if !is_use_dpop_nonce_error(is_to_auth_server, &response) {
         return Ok(response);
     }
-    let next_proof = build_dpop_proof(data_source.key(), method, uri, next_nonce, ath)?;
-    request.headers_mut().insert("DPoP", next_proof.parse()?);
+    let next_proof = build_dpop_proof(
+        data_source.key(),
+        &method,
+        &uri,
+        next_nonce.as_deref(),
+        ath.as_deref(),
+    )?;
+    request
+        .headers_mut()
+        .insert("DPoP", next_proof.as_str().parse()?);
     let response = client
         .send_http(request)
         .await
-        .map_err(|e| DpopError::nonce_retry(target, url_str, e))?;
+        .map_err(|e| DpopError::nonce_retry(target, uri.clone(), e))?;
     Ok(response)
 }
 
@@ -584,53 +590,61 @@ where
     } else {
         DpopTarget::ResourceServer
     };
-    let uri = request.uri().clone();
-    let method = request.method().to_cowstr().into_static();
-    let url_str: SmolStr = uri.to_cowstr().as_ref().into();
-    let uri = uri.to_cowstr();
+    let method = request.method().to_smolstr();
+    let uri = request.uri().to_smolstr();
     let ath = extract_ath(request.headers());
 
     let init_nonce = get_nonce(data_source, is_to_auth_server);
     let init_proof = build_dpop_proof(
         data_source.key(),
-        method.clone(),
-        uri.clone(),
-        init_nonce.clone(),
-        ath.clone(),
+        &method,
+        &uri,
+        init_nonce.as_deref(),
+        ath.as_deref(),
     )?;
-    request.headers_mut().insert("DPoP", init_proof.parse()?);
+    request
+        .headers_mut()
+        .insert("DPoP", init_proof.as_str().parse()?);
     let http_response = client
         .send_http_streaming(request.clone())
         .await
-        .map_err(|e| DpopError::transport(target, url_str.clone(), e))?;
+        .map_err(|e| DpopError::transport(target, uri.clone(), e))?;
 
     let (parts, body) = http_response.into_parts();
-    let next_nonce = parts
+    let next_nonce: Option<SmolStr> = parts
         .headers
         .get("DPoP-Nonce")
         .and_then(|v| v.to_str().ok())
-        .map(|c| CowStr::from(c.to_string()));
+        .map(SmolStr::new);
     match &next_nonce {
-        Some(s) if next_nonce != init_nonce => {
-            store_nonce(data_source, is_to_auth_server, s.clone());
+        Some(_) if next_nonce.as_deref() != init_nonce.as_deref() => {
+            store_nonce(data_source, is_to_auth_server, next_nonce.clone().unwrap());
         }
         _ => {
             return Ok(StreamingResponse::new(parts, body));
         }
     }
 
-    // For streaming responses, we can't easily check the body for use_dpop_nonce error
-    // We check status code + headers only
+    // For streaming responses, we can't easily check the body for use_dpop_nonce error.
+    // We check status code + headers only.
     if !is_use_dpop_nonce_error_streaming(is_to_auth_server, parts.status, &parts.headers) {
         return Ok(StreamingResponse::new(parts, body));
     }
 
-    let next_proof = build_dpop_proof(data_source.key(), method, uri, next_nonce, ath)?;
-    request.headers_mut().insert("DPoP", next_proof.parse()?);
+    let next_proof = build_dpop_proof(
+        data_source.key(),
+        &method,
+        &uri,
+        next_nonce.as_deref(),
+        ath.as_deref(),
+    )?;
+    request
+        .headers_mut()
+        .insert("DPoP", next_proof.as_str().parse()?);
     let http_response = client
         .send_http_streaming(request)
         .await
-        .map_err(|e| DpopError::nonce_retry(target, url_str, e))?;
+        .map_err(|e| DpopError::nonce_retry(target, uri, e))?;
     let (parts, body) = http_response.into_parts();
     Ok(StreamingResponse::new(parts, body))
 }
@@ -658,58 +672,62 @@ where
     } else {
         DpopTarget::ResourceServer
     };
-    let uri = parts.uri.clone();
-    let method = parts.method.to_cowstr().into_static();
-    let url_str: SmolStr = uri.to_cowstr().as_ref().into();
-    let uri = uri.to_cowstr();
+    let method = parts.method.to_smolstr();
+    let uri = parts.uri.to_smolstr();
     let ath = extract_ath(&parts.headers);
 
     let init_nonce = get_nonce(data_source, is_to_auth_server);
     let init_proof = build_dpop_proof(
         data_source.key(),
-        method.clone(),
-        uri.clone(),
-        init_nonce.clone(),
-        ath.clone(),
+        &method,
+        &uri,
+        init_nonce.as_deref(),
+        ath.as_deref(),
     )?;
-    parts.headers.insert("DPoP", init_proof.parse()?);
+    parts.headers.insert("DPoP", init_proof.as_str().parse()?);
 
-    // Clone the stream for potential retry
+    // Clone the stream for potential retry.
     let (body1, body2) = body.tee();
 
     let http_response = client
         .send_http_bidirectional(parts.clone(), body1.into_inner())
         .await
-        .map_err(|e| DpopError::transport(target, url_str.clone(), e))?;
+        .map_err(|e| DpopError::transport(target, uri.clone(), e))?;
 
     let (resp_parts, resp_body) = http_response.into_parts();
-    let next_nonce = resp_parts
+    let next_nonce: Option<SmolStr> = resp_parts
         .headers
         .get("DPoP-Nonce")
         .and_then(|v| v.to_str().ok())
-        .map(|c| CowStr::from(c.to_string()));
+        .map(SmolStr::new);
     match &next_nonce {
-        Some(s) if next_nonce != init_nonce => {
-            store_nonce(data_source, is_to_auth_server, s.clone());
+        Some(_) if next_nonce.as_deref() != init_nonce.as_deref() => {
+            store_nonce(data_source, is_to_auth_server, next_nonce.clone().unwrap());
         }
         _ => {
             return Ok(StreamingResponse::new(resp_parts, resp_body));
         }
     }
 
-    // For streaming responses, we can't easily check the body for use_dpop_nonce error
-    // We check status code + headers only
+    // For streaming responses, we can't easily check the body for use_dpop_nonce error.
+    // We check status code + headers only.
     if !is_use_dpop_nonce_error_streaming(is_to_auth_server, resp_parts.status, &resp_parts.headers)
     {
         return Ok(StreamingResponse::new(resp_parts, resp_body));
     }
 
-    let next_proof = build_dpop_proof(data_source.key(), method, uri, next_nonce, ath)?;
-    parts.headers.insert("DPoP", next_proof.parse()?);
+    let next_proof = build_dpop_proof(
+        data_source.key(),
+        &method,
+        &uri,
+        next_nonce.as_deref(),
+        ath.as_deref(),
+    )?;
+    parts.headers.insert("DPoP", next_proof.as_str().parse()?);
     let http_response = client
         .send_http_bidirectional(parts, body2.into_inner())
         .await
-        .map_err(|e| DpopError::nonce_retry(target, url_str, e))?;
+        .map_err(|e| DpopError::nonce_retry(target, uri, e))?;
     let (parts, body) = http_response.into_parts();
     Ok(StreamingResponse::new(parts, body))
 }
@@ -760,7 +778,7 @@ fn is_use_dpop_nonce_error(is_to_auth_server: bool, response: &Response<Vec<u8>>
 }
 
 #[inline]
-pub(crate) fn generate_jti() -> CowStr<'static> {
+pub(crate) fn generate_jti() -> SmolStr {
     let mut rng = rand::rngs::SmallRng::from_entropy();
     let mut bytes = [0u8; 12];
     rng.fill_bytes(&mut bytes);
@@ -769,25 +787,26 @@ pub(crate) fn generate_jti() -> CowStr<'static> {
 
 /// Build a compact JWS (ES256) for DPoP with embedded public JWK.
 #[inline]
-pub fn build_dpop_proof<'s>(
+pub fn build_dpop_proof(
     key: &Key,
-    method: CowStr<'s>,
-    url: CowStr<'s>,
-    nonce: Option<CowStr<'s>>,
-    ath: Option<CowStr<'s>>,
-) -> Result<CowStr<'s>> {
+    method: &str,
+    url: &str,
+    nonce: Option<&str>,
+    ath: Option<&str>,
+) -> Result<SmolStr> {
     let secret = match crypto::Key::try_from(key).map_err(DpopError::crypto)? {
         crypto::Key::P256(crypto::Kind::Secret(sk)) => sk,
         _ => return Err(DpopError::unsupported_key()),
     };
-    let mut header = RegisteredHeader::from(Algorithm::Signing(Signing::Es256));
-    header.typ = Some(JWT_HEADER_TYP_DPOP.into());
+    let mut header: RegisteredHeader<&str> =
+        RegisteredHeader::from(Algorithm::Signing(Signing::Es256));
+    header.typ = Some(JWT_HEADER_TYP_DPOP);
     header.jwk = Some(Jwk {
         key: Key::from(&crypto::Key::from(secret.public_key())),
         prm: Default::default(),
     });
 
-    let claims = Claims {
+    let claims: Claims<&str> = Claims {
         registered: RegisteredClaims {
             jti: Some(generate_jti()),
             iat: Some(Utc::now().timestamp()),
@@ -796,8 +815,8 @@ pub fn build_dpop_proof<'s>(
         public: PublicClaims {
             htm: Some(method),
             htu: Some(url),
-            ath: ath,
-            nonce: nonce,
+            ath,
+            nonce,
         },
     };
     Ok(signing::create_signed_jwt_es256(

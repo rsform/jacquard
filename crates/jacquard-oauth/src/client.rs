@@ -11,13 +11,13 @@ use crate::{
 };
 use jacquard_common::{
     AuthorizationToken, CowStr, IntoStatic,
-    cowstr::ToCowStr,
+    bos::BosStr,
     deps::fluent_uri::Uri,
     error::{AuthError, ClientError, XrpcResult},
     http_client::HttpClient,
     types::{did::Did, string::Handle},
     xrpc::{
-        CallOptions, Response, XrpcClient, XrpcError, XrpcExt, XrpcRequest, XrpcResp, XrpcResponse,
+        CallOptions, Response, XrpcClient, XrpcExt, XrpcRequest, XrpcResp, XrpcResponse,
         build_http_request, process_response,
     },
 };
@@ -31,7 +31,8 @@ use jacquard_identity::{
     resolver::{DidDocResponse, IdentityError, IdentityResolver, ResolverOptions},
 };
 use jose_jwk::JwkSet;
-use std::{future::Future, sync::Arc};
+use smol_str::{SmolStr, ToSmolStr};
+use std::{str::FromStr, sync::Arc};
 use tokio::sync::RwLock;
 
 /// The top-level OAuth client responsible for driving the authorization flow.
@@ -41,7 +42,7 @@ where
     S: ClientAuthStore,
 {
     /// Shared session registry that mediates access to the backing auth store.
-    pub registry: Arc<SessionRegistry<T, S>>,
+    pub registry: Arc<SessionRegistry<T, S, SmolStr>>,
     /// Default call options applied to every outgoing XRPC request.
     pub options: RwLock<CallOptions<'static>>,
     /// Override for the XRPC base URI; falls back to the public Bluesky AppView when `None`.
@@ -52,7 +53,7 @@ where
 
 impl<S: ClientAuthStore> OAuthClient<JacquardResolver, S> {
     /// Create an `OAuthClient` using the default [`JacquardResolver`] for identity and metadata resolution.
-    pub fn new(store: S, client_data: ClientData<'static>) -> Self {
+    pub fn new(store: S, client_data: ClientData<SmolStr>) -> Self {
         let client = JacquardResolver::default();
         Self::new_from_resolver(store, client, client_data)
     }
@@ -110,7 +111,7 @@ where
     S: ClientAuthStore,
 {
     /// Create an OAuth client from an explicit resolver instance, taking ownership of both.
-    pub fn new_from_resolver(store: S, client: T, client_data: ClientData<'static>) -> Self {
+    pub fn new_from_resolver(store: S, client: T, client_data: ClientData<SmolStr>) -> Self {
         // #[cfg(feature = "tracing")]
         // tracing::info!(
         //     redirect_uris = ?client_data.config.redirect_uris,
@@ -133,7 +134,7 @@ where
     pub fn new_with_shared(
         store: Arc<S>,
         client: Arc<T>,
-        client_data: ClientData<'static>,
+        client_data: ClientData<SmolStr>,
     ) -> Self {
         let registry = Arc::new(SessionRegistry::new_shared(
             store,
@@ -172,13 +173,17 @@ where
     ///
     /// The caller is responsible for redirecting the user's browser to the returned URL.
     #[cfg_attr(feature = "tracing", tracing::instrument(level = "debug", skip(self, input), fields(input = input.as_ref())))]
-    pub async fn start_auth(
+    pub async fn start_auth<Str: BosStr>(
         &self,
         input: impl AsRef<str>,
-        options: AuthorizeOptions<'_>,
-    ) -> Result<String> {
+        options: AuthorizeOptions<Str>,
+    ) -> Result<String>
+    where
+        Str: FromStr + Ord + Clone + core::fmt::Debug,
+        <Str as FromStr>::Err: core::fmt::Debug,
+    {
         let client_metadata = atproto_client_metadata(
-            self.registry.client_data.config.clone(),
+            &self.registry.client_data.config,
             &self.registry.client_data.keyset,
         )?;
         let (server_metadata, identity) = self.client.resolve_oauth(input.as_ref()).await?;
@@ -187,7 +192,7 @@ where
         } else {
             None
         };
-        let metadata = OAuthMetadata {
+        let mut metadata = OAuthMetadata {
             server_metadata,
             client_metadata,
             keyset: self.registry.client_data.keyset.clone(),
@@ -197,8 +202,8 @@ where
             self.client.as_ref(),
             login_hint,
             options.prompt,
-            &metadata,
-            options.state,
+            &mut metadata,
+            options.state.map(|s| s.as_ref().to_smolstr()),
         )
         .await?;
 
@@ -209,9 +214,9 @@ where
             .await?;
 
         #[derive(serde::Serialize)]
-        struct Parameters<'s> {
-            client_id: CowStr<'s>,
-            request_uri: CowStr<'s>,
+        struct Parameters {
+            client_id: smol_str::SmolStr,
+            request_uri: smol_str::SmolStr,
         }
         Ok(metadata.server_metadata.authorization_endpoint.to_string()
             + "?"
@@ -227,21 +232,29 @@ where
     /// Validates the `state` and optional `iss` parameters, exchanges the authorization code for
     /// tokens via the token endpoint, verifies the `sub` claim against the expected issuer, and
     /// persists the resulting session. On success returns an [`OAuthSession`] ready for API calls.
-    #[cfg_attr(feature = "tracing", tracing::instrument(level = "info", skip_all, fields(state = params.state.as_ref().map(|s| s.as_ref()))))]
-    pub async fn callback(&self, params: CallbackParams<'_>) -> Result<OAuthSession<T, S>> {
+    #[cfg_attr(feature = "tracing", tracing::instrument(level = "info", skip_all, fields(state = params.state.as_ref().map(|s| s.as_str()))))]
+    pub async fn callback(&self, params: CallbackParams) -> Result<OAuthSession<T, S>> {
         let Some(state_key) = params.state else {
             return Err(CallbackError::MissingState.into());
         };
 
-        let Some(auth_req_info) = self.registry.store.get_auth_req_info(&state_key).await? else {
+        let Some(auth_req_info) = self
+            .registry
+            .store
+            .get_auth_req_info(state_key.as_str())
+            .await?
+        else {
             return Err(CallbackError::MissingState.into());
         };
 
-        self.registry.store.delete_auth_req_info(&state_key).await?;
+        self.registry
+            .store
+            .delete_auth_req_info(state_key.as_str())
+            .await?;
 
         let metadata = self
             .client
-            .get_authorization_server_metadata(&auth_req_info.authserver_url.to_cowstr())
+            .get_authorization_server_metadata(auth_req_info.authserver_url.as_str())
             .await?;
 
         if let Some(iss) = params.iss {
@@ -258,7 +271,7 @@ where
         let metadata = OAuthMetadata {
             server_metadata: metadata,
             client_metadata: atproto_client_metadata(
-                self.registry.client_data.config.clone(),
+                &self.registry.client_data.config,
                 &self.registry.client_data.keyset,
             )?,
             keyset: self.registry.client_data.keyset.clone(),
@@ -268,15 +281,15 @@ where
         match exchange_code(
             self.client.as_ref(),
             &mut auth_req_info.dpop_data.clone(),
-            &params.code,
-            &auth_req_info.pkce_verifier,
+            params.code.as_str(),
+            auth_req_info.pkce_verifier.as_str(),
             &metadata,
         )
         .await
         {
             Ok(token_set) => {
                 let scopes = if let Some(scope) = &token_set.scope {
-                    Scope::parse_multiple_reduced(&scope)
+                    Scope::<SmolStr>::parse_multiple_reduced(scope.as_str())
                         .expect("Failed to parse scopes")
                         .into_static()
                 } else {
@@ -285,18 +298,18 @@ where
                 let client_data = ClientSessionData {
                     account_did: token_set.sub.clone(),
                     session_id: auth_req_info.state,
-                    host_url: Uri::parse(token_set.aud.as_ref())?.to_owned(),
-                    authserver_url: auth_req_info.authserver_url.to_cowstr(),
+                    host_url: Uri::parse(token_set.aud.as_str())?.to_owned(),
+                    authserver_url: auth_req_info.authserver_url,
                     authserver_token_endpoint: auth_req_info.authserver_token_endpoint,
                     authserver_revocation_endpoint: auth_req_info.authserver_revocation_endpoint,
                     scopes,
                     dpop_data: DpopClientData {
                         dpop_key: auth_req_info.dpop_data.dpop_key.clone(),
-                        dpop_authserver_nonce: authserver_nonce.unwrap_or(CowStr::default()),
+                        dpop_authserver_nonce: authserver_nonce.unwrap_or_default(),
                         dpop_host_nonce: auth_req_info
                             .dpop_data
                             .dpop_authserver_nonce
-                            .unwrap_or(CowStr::default()),
+                            .unwrap_or_default(),
                     },
                     token_set,
                 };
@@ -307,7 +320,7 @@ where
         }
     }
 
-    async fn create_session(&self, data: ClientSessionData<'_>) -> Result<OAuthSession<T, S>> {
+    async fn create_session(&self, data: ClientSessionData) -> Result<OAuthSession<T, S>> {
         self.registry.set(data.clone()).await?;
         Ok(OAuthSession::new(
             self.registry.clone(),
@@ -317,7 +330,11 @@ where
     }
 
     /// Restore a previously created session from the backing store, refreshing tokens if needed.
-    pub async fn restore(&self, did: &Did<'_>, session_id: &str) -> Result<OAuthSession<T, S>> {
+    pub async fn restore(
+        &self,
+        did: &Did<impl BosStr + Send + Sync>,
+        session_id: &str,
+    ) -> Result<OAuthSession<T, S>> {
         self.create_session(self.registry.get(did, session_id, true).await?)
             .await
     }
@@ -327,7 +344,11 @@ where
     /// Note: this removes the session from local storage but does **not** call the authorization
     /// server's revocation endpoint. To also invalidate the token server-side, prefer
     /// [`OAuthSession::logout`], which calls `revoke` on the token before deleting the session.
-    pub async fn revoke(&self, did: &Did<'_>, session_id: &str) -> Result<()> {
+    pub async fn revoke(
+        &self,
+        did: &Did<impl BosStr + Send + Sync>,
+        session_id: &str,
+    ) -> Result<()> {
         Ok(self.registry.del(did, session_id).await?)
     }
 }
@@ -356,16 +377,16 @@ where
         self.client.options()
     }
 
-    async fn resolve_handle(
+    async fn resolve_handle<Str: BosStr + Sync>(
         &self,
-        handle: &Handle<'_>,
-    ) -> jacquard_identity::resolver::Result<Did<'static>> {
+        handle: &Handle<Str>,
+    ) -> jacquard_identity::resolver::Result<Did> {
         self.client.resolve_handle(handle).await
     }
 
-    async fn resolve_did_doc(
+    async fn resolve_did_doc<Str: BosStr + Sync>(
         &self,
-        did: &Did<'_>,
+        did: &Did<Str>,
     ) -> jacquard_identity::resolver::Result<DidDocResponse> {
         self.client.resolve_did_doc(did).await
     }
@@ -401,7 +422,7 @@ where
 
     async fn send<R>(&self, request: R) -> XrpcResult<XrpcResponse<R>>
     where
-        R: XrpcRequest + Send + Sync,
+        R: XrpcRequest + Send + Sync + serde::Serialize,
         <R as XrpcRequest>::Response: Send + Sync,
     {
         let opts = self.options.read().await.clone();
@@ -414,15 +435,17 @@ where
         opts: CallOptions<'_>,
     ) -> XrpcResult<XrpcResponse<R>>
     where
-        R: XrpcRequest + Send + Sync,
+        R: XrpcRequest + Send + Sync + serde::Serialize,
         <R as XrpcRequest>::Response: Send + Sync,
     {
         let base_uri = self.base_uri().await;
-        self.client
-            .xrpc(base_uri)
-            .with_options(opts.clone())
-            .send(&request)
+        let http_request = build_http_request(&base_uri.borrow(), &request, &opts)?;
+        let http_response = self
+            .client
+            .send_http(http_request)
             .await
+            .map_err(|e| ClientError::transport(e).for_nsid(R::NSID))?;
+        process_response(http_response)
     }
 }
 
@@ -439,13 +462,13 @@ where
     S: ClientAuthStore,
 {
     /// Shared registry used to persist and retrieve session data across refresh operations.
-    pub registry: Arc<SessionRegistry<T, S>>,
+    pub registry: Arc<SessionRegistry<T, S, SmolStr>>,
     /// Underlying HTTP/identity/OAuth resolver shared with the parent `OAuthClient`.
     pub client: Arc<T>,
     /// Optional WebSocket client; `()` when WebSocket support is not required.
     pub ws_client: W,
     /// Mutable session data including DPoP key, nonces, and token set.
-    pub data: RwLock<ClientSessionData<'static>>,
+    pub data: RwLock<ClientSessionData>,
     /// Default call options applied to every outgoing XRPC request from this session.
     pub options: RwLock<CallOptions<'static>>,
 }
@@ -460,9 +483,9 @@ where
     /// This is the standard constructor used by [`OAuthClient::callback`] and
     /// [`OAuthClient::restore`]. For WebSocket support use [`OAuthSession::new_with_ws`].
     pub fn new(
-        registry: Arc<SessionRegistry<T, S>>,
+        registry: Arc<SessionRegistry<T, S, SmolStr>>,
         client: Arc<T>,
-        data: ClientSessionData<'static>,
+        data: ClientSessionData,
     ) -> Self {
         Self {
             registry,
@@ -485,10 +508,10 @@ where
     /// to standard XRPC calls. The `ws_client` is exposed via [`OAuthSession::ws_client`] and
     /// is used by the `WebSocketClient` impl when the `websocket` feature is enabled.
     pub fn new_with_ws(
-        registry: Arc<SessionRegistry<T, S>>,
+        registry: Arc<SessionRegistry<T, S, SmolStr>>,
         client: Arc<T>,
         ws_client: W,
-        data: ClientSessionData<'static>,
+        data: ClientSessionData,
     ) -> Self {
         Self {
             registry,
@@ -527,7 +550,7 @@ where
     ///
     /// The session ID is the random `state` token generated during the PAR flow and can
     /// be used together with the DID to restore the session via [`OAuthClient::restore`].
-    pub async fn session_info(&self) -> (Did<'_>, CowStr<'_>) {
+    pub async fn session_info(&self) -> (Did, smol_str::SmolStr) {
         let data = self.data.read().await;
         (data.account_did.clone(), data.session_id.clone())
     }
@@ -541,22 +564,24 @@ where
     ///
     /// The token may be stale if it has expired; use [`OAuthSession::refresh`] or
     /// rely on the automatic refresh performed by `send_with_opts` to obtain a fresh one.
-    pub async fn access_token(&self) -> AuthorizationToken<'_> {
-        AuthorizationToken::Dpop(self.data.read().await.token_set.access_token.clone())
+    pub async fn access_token(&self) -> AuthorizationToken<'static> {
+        AuthorizationToken::Dpop(CowStr::Owned(
+            self.data.read().await.token_set.access_token.clone(),
+        ))
     }
 
     /// Return the current refresh token for this session, if one is present.
     ///
     /// Not all authorization servers issue refresh tokens. When `None` is returned,
     /// the session cannot be silently renewed and the user must re-authenticate.
-    pub async fn refresh_token(&self) -> Option<AuthorizationToken<'_>> {
+    pub async fn refresh_token(&self) -> Option<AuthorizationToken<'static>> {
         self.data
             .read()
             .await
             .token_set
             .refresh_token
-            .as_ref()
-            .map(|t| AuthorizationToken::Dpop(t.clone()))
+            .clone()
+            .map(|t| AuthorizationToken::Dpop(CowStr::Owned(t)))
     }
 
     /// Derive an unauthenticated [`OAuthClient`] that shares the same registry and resolver.
@@ -628,14 +653,15 @@ where
     /// The actual token exchange is serialized per `(DID, session_id)` pair via a `Mutex` inside
     /// the registry, so concurrent refresh attempts will not result in duplicate token exchanges.
     #[cfg_attr(feature = "tracing", tracing::instrument(level = "debug", skip_all))]
-    pub async fn refresh(&self) -> Result<AuthorizationToken<'_>> {
+    pub async fn refresh(&self) -> Result<AuthorizationToken<'static>> {
         // Read identifiers without holding the lock across await
         let (did, sid) = {
             let data = self.data.read().await;
             (data.account_did.clone(), data.session_id.clone())
         };
         let refreshed = self.registry.as_ref().get(&did, &sid, true).await?;
-        let token = AuthorizationToken::Dpop(refreshed.token_set.access_token.clone());
+        let token =
+            AuthorizationToken::Dpop(CowStr::Owned(refreshed.token_set.access_token.clone()));
         // Write back updated session
         *self.data.write().await = refreshed.clone().into_static();
         // Store in the registry
@@ -687,7 +713,7 @@ where
 
     async fn send<R>(&self, request: R) -> XrpcResult<XrpcResponse<R>>
     where
-        R: XrpcRequest + Send + Sync,
+        R: XrpcRequest + Send + Sync + serde::Serialize,
         <R as XrpcRequest>::Response: Send + Sync,
     {
         let opts = self.options.read().await.clone();
@@ -700,7 +726,7 @@ where
         mut opts: CallOptions<'_>,
     ) -> XrpcResult<XrpcResponse<R>>
     where
-        R: XrpcRequest + Send + Sync,
+        R: XrpcRequest + Send + Sync + serde::Serialize,
         <R as XrpcRequest>::Response: Send + Sync,
     {
         let base_uri = self.base_uri().await;
@@ -711,7 +737,7 @@ where
         let http_response = self
             .client
             .dpop_call(&mut dpop)
-            .send(build_http_request(&base_uri, &request, &opts)?)
+            .send(build_http_request(&base_uri.borrow(), &request, &opts)?)
             .await
             .map_err(|e| ClientError::from(e).for_nsid(R::NSID))?;
         let resp = process_response(http_response);
@@ -741,7 +767,7 @@ where
             let http_response = self
                 .client
                 .dpop_call(&mut dpop)
-                .send(build_http_request(&base_uri, &request, &opts)?)
+                .send(build_http_request(&base_uri.borrow(), &request, &opts)?)
                 .await
                 .map_err(|e| {
                     ClientError::from(e)
@@ -832,7 +858,7 @@ where
         request: R,
     ) -> core::result::Result<jacquard_common::xrpc::StreamingResponse, jacquard_common::StreamError>
     where
-        R: XrpcRequest + Send + Sync,
+        R: XrpcRequest + Send + Sync + serde::Serialize,
         <R as XrpcRequest>::Response: Send + Sync,
     {
         use jacquard_common::StreamError;
@@ -840,7 +866,7 @@ where
         let base_uri = <Self as XrpcClient>::base_uri(self).await;
         let mut opts = self.options.read().await.clone();
         opts.auth = Some(self.access_token().await);
-        let http_request = build_http_request(&base_uri, &request, &opts)
+        let http_request = build_http_request(&base_uri.borrow(), &request, &opts)
             .map_err(|e| StreamError::protocol(e.to_string()))?;
         let guard = self.data.read().await;
         let mut dpop = guard.dpop_data.clone();
@@ -860,7 +886,7 @@ where
                         .await
                         .map_err(|e| StreamError::transport(e))?,
                 );
-                let http_request = build_http_request(&base_uri, &request, &opts)
+                let http_request = build_http_request(&base_uri.borrow(), &request, &opts)
                     .map_err(|e| StreamError::protocol(e.to_string()))?;
                 let guard = self.data.read().await;
                 let mut dpop = guard.dpop_data.clone();
@@ -976,10 +1002,7 @@ fn is_invalid_token_response<R: XrpcResp>(response: &XrpcResult<Response<R>>) ->
                 .is_ok_and(|s| s.starts_with("DPoP ") && s.contains("error=\"invalid_token\"")),
             _ => false,
         },
-        Ok(resp) => match resp.parse() {
-            Err(XrpcError::Auth(AuthError::InvalidToken)) => true,
-            _ => false,
-        },
+        Ok(_) => false,
     }
 }
 
@@ -993,18 +1016,18 @@ where
         self.client.options()
     }
 
-    fn resolve_handle(
+    async fn resolve_handle<Str: BosStr + Sync>(
         &self,
-        handle: &Handle<'_>,
-    ) -> impl Future<Output = std::result::Result<Did<'static>, IdentityError>> {
-        async { self.client.resolve_handle(handle).await }
+        handle: &Handle<Str>,
+    ) -> std::result::Result<Did, IdentityError> {
+        self.client.resolve_handle(handle).await
     }
 
-    fn resolve_did_doc(
+    async fn resolve_did_doc<Str: BosStr + Sync>(
         &self,
-        did: &Did<'_>,
-    ) -> impl Future<Output = std::result::Result<DidDocResponse, IdentityError>> {
-        async { self.client.resolve_did_doc(did).await }
+        did: &Did<Str>,
+    ) -> std::result::Result<DidDocResponse, IdentityError> {
+        self.client.resolve_did_doc(did).await
     }
 }
 
@@ -1061,7 +1084,7 @@ where
         params: &Sub,
     ) -> std::result::Result<jacquard_common::xrpc::SubscriptionStream<Sub::Stream>, Self::Error>
     where
-        Sub: XrpcSubscription + Send + Sync,
+        Sub: XrpcSubscription + Send + Sync + serde::Serialize,
     {
         let opts = self.subscription_opts().await;
         self.subscribe_with_opts(params, opts).await
@@ -1073,7 +1096,7 @@ where
         opts: jacquard_common::xrpc::SubscriptionOptions<'_>,
     ) -> std::result::Result<jacquard_common::xrpc::SubscriptionStream<Sub::Stream>, Self::Error>
     where
-        Sub: XrpcSubscription + Send + Sync,
+        Sub: XrpcSubscription + Send + Sync + serde::Serialize,
     {
         use jacquard_common::xrpc::SubscriptionExt;
         let base = self.base_uri().await;

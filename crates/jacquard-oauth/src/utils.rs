@@ -1,10 +1,11 @@
 use base64::Engine;
 use base64::engine::general_purpose::URL_SAFE_NO_PAD;
 use elliptic_curve::SecretKey;
-use jacquard_common::CowStr;
+use jacquard_common::BosStr;
 use jose_jwk::{Key, crypto};
 use rand::{CryptoRng, RngCore, rngs::ThreadRng};
 use sha2::{Digest, Sha256};
+use smol_str::SmolStr;
 use std::cmp::Ordering;
 
 use crate::{FALLBACK_ALG, types::OAuthAuthorizationServerMetadata};
@@ -13,7 +14,7 @@ use crate::{FALLBACK_ALG, types::OAuthAuthorizationServerMetadata};
 /// supported, returning `None` if none are supported.
 ///
 /// Currently only `ES256` (P-256 ECDSA) is implemented; other algorithm identifiers are skipped.
-pub fn generate_key(allowed_algos: &[CowStr]) -> Option<Key> {
+pub fn generate_key(allowed_algos: &[impl AsRef<str>]) -> Option<Key> {
     for alg in allowed_algos {
         #[allow(clippy::single_match)]
         match alg.as_ref() {
@@ -31,14 +32,14 @@ pub fn generate_key(allowed_algos: &[CowStr]) -> Option<Key> {
 }
 
 /// Generate a cryptographically random 16-byte nonce encoded as base64url (no padding).
-pub fn generate_nonce() -> CowStr<'static> {
+pub fn generate_nonce() -> SmolStr {
     URL_SAFE_NO_PAD
         .encode(get_random_values::<_, 16>(&mut ThreadRng::default()))
         .into()
 }
 
 /// Generate a cryptographically random 43-byte PKCE code verifier encoded as base64url (no padding).
-pub fn generate_verifier() -> CowStr<'static> {
+pub fn generate_verifier() -> SmolStr {
     URL_SAFE_NO_PAD
         .encode(get_random_values::<_, 43>(&mut ThreadRng::default()))
         .into()
@@ -58,11 +59,13 @@ where
 ///
 /// The ordering is: ES256K > ES (256 > 384 > 512) > PS (256 > 384 > 512) > RS (256 > 384 > 512) > other.
 /// Algorithms within the same family are ordered by key length, preferring shorter (faster) keys first.
-pub fn compare_algos(a: &CowStr, b: &CowStr) -> Ordering {
-    if a.as_ref() == "ES256K" {
+pub fn compare_algos(a: &impl AsRef<str>, b: &impl AsRef<str>) -> Ordering {
+    let a = a.as_ref();
+    let b = b.as_ref();
+    if a == "ES256K" {
         return Ordering::Less;
     }
-    if b.as_ref() == "ES256K" {
+    if b == "ES256K" {
         return Ordering::Greater;
     }
     for prefix in ["ES", "PS", "RS"] {
@@ -89,12 +92,12 @@ pub fn compare_algos(a: &CowStr, b: &CowStr) -> Ordering {
 /// of the verifier, per [RFC 7636 §4.1](https://datatracker.ietf.org/doc/html/rfc7636#section-4.1).
 /// The verifier must be kept secret and sent at the token endpoint; the challenge is sent at
 /// the authorization endpoint.
-pub fn generate_pkce() -> (CowStr<'static>, CowStr<'static>) {
+pub fn generate_pkce() -> (SmolStr, SmolStr) {
     // https://datatracker.ietf.org/doc/html/rfc7636#section-4.1
     let verifier = generate_verifier();
     (
         URL_SAFE_NO_PAD
-            .encode(Sha256::digest(&verifier.as_str()))
+            .encode(Sha256::digest(verifier.as_str()))
             .into(),
         verifier,
     )
@@ -105,11 +108,14 @@ pub fn generate_pkce() -> (CowStr<'static>, CowStr<'static>) {
 /// Reads `dpop_signing_alg_values_supported` from the server metadata, sorts by preference
 /// using [`compare_algos`], and attempts to generate a key for the most preferred supported
 /// algorithm. Falls back to [`crate::FALLBACK_ALG`] if the server does not advertise any algorithms.
-pub fn generate_dpop_key(metadata: &OAuthAuthorizationServerMetadata) -> Option<Key> {
-    let mut algs = metadata
+pub fn generate_dpop_key<S: BosStr>(
+    metadata: &mut OAuthAuthorizationServerMetadata<S>,
+) -> Option<Key> {
+    let mut fallback = vec![S::from_static(FALLBACK_ALG)];
+    let algs = metadata
         .dpop_signing_alg_values_supported
-        .clone()
-        .unwrap_or(vec![FALLBACK_ALG.into()]);
+        .as_deref_mut()
+        .unwrap_or(&mut fallback);
     algs.sort_by(compare_algos);
     generate_key(&algs)
 }

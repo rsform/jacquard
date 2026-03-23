@@ -8,10 +8,10 @@ pub(crate) mod serde_bytes_helper;
 use crate::error::{CommitError, Result};
 use bytes::Bytes;
 use cid::Cid as IpldCid;
-use jacquard_common::IntoStatic;
 use jacquard_common::types::crypto::PublicKey;
 use jacquard_common::types::string::Did;
 use jacquard_common::types::tid::Tid;
+use jacquard_common::{BosStr, IntoStatic};
 
 /// Repository commit object
 ///
@@ -22,10 +22,9 @@ use jacquard_common::types::tid::Tid;
 /// serialized (v2 uses it, v3 must include it even if null). This struct
 /// handles both by always including `prev` in serialization.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-pub struct Commit<'a> {
+pub struct Commit<S: BosStr> {
     /// Repository DID
-    #[serde(borrow)]
-    pub did: Did<'a>,
+    pub did: Did<S>,
 
     /// Commit version (2 or 3)
     pub version: i64,
@@ -48,10 +47,9 @@ pub struct Commit<'a> {
 /// Explicitly a separate struct minus the sig field to match deserialization/signatures
 /// from other implementations.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
-pub struct UnsignedCommit<'a> {
+pub struct UnsignedCommit<S: BosStr> {
     /// Repository DID
-    #[serde(borrow)]
-    pub did: Did<'a>,
+    pub did: Did<S>,
 
     /// Commit version (2 or 3)
     pub version: i64,
@@ -66,14 +64,14 @@ pub struct UnsignedCommit<'a> {
     pub prev: Option<IpldCid>,
 }
 
-impl<'a> UnsignedCommit<'a> {
+impl<S: BosStr + serde::Serialize> UnsignedCommit<S> {
     /// Create new unsigned commit (version = 3, sig empty)
     pub fn new_unsigned(
-        did: Did<'a>,
+        did: Did<S>,
         data: IpldCid,
         rev: Tid,
         prev: Option<IpldCid>,
-    ) -> UnsignedCommit<'a> {
+    ) -> UnsignedCommit<S> {
         Self {
             did,
             version: 3,
@@ -85,13 +83,12 @@ impl<'a> UnsignedCommit<'a> {
     /// Get unsigned commit bytes (for signing/verification)
     pub(super) fn unsigned_bytes(&self) -> Result<Vec<u8>> {
         // Serialize without signature field
-        let unsigned = self.clone();
-        serde_ipld_dagcbor::to_vec(&unsigned)
+        serde_ipld_dagcbor::to_vec(self)
             .map_err(|e| crate::error::CommitError::Serialization(Box::new(e)).into())
     }
 
     /// Sign this commit with a key
-    pub fn sign(self, key: &impl SigningKey) -> Result<Commit<'a>> {
+    pub fn sign(self, key: &impl SigningKey) -> Result<Commit<S>> {
         let unsigned = self.unsigned_bytes()?;
         let sig = key.sign_bytes(&unsigned)?;
 
@@ -105,7 +102,7 @@ impl<'a> UnsignedCommit<'a> {
         })
     }
     /// Get the repository DID
-    pub fn did(&self) -> &Did<'a> {
+    pub fn did(&self) -> &Did<S> {
         &self.did
     }
 
@@ -125,14 +122,14 @@ impl<'a> UnsignedCommit<'a> {
     }
 }
 
-impl<'a> Commit<'a> {
+impl<S: BosStr + Clone + serde::Serialize> Commit<S> {
     /// Create new unsigned commit (version = 3, sig empty)
     pub fn new_unsigned(
-        did: Did<'a>,
+        did: Did<S>,
         data: IpldCid,
         rev: Tid,
         prev: Option<IpldCid>,
-    ) -> UnsignedCommit<'a> {
+    ) -> UnsignedCommit<S> {
         UnsignedCommit {
             did,
             version: 3,
@@ -157,7 +154,7 @@ impl<'a> Commit<'a> {
     }
 
     /// Get the repository DID
-    pub fn did(&self) -> &Did<'a> {
+    pub fn did(&self) -> &Did<S> {
         &self.did
     }
 
@@ -187,7 +184,10 @@ impl<'a> Commit<'a> {
     }
 
     /// Deserialize from DAG-CBOR
-    pub fn from_cbor(data: &'a [u8]) -> Result<Self> {
+    pub fn from_cbor<'a>(data: &'a [u8]) -> Result<Self>
+    where
+        S: serde::Deserialize<'a>,
+    {
         serde_ipld_dagcbor::from_slice(data)
             .map_err(|e| CommitError::Serialization(Box::new(e)).into())
     }
@@ -251,8 +251,12 @@ impl<'a> Commit<'a> {
     }
 }
 
-impl IntoStatic for Commit<'_> {
-    type Output = Commit<'static>;
+impl<S> IntoStatic for Commit<S>
+where
+    S: BosStr + IntoStatic,
+    S::Output: BosStr,
+{
+    type Output = Commit<S::Output>;
 
     fn into_static(self) -> Self::Output {
         Commit {

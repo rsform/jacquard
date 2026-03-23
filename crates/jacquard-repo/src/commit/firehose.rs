@@ -7,13 +7,15 @@
 pub use jacquard_api::com_atproto::sync::subscribe_repos::Commit as FirehoseCommit;
 pub use jacquard_api::com_atproto::sync::subscribe_repos::RepoOp;
 use jacquard_api::com_atproto::sync::subscribe_repos::{Commit, RepoOpAction};
+use jacquard_common::BosStr;
 use jacquard_common::types::crypto::PublicKey;
+use smol_str::SmolStr;
 use smol_str::ToSmolStr;
 
 /// Convert to VerifiedWriteOp for v1.1 validation
 ///
 /// Validates that all required fields are present for inversion.
-pub fn to_invertible_op(op: &RepoOp<'_>) -> Result<VerifiedWriteOp> {
+pub fn to_invertible_op<S: BosStr + core::fmt::Display>(op: &RepoOp<S>) -> Result<VerifiedWriteOp> {
     let key = op.path.to_smolstr();
     match op.action {
         RepoOpAction::Create => {
@@ -91,8 +93,8 @@ use std::sync::Arc;
 /// 4. Verify result matches commit.data (new MST root)
 ///
 /// Returns the new MST root CID on success.
-pub async fn validate_v1_0<S: BlockStore + Sync + 'static>(
-    fh_commit: &Commit<'_>,
+pub async fn validate_v1_0<B: BosStr, S: BlockStore + Sync + 'static>(
+    fh_commit: &Commit<B>,
     prev_mst_root: Option<IpldCid>,
     prev_storage: Arc<S>,
     pubkey: &PublicKey<'_>,
@@ -115,7 +117,7 @@ pub async fn validate_v1_0<S: BlockStore + Sync + 'static>(
         .await?
         .ok_or_else(|| RepoError::not_found("commit block", &commit_cid))?;
 
-    let commit = super::Commit::from_cbor(&commit_bytes)?;
+    let commit = super::Commit::<SmolStr>::from_cbor(&commit_bytes)?;
 
     // Verify DID matches
     if commit.did().as_ref() != fh_commit.repo.as_ref() {
@@ -186,7 +188,10 @@ pub async fn validate_v1_0<S: BlockStore + Sync + 'static>(
 /// this is far from the most efficient possible validation function possible. The repo
 /// tree struct carries extra information. However,
 /// it has the virtue of making everything self-validating.
-pub async fn validate_v1_1(fh_commit: &Commit<'_>, pubkey: &PublicKey<'_>) -> Result<IpldCid> {
+pub async fn validate_v1_1<S: BosStr + core::fmt::Display>(
+    fh_commit: &Commit<S>,
+    pubkey: &PublicKey<'_>,
+) -> Result<IpldCid> {
     // 1. Require prev_data for v1.1
     let prev_data_cid: IpldCid = fh_commit
         .prev_data
@@ -210,7 +215,7 @@ pub async fn validate_v1_1(fh_commit: &Commit<'_>, pubkey: &PublicKey<'_>) -> Re
         .await?
         .ok_or_else(|| RepoError::not_found("commit block", &commit_cid))?;
 
-    let commit = super::Commit::from_cbor(&commit_bytes)?;
+    let commit = super::Commit::<SmolStr>::from_cbor(&commit_bytes)?;
 
     // Verify DID matches
     if commit.did().as_ref() != fh_commit.repo.as_ref() {
@@ -300,7 +305,9 @@ mod tests {
         record
     }
 
-    async fn create_test_repo(storage: Arc<MemoryBlockStore>) -> Repository<MemoryBlockStore> {
+    async fn create_test_repo<'a>(
+        storage: Arc<MemoryBlockStore>,
+    ) -> Repository<SmolStr, MemoryBlockStore> {
         let did = Did::new("did:plc:test").unwrap();
         let signing_key = k256::ecdsa::SigningKey::random(&mut rand::rngs::OsRng);
 
@@ -332,10 +339,10 @@ mod tests {
         let storage = Arc::new(MemoryBlockStore::new());
         let mut repo = create_test_repo(storage.clone()).await;
 
-        let collection = Nsid::new("app.bsky.feed.post").unwrap();
-        let rkey = RecordKey(Rkey::new("test1").unwrap());
+        let collection = Nsid::new("app.bsky.feed.post").unwrap().into_static();
+        let rkey = RecordKey(Rkey::new("test1").unwrap().into_static());
 
-        let did = Did::new("did:plc:test").unwrap();
+        let did = Did::new("did:plc:test").unwrap().into_static();
         let signing_key = k256::ecdsa::SigningKey::random(&mut rand::rngs::OsRng);
         let pubkey = get_public_key(&signing_key);
 
@@ -381,10 +388,10 @@ mod tests {
         let storage = Arc::new(MemoryBlockStore::new());
         let mut repo = create_test_repo(storage.clone()).await;
 
-        let collection = Nsid::new("app.bsky.feed.post").unwrap();
-        let rkey = RecordKey(Rkey::new("test1").unwrap());
+        let collection = Nsid::new("app.bsky.feed.post").unwrap().into_static();
+        let rkey = RecordKey(Rkey::new("test1").unwrap()).into_static();
 
-        let did = Did::new("did:plc:test").unwrap();
+        let did = Did::new("did:plc:test").unwrap().into_static();
         let signing_key = k256::ecdsa::SigningKey::random(&mut rand::rngs::OsRng);
         let pubkey = get_public_key(&signing_key);
 
@@ -433,8 +440,8 @@ mod tests {
         let storage = Arc::new(MemoryBlockStore::new());
         let mut repo = create_test_repo(storage.clone()).await;
 
-        let collection = Nsid::new("app.bsky.feed.post").unwrap();
-        let did = Did::new("did:plc:test").unwrap();
+        let collection = Nsid::new("app.bsky.feed.post").unwrap().into_static();
+        let did = Did::new("did:plc:test").unwrap().into_static();
         let signing_key = k256::ecdsa::SigningKey::random(&mut rand::rngs::OsRng);
         let pubkey = get_public_key(&signing_key);
 
@@ -442,12 +449,12 @@ mod tests {
         let ops1 = vec![
             RecordWriteOp::Create {
                 collection: collection.clone(),
-                rkey: RecordKey(Rkey::new("post1").unwrap()),
+                rkey: RecordKey(Rkey::new("post1").unwrap()).into_static(),
                 record: make_test_record(1),
             },
             RecordWriteOp::Create {
                 collection: collection.clone(),
-                rkey: RecordKey(Rkey::new("post2").unwrap()),
+                rkey: RecordKey(Rkey::new("post2").unwrap()).into_static(),
                 record: make_test_record(2),
             },
         ];
@@ -476,14 +483,14 @@ mod tests {
         let storage = Arc::new(MemoryBlockStore::new());
         let mut repo = create_test_repo(storage.clone()).await;
 
-        let collection = Nsid::new("app.bsky.feed.post").unwrap();
-        let did = Did::new("did:plc:test").unwrap();
+        let collection = Nsid::new("app.bsky.feed.post").unwrap().into_static();
+        let did = Did::new("did:plc:test").unwrap().into_static();
         let signing_key = k256::ecdsa::SigningKey::random(&mut rand::rngs::OsRng);
         let pubkey = get_public_key(&signing_key);
 
         // First: create records
-        let rkey1 = RecordKey(Rkey::new("post1").unwrap());
-        let rkey2 = RecordKey(Rkey::new("post2").unwrap());
+        let rkey1 = RecordKey(Rkey::new("post1").unwrap()).into_static();
+        let rkey2 = RecordKey(Rkey::new("post2").unwrap()).into_static();
 
         let create_ops = vec![
             RecordWriteOp::Create {
@@ -552,14 +559,14 @@ mod tests {
         let storage = Arc::new(MemoryBlockStore::new());
         let mut repo = create_test_repo(storage.clone()).await;
 
-        let collection = Nsid::new("app.bsky.feed.post").unwrap();
-        let did = Did::new("did:plc:test").unwrap();
+        let collection = Nsid::new("app.bsky.feed.post").unwrap().into_static();
+        let did = Did::new("did:plc:test").unwrap().into_static();
         let signing_key = k256::ecdsa::SigningKey::random(&mut rand::rngs::OsRng);
         let pubkey = get_public_key(&signing_key);
 
         let ops = vec![RecordWriteOp::Create {
             collection: collection.clone(),
-            rkey: RecordKey(Rkey::new("test1").unwrap()),
+            rkey: RecordKey(Rkey::new("test1").unwrap()).into_static(),
             record: make_test_record(1),
         }];
 
@@ -607,8 +614,8 @@ mod tests {
         let storage = Arc::new(MemoryBlockStore::new());
         let mut repo = create_test_repo(storage.clone()).await;
 
-        let collection = Nsid::new("app.bsky.feed.post").unwrap();
-        let did = Did::new("did:plc:test").unwrap();
+        let collection = Nsid::new("app.bsky.feed.post").unwrap().into_static();
+        let did = Did::new("did:plc:test").unwrap().into_static();
         let signing_key = k256::ecdsa::SigningKey::random(&mut rand::rngs::OsRng);
         let pubkey = get_public_key(&signing_key);
 
@@ -616,12 +623,12 @@ mod tests {
         let ops = vec![
             RecordWriteOp::Create {
                 collection: collection.clone(),
-                rkey: RecordKey(Rkey::new("aaa").unwrap()),
+                rkey: RecordKey(Rkey::new("aaa").unwrap()).into_static(),
                 record: make_test_record(1),
             },
             RecordWriteOp::Create {
                 collection: collection.clone(),
-                rkey: RecordKey(Rkey::new("zzz").unwrap()),
+                rkey: RecordKey(Rkey::new("zzz").unwrap()).into_static(),
                 record: make_test_record(2),
             },
         ];
@@ -669,14 +676,14 @@ mod tests {
         let storage = Arc::new(MemoryBlockStore::new());
         let mut repo = create_test_repo(storage.clone()).await;
 
-        let collection = Nsid::new("app.bsky.feed.post").unwrap();
-        let did = Did::new("did:plc:test").unwrap();
+        let collection = Nsid::new("app.bsky.feed.post").unwrap().into_static();
+        let did = Did::new("did:plc:test").unwrap().into_static();
         let signing_key = k256::ecdsa::SigningKey::random(&mut rand::rngs::OsRng);
         let pubkey = get_public_key(&signing_key);
 
         let ops = vec![RecordWriteOp::Create {
             collection: collection.clone(),
-            rkey: RecordKey(Rkey::new("test1").unwrap()),
+            rkey: RecordKey(Rkey::new("test1").unwrap()).into_static(),
             record: make_test_record(1),
         }];
 
@@ -730,15 +737,15 @@ mod tests {
         let storage = Arc::new(MemoryBlockStore::new());
         let mut repo = create_test_repo(storage.clone()).await;
 
-        let collection = Nsid::new("app.bsky.feed.post").unwrap();
-        let did = Did::new("did:plc:test").unwrap();
-        let wrong_did = Did::new("did:plc:wrong").unwrap();
+        let collection = Nsid::new("app.bsky.feed.post").unwrap().into_static();
+        let did = Did::new("did:plc:test").unwrap().into_static();
+        let wrong_did = Did::new("did:plc:wrong").unwrap().into_static();
         let signing_key = k256::ecdsa::SigningKey::random(&mut rand::rngs::OsRng);
         let pubkey = get_public_key(&signing_key);
 
         let ops = vec![RecordWriteOp::Create {
             collection: collection.clone(),
-            rkey: RecordKey(Rkey::new("test1").unwrap()),
+            rkey: RecordKey(Rkey::new("test1").unwrap()).into_static(),
             record: make_test_record(1),
         }];
 
@@ -778,8 +785,8 @@ mod tests {
         let storage = Arc::new(MemoryBlockStore::new());
         let mut repo = create_test_repo(storage.clone()).await;
 
-        let collection = Nsid::new("app.bsky.feed.post").unwrap();
-        let did = Did::new("did:plc:test").unwrap();
+        let collection = Nsid::new("app.bsky.feed.post").unwrap().into_static();
+        let did = Did::new("did:plc:test").unwrap().into_static();
         let signing_key = k256::ecdsa::SigningKey::random(&mut rand::rngs::OsRng);
 
         // Use a different key for verification
@@ -788,7 +795,7 @@ mod tests {
 
         let ops = vec![RecordWriteOp::Create {
             collection: collection.clone(),
-            rkey: RecordKey(Rkey::new("test1").unwrap()),
+            rkey: RecordKey(Rkey::new("test1").unwrap().into_static()),
             record: make_test_record(1),
         }];
 
@@ -819,14 +826,14 @@ mod tests {
         let storage = Arc::new(MemoryBlockStore::new());
         let mut repo = create_test_repo(storage.clone()).await;
 
-        let collection = Nsid::new("app.bsky.feed.post").unwrap();
-        let did = Did::new("did:plc:test").unwrap();
+        let collection = Nsid::new("app.bsky.feed.post").unwrap().into_static();
+        let did = Did::new("did:plc:test").unwrap().into_static();
         let signing_key = k256::ecdsa::SigningKey::random(&mut rand::rngs::OsRng);
         let pubkey = get_public_key(&signing_key);
 
         let ops = vec![RecordWriteOp::Create {
             collection: collection.clone(),
-            rkey: RecordKey(Rkey::new("test1").unwrap()),
+            rkey: RecordKey(Rkey::new("test1").unwrap().into_static()),
             record: make_test_record(1),
         }];
 
@@ -866,14 +873,14 @@ mod tests {
         let storage = Arc::new(MemoryBlockStore::new());
         let mut repo = create_test_repo(storage.clone()).await;
 
-        let collection = Nsid::new("app.bsky.feed.post").unwrap();
-        let did = Did::new("did:plc:test").unwrap();
+        let collection = Nsid::new("app.bsky.feed.post").unwrap().into_static();
+        let did = Did::new("did:plc:test").unwrap().into_static();
         let signing_key = k256::ecdsa::SigningKey::random(&mut rand::rngs::OsRng);
         let pubkey = get_public_key(&signing_key);
 
         let ops = vec![RecordWriteOp::Create {
             collection: collection.clone(),
-            rkey: RecordKey(Rkey::new("test1").unwrap()),
+            rkey: RecordKey(Rkey::new("test1").unwrap()).into_static(),
             record: make_test_record(1),
         }];
 

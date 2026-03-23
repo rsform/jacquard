@@ -1,8 +1,10 @@
+use std::str::FromStr;
+
 use chrono::{TimeDelta, Utc};
 use http::{Method, Request, StatusCode};
 use jacquard_common::{
     CowStr, IntoStatic,
-    cowstr::ToCowStr,
+    bos::{BosStr, DefaultStr},
     http_client::HttpClient,
     session::SessionStoreError,
     types::{
@@ -34,7 +36,7 @@ use crate::{
         OAuthTokenResponse, ParParameters, RefreshRequestParameters, RevocationRequestParameters,
         TokenGrantType, TokenRequestParameters, TokenSet,
     },
-    utils::{compare_algos, generate_dpop_key, generate_nonce, generate_pkce},
+    utils::{generate_dpop_key, generate_nonce, generate_pkce},
 };
 
 // https://datatracker.ietf.org/doc/html/rfc7523#section-2.2
@@ -428,27 +430,27 @@ pub type Result<T> = core::result::Result<T, RequestError>;
 #[allow(dead_code)]
 pub enum OAuthRequest<'a> {
     /// Standard authorization-code token exchange.
-    Token(TokenRequestParameters<'a>),
+    Token(TokenRequestParameters<&'a str>),
     /// Refresh-token grant to obtain a fresh access token.
-    Refresh(RefreshRequestParameters<'a>),
+    Refresh(RefreshRequestParameters<&'a str>),
     /// Token revocation request (RFC 7009).
-    Revocation(RevocationRequestParameters<'a>),
+    Revocation(RevocationRequestParameters<&'a str>),
     /// Token introspection request (RFC 7662).
     Introspection,
     /// Pushed authorization request (RFC 9126) for pre-registering auth parameters.
-    PushedAuthorizationRequest(ParParameters<'a>),
+    PushedAuthorizationRequest(ParParameters<&'a str>),
 }
 
 impl OAuthRequest<'_> {
     /// Return a human-readable name for this request variant, used in error messages.
-    pub fn name(&self) -> CowStr<'static> {
-        CowStr::new_static(match self {
+    pub fn name(&self) -> &'static str {
+        match self {
             Self::Token(_) => "token",
             Self::Refresh(_) => "refresh",
             Self::Revocation(_) => "revocation",
             Self::Introspection => "introspection",
             Self::PushedAuthorizationRequest(_) => "pushed_authorization_request",
-        })
+        }
     }
     /// Returns the HTTP status code that a successful response to this request should carry.
     pub fn expected_status(&self) -> StatusCode {
@@ -476,7 +478,7 @@ where
     client_assertion_type: Option<CowStr<'a>>,
     /// A JWT signed with the client's private key, proving client identity to the server.
     #[serde(skip_serializing_if = "Option::is_none")]
-    client_assertion: Option<CowStr<'a>>,
+    client_assertion: Option<SmolStr>,
     /// The grant-specific parameters (token request, refresh, PAR, etc.) flattened into the body.
     #[serde(flatten)]
     parameters: T,
@@ -488,33 +490,35 @@ where
 /// and the optional signing keyset into a single value that is passed to helper functions such
 /// as [`par`], [`exchange_code`], [`refresh`], and [`revoke`].
 #[derive(Debug, Clone)]
-pub struct OAuthMetadata {
+pub struct OAuthMetadata<S: BosStr = DefaultStr> {
     /// Metadata fetched from the authorization server's `/.well-known/oauth-authorization-server` document.
-    pub server_metadata: OAuthAuthorizationServerMetadata<'static>,
+    pub server_metadata: OAuthAuthorizationServerMetadata,
     /// This client's registered metadata, derived from [`crate::atproto::AtprotoClientMetadata`].
-    pub client_metadata: OAuthClientMetadata<'static>,
+    pub client_metadata: OAuthClientMetadata<S>,
     /// Optional signing keyset; required for `private_key_jwt` client authentication.
     pub keyset: Option<Keyset>,
 }
 
-impl OAuthMetadata {
+impl<S: BosStr> OAuthMetadata<S> {
     /// Fetch server metadata and assemble an `OAuthMetadata` from an active session context.
     ///
     /// Contacts the authorization server recorded in `session_data` to retrieve its current
     /// metadata, then combines it with the client configuration. This is the preferred way to
     /// build an `OAuthMetadata` during token refresh or revocation.
-    pub async fn new<'r, T: HttpClient + OAuthResolver + Send + Sync>(
+    pub async fn new<T: HttpClient + OAuthResolver + Send + Sync>(
         client: &T,
-        ClientData { keyset, config }: &ClientData<'r>,
-        session_data: &ClientSessionData<'r>,
-    ) -> Result<Self> {
+        ClientData { keyset, config }: &ClientData<S>,
+        session_data: &ClientSessionData,
+    ) -> Result<Self>
+    where
+        S: Clone + FromStr + Ord,
+        <S as FromStr>::Err: core::fmt::Debug,
+    {
         Ok(OAuthMetadata {
             server_metadata: client
-                .get_authorization_server_metadata(&session_data.authserver_url)
+                .get_authorization_server_metadata(session_data.authserver_url.as_ref())
                 .await?,
-            client_metadata: atproto_client_metadata(config.clone(), &keyset)
-                .unwrap()
-                .into_static(),
+            client_metadata: atproto_client_metadata(&config, &keyset)?,
             keyset: keyset.clone(),
         })
     }
@@ -527,37 +531,36 @@ impl OAuthMetadata {
 /// persisted (e.g., in the auth store) so it can be retrieved and verified during
 /// [`crate::client::OAuthClient::callback`].
 #[cfg_attr(feature = "tracing", tracing::instrument(level = "debug", skip_all, fields(login_hint = login_hint.as_ref().map(|h| h.as_ref()))))]
-pub async fn par<'r, T: OAuthResolver + DpopExt + Send + Sync + 'static>(
+pub async fn par<
+    S: BosStr + Clone + Send + Sync,
+    T: OAuthResolver + DpopExt + Send + Sync + 'static,
+>(
     client: &T,
-    login_hint: Option<CowStr<'r>>,
+    login_hint: Option<S>,
     prompt: Option<AuthorizeOptionPrompt>,
-    metadata: &OAuthMetadata,
-    state: Option<CowStr<'r>>,
-) -> crate::request::Result<AuthRequestData<'r>> {
-    let state = if let Some(state) = state {
-        state
-    } else {
-        generate_nonce()
-    };
+    metadata: &mut OAuthMetadata<S>,
+    state: Option<SmolStr>,
+) -> crate::request::Result<AuthRequestData> {
+    let state = state.unwrap_or_else(generate_nonce);
     let (code_challenge, verifier) = generate_pkce();
 
-    let Some(dpop_key) = generate_dpop_key(&metadata.server_metadata) else {
+    let Some(dpop_key) = generate_dpop_key(&mut metadata.server_metadata) else {
         return Err(RequestError::token_verification());
     };
     let mut dpop_data = DpopReqData {
         dpop_key,
         dpop_authserver_nonce: None,
     };
-    let parameters = ParParameters {
+    let parameters: ParParameters<&str> = ParParameters {
         response_type: AuthorizationResponseType::Code,
-        redirect_uri: metadata.client_metadata.redirect_uris[0].to_cowstr(),
-        state: state.clone(),
-        scope: metadata.client_metadata.scope.clone(),
+        redirect_uri: metadata.client_metadata.redirect_uris[0].as_ref(),
+        state: state.as_ref(),
+        scope: metadata.client_metadata.scope.as_ref().map(|s| s.as_ref()),
         response_mode: None,
-        code_challenge,
+        code_challenge: code_challenge.as_str(),
         code_challenge_method: AuthorizationCodeChallengeMethod::S256,
-        login_hint: login_hint,
-        prompt: prompt.map(CowStr::from),
+        login_hint: login_hint.as_ref().map(|h| h.as_ref()),
+        prompt: prompt.map(|p| p.into()),
     };
 
     if metadata
@@ -565,7 +568,7 @@ pub async fn par<'r, T: OAuthResolver + DpopExt + Send + Sync + 'static>(
         .pushed_authorization_request_endpoint
         .is_some()
     {
-        let par_response = oauth_request::<OAuthParResponse, T, DpopReqData>(
+        let par_response = oauth_request::<OAuthParResponse, T, DpopReqData, _>(
             &client,
             &mut dpop_data,
             OAuthRequest::PushedAuthorizationRequest(parameters),
@@ -574,21 +577,21 @@ pub async fn par<'r, T: OAuthResolver + DpopExt + Send + Sync + 'static>(
         .await?;
 
         let scopes = if let Some(scope) = &metadata.client_metadata.scope {
-            Scope::parse_multiple_reduced(&scope)
+            Scope::<SmolStr>::parse_multiple_reduced(scope.as_ref())
                 .expect("Failed to parse scopes")
                 .into_static()
         } else {
             vec![]
         };
-        let auth_req_data = AuthRequestData {
-            state,
-            authserver_url: metadata.server_metadata.issuer.clone(),
+        let auth_req_data: AuthRequestData = AuthRequestData {
+            state: state.into(),
+            authserver_url: metadata.server_metadata.issuer.to_smolstr(),
             account_did: None,
             scopes,
-            request_uri: par_response.request_uri.to_cowstr().into_static(),
-            authserver_token_endpoint: metadata.server_metadata.token_endpoint.clone(),
+            request_uri: par_response.request_uri.clone(),
+            authserver_token_endpoint: metadata.server_metadata.token_endpoint.to_smolstr(),
             authserver_revocation_endpoint: metadata.server_metadata.revocation_endpoint.clone(),
-            pkce_verifier: verifier,
+            pkce_verifier: verifier.into(),
             dpop_data,
         };
 
@@ -606,12 +609,13 @@ pub async fn par<'r, T: OAuthResolver + DpopExt + Send + Sync + 'static>(
 
 /// Exchange a refresh token for a fresh token set and update the session data in place.
 #[cfg_attr(feature = "tracing", tracing::instrument(level = "debug", skip_all, fields(did = %session_data.account_did)))]
-pub async fn refresh<'r, T>(
+pub async fn refresh<S, T>(
     client: &T,
-    mut session_data: ClientSessionData<'r>,
-    metadata: &OAuthMetadata,
-) -> Result<ClientSessionData<'r>>
+    mut session_data: ClientSessionData,
+    metadata: &OAuthMetadata<S>,
+) -> Result<ClientSessionData>
 where
+    S: BosStr + FromStr,
     T: OAuthResolver + DpopExt + Send + Sync + 'static,
 {
     let Some(refresh_token) = session_data.token_set.refresh_token.as_ref() else {
@@ -631,12 +635,12 @@ where
         .await?;
     let iss = metadata.server_metadata.issuer.clone();
 
-    let response = oauth_request::<OAuthTokenResponse, T, DpopClientData>(
+    let response = oauth_request::<OAuthTokenResponse, T, DpopClientData, _>(
         client,
         &mut session_data.dpop_data,
         OAuthRequest::Refresh(RefreshRequestParameters {
             grant_type: TokenGrantType::RefreshToken,
-            refresh_token: refresh_token.clone(),
+            refresh_token: refresh_token.as_ref(),
             scope: None,
         }),
         metadata,
@@ -650,13 +654,13 @@ where
             .map(Datetime::new)
     });
 
-    session_data.update_with_tokens(TokenSet {
+    session_data.update_with_tokens(&TokenSet {
         iss,
         sub: session_data.token_set.sub.clone(),
-        aud: CowStr::Owned(aud.to_smolstr()),
-        scope: response.scope.map(CowStr::Owned),
-        access_token: CowStr::Owned(response.access_token),
-        refresh_token: response.refresh_token.map(CowStr::Owned),
+        aud: SmolStr::from(aud.as_str()),
+        scope: response.scope,
+        access_token: response.access_token,
+        refresh_token: response.refresh_token,
         token_type: response.token_type,
         expires_at,
     });
@@ -671,28 +675,25 @@ where
 /// function performs that verification as part of the exchange, so callers receive a token
 /// set that is safe to persist.
 #[cfg_attr(feature = "tracing", tracing::instrument(level = "debug", skip_all))]
-pub async fn exchange_code<'r, T, D>(
+pub async fn exchange_code<S, T, D>(
     client: &T,
-    data_source: &'r mut D,
+    data_source: &mut D,
     code: &str,
     verifier: &str,
-    metadata: &OAuthMetadata,
-) -> Result<TokenSet<'r>>
+    metadata: &OAuthMetadata<S>,
+) -> Result<TokenSet>
 where
+    S: BosStr + Send + Sync,
     T: OAuthResolver + DpopExt + Send + Sync + 'static,
     D: DpopDataSource,
 {
-    let token_response = oauth_request::<OAuthTokenResponse, T, D>(
+    let token_response = oauth_request::<OAuthTokenResponse, T, D, _>(
         client,
         data_source,
         OAuthRequest::Token(TokenRequestParameters {
             grant_type: TokenGrantType::AuthorizationCode,
             code: code.into(),
-            redirect_uri: CowStr::Owned(
-                metadata.client_metadata.redirect_uris[0]
-                    .clone()
-                    .to_smolstr(),
-            ),
+            redirect_uri: metadata.client_metadata.redirect_uris[0].as_ref(),
             code_verifier: verifier.into(),
         }),
         metadata,
@@ -720,10 +721,10 @@ where
     Ok(TokenSet {
         iss,
         sub,
-        aud: CowStr::Owned(aud.to_smolstr()),
-        scope: token_response.scope.map(CowStr::Owned),
-        access_token: CowStr::Owned(token_response.access_token),
-        refresh_token: token_response.refresh_token.map(CowStr::Owned),
+        aud: SmolStr::from(aud.as_str()),
+        scope: token_response.scope,
+        access_token: token_response.access_token,
+        refresh_token: token_response.refresh_token,
         token_type: token_response.token_type,
         expires_at,
     })
@@ -735,17 +736,17 @@ where
 /// by the server. The caller is responsible for deleting the session from local storage regardless
 /// of whether revocation succeeds.
 #[cfg_attr(feature = "tracing", tracing::instrument(level = "debug", skip_all))]
-pub async fn revoke<'r, T, D>(
+pub async fn revoke<S: BosStr + Send + Sync, T, D>(
     client: &T,
-    data_source: &'r mut D,
+    data_source: &mut D,
     token: &str,
-    metadata: &OAuthMetadata,
+    metadata: &OAuthMetadata<S>,
 ) -> Result<()>
 where
     T: OAuthResolver + DpopExt + Send + Sync + 'static,
     D: DpopDataSource,
 {
-    oauth_request::<(), T, D>(
+    oauth_request::<(), T, D, _>(
         client,
         data_source,
         OAuthRequest::Revocation(RevocationRequestParameters {
@@ -763,11 +764,11 @@ where
 /// client authentication, performs the DPoP-wrapped HTTP POST, and deserializes the response
 /// body into `O`. The type parameter `O` is inferred from the call site; use `()` for requests
 /// where the response body is empty (e.g., revocation).
-pub async fn oauth_request<'de: 'r, 'r, O, T, D>(
+pub async fn oauth_request<'r, O, T, D, S: BosStr>(
     client: &T,
-    data_source: &'r mut D,
+    data_source: &mut D,
     request: OAuthRequest<'r>,
-    metadata: &OAuthMetadata,
+    metadata: &OAuthMetadata<S>,
 ) -> Result<O>
 where
     T: OAuthResolver + DpopExt + Send + Sync + 'static,
@@ -792,7 +793,7 @@ where
         _ => unimplemented!(),
     };
     let req = Request::builder()
-        .uri(url.to_string())
+        .uri(url)
         .method(Method::POST)
         .header("Content-Type", "application/x-www-form-urlencoded")
         .body(body.into_bytes())?;
@@ -817,17 +818,26 @@ where
 }
 
 #[inline]
-fn endpoint_for_req<'a, 'r>(
-    server_metadata: &'r OAuthAuthorizationServerMetadata<'a>,
+fn endpoint_for_req<'r, S: BosStr>(
+    server_metadata: &'r OAuthAuthorizationServerMetadata<S>,
     request: &'r OAuthRequest,
-) -> Option<&'r CowStr<'a>> {
+) -> Option<&'r str> {
     match request {
-        OAuthRequest::Token(_) | OAuthRequest::Refresh(_) => Some(&server_metadata.token_endpoint),
-        OAuthRequest::Revocation(_) => server_metadata.revocation_endpoint.as_ref(),
-        OAuthRequest::Introspection => server_metadata.introspection_endpoint.as_ref(),
+        OAuthRequest::Token(_) | OAuthRequest::Refresh(_) => {
+            Some(server_metadata.token_endpoint.as_ref())
+        }
+        OAuthRequest::Revocation(_) => server_metadata
+            .revocation_endpoint
+            .as_ref()
+            .map(AsRef::as_ref),
+        OAuthRequest::Introspection => server_metadata
+            .introspection_endpoint
+            .as_ref()
+            .map(AsRef::as_ref),
         OAuthRequest::PushedAuthorizationRequest(_) => server_metadata
             .pushed_authorization_request_endpoint
-            .as_ref(),
+            .as_ref()
+            .map(AsRef::as_ref),
     }
 }
 
@@ -856,7 +866,7 @@ pub struct ClientAuth<'a> {
     /// Either absent (for `none` auth) or `urn:ietf:params:oauth:client-assertion-type:jwt-bearer`.
     assertion_type: Option<CowStr<'a>>,
     /// A signed JWT proving client identity; present only for `private_key_jwt` auth.
-    assertion: Option<CowStr<'a>>,
+    assertion: Option<SmolStr>,
 }
 
 impl<'s> ClientAuth<'s> {
@@ -870,34 +880,39 @@ impl<'s> ClientAuth<'s> {
     }
 }
 
-fn build_auth<'a>(
+fn build_auth<'a, S: BosStr>(
     keyset: Option<&Keyset>,
-    server_metadata: &OAuthAuthorizationServerMetadata<'a>,
-    client_metadata: &OAuthClientMetadata<'a>,
+    server_metadata: &'a OAuthAuthorizationServerMetadata,
+    client_metadata: &'a OAuthClientMetadata<S>,
 ) -> Result<ClientAuth<'a>> {
     let method_supported = server_metadata
         .token_endpoint_auth_methods_supported
         .as_ref();
 
-    let client_id = client_metadata.client_id.to_cowstr().into_static();
+    let client_id = CowStr::Borrowed(client_metadata.client_id.as_ref());
     if let Some(method) = client_metadata.token_endpoint_auth_method.as_ref() {
-        match (*method).as_ref() {
+        match method.as_ref() {
             "private_key_jwt"
                 if method_supported
                     .as_ref()
-                    .is_some_and(|v| v.contains(&CowStr::new_static("private_key_jwt"))) =>
+                    .is_some_and(|v| v.iter().any(|s| s.as_str() == "private_key_jwt")) =>
             {
                 if let Some(keyset) = &keyset {
-                    let mut alg_strs = server_metadata
+                    let mut alg_strs: Vec<&str> = server_metadata
                         .token_endpoint_auth_signing_alg_values_supported
-                        .clone()
-                        .unwrap_or(vec![FALLBACK_ALG.into()]);
-                    alg_strs.sort_by(compare_algos);
+                        .as_ref()
+                        .map(|v| v.iter().map(|s| s.as_ref()).collect())
+                        .unwrap_or_default();
+                    if alg_strs.is_empty() {
+                        alg_strs.push(FALLBACK_ALG);
+                    }
                     let algs: Vec<Signing> = alg_strs
                         .iter()
                         .filter_map(|s| crate::keyset::parse_signing_alg(s))
                         .collect();
                     let iat = Utc::now().timestamp();
+                    let client_id_str: &str = client_metadata.client_id.as_ref();
+                    let issuer_str: &str = server_metadata.issuer.as_ref();
                     return Ok(ClientAuth {
                         client_id: client_id.clone(),
                         assertion_type: Some(CowStr::new_static(CLIENT_ASSERTION_TYPE_JWT_BEARER)),
@@ -906,11 +921,9 @@ fn build_auth<'a>(
                                 &algs,
                                 // https://datatracker.ietf.org/doc/html/rfc7523#section-3
                                 RegisteredClaims {
-                                    iss: Some(client_id.clone()),
-                                    sub: Some(client_id),
-                                    aud: Some(RegisteredClaimsAud::Single(
-                                        server_metadata.issuer.clone(),
-                                    )),
+                                    iss: Some(client_id_str),
+                                    sub: Some(client_id_str),
+                                    aud: Some(RegisteredClaimsAud::Single(issuer_str)),
                                     exp: Some(iat + 60),
                                     // "iat" is required and **MUST** be less than one minute
                                     // https://datatracker.ietf.org/doc/html/rfc9101
@@ -928,7 +941,7 @@ fn build_auth<'a>(
             "none"
                 if method_supported
                     .as_ref()
-                    .is_some_and(|v| v.contains(&CowStr::new_static("none"))) =>
+                    .is_some_and(|v| v.iter().any(|s| s.as_str() == "none")) =>
             {
                 return Ok(ClientAuth::new_id(client_id));
             }
@@ -945,8 +958,11 @@ mod tests {
     use crate::types::{OAuthAuthorizationServerMetadata, OAuthClientMetadata};
     use bytes::Bytes;
     use http::{Response as HttpResponse, StatusCode};
-    use jacquard_common::{deps::fluent_uri::Uri, http_client::HttpClient, types::string::Did};
+    use jacquard_common::{
+        bos::BosStr, deps::fluent_uri::Uri, http_client::HttpClient, types::string::Did,
+    };
     use jacquard_identity::resolver::IdentityResolver;
+    use smol_str::SmolStr;
     use std::sync::Arc;
     use tokio::sync::Mutex;
 
@@ -976,15 +992,15 @@ mod tests {
                 LazyLock::new(|| jacquard_identity::resolver::ResolverOptions::default());
             &OPTS
         }
-        async fn resolve_handle(
+        async fn resolve_handle<S: BosStr + Sync>(
             &self,
-            _handle: &jacquard_common::types::string::Handle<'_>,
-        ) -> std::result::Result<Did<'static>, jacquard_identity::resolver::IdentityError> {
+            _handle: &jacquard_common::types::string::Handle<S>,
+        ) -> std::result::Result<Did, jacquard_identity::resolver::IdentityError> {
             Ok(Did::new_static("did:plc:alice").unwrap())
         }
-        async fn resolve_did_doc(
+        async fn resolve_did_doc<S: BosStr + Sync>(
             &self,
-            _did: &Did<'_>,
+            _did: &Did<S>,
         ) -> std::result::Result<
             jacquard_identity::resolver::DidDocResponse,
             jacquard_identity::resolver::IdentityError,
@@ -1012,21 +1028,21 @@ mod tests {
 
     fn base_metadata() -> OAuthMetadata {
         let mut server = OAuthAuthorizationServerMetadata::default();
-        server.issuer = CowStr::from("https://issuer");
-        server.authorization_endpoint = CowStr::from("https://issuer/authorize");
-        server.token_endpoint = CowStr::from("https://issuer/token");
-        server.token_endpoint_auth_methods_supported = Some(vec![CowStr::from("none")]);
+        server.issuer = SmolStr::new_static("https://issuer");
+        server.authorization_endpoint = SmolStr::new_static("https://issuer/authorize");
+        server.token_endpoint = SmolStr::new_static("https://issuer/token");
+        server.token_endpoint_auth_methods_supported = Some(vec![SmolStr::new_static("none")]);
         OAuthMetadata {
             server_metadata: server,
             client_metadata: OAuthClientMetadata {
-                client_id: CowStr::new_static("https://client"),
+                client_id: SmolStr::new_static("https://client"),
                 client_uri: None,
-                redirect_uris: vec![CowStr::new_static("https://client/cb")],
-                scope: Some(CowStr::from("atproto")),
+                redirect_uris: vec![SmolStr::new_static("https://client/cb")],
+                scope: Some(SmolStr::new_static("atproto")),
                 grant_types: None,
-                response_types: vec![CowStr::new_static("code")],
-                application_type: Some(CowStr::new_static("web")),
-                token_endpoint_auth_method: Some(CowStr::from("none")),
+                response_types: vec![SmolStr::new_static("code")],
+                application_type: Some(SmolStr::new_static("web")),
+                token_endpoint_auth_method: Some(SmolStr::new_static("none")),
                 dpop_bound_access_tokens: None,
                 jwks_uri: None,
                 jwks: None,
@@ -1046,7 +1062,7 @@ mod tests {
         meta.server_metadata.require_pushed_authorization_requests = Some(true);
         meta.server_metadata.pushed_authorization_request_endpoint = None;
         // require_pushed_authorization_requests is true and no endpoint
-        let err = super::par(&MockClient::default(), None, None, &meta, None)
+        let err = super::par(&MockClient::default(), None, None, &mut meta, None)
             .await
             .unwrap_err();
         assert!(
@@ -1060,24 +1076,24 @@ mod tests {
         let meta = base_metadata();
         let session = ClientSessionData {
             account_did: Did::new_static("did:plc:alice").unwrap(),
-            session_id: CowStr::from("state"),
+            session_id: SmolStr::new_static("state"),
             host_url: Uri::parse("https://pds").expect("valid").to_owned(),
-            authserver_url: CowStr::new_static("https://issuer"),
-            authserver_token_endpoint: CowStr::from("https://issuer/token"),
+            authserver_url: SmolStr::new_static("https://issuer"),
+            authserver_token_endpoint: SmolStr::new_static("https://issuer/token"),
             authserver_revocation_endpoint: None,
             scopes: vec![],
             dpop_data: DpopClientData {
-                dpop_key: crate::utils::generate_key(&[CowStr::from("ES256")]).unwrap(),
-                dpop_authserver_nonce: CowStr::from(""),
-                dpop_host_nonce: CowStr::from(""),
+                dpop_key: crate::utils::generate_key(&[SmolStr::new_static("ES256")]).unwrap(),
+                dpop_authserver_nonce: SmolStr::default(),
+                dpop_host_nonce: SmolStr::default(),
             },
             token_set: crate::types::TokenSet {
-                iss: CowStr::from("https://issuer"),
+                iss: SmolStr::new_static("https://issuer"),
                 sub: Did::new_static("did:plc:alice").unwrap(),
-                aud: CowStr::from("https://pds"),
+                aud: SmolStr::new_static("https://pds"),
                 scope: None,
                 refresh_token: None,
-                access_token: CowStr::from("abc"),
+                access_token: SmolStr::new_static("abc"),
                 token_type: crate::types::OAuthTokenType::DPoP,
                 expires_at: None,
             },
@@ -1105,7 +1121,7 @@ mod tests {
         );
         let meta = base_metadata();
         let mut dpop = DpopReqData {
-            dpop_key: crate::utils::generate_key(&[CowStr::from("ES256")]).unwrap(),
+            dpop_key: crate::utils::generate_key(&[SmolStr::new_static("ES256")]).unwrap(),
             dpop_authserver_nonce: None,
         };
         let err = super::exchange_code(&client, &mut dpop, "abc", "verifier", &meta)

@@ -53,9 +53,10 @@ use crate::{
     resolver::OAuthResolver,
     types::{AuthorizeOptions, CallbackParams},
 };
+use jacquard_common::IntoStatic;
 use jacquard_common::deps::fluent_uri::Uri;
-use jacquard_common::{IntoStatic, cowstr::ToCowStr};
 use rouille::Server;
+use smol_str::{SmolStr, ToSmolStr};
 use std::net::SocketAddr;
 use tokio::sync::mpsc;
 
@@ -115,9 +116,9 @@ fn create_callback_router(
                 let code = request.get_param("code").unwrap();
                 let iss = request.get_param("iss").unwrap();
                 let callback_params = CallbackParams {
-                    state: Some(state.to_cowstr().into_static()),
-                    code: code.to_cowstr().into_static(),
-                    iss: Some(iss.to_cowstr().into_static()),
+                    state: Some(state.to_smolstr()),
+                    code: code.to_smolstr(),
+                    iss: Some(iss.to_smolstr()),
                 };
                 tx.try_send(callback_params).unwrap();
                 rouille::Response::text("Logged in!")
@@ -131,7 +132,7 @@ pub struct CallbackHandle {
     #[allow(dead_code)]
     server_handle: std::thread::JoinHandle<()>,
     server_stop: std::sync::mpsc::Sender<()>,
-    callback_rx: mpsc::Receiver<CallbackParams<'static>>,
+    callback_rx: mpsc::Receiver<CallbackParams>,
 }
 
 /// One-shot OAuth callback server.
@@ -214,7 +215,7 @@ where
     pub async fn login_with_local_server(
         &self,
         input: impl AsRef<str>,
-        opts: AuthorizeOptions<'_>,
+        opts: AuthorizeOptions<SmolStr>,
         cfg: LoopbackConfig,
     ) -> crate::error::Result<super::client::OAuthSession<T, S>> {
         let port = match cfg.port {
@@ -252,16 +253,24 @@ where
     pub fn build_localhost_client_data(
         &self,
         cfg: &LoopbackConfig,
-        opts: &AuthorizeOptions<'_>,
+        opts: &AuthorizeOptions<SmolStr>,
         local_addr: SocketAddr,
-    ) -> crate::session::ClientData<'static> {
+    ) -> crate::session::ClientData<SmolStr> {
         let redirect_uri = format!("http://{}:{}/oauth/callback", cfg.host, local_addr.port(),);
         let redirect = Uri::parse(redirect_uri).unwrap();
 
         let scopes = if opts.scopes.is_empty() {
-            Some(self.registry.client_data.config.scopes.clone())
+            Some(
+                self.registry
+                    .client_data
+                    .config
+                    .scopes
+                    .iter()
+                    .cloned()
+                    .collect(),
+            )
         } else {
-            Some(opts.scopes.clone().into_static())
+            Some(opts.scopes.clone())
         };
 
         crate::session::ClientData {

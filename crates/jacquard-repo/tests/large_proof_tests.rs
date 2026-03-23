@@ -15,7 +15,7 @@ use jacquard_repo::mst::RecordWriteOp;
 use jacquard_repo::storage::{BlockStore, MemoryBlockStore};
 use rand::Rng;
 use rand::seq::SliceRandom;
-use smol_str::SmolStr;
+use smol_str::{SmolStr, ToSmolStr};
 use std::collections::{BTreeMap, HashMap};
 use std::sync::Arc;
 
@@ -50,7 +50,7 @@ fn get_public_key(signing_key: &k256::ecdsa::SigningKey) -> PublicKey<'static> {
     }
 }
 
-async fn create_test_repo(storage: Arc<MemoryBlockStore>) -> Repository<MemoryBlockStore> {
+async fn create_test_repo(storage: Arc<MemoryBlockStore>) -> Repository<SmolStr, MemoryBlockStore> {
     let did = Did::new("did:plc:stresstest").unwrap();
     let signing_key = k256::ecdsa::SigningKey::random(&mut rand::rngs::OsRng);
 
@@ -61,7 +61,7 @@ async fn create_test_repo(storage: Arc<MemoryBlockStore>) -> Repository<MemoryBl
 
 /// Track existing records for generating realistic updates/deletes
 struct RecordTracker {
-    records: HashMap<String, u32>,
+    records: HashMap<SmolStr, u32>,
     ticker: Ticker,
 }
 
@@ -73,16 +73,16 @@ impl RecordTracker {
         }
     }
 
-    fn gen_new_rkey(&mut self) -> String {
-        self.ticker.next(None).into_static().to_string()
+    fn gen_new_rkey(&mut self) -> SmolStr {
+        self.ticker.next(None).into_static().to_smolstr()
     }
 
-    fn pick_random_existing<R: Rng>(&self, rng: &mut R) -> Option<String> {
+    fn pick_random_existing<R: Rng>(&self, rng: &mut R) -> Option<SmolStr> {
         let keys: Vec<_> = self.records.keys().cloned().collect();
         keys.choose(rng).cloned()
     }
 
-    fn add(&mut self, rkey: String, counter: u32) {
+    fn add(&mut self, rkey: SmolStr, counter: u32) {
         self.records.insert(rkey, counter);
     }
 
@@ -97,9 +97,9 @@ impl RecordTracker {
 
 #[derive(Debug, Clone)]
 enum TestOp {
-    Create { rkey: String, counter: u32 },
-    Update { rkey: String, counter: u32 },
-    Delete { rkey: String },
+    Create { rkey: SmolStr, counter: u32 },
+    Update { rkey: SmolStr, counter: u32 },
+    Delete { rkey: SmolStr },
 }
 
 fn generate_creates_only<R: Rng>(
@@ -167,24 +167,27 @@ fn generate_random_ops<R: Rng>(
     ops
 }
 
-fn test_ops_to_record_writes(ops: Vec<TestOp>, collection: &Nsid) -> Vec<RecordWriteOp<'static>> {
+fn test_ops_to_record_writes(
+    ops: Vec<TestOp>,
+    collection: &Nsid,
+) -> Vec<RecordWriteOp<'_, SmolStr>> {
     let collection_static = collection.clone().into_static();
     ops.into_iter()
         .map(|op| match op {
             TestOp::Create { rkey, counter } => RecordWriteOp::Create {
                 collection: collection_static.clone(),
-                rkey: RecordKey(Rkey::new(&rkey).unwrap()).into_static(),
+                rkey: RecordKey(Rkey::new(rkey).unwrap()).into_static(),
                 record: make_test_record(counter, "Random post"),
             },
             TestOp::Update { rkey, counter } => RecordWriteOp::Update {
                 collection: collection_static.clone(),
-                rkey: RecordKey(Rkey::new(&rkey).unwrap()).into_static(),
+                rkey: RecordKey(Rkey::new(rkey).unwrap()).into_static(),
                 record: make_test_record(counter, "Updated post"),
                 prev: None,
             },
             TestOp::Delete { rkey } => RecordWriteOp::Delete {
                 collection: collection_static.clone(),
-                rkey: RecordKey(Rkey::new(&rkey).unwrap()).into_static(),
+                rkey: RecordKey(Rkey::new(rkey).unwrap()).into_static(),
                 prev: None,
             },
         })
@@ -196,8 +199,8 @@ async fn test_stress_random_operations() {
     let storage = Arc::new(MemoryBlockStore::new());
     let mut repo = create_test_repo(storage.clone()).await;
 
-    let collection = Nsid::new("app.bsky.feed.post").unwrap();
-    let did = Did::new("did:plc:stresstest").unwrap();
+    let collection = Nsid::new("app.bsky.feed.post").unwrap().into_static();
+    let did = Did::new("did:plc:stresstest").unwrap().into_static();
     let signing_key = k256::ecdsa::SigningKey::random(&mut rand::rngs::OsRng);
     let pubkey = get_public_key(&signing_key);
 
@@ -308,8 +311,8 @@ async fn test_stress_large_batches() {
     let storage = Arc::new(MemoryBlockStore::new());
     let mut repo = create_test_repo(storage.clone()).await;
 
-    let collection = Nsid::new("app.bsky.feed.post").unwrap();
-    let did = Did::new("did:plc:stresstest").unwrap();
+    let collection = Nsid::new("app.bsky.feed.post").unwrap().into_static();
+    let did = Did::new("did:plc:stresstest").unwrap().into_static();
     let signing_key = k256::ecdsa::SigningKey::random(&mut rand::rngs::OsRng);
     let pubkey = get_public_key(&signing_key);
 
@@ -408,7 +411,7 @@ async fn test_stress_with_fixture() {
         repo.current_commit_cid()
     );
 
-    let collection = Nsid::new("app.bsky.feed.post").unwrap();
+    let collection = Nsid::new("app.bsky.feed.post").unwrap().into_static();
     let signing_key = k256::ecdsa::SigningKey::random(&mut rand::rngs::OsRng);
     let pubkey = get_public_key(&signing_key);
     let did = repo.did().clone().into_static();

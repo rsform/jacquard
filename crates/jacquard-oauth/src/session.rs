@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{str::FromStr, sync::Arc};
 
 use chrono::TimeDelta;
 
@@ -15,7 +15,8 @@ use crate::{
 
 use dashmap::DashMap;
 use jacquard_common::{
-    CowStr, IntoStatic,
+    IntoStatic,
+    bos::{BosStr, DefaultStr},
     deps::fluent_uri::Uri,
     http_client::HttpClient,
     session::SessionStoreError,
@@ -37,55 +38,61 @@ pub trait DpopDataSource {
     /// Return the private JWK used to sign DPoP proofs.
     fn key(&self) -> &Key;
     /// Return the most recently observed nonce from the authorization server, if any.
-    fn authserver_nonce(&self) -> Option<CowStr<'_>>;
+    fn authserver_nonce(&self) -> Option<&str>;
     /// Persist a new nonce received from the authorization server.
-    fn set_authserver_nonce(&mut self, nonce: CowStr<'_>);
+    fn set_authserver_nonce(&mut self, nonce: SmolStr);
     /// Return the most recently observed nonce from the resource server (PDS), if any.
-    fn host_nonce(&self) -> Option<CowStr<'_>>;
+    fn host_nonce(&self) -> Option<&str>;
     /// Persist a new nonce received from the resource server (PDS).
-    fn set_host_nonce(&mut self, nonce: CowStr<'_>);
+    fn set_host_nonce(&mut self, nonce: SmolStr);
 }
 
 /// Persisted information about an OAuth session. Used to resume an active session.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct ClientSessionData<'s> {
+#[serde(bound(
+    serialize = "S: serde::Serialize + BosStr + Ord",
+    deserialize = "S: serde::Deserialize<'de> + BosStr, Scope<S>: serde::Deserialize<'de>"
+))]
+pub struct ClientSessionData<S: BosStr = DefaultStr> {
     /// DID of the authenticated account; serves as the primary key for session storage
     /// because only one active session per account is assumed.
-    #[serde(borrow)]
-    pub account_did: Did<'s>,
+    pub account_did: Did<S>,
 
     /// Opaque identifier that distinguishes this session from other sessions for the same account.
     ///
     /// Reuses the random `state` token generated during the PAR flow.
-    pub session_id: CowStr<'s>,
+    pub session_id: S,
 
     /// Base URL of the resource server (PDS): scheme, host, and port only
     pub host_url: Uri<String>,
 
     /// Base URL of the authorization server (PDS or entryway): scheme, host, and port only
-    pub authserver_url: CowStr<'s>,
+    pub authserver_url: S,
 
     /// Full URL of the authorization server's token endpoint.
-    pub authserver_token_endpoint: CowStr<'s>,
+    pub authserver_token_endpoint: S,
 
     /// Full URL of the authorization server's revocation endpoint, if advertised.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub authserver_revocation_endpoint: Option<CowStr<'s>>,
+    pub authserver_revocation_endpoint: Option<S>,
 
     /// The set of OAuth scopes approved for this session, as returned in the initial token response.
-    pub scopes: Vec<Scope<'s>>,
+    pub scopes: Vec<Scope<S>>,
 
     /// DPoP key and nonce state for ongoing requests in this session.
     #[serde(flatten)]
-    pub dpop_data: DpopClientData<'s>,
+    pub dpop_data: DpopClientData,
 
     /// Current token set (access token, refresh token, expiry, etc.).
     #[serde(flatten)]
-    pub token_set: TokenSet<'s>,
+    pub token_set: TokenSet<S>,
 }
 
-impl IntoStatic for ClientSessionData<'_> {
-    type Output = ClientSessionData<'static>;
+impl<S: BosStr + Ord + IntoStatic> IntoStatic for ClientSessionData<S>
+where
+    S::Output: BosStr + Ord,
+{
+    type Output = ClientSessionData<S::Output>;
 
     fn into_static(self) -> Self::Output {
         ClientSessionData {
@@ -95,7 +102,7 @@ impl IntoStatic for ClientSessionData<'_> {
                 .authserver_revocation_endpoint
                 .map(IntoStatic::into_static),
             scopes: self.scopes.into_static(),
-            dpop_data: self.dpop_data.into_static(),
+            dpop_data: self.dpop_data,
             token_set: self.token_set.into_static(),
             account_did: self.account_did.into_static(),
             session_id: self.session_id.into_static(),
@@ -104,20 +111,28 @@ impl IntoStatic for ClientSessionData<'_> {
     }
 }
 
-impl ClientSessionData<'_> {
+impl<S: BosStr + Ord> ClientSessionData<S> {
     /// Update this session's token set and, if the new token set includes scopes, replace the scope list.
     ///
     /// Called after a successful token refresh so that any scope changes returned by the server
     /// are reflected in the persisted session without requiring a full re-authentication.
-    pub fn update_with_tokens(&mut self, token_set: TokenSet<'_>) {
+    ///
+    /// This method is only available on `DefaultStr`-backed sessions (the common case for
+    /// in-memory sessions). Zero-copy borrowed sessions are read-only by nature and would
+    /// not be refreshed in place.
+    pub fn update_with_tokens(&mut self, token_set: &TokenSet<S>)
+    where
+        S: FromStr + Clone,
+        S::Err: std::fmt::Debug,
+    {
         if let Some(Ok(scopes)) = token_set
             .scope
             .as_ref()
-            .map(|scope| Scope::parse_multiple_reduced(&scope).map(IntoStatic::into_static))
+            .map(|scope| Scope::<S>::parse_multiple_reduced(scope.as_ref()))
         {
-            self.scopes = scopes;
+            self.scopes = scopes.into_iter().map(|s| s.convert()).collect();
         }
-        self.token_set = token_set.into_static();
+        self.token_set = token_set.clone();
     }
 }
 
@@ -126,46 +141,34 @@ impl ClientSessionData<'_> {
 /// Both nonces must be written back to the store after each request so that the next
 /// request to the same server includes the correct replay-protection nonce.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
-pub struct DpopClientData<'s> {
+pub struct DpopClientData {
     /// The private JWK bound to this session; used to sign all DPoP proofs.
     pub dpop_key: Key,
     /// Most recently observed DPoP nonce from the authorization server.
-    #[serde(borrow)]
-    pub dpop_authserver_nonce: CowStr<'s>,
+    pub dpop_authserver_nonce: SmolStr,
     /// Most recently observed DPoP nonce from the resource server (PDS).
-    pub dpop_host_nonce: CowStr<'s>,
+    pub dpop_host_nonce: SmolStr,
 }
 
-impl IntoStatic for DpopClientData<'_> {
-    type Output = DpopClientData<'static>;
-
-    fn into_static(self) -> Self::Output {
-        DpopClientData {
-            dpop_key: self.dpop_key,
-            dpop_authserver_nonce: self.dpop_authserver_nonce.into_static(),
-            dpop_host_nonce: self.dpop_host_nonce.into_static(),
-        }
-    }
-}
-
-impl DpopDataSource for DpopClientData<'_> {
+impl DpopDataSource for DpopClientData {
     fn key(&self) -> &Key {
         &self.dpop_key
     }
-    fn authserver_nonce(&self) -> Option<CowStr<'_>> {
-        Some(self.dpop_authserver_nonce.clone())
+
+    fn authserver_nonce(&self) -> Option<&str> {
+        Some(self.dpop_authserver_nonce.as_ref())
     }
 
-    fn host_nonce(&self) -> Option<CowStr<'_>> {
-        Some(self.dpop_host_nonce.clone())
+    fn host_nonce(&self) -> Option<&str> {
+        Some(self.dpop_host_nonce.as_ref())
     }
 
-    fn set_authserver_nonce(&mut self, nonce: CowStr<'_>) {
-        self.dpop_authserver_nonce = nonce.into_static();
+    fn set_authserver_nonce(&mut self, nonce: SmolStr) {
+        self.dpop_authserver_nonce = nonce;
     }
 
-    fn set_host_nonce(&mut self, nonce: CowStr<'_>) {
-        self.dpop_host_nonce = nonce.into_static();
+    fn set_host_nonce(&mut self, nonce: SmolStr) {
+        self.dpop_host_nonce = nonce;
     }
 }
 
@@ -175,45 +178,52 @@ impl DpopDataSource for DpopClientData<'_> {
 /// [`crate::client::OAuthClient::callback`] so that the callback can verify the
 /// `state`, reconstruct the token exchange, and create a full [`ClientSessionData`].
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
-pub struct AuthRequestData<'s> {
+#[serde(bound(
+    serialize = "S: serde::Serialize + BosStr + Ord",
+    deserialize = "S: serde::Deserialize<'de> + BosStr, Scope<S>: serde::Deserialize<'de>"
+))]
+pub struct AuthRequestData<S: BosStr = DefaultStr> {
     /// Random identifier generated for this authorization request; used as the primary key
     /// for storing and looking up this record during the callback.
-    #[serde(borrow)]
-    pub state: CowStr<'s>,
+    pub state: S,
 
     /// Base URL of the authorization server that was selected for this flow.
-    pub authserver_url: CowStr<'s>,
+    pub authserver_url: S,
 
     /// If the flow was initiated with a DID or handle, the resolved DID is stored here
     /// so it can be compared against the `sub` in the token response.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub account_did: Option<Did<'s>>,
+    pub account_did: Option<Did<S>>,
 
     /// OAuth scopes requested for this authorization.
-    pub scopes: Vec<Scope<'s>>,
+    pub scopes: Vec<Scope<S>>,
 
     /// The PAR `request_uri` returned by the authorization server; included in the redirect URL.
-    pub request_uri: CowStr<'s>,
+    pub request_uri: S,
 
     /// Full URL of the authorization server's token endpoint.
-    pub authserver_token_endpoint: CowStr<'s>,
+    pub authserver_token_endpoint: S,
 
     /// Full URL of the authorization server's revocation endpoint, if advertised.
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
-    pub authserver_revocation_endpoint: Option<CowStr<'s>>,
+    pub authserver_revocation_endpoint: Option<S>,
 
     /// The PKCE code verifier whose SHA-256 hash was sent as the code challenge; required
     /// at the token exchange step to prove the initiator of the auth request.
-    pub pkce_verifier: CowStr<'s>,
+    pub pkce_verifier: S,
 
     /// DPoP key and any authserver nonce observed during the PAR request.
     #[serde(flatten)]
-    pub dpop_data: DpopReqData<'s>,
+    pub dpop_data: DpopReqData,
 }
 
-impl IntoStatic for AuthRequestData<'_> {
-    type Output = AuthRequestData<'static>;
-    fn into_static(self) -> AuthRequestData<'static> {
+impl<S: BosStr + Ord + IntoStatic> IntoStatic for AuthRequestData<S>
+where
+    S::Output: BosStr + Ord,
+{
+    type Output = AuthRequestData<S::Output>;
+
+    fn into_static(self) -> AuthRequestData<S::Output> {
         AuthRequestData {
             request_uri: self.request_uri.into_static(),
             authserver_token_endpoint: self.authserver_token_endpoint.into_static(),
@@ -221,7 +231,7 @@ impl IntoStatic for AuthRequestData<'_> {
                 .authserver_revocation_endpoint
                 .map(|s| s.into_static()),
             pkce_verifier: self.pkce_verifier.into_static(),
-            dpop_data: self.dpop_data.into_static(),
+            dpop_data: self.dpop_data,
             state: self.state.into_static(),
             authserver_url: self.authserver_url.into_static(),
             account_did: self.account_did.into_static(),
@@ -235,41 +245,31 @@ impl IntoStatic for AuthRequestData<'_> {
 /// Unlike [`DpopClientData`], this struct only tracks the authserver nonce—no resource-server
 /// nonce is needed until a full session is established.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
-pub struct DpopReqData<'s> {
+pub struct DpopReqData {
     /// The private JWK generated fresh for this authorization request and session.
     pub dpop_key: Key,
     /// DPoP nonce received from the authorization server during the PAR exchange, if any.
-    #[serde(borrow)]
-    pub dpop_authserver_nonce: Option<CowStr<'s>>,
+    pub dpop_authserver_nonce: Option<SmolStr>,
 }
 
-impl IntoStatic for DpopReqData<'_> {
-    type Output = DpopReqData<'static>;
-    fn into_static(self) -> DpopReqData<'static> {
-        DpopReqData {
-            dpop_key: self.dpop_key,
-            dpop_authserver_nonce: self.dpop_authserver_nonce.into_static(),
-        }
-    }
-}
-
-impl DpopDataSource for DpopReqData<'_> {
+impl DpopDataSource for DpopReqData {
     fn key(&self) -> &Key {
         &self.dpop_key
     }
-    fn authserver_nonce(&self) -> Option<CowStr<'_>> {
-        self.dpop_authserver_nonce.clone()
+
+    fn authserver_nonce(&self) -> Option<&str> {
+        self.dpop_authserver_nonce.as_ref().map(|n| n.as_ref())
     }
 
-    fn host_nonce(&self) -> Option<CowStr<'_>> {
+    fn host_nonce(&self) -> Option<&str> {
         None
     }
 
-    fn set_authserver_nonce(&mut self, nonce: CowStr<'_>) {
-        self.dpop_authserver_nonce = Some(nonce.into_static());
+    fn set_authserver_nonce(&mut self, nonce: SmolStr) {
+        self.dpop_authserver_nonce = Some(nonce);
     }
 
-    fn set_host_nonce(&mut self, _nonce: CowStr<'_>) {}
+    fn set_host_nonce(&mut self, _nonce: SmolStr) {}
 }
 
 /// Static configuration for an OAuth client: the signing keyset and registered client metadata.
@@ -277,17 +277,27 @@ impl DpopDataSource for DpopReqData<'_> {
 /// `ClientData` is constructed once at startup and shared (via `Arc`) across all sessions
 /// managed by the same [`crate::client::OAuthClient`].
 #[derive(Clone, Debug)]
-pub struct ClientData<'s> {
+pub struct ClientData<S>
+where
+    S: BosStr + FromStr + Ord,
+    <S as FromStr>::Err: core::fmt::Debug,
+{
     /// Optional private key set used for `private_key_jwt` client authentication.
     /// When `None`, the `none` authentication method is used instead.
     pub keyset: Option<Keyset>,
     /// AT Protocol-specific client registration metadata (redirect URIs, scopes, etc.).
-    pub config: AtprotoClientMetadata<'s>,
+    pub config: AtprotoClientMetadata<S>,
 }
 
-impl<'s> IntoStatic for ClientData<'s> {
-    type Output = ClientData<'static>;
-    fn into_static(self) -> ClientData<'static> {
+impl<S> IntoStatic for ClientData<S>
+where
+    S: BosStr + FromStr + Ord + IntoStatic,
+    S::Output: BosStr + Ord + FromStr,
+    <S as FromStr>::Err: core::fmt::Debug,
+    <S::Output as FromStr>::Err: core::fmt::Debug,
+{
+    type Output = ClientData<S::Output>;
+    fn into_static(self) -> ClientData<S::Output> {
         ClientData {
             keyset: self.keyset,
             config: self.config.into_static(),
@@ -295,9 +305,12 @@ impl<'s> IntoStatic for ClientData<'s> {
     }
 }
 
-impl<'s> ClientData<'s> {
+impl<S: BosStr + FromStr + Ord> ClientData<S>
+where
+    <S as FromStr>::Err: core::fmt::Debug,
+{
     /// Create `ClientData` with an optional signing keyset and the given client metadata.
-    pub fn new(keyset: Option<Keyset>, config: AtprotoClientMetadata<'s>) -> Self {
+    pub fn new(keyset: Option<Keyset>, config: AtprotoClientMetadata<S>) -> Self {
         Self { keyset, config }
     }
 
@@ -305,7 +318,7 @@ impl<'s> ClientData<'s> {
     ///
     /// Suitable for public clients (e.g., single-page applications or native apps) that
     /// cannot securely store a private key.
-    pub fn new_public(config: AtprotoClientMetadata<'s>) -> Self {
+    pub fn new_public(config: AtprotoClientMetadata<S>) -> Self {
         Self {
             keyset: None,
             config,
@@ -318,20 +331,28 @@ impl<'s> ClientData<'s> {
 /// `ClientSession` is a convenience type that pairs a [`ClientData`] with a
 /// [`ClientSessionData`] so that methods like `metadata` can access both without requiring
 /// callers to pass them separately.
-pub struct ClientSession<'s> {
+pub struct ClientSession<S: BosStr = DefaultStr>
+where
+    S: FromStr + Ord,
+    <S as FromStr>::Err: core::fmt::Debug,
+{
     /// Optional signing keyset, forwarded from [`ClientData`].
     pub keyset: Option<Keyset>,
     /// Client registration metadata, forwarded from [`ClientData`].
-    pub config: AtprotoClientMetadata<'s>,
+    pub config: AtprotoClientMetadata<S>,
     /// The session state for the authenticated account.
-    pub session_data: ClientSessionData<'s>,
+    pub session_data: ClientSessionData<S>,
 }
 
-impl<'s> ClientSession<'s> {
+impl<S: BosStr> ClientSession<S>
+where
+    S: FromStr + Ord + Clone,
+    <S as FromStr>::Err: core::fmt::Debug,
+{
     /// Construct a `ClientSession` from a [`ClientData`] and an active session.
     pub fn new(
-        ClientData { keyset, config }: ClientData<'s>,
-        session_data: ClientSessionData<'s>,
+        ClientData { keyset, config }: ClientData<S>,
+        session_data: ClientSessionData<S>,
     ) -> Self {
         Self {
             keyset,
@@ -344,15 +365,16 @@ impl<'s> ClientSession<'s> {
     pub async fn metadata<T: HttpClient + OAuthResolver + Send + Sync>(
         &self,
         client: &T,
-    ) -> Result<OAuthMetadata, Error> {
+    ) -> Result<OAuthMetadata<S>, Error>
+    where
+        S: IntoStatic,
+    {
         Ok(OAuthMetadata {
             server_metadata: client
-                .get_authorization_server_metadata(&self.session_data.authserver_url)
+                .get_authorization_server_metadata(self.session_data.authserver_url.as_ref())
                 .await
                 .map_err(|e| Error::ServerAgent(crate::request::RequestError::resolver(e)))?,
-            client_metadata: atproto_client_metadata(self.config.clone(), &self.keyset)
-                .unwrap()
-                .into_static(),
+            client_metadata: atproto_client_metadata(&self.config, &self.keyset).unwrap(),
             keyset: self.keyset.clone(),
         })
     }
@@ -403,28 +425,32 @@ impl Error {
 /// concurrent refresh attempts for the same `(DID, session_id)` pair are coalesced behind
 /// a per-key `Mutex` stored in `pending`, so only one refresh request is issued to the
 /// authorization server even when many concurrent requests detect an expired token.
-pub struct SessionRegistry<T, S>
+pub struct SessionRegistry<T, S, Str>
 where
     T: OAuthResolver,
     S: ClientAuthStore,
+    Str: BosStr + FromStr + Ord,
+    <Str as FromStr>::Err: core::fmt::Debug,
 {
     /// Backing store for persisting session data across process restarts.
     pub store: Arc<S>,
     /// Shared resolver used to fetch authorization server metadata during refresh.
     pub client: Arc<T>,
     /// Static client configuration (keyset and registration metadata).
-    pub client_data: ClientData<'static>,
+    pub client_data: ClientData<Str>,
     /// Per-`(DID, session_id)` mutex that serializes concurrent refresh attempts.
     pending: DashMap<SmolStr, Arc<Mutex<()>>>,
 }
 
-impl<T, S> SessionRegistry<T, S>
+impl<T, S, Str> SessionRegistry<T, S, Str>
 where
     S: ClientAuthStore,
     T: OAuthResolver,
+    Str: BosStr + FromStr + Ord,
+    <Str as FromStr>::Err: core::fmt::Debug,
 {
     /// Create a new registry, taking ownership of the store.
-    pub fn new(store: S, client: Arc<T>, client_data: ClientData<'static>) -> Self {
+    pub fn new(store: S, client: Arc<T>, client_data: ClientData<Str>) -> Self {
         let store = Arc::new(store);
         Self {
             store: Arc::clone(&store),
@@ -438,7 +464,7 @@ where
     ///
     /// Use this variant when the store needs to be accessed from outside the registry,
     /// for example to expose session listing or administration functionality.
-    pub fn new_shared(store: Arc<S>, client: Arc<T>, client_data: ClientData<'static>) -> Self {
+    pub fn new_shared(store: Arc<S>, client: Arc<T>, client_data: ClientData<Str>) -> Self {
         Self {
             store,
             client,
@@ -448,16 +474,18 @@ where
     }
 }
 
-impl<T, S> SessionRegistry<T, S>
+impl<T, S, Str> SessionRegistry<T, S, Str>
 where
     S: ClientAuthStore + Send + Sync + 'static,
     T: OAuthResolver + DpopExt + Send + Sync + 'static,
+    Str: BosStr + FromStr + Ord + Clone,
+    <Str as FromStr>::Err: core::fmt::Debug,
 {
-    async fn get_refreshed(
+    async fn get_refreshed<D: BosStr + Send + Sync>(
         &self,
-        did: &Did<'_>,
+        did: &Did<D>,
         session_id: &str,
-    ) -> Result<ClientSessionData<'_>, Error> {
+    ) -> Result<ClientSessionData, Error> {
         let key = format_smolstr!("{}_{}", did, session_id);
         let lock = self
             .pending
@@ -506,12 +534,12 @@ where
     /// When `refresh` is `true`, proactively
     /// renews the token if it is within 60 seconds of expiry. When `false`, returns the session
     /// data as-is without contacting the authorization server.
-    pub async fn get(
+    pub async fn get<D: BosStr + Send + Sync>(
         &self,
-        did: &Did<'_>,
+        did: &Did<D>,
         session_id: &str,
         refresh: bool,
-    ) -> Result<ClientSessionData<'_>, Error> {
+    ) -> Result<ClientSessionData, Error> {
         if refresh {
             self.get_refreshed(did, session_id).await
         } else {
@@ -523,12 +551,16 @@ where
         }
     }
     /// Persist an updated session to the backing store.
-    pub async fn set(&self, value: ClientSessionData<'_>) -> Result<(), Error> {
+    pub async fn set(&self, value: ClientSessionData) -> Result<(), Error> {
         self.store.upsert_session(value).await?;
         Ok(())
     }
     /// Delete a session from the backing store.
-    pub async fn del(&self, did: &Did<'_>, session_id: &str) -> Result<(), Error> {
+    pub async fn del<D: BosStr + Send + Sync>(
+        &self,
+        did: &Did<D>,
+        session_id: &str,
+    ) -> Result<(), Error> {
         self.store.delete_session(did, session_id).await?;
         Ok(())
     }
