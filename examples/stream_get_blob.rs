@@ -38,7 +38,7 @@ async fn main() -> miette::Result<()> {
     let output: StreamingResponse = agent
         .download(GetBlob {
             did: Did::new(args.did)?,
-            cid: Cid::str(&args.cid),
+            cid: Cid::new(args.cid.as_bytes())?,
         })
         .await?;
 

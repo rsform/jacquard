@@ -9,8 +9,10 @@ use crate::{
     session::{ClientData, ClientSessionData, DpopClientData, SessionRegistry},
     types::{AuthorizeOptions, CallbackParams},
 };
+#[cfg(feature = "websocket")]
+use jacquard_common::CowStr;
 use jacquard_common::{
-    AuthorizationToken, CowStr, IntoStatic,
+    AuthorizationToken, IntoStatic,
     bos::BosStr,
     deps::fluent_uri::Uri,
     error::{AuthError, ClientError, XrpcResult},
@@ -1000,7 +1002,15 @@ fn is_invalid_token_response<R: XrpcResp>(response: &XrpcResult<Response<R>>) ->
                 .is_ok_and(|s| s.starts_with("DPoP ") && s.contains("error=\"invalid_token\"")),
             _ => false,
         },
-        Ok(_) => false,
+        // Some servers return 200/401 with an error in the body rather than using
+        // WWW-Authenticate. Check the raw response bytes for the invalid_token pattern.
+        Ok(resp) => {
+            resp.status() == http::StatusCode::UNAUTHORIZED
+                || serde_json::from_slice::<serde_json::Value>(resp.buffer())
+                    .ok()
+                    .and_then(|v| v.get("error")?.as_str().map(|s| s == "invalid_token"))
+                    .unwrap_or(false)
+        }
     }
 }
 

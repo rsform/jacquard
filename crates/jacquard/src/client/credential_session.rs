@@ -516,7 +516,9 @@ fn is_expired<R: XrpcResp>(response: &XrpcResult<Response<R>>) -> bool {
         {
             true
         }
-        Ok(_) => false,
+        // A 401 without WWW-Authenticate flows through as Ok(Response) with 401 status.
+        // Check the status code directly to catch expired tokens signalled via body JSON.
+        Ok(resp) if resp.status() == http::StatusCode::UNAUTHORIZED => true,
         _ => false,
     }
 }

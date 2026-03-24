@@ -17,7 +17,7 @@ async fn main() -> miette::Result<()> {
     let args = Args::parse();
 
     // Parse the handle
-    let handle = Handle::new(&args.handle)?;
+    let handle = Handle::new(args.handle.as_str())?;
 
     // Create an unauthenticated client with identity resolver
     let client = BasicClient::unauthenticated();

@@ -86,10 +86,10 @@ async fn main() -> miette::Result<()> {
     // Subscribe with no filters (firehose mode)
     // Enable compression if zstd feature is available
     #[cfg(feature = "zstd")]
-    let params = { JetstreamParams::new().compress(true).build() };
+    let params: JetstreamParams = { JetstreamParams::new().compress(true).build() };
 
     #[cfg(not(feature = "zstd"))]
-    let params = { JetstreamParams::new().build() };
+    let params: JetstreamParams = { JetstreamParams::new().build() };
 
     let stream = client.subscribe(&params).await.into_diagnostic()?;
 

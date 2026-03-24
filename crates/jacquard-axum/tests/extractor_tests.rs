@@ -1,82 +1,55 @@
 use axum::{Json, Router, response::IntoResponse};
 use axum_test::TestServer;
 use jacquard_axum::{ExtractXrpc, IntoRouter};
+use jacquard_common::bos::{BosStr, DefaultStr};
 use jacquard_common::types::string::Did;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 
 // Mock XRPC endpoint for testing
 #[derive(Debug, Clone, Serialize, Deserialize)]
-struct TestQueryRequest<'a> {
-    #[serde(borrow)]
-    did: Did<'a>,
+#[serde(bound(deserialize = "S: serde::Deserialize<'de> + BosStr"))]
+struct TestQueryRequest<S: BosStr = DefaultStr> {
+    did: Did<S>,
     #[serde(default)]
     limit: Option<u32>,
 }
 
-impl jacquard::IntoStatic for TestQueryRequest<'_> {
-    type Output = TestQueryRequest<'static>;
-
-    fn into_static(self) -> Self::Output {
-        TestQueryRequest {
-            did: self.did.into_static(),
-            limit: self.limit,
-        }
-    }
-}
-
 #[derive(Debug, Clone, Serialize, Deserialize)]
-struct TestQueryResponse<'a> {
-    #[serde(borrow)]
-    did: Did<'a>,
+#[serde(bound(deserialize = "S: serde::Deserialize<'de> + BosStr"))]
+struct TestQueryResponse<S: BosStr = DefaultStr> {
+    did: Did<S>,
     #[serde(skip_serializing_if = "BTreeMap::is_empty", default)]
     extra_data: BTreeMap<String, serde_json::Value>,
-}
-
-impl jacquard::IntoStatic for TestQueryResponse<'_> {
-    type Output = TestQueryResponse<'static>;
-
-    fn into_static(self) -> Self::Output {
-        TestQueryResponse {
-            did: self.did.into_static(),
-            extra_data: self.extra_data,
-        }
-    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, thiserror::Error)]
 #[error("test error")]
 struct TestError;
 
-impl jacquard::IntoStatic for TestError {
-    type Output = TestError;
-
-    fn into_static(self) -> Self::Output {
-        self
-    }
-}
-
-impl jacquard::xrpc::XrpcResp for TestQueryResponse<'_> {
+impl jacquard::xrpc::XrpcResp for TestQueryResponse {
     const NSID: &'static str = "com.example.test.query";
     const ENCODING: &'static str = "application/json";
-    type Output<'a> = TestQueryResponse<'a>;
-    type Err<'a> = TestError;
+    type Output<S: BosStr> = TestQueryResponse<S>;
+    type Err = TestError;
 }
 
-impl jacquard::xrpc::XrpcRequest for TestQueryRequest<'_> {
+impl<S: BosStr + serde::Serialize> jacquard::xrpc::XrpcRequest for TestQueryRequest<S> {
     const NSID: &'static str = "com.example.test.query";
     const METHOD: jacquard::xrpc::XrpcMethod = jacquard::xrpc::XrpcMethod::Query;
-    type Response = TestQueryResponse<'static>;
+    type Response = TestQueryResponse;
 }
 
-impl jacquard::xrpc::XrpcEndpoint for TestQueryRequest<'_> {
+impl jacquard::xrpc::XrpcEndpoint for TestQueryRequest {
     const PATH: &'static str = "/xrpc/com.example.test.query";
     const METHOD: jacquard::xrpc::XrpcMethod = jacquard::xrpc::XrpcMethod::Query;
-    type Request<'a> = TestQueryRequest<'a>;
-    type Response = TestQueryResponse<'static>;
+    type Request<S: BosStr> = TestQueryRequest<S>;
+    type Response = TestQueryResponse;
 }
 
-async fn test_handler(ExtractXrpc(req): ExtractXrpc<TestQueryRequest<'_>>) -> impl IntoResponse {
+async fn test_handler(
+    ExtractXrpc(req): ExtractXrpc<TestQueryRequest, DefaultStr>,
+) -> impl IntoResponse {
     Json(TestQueryResponse {
         did: req.did,
         extra_data: BTreeMap::new(),

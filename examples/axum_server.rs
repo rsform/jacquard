@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use axum::{Json, Router, extract::State, http::StatusCode, response::IntoResponse};
 use jacquard::{
-    CowStr,
+    CowStr, DefaultStr,
     api::com_atproto::identity::resolve_did::{ResolveDidOutput, ResolveDidRequest},
     identity::{JacquardResolver, resolver::IdentityResolver},
     types::value::to_data,
@@ -14,7 +14,7 @@ use tracing_subscriber::EnvFilter;
 #[axum_macros::debug_handler]
 async fn resolve_did(
     State(state): State<Arc<AppState>>,
-    ExtractXrpc(args): ExtractXrpc<ResolveDidRequest, CowStr<'_>>,
+    ExtractXrpc(args): ExtractXrpc<ResolveDidRequest, DefaultStr>,
 ) -> Result<Json<ResolveDidOutput<CowStr<'static>>>, XrpcErrorResponse> {
     let doc = state
         .resolver

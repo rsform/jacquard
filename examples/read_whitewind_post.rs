@@ -16,13 +16,13 @@ async fn main() -> miette::Result<()> {
     let args = Args::parse();
 
     // Parse the at:// URI
-    let uri = AtUri::new(&args.uri)?;
+    let uri = AtUri::new(args.uri.as_str())?;
 
     // Create an unauthenticated agent for public record access
     let agent = BasicClient::unauthenticated();
 
     // Use Agent's get_record helper with the at:// URI
-    let response = agent.get_record::<Entry>(&uri).await?;
+    let response = agent.get_record::<Entry, _>(&uri).await?;
     let output = response.into_output()?;
 
     println!("📚 WhiteWind Blog Entry\n");

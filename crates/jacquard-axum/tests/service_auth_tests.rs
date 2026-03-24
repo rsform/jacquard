@@ -13,7 +13,9 @@ use jacquard_axum::service_auth::{
     ExtractServiceAuth, ServiceAuthConfig, VerifiedServiceAuth, service_auth_middleware,
 };
 use jacquard_common::{
-    CowStr, IntoStatic,
+    CowStr,
+    bos::BosStr,
+    deps::smol_str::SmolStr,
     service_auth::JwtHeader,
     types::{
         did::Did,
@@ -66,7 +68,7 @@ fn create_test_jwt(
 }
 
 // Test helper: create DID document with k256 key
-fn create_test_did_doc(did: &str, public_key: &k256::ecdsa::VerifyingKey) -> DidDocument<'static> {
+fn create_test_did_doc(did: &str, public_key: &k256::ecdsa::VerifyingKey) -> DidDocument {
     use std::collections::BTreeMap;
 
     // Encode as compressed SEC1
@@ -82,13 +84,13 @@ fn create_test_did_doc(did: &str, public_key: &k256::ecdsa::VerifyingKey) -> Did
 
     DidDocument {
         context: default_context(),
-        id: Did::new_owned(did).unwrap().into_static(),
+        id: Did::new_owned(did).unwrap(),
         also_known_as: None,
         verification_method: Some(vec![VerificationMethod {
-            id: CowStr::Owned(format!("{}#atproto", did).into()),
-            r#type: CowStr::new_static("Multikey"),
-            controller: Some(CowStr::Owned(did.into())),
-            public_key_multibase: Some(CowStr::Owned(multibase_key.into())),
+            id: SmolStr::from(format!("{}#atproto", did)),
+            r#type: SmolStr::new_static("Multikey"),
+            controller: Some(SmolStr::from(did)),
+            public_key_multibase: Some(SmolStr::from(multibase_key)),
             extra_data: BTreeMap::new(),
         }]),
         service: None,
@@ -99,12 +101,12 @@ fn create_test_did_doc(did: &str, public_key: &k256::ecdsa::VerifyingKey) -> Did
 // Mock resolver for tests
 #[derive(Clone)]
 struct MockResolver {
-    did_doc: DidDocument<'static>,
+    did_doc: DidDocument,
     options: ResolverOptions,
 }
 
 impl MockResolver {
-    fn new(did_doc: DidDocument<'static>) -> Self {
+    fn new(did_doc: DidDocument) -> Self {
         Self {
             did_doc,
             options: ResolverOptions::default(),
@@ -117,16 +119,16 @@ impl IdentityResolver for MockResolver {
         &self.options
     }
 
-    fn resolve_handle(
+    fn resolve_handle<S: BosStr + Sync>(
         &self,
-        _handle: &jacquard_common::types::string::Handle<'_>,
-    ) -> impl Future<Output = Result<Did<'static>, IdentityError>> + Send {
+        _handle: &jacquard_common::types::string::Handle<S>,
+    ) -> impl Future<Output = Result<Did, IdentityError>> + Send {
         async { Err(IdentityError::handle_resolution_exhausted()) }
     }
 
-    fn resolve_did_doc(
+    fn resolve_did_doc<S: BosStr + Sync>(
         &self,
-        _did: &Did<'_>,
+        _did: &Did<S>,
     ) -> impl Future<Output = Result<DidDocResponse, IdentityError>> + Send {
         let doc = self.did_doc.clone();
         async move {

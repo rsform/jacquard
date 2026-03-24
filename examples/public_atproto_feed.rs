@@ -15,13 +15,13 @@ async fn main() -> miette::Result<()> {
         .to_owned();
 
     // Feed of posts about the AT Protocol
-    let feed_uri =
+    let feed_uri: AtUri =
         AtUri::new_static("at://did:plc:oio4hkxaop4ao4wz2pp3f4cr/app.bsky.feed.generator/atproto")
             .unwrap();
 
     let request = GetFeed::new().feed(feed_uri).limit(10).build();
 
-    let response = http.xrpc(&base.borrow()).send(&request).await?;
+    let response = http.xrpc(base.borrow()).send(&request).await?;
     let output = response.into_output()?;
 
     println!("Latest posts from the AT Protocol feed:\n");

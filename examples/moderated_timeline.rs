@@ -89,7 +89,7 @@ async fn main() -> miette::Result<()> {
             .map(|did| did.to_cowstr())
             .collect(),
     );
-    let request = GetTimeline::new().limit(args.limit).build();
+    let request: GetTimeline = GetTimeline::new().limit(args.limit).build();
 
     println!("\nFetching timeline with {} posts...\n", args.limit);
 
