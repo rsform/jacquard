@@ -117,7 +117,7 @@ where
     /// Current base endpoint. Defaults to the public appview when unset.
     pub async fn endpoint(&self) -> Uri<String> {
         self.endpoint.read().await.clone().unwrap_or_else(|| {
-            Uri::parse("https://public.bsky.app")
+            Uri::parse("https://public.api.bsky.app")
                 .expect("hardcoded URI is valid")
                 .to_owned()
         })
@@ -442,7 +442,7 @@ where
 {
     async fn base_uri(&self) -> Uri<String> {
         self.endpoint.read().await.clone().unwrap_or_else(|| {
-            Uri::parse("https://public.bsky.app")
+            Uri::parse("https://public.api.bsky.app")
                 .expect("hardcoded URI is valid")
                 .to_owned()
         })
@@ -847,7 +847,7 @@ where
 {
     async fn base_uri(&self) -> Uri<String> {
         self.endpoint.read().await.clone().unwrap_or_else(|| {
-            Uri::parse("https://public.bsky.app")
+            Uri::parse("https://public.api.bsky.app")
                 .expect("hardcoded URI is valid")
                 .to_owned()
         })

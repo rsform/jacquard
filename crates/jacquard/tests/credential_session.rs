@@ -171,7 +171,10 @@ async fn credential_login_and_auto_refresh() {
     let session = CredentialSession::new(store.clone(), client.clone());
 
     // Before login, default endpoint should be public appview
-    assert_eq!(session.endpoint().await.as_str(), "https://public.bsky.app");
+    assert_eq!(
+        session.endpoint().await.as_str(),
+        "https://public.api.bsky.app"
+    );
 
     // Login using handle; resolves to PDS and persists session
     session
