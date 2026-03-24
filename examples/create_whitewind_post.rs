@@ -62,7 +62,11 @@ async fn main() -> miette::Result<()> {
     let url_str = format!(
         "https://whtwnd.nat.vg/{}/{}",
         output.uri.authority(),
-        output.uri.rkey().map(|r| r.as_ref()).unwrap_or("")
+        output
+            .uri
+            .rkey()
+            .map(|r| r.to_string())
+            .unwrap_or("".to_string())
     );
     let url = Uri::parse(url_str.as_str()).into_diagnostic()?;
     println!("View at: {}", url);

@@ -57,9 +57,10 @@ use axum::{
     response::{IntoResponse, Response},
 };
 use jacquard::{
-    BosStr, IntoStatic,
+    BosStr, CowStr, IntoStatic,
     xrpc::{XrpcEndpoint, XrpcError, XrpcMethod, XrpcRequest},
 };
+use serde::Deserialize;
 use serde_json::json;
 
 /// Axum extractor for XRPC requests
@@ -68,18 +69,17 @@ use serde_json::json;
 /// and returns the owned (`'static`) request type ready for handler logic.
 pub struct ExtractXrpc<E: XrpcEndpoint, S: BosStr>(pub E::Request<S>);
 
-impl<S, R, B> FromRequest<S> for ExtractXrpc<R, B>
+impl<R> FromRequest<CowStr<'_>> for ExtractXrpc<R, CowStr<'static>>
 where
-    S: BosStr + Send + Sync,
-    B: BosStr,
     R: XrpcEndpoint,
-    R::Request<S>: IntoStatic<Output = R::Request<B>>,
+    for<'de> R::Request<CowStr<'de>>: Deserialize<'de>,
+    for<'a> R::Request<CowStr<'a>>: IntoStatic<Output = R::Request<CowStr<'static>>>,
 {
     type Rejection = Response;
 
     fn from_request(
         req: Request,
-        state: &S,
+        state: &CowStr<'_>,
     ) -> impl Future<Output = Result<Self, Self::Rejection>> + Send {
         async {
             match R::METHOD {
@@ -89,7 +89,7 @@ where
                         .map_err(IntoResponse::into_response)?;
                     let decoded = R::Request::decode_body(&body);
                     match decoded {
-                        Ok(value) => Ok(ExtractXrpc(*value.into_static())),
+                        Ok(value) => Ok(ExtractXrpc(value.into_static())),
                         Err(err) => Err((
                             StatusCode::BAD_REQUEST,
                             Json(json!({
@@ -103,17 +103,19 @@ where
                 XrpcMethod::Query => {
                     if let Some(path_query) = req.uri().path_and_query() {
                         let query = path_query.query().unwrap_or("");
-                        let value: R::Request<S> =
-                            serde_html_form::from_str::<R::Request<S>>(query).map_err(|e| {
-                                (
-                                    StatusCode::BAD_REQUEST,
-                                    Json(json!({
-                                        "error": "InvalidRequest",
-                                        "message": format!("failed to decode request: {}", e)
-                                    })),
-                                )
-                                    .into_response()
-                            })?;
+                        let value: R::Request<CowStr<'_>> = serde_html_form::from_str::<
+                            R::Request<CowStr<'_>>,
+                        >(query)
+                        .map_err(|e| {
+                            (
+                                StatusCode::BAD_REQUEST,
+                                Json(json!({
+                                    "error": "InvalidRequest",
+                                    "message": format!("failed to decode request: {}", e)
+                                })),
+                            )
+                                .into_response()
+                        })?;
                         Ok(ExtractXrpc(value.into_static()))
                     } else {
                         Err((

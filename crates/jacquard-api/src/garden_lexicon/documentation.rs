@@ -613,37 +613,37 @@ pub mod documentation_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Lexicon;
         type CreatedAt;
+        type Lexicon;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Lexicon = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `lexicon` field to Set
-    pub struct SetLexicon<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetLexicon<St> {}
-    impl<St: State> State for SetLexicon<St> {
-        type Lexicon = Set<members::lexicon>;
-        type CreatedAt = St::CreatedAt;
+        type Lexicon = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Lexicon = St::Lexicon;
         type CreatedAt = Set<members::created_at>;
+        type Lexicon = St::Lexicon;
+    }
+    ///State transition - sets the `lexicon` field to Set
+    pub struct SetLexicon<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLexicon<St> {}
+    impl<St: State> State for SetLexicon<St> {
+        type CreatedAt = St::CreatedAt;
+        type Lexicon = Set<members::lexicon>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `lexicon` field
-        pub struct lexicon(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `lexicon` field
+        pub struct lexicon(());
     }
 }
 
@@ -756,8 +756,8 @@ where
 impl<S: BosStr, St> DocumentationBuilder<S, St>
 where
     St: documentation_state::State,
-    St::Lexicon: documentation_state::IsSet,
     St::CreatedAt: documentation_state::IsSet,
+    St::Lexicon: documentation_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Documentation<S> {

@@ -391,8 +391,8 @@ pub mod lore_state {
     pub trait State: sealed::Sealed {
         type Title;
         type CreatedAt;
-        type WorldReference;
         type CreatorDid;
+        type WorldReference;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -400,8 +400,8 @@ pub mod lore_state {
     impl State for Empty {
         type Title = Unset;
         type CreatedAt = Unset;
-        type WorldReference = Unset;
         type CreatorDid = Unset;
+        type WorldReference = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
@@ -409,8 +409,8 @@ pub mod lore_state {
     impl<St: State> State for SetTitle<St> {
         type Title = Set<members::title>;
         type CreatedAt = St::CreatedAt;
-        type WorldReference = St::WorldReference;
         type CreatorDid = St::CreatorDid;
+        type WorldReference = St::WorldReference;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
@@ -418,17 +418,8 @@ pub mod lore_state {
     impl<St: State> State for SetCreatedAt<St> {
         type Title = St::Title;
         type CreatedAt = Set<members::created_at>;
+        type CreatorDid = St::CreatorDid;
         type WorldReference = St::WorldReference;
-        type CreatorDid = St::CreatorDid;
-    }
-    ///State transition - sets the `world_reference` field to Set
-    pub struct SetWorldReference<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetWorldReference<St> {}
-    impl<St: State> State for SetWorldReference<St> {
-        type Title = St::Title;
-        type CreatedAt = St::CreatedAt;
-        type WorldReference = Set<members::world_reference>;
-        type CreatorDid = St::CreatorDid;
     }
     ///State transition - sets the `creator_did` field to Set
     pub struct SetCreatorDid<St: State = Empty>(PhantomData<fn() -> St>);
@@ -436,8 +427,17 @@ pub mod lore_state {
     impl<St: State> State for SetCreatorDid<St> {
         type Title = St::Title;
         type CreatedAt = St::CreatedAt;
-        type WorldReference = St::WorldReference;
         type CreatorDid = Set<members::creator_did>;
+        type WorldReference = St::WorldReference;
+    }
+    ///State transition - sets the `world_reference` field to Set
+    pub struct SetWorldReference<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetWorldReference<St> {}
+    impl<St: State> State for SetWorldReference<St> {
+        type Title = St::Title;
+        type CreatedAt = St::CreatedAt;
+        type CreatorDid = St::CreatorDid;
+        type WorldReference = Set<members::world_reference>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -446,10 +446,10 @@ pub mod lore_state {
         pub struct title(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `world_reference` field
-        pub struct world_reference(());
         ///Marker type for the `creator_did` field
         pub struct creator_did(());
+        ///Marker type for the `world_reference` field
+        pub struct world_reference(());
     }
 }
 
@@ -674,8 +674,8 @@ where
     St: lore_state::State,
     St::Title: lore_state::IsSet,
     St::CreatedAt: lore_state::IsSet,
-    St::WorldReference: lore_state::IsSet,
     St::CreatorDid: lore_state::IsSet,
+    St::WorldReference: lore_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Lore<S> {

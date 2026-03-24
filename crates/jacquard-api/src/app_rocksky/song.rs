@@ -595,105 +595,105 @@ pub mod song_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Duration;
+        type Title;
+        type Album;
+        type AlbumArtist;
         type Artist;
         type CreatedAt;
-        type Duration;
-        type Album;
-        type Title;
-        type AlbumArtist;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Duration = Unset;
+        type Title = Unset;
+        type Album = Unset;
+        type AlbumArtist = Unset;
         type Artist = Unset;
         type CreatedAt = Unset;
-        type Duration = Unset;
-        type Album = Unset;
-        type Title = Unset;
-        type AlbumArtist = Unset;
-    }
-    ///State transition - sets the `artist` field to Set
-    pub struct SetArtist<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetArtist<St> {}
-    impl<St: State> State for SetArtist<St> {
-        type Artist = Set<members::artist>;
-        type CreatedAt = St::CreatedAt;
-        type Duration = St::Duration;
-        type Album = St::Album;
-        type Title = St::Title;
-        type AlbumArtist = St::AlbumArtist;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type Artist = St::Artist;
-        type CreatedAt = Set<members::created_at>;
-        type Duration = St::Duration;
-        type Album = St::Album;
-        type Title = St::Title;
-        type AlbumArtist = St::AlbumArtist;
     }
     ///State transition - sets the `duration` field to Set
     pub struct SetDuration<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDuration<St> {}
     impl<St: State> State for SetDuration<St> {
-        type Artist = St::Artist;
-        type CreatedAt = St::CreatedAt;
         type Duration = Set<members::duration>;
-        type Album = St::Album;
         type Title = St::Title;
+        type Album = St::Album;
         type AlbumArtist = St::AlbumArtist;
-    }
-    ///State transition - sets the `album` field to Set
-    pub struct SetAlbum<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetAlbum<St> {}
-    impl<St: State> State for SetAlbum<St> {
         type Artist = St::Artist;
         type CreatedAt = St::CreatedAt;
-        type Duration = St::Duration;
-        type Album = Set<members::album>;
-        type Title = St::Title;
-        type AlbumArtist = St::AlbumArtist;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTitle<St> {}
     impl<St: State> State for SetTitle<St> {
+        type Duration = St::Duration;
+        type Title = Set<members::title>;
+        type Album = St::Album;
+        type AlbumArtist = St::AlbumArtist;
         type Artist = St::Artist;
         type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `album` field to Set
+    pub struct SetAlbum<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAlbum<St> {}
+    impl<St: State> State for SetAlbum<St> {
         type Duration = St::Duration;
-        type Album = St::Album;
-        type Title = Set<members::title>;
+        type Title = St::Title;
+        type Album = Set<members::album>;
         type AlbumArtist = St::AlbumArtist;
+        type Artist = St::Artist;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `album_artist` field to Set
     pub struct SetAlbumArtist<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetAlbumArtist<St> {}
     impl<St: State> State for SetAlbumArtist<St> {
+        type Duration = St::Duration;
+        type Title = St::Title;
+        type Album = St::Album;
+        type AlbumArtist = Set<members::album_artist>;
         type Artist = St::Artist;
         type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `artist` field to Set
+    pub struct SetArtist<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetArtist<St> {}
+    impl<St: State> State for SetArtist<St> {
         type Duration = St::Duration;
-        type Album = St::Album;
         type Title = St::Title;
-        type AlbumArtist = Set<members::album_artist>;
+        type Album = St::Album;
+        type AlbumArtist = St::AlbumArtist;
+        type Artist = Set<members::artist>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Duration = St::Duration;
+        type Title = St::Title;
+        type Album = St::Album;
+        type AlbumArtist = St::AlbumArtist;
+        type Artist = St::Artist;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `duration` field
+        pub struct duration(());
+        ///Marker type for the `title` field
+        pub struct title(());
+        ///Marker type for the `album` field
+        pub struct album(());
+        ///Marker type for the `album_artist` field
+        pub struct album_artist(());
         ///Marker type for the `artist` field
         pub struct artist(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `duration` field
-        pub struct duration(());
-        ///Marker type for the `album` field
-        pub struct album(());
-        ///Marker type for the `title` field
-        pub struct title(());
-        ///Marker type for the `album_artist` field
-        pub struct album_artist(());
     }
 }
 
@@ -1138,12 +1138,12 @@ impl<S: BosStr, St: song_state::State> SongBuilder<S, St> {
 impl<S: BosStr, St> SongBuilder<S, St>
 where
     St: song_state::State,
+    St::Duration: song_state::IsSet,
+    St::Title: song_state::IsSet,
+    St::Album: song_state::IsSet,
+    St::AlbumArtist: song_state::IsSet,
     St::Artist: song_state::IsSet,
     St::CreatedAt: song_state::IsSet,
-    St::Duration: song_state::IsSet,
-    St::Album: song_state::IsSet,
-    St::Title: song_state::IsSet,
-    St::AlbumArtist: song_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Song<S> {

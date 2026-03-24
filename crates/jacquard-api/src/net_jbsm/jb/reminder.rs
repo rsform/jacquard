@@ -140,67 +140,67 @@ pub mod reminder_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type TriggerAt;
         type Subject;
-        type Requester;
         type CreatedAt;
+        type TriggerAt;
+        type Requester;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type TriggerAt = Unset;
         type Subject = Unset;
-        type Requester = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `trigger_at` field to Set
-    pub struct SetTriggerAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTriggerAt<St> {}
-    impl<St: State> State for SetTriggerAt<St> {
-        type TriggerAt = Set<members::trigger_at>;
-        type Subject = St::Subject;
-        type Requester = St::Requester;
-        type CreatedAt = St::CreatedAt;
+        type TriggerAt = Unset;
+        type Requester = Unset;
     }
     ///State transition - sets the `subject` field to Set
     pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSubject<St> {}
     impl<St: State> State for SetSubject<St> {
-        type TriggerAt = St::TriggerAt;
         type Subject = Set<members::subject>;
-        type Requester = St::Requester;
         type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `requester` field to Set
-    pub struct SetRequester<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRequester<St> {}
-    impl<St: State> State for SetRequester<St> {
         type TriggerAt = St::TriggerAt;
-        type Subject = St::Subject;
-        type Requester = Set<members::requester>;
-        type CreatedAt = St::CreatedAt;
+        type Requester = St::Requester;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type TriggerAt = St::TriggerAt;
         type Subject = St::Subject;
-        type Requester = St::Requester;
         type CreatedAt = Set<members::created_at>;
+        type TriggerAt = St::TriggerAt;
+        type Requester = St::Requester;
+    }
+    ///State transition - sets the `trigger_at` field to Set
+    pub struct SetTriggerAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTriggerAt<St> {}
+    impl<St: State> State for SetTriggerAt<St> {
+        type Subject = St::Subject;
+        type CreatedAt = St::CreatedAt;
+        type TriggerAt = Set<members::trigger_at>;
+        type Requester = St::Requester;
+    }
+    ///State transition - sets the `requester` field to Set
+    pub struct SetRequester<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRequester<St> {}
+    impl<St: State> State for SetRequester<St> {
+        type Subject = St::Subject;
+        type CreatedAt = St::CreatedAt;
+        type TriggerAt = St::TriggerAt;
+        type Requester = Set<members::requester>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `trigger_at` field
-        pub struct trigger_at(());
         ///Marker type for the `subject` field
         pub struct subject(());
-        ///Marker type for the `requester` field
-        pub struct requester(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `trigger_at` field
+        pub struct trigger_at(());
+        ///Marker type for the `requester` field
+        pub struct requester(());
     }
 }
 
@@ -341,10 +341,10 @@ where
 impl<S: BosStr, St> ReminderBuilder<S, St>
 where
     St: reminder_state::State,
-    St::TriggerAt: reminder_state::IsSet,
     St::Subject: reminder_state::IsSet,
-    St::Requester: reminder_state::IsSet,
     St::CreatedAt: reminder_state::IsSet,
+    St::TriggerAt: reminder_state::IsSet,
+    St::Requester: reminder_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Reminder<S> {

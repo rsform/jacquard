@@ -23,7 +23,7 @@ async fn main() -> miette::Result<()> {
     let agent = BasicClient::unauthenticated();
 
     // Use Agent's fetch_record helper with typed record URI
-    let output: Repo<'_> = agent.fetch_record(&uri).await?.into();
+    let output: Repo = agent.fetch_record(&uri).await?.into();
 
     println!("Tangled Repository\n");
     println!("URI: {}", uri);

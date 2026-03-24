@@ -291,83 +291,83 @@ pub mod submission_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type AuthType;
-        type Url;
         type Name;
+        type AuthType;
         type CreatedAt;
+        type Url;
         type Description;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type AuthType = Unset;
-        type Url = Unset;
         type Name = Unset;
+        type AuthType = Unset;
         type CreatedAt = Unset;
+        type Url = Unset;
         type Description = Unset;
-    }
-    ///State transition - sets the `auth_type` field to Set
-    pub struct SetAuthType<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetAuthType<St> {}
-    impl<St: State> State for SetAuthType<St> {
-        type AuthType = Set<members::auth_type>;
-        type Url = St::Url;
-        type Name = St::Name;
-        type CreatedAt = St::CreatedAt;
-        type Description = St::Description;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUrl<St> {}
-    impl<St: State> State for SetUrl<St> {
-        type AuthType = St::AuthType;
-        type Url = Set<members::url>;
-        type Name = St::Name;
-        type CreatedAt = St::CreatedAt;
-        type Description = St::Description;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetName<St> {}
     impl<St: State> State for SetName<St> {
-        type AuthType = St::AuthType;
-        type Url = St::Url;
         type Name = Set<members::name>;
+        type AuthType = St::AuthType;
         type CreatedAt = St::CreatedAt;
+        type Url = St::Url;
+        type Description = St::Description;
+    }
+    ///State transition - sets the `auth_type` field to Set
+    pub struct SetAuthType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAuthType<St> {}
+    impl<St: State> State for SetAuthType<St> {
+        type Name = St::Name;
+        type AuthType = Set<members::auth_type>;
+        type CreatedAt = St::CreatedAt;
+        type Url = St::Url;
         type Description = St::Description;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type AuthType = St::AuthType;
-        type Url = St::Url;
         type Name = St::Name;
+        type AuthType = St::AuthType;
         type CreatedAt = Set<members::created_at>;
+        type Url = St::Url;
+        type Description = St::Description;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUrl<St> {}
+    impl<St: State> State for SetUrl<St> {
+        type Name = St::Name;
+        type AuthType = St::AuthType;
+        type CreatedAt = St::CreatedAt;
+        type Url = Set<members::url>;
         type Description = St::Description;
     }
     ///State transition - sets the `description` field to Set
     pub struct SetDescription<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDescription<St> {}
     impl<St: State> State for SetDescription<St> {
-        type AuthType = St::AuthType;
-        type Url = St::Url;
         type Name = St::Name;
+        type AuthType = St::AuthType;
         type CreatedAt = St::CreatedAt;
+        type Url = St::Url;
         type Description = Set<members::description>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `auth_type` field
-        pub struct auth_type(());
-        ///Marker type for the `url` field
-        pub struct url(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `auth_type` field
+        pub struct auth_type(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `url` field
+        pub struct url(());
         ///Marker type for the `description` field
         pub struct description(());
     }
@@ -572,10 +572,10 @@ where
 impl<S: BosStr, St> SubmissionBuilder<S, St>
 where
     St: submission_state::State,
-    St::AuthType: submission_state::IsSet,
-    St::Url: submission_state::IsSet,
     St::Name: submission_state::IsSet,
+    St::AuthType: submission_state::IsSet,
     St::CreatedAt: submission_state::IsSet,
+    St::Url: submission_state::IsSet,
     St::Description: submission_state::IsSet,
 {
     /// Build the final struct.

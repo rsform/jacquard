@@ -1296,66 +1296,66 @@ pub mod pagination_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Limit;
-        type Total;
         type Page;
         type TotalPages;
+        type Total;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Limit = Unset;
-        type Total = Unset;
         type Page = Unset;
         type TotalPages = Unset;
+        type Total = Unset;
     }
     ///State transition - sets the `limit` field to Set
     pub struct SetLimit<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetLimit<St> {}
     impl<St: State> State for SetLimit<St> {
         type Limit = Set<members::limit>;
+        type Page = St::Page;
+        type TotalPages = St::TotalPages;
         type Total = St::Total;
-        type Page = St::Page;
-        type TotalPages = St::TotalPages;
-    }
-    ///State transition - sets the `total` field to Set
-    pub struct SetTotal<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTotal<St> {}
-    impl<St: State> State for SetTotal<St> {
-        type Limit = St::Limit;
-        type Total = Set<members::total>;
-        type Page = St::Page;
-        type TotalPages = St::TotalPages;
     }
     ///State transition - sets the `page` field to Set
     pub struct SetPage<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPage<St> {}
     impl<St: State> State for SetPage<St> {
         type Limit = St::Limit;
-        type Total = St::Total;
         type Page = Set<members::page>;
         type TotalPages = St::TotalPages;
+        type Total = St::Total;
     }
     ///State transition - sets the `total_pages` field to Set
     pub struct SetTotalPages<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTotalPages<St> {}
     impl<St: State> State for SetTotalPages<St> {
         type Limit = St::Limit;
-        type Total = St::Total;
         type Page = St::Page;
         type TotalPages = Set<members::total_pages>;
+        type Total = St::Total;
+    }
+    ///State transition - sets the `total` field to Set
+    pub struct SetTotal<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTotal<St> {}
+    impl<St: State> State for SetTotal<St> {
+        type Limit = St::Limit;
+        type Page = St::Page;
+        type TotalPages = St::TotalPages;
+        type Total = Set<members::total>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `limit` field
         pub struct limit(());
-        ///Marker type for the `total` field
-        pub struct total(());
         ///Marker type for the `page` field
         pub struct page(());
         ///Marker type for the `total_pages` field
         pub struct total_pages(());
+        ///Marker type for the `total` field
+        pub struct total(());
     }
 }
 
@@ -1464,9 +1464,9 @@ impl<S: BosStr, St> PaginationBuilder<S, St>
 where
     St: pagination_state::State,
     St::Limit: pagination_state::IsSet,
-    St::Total: pagination_state::IsSet,
     St::Page: pagination_state::IsSet,
     St::TotalPages: pagination_state::IsSet,
+    St::Total: pagination_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Pagination<S> {
@@ -1503,177 +1503,177 @@ pub mod scheduled_post_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type UserId;
-        type Text;
-        type ScheduledAt;
         type Id;
-        type CreatedAt;
+        type Text;
+        type UserId;
         type UpdatedAt;
-        type Status;
-        type RetryCount;
         type Langs;
+        type RetryCount;
+        type CreatedAt;
+        type Status;
+        type ScheduledAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type UserId = Unset;
-        type Text = Unset;
-        type ScheduledAt = Unset;
         type Id = Unset;
-        type CreatedAt = Unset;
+        type Text = Unset;
+        type UserId = Unset;
         type UpdatedAt = Unset;
-        type Status = Unset;
-        type RetryCount = Unset;
         type Langs = Unset;
-    }
-    ///State transition - sets the `user_id` field to Set
-    pub struct SetUserId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUserId<St> {}
-    impl<St: State> State for SetUserId<St> {
-        type UserId = Set<members::user_id>;
-        type Text = St::Text;
-        type ScheduledAt = St::ScheduledAt;
-        type Id = St::Id;
-        type CreatedAt = St::CreatedAt;
-        type UpdatedAt = St::UpdatedAt;
-        type Status = St::Status;
-        type RetryCount = St::RetryCount;
-        type Langs = St::Langs;
-    }
-    ///State transition - sets the `text` field to Set
-    pub struct SetText<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetText<St> {}
-    impl<St: State> State for SetText<St> {
-        type UserId = St::UserId;
-        type Text = Set<members::text>;
-        type ScheduledAt = St::ScheduledAt;
-        type Id = St::Id;
-        type CreatedAt = St::CreatedAt;
-        type UpdatedAt = St::UpdatedAt;
-        type Status = St::Status;
-        type RetryCount = St::RetryCount;
-        type Langs = St::Langs;
-    }
-    ///State transition - sets the `scheduled_at` field to Set
-    pub struct SetScheduledAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetScheduledAt<St> {}
-    impl<St: State> State for SetScheduledAt<St> {
-        type UserId = St::UserId;
-        type Text = St::Text;
-        type ScheduledAt = Set<members::scheduled_at>;
-        type Id = St::Id;
-        type CreatedAt = St::CreatedAt;
-        type UpdatedAt = St::UpdatedAt;
-        type Status = St::Status;
-        type RetryCount = St::RetryCount;
-        type Langs = St::Langs;
+        type RetryCount = Unset;
+        type CreatedAt = Unset;
+        type Status = Unset;
+        type ScheduledAt = Unset;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetId<St> {}
     impl<St: State> State for SetId<St> {
-        type UserId = St::UserId;
-        type Text = St::Text;
-        type ScheduledAt = St::ScheduledAt;
         type Id = Set<members::id>;
-        type CreatedAt = St::CreatedAt;
-        type UpdatedAt = St::UpdatedAt;
-        type Status = St::Status;
-        type RetryCount = St::RetryCount;
-        type Langs = St::Langs;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type UserId = St::UserId;
         type Text = St::Text;
-        type ScheduledAt = St::ScheduledAt;
-        type Id = St::Id;
-        type CreatedAt = Set<members::created_at>;
+        type UserId = St::UserId;
         type UpdatedAt = St::UpdatedAt;
-        type Status = St::Status;
-        type RetryCount = St::RetryCount;
         type Langs = St::Langs;
+        type RetryCount = St::RetryCount;
+        type CreatedAt = St::CreatedAt;
+        type Status = St::Status;
+        type ScheduledAt = St::ScheduledAt;
+    }
+    ///State transition - sets the `text` field to Set
+    pub struct SetText<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetText<St> {}
+    impl<St: State> State for SetText<St> {
+        type Id = St::Id;
+        type Text = Set<members::text>;
+        type UserId = St::UserId;
+        type UpdatedAt = St::UpdatedAt;
+        type Langs = St::Langs;
+        type RetryCount = St::RetryCount;
+        type CreatedAt = St::CreatedAt;
+        type Status = St::Status;
+        type ScheduledAt = St::ScheduledAt;
+    }
+    ///State transition - sets the `user_id` field to Set
+    pub struct SetUserId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUserId<St> {}
+    impl<St: State> State for SetUserId<St> {
+        type Id = St::Id;
+        type Text = St::Text;
+        type UserId = Set<members::user_id>;
+        type UpdatedAt = St::UpdatedAt;
+        type Langs = St::Langs;
+        type RetryCount = St::RetryCount;
+        type CreatedAt = St::CreatedAt;
+        type Status = St::Status;
+        type ScheduledAt = St::ScheduledAt;
     }
     ///State transition - sets the `updated_at` field to Set
     pub struct SetUpdatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUpdatedAt<St> {}
     impl<St: State> State for SetUpdatedAt<St> {
-        type UserId = St::UserId;
-        type Text = St::Text;
-        type ScheduledAt = St::ScheduledAt;
         type Id = St::Id;
-        type CreatedAt = St::CreatedAt;
+        type Text = St::Text;
+        type UserId = St::UserId;
         type UpdatedAt = Set<members::updated_at>;
-        type Status = St::Status;
+        type Langs = St::Langs;
         type RetryCount = St::RetryCount;
-        type Langs = St::Langs;
-    }
-    ///State transition - sets the `status` field to Set
-    pub struct SetStatus<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetStatus<St> {}
-    impl<St: State> State for SetStatus<St> {
-        type UserId = St::UserId;
-        type Text = St::Text;
-        type ScheduledAt = St::ScheduledAt;
-        type Id = St::Id;
         type CreatedAt = St::CreatedAt;
-        type UpdatedAt = St::UpdatedAt;
-        type Status = Set<members::status>;
-        type RetryCount = St::RetryCount;
-        type Langs = St::Langs;
-    }
-    ///State transition - sets the `retry_count` field to Set
-    pub struct SetRetryCount<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRetryCount<St> {}
-    impl<St: State> State for SetRetryCount<St> {
-        type UserId = St::UserId;
-        type Text = St::Text;
-        type ScheduledAt = St::ScheduledAt;
-        type Id = St::Id;
-        type CreatedAt = St::CreatedAt;
-        type UpdatedAt = St::UpdatedAt;
         type Status = St::Status;
-        type RetryCount = Set<members::retry_count>;
-        type Langs = St::Langs;
+        type ScheduledAt = St::ScheduledAt;
     }
     ///State transition - sets the `langs` field to Set
     pub struct SetLangs<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetLangs<St> {}
     impl<St: State> State for SetLangs<St> {
-        type UserId = St::UserId;
-        type Text = St::Text;
-        type ScheduledAt = St::ScheduledAt;
         type Id = St::Id;
-        type CreatedAt = St::CreatedAt;
+        type Text = St::Text;
+        type UserId = St::UserId;
         type UpdatedAt = St::UpdatedAt;
-        type Status = St::Status;
-        type RetryCount = St::RetryCount;
         type Langs = Set<members::langs>;
+        type RetryCount = St::RetryCount;
+        type CreatedAt = St::CreatedAt;
+        type Status = St::Status;
+        type ScheduledAt = St::ScheduledAt;
+    }
+    ///State transition - sets the `retry_count` field to Set
+    pub struct SetRetryCount<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRetryCount<St> {}
+    impl<St: State> State for SetRetryCount<St> {
+        type Id = St::Id;
+        type Text = St::Text;
+        type UserId = St::UserId;
+        type UpdatedAt = St::UpdatedAt;
+        type Langs = St::Langs;
+        type RetryCount = Set<members::retry_count>;
+        type CreatedAt = St::CreatedAt;
+        type Status = St::Status;
+        type ScheduledAt = St::ScheduledAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Id = St::Id;
+        type Text = St::Text;
+        type UserId = St::UserId;
+        type UpdatedAt = St::UpdatedAt;
+        type Langs = St::Langs;
+        type RetryCount = St::RetryCount;
+        type CreatedAt = Set<members::created_at>;
+        type Status = St::Status;
+        type ScheduledAt = St::ScheduledAt;
+    }
+    ///State transition - sets the `status` field to Set
+    pub struct SetStatus<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStatus<St> {}
+    impl<St: State> State for SetStatus<St> {
+        type Id = St::Id;
+        type Text = St::Text;
+        type UserId = St::UserId;
+        type UpdatedAt = St::UpdatedAt;
+        type Langs = St::Langs;
+        type RetryCount = St::RetryCount;
+        type CreatedAt = St::CreatedAt;
+        type Status = Set<members::status>;
+        type ScheduledAt = St::ScheduledAt;
+    }
+    ///State transition - sets the `scheduled_at` field to Set
+    pub struct SetScheduledAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetScheduledAt<St> {}
+    impl<St: State> State for SetScheduledAt<St> {
+        type Id = St::Id;
+        type Text = St::Text;
+        type UserId = St::UserId;
+        type UpdatedAt = St::UpdatedAt;
+        type Langs = St::Langs;
+        type RetryCount = St::RetryCount;
+        type CreatedAt = St::CreatedAt;
+        type Status = St::Status;
+        type ScheduledAt = Set<members::scheduled_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `user_id` field
-        pub struct user_id(());
-        ///Marker type for the `text` field
-        pub struct text(());
-        ///Marker type for the `scheduled_at` field
-        pub struct scheduled_at(());
         ///Marker type for the `id` field
         pub struct id(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
+        ///Marker type for the `text` field
+        pub struct text(());
+        ///Marker type for the `user_id` field
+        pub struct user_id(());
         ///Marker type for the `updated_at` field
         pub struct updated_at(());
-        ///Marker type for the `status` field
-        pub struct status(());
-        ///Marker type for the `retry_count` field
-        pub struct retry_count(());
         ///Marker type for the `langs` field
         pub struct langs(());
+        ///Marker type for the `retry_count` field
+        pub struct retry_count(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `status` field
+        pub struct status(());
+        ///Marker type for the `scheduled_at` field
+        pub struct scheduled_at(());
     }
 }
 
@@ -2163,15 +2163,15 @@ where
 impl<S: BosStr, St> ScheduledPostBuilder<S, St>
 where
     St: scheduled_post_state::State,
-    St::UserId: scheduled_post_state::IsSet,
-    St::Text: scheduled_post_state::IsSet,
-    St::ScheduledAt: scheduled_post_state::IsSet,
     St::Id: scheduled_post_state::IsSet,
-    St::CreatedAt: scheduled_post_state::IsSet,
+    St::Text: scheduled_post_state::IsSet,
+    St::UserId: scheduled_post_state::IsSet,
     St::UpdatedAt: scheduled_post_state::IsSet,
-    St::Status: scheduled_post_state::IsSet,
-    St::RetryCount: scheduled_post_state::IsSet,
     St::Langs: scheduled_post_state::IsSet,
+    St::RetryCount: scheduled_post_state::IsSet,
+    St::CreatedAt: scheduled_post_state::IsSet,
+    St::Status: scheduled_post_state::IsSet,
+    St::ScheduledAt: scheduled_post_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ScheduledPost<S> {

@@ -399,49 +399,49 @@ pub mod chat_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Site;
         type Title;
+        type Site;
         type PublishedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Site = Unset;
         type Title = Unset;
+        type Site = Unset;
         type PublishedAt = Unset;
-    }
-    ///State transition - sets the `site` field to Set
-    pub struct SetSite<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSite<St> {}
-    impl<St: State> State for SetSite<St> {
-        type Site = Set<members::site>;
-        type Title = St::Title;
-        type PublishedAt = St::PublishedAt;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTitle<St> {}
     impl<St: State> State for SetTitle<St> {
-        type Site = St::Site;
         type Title = Set<members::title>;
+        type Site = St::Site;
+        type PublishedAt = St::PublishedAt;
+    }
+    ///State transition - sets the `site` field to Set
+    pub struct SetSite<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSite<St> {}
+    impl<St: State> State for SetSite<St> {
+        type Title = St::Title;
+        type Site = Set<members::site>;
         type PublishedAt = St::PublishedAt;
     }
     ///State transition - sets the `published_at` field to Set
     pub struct SetPublishedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPublishedAt<St> {}
     impl<St: State> State for SetPublishedAt<St> {
-        type Site = St::Site;
         type Title = St::Title;
+        type Site = St::Site;
         type PublishedAt = Set<members::published_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `site` field
-        pub struct site(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `site` field
+        pub struct site(());
         ///Marker type for the `published_at` field
         pub struct published_at(());
     }
@@ -723,8 +723,8 @@ impl<S: BosStr, St: chat_state::State> ChatBuilder<S, St> {
 impl<S: BosStr, St> ChatBuilder<S, St>
 where
     St: chat_state::State,
-    St::Site: chat_state::IsSet,
     St::Title: chat_state::IsSet,
+    St::Site: chat_state::IsSet,
     St::PublishedAt: chat_state::IsSet,
 {
     /// Build the final struct.

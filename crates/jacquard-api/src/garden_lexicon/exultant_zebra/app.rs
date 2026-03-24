@@ -118,37 +118,37 @@ pub mod app_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Distributions;
         type Name;
+        type Distributions;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Distributions = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `distributions` field to Set
-    pub struct SetDistributions<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDistributions<St> {}
-    impl<St: State> State for SetDistributions<St> {
-        type Distributions = Set<members::distributions>;
-        type Name = St::Name;
+        type Distributions = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetName<St> {}
     impl<St: State> State for SetName<St> {
-        type Distributions = St::Distributions;
         type Name = Set<members::name>;
+        type Distributions = St::Distributions;
+    }
+    ///State transition - sets the `distributions` field to Set
+    pub struct SetDistributions<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDistributions<St> {}
+    impl<St: State> State for SetDistributions<St> {
+        type Name = St::Name;
+        type Distributions = Set<members::distributions>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `distributions` field
-        pub struct distributions(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `distributions` field
+        pub struct distributions(());
     }
 }
 
@@ -228,8 +228,8 @@ where
 impl<S: BosStr, St> AppBuilder<S, St>
 where
     St: app_state::State,
-    St::Distributions: app_state::IsSet,
     St::Name: app_state::IsSet,
+    St::Distributions: app_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> App<S> {

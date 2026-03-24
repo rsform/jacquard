@@ -562,85 +562,85 @@ pub mod provider_result_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Artist;
-        type Url;
-        type Title;
         type Provider;
         type MarketRegion;
+        type Url;
+        type Artist;
+        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Artist = Unset;
-        type Url = Unset;
-        type Title = Unset;
         type Provider = Unset;
         type MarketRegion = Unset;
-    }
-    ///State transition - sets the `artist` field to Set
-    pub struct SetArtist<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetArtist<St> {}
-    impl<St: State> State for SetArtist<St> {
-        type Artist = Set<members::artist>;
-        type Url = St::Url;
-        type Title = St::Title;
-        type Provider = St::Provider;
-        type MarketRegion = St::MarketRegion;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUrl<St> {}
-    impl<St: State> State for SetUrl<St> {
-        type Artist = St::Artist;
-        type Url = Set<members::url>;
-        type Title = St::Title;
-        type Provider = St::Provider;
-        type MarketRegion = St::MarketRegion;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTitle<St> {}
-    impl<St: State> State for SetTitle<St> {
-        type Artist = St::Artist;
-        type Url = St::Url;
-        type Title = Set<members::title>;
-        type Provider = St::Provider;
-        type MarketRegion = St::MarketRegion;
+        type Url = Unset;
+        type Artist = Unset;
+        type Title = Unset;
     }
     ///State transition - sets the `provider` field to Set
     pub struct SetProvider<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetProvider<St> {}
     impl<St: State> State for SetProvider<St> {
-        type Artist = St::Artist;
-        type Url = St::Url;
-        type Title = St::Title;
         type Provider = Set<members::provider>;
         type MarketRegion = St::MarketRegion;
+        type Url = St::Url;
+        type Artist = St::Artist;
+        type Title = St::Title;
     }
     ///State transition - sets the `market_region` field to Set
     pub struct SetMarketRegion<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetMarketRegion<St> {}
     impl<St: State> State for SetMarketRegion<St> {
-        type Artist = St::Artist;
-        type Url = St::Url;
-        type Title = St::Title;
         type Provider = St::Provider;
         type MarketRegion = Set<members::market_region>;
+        type Url = St::Url;
+        type Artist = St::Artist;
+        type Title = St::Title;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUrl<St> {}
+    impl<St: State> State for SetUrl<St> {
+        type Provider = St::Provider;
+        type MarketRegion = St::MarketRegion;
+        type Url = Set<members::url>;
+        type Artist = St::Artist;
+        type Title = St::Title;
+    }
+    ///State transition - sets the `artist` field to Set
+    pub struct SetArtist<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetArtist<St> {}
+    impl<St: State> State for SetArtist<St> {
+        type Provider = St::Provider;
+        type MarketRegion = St::MarketRegion;
+        type Url = St::Url;
+        type Artist = Set<members::artist>;
+        type Title = St::Title;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
+        type Provider = St::Provider;
+        type MarketRegion = St::MarketRegion;
+        type Url = St::Url;
+        type Artist = St::Artist;
+        type Title = Set<members::title>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `artist` field
-        pub struct artist(());
-        ///Marker type for the `url` field
-        pub struct url(());
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `provider` field
         pub struct provider(());
         ///Marker type for the `market_region` field
         pub struct market_region(());
+        ///Marker type for the `url` field
+        pub struct url(());
+        ///Marker type for the `artist` field
+        pub struct artist(());
+        ///Marker type for the `title` field
+        pub struct title(());
     }
 }
 
@@ -815,11 +815,11 @@ where
 impl<S: BosStr, St> ProviderResultBuilder<S, St>
 where
     St: provider_result_state::State,
-    St::Artist: provider_result_state::IsSet,
-    St::Url: provider_result_state::IsSet,
-    St::Title: provider_result_state::IsSet,
     St::Provider: provider_result_state::IsSet,
     St::MarketRegion: provider_result_state::IsSet,
+    St::Url: provider_result_state::IsSet,
+    St::Artist: provider_result_state::IsSet,
+    St::Title: provider_result_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ProviderResult<S> {

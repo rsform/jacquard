@@ -116,51 +116,51 @@ pub mod accept_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Invite;
         type CreatedAt;
         type Resource;
+        type Invite;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Invite = Unset;
         type CreatedAt = Unset;
         type Resource = Unset;
-    }
-    ///State transition - sets the `invite` field to Set
-    pub struct SetInvite<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetInvite<St> {}
-    impl<St: State> State for SetInvite<St> {
-        type Invite = Set<members::invite>;
-        type CreatedAt = St::CreatedAt;
-        type Resource = St::Resource;
+        type Invite = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Invite = St::Invite;
         type CreatedAt = Set<members::created_at>;
         type Resource = St::Resource;
+        type Invite = St::Invite;
     }
     ///State transition - sets the `resource` field to Set
     pub struct SetResource<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetResource<St> {}
     impl<St: State> State for SetResource<St> {
-        type Invite = St::Invite;
         type CreatedAt = St::CreatedAt;
         type Resource = Set<members::resource>;
+        type Invite = St::Invite;
+    }
+    ///State transition - sets the `invite` field to Set
+    pub struct SetInvite<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetInvite<St> {}
+    impl<St: State> State for SetInvite<St> {
+        type CreatedAt = St::CreatedAt;
+        type Resource = St::Resource;
+        type Invite = Set<members::invite>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `invite` field
-        pub struct invite(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `resource` field
         pub struct resource(());
+        ///Marker type for the `invite` field
+        pub struct invite(());
     }
 }
 
@@ -249,9 +249,9 @@ where
 impl<S: BosStr, St> AcceptBuilder<S, St>
 where
     St: accept_state::State,
-    St::Invite: accept_state::IsSet,
     St::CreatedAt: accept_state::IsSet,
     St::Resource: accept_state::IsSet,
+    St::Invite: accept_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Accept<S> {

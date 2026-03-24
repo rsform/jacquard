@@ -78,37 +78,37 @@ pub mod event_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type StartDate;
         type Title;
+        type StartDate;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type StartDate = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `start_date` field to Set
-    pub struct SetStartDate<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetStartDate<St> {}
-    impl<St: State> State for SetStartDate<St> {
-        type StartDate = Set<members::start_date>;
-        type Title = St::Title;
+        type StartDate = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTitle<St> {}
     impl<St: State> State for SetTitle<St> {
-        type StartDate = St::StartDate;
         type Title = Set<members::title>;
+        type StartDate = St::StartDate;
+    }
+    ///State transition - sets the `start_date` field to Set
+    pub struct SetStartDate<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStartDate<St> {}
+    impl<St: State> State for SetStartDate<St> {
+        type Title = St::Title;
+        type StartDate = Set<members::start_date>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `start_date` field
-        pub struct start_date(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `start_date` field
+        pub struct start_date(());
     }
 }
 
@@ -204,8 +204,8 @@ where
 impl<S: BosStr, St> EventBuilder<S, St>
 where
     St: event_state::State,
-    St::StartDate: event_state::IsSet,
     St::Title: event_state::IsSet,
+    St::StartDate: event_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Event<S> {

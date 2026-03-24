@@ -97,15 +97,14 @@ impl OAuthResolver for MockClient {
         md.pushed_authorization_request_endpoint = Some(SmolStr::from(format!("{}/par", issuer)));
         md.token_endpoint_auth_methods_supported = Some(vec![SmolStr::from("none")]);
         md.dpop_signing_alg_values_supported = Some(vec![SmolStr::from("ES256")]);
-        use jacquard::IntoStatic;
-        Ok(md.into_static())
+        Ok(md)
     }
 
     async fn get_resource_server_metadata(
         &self,
         _pds: &str,
     ) -> Result<OAuthAuthorizationServerMetadata, jacquard_oauth::resolver::ResolverError> {
-        // Return metadata pointing to the same issuer as above
+        // Return metadata pointing to the same issuer as above.
         let mut md = OAuthAuthorizationServerMetadata::default();
         md.issuer = SmolStr::from("https://issuer");
         md.token_endpoint = SmolStr::from("https://issuer/token");
@@ -114,10 +113,10 @@ impl OAuthResolver for MockClient {
         md.pushed_authorization_request_endpoint = Some(SmolStr::from("https://issuer/par"));
         md.token_endpoint_auth_methods_supported = Some(vec![SmolStr::from("none")]);
         md.dpop_signing_alg_values_supported = Some(vec![SmolStr::from("ES256")]);
-        Ok(md.into_static())
+        Ok(md)
     }
 
-    async fn verify_issuer<S: BosStr>(
+    async fn verify_issuer<S: BosStr + Sync>(
         &self,
         _server_metadata: &OAuthAuthorizationServerMetadata,
         _sub: &Did<S>,

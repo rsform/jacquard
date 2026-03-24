@@ -211,51 +211,51 @@ pub mod analyze_merge_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Branch;
-        type Repo;
         type Patch;
+        type Repo;
+        type Branch;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Branch = Unset;
-        type Repo = Unset;
         type Patch = Unset;
-    }
-    ///State transition - sets the `branch` field to Set
-    pub struct SetBranch<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetBranch<St> {}
-    impl<St: State> State for SetBranch<St> {
-        type Branch = Set<members::branch>;
-        type Repo = St::Repo;
-        type Patch = St::Patch;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRepo<St> {}
-    impl<St: State> State for SetRepo<St> {
-        type Branch = St::Branch;
-        type Repo = Set<members::repo>;
-        type Patch = St::Patch;
+        type Repo = Unset;
+        type Branch = Unset;
     }
     ///State transition - sets the `patch` field to Set
     pub struct SetPatch<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPatch<St> {}
     impl<St: State> State for SetPatch<St> {
-        type Branch = St::Branch;
-        type Repo = St::Repo;
         type Patch = Set<members::patch>;
+        type Repo = St::Repo;
+        type Branch = St::Branch;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRepo<St> {}
+    impl<St: State> State for SetRepo<St> {
+        type Patch = St::Patch;
+        type Repo = Set<members::repo>;
+        type Branch = St::Branch;
+    }
+    ///State transition - sets the `branch` field to Set
+    pub struct SetBranch<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBranch<St> {}
+    impl<St: State> State for SetBranch<St> {
+        type Patch = St::Patch;
+        type Repo = St::Repo;
+        type Branch = Set<members::branch>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `branch` field
-        pub struct branch(());
-        ///Marker type for the `repo` field
-        pub struct repo(());
         ///Marker type for the `patch` field
         pub struct patch(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
+        ///Marker type for the `branch` field
+        pub struct branch(());
     }
 }
 
@@ -344,9 +344,9 @@ where
 impl<S: BosStr, St> AnalyzeMergeBuilder<S, St>
 where
     St: analyze_merge_state::State,
-    St::Branch: analyze_merge_state::IsSet,
-    St::Repo: analyze_merge_state::IsSet,
     St::Patch: analyze_merge_state::IsSet,
+    St::Repo: analyze_merge_state::IsSet,
+    St::Branch: analyze_merge_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> AnalyzeMerge<S> {

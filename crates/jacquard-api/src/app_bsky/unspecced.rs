@@ -731,50 +731,50 @@ pub mod age_assurance_event_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Status;
-        type AttemptId;
         type CreatedAt;
+        type AttemptId;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Status = Unset;
-        type AttemptId = Unset;
         type CreatedAt = Unset;
+        type AttemptId = Unset;
     }
     ///State transition - sets the `status` field to Set
     pub struct SetStatus<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetStatus<St> {}
     impl<St: State> State for SetStatus<St> {
         type Status = Set<members::status>;
+        type CreatedAt = St::CreatedAt;
         type AttemptId = St::AttemptId;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `attempt_id` field to Set
-    pub struct SetAttemptId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetAttemptId<St> {}
-    impl<St: State> State for SetAttemptId<St> {
-        type Status = St::Status;
-        type AttemptId = Set<members::attempt_id>;
-        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
         type Status = St::Status;
-        type AttemptId = St::AttemptId;
         type CreatedAt = Set<members::created_at>;
+        type AttemptId = St::AttemptId;
+    }
+    ///State transition - sets the `attempt_id` field to Set
+    pub struct SetAttemptId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAttemptId<St> {}
+    impl<St: State> State for SetAttemptId<St> {
+        type Status = St::Status;
+        type CreatedAt = St::CreatedAt;
+        type AttemptId = Set<members::attempt_id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `status` field
         pub struct status(());
-        ///Marker type for the `attempt_id` field
-        pub struct attempt_id(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `attempt_id` field
+        pub struct attempt_id(());
     }
 }
 
@@ -938,8 +938,8 @@ impl<S: BosStr, St> AgeAssuranceEventBuilder<S, St>
 where
     St: age_assurance_event_state::State,
     St::Status: age_assurance_event_state::IsSet,
-    St::AttemptId: age_assurance_event_state::IsSet,
     St::CreatedAt: age_assurance_event_state::IsSet,
+    St::AttemptId: age_assurance_event_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> AgeAssuranceEvent<S> {
@@ -1781,105 +1781,105 @@ pub mod skeleton_trend_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Link;
-        type Topic;
-        type PostCount;
         type Dids;
         type StartedAt;
         type DisplayName;
+        type Link;
+        type PostCount;
+        type Topic;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Link = Unset;
-        type Topic = Unset;
-        type PostCount = Unset;
         type Dids = Unset;
         type StartedAt = Unset;
         type DisplayName = Unset;
-    }
-    ///State transition - sets the `link` field to Set
-    pub struct SetLink<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetLink<St> {}
-    impl<St: State> State for SetLink<St> {
-        type Link = Set<members::link>;
-        type Topic = St::Topic;
-        type PostCount = St::PostCount;
-        type Dids = St::Dids;
-        type StartedAt = St::StartedAt;
-        type DisplayName = St::DisplayName;
-    }
-    ///State transition - sets the `topic` field to Set
-    pub struct SetTopic<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTopic<St> {}
-    impl<St: State> State for SetTopic<St> {
-        type Link = St::Link;
-        type Topic = Set<members::topic>;
-        type PostCount = St::PostCount;
-        type Dids = St::Dids;
-        type StartedAt = St::StartedAt;
-        type DisplayName = St::DisplayName;
-    }
-    ///State transition - sets the `post_count` field to Set
-    pub struct SetPostCount<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPostCount<St> {}
-    impl<St: State> State for SetPostCount<St> {
-        type Link = St::Link;
-        type Topic = St::Topic;
-        type PostCount = Set<members::post_count>;
-        type Dids = St::Dids;
-        type StartedAt = St::StartedAt;
-        type DisplayName = St::DisplayName;
+        type Link = Unset;
+        type PostCount = Unset;
+        type Topic = Unset;
     }
     ///State transition - sets the `dids` field to Set
     pub struct SetDids<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDids<St> {}
     impl<St: State> State for SetDids<St> {
-        type Link = St::Link;
-        type Topic = St::Topic;
-        type PostCount = St::PostCount;
         type Dids = Set<members::dids>;
         type StartedAt = St::StartedAt;
         type DisplayName = St::DisplayName;
+        type Link = St::Link;
+        type PostCount = St::PostCount;
+        type Topic = St::Topic;
     }
     ///State transition - sets the `started_at` field to Set
     pub struct SetStartedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetStartedAt<St> {}
     impl<St: State> State for SetStartedAt<St> {
-        type Link = St::Link;
-        type Topic = St::Topic;
-        type PostCount = St::PostCount;
         type Dids = St::Dids;
         type StartedAt = Set<members::started_at>;
         type DisplayName = St::DisplayName;
+        type Link = St::Link;
+        type PostCount = St::PostCount;
+        type Topic = St::Topic;
     }
     ///State transition - sets the `display_name` field to Set
     pub struct SetDisplayName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDisplayName<St> {}
     impl<St: State> State for SetDisplayName<St> {
-        type Link = St::Link;
-        type Topic = St::Topic;
-        type PostCount = St::PostCount;
         type Dids = St::Dids;
         type StartedAt = St::StartedAt;
         type DisplayName = Set<members::display_name>;
+        type Link = St::Link;
+        type PostCount = St::PostCount;
+        type Topic = St::Topic;
+    }
+    ///State transition - sets the `link` field to Set
+    pub struct SetLink<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLink<St> {}
+    impl<St: State> State for SetLink<St> {
+        type Dids = St::Dids;
+        type StartedAt = St::StartedAt;
+        type DisplayName = St::DisplayName;
+        type Link = Set<members::link>;
+        type PostCount = St::PostCount;
+        type Topic = St::Topic;
+    }
+    ///State transition - sets the `post_count` field to Set
+    pub struct SetPostCount<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPostCount<St> {}
+    impl<St: State> State for SetPostCount<St> {
+        type Dids = St::Dids;
+        type StartedAt = St::StartedAt;
+        type DisplayName = St::DisplayName;
+        type Link = St::Link;
+        type PostCount = Set<members::post_count>;
+        type Topic = St::Topic;
+    }
+    ///State transition - sets the `topic` field to Set
+    pub struct SetTopic<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTopic<St> {}
+    impl<St: State> State for SetTopic<St> {
+        type Dids = St::Dids;
+        type StartedAt = St::StartedAt;
+        type DisplayName = St::DisplayName;
+        type Link = St::Link;
+        type PostCount = St::PostCount;
+        type Topic = Set<members::topic>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `link` field
-        pub struct link(());
-        ///Marker type for the `topic` field
-        pub struct topic(());
-        ///Marker type for the `post_count` field
-        pub struct post_count(());
         ///Marker type for the `dids` field
         pub struct dids(());
         ///Marker type for the `started_at` field
         pub struct started_at(());
         ///Marker type for the `display_name` field
         pub struct display_name(());
+        ///Marker type for the `link` field
+        pub struct link(());
+        ///Marker type for the `post_count` field
+        pub struct post_count(());
+        ///Marker type for the `topic` field
+        pub struct topic(());
     }
 }
 
@@ -2060,12 +2060,12 @@ where
 impl<S: BosStr, St> SkeletonTrendBuilder<S, St>
 where
     St: skeleton_trend_state::State,
-    St::Link: skeleton_trend_state::IsSet,
-    St::Topic: skeleton_trend_state::IsSet,
-    St::PostCount: skeleton_trend_state::IsSet,
     St::Dids: skeleton_trend_state::IsSet,
     St::StartedAt: skeleton_trend_state::IsSet,
     St::DisplayName: skeleton_trend_state::IsSet,
+    St::Link: skeleton_trend_state::IsSet,
+    St::PostCount: skeleton_trend_state::IsSet,
+    St::Topic: skeleton_trend_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> SkeletonTrend<S> {
@@ -2210,105 +2210,105 @@ pub mod thread_item_post_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type MoreParents;
-        type HiddenByThreadgate;
         type Post;
+        type HiddenByThreadgate;
         type OpThread;
-        type MoreReplies;
         type MutedByViewer;
+        type MoreReplies;
+        type MoreParents;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type MoreParents = Unset;
-        type HiddenByThreadgate = Unset;
         type Post = Unset;
+        type HiddenByThreadgate = Unset;
         type OpThread = Unset;
-        type MoreReplies = Unset;
         type MutedByViewer = Unset;
-    }
-    ///State transition - sets the `more_parents` field to Set
-    pub struct SetMoreParents<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetMoreParents<St> {}
-    impl<St: State> State for SetMoreParents<St> {
-        type MoreParents = Set<members::more_parents>;
-        type HiddenByThreadgate = St::HiddenByThreadgate;
-        type Post = St::Post;
-        type OpThread = St::OpThread;
-        type MoreReplies = St::MoreReplies;
-        type MutedByViewer = St::MutedByViewer;
-    }
-    ///State transition - sets the `hidden_by_threadgate` field to Set
-    pub struct SetHiddenByThreadgate<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetHiddenByThreadgate<St> {}
-    impl<St: State> State for SetHiddenByThreadgate<St> {
-        type MoreParents = St::MoreParents;
-        type HiddenByThreadgate = Set<members::hidden_by_threadgate>;
-        type Post = St::Post;
-        type OpThread = St::OpThread;
-        type MoreReplies = St::MoreReplies;
-        type MutedByViewer = St::MutedByViewer;
+        type MoreReplies = Unset;
+        type MoreParents = Unset;
     }
     ///State transition - sets the `post` field to Set
     pub struct SetPost<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPost<St> {}
     impl<St: State> State for SetPost<St> {
-        type MoreParents = St::MoreParents;
-        type HiddenByThreadgate = St::HiddenByThreadgate;
         type Post = Set<members::post>;
+        type HiddenByThreadgate = St::HiddenByThreadgate;
         type OpThread = St::OpThread;
-        type MoreReplies = St::MoreReplies;
         type MutedByViewer = St::MutedByViewer;
+        type MoreReplies = St::MoreReplies;
+        type MoreParents = St::MoreParents;
+    }
+    ///State transition - sets the `hidden_by_threadgate` field to Set
+    pub struct SetHiddenByThreadgate<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHiddenByThreadgate<St> {}
+    impl<St: State> State for SetHiddenByThreadgate<St> {
+        type Post = St::Post;
+        type HiddenByThreadgate = Set<members::hidden_by_threadgate>;
+        type OpThread = St::OpThread;
+        type MutedByViewer = St::MutedByViewer;
+        type MoreReplies = St::MoreReplies;
+        type MoreParents = St::MoreParents;
     }
     ///State transition - sets the `op_thread` field to Set
     pub struct SetOpThread<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetOpThread<St> {}
     impl<St: State> State for SetOpThread<St> {
-        type MoreParents = St::MoreParents;
-        type HiddenByThreadgate = St::HiddenByThreadgate;
         type Post = St::Post;
+        type HiddenByThreadgate = St::HiddenByThreadgate;
         type OpThread = Set<members::op_thread>;
+        type MutedByViewer = St::MutedByViewer;
         type MoreReplies = St::MoreReplies;
-        type MutedByViewer = St::MutedByViewer;
-    }
-    ///State transition - sets the `more_replies` field to Set
-    pub struct SetMoreReplies<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetMoreReplies<St> {}
-    impl<St: State> State for SetMoreReplies<St> {
         type MoreParents = St::MoreParents;
-        type HiddenByThreadgate = St::HiddenByThreadgate;
-        type Post = St::Post;
-        type OpThread = St::OpThread;
-        type MoreReplies = Set<members::more_replies>;
-        type MutedByViewer = St::MutedByViewer;
     }
     ///State transition - sets the `muted_by_viewer` field to Set
     pub struct SetMutedByViewer<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetMutedByViewer<St> {}
     impl<St: State> State for SetMutedByViewer<St> {
-        type MoreParents = St::MoreParents;
-        type HiddenByThreadgate = St::HiddenByThreadgate;
         type Post = St::Post;
+        type HiddenByThreadgate = St::HiddenByThreadgate;
         type OpThread = St::OpThread;
-        type MoreReplies = St::MoreReplies;
         type MutedByViewer = Set<members::muted_by_viewer>;
+        type MoreReplies = St::MoreReplies;
+        type MoreParents = St::MoreParents;
+    }
+    ///State transition - sets the `more_replies` field to Set
+    pub struct SetMoreReplies<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMoreReplies<St> {}
+    impl<St: State> State for SetMoreReplies<St> {
+        type Post = St::Post;
+        type HiddenByThreadgate = St::HiddenByThreadgate;
+        type OpThread = St::OpThread;
+        type MutedByViewer = St::MutedByViewer;
+        type MoreReplies = Set<members::more_replies>;
+        type MoreParents = St::MoreParents;
+    }
+    ///State transition - sets the `more_parents` field to Set
+    pub struct SetMoreParents<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMoreParents<St> {}
+    impl<St: State> State for SetMoreParents<St> {
+        type Post = St::Post;
+        type HiddenByThreadgate = St::HiddenByThreadgate;
+        type OpThread = St::OpThread;
+        type MutedByViewer = St::MutedByViewer;
+        type MoreReplies = St::MoreReplies;
+        type MoreParents = Set<members::more_parents>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `more_parents` field
-        pub struct more_parents(());
-        ///Marker type for the `hidden_by_threadgate` field
-        pub struct hidden_by_threadgate(());
         ///Marker type for the `post` field
         pub struct post(());
+        ///Marker type for the `hidden_by_threadgate` field
+        pub struct hidden_by_threadgate(());
         ///Marker type for the `op_thread` field
         pub struct op_thread(());
-        ///Marker type for the `more_replies` field
-        pub struct more_replies(());
         ///Marker type for the `muted_by_viewer` field
         pub struct muted_by_viewer(());
+        ///Marker type for the `more_replies` field
+        pub struct more_replies(());
+        ///Marker type for the `more_parents` field
+        pub struct more_parents(());
     }
 }
 
@@ -2461,12 +2461,12 @@ where
 impl<S: BosStr, St> ThreadItemPostBuilder<S, St>
 where
     St: thread_item_post_state::State,
-    St::MoreParents: thread_item_post_state::IsSet,
-    St::HiddenByThreadgate: thread_item_post_state::IsSet,
     St::Post: thread_item_post_state::IsSet,
+    St::HiddenByThreadgate: thread_item_post_state::IsSet,
     St::OpThread: thread_item_post_state::IsSet,
-    St::MoreReplies: thread_item_post_state::IsSet,
     St::MutedByViewer: thread_item_post_state::IsSet,
+    St::MoreReplies: thread_item_post_state::IsSet,
+    St::MoreParents: thread_item_post_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ThreadItemPost<S> {
@@ -2507,105 +2507,105 @@ pub mod trend_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type StartedAt;
-        type Actors;
-        type Link;
-        type Topic;
-        type DisplayName;
         type PostCount;
+        type Actors;
+        type Topic;
+        type Link;
+        type StartedAt;
+        type DisplayName;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type StartedAt = Unset;
-        type Actors = Unset;
-        type Link = Unset;
-        type Topic = Unset;
-        type DisplayName = Unset;
         type PostCount = Unset;
-    }
-    ///State transition - sets the `started_at` field to Set
-    pub struct SetStartedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetStartedAt<St> {}
-    impl<St: State> State for SetStartedAt<St> {
-        type StartedAt = Set<members::started_at>;
-        type Actors = St::Actors;
-        type Link = St::Link;
-        type Topic = St::Topic;
-        type DisplayName = St::DisplayName;
-        type PostCount = St::PostCount;
-    }
-    ///State transition - sets the `actors` field to Set
-    pub struct SetActors<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetActors<St> {}
-    impl<St: State> State for SetActors<St> {
-        type StartedAt = St::StartedAt;
-        type Actors = Set<members::actors>;
-        type Link = St::Link;
-        type Topic = St::Topic;
-        type DisplayName = St::DisplayName;
-        type PostCount = St::PostCount;
-    }
-    ///State transition - sets the `link` field to Set
-    pub struct SetLink<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetLink<St> {}
-    impl<St: State> State for SetLink<St> {
-        type StartedAt = St::StartedAt;
-        type Actors = St::Actors;
-        type Link = Set<members::link>;
-        type Topic = St::Topic;
-        type DisplayName = St::DisplayName;
-        type PostCount = St::PostCount;
-    }
-    ///State transition - sets the `topic` field to Set
-    pub struct SetTopic<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTopic<St> {}
-    impl<St: State> State for SetTopic<St> {
-        type StartedAt = St::StartedAt;
-        type Actors = St::Actors;
-        type Link = St::Link;
-        type Topic = Set<members::topic>;
-        type DisplayName = St::DisplayName;
-        type PostCount = St::PostCount;
-    }
-    ///State transition - sets the `display_name` field to Set
-    pub struct SetDisplayName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDisplayName<St> {}
-    impl<St: State> State for SetDisplayName<St> {
-        type StartedAt = St::StartedAt;
-        type Actors = St::Actors;
-        type Link = St::Link;
-        type Topic = St::Topic;
-        type DisplayName = Set<members::display_name>;
-        type PostCount = St::PostCount;
+        type Actors = Unset;
+        type Topic = Unset;
+        type Link = Unset;
+        type StartedAt = Unset;
+        type DisplayName = Unset;
     }
     ///State transition - sets the `post_count` field to Set
     pub struct SetPostCount<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPostCount<St> {}
     impl<St: State> State for SetPostCount<St> {
-        type StartedAt = St::StartedAt;
-        type Actors = St::Actors;
-        type Link = St::Link;
-        type Topic = St::Topic;
-        type DisplayName = St::DisplayName;
         type PostCount = Set<members::post_count>;
+        type Actors = St::Actors;
+        type Topic = St::Topic;
+        type Link = St::Link;
+        type StartedAt = St::StartedAt;
+        type DisplayName = St::DisplayName;
+    }
+    ///State transition - sets the `actors` field to Set
+    pub struct SetActors<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetActors<St> {}
+    impl<St: State> State for SetActors<St> {
+        type PostCount = St::PostCount;
+        type Actors = Set<members::actors>;
+        type Topic = St::Topic;
+        type Link = St::Link;
+        type StartedAt = St::StartedAt;
+        type DisplayName = St::DisplayName;
+    }
+    ///State transition - sets the `topic` field to Set
+    pub struct SetTopic<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTopic<St> {}
+    impl<St: State> State for SetTopic<St> {
+        type PostCount = St::PostCount;
+        type Actors = St::Actors;
+        type Topic = Set<members::topic>;
+        type Link = St::Link;
+        type StartedAt = St::StartedAt;
+        type DisplayName = St::DisplayName;
+    }
+    ///State transition - sets the `link` field to Set
+    pub struct SetLink<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLink<St> {}
+    impl<St: State> State for SetLink<St> {
+        type PostCount = St::PostCount;
+        type Actors = St::Actors;
+        type Topic = St::Topic;
+        type Link = Set<members::link>;
+        type StartedAt = St::StartedAt;
+        type DisplayName = St::DisplayName;
+    }
+    ///State transition - sets the `started_at` field to Set
+    pub struct SetStartedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStartedAt<St> {}
+    impl<St: State> State for SetStartedAt<St> {
+        type PostCount = St::PostCount;
+        type Actors = St::Actors;
+        type Topic = St::Topic;
+        type Link = St::Link;
+        type StartedAt = Set<members::started_at>;
+        type DisplayName = St::DisplayName;
+    }
+    ///State transition - sets the `display_name` field to Set
+    pub struct SetDisplayName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDisplayName<St> {}
+    impl<St: State> State for SetDisplayName<St> {
+        type PostCount = St::PostCount;
+        type Actors = St::Actors;
+        type Topic = St::Topic;
+        type Link = St::Link;
+        type StartedAt = St::StartedAt;
+        type DisplayName = Set<members::display_name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `started_at` field
-        pub struct started_at(());
-        ///Marker type for the `actors` field
-        pub struct actors(());
-        ///Marker type for the `link` field
-        pub struct link(());
-        ///Marker type for the `topic` field
-        pub struct topic(());
-        ///Marker type for the `display_name` field
-        pub struct display_name(());
         ///Marker type for the `post_count` field
         pub struct post_count(());
+        ///Marker type for the `actors` field
+        pub struct actors(());
+        ///Marker type for the `topic` field
+        pub struct topic(());
+        ///Marker type for the `link` field
+        pub struct link(());
+        ///Marker type for the `started_at` field
+        pub struct started_at(());
+        ///Marker type for the `display_name` field
+        pub struct display_name(());
     }
 }
 
@@ -2786,12 +2786,12 @@ where
 impl<S: BosStr, St> TrendViewBuilder<S, St>
 where
     St: trend_view_state::State,
-    St::StartedAt: trend_view_state::IsSet,
-    St::Actors: trend_view_state::IsSet,
-    St::Link: trend_view_state::IsSet,
-    St::Topic: trend_view_state::IsSet,
-    St::DisplayName: trend_view_state::IsSet,
     St::PostCount: trend_view_state::IsSet,
+    St::Actors: trend_view_state::IsSet,
+    St::Topic: trend_view_state::IsSet,
+    St::Link: trend_view_state::IsSet,
+    St::StartedAt: trend_view_state::IsSet,
+    St::DisplayName: trend_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> TrendView<S> {

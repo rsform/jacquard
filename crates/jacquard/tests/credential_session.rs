@@ -3,6 +3,7 @@ use std::sync::Arc;
 
 use bytes::Bytes;
 use http::{HeaderValue, Method, Response as HttpResponse, StatusCode};
+use jacquard::BosStr;
 use jacquard::client::AtpSession;
 use jacquard::client::credential_session::{CredentialSession, SessionKey};
 use jacquard::identity::resolver::{DidDocResponse, IdentityResolver, ResolverOptions};
@@ -11,6 +12,7 @@ use jacquard::types::string::Handle;
 use jacquard::xrpc::XrpcClient;
 use jacquard_common::http_client::HttpClient;
 use jacquard_common::session::{MemorySessionStore, SessionStore};
+use smol_str::SmolStr;
 use tokio::sync::{Mutex, RwLock};
 
 #[derive(Clone, Default)]
@@ -60,18 +62,18 @@ impl IdentityResolver for MockClient {
         &OPTS
     }
 
-    async fn resolve_handle(
+    async fn resolve_handle<S: BosStr + Sync>(
         &self,
-        handle: &Handle<'_>,
-    ) -> std::result::Result<Did<'static>, jacquard::identity::resolver::IdentityError> {
+        handle: &Handle<S>,
+    ) -> std::result::Result<Did, jacquard::identity::resolver::IdentityError> {
         // Return a fixed DID for any handle
         assert!(handle.as_str().contains('.'));
         Ok(Did::new_static("did:plc:alice").unwrap())
     }
 
-    async fn resolve_did_doc(
+    async fn resolve_did_doc<S: BosStr + Sync>(
         &self,
-        did: &Did<'_>,
+        did: &Did<S>,
     ) -> std::result::Result<DidDocResponse, jacquard::identity::resolver::IdentityError> {
         // Track calls and return a minimal DID doc with a PDS endpoint
         *self.did_doc_calls.write().await += 1;
@@ -193,7 +195,9 @@ async fn credential_login_and_auto_refresh() {
         .await
         .expect("xrpc send ok");
     assert_eq!(resp.status(), StatusCode::OK);
-    let out = resp
+    let out: jacquard::api::com_atproto::server::get_session::GetSessionOutput<
+        jacquard::CowStr<'_>,
+    > = resp
         .parse()
         .expect("parse ok after refresh (GetSession output)");
     assert_eq!(out.handle.as_str(), "alice.bsky.social");
@@ -250,9 +254,9 @@ async fn credential_login_and_auto_refresh() {
     // Verify store updated with refreshed tokens
     let key = SessionKey(
         Did::new_static("did:plc:alice").unwrap(),
-        jacquard::CowStr::from("session"),
+        SmolStr::from("session"),
     );
     let updated = store.get(&key).await.expect("session present");
-    assert_eq!(updated.access_jwt.as_ref(), "acc2");
-    assert_eq!(updated.refresh_jwt.as_ref(), "ref2");
+    assert_eq!(updated.access_jwt.as_str(), "acc2");
+    assert_eq!(updated.refresh_jwt.as_str(), "ref2");
 }

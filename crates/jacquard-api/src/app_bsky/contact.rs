@@ -158,37 +158,37 @@ pub mod match_and_contact_index_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Match;
         type ContactIndex;
+        type Match;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Match = Unset;
         type ContactIndex = Unset;
-    }
-    ///State transition - sets the `match` field to Set
-    pub struct SetMatch<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetMatch<St> {}
-    impl<St: State> State for SetMatch<St> {
-        type Match = Set<members::r#match>;
-        type ContactIndex = St::ContactIndex;
+        type Match = Unset;
     }
     ///State transition - sets the `contact_index` field to Set
     pub struct SetContactIndex<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetContactIndex<St> {}
     impl<St: State> State for SetContactIndex<St> {
-        type Match = St::Match;
         type ContactIndex = Set<members::contact_index>;
+        type Match = St::Match;
+    }
+    ///State transition - sets the `match` field to Set
+    pub struct SetMatch<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMatch<St> {}
+    impl<St: State> State for SetMatch<St> {
+        type ContactIndex = St::ContactIndex;
+        type Match = Set<members::r#match>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `match` field
-        pub struct r#match(());
         ///Marker type for the `contact_index` field
         pub struct contact_index(());
+        ///Marker type for the `match` field
+        pub struct r#match(());
     }
 }
 
@@ -267,8 +267,8 @@ where
 impl<S: BosStr, St> MatchAndContactIndexBuilder<S, St>
 where
     St: match_and_contact_index_state::State,
-    St::Match: match_and_contact_index_state::IsSet,
     St::ContactIndex: match_and_contact_index_state::IsSet,
+    St::Match: match_and_contact_index_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> MatchAndContactIndex<S> {
@@ -435,37 +435,37 @@ pub mod notification_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type To;
         type From;
+        type To;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type To = Unset;
         type From = Unset;
-    }
-    ///State transition - sets the `to` field to Set
-    pub struct SetTo<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTo<St> {}
-    impl<St: State> State for SetTo<St> {
-        type To = Set<members::to>;
-        type From = St::From;
+        type To = Unset;
     }
     ///State transition - sets the `from` field to Set
     pub struct SetFrom<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetFrom<St> {}
     impl<St: State> State for SetFrom<St> {
-        type To = St::To;
         type From = Set<members::from>;
+        type To = St::To;
+    }
+    ///State transition - sets the `to` field to Set
+    pub struct SetTo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTo<St> {}
+    impl<St: State> State for SetTo<St> {
+        type From = St::From;
+        type To = Set<members::to>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `to` field
-        pub struct to(());
         ///Marker type for the `from` field
         pub struct from(());
+        ///Marker type for the `to` field
+        pub struct to(());
     }
 }
 
@@ -535,8 +535,8 @@ where
 impl<S: BosStr, St> NotificationBuilder<S, St>
 where
     St: notification_state::State,
-    St::To: notification_state::IsSet,
     St::From: notification_state::IsSet,
+    St::To: notification_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Notification<S> {

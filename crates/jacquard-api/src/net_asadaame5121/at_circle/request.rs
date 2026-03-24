@@ -171,8 +171,8 @@ pub mod request_state {
     pub trait State: sealed::Sealed {
         type Ring;
         type SiteTitle;
-        type CreatedAt;
         type SiteUrl;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -180,8 +180,8 @@ pub mod request_state {
     impl State for Empty {
         type Ring = Unset;
         type SiteTitle = Unset;
-        type CreatedAt = Unset;
         type SiteUrl = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `ring` field to Set
     pub struct SetRing<St: State = Empty>(PhantomData<fn() -> St>);
@@ -189,8 +189,8 @@ pub mod request_state {
     impl<St: State> State for SetRing<St> {
         type Ring = Set<members::ring>;
         type SiteTitle = St::SiteTitle;
-        type CreatedAt = St::CreatedAt;
         type SiteUrl = St::SiteUrl;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `site_title` field to Set
     pub struct SetSiteTitle<St: State = Empty>(PhantomData<fn() -> St>);
@@ -198,17 +198,8 @@ pub mod request_state {
     impl<St: State> State for SetSiteTitle<St> {
         type Ring = St::Ring;
         type SiteTitle = Set<members::site_title>;
+        type SiteUrl = St::SiteUrl;
         type CreatedAt = St::CreatedAt;
-        type SiteUrl = St::SiteUrl;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type Ring = St::Ring;
-        type SiteTitle = St::SiteTitle;
-        type CreatedAt = Set<members::created_at>;
-        type SiteUrl = St::SiteUrl;
     }
     ///State transition - sets the `site_url` field to Set
     pub struct SetSiteUrl<St: State = Empty>(PhantomData<fn() -> St>);
@@ -216,8 +207,17 @@ pub mod request_state {
     impl<St: State> State for SetSiteUrl<St> {
         type Ring = St::Ring;
         type SiteTitle = St::SiteTitle;
-        type CreatedAt = St::CreatedAt;
         type SiteUrl = Set<members::site_url>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Ring = St::Ring;
+        type SiteTitle = St::SiteTitle;
+        type SiteUrl = St::SiteUrl;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -226,10 +226,10 @@ pub mod request_state {
         pub struct ring(());
         ///Marker type for the `site_title` field
         pub struct site_title(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `site_url` field
         pub struct site_url(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -372,8 +372,8 @@ where
     St: request_state::State,
     St::Ring: request_state::IsSet,
     St::SiteTitle: request_state::IsSet,
-    St::CreatedAt: request_state::IsSet,
     St::SiteUrl: request_state::IsSet,
+    St::CreatedAt: request_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Request<S> {

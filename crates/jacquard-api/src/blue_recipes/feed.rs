@@ -332,83 +332,83 @@ pub mod recipe_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Author;
         type Uri;
-        type IndexedAt;
         type Record;
+        type IndexedAt;
+        type Author;
         type Cid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Author = Unset;
         type Uri = Unset;
-        type IndexedAt = Unset;
         type Record = Unset;
+        type IndexedAt = Unset;
+        type Author = Unset;
         type Cid = Unset;
-    }
-    ///State transition - sets the `author` field to Set
-    pub struct SetAuthor<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetAuthor<St> {}
-    impl<St: State> State for SetAuthor<St> {
-        type Author = Set<members::author>;
-        type Uri = St::Uri;
-        type IndexedAt = St::IndexedAt;
-        type Record = St::Record;
-        type Cid = St::Cid;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUri<St> {}
     impl<St: State> State for SetUri<St> {
-        type Author = St::Author;
         type Uri = Set<members::uri>;
+        type Record = St::Record;
         type IndexedAt = St::IndexedAt;
-        type Record = St::Record;
-        type Cid = St::Cid;
-    }
-    ///State transition - sets the `indexed_at` field to Set
-    pub struct SetIndexedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetIndexedAt<St> {}
-    impl<St: State> State for SetIndexedAt<St> {
         type Author = St::Author;
-        type Uri = St::Uri;
-        type IndexedAt = Set<members::indexed_at>;
-        type Record = St::Record;
         type Cid = St::Cid;
     }
     ///State transition - sets the `record` field to Set
     pub struct SetRecord<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRecord<St> {}
     impl<St: State> State for SetRecord<St> {
-        type Author = St::Author;
         type Uri = St::Uri;
-        type IndexedAt = St::IndexedAt;
         type Record = Set<members::record>;
+        type IndexedAt = St::IndexedAt;
+        type Author = St::Author;
+        type Cid = St::Cid;
+    }
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIndexedAt<St> {}
+    impl<St: State> State for SetIndexedAt<St> {
+        type Uri = St::Uri;
+        type Record = St::Record;
+        type IndexedAt = Set<members::indexed_at>;
+        type Author = St::Author;
+        type Cid = St::Cid;
+    }
+    ///State transition - sets the `author` field to Set
+    pub struct SetAuthor<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAuthor<St> {}
+    impl<St: State> State for SetAuthor<St> {
+        type Uri = St::Uri;
+        type Record = St::Record;
+        type IndexedAt = St::IndexedAt;
+        type Author = Set<members::author>;
         type Cid = St::Cid;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCid<St> {}
     impl<St: State> State for SetCid<St> {
-        type Author = St::Author;
         type Uri = St::Uri;
-        type IndexedAt = St::IndexedAt;
         type Record = St::Record;
+        type IndexedAt = St::IndexedAt;
+        type Author = St::Author;
         type Cid = Set<members::cid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `author` field
-        pub struct author(());
         ///Marker type for the `uri` field
         pub struct uri(());
-        ///Marker type for the `indexed_at` field
-        pub struct indexed_at(());
         ///Marker type for the `record` field
         pub struct record(());
+        ///Marker type for the `indexed_at` field
+        pub struct indexed_at(());
+        ///Marker type for the `author` field
+        pub struct author(());
         ///Marker type for the `cid` field
         pub struct cid(());
     }
@@ -543,10 +543,10 @@ where
 impl<S: BosStr, St> RecipeViewBuilder<S, St>
 where
     St: recipe_view_state::State,
-    St::Author: recipe_view_state::IsSet,
     St::Uri: recipe_view_state::IsSet,
-    St::IndexedAt: recipe_view_state::IsSet,
     St::Record: recipe_view_state::IsSet,
+    St::IndexedAt: recipe_view_state::IsSet,
+    St::Author: recipe_view_state::IsSet,
     St::Cid: recipe_view_state::IsSet,
 {
     /// Build the final struct.

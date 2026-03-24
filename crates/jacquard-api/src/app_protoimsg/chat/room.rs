@@ -398,67 +398,67 @@ pub mod room_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Topic;
-        type CreatedAt;
         type Name;
         type Purpose;
+        type CreatedAt;
+        type Topic;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Topic = Unset;
-        type CreatedAt = Unset;
         type Name = Unset;
         type Purpose = Unset;
-    }
-    ///State transition - sets the `topic` field to Set
-    pub struct SetTopic<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTopic<St> {}
-    impl<St: State> State for SetTopic<St> {
-        type Topic = Set<members::topic>;
-        type CreatedAt = St::CreatedAt;
-        type Name = St::Name;
-        type Purpose = St::Purpose;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type Topic = St::Topic;
-        type CreatedAt = Set<members::created_at>;
-        type Name = St::Name;
-        type Purpose = St::Purpose;
+        type CreatedAt = Unset;
+        type Topic = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetName<St> {}
     impl<St: State> State for SetName<St> {
-        type Topic = St::Topic;
-        type CreatedAt = St::CreatedAt;
         type Name = Set<members::name>;
         type Purpose = St::Purpose;
+        type CreatedAt = St::CreatedAt;
+        type Topic = St::Topic;
     }
     ///State transition - sets the `purpose` field to Set
     pub struct SetPurpose<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPurpose<St> {}
     impl<St: State> State for SetPurpose<St> {
-        type Topic = St::Topic;
-        type CreatedAt = St::CreatedAt;
         type Name = St::Name;
         type Purpose = Set<members::purpose>;
+        type CreatedAt = St::CreatedAt;
+        type Topic = St::Topic;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Name = St::Name;
+        type Purpose = St::Purpose;
+        type CreatedAt = Set<members::created_at>;
+        type Topic = St::Topic;
+    }
+    ///State transition - sets the `topic` field to Set
+    pub struct SetTopic<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTopic<St> {}
+    impl<St: State> State for SetTopic<St> {
+        type Name = St::Name;
+        type Purpose = St::Purpose;
+        type CreatedAt = St::CreatedAt;
+        type Topic = Set<members::topic>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `topic` field
-        pub struct topic(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `purpose` field
         pub struct purpose(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `topic` field
+        pub struct topic(());
     }
 }
 
@@ -613,10 +613,10 @@ where
 impl<S: BosStr, St> RoomBuilder<S, St>
 where
     St: room_state::State,
-    St::Topic: room_state::IsSet,
-    St::CreatedAt: room_state::IsSet,
     St::Name: room_state::IsSet,
     St::Purpose: room_state::IsSet,
+    St::CreatedAt: room_state::IsSet,
+    St::Topic: room_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Room<S> {

@@ -206,51 +206,51 @@ pub mod complete_upload_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Digest;
         type Parts;
         type UploadId;
-        type Digest;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Digest = Unset;
         type Parts = Unset;
         type UploadId = Unset;
-        type Digest = Unset;
-    }
-    ///State transition - sets the `parts` field to Set
-    pub struct SetParts<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetParts<St> {}
-    impl<St: State> State for SetParts<St> {
-        type Parts = Set<members::parts>;
-        type UploadId = St::UploadId;
-        type Digest = St::Digest;
-    }
-    ///State transition - sets the `upload_id` field to Set
-    pub struct SetUploadId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUploadId<St> {}
-    impl<St: State> State for SetUploadId<St> {
-        type Parts = St::Parts;
-        type UploadId = Set<members::upload_id>;
-        type Digest = St::Digest;
     }
     ///State transition - sets the `digest` field to Set
     pub struct SetDigest<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDigest<St> {}
     impl<St: State> State for SetDigest<St> {
+        type Digest = Set<members::digest>;
         type Parts = St::Parts;
         type UploadId = St::UploadId;
-        type Digest = Set<members::digest>;
+    }
+    ///State transition - sets the `parts` field to Set
+    pub struct SetParts<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetParts<St> {}
+    impl<St: State> State for SetParts<St> {
+        type Digest = St::Digest;
+        type Parts = Set<members::parts>;
+        type UploadId = St::UploadId;
+    }
+    ///State transition - sets the `upload_id` field to Set
+    pub struct SetUploadId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUploadId<St> {}
+    impl<St: State> State for SetUploadId<St> {
+        type Digest = St::Digest;
+        type Parts = St::Parts;
+        type UploadId = Set<members::upload_id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `digest` field
+        pub struct digest(());
         ///Marker type for the `parts` field
         pub struct parts(());
         ///Marker type for the `upload_id` field
         pub struct upload_id(());
-        ///Marker type for the `digest` field
-        pub struct digest(());
     }
 }
 
@@ -339,9 +339,9 @@ where
 impl<S: BosStr, St> CompleteUploadBuilder<S, St>
 where
     St: complete_upload_state::State,
+    St::Digest: complete_upload_state::IsSet,
     St::Parts: complete_upload_state::IsSet,
     St::UploadId: complete_upload_state::IsSet,
-    St::Digest: complete_upload_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> CompleteUpload<S> {
@@ -376,37 +376,37 @@ pub mod part_info_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Etag;
         type PartNumber;
+        type Etag;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Etag = Unset;
         type PartNumber = Unset;
-    }
-    ///State transition - sets the `etag` field to Set
-    pub struct SetEtag<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetEtag<St> {}
-    impl<St: State> State for SetEtag<St> {
-        type Etag = Set<members::etag>;
-        type PartNumber = St::PartNumber;
+        type Etag = Unset;
     }
     ///State transition - sets the `part_number` field to Set
     pub struct SetPartNumber<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPartNumber<St> {}
     impl<St: State> State for SetPartNumber<St> {
-        type Etag = St::Etag;
         type PartNumber = Set<members::part_number>;
+        type Etag = St::Etag;
+    }
+    ///State transition - sets the `etag` field to Set
+    pub struct SetEtag<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetEtag<St> {}
+    impl<St: State> State for SetEtag<St> {
+        type PartNumber = St::PartNumber;
+        type Etag = Set<members::etag>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `etag` field
-        pub struct etag(());
         ///Marker type for the `part_number` field
         pub struct part_number(());
+        ///Marker type for the `etag` field
+        pub struct etag(());
     }
 }
 
@@ -476,8 +476,8 @@ where
 impl<S: BosStr, St> PartInfoBuilder<S, St>
 where
     St: part_info_state::State,
-    St::Etag: part_info_state::IsSet,
     St::PartNumber: part_info_state::IsSet,
+    St::Etag: part_info_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> PartInfo<S> {

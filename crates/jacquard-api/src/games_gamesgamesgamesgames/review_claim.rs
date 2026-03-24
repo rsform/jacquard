@@ -156,37 +156,37 @@ pub mod review_claim_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Claim;
         type Status;
+        type Claim;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Claim = Unset;
         type Status = Unset;
-    }
-    ///State transition - sets the `claim` field to Set
-    pub struct SetClaim<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetClaim<St> {}
-    impl<St: State> State for SetClaim<St> {
-        type Claim = Set<members::claim>;
-        type Status = St::Status;
+        type Claim = Unset;
     }
     ///State transition - sets the `status` field to Set
     pub struct SetStatus<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetStatus<St> {}
     impl<St: State> State for SetStatus<St> {
-        type Claim = St::Claim;
         type Status = Set<members::status>;
+        type Claim = St::Claim;
+    }
+    ///State transition - sets the `claim` field to Set
+    pub struct SetClaim<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetClaim<St> {}
+    impl<St: State> State for SetClaim<St> {
+        type Status = St::Status;
+        type Claim = Set<members::claim>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `claim` field
-        pub struct claim(());
         ///Marker type for the `status` field
         pub struct status(());
+        ///Marker type for the `claim` field
+        pub struct claim(());
     }
 }
 
@@ -287,8 +287,8 @@ where
 impl<S: BosStr, St> ReviewClaimBuilder<S, St>
 where
     St: review_claim_state::State,
-    St::Claim: review_claim_state::IsSet,
     St::Status: review_claim_state::IsSet,
+    St::Claim: review_claim_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ReviewClaim<S> {

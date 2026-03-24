@@ -224,49 +224,49 @@ pub mod document_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
         type PublishedAt;
+        type Title;
         type Site;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
         type PublishedAt = Unset;
+        type Title = Unset;
         type Site = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTitle<St> {}
-    impl<St: State> State for SetTitle<St> {
-        type Title = Set<members::title>;
-        type PublishedAt = St::PublishedAt;
-        type Site = St::Site;
     }
     ///State transition - sets the `published_at` field to Set
     pub struct SetPublishedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPublishedAt<St> {}
     impl<St: State> State for SetPublishedAt<St> {
-        type Title = St::Title;
         type PublishedAt = Set<members::published_at>;
+        type Title = St::Title;
+        type Site = St::Site;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
+        type PublishedAt = St::PublishedAt;
+        type Title = Set<members::title>;
         type Site = St::Site;
     }
     ///State transition - sets the `site` field to Set
     pub struct SetSite<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSite<St> {}
     impl<St: State> State for SetSite<St> {
-        type Title = St::Title;
         type PublishedAt = St::PublishedAt;
+        type Title = St::Title;
         type Site = Set<members::site>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `published_at` field
         pub struct published_at(());
+        ///Marker type for the `title` field
+        pub struct title(());
         ///Marker type for the `site` field
         pub struct site(());
     }
@@ -515,8 +515,8 @@ impl<S: BosStr, St: document_state::State> DocumentBuilder<S, St> {
 impl<S: BosStr, St> DocumentBuilder<S, St>
 where
     St: document_state::State,
-    St::Title: document_state::IsSet,
     St::PublishedAt: document_state::IsSet,
+    St::Title: document_state::IsSet,
     St::Site: document_state::IsSet,
 {
     /// Build the final struct.

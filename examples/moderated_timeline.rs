@@ -42,7 +42,7 @@ async fn main() -> miette::Result<()> {
     let args = Args::parse();
 
     // Extract labeler DIDs from the static JSON (used for testing)
-    let services: GetServicesOutput<'static> =
+    let services: GetServicesOutput =
         serde_json::from_str(LABELER_SERVICES_JSON).expect("failed to parse labeler services");
 
     let mut accepted_labelers = Vec::new();

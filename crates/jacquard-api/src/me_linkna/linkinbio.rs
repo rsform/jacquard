@@ -2795,50 +2795,50 @@ pub mod github_contribution_day_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Level;
-        type Date;
         type Count;
+        type Date;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Level = Unset;
-        type Date = Unset;
         type Count = Unset;
+        type Date = Unset;
     }
     ///State transition - sets the `level` field to Set
     pub struct SetLevel<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetLevel<St> {}
     impl<St: State> State for SetLevel<St> {
         type Level = Set<members::level>;
+        type Count = St::Count;
         type Date = St::Date;
-        type Count = St::Count;
-    }
-    ///State transition - sets the `date` field to Set
-    pub struct SetDate<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDate<St> {}
-    impl<St: State> State for SetDate<St> {
-        type Level = St::Level;
-        type Date = Set<members::date>;
-        type Count = St::Count;
     }
     ///State transition - sets the `count` field to Set
     pub struct SetCount<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCount<St> {}
     impl<St: State> State for SetCount<St> {
         type Level = St::Level;
-        type Date = St::Date;
         type Count = Set<members::count>;
+        type Date = St::Date;
+    }
+    ///State transition - sets the `date` field to Set
+    pub struct SetDate<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDate<St> {}
+    impl<St: State> State for SetDate<St> {
+        type Level = St::Level;
+        type Count = St::Count;
+        type Date = Set<members::date>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `level` field
         pub struct level(());
-        ///Marker type for the `date` field
-        pub struct date(());
         ///Marker type for the `count` field
         pub struct count(());
+        ///Marker type for the `date` field
+        pub struct date(());
     }
 }
 
@@ -2934,8 +2934,8 @@ impl<S: BosStr, St> GithubContributionDayBuilder<S, St>
 where
     St: github_contribution_day_state::State,
     St::Level: github_contribution_day_state::IsSet,
-    St::Date: github_contribution_day_state::IsSet,
     St::Count: github_contribution_day_state::IsSet,
+    St::Date: github_contribution_day_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> GithubContributionDay<S> {
@@ -3155,50 +3155,50 @@ pub mod social_icon_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Id;
-        type Url;
         type Platform;
+        type Url;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Id = Unset;
-        type Url = Unset;
         type Platform = Unset;
+        type Url = Unset;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetId<St> {}
     impl<St: State> State for SetId<St> {
         type Id = Set<members::id>;
+        type Platform = St::Platform;
         type Url = St::Url;
-        type Platform = St::Platform;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUrl<St> {}
-    impl<St: State> State for SetUrl<St> {
-        type Id = St::Id;
-        type Url = Set<members::url>;
-        type Platform = St::Platform;
     }
     ///State transition - sets the `platform` field to Set
     pub struct SetPlatform<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPlatform<St> {}
     impl<St: State> State for SetPlatform<St> {
         type Id = St::Id;
-        type Url = St::Url;
         type Platform = Set<members::platform>;
+        type Url = St::Url;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUrl<St> {}
+    impl<St: State> State for SetUrl<St> {
+        type Id = St::Id;
+        type Platform = St::Platform;
+        type Url = Set<members::url>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `id` field
         pub struct id(());
-        ///Marker type for the `url` field
-        pub struct url(());
         ///Marker type for the `platform` field
         pub struct platform(());
+        ///Marker type for the `url` field
+        pub struct url(());
     }
 }
 
@@ -3288,8 +3288,8 @@ impl<S: BosStr, St> SocialIconBuilder<S, St>
 where
     St: social_icon_state::State,
     St::Id: social_icon_state::IsSet,
-    St::Url: social_icon_state::IsSet,
     St::Platform: social_icon_state::IsSet,
+    St::Url: social_icon_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> SocialIcon<S> {
@@ -3324,67 +3324,67 @@ pub mod widget_github_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Contributions;
         type Id;
-        type GithubUsername;
         type Type;
+        type Contributions;
+        type GithubUsername;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Contributions = Unset;
         type Id = Unset;
-        type GithubUsername = Unset;
         type Type = Unset;
-    }
-    ///State transition - sets the `contributions` field to Set
-    pub struct SetContributions<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetContributions<St> {}
-    impl<St: State> State for SetContributions<St> {
-        type Contributions = Set<members::contributions>;
-        type Id = St::Id;
-        type GithubUsername = St::GithubUsername;
-        type Type = St::Type;
+        type Contributions = Unset;
+        type GithubUsername = Unset;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetId<St> {}
     impl<St: State> State for SetId<St> {
-        type Contributions = St::Contributions;
         type Id = Set<members::id>;
-        type GithubUsername = St::GithubUsername;
         type Type = St::Type;
-    }
-    ///State transition - sets the `github_username` field to Set
-    pub struct SetGithubUsername<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetGithubUsername<St> {}
-    impl<St: State> State for SetGithubUsername<St> {
         type Contributions = St::Contributions;
-        type Id = St::Id;
-        type GithubUsername = Set<members::github_username>;
-        type Type = St::Type;
+        type GithubUsername = St::GithubUsername;
     }
     ///State transition - sets the `type` field to Set
     pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetType<St> {}
     impl<St: State> State for SetType<St> {
-        type Contributions = St::Contributions;
         type Id = St::Id;
-        type GithubUsername = St::GithubUsername;
         type Type = Set<members::r#type>;
+        type Contributions = St::Contributions;
+        type GithubUsername = St::GithubUsername;
+    }
+    ///State transition - sets the `contributions` field to Set
+    pub struct SetContributions<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetContributions<St> {}
+    impl<St: State> State for SetContributions<St> {
+        type Id = St::Id;
+        type Type = St::Type;
+        type Contributions = Set<members::contributions>;
+        type GithubUsername = St::GithubUsername;
+    }
+    ///State transition - sets the `github_username` field to Set
+    pub struct SetGithubUsername<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetGithubUsername<St> {}
+    impl<St: State> State for SetGithubUsername<St> {
+        type Id = St::Id;
+        type Type = St::Type;
+        type Contributions = St::Contributions;
+        type GithubUsername = Set<members::github_username>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `contributions` field
-        pub struct contributions(());
         ///Marker type for the `id` field
         pub struct id(());
-        ///Marker type for the `github_username` field
-        pub struct github_username(());
         ///Marker type for the `type` field
         pub struct r#type(());
+        ///Marker type for the `contributions` field
+        pub struct contributions(());
+        ///Marker type for the `github_username` field
+        pub struct github_username(());
     }
 }
 
@@ -3553,10 +3553,10 @@ where
 impl<S: BosStr, St> WidgetGithubBuilder<S, St>
 where
     St: widget_github_state::State,
-    St::Contributions: widget_github_state::IsSet,
     St::Id: widget_github_state::IsSet,
-    St::GithubUsername: widget_github_state::IsSet,
     St::Type: widget_github_state::IsSet,
+    St::Contributions: widget_github_state::IsSet,
+    St::GithubUsername: widget_github_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> WidgetGithub<S> {
@@ -3601,85 +3601,85 @@ pub mod widget_goodreads_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Shelf;
-        type Id;
         type GoodreadsUserId;
-        type Type;
+        type Id;
+        type Shelf;
         type Books;
+        type Type;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Shelf = Unset;
-        type Id = Unset;
         type GoodreadsUserId = Unset;
-        type Type = Unset;
+        type Id = Unset;
+        type Shelf = Unset;
         type Books = Unset;
-    }
-    ///State transition - sets the `shelf` field to Set
-    pub struct SetShelf<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetShelf<St> {}
-    impl<St: State> State for SetShelf<St> {
-        type Shelf = Set<members::shelf>;
-        type Id = St::Id;
-        type GoodreadsUserId = St::GoodreadsUserId;
-        type Type = St::Type;
-        type Books = St::Books;
-    }
-    ///State transition - sets the `id` field to Set
-    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetId<St> {}
-    impl<St: State> State for SetId<St> {
-        type Shelf = St::Shelf;
-        type Id = Set<members::id>;
-        type GoodreadsUserId = St::GoodreadsUserId;
-        type Type = St::Type;
-        type Books = St::Books;
+        type Type = Unset;
     }
     ///State transition - sets the `goodreads_user_id` field to Set
     pub struct SetGoodreadsUserId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetGoodreadsUserId<St> {}
     impl<St: State> State for SetGoodreadsUserId<St> {
-        type Shelf = St::Shelf;
-        type Id = St::Id;
         type GoodreadsUserId = Set<members::goodreads_user_id>;
-        type Type = St::Type;
-        type Books = St::Books;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetType<St> {}
-    impl<St: State> State for SetType<St> {
-        type Shelf = St::Shelf;
         type Id = St::Id;
-        type GoodreadsUserId = St::GoodreadsUserId;
-        type Type = Set<members::r#type>;
+        type Shelf = St::Shelf;
         type Books = St::Books;
+        type Type = St::Type;
+    }
+    ///State transition - sets the `id` field to Set
+    pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetId<St> {}
+    impl<St: State> State for SetId<St> {
+        type GoodreadsUserId = St::GoodreadsUserId;
+        type Id = Set<members::id>;
+        type Shelf = St::Shelf;
+        type Books = St::Books;
+        type Type = St::Type;
+    }
+    ///State transition - sets the `shelf` field to Set
+    pub struct SetShelf<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetShelf<St> {}
+    impl<St: State> State for SetShelf<St> {
+        type GoodreadsUserId = St::GoodreadsUserId;
+        type Id = St::Id;
+        type Shelf = Set<members::shelf>;
+        type Books = St::Books;
+        type Type = St::Type;
     }
     ///State transition - sets the `books` field to Set
     pub struct SetBooks<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetBooks<St> {}
     impl<St: State> State for SetBooks<St> {
-        type Shelf = St::Shelf;
-        type Id = St::Id;
         type GoodreadsUserId = St::GoodreadsUserId;
-        type Type = St::Type;
+        type Id = St::Id;
+        type Shelf = St::Shelf;
         type Books = Set<members::books>;
+        type Type = St::Type;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetType<St> {}
+    impl<St: State> State for SetType<St> {
+        type GoodreadsUserId = St::GoodreadsUserId;
+        type Id = St::Id;
+        type Shelf = St::Shelf;
+        type Books = St::Books;
+        type Type = Set<members::r#type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `shelf` field
-        pub struct shelf(());
-        ///Marker type for the `id` field
-        pub struct id(());
         ///Marker type for the `goodreads_user_id` field
         pub struct goodreads_user_id(());
-        ///Marker type for the `type` field
-        pub struct r#type(());
+        ///Marker type for the `id` field
+        pub struct id(());
+        ///Marker type for the `shelf` field
+        pub struct shelf(());
         ///Marker type for the `books` field
         pub struct books(());
+        ///Marker type for the `type` field
+        pub struct r#type(());
     }
 }
 
@@ -3874,11 +3874,11 @@ where
 impl<S: BosStr, St> WidgetGoodreadsBuilder<S, St>
 where
     St: widget_goodreads_state::State,
-    St::Shelf: widget_goodreads_state::IsSet,
-    St::Id: widget_goodreads_state::IsSet,
     St::GoodreadsUserId: widget_goodreads_state::IsSet,
-    St::Type: widget_goodreads_state::IsSet,
+    St::Id: widget_goodreads_state::IsSet,
+    St::Shelf: widget_goodreads_state::IsSet,
     St::Books: widget_goodreads_state::IsSet,
+    St::Type: widget_goodreads_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> WidgetGoodreads<S> {

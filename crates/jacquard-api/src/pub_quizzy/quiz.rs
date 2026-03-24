@@ -344,67 +344,67 @@ pub mod quiz_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
-        type Rounds;
         type Locales;
         type Timestamp;
+        type Title;
+        type Rounds;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
-        type Rounds = Unset;
         type Locales = Unset;
         type Timestamp = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTitle<St> {}
-    impl<St: State> State for SetTitle<St> {
-        type Title = Set<members::title>;
-        type Rounds = St::Rounds;
-        type Locales = St::Locales;
-        type Timestamp = St::Timestamp;
-    }
-    ///State transition - sets the `rounds` field to Set
-    pub struct SetRounds<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRounds<St> {}
-    impl<St: State> State for SetRounds<St> {
-        type Title = St::Title;
-        type Rounds = Set<members::rounds>;
-        type Locales = St::Locales;
-        type Timestamp = St::Timestamp;
+        type Title = Unset;
+        type Rounds = Unset;
     }
     ///State transition - sets the `locales` field to Set
     pub struct SetLocales<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetLocales<St> {}
     impl<St: State> State for SetLocales<St> {
-        type Title = St::Title;
-        type Rounds = St::Rounds;
         type Locales = Set<members::locales>;
         type Timestamp = St::Timestamp;
+        type Title = St::Title;
+        type Rounds = St::Rounds;
     }
     ///State transition - sets the `timestamp` field to Set
     pub struct SetTimestamp<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTimestamp<St> {}
     impl<St: State> State for SetTimestamp<St> {
-        type Title = St::Title;
-        type Rounds = St::Rounds;
         type Locales = St::Locales;
         type Timestamp = Set<members::timestamp>;
+        type Title = St::Title;
+        type Rounds = St::Rounds;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
+        type Locales = St::Locales;
+        type Timestamp = St::Timestamp;
+        type Title = Set<members::title>;
+        type Rounds = St::Rounds;
+    }
+    ///State transition - sets the `rounds` field to Set
+    pub struct SetRounds<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRounds<St> {}
+    impl<St: State> State for SetRounds<St> {
+        type Locales = St::Locales;
+        type Timestamp = St::Timestamp;
+        type Title = St::Title;
+        type Rounds = Set<members::rounds>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
-        ///Marker type for the `rounds` field
-        pub struct rounds(());
         ///Marker type for the `locales` field
         pub struct locales(());
         ///Marker type for the `timestamp` field
         pub struct timestamp(());
+        ///Marker type for the `title` field
+        pub struct title(());
+        ///Marker type for the `rounds` field
+        pub struct rounds(());
     }
 }
 
@@ -573,10 +573,10 @@ where
 impl<S: BosStr, St> QuizBuilder<S, St>
 where
     St: quiz_state::State,
-    St::Title: quiz_state::IsSet,
-    St::Rounds: quiz_state::IsSet,
     St::Locales: quiz_state::IsSet,
     St::Timestamp: quiz_state::IsSet,
+    St::Title: quiz_state::IsSet,
+    St::Rounds: quiz_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Quiz<S> {

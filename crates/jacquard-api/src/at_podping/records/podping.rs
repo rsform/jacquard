@@ -126,83 +126,83 @@ pub mod podping_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Iris;
-        type Version;
         type Medium;
+        type Version;
         type Reason;
+        type Iris;
         type Timestamp;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Iris = Unset;
-        type Version = Unset;
         type Medium = Unset;
+        type Version = Unset;
         type Reason = Unset;
+        type Iris = Unset;
         type Timestamp = Unset;
     }
-    ///State transition - sets the `iris` field to Set
-    pub struct SetIris<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetIris<St> {}
-    impl<St: State> State for SetIris<St> {
-        type Iris = Set<members::iris>;
+    ///State transition - sets the `medium` field to Set
+    pub struct SetMedium<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMedium<St> {}
+    impl<St: State> State for SetMedium<St> {
+        type Medium = Set<members::medium>;
         type Version = St::Version;
-        type Medium = St::Medium;
         type Reason = St::Reason;
+        type Iris = St::Iris;
         type Timestamp = St::Timestamp;
     }
     ///State transition - sets the `version` field to Set
     pub struct SetVersion<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetVersion<St> {}
     impl<St: State> State for SetVersion<St> {
-        type Iris = St::Iris;
-        type Version = Set<members::version>;
         type Medium = St::Medium;
+        type Version = Set<members::version>;
         type Reason = St::Reason;
-        type Timestamp = St::Timestamp;
-    }
-    ///State transition - sets the `medium` field to Set
-    pub struct SetMedium<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetMedium<St> {}
-    impl<St: State> State for SetMedium<St> {
         type Iris = St::Iris;
-        type Version = St::Version;
-        type Medium = Set<members::medium>;
-        type Reason = St::Reason;
         type Timestamp = St::Timestamp;
     }
     ///State transition - sets the `reason` field to Set
     pub struct SetReason<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetReason<St> {}
     impl<St: State> State for SetReason<St> {
-        type Iris = St::Iris;
-        type Version = St::Version;
         type Medium = St::Medium;
+        type Version = St::Version;
         type Reason = Set<members::reason>;
+        type Iris = St::Iris;
+        type Timestamp = St::Timestamp;
+    }
+    ///State transition - sets the `iris` field to Set
+    pub struct SetIris<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIris<St> {}
+    impl<St: State> State for SetIris<St> {
+        type Medium = St::Medium;
+        type Version = St::Version;
+        type Reason = St::Reason;
+        type Iris = Set<members::iris>;
         type Timestamp = St::Timestamp;
     }
     ///State transition - sets the `timestamp` field to Set
     pub struct SetTimestamp<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTimestamp<St> {}
     impl<St: State> State for SetTimestamp<St> {
-        type Iris = St::Iris;
-        type Version = St::Version;
         type Medium = St::Medium;
+        type Version = St::Version;
         type Reason = St::Reason;
+        type Iris = St::Iris;
         type Timestamp = Set<members::timestamp>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `iris` field
-        pub struct iris(());
-        ///Marker type for the `version` field
-        pub struct version(());
         ///Marker type for the `medium` field
         pub struct medium(());
+        ///Marker type for the `version` field
+        pub struct version(());
         ///Marker type for the `reason` field
         pub struct reason(());
+        ///Marker type for the `iris` field
+        pub struct iris(());
         ///Marker type for the `timestamp` field
         pub struct timestamp(());
     }
@@ -365,10 +365,10 @@ where
 impl<S: BosStr, St> PodpingBuilder<S, St>
 where
     St: podping_state::State,
-    St::Iris: podping_state::IsSet,
-    St::Version: podping_state::IsSet,
     St::Medium: podping_state::IsSet,
+    St::Version: podping_state::IsSet,
     St::Reason: podping_state::IsSet,
+    St::Iris: podping_state::IsSet,
     St::Timestamp: podping_state::IsSet,
 {
     /// Build the final struct.

@@ -81,67 +81,67 @@ pub mod put_record_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Collection;
-        type Rkey;
-        type Strategy;
         type Record;
+        type Rkey;
+        type Collection;
+        type Strategy;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Collection = Unset;
-        type Rkey = Unset;
-        type Strategy = Unset;
         type Record = Unset;
-    }
-    ///State transition - sets the `collection` field to Set
-    pub struct SetCollection<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCollection<St> {}
-    impl<St: State> State for SetCollection<St> {
-        type Collection = Set<members::collection>;
-        type Rkey = St::Rkey;
-        type Strategy = St::Strategy;
-        type Record = St::Record;
-    }
-    ///State transition - sets the `rkey` field to Set
-    pub struct SetRkey<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRkey<St> {}
-    impl<St: State> State for SetRkey<St> {
-        type Collection = St::Collection;
-        type Rkey = Set<members::rkey>;
-        type Strategy = St::Strategy;
-        type Record = St::Record;
-    }
-    ///State transition - sets the `strategy` field to Set
-    pub struct SetStrategy<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetStrategy<St> {}
-    impl<St: State> State for SetStrategy<St> {
-        type Collection = St::Collection;
-        type Rkey = St::Rkey;
-        type Strategy = Set<members::strategy>;
-        type Record = St::Record;
+        type Rkey = Unset;
+        type Collection = Unset;
+        type Strategy = Unset;
     }
     ///State transition - sets the `record` field to Set
     pub struct SetRecord<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRecord<St> {}
     impl<St: State> State for SetRecord<St> {
-        type Collection = St::Collection;
-        type Rkey = St::Rkey;
-        type Strategy = St::Strategy;
         type Record = Set<members::record>;
+        type Rkey = St::Rkey;
+        type Collection = St::Collection;
+        type Strategy = St::Strategy;
+    }
+    ///State transition - sets the `rkey` field to Set
+    pub struct SetRkey<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRkey<St> {}
+    impl<St: State> State for SetRkey<St> {
+        type Record = St::Record;
+        type Rkey = Set<members::rkey>;
+        type Collection = St::Collection;
+        type Strategy = St::Strategy;
+    }
+    ///State transition - sets the `collection` field to Set
+    pub struct SetCollection<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCollection<St> {}
+    impl<St: State> State for SetCollection<St> {
+        type Record = St::Record;
+        type Rkey = St::Rkey;
+        type Collection = Set<members::collection>;
+        type Strategy = St::Strategy;
+    }
+    ///State transition - sets the `strategy` field to Set
+    pub struct SetStrategy<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStrategy<St> {}
+    impl<St: State> State for SetStrategy<St> {
+        type Record = St::Record;
+        type Rkey = St::Rkey;
+        type Collection = St::Collection;
+        type Strategy = Set<members::strategy>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `collection` field
-        pub struct collection(());
-        ///Marker type for the `rkey` field
-        pub struct rkey(());
-        ///Marker type for the `strategy` field
-        pub struct strategy(());
         ///Marker type for the `record` field
         pub struct record(());
+        ///Marker type for the `rkey` field
+        pub struct rkey(());
+        ///Marker type for the `collection` field
+        pub struct collection(());
+        ///Marker type for the `strategy` field
+        pub struct strategy(());
     }
 }
 
@@ -254,10 +254,10 @@ where
 impl<S: BosStr, St> PutRecordBuilder<S, St>
 where
     St: put_record_state::State,
-    St::Collection: put_record_state::IsSet,
-    St::Rkey: put_record_state::IsSet,
-    St::Strategy: put_record_state::IsSet,
     St::Record: put_record_state::IsSet,
+    St::Rkey: put_record_state::IsSet,
+    St::Collection: put_record_state::IsSet,
+    St::Strategy: put_record_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> PutRecord<S> {

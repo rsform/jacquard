@@ -145,104 +145,104 @@ pub mod layer_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Size;
-        type CreatedAt;
-        type Digest;
         type MediaType;
         type Manifest;
         type UserDid;
+        type CreatedAt;
+        type Digest;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Size = Unset;
-        type CreatedAt = Unset;
-        type Digest = Unset;
         type MediaType = Unset;
         type Manifest = Unset;
         type UserDid = Unset;
+        type CreatedAt = Unset;
+        type Digest = Unset;
     }
     ///State transition - sets the `size` field to Set
     pub struct SetSize<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSize<St> {}
     impl<St: State> State for SetSize<St> {
         type Size = Set<members::size>;
+        type MediaType = St::MediaType;
+        type Manifest = St::Manifest;
+        type UserDid = St::UserDid;
         type CreatedAt = St::CreatedAt;
         type Digest = St::Digest;
-        type MediaType = St::MediaType;
-        type Manifest = St::Manifest;
-        type UserDid = St::UserDid;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type Size = St::Size;
-        type CreatedAt = Set<members::created_at>;
-        type Digest = St::Digest;
-        type MediaType = St::MediaType;
-        type Manifest = St::Manifest;
-        type UserDid = St::UserDid;
-    }
-    ///State transition - sets the `digest` field to Set
-    pub struct SetDigest<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDigest<St> {}
-    impl<St: State> State for SetDigest<St> {
-        type Size = St::Size;
-        type CreatedAt = St::CreatedAt;
-        type Digest = Set<members::digest>;
-        type MediaType = St::MediaType;
-        type Manifest = St::Manifest;
-        type UserDid = St::UserDid;
     }
     ///State transition - sets the `media_type` field to Set
     pub struct SetMediaType<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetMediaType<St> {}
     impl<St: State> State for SetMediaType<St> {
         type Size = St::Size;
-        type CreatedAt = St::CreatedAt;
-        type Digest = St::Digest;
         type MediaType = Set<members::media_type>;
         type Manifest = St::Manifest;
         type UserDid = St::UserDid;
+        type CreatedAt = St::CreatedAt;
+        type Digest = St::Digest;
     }
     ///State transition - sets the `manifest` field to Set
     pub struct SetManifest<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetManifest<St> {}
     impl<St: State> State for SetManifest<St> {
         type Size = St::Size;
-        type CreatedAt = St::CreatedAt;
-        type Digest = St::Digest;
         type MediaType = St::MediaType;
         type Manifest = Set<members::manifest>;
         type UserDid = St::UserDid;
+        type CreatedAt = St::CreatedAt;
+        type Digest = St::Digest;
     }
     ///State transition - sets the `user_did` field to Set
     pub struct SetUserDid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUserDid<St> {}
     impl<St: State> State for SetUserDid<St> {
         type Size = St::Size;
-        type CreatedAt = St::CreatedAt;
-        type Digest = St::Digest;
         type MediaType = St::MediaType;
         type Manifest = St::Manifest;
         type UserDid = Set<members::user_did>;
+        type CreatedAt = St::CreatedAt;
+        type Digest = St::Digest;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Size = St::Size;
+        type MediaType = St::MediaType;
+        type Manifest = St::Manifest;
+        type UserDid = St::UserDid;
+        type CreatedAt = Set<members::created_at>;
+        type Digest = St::Digest;
+    }
+    ///State transition - sets the `digest` field to Set
+    pub struct SetDigest<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDigest<St> {}
+    impl<St: State> State for SetDigest<St> {
+        type Size = St::Size;
+        type MediaType = St::MediaType;
+        type Manifest = St::Manifest;
+        type UserDid = St::UserDid;
+        type CreatedAt = St::CreatedAt;
+        type Digest = Set<members::digest>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `size` field
         pub struct size(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `digest` field
-        pub struct digest(());
         ///Marker type for the `media_type` field
         pub struct media_type(());
         ///Marker type for the `manifest` field
         pub struct manifest(());
         ///Marker type for the `user_did` field
         pub struct user_did(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `digest` field
+        pub struct digest(());
     }
 }
 
@@ -396,11 +396,11 @@ impl<S: BosStr, St> LayerBuilder<S, St>
 where
     St: layer_state::State,
     St::Size: layer_state::IsSet,
-    St::CreatedAt: layer_state::IsSet,
-    St::Digest: layer_state::IsSet,
     St::MediaType: layer_state::IsSet,
     St::Manifest: layer_state::IsSet,
     St::UserDid: layer_state::IsSet,
+    St::CreatedAt: layer_state::IsSet,
+    St::Digest: layer_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Layer<S> {

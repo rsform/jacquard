@@ -566,37 +566,37 @@ pub mod location_entry_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type H3;
         type BookCount;
+        type H3;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type H3 = Unset;
         type BookCount = Unset;
-    }
-    ///State transition - sets the `h3` field to Set
-    pub struct SetH3<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetH3<St> {}
-    impl<St: State> State for SetH3<St> {
-        type H3 = Set<members::h3>;
-        type BookCount = St::BookCount;
+        type H3 = Unset;
     }
     ///State transition - sets the `book_count` field to Set
     pub struct SetBookCount<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetBookCount<St> {}
     impl<St: State> State for SetBookCount<St> {
-        type H3 = St::H3;
         type BookCount = Set<members::book_count>;
+        type H3 = St::H3;
+    }
+    ///State transition - sets the `h3` field to Set
+    pub struct SetH3<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetH3<St> {}
+    impl<St: State> State for SetH3<St> {
+        type BookCount = St::BookCount;
+        type H3 = Set<members::h3>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `h3` field
-        pub struct h3(());
         ///Marker type for the `book_count` field
         pub struct book_count(());
+        ///Marker type for the `h3` field
+        pub struct h3(());
     }
 }
 
@@ -666,8 +666,8 @@ where
 impl<S: BosStr, St> LocationEntryBuilder<S, St>
 where
     St: location_entry_state::State,
-    St::H3: location_entry_state::IsSet,
     St::BookCount: location_entry_state::IsSet,
+    St::H3: location_entry_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> LocationEntry<S> {

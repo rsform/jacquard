@@ -977,49 +977,49 @@ pub mod fs_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Site;
+        type CreatedAt;
         type Root;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Site = Unset;
+        type CreatedAt = Unset;
         type Root = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type Site = St::Site;
-        type Root = St::Root;
     }
     ///State transition - sets the `site` field to Set
     pub struct SetSite<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSite<St> {}
     impl<St: State> State for SetSite<St> {
-        type CreatedAt = St::CreatedAt;
         type Site = Set<members::site>;
+        type CreatedAt = St::CreatedAt;
+        type Root = St::Root;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Site = St::Site;
+        type CreatedAt = Set<members::created_at>;
         type Root = St::Root;
     }
     ///State transition - sets the `root` field to Set
     pub struct SetRoot<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRoot<St> {}
     impl<St: State> State for SetRoot<St> {
-        type CreatedAt = St::CreatedAt;
         type Site = St::Site;
+        type CreatedAt = St::CreatedAt;
         type Root = Set<members::root>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `site` field
         pub struct site(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `root` field
         pub struct root(());
     }
@@ -1120,8 +1120,8 @@ where
 impl<S: BosStr, St> FsBuilder<S, St>
 where
     St: fs_state::State,
-    St::CreatedAt: fs_state::IsSet,
     St::Site: fs_state::IsSet,
+    St::CreatedAt: fs_state::IsSet,
     St::Root: fs_state::IsSet,
 {
     /// Build the final struct.

@@ -7134,51 +7134,51 @@ pub mod verification_state_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Verifications;
         type VerifiedStatus;
         type TrustedVerifierStatus;
-        type Verifications;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Verifications = Unset;
         type VerifiedStatus = Unset;
         type TrustedVerifierStatus = Unset;
-        type Verifications = Unset;
-    }
-    ///State transition - sets the `verified_status` field to Set
-    pub struct SetVerifiedStatus<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetVerifiedStatus<St> {}
-    impl<St: State> State for SetVerifiedStatus<St> {
-        type VerifiedStatus = Set<members::verified_status>;
-        type TrustedVerifierStatus = St::TrustedVerifierStatus;
-        type Verifications = St::Verifications;
-    }
-    ///State transition - sets the `trusted_verifier_status` field to Set
-    pub struct SetTrustedVerifierStatus<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTrustedVerifierStatus<St> {}
-    impl<St: State> State for SetTrustedVerifierStatus<St> {
-        type VerifiedStatus = St::VerifiedStatus;
-        type TrustedVerifierStatus = Set<members::trusted_verifier_status>;
-        type Verifications = St::Verifications;
     }
     ///State transition - sets the `verifications` field to Set
     pub struct SetVerifications<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetVerifications<St> {}
     impl<St: State> State for SetVerifications<St> {
+        type Verifications = Set<members::verifications>;
         type VerifiedStatus = St::VerifiedStatus;
         type TrustedVerifierStatus = St::TrustedVerifierStatus;
-        type Verifications = Set<members::verifications>;
+    }
+    ///State transition - sets the `verified_status` field to Set
+    pub struct SetVerifiedStatus<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetVerifiedStatus<St> {}
+    impl<St: State> State for SetVerifiedStatus<St> {
+        type Verifications = St::Verifications;
+        type VerifiedStatus = Set<members::verified_status>;
+        type TrustedVerifierStatus = St::TrustedVerifierStatus;
+    }
+    ///State transition - sets the `trusted_verifier_status` field to Set
+    pub struct SetTrustedVerifierStatus<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTrustedVerifierStatus<St> {}
+    impl<St: State> State for SetTrustedVerifierStatus<St> {
+        type Verifications = St::Verifications;
+        type VerifiedStatus = St::VerifiedStatus;
+        type TrustedVerifierStatus = Set<members::trusted_verifier_status>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `verifications` field
+        pub struct verifications(());
         ///Marker type for the `verified_status` field
         pub struct verified_status(());
         ///Marker type for the `trusted_verifier_status` field
         pub struct trusted_verifier_status(());
-        ///Marker type for the `verifications` field
-        pub struct verifications(());
     }
 }
 
@@ -7274,9 +7274,9 @@ where
 impl<S: BosStr, St> VerificationStateBuilder<S, St>
 where
     St: verification_state_state::State,
+    St::Verifications: verification_state_state::IsSet,
     St::VerifiedStatus: verification_state_state::IsSet,
     St::TrustedVerifierStatus: verification_state_state::IsSet,
-    St::Verifications: verification_state_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> VerificationState<S> {
@@ -7312,66 +7312,66 @@ pub mod verification_view_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Uri;
-        type Issuer;
         type IsValid;
         type CreatedAt;
+        type Issuer;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Uri = Unset;
-        type Issuer = Unset;
         type IsValid = Unset;
         type CreatedAt = Unset;
+        type Issuer = Unset;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUri<St> {}
     impl<St: State> State for SetUri<St> {
         type Uri = Set<members::uri>;
+        type IsValid = St::IsValid;
+        type CreatedAt = St::CreatedAt;
         type Issuer = St::Issuer;
-        type IsValid = St::IsValid;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `issuer` field to Set
-    pub struct SetIssuer<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetIssuer<St> {}
-    impl<St: State> State for SetIssuer<St> {
-        type Uri = St::Uri;
-        type Issuer = Set<members::issuer>;
-        type IsValid = St::IsValid;
-        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `is_valid` field to Set
     pub struct SetIsValid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetIsValid<St> {}
     impl<St: State> State for SetIsValid<St> {
         type Uri = St::Uri;
-        type Issuer = St::Issuer;
         type IsValid = Set<members::is_valid>;
         type CreatedAt = St::CreatedAt;
+        type Issuer = St::Issuer;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
         type Uri = St::Uri;
-        type Issuer = St::Issuer;
         type IsValid = St::IsValid;
         type CreatedAt = Set<members::created_at>;
+        type Issuer = St::Issuer;
+    }
+    ///State transition - sets the `issuer` field to Set
+    pub struct SetIssuer<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIssuer<St> {}
+    impl<St: State> State for SetIssuer<St> {
+        type Uri = St::Uri;
+        type IsValid = St::IsValid;
+        type CreatedAt = St::CreatedAt;
+        type Issuer = Set<members::issuer>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `uri` field
         pub struct uri(());
-        ///Marker type for the `issuer` field
-        pub struct issuer(());
         ///Marker type for the `is_valid` field
         pub struct is_valid(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `issuer` field
+        pub struct issuer(());
     }
 }
 
@@ -7480,9 +7480,9 @@ impl<S: BosStr, St> VerificationViewBuilder<S, St>
 where
     St: verification_view_state::State,
     St::Uri: verification_view_state::IsSet,
-    St::Issuer: verification_view_state::IsSet,
     St::IsValid: verification_view_state::IsSet,
     St::CreatedAt: verification_view_state::IsSet,
+    St::Issuer: verification_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> VerificationView<S> {

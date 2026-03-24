@@ -1290,7 +1290,7 @@ impl<'c> CodeGenerator<'c> {
         // Generate encode_body() method for binary inputs
         let encode_body_method = if is_binary_input {
             quote! {
-                fn encode_body(&self, buffer: &mut [u8]) -> Result<(), jacquard_common::xrpc::EncodeError>
+                fn encode_body(&self, buffer: &mut Vec<u8>) -> Result<(), jacquard_common::xrpc::EncodeError>
                 where
                     Self: #ser_path,
                 {

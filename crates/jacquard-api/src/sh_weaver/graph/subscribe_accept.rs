@@ -114,37 +114,37 @@ pub mod subscribe_accept_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Subscribe;
         type CreatedAt;
+        type Subscribe;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Subscribe = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `subscribe` field to Set
-    pub struct SetSubscribe<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSubscribe<St> {}
-    impl<St: State> State for SetSubscribe<St> {
-        type Subscribe = Set<members::subscribe>;
-        type CreatedAt = St::CreatedAt;
+        type Subscribe = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Subscribe = St::Subscribe;
         type CreatedAt = Set<members::created_at>;
+        type Subscribe = St::Subscribe;
+    }
+    ///State transition - sets the `subscribe` field to Set
+    pub struct SetSubscribe<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubscribe<St> {}
+    impl<St: State> State for SetSubscribe<St> {
+        type CreatedAt = St::CreatedAt;
+        type Subscribe = Set<members::subscribe>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `subscribe` field
-        pub struct subscribe(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `subscribe` field
+        pub struct subscribe(());
     }
 }
 
@@ -214,8 +214,8 @@ where
 impl<S: BosStr, St> SubscribeAcceptBuilder<S, St>
 where
     St: subscribe_accept_state::State,
-    St::Subscribe: subscribe_accept_state::IsSet,
     St::CreatedAt: subscribe_accept_state::IsSet,
+    St::Subscribe: subscribe_accept_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> SubscribeAccept<S> {

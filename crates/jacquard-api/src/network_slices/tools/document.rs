@@ -1037,67 +1037,67 @@ pub mod document_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
         type Blocks;
-        type CreatedAt;
         type Slug;
+        type Title;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
         type Blocks = Unset;
-        type CreatedAt = Unset;
         type Slug = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTitle<St> {}
-    impl<St: State> State for SetTitle<St> {
-        type Title = Set<members::title>;
-        type Blocks = St::Blocks;
-        type CreatedAt = St::CreatedAt;
-        type Slug = St::Slug;
+        type Title = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `blocks` field to Set
     pub struct SetBlocks<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetBlocks<St> {}
     impl<St: State> State for SetBlocks<St> {
-        type Title = St::Title;
         type Blocks = Set<members::blocks>;
-        type CreatedAt = St::CreatedAt;
         type Slug = St::Slug;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
         type Title = St::Title;
-        type Blocks = St::Blocks;
-        type CreatedAt = Set<members::created_at>;
-        type Slug = St::Slug;
+        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `slug` field to Set
     pub struct SetSlug<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSlug<St> {}
     impl<St: State> State for SetSlug<St> {
-        type Title = St::Title;
         type Blocks = St::Blocks;
-        type CreatedAt = St::CreatedAt;
         type Slug = Set<members::slug>;
+        type Title = St::Title;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
+        type Blocks = St::Blocks;
+        type Slug = St::Slug;
+        type Title = Set<members::title>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Blocks = St::Blocks;
+        type Slug = St::Slug;
+        type Title = St::Title;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `blocks` field
         pub struct blocks(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `slug` field
         pub struct slug(());
+        ///Marker type for the `title` field
+        pub struct title(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -1224,10 +1224,10 @@ impl<S: BosStr, St: document_state::State> DocumentBuilder<S, St> {
 impl<S: BosStr, St> DocumentBuilder<S, St>
 where
     St: document_state::State,
-    St::Title: document_state::IsSet,
     St::Blocks: document_state::IsSet,
-    St::CreatedAt: document_state::IsSet,
     St::Slug: document_state::IsSet,
+    St::Title: document_state::IsSet,
+    St::CreatedAt: document_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Document<S> {

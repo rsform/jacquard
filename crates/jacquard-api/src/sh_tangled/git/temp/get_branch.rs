@@ -141,37 +141,37 @@ pub mod get_branch_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Repo;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Repo = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Name = Set<members::name>;
-        type Repo = St::Repo;
+        type Name = Unset;
     }
     ///State transition - sets the `repo` field to Set
     pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRepo<St> {}
     impl<St: State> State for SetRepo<St> {
-        type Name = St::Name;
         type Repo = Set<members::repo>;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Repo = St::Repo;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `repo` field
         pub struct repo(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -241,8 +241,8 @@ where
 impl<S: BosStr, St> GetBranchBuilder<S, St>
 where
     St: get_branch_state::State,
-    St::Name: get_branch_state::IsSet,
     St::Repo: get_branch_state::IsSet,
+    St::Name: get_branch_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> GetBranch<S> {

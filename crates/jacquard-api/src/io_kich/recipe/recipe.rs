@@ -667,51 +667,51 @@ pub mod recipe_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
         type Name;
         type Servings;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
         type Name = Unset;
         type Servings = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Name = Set<members::name>;
-        type Servings = St::Servings;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `servings` field to Set
-    pub struct SetServings<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetServings<St> {}
-    impl<St: State> State for SetServings<St> {
-        type Name = St::Name;
-        type Servings = Set<members::servings>;
-        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
+        type CreatedAt = Set<members::created_at>;
         type Name = St::Name;
         type Servings = St::Servings;
-        type CreatedAt = Set<members::created_at>;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type CreatedAt = St::CreatedAt;
+        type Name = Set<members::name>;
+        type Servings = St::Servings;
+    }
+    ///State transition - sets the `servings` field to Set
+    pub struct SetServings<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetServings<St> {}
+    impl<St: State> State for SetServings<St> {
+        type CreatedAt = St::CreatedAt;
+        type Name = St::Name;
+        type Servings = Set<members::servings>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `servings` field
         pub struct servings(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
@@ -1045,9 +1045,9 @@ impl<S: BosStr, St: recipe_state::State> RecipeBuilder<S, St> {
 impl<S: BosStr, St> RecipeBuilder<S, St>
 where
     St: recipe_state::State,
+    St::CreatedAt: recipe_state::IsSet,
     St::Name: recipe_state::IsSet,
     St::Servings: recipe_state::IsSet,
-    St::CreatedAt: recipe_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Recipe<S> {

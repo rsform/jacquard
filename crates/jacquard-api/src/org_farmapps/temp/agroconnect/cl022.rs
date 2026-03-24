@@ -178,37 +178,37 @@ pub mod cl022_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Description;
         type Id;
+        type Description;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Description = Unset;
         type Id = Unset;
-    }
-    ///State transition - sets the `description` field to Set
-    pub struct SetDescription<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDescription<St> {}
-    impl<St: State> State for SetDescription<St> {
-        type Description = Set<members::description>;
-        type Id = St::Id;
+        type Description = Unset;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetId<St> {}
     impl<St: State> State for SetId<St> {
-        type Description = St::Description;
         type Id = Set<members::id>;
+        type Description = St::Description;
+    }
+    ///State transition - sets the `description` field to Set
+    pub struct SetDescription<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDescription<St> {}
+    impl<St: State> State for SetDescription<St> {
+        type Id = St::Id;
+        type Description = Set<members::description>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `description` field
-        pub struct description(());
         ///Marker type for the `id` field
         pub struct id(());
+        ///Marker type for the `description` field
+        pub struct description(());
     }
 }
 
@@ -407,8 +407,8 @@ impl<S: BosStr, St: cl022_state::State> Cl022Builder<S, St> {
 impl<S: BosStr, St> Cl022Builder<S, St>
 where
     St: cl022_state::State,
-    St::Description: cl022_state::IsSet,
     St::Id: cl022_state::IsSet,
+    St::Description: cl022_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Cl022<S> {

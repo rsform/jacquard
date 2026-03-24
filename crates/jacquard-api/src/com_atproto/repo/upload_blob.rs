@@ -50,7 +50,7 @@ impl jacquard_common::xrpc::XrpcRequest for UploadBlob {
     type Response = UploadBlobResponse;
     fn encode_body(
         &self,
-        buffer: &mut [u8],
+        buffer: &mut Vec<u8>,
     ) -> Result<(), jacquard_common::xrpc::EncodeError>
     where
         Self: Serialize,

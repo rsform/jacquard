@@ -120,65 +120,65 @@ pub mod post_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type TwUserId;
         type BskyPost;
+        type TwUserId;
+        type CreatedAt;
         type TweetId;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type TwUserId = Unset;
         type BskyPost = Unset;
+        type TwUserId = Unset;
+        type CreatedAt = Unset;
         type TweetId = Unset;
     }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
+    ///State transition - sets the `bsky_post` field to Set
+    pub struct SetBskyPost<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBskyPost<St> {}
+    impl<St: State> State for SetBskyPost<St> {
+        type BskyPost = Set<members::bsky_post>;
         type TwUserId = St::TwUserId;
-        type BskyPost = St::BskyPost;
+        type CreatedAt = St::CreatedAt;
         type TweetId = St::TweetId;
     }
     ///State transition - sets the `tw_user_id` field to Set
     pub struct SetTwUserId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTwUserId<St> {}
     impl<St: State> State for SetTwUserId<St> {
-        type CreatedAt = St::CreatedAt;
-        type TwUserId = Set<members::tw_user_id>;
         type BskyPost = St::BskyPost;
+        type TwUserId = Set<members::tw_user_id>;
+        type CreatedAt = St::CreatedAt;
         type TweetId = St::TweetId;
     }
-    ///State transition - sets the `bsky_post` field to Set
-    pub struct SetBskyPost<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetBskyPost<St> {}
-    impl<St: State> State for SetBskyPost<St> {
-        type CreatedAt = St::CreatedAt;
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type BskyPost = St::BskyPost;
         type TwUserId = St::TwUserId;
-        type BskyPost = Set<members::bsky_post>;
+        type CreatedAt = Set<members::created_at>;
         type TweetId = St::TweetId;
     }
     ///State transition - sets the `tweet_id` field to Set
     pub struct SetTweetId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTweetId<St> {}
     impl<St: State> State for SetTweetId<St> {
-        type CreatedAt = St::CreatedAt;
-        type TwUserId = St::TwUserId;
         type BskyPost = St::BskyPost;
+        type TwUserId = St::TwUserId;
+        type CreatedAt = St::CreatedAt;
         type TweetId = Set<members::tweet_id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `tw_user_id` field
-        pub struct tw_user_id(());
         ///Marker type for the `bsky_post` field
         pub struct bsky_post(());
+        ///Marker type for the `tw_user_id` field
+        pub struct tw_user_id(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `tweet_id` field
         pub struct tweet_id(());
     }
@@ -293,9 +293,9 @@ where
 impl<S: BosStr, St> PostBuilder<S, St>
 where
     St: post_state::State,
-    St::CreatedAt: post_state::IsSet,
-    St::TwUserId: post_state::IsSet,
     St::BskyPost: post_state::IsSet,
+    St::TwUserId: post_state::IsSet,
+    St::CreatedAt: post_state::IsSet,
     St::TweetId: post_state::IsSet,
 {
     /// Build the final struct.

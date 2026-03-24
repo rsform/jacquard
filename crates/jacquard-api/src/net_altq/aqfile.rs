@@ -554,37 +554,37 @@ pub mod file_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Size;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Size = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Name = Set<members::name>;
-        type Size = St::Size;
+        type Name = Unset;
     }
     ///State transition - sets the `size` field to Set
     pub struct SetSize<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSize<St> {}
     impl<St: State> State for SetSize<St> {
-        type Name = St::Name;
         type Size = Set<members::size>;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Size = St::Size;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `size` field
         pub struct size(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -680,8 +680,8 @@ where
 impl<S: BosStr, St> FileBuilder<S, St>
 where
     St: file_state::State,
-    St::Name: file_state::IsSet,
     St::Size: file_state::IsSet,
+    St::Name: file_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> File<S> {
@@ -715,49 +715,49 @@ pub mod aqfile_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Blob;
         type CreatedAt;
+        type Blob;
         type File;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Blob = Unset;
         type CreatedAt = Unset;
+        type Blob = Unset;
         type File = Unset;
-    }
-    ///State transition - sets the `blob` field to Set
-    pub struct SetBlob<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetBlob<St> {}
-    impl<St: State> State for SetBlob<St> {
-        type Blob = Set<members::blob>;
-        type CreatedAt = St::CreatedAt;
-        type File = St::File;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Blob = St::Blob;
         type CreatedAt = Set<members::created_at>;
+        type Blob = St::Blob;
+        type File = St::File;
+    }
+    ///State transition - sets the `blob` field to Set
+    pub struct SetBlob<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBlob<St> {}
+    impl<St: State> State for SetBlob<St> {
+        type CreatedAt = St::CreatedAt;
+        type Blob = Set<members::blob>;
         type File = St::File;
     }
     ///State transition - sets the `file` field to Set
     pub struct SetFile<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetFile<St> {}
     impl<St: State> State for SetFile<St> {
-        type Blob = St::Blob;
         type CreatedAt = St::CreatedAt;
+        type Blob = St::Blob;
         type File = Set<members::file>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `blob` field
-        pub struct blob(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `blob` field
+        pub struct blob(());
         ///Marker type for the `file` field
         pub struct file(());
     }
@@ -880,8 +880,8 @@ where
 impl<S: BosStr, St> AqfileBuilder<S, St>
 where
     St: aqfile_state::State,
-    St::Blob: aqfile_state::IsSet,
     St::CreatedAt: aqfile_state::IsSet,
+    St::Blob: aqfile_state::IsSet,
     St::File: aqfile_state::IsSet,
 {
     /// Build the final struct.

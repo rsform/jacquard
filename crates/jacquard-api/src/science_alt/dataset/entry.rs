@@ -578,66 +578,66 @@ pub mod entry_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CreatedAt;
-        type Storage;
-        type Name;
         type SchemaRef;
+        type Name;
+        type Storage;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CreatedAt = Unset;
-        type Storage = Unset;
-        type Name = Unset;
         type SchemaRef = Unset;
+        type Name = Unset;
+        type Storage = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
-        type Storage = St::Storage;
+        type SchemaRef = St::SchemaRef;
         type Name = St::Name;
-        type SchemaRef = St::SchemaRef;
-    }
-    ///State transition - sets the `storage` field to Set
-    pub struct SetStorage<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetStorage<St> {}
-    impl<St: State> State for SetStorage<St> {
-        type CreatedAt = St::CreatedAt;
-        type Storage = Set<members::storage>;
-        type Name = St::Name;
-        type SchemaRef = St::SchemaRef;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type CreatedAt = St::CreatedAt;
         type Storage = St::Storage;
-        type Name = Set<members::name>;
-        type SchemaRef = St::SchemaRef;
     }
     ///State transition - sets the `schema_ref` field to Set
     pub struct SetSchemaRef<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSchemaRef<St> {}
     impl<St: State> State for SetSchemaRef<St> {
         type CreatedAt = St::CreatedAt;
-        type Storage = St::Storage;
-        type Name = St::Name;
         type SchemaRef = Set<members::schema_ref>;
+        type Name = St::Name;
+        type Storage = St::Storage;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type CreatedAt = St::CreatedAt;
+        type SchemaRef = St::SchemaRef;
+        type Name = Set<members::name>;
+        type Storage = St::Storage;
+    }
+    ///State transition - sets the `storage` field to Set
+    pub struct SetStorage<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStorage<St> {}
+    impl<St: State> State for SetStorage<St> {
+        type CreatedAt = St::CreatedAt;
+        type SchemaRef = St::SchemaRef;
+        type Name = St::Name;
+        type Storage = Set<members::storage>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `storage` field
-        pub struct storage(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `schema_ref` field
         pub struct schema_ref(());
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `storage` field
+        pub struct storage(());
     }
 }
 
@@ -849,9 +849,9 @@ impl<S: BosStr, St> EntryBuilder<S, St>
 where
     St: entry_state::State,
     St::CreatedAt: entry_state::IsSet,
-    St::Storage: entry_state::IsSet,
-    St::Name: entry_state::IsSet,
     St::SchemaRef: entry_state::IsSet,
+    St::Name: entry_state::IsSet,
+    St::Storage: entry_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Entry<S> {

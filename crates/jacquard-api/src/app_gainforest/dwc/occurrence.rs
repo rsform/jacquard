@@ -1182,67 +1182,67 @@ pub mod occurrence_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type BasisOfRecord;
+        type EventDate;
         type ScientificName;
         type CreatedAt;
-        type EventDate;
+        type BasisOfRecord;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type BasisOfRecord = Unset;
+        type EventDate = Unset;
         type ScientificName = Unset;
         type CreatedAt = Unset;
-        type EventDate = Unset;
-    }
-    ///State transition - sets the `basis_of_record` field to Set
-    pub struct SetBasisOfRecord<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetBasisOfRecord<St> {}
-    impl<St: State> State for SetBasisOfRecord<St> {
-        type BasisOfRecord = Set<members::basis_of_record>;
-        type ScientificName = St::ScientificName;
-        type CreatedAt = St::CreatedAt;
-        type EventDate = St::EventDate;
-    }
-    ///State transition - sets the `scientific_name` field to Set
-    pub struct SetScientificName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetScientificName<St> {}
-    impl<St: State> State for SetScientificName<St> {
-        type BasisOfRecord = St::BasisOfRecord;
-        type ScientificName = Set<members::scientific_name>;
-        type CreatedAt = St::CreatedAt;
-        type EventDate = St::EventDate;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type BasisOfRecord = St::BasisOfRecord;
-        type ScientificName = St::ScientificName;
-        type CreatedAt = Set<members::created_at>;
-        type EventDate = St::EventDate;
+        type BasisOfRecord = Unset;
     }
     ///State transition - sets the `event_date` field to Set
     pub struct SetEventDate<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetEventDate<St> {}
     impl<St: State> State for SetEventDate<St> {
-        type BasisOfRecord = St::BasisOfRecord;
+        type EventDate = Set<members::event_date>;
         type ScientificName = St::ScientificName;
         type CreatedAt = St::CreatedAt;
-        type EventDate = Set<members::event_date>;
+        type BasisOfRecord = St::BasisOfRecord;
+    }
+    ///State transition - sets the `scientific_name` field to Set
+    pub struct SetScientificName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetScientificName<St> {}
+    impl<St: State> State for SetScientificName<St> {
+        type EventDate = St::EventDate;
+        type ScientificName = Set<members::scientific_name>;
+        type CreatedAt = St::CreatedAt;
+        type BasisOfRecord = St::BasisOfRecord;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type EventDate = St::EventDate;
+        type ScientificName = St::ScientificName;
+        type CreatedAt = Set<members::created_at>;
+        type BasisOfRecord = St::BasisOfRecord;
+    }
+    ///State transition - sets the `basis_of_record` field to Set
+    pub struct SetBasisOfRecord<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBasisOfRecord<St> {}
+    impl<St: State> State for SetBasisOfRecord<St> {
+        type EventDate = St::EventDate;
+        type ScientificName = St::ScientificName;
+        type CreatedAt = St::CreatedAt;
+        type BasisOfRecord = Set<members::basis_of_record>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `basis_of_record` field
-        pub struct basis_of_record(());
+        ///Marker type for the `event_date` field
+        pub struct event_date(());
         ///Marker type for the `scientific_name` field
         pub struct scientific_name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `event_date` field
-        pub struct event_date(());
+        ///Marker type for the `basis_of_record` field
+        pub struct basis_of_record(());
     }
 }
 
@@ -2488,10 +2488,10 @@ impl<S: BosStr, St: occurrence_state::State> OccurrenceBuilder<S, St> {
 impl<S: BosStr, St> OccurrenceBuilder<S, St>
 where
     St: occurrence_state::State,
-    St::BasisOfRecord: occurrence_state::IsSet,
+    St::EventDate: occurrence_state::IsSet,
     St::ScientificName: occurrence_state::IsSet,
     St::CreatedAt: occurrence_state::IsSet,
-    St::EventDate: occurrence_state::IsSet,
+    St::BasisOfRecord: occurrence_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Occurrence<S> {

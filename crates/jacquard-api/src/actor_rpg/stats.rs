@@ -7658,37 +7658,37 @@ pub mod spellslot_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Level;
         type Total;
+        type Level;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Level = Unset;
         type Total = Unset;
-    }
-    ///State transition - sets the `level` field to Set
-    pub struct SetLevel<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetLevel<St> {}
-    impl<St: State> State for SetLevel<St> {
-        type Level = Set<members::level>;
-        type Total = St::Total;
+        type Level = Unset;
     }
     ///State transition - sets the `total` field to Set
     pub struct SetTotal<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTotal<St> {}
     impl<St: State> State for SetTotal<St> {
-        type Level = St::Level;
         type Total = Set<members::total>;
+        type Level = St::Level;
+    }
+    ///State transition - sets the `level` field to Set
+    pub struct SetLevel<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLevel<St> {}
+    impl<St: State> State for SetLevel<St> {
+        type Total = St::Total;
+        type Level = Set<members::level>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `level` field
-        pub struct level(());
         ///Marker type for the `total` field
         pub struct total(());
+        ///Marker type for the `level` field
+        pub struct level(());
     }
 }
 
@@ -7771,8 +7771,8 @@ impl<S: BosStr, St: spellslot_state::State> SpellslotBuilder<S, St> {
 impl<S: BosStr, St> SpellslotBuilder<S, St>
 where
     St: spellslot_state::State,
-    St::Level: spellslot_state::IsSet,
     St::Total: spellslot_state::IsSet,
+    St::Level: spellslot_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Spellslot<S> {

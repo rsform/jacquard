@@ -131,37 +131,37 @@ pub mod credit_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Game;
         type Credits;
+        type Game;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Game = Unset;
         type Credits = Unset;
-    }
-    ///State transition - sets the `game` field to Set
-    pub struct SetGame<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetGame<St> {}
-    impl<St: State> State for SetGame<St> {
-        type Game = Set<members::game>;
-        type Credits = St::Credits;
+        type Game = Unset;
     }
     ///State transition - sets the `credits` field to Set
     pub struct SetCredits<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCredits<St> {}
     impl<St: State> State for SetCredits<St> {
-        type Game = St::Game;
         type Credits = Set<members::credits>;
+        type Game = St::Game;
+    }
+    ///State transition - sets the `game` field to Set
+    pub struct SetGame<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetGame<St> {}
+    impl<St: State> State for SetGame<St> {
+        type Credits = St::Credits;
+        type Game = Set<members::game>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `game` field
-        pub struct game(());
         ///Marker type for the `credits` field
         pub struct credits(());
+        ///Marker type for the `game` field
+        pub struct game(());
     }
 }
 
@@ -262,8 +262,8 @@ where
 impl<S: BosStr, St> CreditBuilder<S, St>
 where
     St: credit_state::State,
-    St::Game: credit_state::IsSet,
     St::Credits: credit_state::IsSet,
+    St::Game: credit_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Credit<S> {

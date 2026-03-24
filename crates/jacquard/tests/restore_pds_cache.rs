@@ -2,6 +2,7 @@ use std::sync::Arc;
 
 use bytes::Bytes;
 use http::{Response as HttpResponse, StatusCode};
+use jacquard::BosStr;
 use jacquard::client::credential_session::{CredentialSession, SessionKey};
 use jacquard::client::{AtpSession, FileAuthStore};
 use jacquard::identity::resolver::{DidDocResponse, IdentityResolver, ResolverOptions};
@@ -44,15 +45,15 @@ impl IdentityResolver for MockResolver {
         static OPTS: LazyLock<ResolverOptions> = LazyLock::new(ResolverOptions::default);
         &OPTS
     }
-    async fn resolve_handle(
+    async fn resolve_handle<S: BosStr + Sync>(
         &self,
-        _handle: &Handle<'_>,
-    ) -> std::result::Result<Did<'static>, jacquard::identity::resolver::IdentityError> {
+        _handle: &Handle<S>,
+    ) -> std::result::Result<Did, jacquard::identity::resolver::IdentityError> {
         Ok(Did::new_static("did:plc:alice").unwrap())
     }
-    async fn resolve_did_doc(
+    async fn resolve_did_doc<S: BosStr + Sync>(
         &self,
-        _did: &Did<'_>,
+        _did: &Did<S>,
     ) -> std::result::Result<DidDocResponse, jacquard::identity::resolver::IdentityError> {
         *self.did_doc_calls.write().await += 1;
         let doc = serde_json::json!({

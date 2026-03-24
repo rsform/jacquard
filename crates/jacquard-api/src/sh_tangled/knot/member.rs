@@ -114,50 +114,50 @@ pub mod member_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Domain;
-        type Subject;
         type CreatedAt;
+        type Subject;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Domain = Unset;
-        type Subject = Unset;
         type CreatedAt = Unset;
+        type Subject = Unset;
     }
     ///State transition - sets the `domain` field to Set
     pub struct SetDomain<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDomain<St> {}
     impl<St: State> State for SetDomain<St> {
         type Domain = Set<members::domain>;
+        type CreatedAt = St::CreatedAt;
         type Subject = St::Subject;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `subject` field to Set
-    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSubject<St> {}
-    impl<St: State> State for SetSubject<St> {
-        type Domain = St::Domain;
-        type Subject = Set<members::subject>;
-        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
         type Domain = St::Domain;
-        type Subject = St::Subject;
         type CreatedAt = Set<members::created_at>;
+        type Subject = St::Subject;
+    }
+    ///State transition - sets the `subject` field to Set
+    pub struct SetSubject<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSubject<St> {}
+    impl<St: State> State for SetSubject<St> {
+        type Domain = St::Domain;
+        type CreatedAt = St::CreatedAt;
+        type Subject = Set<members::subject>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `domain` field
         pub struct domain(());
-        ///Marker type for the `subject` field
-        pub struct subject(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `subject` field
+        pub struct subject(());
     }
 }
 
@@ -247,8 +247,8 @@ impl<S: BosStr, St> MemberBuilder<S, St>
 where
     St: member_state::State,
     St::Domain: member_state::IsSet,
-    St::Subject: member_state::IsSet,
     St::CreatedAt: member_state::IsSet,
+    St::Subject: member_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Member<S> {

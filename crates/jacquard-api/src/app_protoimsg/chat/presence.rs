@@ -218,37 +218,37 @@ pub mod presence_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Status;
         type UpdatedAt;
+        type Status;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Status = Unset;
         type UpdatedAt = Unset;
-    }
-    ///State transition - sets the `status` field to Set
-    pub struct SetStatus<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetStatus<St> {}
-    impl<St: State> State for SetStatus<St> {
-        type Status = Set<members::status>;
-        type UpdatedAt = St::UpdatedAt;
+        type Status = Unset;
     }
     ///State transition - sets the `updated_at` field to Set
     pub struct SetUpdatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUpdatedAt<St> {}
     impl<St: State> State for SetUpdatedAt<St> {
-        type Status = St::Status;
         type UpdatedAt = Set<members::updated_at>;
+        type Status = St::Status;
+    }
+    ///State transition - sets the `status` field to Set
+    pub struct SetStatus<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStatus<St> {}
+    impl<St: State> State for SetStatus<St> {
+        type UpdatedAt = St::UpdatedAt;
+        type Status = Set<members::status>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `status` field
-        pub struct status(());
         ///Marker type for the `updated_at` field
         pub struct updated_at(());
+        ///Marker type for the `status` field
+        pub struct status(());
     }
 }
 
@@ -331,8 +331,8 @@ where
 impl<S: BosStr, St> PresenceBuilder<S, St>
 where
     St: presence_state::State,
-    St::Status: presence_state::IsSet,
     St::UpdatedAt: presence_state::IsSet,
+    St::Status: presence_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Presence<S> {

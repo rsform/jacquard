@@ -445,51 +445,51 @@ pub mod sprite_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Engine;
         type CreatedAt;
         type SpriteSheet;
-        type Engine;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Engine = Unset;
         type CreatedAt = Unset;
         type SpriteSheet = Unset;
-        type Engine = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type SpriteSheet = St::SpriteSheet;
-        type Engine = St::Engine;
-    }
-    ///State transition - sets the `sprite_sheet` field to Set
-    pub struct SetSpriteSheet<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSpriteSheet<St> {}
-    impl<St: State> State for SetSpriteSheet<St> {
-        type CreatedAt = St::CreatedAt;
-        type SpriteSheet = Set<members::sprite_sheet>;
-        type Engine = St::Engine;
     }
     ///State transition - sets the `engine` field to Set
     pub struct SetEngine<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetEngine<St> {}
     impl<St: State> State for SetEngine<St> {
+        type Engine = Set<members::engine>;
         type CreatedAt = St::CreatedAt;
         type SpriteSheet = St::SpriteSheet;
-        type Engine = Set<members::engine>;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Engine = St::Engine;
+        type CreatedAt = Set<members::created_at>;
+        type SpriteSheet = St::SpriteSheet;
+    }
+    ///State transition - sets the `sprite_sheet` field to Set
+    pub struct SetSpriteSheet<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSpriteSheet<St> {}
+    impl<St: State> State for SetSpriteSheet<St> {
+        type Engine = St::Engine;
+        type CreatedAt = St::CreatedAt;
+        type SpriteSheet = Set<members::sprite_sheet>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `engine` field
+        pub struct engine(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `sprite_sheet` field
         pub struct sprite_sheet(());
-        ///Marker type for the `engine` field
-        pub struct engine(());
     }
 }
 
@@ -736,9 +736,9 @@ impl<S: BosStr, St: sprite_state::State> SpriteBuilder<S, St> {
 impl<S: BosStr, St> SpriteBuilder<S, St>
 where
     St: sprite_state::State,
+    St::Engine: sprite_state::IsSet,
     St::CreatedAt: sprite_state::IsSet,
     St::SpriteSheet: sprite_state::IsSet,
-    St::Engine: sprite_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Sprite<S> {

@@ -140,37 +140,37 @@ pub mod subscription_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Evaluator;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Evaluator = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type Evaluator = St::Evaluator;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `evaluator` field to Set
     pub struct SetEvaluator<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetEvaluator<St> {}
     impl<St: State> State for SetEvaluator<St> {
-        type CreatedAt = St::CreatedAt;
         type Evaluator = Set<members::evaluator>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Evaluator = St::Evaluator;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `evaluator` field
         pub struct evaluator(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -266,8 +266,8 @@ where
 impl<S: BosStr, St> SubscriptionBuilder<S, St>
 where
     St: subscription_state::State,
-    St::CreatedAt: subscription_state::IsSet,
     St::Evaluator: subscription_state::IsSet,
+    St::CreatedAt: subscription_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Subscription<S> {

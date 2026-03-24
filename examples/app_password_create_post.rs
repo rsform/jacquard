@@ -3,6 +3,7 @@ use jacquard::CowStr;
 use jacquard::api::app_bsky::feed::post::Post;
 use jacquard::client::{Agent, AgentSessionExt, MemoryCredentialSession};
 use jacquard::types::string::Datetime;
+use smol_str::SmolStr;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about = "Create a simple post")]

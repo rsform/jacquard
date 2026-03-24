@@ -633,85 +633,85 @@ pub mod claim_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Type;
         type ClaimUri;
-        type Sigs;
-        type CreatedAt;
+        type Type;
         type Identity;
+        type CreatedAt;
+        type Sigs;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Type = Unset;
         type ClaimUri = Unset;
-        type Sigs = Unset;
-        type CreatedAt = Unset;
+        type Type = Unset;
         type Identity = Unset;
-    }
-    ///State transition - sets the `type` field to Set
-    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetType<St> {}
-    impl<St: State> State for SetType<St> {
-        type Type = Set<members::r#type>;
-        type ClaimUri = St::ClaimUri;
-        type Sigs = St::Sigs;
-        type CreatedAt = St::CreatedAt;
-        type Identity = St::Identity;
+        type CreatedAt = Unset;
+        type Sigs = Unset;
     }
     ///State transition - sets the `claim_uri` field to Set
     pub struct SetClaimUri<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetClaimUri<St> {}
     impl<St: State> State for SetClaimUri<St> {
-        type Type = St::Type;
         type ClaimUri = Set<members::claim_uri>;
-        type Sigs = St::Sigs;
-        type CreatedAt = St::CreatedAt;
-        type Identity = St::Identity;
-    }
-    ///State transition - sets the `sigs` field to Set
-    pub struct SetSigs<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSigs<St> {}
-    impl<St: State> State for SetSigs<St> {
         type Type = St::Type;
-        type ClaimUri = St::ClaimUri;
-        type Sigs = Set<members::sigs>;
+        type Identity = St::Identity;
         type CreatedAt = St::CreatedAt;
-        type Identity = St::Identity;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type Type = St::Type;
-        type ClaimUri = St::ClaimUri;
         type Sigs = St::Sigs;
-        type CreatedAt = Set<members::created_at>;
+    }
+    ///State transition - sets the `type` field to Set
+    pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetType<St> {}
+    impl<St: State> State for SetType<St> {
+        type ClaimUri = St::ClaimUri;
+        type Type = Set<members::r#type>;
         type Identity = St::Identity;
+        type CreatedAt = St::CreatedAt;
+        type Sigs = St::Sigs;
     }
     ///State transition - sets the `identity` field to Set
     pub struct SetIdentity<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetIdentity<St> {}
     impl<St: State> State for SetIdentity<St> {
-        type Type = St::Type;
         type ClaimUri = St::ClaimUri;
-        type Sigs = St::Sigs;
-        type CreatedAt = St::CreatedAt;
+        type Type = St::Type;
         type Identity = Set<members::identity>;
+        type CreatedAt = St::CreatedAt;
+        type Sigs = St::Sigs;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type ClaimUri = St::ClaimUri;
+        type Type = St::Type;
+        type Identity = St::Identity;
+        type CreatedAt = Set<members::created_at>;
+        type Sigs = St::Sigs;
+    }
+    ///State transition - sets the `sigs` field to Set
+    pub struct SetSigs<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSigs<St> {}
+    impl<St: State> State for SetSigs<St> {
+        type ClaimUri = St::ClaimUri;
+        type Type = St::Type;
+        type Identity = St::Identity;
+        type CreatedAt = St::CreatedAt;
+        type Sigs = Set<members::sigs>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `type` field
-        pub struct r#type(());
         ///Marker type for the `claim_uri` field
         pub struct claim_uri(());
-        ///Marker type for the `sigs` field
-        pub struct sigs(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
+        ///Marker type for the `type` field
+        pub struct r#type(());
         ///Marker type for the `identity` field
         pub struct identity(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `sigs` field
+        pub struct sigs(());
     }
 }
 
@@ -955,11 +955,11 @@ where
 impl<S: BosStr, St> ClaimBuilder<S, St>
 where
     St: claim_state::State,
-    St::Type: claim_state::IsSet,
     St::ClaimUri: claim_state::IsSet,
-    St::Sigs: claim_state::IsSet,
-    St::CreatedAt: claim_state::IsSet,
+    St::Type: claim_state::IsSet,
     St::Identity: claim_state::IsSet,
+    St::CreatedAt: claim_state::IsSet,
+    St::Sigs: claim_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Claim<S> {

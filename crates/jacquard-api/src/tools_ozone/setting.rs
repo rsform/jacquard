@@ -266,10 +266,10 @@ pub mod defs_option_state {
     pub trait State: sealed::Sealed {
         type Key;
         type Value;
-        type CreatedBy;
+        type Did;
         type Scope;
         type LastUpdatedBy;
-        type Did;
+        type CreatedBy;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -277,10 +277,10 @@ pub mod defs_option_state {
     impl State for Empty {
         type Key = Unset;
         type Value = Unset;
-        type CreatedBy = Unset;
+        type Did = Unset;
         type Scope = Unset;
         type LastUpdatedBy = Unset;
-        type Did = Unset;
+        type CreatedBy = Unset;
     }
     ///State transition - sets the `key` field to Set
     pub struct SetKey<St: State = Empty>(PhantomData<fn() -> St>);
@@ -288,10 +288,10 @@ pub mod defs_option_state {
     impl<St: State> State for SetKey<St> {
         type Key = Set<members::key>;
         type Value = St::Value;
-        type CreatedBy = St::CreatedBy;
+        type Did = St::Did;
         type Scope = St::Scope;
         type LastUpdatedBy = St::LastUpdatedBy;
-        type Did = St::Did;
+        type CreatedBy = St::CreatedBy;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<St: State = Empty>(PhantomData<fn() -> St>);
@@ -299,43 +299,10 @@ pub mod defs_option_state {
     impl<St: State> State for SetValue<St> {
         type Key = St::Key;
         type Value = Set<members::value>;
-        type CreatedBy = St::CreatedBy;
+        type Did = St::Did;
         type Scope = St::Scope;
         type LastUpdatedBy = St::LastUpdatedBy;
-        type Did = St::Did;
-    }
-    ///State transition - sets the `created_by` field to Set
-    pub struct SetCreatedBy<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedBy<St> {}
-    impl<St: State> State for SetCreatedBy<St> {
-        type Key = St::Key;
-        type Value = St::Value;
-        type CreatedBy = Set<members::created_by>;
-        type Scope = St::Scope;
-        type LastUpdatedBy = St::LastUpdatedBy;
-        type Did = St::Did;
-    }
-    ///State transition - sets the `scope` field to Set
-    pub struct SetScope<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetScope<St> {}
-    impl<St: State> State for SetScope<St> {
-        type Key = St::Key;
-        type Value = St::Value;
         type CreatedBy = St::CreatedBy;
-        type Scope = Set<members::scope>;
-        type LastUpdatedBy = St::LastUpdatedBy;
-        type Did = St::Did;
-    }
-    ///State transition - sets the `last_updated_by` field to Set
-    pub struct SetLastUpdatedBy<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetLastUpdatedBy<St> {}
-    impl<St: State> State for SetLastUpdatedBy<St> {
-        type Key = St::Key;
-        type Value = St::Value;
-        type CreatedBy = St::CreatedBy;
-        type Scope = St::Scope;
-        type LastUpdatedBy = Set<members::last_updated_by>;
-        type Did = St::Did;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
@@ -343,10 +310,43 @@ pub mod defs_option_state {
     impl<St: State> State for SetDid<St> {
         type Key = St::Key;
         type Value = St::Value;
-        type CreatedBy = St::CreatedBy;
+        type Did = Set<members::did>;
         type Scope = St::Scope;
         type LastUpdatedBy = St::LastUpdatedBy;
-        type Did = Set<members::did>;
+        type CreatedBy = St::CreatedBy;
+    }
+    ///State transition - sets the `scope` field to Set
+    pub struct SetScope<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetScope<St> {}
+    impl<St: State> State for SetScope<St> {
+        type Key = St::Key;
+        type Value = St::Value;
+        type Did = St::Did;
+        type Scope = Set<members::scope>;
+        type LastUpdatedBy = St::LastUpdatedBy;
+        type CreatedBy = St::CreatedBy;
+    }
+    ///State transition - sets the `last_updated_by` field to Set
+    pub struct SetLastUpdatedBy<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLastUpdatedBy<St> {}
+    impl<St: State> State for SetLastUpdatedBy<St> {
+        type Key = St::Key;
+        type Value = St::Value;
+        type Did = St::Did;
+        type Scope = St::Scope;
+        type LastUpdatedBy = Set<members::last_updated_by>;
+        type CreatedBy = St::CreatedBy;
+    }
+    ///State transition - sets the `created_by` field to Set
+    pub struct SetCreatedBy<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedBy<St> {}
+    impl<St: State> State for SetCreatedBy<St> {
+        type Key = St::Key;
+        type Value = St::Value;
+        type Did = St::Did;
+        type Scope = St::Scope;
+        type LastUpdatedBy = St::LastUpdatedBy;
+        type CreatedBy = Set<members::created_by>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -355,14 +355,14 @@ pub mod defs_option_state {
         pub struct key(());
         ///Marker type for the `value` field
         pub struct value(());
-        ///Marker type for the `created_by` field
-        pub struct created_by(());
+        ///Marker type for the `did` field
+        pub struct did(());
         ///Marker type for the `scope` field
         pub struct scope(());
         ///Marker type for the `last_updated_by` field
         pub struct last_updated_by(());
-        ///Marker type for the `did` field
-        pub struct did(());
+        ///Marker type for the `created_by` field
+        pub struct created_by(());
     }
 }
 
@@ -579,10 +579,10 @@ where
     St: defs_option_state::State,
     St::Key: defs_option_state::IsSet,
     St::Value: defs_option_state::IsSet,
-    St::CreatedBy: defs_option_state::IsSet,
+    St::Did: defs_option_state::IsSet,
     St::Scope: defs_option_state::IsSet,
     St::LastUpdatedBy: defs_option_state::IsSet,
-    St::Did: defs_option_state::IsSet,
+    St::CreatedBy: defs_option_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> DefsOption<S> {

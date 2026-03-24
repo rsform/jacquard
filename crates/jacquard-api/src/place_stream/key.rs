@@ -139,37 +139,37 @@ pub mod key_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type SigningKey;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type SigningKey = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type SigningKey = St::SigningKey;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `signing_key` field to Set
     pub struct SetSigningKey<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSigningKey<St> {}
     impl<St: State> State for SetSigningKey<St> {
-        type CreatedAt = St::CreatedAt;
         type SigningKey = Set<members::signing_key>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type SigningKey = St::SigningKey;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `signing_key` field
         pub struct signing_key(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -252,8 +252,8 @@ where
 impl<S: BosStr, St> KeyBuilder<S, St>
 where
     St: key_state::State,
-    St::CreatedAt: key_state::IsSet,
     St::SigningKey: key_state::IsSet,
+    St::CreatedAt: key_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Key<S> {

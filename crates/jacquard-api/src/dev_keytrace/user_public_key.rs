@@ -276,49 +276,49 @@ pub mod user_public_key_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type KeyType;
         type CreatedAt;
+        type KeyType;
         type PublicKeyArmored;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type KeyType = Unset;
         type CreatedAt = Unset;
+        type KeyType = Unset;
         type PublicKeyArmored = Unset;
-    }
-    ///State transition - sets the `key_type` field to Set
-    pub struct SetKeyType<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetKeyType<St> {}
-    impl<St: State> State for SetKeyType<St> {
-        type KeyType = Set<members::key_type>;
-        type CreatedAt = St::CreatedAt;
-        type PublicKeyArmored = St::PublicKeyArmored;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type KeyType = St::KeyType;
         type CreatedAt = Set<members::created_at>;
+        type KeyType = St::KeyType;
+        type PublicKeyArmored = St::PublicKeyArmored;
+    }
+    ///State transition - sets the `key_type` field to Set
+    pub struct SetKeyType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetKeyType<St> {}
+    impl<St: State> State for SetKeyType<St> {
+        type CreatedAt = St::CreatedAt;
+        type KeyType = Set<members::key_type>;
         type PublicKeyArmored = St::PublicKeyArmored;
     }
     ///State transition - sets the `public_key_armored` field to Set
     pub struct SetPublicKeyArmored<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPublicKeyArmored<St> {}
     impl<St: State> State for SetPublicKeyArmored<St> {
-        type KeyType = St::KeyType;
         type CreatedAt = St::CreatedAt;
+        type KeyType = St::KeyType;
         type PublicKeyArmored = Set<members::public_key_armored>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `key_type` field
-        pub struct key_type(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `key_type` field
+        pub struct key_type(());
         ///Marker type for the `public_key_armored` field
         pub struct public_key_armored(());
     }
@@ -483,8 +483,8 @@ impl<S: BosStr, St: user_public_key_state::State> UserPublicKeyBuilder<S, St> {
 impl<S: BosStr, St> UserPublicKeyBuilder<S, St>
 where
     St: user_public_key_state::State,
-    St::KeyType: user_public_key_state::IsSet,
     St::CreatedAt: user_public_key_state::IsSet,
+    St::KeyType: user_public_key_state::IsSet,
     St::PublicKeyArmored: user_public_key_state::IsSet,
 {
     /// Build the final struct.

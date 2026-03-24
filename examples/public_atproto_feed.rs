@@ -21,7 +21,7 @@ async fn main() -> miette::Result<()> {
 
     let request = GetFeed::new().feed(feed_uri).limit(10).build();
 
-    let response = http.xrpc(base).send(&request).await?;
+    let response = http.xrpc(&base.borrow()).send(&request).await?;
     let output = response.into_output()?;
 
     println!("Latest posts from the AT Protocol feed:\n");

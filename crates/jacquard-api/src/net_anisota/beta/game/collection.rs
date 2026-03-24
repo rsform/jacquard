@@ -294,8 +294,8 @@ pub mod collection_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type AcquiredAt;
-        type Quantity;
         type SpecimenId;
+        type Quantity;
         type CreatedAt;
     }
     /// Empty state - all required fields are unset
@@ -303,8 +303,8 @@ pub mod collection_state {
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type AcquiredAt = Unset;
-        type Quantity = Unset;
         type SpecimenId = Unset;
+        type Quantity = Unset;
         type CreatedAt = Unset;
     }
     ///State transition - sets the `acquired_at` field to Set
@@ -312,17 +312,8 @@ pub mod collection_state {
     impl<St: State> sealed::Sealed for SetAcquiredAt<St> {}
     impl<St: State> State for SetAcquiredAt<St> {
         type AcquiredAt = Set<members::acquired_at>;
+        type SpecimenId = St::SpecimenId;
         type Quantity = St::Quantity;
-        type SpecimenId = St::SpecimenId;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `quantity` field to Set
-    pub struct SetQuantity<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetQuantity<St> {}
-    impl<St: State> State for SetQuantity<St> {
-        type AcquiredAt = St::AcquiredAt;
-        type Quantity = Set<members::quantity>;
-        type SpecimenId = St::SpecimenId;
         type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `specimen_id` field to Set
@@ -330,8 +321,17 @@ pub mod collection_state {
     impl<St: State> sealed::Sealed for SetSpecimenId<St> {}
     impl<St: State> State for SetSpecimenId<St> {
         type AcquiredAt = St::AcquiredAt;
-        type Quantity = St::Quantity;
         type SpecimenId = Set<members::specimen_id>;
+        type Quantity = St::Quantity;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `quantity` field to Set
+    pub struct SetQuantity<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetQuantity<St> {}
+    impl<St: State> State for SetQuantity<St> {
+        type AcquiredAt = St::AcquiredAt;
+        type SpecimenId = St::SpecimenId;
+        type Quantity = Set<members::quantity>;
         type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
@@ -339,8 +339,8 @@ pub mod collection_state {
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
         type AcquiredAt = St::AcquiredAt;
-        type Quantity = St::Quantity;
         type SpecimenId = St::SpecimenId;
+        type Quantity = St::Quantity;
         type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
@@ -348,10 +348,10 @@ pub mod collection_state {
     pub mod members {
         ///Marker type for the `acquired_at` field
         pub struct acquired_at(());
-        ///Marker type for the `quantity` field
-        pub struct quantity(());
         ///Marker type for the `specimen_id` field
         pub struct specimen_id(());
+        ///Marker type for the `quantity` field
+        pub struct quantity(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
     }
@@ -679,8 +679,8 @@ impl<S: BosStr, St> CollectionBuilder<S, St>
 where
     St: collection_state::State,
     St::AcquiredAt: collection_state::IsSet,
-    St::Quantity: collection_state::IsSet,
     St::SpecimenId: collection_state::IsSet,
+    St::Quantity: collection_state::IsSet,
     St::CreatedAt: collection_state::IsSet,
 {
     /// Build the final struct.

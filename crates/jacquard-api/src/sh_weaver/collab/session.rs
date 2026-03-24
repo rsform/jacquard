@@ -122,51 +122,51 @@ pub mod session_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type NodeId;
         type CreatedAt;
         type Resource;
+        type NodeId;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type NodeId = Unset;
         type CreatedAt = Unset;
         type Resource = Unset;
-    }
-    ///State transition - sets the `node_id` field to Set
-    pub struct SetNodeId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetNodeId<St> {}
-    impl<St: State> State for SetNodeId<St> {
-        type NodeId = Set<members::node_id>;
-        type CreatedAt = St::CreatedAt;
-        type Resource = St::Resource;
+        type NodeId = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type NodeId = St::NodeId;
         type CreatedAt = Set<members::created_at>;
         type Resource = St::Resource;
+        type NodeId = St::NodeId;
     }
     ///State transition - sets the `resource` field to Set
     pub struct SetResource<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetResource<St> {}
     impl<St: State> State for SetResource<St> {
-        type NodeId = St::NodeId;
         type CreatedAt = St::CreatedAt;
         type Resource = Set<members::resource>;
+        type NodeId = St::NodeId;
+    }
+    ///State transition - sets the `node_id` field to Set
+    pub struct SetNodeId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetNodeId<St> {}
+    impl<St: State> State for SetNodeId<St> {
+        type CreatedAt = St::CreatedAt;
+        type Resource = St::Resource;
+        type NodeId = Set<members::node_id>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `node_id` field
-        pub struct node_id(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `resource` field
         pub struct resource(());
+        ///Marker type for the `node_id` field
+        pub struct node_id(());
     }
 }
 
@@ -287,9 +287,9 @@ where
 impl<S: BosStr, St> SessionBuilder<S, St>
 where
     St: session_state::State,
-    St::NodeId: session_state::IsSet,
     St::CreatedAt: session_state::IsSet,
     St::Resource: session_state::IsSet,
+    St::NodeId: session_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Session<S> {

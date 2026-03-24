@@ -1350,105 +1350,105 @@ pub mod list_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Cid;
         type Purpose;
-        type Name;
         type IndexedAt;
-        type Creator;
         type Uri;
+        type Cid;
+        type Name;
+        type Creator;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Cid = Unset;
         type Purpose = Unset;
-        type Name = Unset;
         type IndexedAt = Unset;
-        type Creator = Unset;
         type Uri = Unset;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCid<St> {}
-    impl<St: State> State for SetCid<St> {
-        type Cid = Set<members::cid>;
-        type Purpose = St::Purpose;
-        type Name = St::Name;
-        type IndexedAt = St::IndexedAt;
-        type Creator = St::Creator;
-        type Uri = St::Uri;
+        type Cid = Unset;
+        type Name = Unset;
+        type Creator = Unset;
     }
     ///State transition - sets the `purpose` field to Set
     pub struct SetPurpose<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPurpose<St> {}
     impl<St: State> State for SetPurpose<St> {
-        type Cid = St::Cid;
         type Purpose = Set<members::purpose>;
-        type Name = St::Name;
         type IndexedAt = St::IndexedAt;
-        type Creator = St::Creator;
         type Uri = St::Uri;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
         type Cid = St::Cid;
-        type Purpose = St::Purpose;
-        type Name = Set<members::name>;
-        type IndexedAt = St::IndexedAt;
+        type Name = St::Name;
         type Creator = St::Creator;
-        type Uri = St::Uri;
     }
     ///State transition - sets the `indexed_at` field to Set
     pub struct SetIndexedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetIndexedAt<St> {}
     impl<St: State> State for SetIndexedAt<St> {
-        type Cid = St::Cid;
         type Purpose = St::Purpose;
-        type Name = St::Name;
         type IndexedAt = Set<members::indexed_at>;
-        type Creator = St::Creator;
         type Uri = St::Uri;
-    }
-    ///State transition - sets the `creator` field to Set
-    pub struct SetCreator<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreator<St> {}
-    impl<St: State> State for SetCreator<St> {
         type Cid = St::Cid;
-        type Purpose = St::Purpose;
         type Name = St::Name;
-        type IndexedAt = St::IndexedAt;
-        type Creator = Set<members::creator>;
-        type Uri = St::Uri;
+        type Creator = St::Creator;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUri<St> {}
     impl<St: State> State for SetUri<St> {
-        type Cid = St::Cid;
         type Purpose = St::Purpose;
-        type Name = St::Name;
         type IndexedAt = St::IndexedAt;
-        type Creator = St::Creator;
         type Uri = Set<members::uri>;
+        type Cid = St::Cid;
+        type Name = St::Name;
+        type Creator = St::Creator;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCid<St> {}
+    impl<St: State> State for SetCid<St> {
+        type Purpose = St::Purpose;
+        type IndexedAt = St::IndexedAt;
+        type Uri = St::Uri;
+        type Cid = Set<members::cid>;
+        type Name = St::Name;
+        type Creator = St::Creator;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Purpose = St::Purpose;
+        type IndexedAt = St::IndexedAt;
+        type Uri = St::Uri;
+        type Cid = St::Cid;
+        type Name = Set<members::name>;
+        type Creator = St::Creator;
+    }
+    ///State transition - sets the `creator` field to Set
+    pub struct SetCreator<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreator<St> {}
+    impl<St: State> State for SetCreator<St> {
+        type Purpose = St::Purpose;
+        type IndexedAt = St::IndexedAt;
+        type Uri = St::Uri;
+        type Cid = St::Cid;
+        type Name = St::Name;
+        type Creator = Set<members::creator>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `purpose` field
         pub struct purpose(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `indexed_at` field
         pub struct indexed_at(());
-        ///Marker type for the `creator` field
-        pub struct creator(());
         ///Marker type for the `uri` field
         pub struct uri(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
+        ///Marker type for the `name` field
+        pub struct name(());
+        ///Marker type for the `creator` field
+        pub struct creator(());
     }
 }
 
@@ -1704,12 +1704,12 @@ impl<S: BosStr, St: list_view_state::State> ListViewBuilder<S, St> {
 impl<S: BosStr, St> ListViewBuilder<S, St>
 where
     St: list_view_state::State,
-    St::Cid: list_view_state::IsSet,
     St::Purpose: list_view_state::IsSet,
-    St::Name: list_view_state::IsSet,
     St::IndexedAt: list_view_state::IsSet,
-    St::Creator: list_view_state::IsSet,
     St::Uri: list_view_state::IsSet,
+    St::Cid: list_view_state::IsSet,
+    St::Name: list_view_state::IsSet,
+    St::Creator: list_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ListView<S> {
@@ -1759,67 +1759,67 @@ pub mod list_view_basic_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Purpose;
-        type Uri;
-        type Cid;
         type Name;
+        type Uri;
+        type Purpose;
+        type Cid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Purpose = Unset;
-        type Uri = Unset;
-        type Cid = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `purpose` field to Set
-    pub struct SetPurpose<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPurpose<St> {}
-    impl<St: State> State for SetPurpose<St> {
-        type Purpose = Set<members::purpose>;
-        type Uri = St::Uri;
-        type Cid = St::Cid;
-        type Name = St::Name;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUri<St> {}
-    impl<St: State> State for SetUri<St> {
-        type Purpose = St::Purpose;
-        type Uri = Set<members::uri>;
-        type Cid = St::Cid;
-        type Name = St::Name;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCid<St> {}
-    impl<St: State> State for SetCid<St> {
-        type Purpose = St::Purpose;
-        type Uri = St::Uri;
-        type Cid = Set<members::cid>;
-        type Name = St::Name;
+        type Uri = Unset;
+        type Purpose = Unset;
+        type Cid = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetName<St> {}
     impl<St: State> State for SetName<St> {
-        type Purpose = St::Purpose;
-        type Uri = St::Uri;
-        type Cid = St::Cid;
         type Name = Set<members::name>;
+        type Uri = St::Uri;
+        type Purpose = St::Purpose;
+        type Cid = St::Cid;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Name = St::Name;
+        type Uri = Set<members::uri>;
+        type Purpose = St::Purpose;
+        type Cid = St::Cid;
+    }
+    ///State transition - sets the `purpose` field to Set
+    pub struct SetPurpose<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPurpose<St> {}
+    impl<St: State> State for SetPurpose<St> {
+        type Name = St::Name;
+        type Uri = St::Uri;
+        type Purpose = Set<members::purpose>;
+        type Cid = St::Cid;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCid<St> {}
+    impl<St: State> State for SetCid<St> {
+        type Name = St::Name;
+        type Uri = St::Uri;
+        type Purpose = St::Purpose;
+        type Cid = Set<members::cid>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `purpose` field
-        pub struct purpose(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `purpose` field
+        pub struct purpose(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
     }
 }
 
@@ -2005,10 +2005,10 @@ impl<S: BosStr, St: list_view_basic_state::State> ListViewBasicBuilder<S, St> {
 impl<S: BosStr, St> ListViewBasicBuilder<S, St>
 where
     St: list_view_basic_state::State,
-    St::Purpose: list_view_basic_state::IsSet,
-    St::Uri: list_view_basic_state::IsSet,
-    St::Cid: list_view_basic_state::IsSet,
     St::Name: list_view_basic_state::IsSet,
+    St::Uri: list_view_basic_state::IsSet,
+    St::Purpose: list_view_basic_state::IsSet,
+    St::Cid: list_view_basic_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ListViewBasic<S> {
@@ -2055,37 +2055,37 @@ pub mod not_found_actor_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type NotFound;
         type Actor;
+        type NotFound;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type NotFound = Unset;
         type Actor = Unset;
-    }
-    ///State transition - sets the `not_found` field to Set
-    pub struct SetNotFound<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetNotFound<St> {}
-    impl<St: State> State for SetNotFound<St> {
-        type NotFound = Set<members::not_found>;
-        type Actor = St::Actor;
+        type NotFound = Unset;
     }
     ///State transition - sets the `actor` field to Set
     pub struct SetActor<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetActor<St> {}
     impl<St: State> State for SetActor<St> {
-        type NotFound = St::NotFound;
         type Actor = Set<members::actor>;
+        type NotFound = St::NotFound;
+    }
+    ///State transition - sets the `not_found` field to Set
+    pub struct SetNotFound<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetNotFound<St> {}
+    impl<St: State> State for SetNotFound<St> {
+        type Actor = St::Actor;
+        type NotFound = Set<members::not_found>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `not_found` field
-        pub struct not_found(());
         ///Marker type for the `actor` field
         pub struct actor(());
+        ///Marker type for the `not_found` field
+        pub struct not_found(());
     }
 }
 
@@ -2155,8 +2155,8 @@ where
 impl<S: BosStr, St> NotFoundActorBuilder<S, St>
 where
     St: not_found_actor_state::State,
-    St::NotFound: not_found_actor_state::IsSet,
     St::Actor: not_found_actor_state::IsSet,
+    St::NotFound: not_found_actor_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> NotFoundActor<S> {
@@ -2743,85 +2743,85 @@ pub mod starter_pack_view_basic_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type IndexedAt;
-        type Record;
         type Creator;
+        type IndexedAt;
         type Uri;
         type Cid;
+        type Record;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type IndexedAt = Unset;
-        type Record = Unset;
         type Creator = Unset;
+        type IndexedAt = Unset;
         type Uri = Unset;
         type Cid = Unset;
-    }
-    ///State transition - sets the `indexed_at` field to Set
-    pub struct SetIndexedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetIndexedAt<St> {}
-    impl<St: State> State for SetIndexedAt<St> {
-        type IndexedAt = Set<members::indexed_at>;
-        type Record = St::Record;
-        type Creator = St::Creator;
-        type Uri = St::Uri;
-        type Cid = St::Cid;
-    }
-    ///State transition - sets the `record` field to Set
-    pub struct SetRecord<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRecord<St> {}
-    impl<St: State> State for SetRecord<St> {
-        type IndexedAt = St::IndexedAt;
-        type Record = Set<members::record>;
-        type Creator = St::Creator;
-        type Uri = St::Uri;
-        type Cid = St::Cid;
+        type Record = Unset;
     }
     ///State transition - sets the `creator` field to Set
     pub struct SetCreator<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreator<St> {}
     impl<St: State> State for SetCreator<St> {
-        type IndexedAt = St::IndexedAt;
-        type Record = St::Record;
         type Creator = Set<members::creator>;
+        type IndexedAt = St::IndexedAt;
         type Uri = St::Uri;
         type Cid = St::Cid;
+        type Record = St::Record;
+    }
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIndexedAt<St> {}
+    impl<St: State> State for SetIndexedAt<St> {
+        type Creator = St::Creator;
+        type IndexedAt = Set<members::indexed_at>;
+        type Uri = St::Uri;
+        type Cid = St::Cid;
+        type Record = St::Record;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUri<St> {}
     impl<St: State> State for SetUri<St> {
-        type IndexedAt = St::IndexedAt;
-        type Record = St::Record;
         type Creator = St::Creator;
+        type IndexedAt = St::IndexedAt;
         type Uri = Set<members::uri>;
         type Cid = St::Cid;
+        type Record = St::Record;
     }
     ///State transition - sets the `cid` field to Set
     pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCid<St> {}
     impl<St: State> State for SetCid<St> {
-        type IndexedAt = St::IndexedAt;
-        type Record = St::Record;
         type Creator = St::Creator;
+        type IndexedAt = St::IndexedAt;
         type Uri = St::Uri;
         type Cid = Set<members::cid>;
+        type Record = St::Record;
+    }
+    ///State transition - sets the `record` field to Set
+    pub struct SetRecord<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRecord<St> {}
+    impl<St: State> State for SetRecord<St> {
+        type Creator = St::Creator;
+        type IndexedAt = St::IndexedAt;
+        type Uri = St::Uri;
+        type Cid = St::Cid;
+        type Record = Set<members::record>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `indexed_at` field
-        pub struct indexed_at(());
-        ///Marker type for the `record` field
-        pub struct record(());
         ///Marker type for the `creator` field
         pub struct creator(());
+        ///Marker type for the `indexed_at` field
+        pub struct indexed_at(());
         ///Marker type for the `uri` field
         pub struct uri(());
         ///Marker type for the `cid` field
         pub struct cid(());
+        ///Marker type for the `record` field
+        pub struct record(());
     }
 }
 
@@ -3031,11 +3031,11 @@ where
 impl<S: BosStr, St> StarterPackViewBasicBuilder<S, St>
 where
     St: starter_pack_view_basic_state::State,
-    St::IndexedAt: starter_pack_view_basic_state::IsSet,
-    St::Record: starter_pack_view_basic_state::IsSet,
     St::Creator: starter_pack_view_basic_state::IsSet,
+    St::IndexedAt: starter_pack_view_basic_state::IsSet,
     St::Uri: starter_pack_view_basic_state::IsSet,
     St::Cid: starter_pack_view_basic_state::IsSet,
+    St::Record: starter_pack_view_basic_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> StarterPackViewBasic<S> {

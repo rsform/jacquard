@@ -283,37 +283,37 @@ pub mod work_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type WorkType;
         type Title;
+        type WorkType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type WorkType = Unset;
         type Title = Unset;
-    }
-    ///State transition - sets the `work_type` field to Set
-    pub struct SetWorkType<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetWorkType<St> {}
-    impl<St: State> State for SetWorkType<St> {
-        type WorkType = Set<members::work_type>;
-        type Title = St::Title;
+        type WorkType = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTitle<St> {}
     impl<St: State> State for SetTitle<St> {
-        type WorkType = St::WorkType;
         type Title = Set<members::title>;
+        type WorkType = St::WorkType;
+    }
+    ///State transition - sets the `work_type` field to Set
+    pub struct SetWorkType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetWorkType<St> {}
+    impl<St: State> State for SetWorkType<St> {
+        type Title = St::Title;
+        type WorkType = Set<members::work_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `work_type` field
-        pub struct work_type(());
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `work_type` field
+        pub struct work_type(());
     }
 }
 
@@ -409,8 +409,8 @@ impl<S: BosStr, St: work_state::State> WorkBuilder<S, St> {
 impl<S: BosStr, St> WorkBuilder<S, St>
 where
     St: work_state::State,
-    St::WorkType: work_state::IsSet,
     St::Title: work_state::IsSet,
+    St::WorkType: work_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Work<S> {

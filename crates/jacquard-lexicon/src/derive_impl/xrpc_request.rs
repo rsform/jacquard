@@ -24,17 +24,31 @@ fn xrpc_request_impl(input: &DeriveInput) -> syn::Result<TokenStream> {
     let name = &input.ident;
     let generics = &input.generics;
 
-    // Detect if type has lifetime parameter
+    // Detect if type has any generic parameters (type params or lifetimes).
+    // BOS-style types use a type parameter `S: BosStr`; legacy types may use a lifetime.
+    // Either way, the XrpcRequest impl is for `#name` with no explicit args (Rust infers them),
+    // and the XrpcEndpoint uses `#name<S>` to thread the backing-string type through.
+    let has_type_params = generics.type_params().next().is_some();
     let has_lifetime = generics.lifetimes().next().is_some();
-    let lifetime = if has_lifetime {
-        quote! { <'_> }
+    let has_generics = has_type_params || has_lifetime;
+
+    // For XrpcRequest impl: use the struct's own generics clause unchanged.
+    // For XrpcEndpoint's Request<S> GAT: supply `S` as the single type argument if the
+    // request type is generic; otherwise supply nothing.
+    let request_in_endpoint = if has_generics {
+        quote! { #name<S> }
     } else {
-        quote! {}
+        quote! { #name }
     };
+
+    // For XrpcRequest impl bounds: pass through the full generics.
+    let (impl_generics, ty_generics, where_clause) = generics.split_for_impl();
 
     let nsid = &attrs.nsid;
     let method = method_expr(&attrs.method);
     let output_ty = &attrs.output;
+    // Error type is always owned (DeserializeOwned); the BOS migration removed the 'de lifetime
+    // from XrpcResp::Err.  We accept whatever type the user named and use it without a param.
     let error_ty = attrs
         .error
         .as_ref()
@@ -52,11 +66,11 @@ fn xrpc_request_impl(input: &DeriveInput) -> syn::Result<TokenStream> {
         impl ::jacquard_common::xrpc::XrpcResp for #response_name {
             const NSID: &'static str = #nsid;
             const ENCODING: &'static str = "application/json";
-            type Output<'de> = #output_ty<'de>;
-            type Err<'de> = #error_ty<'de>;
+            type Output<S: ::jacquard_common::BosStr> = #output_ty<S>;
+            type Err = #error_ty;
         }
 
-        impl #generics ::jacquard_common::xrpc::XrpcRequest for #name #lifetime {
+        impl #impl_generics ::jacquard_common::xrpc::XrpcRequest for #name #ty_generics #where_clause {
             const NSID: &'static str = #nsid;
             const METHOD: ::jacquard_common::xrpc::XrpcMethod = #method;
             type Response = #response_name;
@@ -68,13 +82,6 @@ fn xrpc_request_impl(input: &DeriveInput) -> syn::Result<TokenStream> {
         let endpoint_name = format_ident!("{}Endpoint", name);
         let path = format!("/xrpc/{}", nsid);
 
-        // Request type with or without lifetime
-        let request_type = if has_lifetime {
-            quote! { #name<'de> }
-        } else {
-            quote! { #name }
-        };
-
         output.extend(quote! {
             /// Endpoint marker for #name (server-side)
             pub struct #endpoint_name;
@@ -82,7 +89,7 @@ fn xrpc_request_impl(input: &DeriveInput) -> syn::Result<TokenStream> {
             impl ::jacquard_common::xrpc::XrpcEndpoint for #endpoint_name {
                 const PATH: &'static str = #path;
                 const METHOD: ::jacquard_common::xrpc::XrpcMethod = #method;
-                type Request<'de> = #request_type;
+                type Request<S: ::jacquard_common::BosStr> = #request_in_endpoint;
                 type Response = #response_name;
             }
         });

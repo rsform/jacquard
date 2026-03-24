@@ -160,51 +160,51 @@ pub mod get_diff_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Rev2;
-        type Rev1;
         type Repo;
+        type Rev1;
+        type Rev2;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Rev2 = Unset;
-        type Rev1 = Unset;
         type Repo = Unset;
-    }
-    ///State transition - sets the `rev2` field to Set
-    pub struct SetRev2<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRev2<St> {}
-    impl<St: State> State for SetRev2<St> {
-        type Rev2 = Set<members::rev2>;
-        type Rev1 = St::Rev1;
-        type Repo = St::Repo;
-    }
-    ///State transition - sets the `rev1` field to Set
-    pub struct SetRev1<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRev1<St> {}
-    impl<St: State> State for SetRev1<St> {
-        type Rev2 = St::Rev2;
-        type Rev1 = Set<members::rev1>;
-        type Repo = St::Repo;
+        type Rev1 = Unset;
+        type Rev2 = Unset;
     }
     ///State transition - sets the `repo` field to Set
     pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRepo<St> {}
     impl<St: State> State for SetRepo<St> {
-        type Rev2 = St::Rev2;
-        type Rev1 = St::Rev1;
         type Repo = Set<members::repo>;
+        type Rev1 = St::Rev1;
+        type Rev2 = St::Rev2;
+    }
+    ///State transition - sets the `rev1` field to Set
+    pub struct SetRev1<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRev1<St> {}
+    impl<St: State> State for SetRev1<St> {
+        type Repo = St::Repo;
+        type Rev1 = Set<members::rev1>;
+        type Rev2 = St::Rev2;
+    }
+    ///State transition - sets the `rev2` field to Set
+    pub struct SetRev2<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRev2<St> {}
+    impl<St: State> State for SetRev2<St> {
+        type Repo = St::Repo;
+        type Rev1 = St::Rev1;
+        type Rev2 = Set<members::rev2>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `rev2` field
-        pub struct rev2(());
-        ///Marker type for the `rev1` field
-        pub struct rev1(());
         ///Marker type for the `repo` field
         pub struct repo(());
+        ///Marker type for the `rev1` field
+        pub struct rev1(());
+        ///Marker type for the `rev2` field
+        pub struct rev2(());
     }
 }
 
@@ -293,9 +293,9 @@ where
 impl<S: BosStr, St> GetDiffBuilder<S, St>
 where
     St: get_diff_state::State,
-    St::Rev2: get_diff_state::IsSet,
-    St::Rev1: get_diff_state::IsSet,
     St::Repo: get_diff_state::IsSet,
+    St::Rev1: get_diff_state::IsSet,
+    St::Rev2: get_diff_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> GetDiff<S> {

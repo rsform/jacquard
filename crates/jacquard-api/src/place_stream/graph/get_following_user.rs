@@ -69,37 +69,37 @@ pub mod get_following_user_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type UserDid;
         type SubjectDid;
+        type UserDid;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type UserDid = Unset;
         type SubjectDid = Unset;
-    }
-    ///State transition - sets the `user_did` field to Set
-    pub struct SetUserDid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUserDid<St> {}
-    impl<St: State> State for SetUserDid<St> {
-        type UserDid = Set<members::user_did>;
-        type SubjectDid = St::SubjectDid;
+        type UserDid = Unset;
     }
     ///State transition - sets the `subject_did` field to Set
     pub struct SetSubjectDid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSubjectDid<St> {}
     impl<St: State> State for SetSubjectDid<St> {
-        type UserDid = St::UserDid;
         type SubjectDid = Set<members::subject_did>;
+        type UserDid = St::UserDid;
+    }
+    ///State transition - sets the `user_did` field to Set
+    pub struct SetUserDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUserDid<St> {}
+    impl<St: State> State for SetUserDid<St> {
+        type SubjectDid = St::SubjectDid;
+        type UserDid = Set<members::user_did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `user_did` field
-        pub struct user_did(());
         ///Marker type for the `subject_did` field
         pub struct subject_did(());
+        ///Marker type for the `user_did` field
+        pub struct user_did(());
     }
 }
 
@@ -169,8 +169,8 @@ where
 impl<S: BosStr, St> GetFollowingUserBuilder<S, St>
 where
     St: get_following_user_state::State,
-    St::UserDid: get_following_user_state::IsSet,
     St::SubjectDid: get_following_user_state::IsSet,
+    St::UserDid: get_following_user_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> GetFollowingUser<S> {

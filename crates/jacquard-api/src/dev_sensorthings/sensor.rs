@@ -161,51 +161,51 @@ pub mod sensor_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
-        type EncodingType;
         type CreatedAt;
+        type EncodingType;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
-        type EncodingType = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Name = Set<members::name>;
-        type EncodingType = St::EncodingType;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `encoding_type` field to Set
-    pub struct SetEncodingType<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetEncodingType<St> {}
-    impl<St: State> State for SetEncodingType<St> {
-        type Name = St::Name;
-        type EncodingType = Set<members::encoding_type>;
-        type CreatedAt = St::CreatedAt;
+        type EncodingType = Unset;
+        type Name = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Name = St::Name;
-        type EncodingType = St::EncodingType;
         type CreatedAt = Set<members::created_at>;
+        type EncodingType = St::EncodingType;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `encoding_type` field to Set
+    pub struct SetEncodingType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetEncodingType<St> {}
+    impl<St: State> State for SetEncodingType<St> {
+        type CreatedAt = St::CreatedAt;
+        type EncodingType = Set<members::encoding_type>;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type CreatedAt = St::CreatedAt;
+        type EncodingType = St::EncodingType;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
-        ///Marker type for the `encoding_type` field
-        pub struct encoding_type(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `encoding_type` field
+        pub struct encoding_type(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -320,9 +320,9 @@ where
 impl<S: BosStr, St> SensorBuilder<S, St>
 where
     St: sensor_state::State,
-    St::Name: sensor_state::IsSet,
-    St::EncodingType: sensor_state::IsSet,
     St::CreatedAt: sensor_state::IsSet,
+    St::EncodingType: sensor_state::IsSet,
+    St::Name: sensor_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Sensor<S> {

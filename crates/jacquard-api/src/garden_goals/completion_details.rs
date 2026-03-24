@@ -254,9 +254,9 @@ pub mod completion_details_state {
     pub trait State: sealed::Sealed {
         type GoalId;
         type Year;
+        type UpdatedAt;
         type Month;
         type Day;
-        type UpdatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -264,9 +264,9 @@ pub mod completion_details_state {
     impl State for Empty {
         type GoalId = Unset;
         type Year = Unset;
+        type UpdatedAt = Unset;
         type Month = Unset;
         type Day = Unset;
-        type UpdatedAt = Unset;
     }
     ///State transition - sets the `goal_id` field to Set
     pub struct SetGoalId<St: State = Empty>(PhantomData<fn() -> St>);
@@ -274,9 +274,9 @@ pub mod completion_details_state {
     impl<St: State> State for SetGoalId<St> {
         type GoalId = Set<members::goal_id>;
         type Year = St::Year;
+        type UpdatedAt = St::UpdatedAt;
         type Month = St::Month;
         type Day = St::Day;
-        type UpdatedAt = St::UpdatedAt;
     }
     ///State transition - sets the `year` field to Set
     pub struct SetYear<St: State = Empty>(PhantomData<fn() -> St>);
@@ -284,29 +284,9 @@ pub mod completion_details_state {
     impl<St: State> State for SetYear<St> {
         type GoalId = St::GoalId;
         type Year = Set<members::year>;
+        type UpdatedAt = St::UpdatedAt;
         type Month = St::Month;
         type Day = St::Day;
-        type UpdatedAt = St::UpdatedAt;
-    }
-    ///State transition - sets the `month` field to Set
-    pub struct SetMonth<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetMonth<St> {}
-    impl<St: State> State for SetMonth<St> {
-        type GoalId = St::GoalId;
-        type Year = St::Year;
-        type Month = Set<members::month>;
-        type Day = St::Day;
-        type UpdatedAt = St::UpdatedAt;
-    }
-    ///State transition - sets the `day` field to Set
-    pub struct SetDay<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDay<St> {}
-    impl<St: State> State for SetDay<St> {
-        type GoalId = St::GoalId;
-        type Year = St::Year;
-        type Month = St::Month;
-        type Day = Set<members::day>;
-        type UpdatedAt = St::UpdatedAt;
     }
     ///State transition - sets the `updated_at` field to Set
     pub struct SetUpdatedAt<St: State = Empty>(PhantomData<fn() -> St>);
@@ -314,9 +294,29 @@ pub mod completion_details_state {
     impl<St: State> State for SetUpdatedAt<St> {
         type GoalId = St::GoalId;
         type Year = St::Year;
+        type UpdatedAt = Set<members::updated_at>;
         type Month = St::Month;
         type Day = St::Day;
-        type UpdatedAt = Set<members::updated_at>;
+    }
+    ///State transition - sets the `month` field to Set
+    pub struct SetMonth<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMonth<St> {}
+    impl<St: State> State for SetMonth<St> {
+        type GoalId = St::GoalId;
+        type Year = St::Year;
+        type UpdatedAt = St::UpdatedAt;
+        type Month = Set<members::month>;
+        type Day = St::Day;
+    }
+    ///State transition - sets the `day` field to Set
+    pub struct SetDay<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDay<St> {}
+    impl<St: State> State for SetDay<St> {
+        type GoalId = St::GoalId;
+        type Year = St::Year;
+        type UpdatedAt = St::UpdatedAt;
+        type Month = St::Month;
+        type Day = Set<members::day>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -325,12 +325,12 @@ pub mod completion_details_state {
         pub struct goal_id(());
         ///Marker type for the `year` field
         pub struct year(());
+        ///Marker type for the `updated_at` field
+        pub struct updated_at(());
         ///Marker type for the `month` field
         pub struct month(());
         ///Marker type for the `day` field
         pub struct day(());
-        ///Marker type for the `updated_at` field
-        pub struct updated_at(());
     }
 }
 
@@ -521,9 +521,9 @@ where
     St: completion_details_state::State,
     St::GoalId: completion_details_state::IsSet,
     St::Year: completion_details_state::IsSet,
+    St::UpdatedAt: completion_details_state::IsSet,
     St::Month: completion_details_state::IsSet,
     St::Day: completion_details_state::IsSet,
-    St::UpdatedAt: completion_details_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> CompletionDetails<S> {

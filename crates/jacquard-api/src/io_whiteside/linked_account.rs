@@ -120,50 +120,50 @@ pub mod linked_account_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Link;
-        type Name;
         type Icon;
+        type Name;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Link = Unset;
-        type Name = Unset;
         type Icon = Unset;
+        type Name = Unset;
     }
     ///State transition - sets the `link` field to Set
     pub struct SetLink<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetLink<St> {}
     impl<St: State> State for SetLink<St> {
         type Link = Set<members::link>;
+        type Icon = St::Icon;
         type Name = St::Name;
-        type Icon = St::Icon;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Link = St::Link;
-        type Name = Set<members::name>;
-        type Icon = St::Icon;
     }
     ///State transition - sets the `icon` field to Set
     pub struct SetIcon<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetIcon<St> {}
     impl<St: State> State for SetIcon<St> {
         type Link = St::Link;
-        type Name = St::Name;
         type Icon = Set<members::icon>;
+        type Name = St::Name;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Link = St::Link;
+        type Icon = St::Icon;
+        type Name = Set<members::name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `link` field
         pub struct link(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `icon` field
         pub struct icon(());
+        ///Marker type for the `name` field
+        pub struct name(());
     }
 }
 
@@ -266,8 +266,8 @@ impl<S: BosStr, St> LinkedAccountBuilder<S, St>
 where
     St: linked_account_state::State,
     St::Link: linked_account_state::IsSet,
-    St::Name: linked_account_state::IsSet,
     St::Icon: linked_account_state::IsSet,
+    St::Name: linked_account_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> LinkedAccount<S> {

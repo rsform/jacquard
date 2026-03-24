@@ -70,65 +70,65 @@ pub mod fork_sync_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Name;
         type Branch;
         type Did;
-        type Name;
         type Source;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Name = Unset;
         type Branch = Unset;
         type Did = Unset;
-        type Name = Unset;
         type Source = Unset;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Name = Set<members::name>;
+        type Branch = St::Branch;
+        type Did = St::Did;
+        type Source = St::Source;
     }
     ///State transition - sets the `branch` field to Set
     pub struct SetBranch<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetBranch<St> {}
     impl<St: State> State for SetBranch<St> {
+        type Name = St::Name;
         type Branch = Set<members::branch>;
         type Did = St::Did;
-        type Name = St::Name;
         type Source = St::Source;
     }
     ///State transition - sets the `did` field to Set
     pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetDid<St> {}
     impl<St: State> State for SetDid<St> {
+        type Name = St::Name;
         type Branch = St::Branch;
         type Did = Set<members::did>;
-        type Name = St::Name;
-        type Source = St::Source;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Branch = St::Branch;
-        type Did = St::Did;
-        type Name = Set<members::name>;
         type Source = St::Source;
     }
     ///State transition - sets the `source` field to Set
     pub struct SetSource<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSource<St> {}
     impl<St: State> State for SetSource<St> {
+        type Name = St::Name;
         type Branch = St::Branch;
         type Did = St::Did;
-        type Name = St::Name;
         type Source = Set<members::source>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `branch` field
         pub struct branch(());
         ///Marker type for the `did` field
         pub struct did(());
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `source` field
         pub struct source(());
     }
@@ -238,9 +238,9 @@ where
 impl<S: BosStr, St> ForkSyncBuilder<S, St>
 where
     St: fork_sync_state::State,
+    St::Name: fork_sync_state::IsSet,
     St::Branch: fork_sync_state::IsSet,
     St::Did: fork_sync_state::IsSet,
-    St::Name: fork_sync_state::IsSet,
     St::Source: fork_sync_state::IsSet,
 {
     /// Build the final struct.

@@ -150,67 +150,67 @@ pub mod feature_of_interest_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type EncodingType;
-        type Feature;
         type Name;
         type CreatedAt;
+        type EncodingType;
+        type Feature;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type EncodingType = Unset;
-        type Feature = Unset;
         type Name = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `encoding_type` field to Set
-    pub struct SetEncodingType<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetEncodingType<St> {}
-    impl<St: State> State for SetEncodingType<St> {
-        type EncodingType = Set<members::encoding_type>;
-        type Feature = St::Feature;
-        type Name = St::Name;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `feature` field to Set
-    pub struct SetFeature<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetFeature<St> {}
-    impl<St: State> State for SetFeature<St> {
-        type EncodingType = St::EncodingType;
-        type Feature = Set<members::feature>;
-        type Name = St::Name;
-        type CreatedAt = St::CreatedAt;
+        type EncodingType = Unset;
+        type Feature = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetName<St> {}
     impl<St: State> State for SetName<St> {
-        type EncodingType = St::EncodingType;
-        type Feature = St::Feature;
         type Name = Set<members::name>;
         type CreatedAt = St::CreatedAt;
+        type EncodingType = St::EncodingType;
+        type Feature = St::Feature;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type EncodingType = St::EncodingType;
-        type Feature = St::Feature;
         type Name = St::Name;
         type CreatedAt = Set<members::created_at>;
+        type EncodingType = St::EncodingType;
+        type Feature = St::Feature;
+    }
+    ///State transition - sets the `encoding_type` field to Set
+    pub struct SetEncodingType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetEncodingType<St> {}
+    impl<St: State> State for SetEncodingType<St> {
+        type Name = St::Name;
+        type CreatedAt = St::CreatedAt;
+        type EncodingType = Set<members::encoding_type>;
+        type Feature = St::Feature;
+    }
+    ///State transition - sets the `feature` field to Set
+    pub struct SetFeature<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetFeature<St> {}
+    impl<St: State> State for SetFeature<St> {
+        type Name = St::Name;
+        type CreatedAt = St::CreatedAt;
+        type EncodingType = St::EncodingType;
+        type Feature = Set<members::feature>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `encoding_type` field
-        pub struct encoding_type(());
-        ///Marker type for the `feature` field
-        pub struct feature(());
         ///Marker type for the `name` field
         pub struct name(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `encoding_type` field
+        pub struct encoding_type(());
+        ///Marker type for the `feature` field
+        pub struct feature(());
     }
 }
 
@@ -331,10 +331,10 @@ where
 impl<S: BosStr, St> FeatureOfInterestBuilder<S, St>
 where
     St: feature_of_interest_state::State,
-    St::EncodingType: feature_of_interest_state::IsSet,
-    St::Feature: feature_of_interest_state::IsSet,
     St::Name: feature_of_interest_state::IsSet,
     St::CreatedAt: feature_of_interest_state::IsSet,
+    St::EncodingType: feature_of_interest_state::IsSet,
+    St::Feature: feature_of_interest_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> FeatureOfInterest<S> {

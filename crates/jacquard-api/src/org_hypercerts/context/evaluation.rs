@@ -668,51 +668,51 @@ pub mod score_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Max;
         type Value;
         type Min;
+        type Max;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Max = Unset;
         type Value = Unset;
         type Min = Unset;
-    }
-    ///State transition - sets the `max` field to Set
-    pub struct SetMax<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetMax<St> {}
-    impl<St: State> State for SetMax<St> {
-        type Max = Set<members::max>;
-        type Value = St::Value;
-        type Min = St::Min;
+        type Max = Unset;
     }
     ///State transition - sets the `value` field to Set
     pub struct SetValue<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetValue<St> {}
     impl<St: State> State for SetValue<St> {
-        type Max = St::Max;
         type Value = Set<members::value>;
         type Min = St::Min;
+        type Max = St::Max;
     }
     ///State transition - sets the `min` field to Set
     pub struct SetMin<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetMin<St> {}
     impl<St: State> State for SetMin<St> {
-        type Max = St::Max;
         type Value = St::Value;
         type Min = Set<members::min>;
+        type Max = St::Max;
+    }
+    ///State transition - sets the `max` field to Set
+    pub struct SetMax<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMax<St> {}
+    impl<St: State> State for SetMax<St> {
+        type Value = St::Value;
+        type Min = St::Min;
+        type Max = Set<members::max>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `max` field
-        pub struct max(());
         ///Marker type for the `value` field
         pub struct value(());
         ///Marker type for the `min` field
         pub struct min(());
+        ///Marker type for the `max` field
+        pub struct max(());
     }
 }
 
@@ -801,9 +801,9 @@ where
 impl<S: BosStr, St> ScoreBuilder<S, St>
 where
     St: score_state::State,
-    St::Max: score_state::IsSet,
     St::Value: score_state::IsSet,
     St::Min: score_state::IsSet,
+    St::Max: score_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Score<S> {

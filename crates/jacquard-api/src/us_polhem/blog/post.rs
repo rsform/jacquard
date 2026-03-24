@@ -176,8 +176,8 @@ pub mod post_state {
     pub trait State: sealed::Sealed {
         type Title;
         type CreatedAt;
-        type Content;
         type Slug;
+        type Content;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -185,8 +185,8 @@ pub mod post_state {
     impl State for Empty {
         type Title = Unset;
         type CreatedAt = Unset;
-        type Content = Unset;
         type Slug = Unset;
+        type Content = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
@@ -194,8 +194,8 @@ pub mod post_state {
     impl<St: State> State for SetTitle<St> {
         type Title = Set<members::title>;
         type CreatedAt = St::CreatedAt;
-        type Content = St::Content;
         type Slug = St::Slug;
+        type Content = St::Content;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
@@ -203,17 +203,8 @@ pub mod post_state {
     impl<St: State> State for SetCreatedAt<St> {
         type Title = St::Title;
         type CreatedAt = Set<members::created_at>;
+        type Slug = St::Slug;
         type Content = St::Content;
-        type Slug = St::Slug;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetContent<St> {}
-    impl<St: State> State for SetContent<St> {
-        type Title = St::Title;
-        type CreatedAt = St::CreatedAt;
-        type Content = Set<members::content>;
-        type Slug = St::Slug;
     }
     ///State transition - sets the `slug` field to Set
     pub struct SetSlug<St: State = Empty>(PhantomData<fn() -> St>);
@@ -221,8 +212,17 @@ pub mod post_state {
     impl<St: State> State for SetSlug<St> {
         type Title = St::Title;
         type CreatedAt = St::CreatedAt;
-        type Content = St::Content;
         type Slug = Set<members::slug>;
+        type Content = St::Content;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetContent<St> {}
+    impl<St: State> State for SetContent<St> {
+        type Title = St::Title;
+        type CreatedAt = St::CreatedAt;
+        type Slug = St::Slug;
+        type Content = Set<members::content>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -231,10 +231,10 @@ pub mod post_state {
         pub struct title(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `content` field
-        pub struct content(());
         ///Marker type for the `slug` field
         pub struct slug(());
+        ///Marker type for the `content` field
+        pub struct content(());
     }
 }
 
@@ -419,8 +419,8 @@ where
     St: post_state::State,
     St::Title: post_state::IsSet,
     St::CreatedAt: post_state::IsSet,
-    St::Content: post_state::IsSet,
     St::Slug: post_state::IsSet,
+    St::Content: post_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Post<S> {

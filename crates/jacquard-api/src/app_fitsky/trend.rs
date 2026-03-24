@@ -948,84 +948,84 @@ pub mod trend_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type WidgetType;
-        type CreatedAt;
-        type Metric;
         type Period;
         type Summary;
+        type CreatedAt;
+        type Metric;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type WidgetType = Unset;
-        type CreatedAt = Unset;
-        type Metric = Unset;
         type Period = Unset;
         type Summary = Unset;
+        type CreatedAt = Unset;
+        type Metric = Unset;
     }
     ///State transition - sets the `widget_type` field to Set
     pub struct SetWidgetType<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetWidgetType<St> {}
     impl<St: State> State for SetWidgetType<St> {
         type WidgetType = Set<members::widget_type>;
+        type Period = St::Period;
+        type Summary = St::Summary;
         type CreatedAt = St::CreatedAt;
         type Metric = St::Metric;
-        type Period = St::Period;
-        type Summary = St::Summary;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type WidgetType = St::WidgetType;
-        type CreatedAt = Set<members::created_at>;
-        type Metric = St::Metric;
-        type Period = St::Period;
-        type Summary = St::Summary;
-    }
-    ///State transition - sets the `metric` field to Set
-    pub struct SetMetric<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetMetric<St> {}
-    impl<St: State> State for SetMetric<St> {
-        type WidgetType = St::WidgetType;
-        type CreatedAt = St::CreatedAt;
-        type Metric = Set<members::metric>;
-        type Period = St::Period;
-        type Summary = St::Summary;
     }
     ///State transition - sets the `period` field to Set
     pub struct SetPeriod<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPeriod<St> {}
     impl<St: State> State for SetPeriod<St> {
         type WidgetType = St::WidgetType;
-        type CreatedAt = St::CreatedAt;
-        type Metric = St::Metric;
         type Period = Set<members::period>;
         type Summary = St::Summary;
+        type CreatedAt = St::CreatedAt;
+        type Metric = St::Metric;
     }
     ///State transition - sets the `summary` field to Set
     pub struct SetSummary<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSummary<St> {}
     impl<St: State> State for SetSummary<St> {
         type WidgetType = St::WidgetType;
-        type CreatedAt = St::CreatedAt;
-        type Metric = St::Metric;
         type Period = St::Period;
         type Summary = Set<members::summary>;
+        type CreatedAt = St::CreatedAt;
+        type Metric = St::Metric;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type WidgetType = St::WidgetType;
+        type Period = St::Period;
+        type Summary = St::Summary;
+        type CreatedAt = Set<members::created_at>;
+        type Metric = St::Metric;
+    }
+    ///State transition - sets the `metric` field to Set
+    pub struct SetMetric<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMetric<St> {}
+    impl<St: State> State for SetMetric<St> {
+        type WidgetType = St::WidgetType;
+        type Period = St::Period;
+        type Summary = St::Summary;
+        type CreatedAt = St::CreatedAt;
+        type Metric = Set<members::metric>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `widget_type` field
         pub struct widget_type(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `metric` field
-        pub struct metric(());
         ///Marker type for the `period` field
         pub struct period(());
         ///Marker type for the `summary` field
         pub struct summary(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
+        ///Marker type for the `metric` field
+        pub struct metric(());
     }
 }
 
@@ -1218,10 +1218,10 @@ impl<S: BosStr, St> TrendBuilder<S, St>
 where
     St: trend_state::State,
     St::WidgetType: trend_state::IsSet,
-    St::CreatedAt: trend_state::IsSet,
-    St::Metric: trend_state::IsSet,
     St::Period: trend_state::IsSet,
     St::Summary: trend_state::IsSet,
+    St::CreatedAt: trend_state::IsSet,
+    St::Metric: trend_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Trend<S> {

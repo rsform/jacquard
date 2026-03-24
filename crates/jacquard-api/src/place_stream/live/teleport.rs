@@ -135,37 +135,37 @@ pub mod teleport_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type StartsAt;
         type Streamer;
+        type StartsAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type StartsAt = Unset;
         type Streamer = Unset;
-    }
-    ///State transition - sets the `starts_at` field to Set
-    pub struct SetStartsAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetStartsAt<St> {}
-    impl<St: State> State for SetStartsAt<St> {
-        type StartsAt = Set<members::starts_at>;
-        type Streamer = St::Streamer;
+        type StartsAt = Unset;
     }
     ///State transition - sets the `streamer` field to Set
     pub struct SetStreamer<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetStreamer<St> {}
     impl<St: State> State for SetStreamer<St> {
-        type StartsAt = St::StartsAt;
         type Streamer = Set<members::streamer>;
+        type StartsAt = St::StartsAt;
+    }
+    ///State transition - sets the `starts_at` field to Set
+    pub struct SetStartsAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStartsAt<St> {}
+    impl<St: State> State for SetStartsAt<St> {
+        type Streamer = St::Streamer;
+        type StartsAt = Set<members::starts_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `starts_at` field
-        pub struct starts_at(());
         ///Marker type for the `streamer` field
         pub struct streamer(());
+        ///Marker type for the `starts_at` field
+        pub struct starts_at(());
     }
 }
 
@@ -248,8 +248,8 @@ where
 impl<S: BosStr, St> TeleportBuilder<S, St>
 where
     St: teleport_state::State,
-    St::StartsAt: teleport_state::IsSet,
     St::Streamer: teleport_state::IsSet,
+    St::StartsAt: teleport_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Teleport<S> {

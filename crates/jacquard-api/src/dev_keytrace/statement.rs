@@ -160,67 +160,67 @@ pub mod statement_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Sig;
         type KeyRef;
         type CreatedAt;
         type Content;
-        type Sig;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Sig = Unset;
         type KeyRef = Unset;
         type CreatedAt = Unset;
         type Content = Unset;
-        type Sig = Unset;
-    }
-    ///State transition - sets the `key_ref` field to Set
-    pub struct SetKeyRef<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetKeyRef<St> {}
-    impl<St: State> State for SetKeyRef<St> {
-        type KeyRef = Set<members::key_ref>;
-        type CreatedAt = St::CreatedAt;
-        type Content = St::Content;
-        type Sig = St::Sig;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type KeyRef = St::KeyRef;
-        type CreatedAt = Set<members::created_at>;
-        type Content = St::Content;
-        type Sig = St::Sig;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetContent<St> {}
-    impl<St: State> State for SetContent<St> {
-        type KeyRef = St::KeyRef;
-        type CreatedAt = St::CreatedAt;
-        type Content = Set<members::content>;
-        type Sig = St::Sig;
     }
     ///State transition - sets the `sig` field to Set
     pub struct SetSig<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSig<St> {}
     impl<St: State> State for SetSig<St> {
+        type Sig = Set<members::sig>;
         type KeyRef = St::KeyRef;
         type CreatedAt = St::CreatedAt;
         type Content = St::Content;
-        type Sig = Set<members::sig>;
+    }
+    ///State transition - sets the `key_ref` field to Set
+    pub struct SetKeyRef<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetKeyRef<St> {}
+    impl<St: State> State for SetKeyRef<St> {
+        type Sig = St::Sig;
+        type KeyRef = Set<members::key_ref>;
+        type CreatedAt = St::CreatedAt;
+        type Content = St::Content;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Sig = St::Sig;
+        type KeyRef = St::KeyRef;
+        type CreatedAt = Set<members::created_at>;
+        type Content = St::Content;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetContent<St> {}
+    impl<St: State> State for SetContent<St> {
+        type Sig = St::Sig;
+        type KeyRef = St::KeyRef;
+        type CreatedAt = St::CreatedAt;
+        type Content = Set<members::content>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `sig` field
+        pub struct sig(());
         ///Marker type for the `key_ref` field
         pub struct key_ref(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `content` field
         pub struct content(());
-        ///Marker type for the `sig` field
-        pub struct sig(());
     }
 }
 
@@ -361,10 +361,10 @@ impl<S: BosStr, St: statement_state::State> StatementBuilder<S, St> {
 impl<S: BosStr, St> StatementBuilder<S, St>
 where
     St: statement_state::State,
+    St::Sig: statement_state::IsSet,
     St::KeyRef: statement_state::IsSet,
     St::CreatedAt: statement_state::IsSet,
     St::Content: statement_state::IsSet,
-    St::Sig: statement_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Statement<S> {

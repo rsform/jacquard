@@ -263,203 +263,203 @@ pub mod scan_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Medium;
-        type Total;
-        type UserDid;
-        type Manifest;
-        type Low;
-        type ScannerVersion;
-        type Critical;
-        type ScannedAt;
         type Repository;
+        type Critical;
+        type Total;
+        type ScannedAt;
+        type Manifest;
+        type Medium;
+        type UserDid;
+        type ScannerVersion;
+        type Low;
         type High;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Medium = Unset;
-        type Total = Unset;
-        type UserDid = Unset;
-        type Manifest = Unset;
-        type Low = Unset;
-        type ScannerVersion = Unset;
-        type Critical = Unset;
-        type ScannedAt = Unset;
         type Repository = Unset;
+        type Critical = Unset;
+        type Total = Unset;
+        type ScannedAt = Unset;
+        type Manifest = Unset;
+        type Medium = Unset;
+        type UserDid = Unset;
+        type ScannerVersion = Unset;
+        type Low = Unset;
         type High = Unset;
     }
-    ///State transition - sets the `medium` field to Set
-    pub struct SetMedium<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetMedium<St> {}
-    impl<St: State> State for SetMedium<St> {
-        type Medium = Set<members::medium>;
+    ///State transition - sets the `repository` field to Set
+    pub struct SetRepository<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRepository<St> {}
+    impl<St: State> State for SetRepository<St> {
+        type Repository = Set<members::repository>;
+        type Critical = St::Critical;
         type Total = St::Total;
-        type UserDid = St::UserDid;
+        type ScannedAt = St::ScannedAt;
         type Manifest = St::Manifest;
-        type Low = St::Low;
-        type ScannerVersion = St::ScannerVersion;
-        type Critical = St::Critical;
-        type ScannedAt = St::ScannedAt;
-        type Repository = St::Repository;
-        type High = St::High;
-    }
-    ///State transition - sets the `total` field to Set
-    pub struct SetTotal<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTotal<St> {}
-    impl<St: State> State for SetTotal<St> {
         type Medium = St::Medium;
-        type Total = Set<members::total>;
         type UserDid = St::UserDid;
-        type Manifest = St::Manifest;
-        type Low = St::Low;
         type ScannerVersion = St::ScannerVersion;
-        type Critical = St::Critical;
-        type ScannedAt = St::ScannedAt;
-        type Repository = St::Repository;
-        type High = St::High;
-    }
-    ///State transition - sets the `user_did` field to Set
-    pub struct SetUserDid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUserDid<St> {}
-    impl<St: State> State for SetUserDid<St> {
-        type Medium = St::Medium;
-        type Total = St::Total;
-        type UserDid = Set<members::user_did>;
-        type Manifest = St::Manifest;
         type Low = St::Low;
-        type ScannerVersion = St::ScannerVersion;
-        type Critical = St::Critical;
-        type ScannedAt = St::ScannedAt;
-        type Repository = St::Repository;
-        type High = St::High;
-    }
-    ///State transition - sets the `manifest` field to Set
-    pub struct SetManifest<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetManifest<St> {}
-    impl<St: State> State for SetManifest<St> {
-        type Medium = St::Medium;
-        type Total = St::Total;
-        type UserDid = St::UserDid;
-        type Manifest = Set<members::manifest>;
-        type Low = St::Low;
-        type ScannerVersion = St::ScannerVersion;
-        type Critical = St::Critical;
-        type ScannedAt = St::ScannedAt;
-        type Repository = St::Repository;
-        type High = St::High;
-    }
-    ///State transition - sets the `low` field to Set
-    pub struct SetLow<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetLow<St> {}
-    impl<St: State> State for SetLow<St> {
-        type Medium = St::Medium;
-        type Total = St::Total;
-        type UserDid = St::UserDid;
-        type Manifest = St::Manifest;
-        type Low = Set<members::low>;
-        type ScannerVersion = St::ScannerVersion;
-        type Critical = St::Critical;
-        type ScannedAt = St::ScannedAt;
-        type Repository = St::Repository;
-        type High = St::High;
-    }
-    ///State transition - sets the `scanner_version` field to Set
-    pub struct SetScannerVersion<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetScannerVersion<St> {}
-    impl<St: State> State for SetScannerVersion<St> {
-        type Medium = St::Medium;
-        type Total = St::Total;
-        type UserDid = St::UserDid;
-        type Manifest = St::Manifest;
-        type Low = St::Low;
-        type ScannerVersion = Set<members::scanner_version>;
-        type Critical = St::Critical;
-        type ScannedAt = St::ScannedAt;
-        type Repository = St::Repository;
         type High = St::High;
     }
     ///State transition - sets the `critical` field to Set
     pub struct SetCritical<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCritical<St> {}
     impl<St: State> State for SetCritical<St> {
-        type Medium = St::Medium;
-        type Total = St::Total;
-        type UserDid = St::UserDid;
-        type Manifest = St::Manifest;
-        type Low = St::Low;
-        type ScannerVersion = St::ScannerVersion;
-        type Critical = Set<members::critical>;
-        type ScannedAt = St::ScannedAt;
         type Repository = St::Repository;
+        type Critical = Set<members::critical>;
+        type Total = St::Total;
+        type ScannedAt = St::ScannedAt;
+        type Manifest = St::Manifest;
+        type Medium = St::Medium;
+        type UserDid = St::UserDid;
+        type ScannerVersion = St::ScannerVersion;
+        type Low = St::Low;
+        type High = St::High;
+    }
+    ///State transition - sets the `total` field to Set
+    pub struct SetTotal<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTotal<St> {}
+    impl<St: State> State for SetTotal<St> {
+        type Repository = St::Repository;
+        type Critical = St::Critical;
+        type Total = Set<members::total>;
+        type ScannedAt = St::ScannedAt;
+        type Manifest = St::Manifest;
+        type Medium = St::Medium;
+        type UserDid = St::UserDid;
+        type ScannerVersion = St::ScannerVersion;
+        type Low = St::Low;
         type High = St::High;
     }
     ///State transition - sets the `scanned_at` field to Set
     pub struct SetScannedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetScannedAt<St> {}
     impl<St: State> State for SetScannedAt<St> {
-        type Medium = St::Medium;
-        type Total = St::Total;
-        type UserDid = St::UserDid;
-        type Manifest = St::Manifest;
-        type Low = St::Low;
-        type ScannerVersion = St::ScannerVersion;
-        type Critical = St::Critical;
-        type ScannedAt = Set<members::scanned_at>;
         type Repository = St::Repository;
+        type Critical = St::Critical;
+        type Total = St::Total;
+        type ScannedAt = Set<members::scanned_at>;
+        type Manifest = St::Manifest;
+        type Medium = St::Medium;
+        type UserDid = St::UserDid;
+        type ScannerVersion = St::ScannerVersion;
+        type Low = St::Low;
         type High = St::High;
     }
-    ///State transition - sets the `repository` field to Set
-    pub struct SetRepository<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRepository<St> {}
-    impl<St: State> State for SetRepository<St> {
-        type Medium = St::Medium;
-        type Total = St::Total;
-        type UserDid = St::UserDid;
-        type Manifest = St::Manifest;
-        type Low = St::Low;
-        type ScannerVersion = St::ScannerVersion;
+    ///State transition - sets the `manifest` field to Set
+    pub struct SetManifest<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetManifest<St> {}
+    impl<St: State> State for SetManifest<St> {
+        type Repository = St::Repository;
         type Critical = St::Critical;
+        type Total = St::Total;
         type ScannedAt = St::ScannedAt;
-        type Repository = Set<members::repository>;
+        type Manifest = Set<members::manifest>;
+        type Medium = St::Medium;
+        type UserDid = St::UserDid;
+        type ScannerVersion = St::ScannerVersion;
+        type Low = St::Low;
+        type High = St::High;
+    }
+    ///State transition - sets the `medium` field to Set
+    pub struct SetMedium<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetMedium<St> {}
+    impl<St: State> State for SetMedium<St> {
+        type Repository = St::Repository;
+        type Critical = St::Critical;
+        type Total = St::Total;
+        type ScannedAt = St::ScannedAt;
+        type Manifest = St::Manifest;
+        type Medium = Set<members::medium>;
+        type UserDid = St::UserDid;
+        type ScannerVersion = St::ScannerVersion;
+        type Low = St::Low;
+        type High = St::High;
+    }
+    ///State transition - sets the `user_did` field to Set
+    pub struct SetUserDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUserDid<St> {}
+    impl<St: State> State for SetUserDid<St> {
+        type Repository = St::Repository;
+        type Critical = St::Critical;
+        type Total = St::Total;
+        type ScannedAt = St::ScannedAt;
+        type Manifest = St::Manifest;
+        type Medium = St::Medium;
+        type UserDid = Set<members::user_did>;
+        type ScannerVersion = St::ScannerVersion;
+        type Low = St::Low;
+        type High = St::High;
+    }
+    ///State transition - sets the `scanner_version` field to Set
+    pub struct SetScannerVersion<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetScannerVersion<St> {}
+    impl<St: State> State for SetScannerVersion<St> {
+        type Repository = St::Repository;
+        type Critical = St::Critical;
+        type Total = St::Total;
+        type ScannedAt = St::ScannedAt;
+        type Manifest = St::Manifest;
+        type Medium = St::Medium;
+        type UserDid = St::UserDid;
+        type ScannerVersion = Set<members::scanner_version>;
+        type Low = St::Low;
+        type High = St::High;
+    }
+    ///State transition - sets the `low` field to Set
+    pub struct SetLow<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLow<St> {}
+    impl<St: State> State for SetLow<St> {
+        type Repository = St::Repository;
+        type Critical = St::Critical;
+        type Total = St::Total;
+        type ScannedAt = St::ScannedAt;
+        type Manifest = St::Manifest;
+        type Medium = St::Medium;
+        type UserDid = St::UserDid;
+        type ScannerVersion = St::ScannerVersion;
+        type Low = Set<members::low>;
         type High = St::High;
     }
     ///State transition - sets the `high` field to Set
     pub struct SetHigh<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetHigh<St> {}
     impl<St: State> State for SetHigh<St> {
-        type Medium = St::Medium;
-        type Total = St::Total;
-        type UserDid = St::UserDid;
-        type Manifest = St::Manifest;
-        type Low = St::Low;
-        type ScannerVersion = St::ScannerVersion;
-        type Critical = St::Critical;
-        type ScannedAt = St::ScannedAt;
         type Repository = St::Repository;
+        type Critical = St::Critical;
+        type Total = St::Total;
+        type ScannedAt = St::ScannedAt;
+        type Manifest = St::Manifest;
+        type Medium = St::Medium;
+        type UserDid = St::UserDid;
+        type ScannerVersion = St::ScannerVersion;
+        type Low = St::Low;
         type High = Set<members::high>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `medium` field
-        pub struct medium(());
-        ///Marker type for the `total` field
-        pub struct total(());
-        ///Marker type for the `user_did` field
-        pub struct user_did(());
-        ///Marker type for the `manifest` field
-        pub struct manifest(());
-        ///Marker type for the `low` field
-        pub struct low(());
-        ///Marker type for the `scanner_version` field
-        pub struct scanner_version(());
-        ///Marker type for the `critical` field
-        pub struct critical(());
-        ///Marker type for the `scanned_at` field
-        pub struct scanned_at(());
         ///Marker type for the `repository` field
         pub struct repository(());
+        ///Marker type for the `critical` field
+        pub struct critical(());
+        ///Marker type for the `total` field
+        pub struct total(());
+        ///Marker type for the `scanned_at` field
+        pub struct scanned_at(());
+        ///Marker type for the `manifest` field
+        pub struct manifest(());
+        ///Marker type for the `medium` field
+        pub struct medium(());
+        ///Marker type for the `user_did` field
+        pub struct user_did(());
+        ///Marker type for the `scanner_version` field
+        pub struct scanner_version(());
+        ///Marker type for the `low` field
+        pub struct low(());
         ///Marker type for the `high` field
         pub struct high(());
     }
@@ -735,15 +735,15 @@ impl<S: BosStr, St: scan_state::State> ScanBuilder<S, St> {
 impl<S: BosStr, St> ScanBuilder<S, St>
 where
     St: scan_state::State,
-    St::Medium: scan_state::IsSet,
-    St::Total: scan_state::IsSet,
-    St::UserDid: scan_state::IsSet,
-    St::Manifest: scan_state::IsSet,
-    St::Low: scan_state::IsSet,
-    St::ScannerVersion: scan_state::IsSet,
-    St::Critical: scan_state::IsSet,
-    St::ScannedAt: scan_state::IsSet,
     St::Repository: scan_state::IsSet,
+    St::Critical: scan_state::IsSet,
+    St::Total: scan_state::IsSet,
+    St::ScannedAt: scan_state::IsSet,
+    St::Manifest: scan_state::IsSet,
+    St::Medium: scan_state::IsSet,
+    St::UserDid: scan_state::IsSet,
+    St::ScannerVersion: scan_state::IsSet,
+    St::Low: scan_state::IsSet,
     St::High: scan_state::IsSet,
 {
     /// Build the final struct.

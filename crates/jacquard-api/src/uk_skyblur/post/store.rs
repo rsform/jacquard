@@ -79,51 +79,51 @@ pub mod store_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Text;
         type Visibility;
         type Uri;
-        type Text;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Text = Unset;
         type Visibility = Unset;
         type Uri = Unset;
-        type Text = Unset;
-    }
-    ///State transition - sets the `visibility` field to Set
-    pub struct SetVisibility<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetVisibility<St> {}
-    impl<St: State> State for SetVisibility<St> {
-        type Visibility = Set<members::visibility>;
-        type Uri = St::Uri;
-        type Text = St::Text;
-    }
-    ///State transition - sets the `uri` field to Set
-    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUri<St> {}
-    impl<St: State> State for SetUri<St> {
-        type Visibility = St::Visibility;
-        type Uri = Set<members::uri>;
-        type Text = St::Text;
     }
     ///State transition - sets the `text` field to Set
     pub struct SetText<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetText<St> {}
     impl<St: State> State for SetText<St> {
+        type Text = Set<members::text>;
         type Visibility = St::Visibility;
         type Uri = St::Uri;
-        type Text = Set<members::text>;
+    }
+    ///State transition - sets the `visibility` field to Set
+    pub struct SetVisibility<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetVisibility<St> {}
+    impl<St: State> State for SetVisibility<St> {
+        type Text = St::Text;
+        type Visibility = Set<members::visibility>;
+        type Uri = St::Uri;
+    }
+    ///State transition - sets the `uri` field to Set
+    pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUri<St> {}
+    impl<St: State> State for SetUri<St> {
+        type Text = St::Text;
+        type Visibility = St::Visibility;
+        type Uri = Set<members::uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `text` field
+        pub struct text(());
         ///Marker type for the `visibility` field
         pub struct visibility(());
         ///Marker type for the `uri` field
         pub struct uri(());
-        ///Marker type for the `text` field
-        pub struct text(());
     }
 }
 
@@ -225,9 +225,9 @@ where
 impl<S: BosStr, St> StoreBuilder<S, St>
 where
     St: store_state::State,
+    St::Text: store_state::IsSet,
     St::Visibility: store_state::IsSet,
     St::Uri: store_state::IsSet,
-    St::Text: store_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Store<S> {

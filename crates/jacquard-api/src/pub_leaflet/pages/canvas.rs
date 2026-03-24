@@ -222,66 +222,66 @@ pub mod block_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Width;
-        type Y;
-        type Block;
         type X;
+        type Block;
+        type Y;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Width = Unset;
-        type Y = Unset;
-        type Block = Unset;
         type X = Unset;
+        type Block = Unset;
+        type Y = Unset;
     }
     ///State transition - sets the `width` field to Set
     pub struct SetWidth<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetWidth<St> {}
     impl<St: State> State for SetWidth<St> {
         type Width = Set<members::width>;
-        type Y = St::Y;
+        type X = St::X;
         type Block = St::Block;
-        type X = St::X;
-    }
-    ///State transition - sets the `y` field to Set
-    pub struct SetY<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetY<St> {}
-    impl<St: State> State for SetY<St> {
-        type Width = St::Width;
-        type Y = Set<members::y>;
-        type Block = St::Block;
-        type X = St::X;
-    }
-    ///State transition - sets the `block` field to Set
-    pub struct SetBlock<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetBlock<St> {}
-    impl<St: State> State for SetBlock<St> {
-        type Width = St::Width;
         type Y = St::Y;
-        type Block = Set<members::block>;
-        type X = St::X;
     }
     ///State transition - sets the `x` field to Set
     pub struct SetX<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetX<St> {}
     impl<St: State> State for SetX<St> {
         type Width = St::Width;
-        type Y = St::Y;
-        type Block = St::Block;
         type X = Set<members::x>;
+        type Block = St::Block;
+        type Y = St::Y;
+    }
+    ///State transition - sets the `block` field to Set
+    pub struct SetBlock<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBlock<St> {}
+    impl<St: State> State for SetBlock<St> {
+        type Width = St::Width;
+        type X = St::X;
+        type Block = Set<members::block>;
+        type Y = St::Y;
+    }
+    ///State transition - sets the `y` field to Set
+    pub struct SetY<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetY<St> {}
+    impl<St: State> State for SetY<St> {
+        type Width = St::Width;
+        type X = St::X;
+        type Block = St::Block;
+        type Y = Set<members::y>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `width` field
         pub struct width(());
-        ///Marker type for the `y` field
-        pub struct y(());
-        ///Marker type for the `block` field
-        pub struct block(());
         ///Marker type for the `x` field
         pub struct x(());
+        ///Marker type for the `block` field
+        pub struct block(());
+        ///Marker type for the `y` field
+        pub struct y(());
     }
 }
 
@@ -417,9 +417,9 @@ impl<S: BosStr, St> BlockBuilder<S, St>
 where
     St: block_state::State,
     St::Width: block_state::IsSet,
-    St::Y: block_state::IsSet,
-    St::Block: block_state::IsSet,
     St::X: block_state::IsSet,
+    St::Block: block_state::IsSet,
+    St::Y: block_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Block<S> {
@@ -750,37 +750,37 @@ pub mod position_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Offset;
         type Block;
+        type Offset;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Offset = Unset;
         type Block = Unset;
-    }
-    ///State transition - sets the `offset` field to Set
-    pub struct SetOffset<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetOffset<St> {}
-    impl<St: State> State for SetOffset<St> {
-        type Offset = Set<members::offset>;
-        type Block = St::Block;
+        type Offset = Unset;
     }
     ///State transition - sets the `block` field to Set
     pub struct SetBlock<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetBlock<St> {}
     impl<St: State> State for SetBlock<St> {
-        type Offset = St::Offset;
         type Block = Set<members::block>;
+        type Offset = St::Offset;
+    }
+    ///State transition - sets the `offset` field to Set
+    pub struct SetOffset<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetOffset<St> {}
+    impl<St: State> State for SetOffset<St> {
+        type Block = St::Block;
+        type Offset = Set<members::offset>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `offset` field
-        pub struct offset(());
         ///Marker type for the `block` field
         pub struct block(());
+        ///Marker type for the `offset` field
+        pub struct offset(());
     }
 }
 
@@ -850,8 +850,8 @@ where
 impl<S: BosStr, St> PositionBuilder<S, St>
 where
     St: position_state::State,
-    St::Offset: position_state::IsSet,
     St::Block: position_state::IsSet,
+    St::Offset: position_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Position<S> {

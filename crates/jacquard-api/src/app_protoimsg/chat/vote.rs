@@ -127,51 +127,51 @@ pub mod vote_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type SelectedOptions;
-        type Poll;
         type CreatedAt;
+        type Poll;
+        type SelectedOptions;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type SelectedOptions = Unset;
-        type Poll = Unset;
         type CreatedAt = Unset;
-    }
-    ///State transition - sets the `selected_options` field to Set
-    pub struct SetSelectedOptions<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSelectedOptions<St> {}
-    impl<St: State> State for SetSelectedOptions<St> {
-        type SelectedOptions = Set<members::selected_options>;
-        type Poll = St::Poll;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `poll` field to Set
-    pub struct SetPoll<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPoll<St> {}
-    impl<St: State> State for SetPoll<St> {
-        type SelectedOptions = St::SelectedOptions;
-        type Poll = Set<members::poll>;
-        type CreatedAt = St::CreatedAt;
+        type Poll = Unset;
+        type SelectedOptions = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type SelectedOptions = St::SelectedOptions;
-        type Poll = St::Poll;
         type CreatedAt = Set<members::created_at>;
+        type Poll = St::Poll;
+        type SelectedOptions = St::SelectedOptions;
+    }
+    ///State transition - sets the `poll` field to Set
+    pub struct SetPoll<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPoll<St> {}
+    impl<St: State> State for SetPoll<St> {
+        type CreatedAt = St::CreatedAt;
+        type Poll = Set<members::poll>;
+        type SelectedOptions = St::SelectedOptions;
+    }
+    ///State transition - sets the `selected_options` field to Set
+    pub struct SetSelectedOptions<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSelectedOptions<St> {}
+    impl<St: State> State for SetSelectedOptions<St> {
+        type CreatedAt = St::CreatedAt;
+        type Poll = St::Poll;
+        type SelectedOptions = Set<members::selected_options>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `selected_options` field
-        pub struct selected_options(());
-        ///Marker type for the `poll` field
-        pub struct poll(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `poll` field
+        pub struct poll(());
+        ///Marker type for the `selected_options` field
+        pub struct selected_options(());
     }
 }
 
@@ -260,9 +260,9 @@ where
 impl<S: BosStr, St> VoteBuilder<S, St>
 where
     St: vote_state::State,
-    St::SelectedOptions: vote_state::IsSet,
-    St::Poll: vote_state::IsSet,
     St::CreatedAt: vote_state::IsSet,
+    St::Poll: vote_state::IsSet,
+    St::SelectedOptions: vote_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Vote<S> {

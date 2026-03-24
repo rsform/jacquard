@@ -132,37 +132,37 @@ pub mod exif_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Photo;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Photo = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type Photo = St::Photo;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `photo` field to Set
     pub struct SetPhoto<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPhoto<St> {}
     impl<St: State> State for SetPhoto<St> {
-        type CreatedAt = St::CreatedAt;
         type Photo = Set<members::photo>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Photo = St::Photo;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `photo` field
         pub struct photo(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -388,8 +388,8 @@ where
 impl<S: BosStr, St> ExifBuilder<S, St>
 where
     St: exif_state::State,
-    St::CreatedAt: exif_state::IsSet,
     St::Photo: exif_state::IsSet,
+    St::CreatedAt: exif_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Exif<S> {

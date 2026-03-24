@@ -77,37 +77,37 @@ pub mod put_note_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Record;
         type Rkey;
+        type Record;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Record = Unset;
         type Rkey = Unset;
-    }
-    ///State transition - sets the `record` field to Set
-    pub struct SetRecord<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRecord<St> {}
-    impl<St: State> State for SetRecord<St> {
-        type Record = Set<members::record>;
-        type Rkey = St::Rkey;
+        type Record = Unset;
     }
     ///State transition - sets the `rkey` field to Set
     pub struct SetRkey<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetRkey<St> {}
     impl<St: State> State for SetRkey<St> {
-        type Record = St::Record;
         type Rkey = Set<members::rkey>;
+        type Record = St::Record;
+    }
+    ///State transition - sets the `record` field to Set
+    pub struct SetRecord<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRecord<St> {}
+    impl<St: State> State for SetRecord<St> {
+        type Rkey = St::Rkey;
+        type Record = Set<members::record>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `record` field
-        pub struct record(());
         ///Marker type for the `rkey` field
         pub struct rkey(());
+        ///Marker type for the `record` field
+        pub struct record(());
     }
 }
 
@@ -177,8 +177,8 @@ where
 impl<S: BosStr, St> PutNoteBuilder<S, St>
 where
     St: put_note_state::State,
-    St::Record: put_note_state::IsSet,
     St::Rkey: put_note_state::IsSet,
+    St::Record: put_note_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> PutNote<S> {

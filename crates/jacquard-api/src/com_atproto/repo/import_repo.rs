@@ -40,7 +40,7 @@ impl jacquard_common::xrpc::XrpcRequest for ImportRepo {
     type Response = ImportRepoResponse;
     fn encode_body(
         &self,
-        buffer: &mut [u8],
+        buffer: &mut Vec<u8>,
     ) -> Result<(), jacquard_common::xrpc::EncodeError>
     where
         Self: Serialize,

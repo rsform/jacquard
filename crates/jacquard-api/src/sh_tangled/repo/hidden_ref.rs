@@ -84,51 +84,51 @@ pub mod hidden_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type RemoteRef;
-        type Repo;
         type ForkRef;
+        type Repo;
+        type RemoteRef;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type RemoteRef = Unset;
-        type Repo = Unset;
         type ForkRef = Unset;
-    }
-    ///State transition - sets the `remote_ref` field to Set
-    pub struct SetRemoteRef<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRemoteRef<St> {}
-    impl<St: State> State for SetRemoteRef<St> {
-        type RemoteRef = Set<members::remote_ref>;
-        type Repo = St::Repo;
-        type ForkRef = St::ForkRef;
-    }
-    ///State transition - sets the `repo` field to Set
-    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRepo<St> {}
-    impl<St: State> State for SetRepo<St> {
-        type RemoteRef = St::RemoteRef;
-        type Repo = Set<members::repo>;
-        type ForkRef = St::ForkRef;
+        type Repo = Unset;
+        type RemoteRef = Unset;
     }
     ///State transition - sets the `fork_ref` field to Set
     pub struct SetForkRef<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetForkRef<St> {}
     impl<St: State> State for SetForkRef<St> {
-        type RemoteRef = St::RemoteRef;
-        type Repo = St::Repo;
         type ForkRef = Set<members::fork_ref>;
+        type Repo = St::Repo;
+        type RemoteRef = St::RemoteRef;
+    }
+    ///State transition - sets the `repo` field to Set
+    pub struct SetRepo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRepo<St> {}
+    impl<St: State> State for SetRepo<St> {
+        type ForkRef = St::ForkRef;
+        type Repo = Set<members::repo>;
+        type RemoteRef = St::RemoteRef;
+    }
+    ///State transition - sets the `remote_ref` field to Set
+    pub struct SetRemoteRef<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRemoteRef<St> {}
+    impl<St: State> State for SetRemoteRef<St> {
+        type ForkRef = St::ForkRef;
+        type Repo = St::Repo;
+        type RemoteRef = Set<members::remote_ref>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `remote_ref` field
-        pub struct remote_ref(());
-        ///Marker type for the `repo` field
-        pub struct repo(());
         ///Marker type for the `fork_ref` field
         pub struct fork_ref(());
+        ///Marker type for the `repo` field
+        pub struct repo(());
+        ///Marker type for the `remote_ref` field
+        pub struct remote_ref(());
     }
 }
 
@@ -217,9 +217,9 @@ where
 impl<S: BosStr, St> HiddenRefBuilder<S, St>
 where
     St: hidden_ref_state::State,
-    St::RemoteRef: hidden_ref_state::IsSet,
-    St::Repo: hidden_ref_state::IsSet,
     St::ForkRef: hidden_ref_state::IsSet,
+    St::Repo: hidden_ref_state::IsSet,
+    St::RemoteRef: hidden_ref_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> HiddenRef<S> {

@@ -119,37 +119,37 @@ pub mod resolve_label_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Handle;
         type Name;
+        type Handle;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Handle = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `handle` field to Set
-    pub struct SetHandle<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetHandle<St> {}
-    impl<St: State> State for SetHandle<St> {
-        type Handle = Set<members::handle>;
-        type Name = St::Name;
+        type Handle = Unset;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetName<St> {}
     impl<St: State> State for SetName<St> {
-        type Handle = St::Handle;
         type Name = Set<members::name>;
+        type Handle = St::Handle;
+    }
+    ///State transition - sets the `handle` field to Set
+    pub struct SetHandle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetHandle<St> {}
+    impl<St: State> State for SetHandle<St> {
+        type Name = St::Name;
+        type Handle = Set<members::handle>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `handle` field
-        pub struct handle(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `handle` field
+        pub struct handle(());
     }
 }
 
@@ -232,8 +232,8 @@ impl<S: BosStr, St: resolve_label_state::State> ResolveLabelBuilder<S, St> {
 impl<S: BosStr, St> ResolveLabelBuilder<S, St>
 where
     St: resolve_label_state::State,
-    St::Handle: resolve_label_state::IsSet,
     St::Name: resolve_label_state::IsSet,
+    St::Handle: resolve_label_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> ResolveLabel<S> {

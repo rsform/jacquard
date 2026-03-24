@@ -476,105 +476,105 @@ pub mod slice_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Cid;
-        type Domain;
         type Name;
+        type Uri;
+        type Domain;
+        type Cid;
         type Creator;
         type CreatedAt;
-        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Cid = Unset;
-        type Domain = Unset;
         type Name = Unset;
+        type Uri = Unset;
+        type Domain = Unset;
+        type Cid = Unset;
         type Creator = Unset;
         type CreatedAt = Unset;
-        type Uri = Unset;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCid<St> {}
-    impl<St: State> State for SetCid<St> {
-        type Cid = Set<members::cid>;
-        type Domain = St::Domain;
-        type Name = St::Name;
-        type Creator = St::Creator;
-        type CreatedAt = St::CreatedAt;
-        type Uri = St::Uri;
-    }
-    ///State transition - sets the `domain` field to Set
-    pub struct SetDomain<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDomain<St> {}
-    impl<St: State> State for SetDomain<St> {
-        type Cid = St::Cid;
-        type Domain = Set<members::domain>;
-        type Name = St::Name;
-        type Creator = St::Creator;
-        type CreatedAt = St::CreatedAt;
-        type Uri = St::Uri;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetName<St> {}
     impl<St: State> State for SetName<St> {
-        type Cid = St::Cid;
-        type Domain = St::Domain;
         type Name = Set<members::name>;
+        type Uri = St::Uri;
+        type Domain = St::Domain;
+        type Cid = St::Cid;
         type Creator = St::Creator;
         type CreatedAt = St::CreatedAt;
-        type Uri = St::Uri;
-    }
-    ///State transition - sets the `creator` field to Set
-    pub struct SetCreator<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreator<St> {}
-    impl<St: State> State for SetCreator<St> {
-        type Cid = St::Cid;
-        type Domain = St::Domain;
-        type Name = St::Name;
-        type Creator = Set<members::creator>;
-        type CreatedAt = St::CreatedAt;
-        type Uri = St::Uri;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type Cid = St::Cid;
-        type Domain = St::Domain;
-        type Name = St::Name;
-        type Creator = St::Creator;
-        type CreatedAt = Set<members::created_at>;
-        type Uri = St::Uri;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUri<St> {}
     impl<St: State> State for SetUri<St> {
-        type Cid = St::Cid;
-        type Domain = St::Domain;
         type Name = St::Name;
+        type Uri = Set<members::uri>;
+        type Domain = St::Domain;
+        type Cid = St::Cid;
         type Creator = St::Creator;
         type CreatedAt = St::CreatedAt;
-        type Uri = Set<members::uri>;
+    }
+    ///State transition - sets the `domain` field to Set
+    pub struct SetDomain<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDomain<St> {}
+    impl<St: State> State for SetDomain<St> {
+        type Name = St::Name;
+        type Uri = St::Uri;
+        type Domain = Set<members::domain>;
+        type Cid = St::Cid;
+        type Creator = St::Creator;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCid<St> {}
+    impl<St: State> State for SetCid<St> {
+        type Name = St::Name;
+        type Uri = St::Uri;
+        type Domain = St::Domain;
+        type Cid = Set<members::cid>;
+        type Creator = St::Creator;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `creator` field to Set
+    pub struct SetCreator<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreator<St> {}
+    impl<St: State> State for SetCreator<St> {
+        type Name = St::Name;
+        type Uri = St::Uri;
+        type Domain = St::Domain;
+        type Cid = St::Cid;
+        type Creator = Set<members::creator>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Name = St::Name;
+        type Uri = St::Uri;
+        type Domain = St::Domain;
+        type Cid = St::Cid;
+        type Creator = St::Creator;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `cid` field
-        pub struct cid(());
-        ///Marker type for the `domain` field
-        pub struct domain(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `domain` field
+        pub struct domain(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
         ///Marker type for the `creator` field
         pub struct creator(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
     }
 }
 
@@ -830,12 +830,12 @@ impl<S: BosStr, St: slice_view_state::State> SliceViewBuilder<S, St> {
 impl<S: BosStr, St> SliceViewBuilder<S, St>
 where
     St: slice_view_state::State,
-    St::Cid: slice_view_state::IsSet,
-    St::Domain: slice_view_state::IsSet,
     St::Name: slice_view_state::IsSet,
+    St::Uri: slice_view_state::IsSet,
+    St::Domain: slice_view_state::IsSet,
+    St::Cid: slice_view_state::IsSet,
     St::Creator: slice_view_state::IsSet,
     St::CreatedAt: slice_view_state::IsSet,
-    St::Uri: slice_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> SliceView<S> {
@@ -1049,37 +1049,37 @@ pub mod sparkline_point_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Count;
         type Timestamp;
+        type Count;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Count = Unset;
         type Timestamp = Unset;
-    }
-    ///State transition - sets the `count` field to Set
-    pub struct SetCount<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCount<St> {}
-    impl<St: State> State for SetCount<St> {
-        type Count = Set<members::count>;
-        type Timestamp = St::Timestamp;
+        type Count = Unset;
     }
     ///State transition - sets the `timestamp` field to Set
     pub struct SetTimestamp<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTimestamp<St> {}
     impl<St: State> State for SetTimestamp<St> {
-        type Count = St::Count;
         type Timestamp = Set<members::timestamp>;
+        type Count = St::Count;
+    }
+    ///State transition - sets the `count` field to Set
+    pub struct SetCount<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCount<St> {}
+    impl<St: State> State for SetCount<St> {
+        type Timestamp = St::Timestamp;
+        type Count = Set<members::count>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `count` field
-        pub struct count(());
         ///Marker type for the `timestamp` field
         pub struct timestamp(());
+        ///Marker type for the `count` field
+        pub struct count(());
     }
 }
 
@@ -1149,8 +1149,8 @@ where
 impl<S: BosStr, St> SparklinePointBuilder<S, St>
 where
     St: sparkline_point_state::State,
-    St::Count: sparkline_point_state::IsSet,
     St::Timestamp: sparkline_point_state::IsSet,
+    St::Count: sparkline_point_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> SparklinePoint<S> {

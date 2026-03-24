@@ -367,65 +367,65 @@ pub mod beacon_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Visibility;
         type CreatedAt;
         type VenueUri;
-        type Visibility;
         type VenueName;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Visibility = Unset;
         type CreatedAt = Unset;
         type VenueUri = Unset;
-        type Visibility = Unset;
         type VenueName = Unset;
+    }
+    ///State transition - sets the `visibility` field to Set
+    pub struct SetVisibility<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetVisibility<St> {}
+    impl<St: State> State for SetVisibility<St> {
+        type Visibility = Set<members::visibility>;
+        type CreatedAt = St::CreatedAt;
+        type VenueUri = St::VenueUri;
+        type VenueName = St::VenueName;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
+        type Visibility = St::Visibility;
         type CreatedAt = Set<members::created_at>;
         type VenueUri = St::VenueUri;
-        type Visibility = St::Visibility;
         type VenueName = St::VenueName;
     }
     ///State transition - sets the `venue_uri` field to Set
     pub struct SetVenueUri<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetVenueUri<St> {}
     impl<St: State> State for SetVenueUri<St> {
+        type Visibility = St::Visibility;
         type CreatedAt = St::CreatedAt;
         type VenueUri = Set<members::venue_uri>;
-        type Visibility = St::Visibility;
-        type VenueName = St::VenueName;
-    }
-    ///State transition - sets the `visibility` field to Set
-    pub struct SetVisibility<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetVisibility<St> {}
-    impl<St: State> State for SetVisibility<St> {
-        type CreatedAt = St::CreatedAt;
-        type VenueUri = St::VenueUri;
-        type Visibility = Set<members::visibility>;
         type VenueName = St::VenueName;
     }
     ///State transition - sets the `venue_name` field to Set
     pub struct SetVenueName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetVenueName<St> {}
     impl<St: State> State for SetVenueName<St> {
+        type Visibility = St::Visibility;
         type CreatedAt = St::CreatedAt;
         type VenueUri = St::VenueUri;
-        type Visibility = St::Visibility;
         type VenueName = Set<members::venue_name>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `visibility` field
+        pub struct visibility(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `venue_uri` field
         pub struct venue_uri(());
-        ///Marker type for the `visibility` field
-        pub struct visibility(());
         ///Marker type for the `venue_name` field
         pub struct venue_name(());
     }
@@ -740,9 +740,9 @@ where
 impl<S: BosStr, St> BeaconBuilder<S, St>
 where
     St: beacon_state::State,
+    St::Visibility: beacon_state::IsSet,
     St::CreatedAt: beacon_state::IsSet,
     St::VenueUri: beacon_state::IsSet,
-    St::Visibility: beacon_state::IsSet,
     St::VenueName: beacon_state::IsSet,
 {
     /// Build the final struct.

@@ -3,11 +3,9 @@ use std::sync::Arc;
 
 use bytes::Bytes;
 use http::{Response as HttpResponse, StatusCode};
+use jacquard::BosStr;
 use jacquard::client::Agent;
 use jacquard::xrpc::XrpcClient;
-use jacquard::BosStr;
-use jacquard::IntoStatic;
-use smol_str::SmolStr;
 use jacquard_common::http_client::HttpClient;
 use jacquard_oauth::atproto::AtprotoClientMetadata;
 use jacquard_oauth::authstore::ClientAuthStore;
@@ -15,6 +13,7 @@ use jacquard_oauth::client::OAuthClient;
 use jacquard_oauth::resolver::OAuthResolver;
 use jacquard_oauth::scopes::Scope;
 use jacquard_oauth::session::ClientData;
+use smol_str::SmolStr;
 
 #[derive(Clone, Default)]
 struct MockClient {
@@ -50,10 +49,8 @@ impl jacquard::identity::resolver::IdentityResolver for MockClient {
     async fn resolve_handle<S: BosStr + Sync>(
         &self,
         _handle: &jacquard::types::string::Handle<S>,
-    ) -> std::result::Result<
-        jacquard::types::did::Did,
-        jacquard::identity::resolver::IdentityError,
-    > {
+    ) -> std::result::Result<jacquard::types::did::Did, jacquard::identity::resolver::IdentityError>
+    {
         Ok(jacquard::types::did::Did::new_static("did:plc:alice").unwrap())
     }
     async fn resolve_did_doc<S: BosStr + Sync>(
@@ -85,20 +82,19 @@ impl OAuthResolver for MockClient {
         _input: &str,
     ) -> Result<
         (
-            jacquard_oauth::types::OAuthAuthorizationServerMetadata<'static>,
-            Option<jacquard_common::types::did_doc::DidDocument<'static>>,
+            jacquard_oauth::types::OAuthAuthorizationServerMetadata,
+            Option<jacquard_common::types::did_doc::DidDocument>,
         ),
         jacquard_oauth::resolver::ResolverError,
     > {
         let mut md = jacquard_oauth::types::OAuthAuthorizationServerMetadata::default();
-        md.issuer = jacquard::CowStr::from("https://issuer");
-        md.authorization_endpoint = jacquard::CowStr::from("https://issuer/authorize");
-        md.token_endpoint = jacquard::CowStr::from("https://issuer/token");
+        md.issuer = SmolStr::from("https://issuer");
+        md.authorization_endpoint = SmolStr::from("https://issuer/authorize");
+        md.token_endpoint = SmolStr::from("https://issuer/token");
         md.require_pushed_authorization_requests = Some(true);
-        md.pushed_authorization_request_endpoint =
-            Some(jacquard::CowStr::from("https://issuer/par"));
-        md.token_endpoint_auth_methods_supported = Some(vec![jacquard::CowStr::from("none")]);
-        md.dpop_signing_alg_values_supported = Some(vec![jacquard::CowStr::from("ES256")]);
+        md.pushed_authorization_request_endpoint = Some(SmolStr::from("https://issuer/par"));
+        md.token_endpoint_auth_methods_supported = Some(vec![SmolStr::from("none")]);
+        md.dpop_signing_alg_values_supported = Some(vec![SmolStr::from("ES256")]);
 
         // Simple DID doc pointing to https://pds
         let doc = serde_json::json!({
@@ -110,47 +106,45 @@ impl OAuthResolver for MockClient {
             }]
         });
         let buf = Bytes::from(serde_json::to_vec(&doc).unwrap());
-        let did_doc_b: jacquard_common::types::did_doc::DidDocument<'_> =
+        let did_doc: jacquard_common::types::did_doc::DidDocument =
             serde_json::from_slice(&buf).unwrap();
-        let did_doc = did_doc_b.into_static();
-        Ok((md.into_static(), Some(did_doc)))
+        Ok((md, Some(did_doc)))
     }
+
     async fn get_authorization_server_metadata(
         &self,
-        issuer: &CowStr<'_>,
+        issuer: &str,
     ) -> Result<
-        jacquard_oauth::types::OAuthAuthorizationServerMetadata<'static>,
+        jacquard_oauth::types::OAuthAuthorizationServerMetadata,
         jacquard_oauth::resolver::ResolverError,
     > {
         let mut md = jacquard_oauth::types::OAuthAuthorizationServerMetadata::default();
-        md.issuer = jacquard::CowStr::from(issuer.as_str());
-        md.authorization_endpoint = jacquard::CowStr::from(format!("{}/authorize", issuer));
-        md.token_endpoint = jacquard::CowStr::from(format!("{}/token", issuer));
+        md.issuer = SmolStr::from(issuer);
+        md.authorization_endpoint = SmolStr::from(format!("{}/authorize", issuer));
+        md.token_endpoint = SmolStr::from(format!("{}/token", issuer));
         md.require_pushed_authorization_requests = Some(true);
-        md.pushed_authorization_request_endpoint =
-            Some(jacquard::CowStr::from(format!("{}/par", issuer)));
-        md.token_endpoint_auth_methods_supported = Some(vec![jacquard::CowStr::from("none")]);
-        md.dpop_signing_alg_values_supported = Some(vec![jacquard::CowStr::from("ES256")]);
-        Ok(md.into_static())
+        md.pushed_authorization_request_endpoint = Some(SmolStr::from(format!("{}/par", issuer)));
+        md.token_endpoint_auth_methods_supported = Some(vec![SmolStr::from("none")]);
+        md.dpop_signing_alg_values_supported = Some(vec![SmolStr::from("ES256")]);
+        Ok(md)
     }
 
     async fn get_resource_server_metadata(
         &self,
-        _pds: &CowStr<'_>,
+        _pds: &str,
     ) -> Result<
-        jacquard_oauth::types::OAuthAuthorizationServerMetadata<'static>,
+        jacquard_oauth::types::OAuthAuthorizationServerMetadata,
         jacquard_oauth::resolver::ResolverError,
     > {
         let mut md = jacquard_oauth::types::OAuthAuthorizationServerMetadata::default();
-        md.issuer = jacquard::CowStr::from("https://issuer");
-        md.authorization_endpoint = jacquard::CowStr::from("https://issuer/authorize");
-        md.token_endpoint = jacquard::CowStr::from("https://issuer/token");
+        md.issuer = SmolStr::from("https://issuer");
+        md.authorization_endpoint = SmolStr::from("https://issuer/authorize");
+        md.token_endpoint = SmolStr::from("https://issuer/token");
         md.require_pushed_authorization_requests = Some(true);
-        md.pushed_authorization_request_endpoint =
-            Some(jacquard::CowStr::from("https://issuer/par"));
-        md.token_endpoint_auth_methods_supported = Some(vec![jacquard::CowStr::from("none")]);
-        md.dpop_signing_alg_values_supported = Some(vec![jacquard::CowStr::from("ES256")]);
-        Ok(md.into_static())
+        md.pushed_authorization_request_endpoint = Some(SmolStr::from("https://issuer/par"));
+        md.token_endpoint_auth_methods_supported = Some(vec![SmolStr::from("none")]);
+        md.dpop_signing_alg_values_supported = Some(vec![SmolStr::from("ES256")]);
+        Ok(md)
     }
 }
 
@@ -228,33 +222,32 @@ async fn oauth_end_to_end_mock_flow() {
 
     // Build metadata and call PAR to get an AuthRequestData, then save in store
     let (server_metadata, identity) = client.resolve_oauth("alice.bsky.social").await.unwrap();
-    let metadata = jacquard_oauth::request::OAuthMetadata {
+    let mut metadata = jacquard_oauth::request::OAuthMetadata {
         server_metadata,
         client_metadata: jacquard_oauth::atproto::atproto_client_metadata(
-            AtprotoClientMetadata::new_localhost(None, Some(vec![Scope::Atproto])),
+            &AtprotoClientMetadata::new_localhost(None, Some(vec![Scope::Atproto])),
             &None,
         )
-        .unwrap()
-        .into_static(),
+        .unwrap(),
         keyset: None,
     };
-    let login_hint = identity.map(|_| jacquard::CowStr::from("alice.bsky.social"));
+    let login_hint = identity.map(|_| SmolStr::from("alice.bsky.social"));
     let auth_req =
         jacquard_oauth::request::par(client.as_ref(), login_hint, None, &mut metadata, None)
             .await
             .unwrap();
     // Construct authorization URL as OAuthClient::start_auth would do
     #[derive(serde::Serialize)]
-    struct Parameters<'s> {
-        client_id: CowStr<'s>,
-        request_uri: jacquard::CowStr<'s>,
+    struct Parameters {
+        client_id: SmolStr,
+        request_uri: SmolStr,
     }
     let auth_url = format!(
         "{}?{}",
         metadata.server_metadata.authorization_endpoint,
         serde_html_form::to_string(Parameters {
             client_id: metadata.client_metadata.client_id.clone(),
-            request_uri: jacquard::CowStr::Owned(auth_req.request_uri.clone()),
+            request_uri: auth_req.request_uri.clone(),
         })
         .unwrap()
     );

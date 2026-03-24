@@ -1,27 +1,28 @@
-use jacquard::{CowStr, IntoStatic};
+use jacquard::{BosStr, DefaultStr, IntoStatic};
 use jacquard_derive::XrpcRequest;
 use serde::{Deserialize, Serialize};
+use smol_str::SmolStr;
 
-// Test output type
+// Test output type — uses BOS type parameter so it can borrow from the response buffer or own
+// the data via the default `DefaultStr = SmolStr` backend.
 #[derive(Serialize, Deserialize, IntoStatic)]
-pub struct GetThingOutput<'a> {
-    #[serde(borrow)]
-    pub result: CowStr<'a>,
+#[serde(bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+pub struct GetThingOutput<S: BosStr = DefaultStr> {
+    pub result: S,
 }
 
 // Test basic query endpoint
 #[derive(Serialize, Deserialize, XrpcRequest)]
 #[xrpc(nsid = "com.example.getThing", method = Query, output = GetThingOutput)]
-pub struct GetThing<'a> {
-    #[serde(borrow)]
-    pub id: CowStr<'a>,
+pub struct GetThing<S: BosStr = DefaultStr> {
+    pub id: S,
 }
 
 // Test procedure endpoint
 #[derive(Serialize, Deserialize, IntoStatic)]
-pub struct CreateThingOutput<'a> {
-    #[serde(borrow)]
-    pub id: CowStr<'a>,
+#[serde(bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+pub struct CreateThingOutput<S: BosStr = DefaultStr> {
+    pub id: S,
 }
 
 #[derive(Serialize, Deserialize, XrpcRequest)]
@@ -30,32 +31,29 @@ pub struct CreateThingOutput<'a> {
     method = Procedure,
     output = CreateThingOutput
 )]
-pub struct CreateThing<'a> {
-    #[serde(borrow)]
-    pub name: CowStr<'a>,
+pub struct CreateThing<S: BosStr = DefaultStr> {
+    pub name: S,
 }
 
-// Test with custom error type
+// Test with custom error type — errors must be DeserializeOwned (no borrowing), so they use SmolStr
+// directly rather than a BOS type parameter.
 #[derive(Serialize, Deserialize, Debug, thiserror::Error)]
-#[error("Custom error")]
-pub struct CustomError<'a> {
-    #[serde(borrow)]
-    pub message: CowStr<'a>,
+#[error("Custom error: {message}")]
+pub struct CustomError {
+    pub message: SmolStr,
 }
 
-impl jacquard::IntoStatic for CustomError<'_> {
-    type Output = CustomError<'static>;
+impl jacquard::IntoStatic for CustomError {
+    type Output = CustomError;
     fn into_static(self) -> Self::Output {
-        CustomError {
-            message: self.message.into_static(),
-        }
+        self
     }
 }
 
 #[derive(Serialize, Deserialize, IntoStatic)]
-pub struct DoThingOutput<'a> {
-    #[serde(borrow)]
-    pub status: CowStr<'a>,
+#[serde(bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+pub struct DoThingOutput<S: BosStr = DefaultStr> {
+    pub status: S,
 }
 
 #[derive(Serialize, Deserialize, XrpcRequest)]
@@ -65,16 +63,15 @@ pub struct DoThingOutput<'a> {
     output = DoThingOutput,
     error = CustomError
 )]
-pub struct DoThing<'a> {
-    #[serde(borrow)]
-    pub param: CowStr<'a>,
+pub struct DoThing<S: BosStr = DefaultStr> {
+    pub param: S,
 }
 
 // Test server-side endpoint generation
 #[derive(Serialize, Deserialize, IntoStatic)]
-pub struct ServerThingOutput<'a> {
-    #[serde(borrow)]
-    pub status: CowStr<'a>,
+#[serde(bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+pub struct ServerThingOutput<S: BosStr = DefaultStr> {
+    pub status: S,
 }
 
 #[derive(Serialize, Deserialize, IntoStatic, XrpcRequest)]
@@ -84,9 +81,9 @@ pub struct ServerThingOutput<'a> {
     output = ServerThingOutput,
     server
 )]
-pub struct ServerThing<'a> {
-    #[serde(borrow)]
-    pub query: CowStr<'a>,
+#[serde(bound(deserialize = "S: Deserialize<'de> + BosStr"))]
+pub struct ServerThing<S: BosStr = DefaultStr> {
+    pub query: S,
 }
 
 #[test]
@@ -103,13 +100,13 @@ fn test_xrpc_request_impl() {
     use jacquard::xrpc::{XrpcMethod, XrpcRequest};
 
     // Query endpoint
-    assert_eq!(GetThing::NSID, "com.example.getThing");
-    assert!(matches!(GetThing::METHOD, XrpcMethod::Query));
+    assert_eq!(GetThing::<&str>::NSID, "com.example.getThing");
+    assert!(matches!(GetThing::<&str>::METHOD, XrpcMethod::Query));
 
     // Procedure endpoint
-    assert_eq!(CreateThing::NSID, "com.example.createThing");
+    assert_eq!(CreateThing::<&str>::NSID, "com.example.createThing");
     assert!(matches!(
-        CreateThing::METHOD,
+        CreateThing::<&str>::METHOD,
         XrpcMethod::Procedure("application/json")
     ));
 }

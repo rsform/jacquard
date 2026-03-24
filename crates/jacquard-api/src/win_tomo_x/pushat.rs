@@ -129,49 +129,49 @@ pub mod device_list_item_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Name;
         type Id;
+        type Name;
         type Current;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Name = Unset;
         type Id = Unset;
+        type Name = Unset;
         type Current = Unset;
-    }
-    ///State transition - sets the `name` field to Set
-    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetName<St> {}
-    impl<St: State> State for SetName<St> {
-        type Name = Set<members::name>;
-        type Id = St::Id;
-        type Current = St::Current;
     }
     ///State transition - sets the `id` field to Set
     pub struct SetId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetId<St> {}
     impl<St: State> State for SetId<St> {
-        type Name = St::Name;
         type Id = Set<members::id>;
+        type Name = St::Name;
+        type Current = St::Current;
+    }
+    ///State transition - sets the `name` field to Set
+    pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetName<St> {}
+    impl<St: State> State for SetName<St> {
+        type Id = St::Id;
+        type Name = Set<members::name>;
         type Current = St::Current;
     }
     ///State transition - sets the `current` field to Set
     pub struct SetCurrent<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCurrent<St> {}
     impl<St: State> State for SetCurrent<St> {
-        type Name = St::Name;
         type Id = St::Id;
+        type Name = St::Name;
         type Current = Set<members::current>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `name` field
-        pub struct name(());
         ///Marker type for the `id` field
         pub struct id(());
+        ///Marker type for the `name` field
+        pub struct name(());
         ///Marker type for the `current` field
         pub struct current(());
     }
@@ -262,8 +262,8 @@ where
 impl<S: BosStr, St> DeviceListItemBuilder<S, St>
 where
     St: device_list_item_state::State,
-    St::Name: device_list_item_state::IsSet,
     St::Id: device_list_item_state::IsSet,
+    St::Name: device_list_item_state::IsSet,
     St::Current: device_list_item_state::IsSet,
 {
     /// Build the final struct.

@@ -164,8 +164,8 @@ pub mod review_state {
     pub trait State: sealed::Sealed {
         type Rating;
         type ProjectId;
-        type Text;
         type CreatedAt;
+        type Text;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -173,8 +173,8 @@ pub mod review_state {
     impl State for Empty {
         type Rating = Unset;
         type ProjectId = Unset;
-        type Text = Unset;
         type CreatedAt = Unset;
+        type Text = Unset;
     }
     ///State transition - sets the `rating` field to Set
     pub struct SetRating<St: State = Empty>(PhantomData<fn() -> St>);
@@ -182,8 +182,8 @@ pub mod review_state {
     impl<St: State> State for SetRating<St> {
         type Rating = Set<members::rating>;
         type ProjectId = St::ProjectId;
-        type Text = St::Text;
         type CreatedAt = St::CreatedAt;
+        type Text = St::Text;
     }
     ///State transition - sets the `project_id` field to Set
     pub struct SetProjectId<St: State = Empty>(PhantomData<fn() -> St>);
@@ -191,17 +191,8 @@ pub mod review_state {
     impl<St: State> State for SetProjectId<St> {
         type Rating = St::Rating;
         type ProjectId = Set<members::project_id>;
+        type CreatedAt = St::CreatedAt;
         type Text = St::Text;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `text` field to Set
-    pub struct SetText<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetText<St> {}
-    impl<St: State> State for SetText<St> {
-        type Rating = St::Rating;
-        type ProjectId = St::ProjectId;
-        type Text = Set<members::text>;
-        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
@@ -209,8 +200,17 @@ pub mod review_state {
     impl<St: State> State for SetCreatedAt<St> {
         type Rating = St::Rating;
         type ProjectId = St::ProjectId;
-        type Text = St::Text;
         type CreatedAt = Set<members::created_at>;
+        type Text = St::Text;
+    }
+    ///State transition - sets the `text` field to Set
+    pub struct SetText<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetText<St> {}
+    impl<St: State> State for SetText<St> {
+        type Rating = St::Rating;
+        type ProjectId = St::ProjectId;
+        type CreatedAt = St::CreatedAt;
+        type Text = Set<members::text>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -219,10 +219,10 @@ pub mod review_state {
         pub struct rating(());
         ///Marker type for the `project_id` field
         pub struct project_id(());
-        ///Marker type for the `text` field
-        pub struct text(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `text` field
+        pub struct text(());
     }
 }
 
@@ -332,8 +332,8 @@ where
     St: review_state::State,
     St::Rating: review_state::IsSet,
     St::ProjectId: review_state::IsSet,
-    St::Text: review_state::IsSet,
     St::CreatedAt: review_state::IsSet,
+    St::Text: review_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Review<S> {

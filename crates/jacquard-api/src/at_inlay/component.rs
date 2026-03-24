@@ -1293,37 +1293,37 @@ pub mod view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Prop;
         type Accepts;
+        type Prop;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Prop = Unset;
         type Accepts = Unset;
-    }
-    ///State transition - sets the `prop` field to Set
-    pub struct SetProp<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetProp<St> {}
-    impl<St: State> State for SetProp<St> {
-        type Prop = Set<members::prop>;
-        type Accepts = St::Accepts;
+        type Prop = Unset;
     }
     ///State transition - sets the `accepts` field to Set
     pub struct SetAccepts<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetAccepts<St> {}
     impl<St: State> State for SetAccepts<St> {
-        type Prop = St::Prop;
         type Accepts = Set<members::accepts>;
+        type Prop = St::Prop;
+    }
+    ///State transition - sets the `prop` field to Set
+    pub struct SetProp<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetProp<St> {}
+    impl<St: State> State for SetProp<St> {
+        type Accepts = St::Accepts;
+        type Prop = Set<members::prop>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `prop` field
-        pub struct prop(());
         ///Marker type for the `accepts` field
         pub struct accepts(());
+        ///Marker type for the `prop` field
+        pub struct prop(());
     }
 }
 
@@ -1393,8 +1393,8 @@ where
 impl<S: BosStr, St> ViewBuilder<S, St>
 where
     St: view_state::State,
-    St::Prop: view_state::IsSet,
     St::Accepts: view_state::IsSet,
+    St::Prop: view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> View<S> {

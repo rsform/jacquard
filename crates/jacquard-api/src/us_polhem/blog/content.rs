@@ -138,50 +138,50 @@ pub mod content_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type CreatedAt;
-        type Slug;
         type Content;
+        type Slug;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type CreatedAt = Unset;
-        type Slug = Unset;
         type Content = Unset;
+        type Slug = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
         type CreatedAt = Set<members::created_at>;
+        type Content = St::Content;
         type Slug = St::Slug;
-        type Content = St::Content;
-    }
-    ///State transition - sets the `slug` field to Set
-    pub struct SetSlug<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSlug<St> {}
-    impl<St: State> State for SetSlug<St> {
-        type CreatedAt = St::CreatedAt;
-        type Slug = Set<members::slug>;
-        type Content = St::Content;
     }
     ///State transition - sets the `content` field to Set
     pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetContent<St> {}
     impl<St: State> State for SetContent<St> {
         type CreatedAt = St::CreatedAt;
-        type Slug = St::Slug;
         type Content = Set<members::content>;
+        type Slug = St::Slug;
+    }
+    ///State transition - sets the `slug` field to Set
+    pub struct SetSlug<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSlug<St> {}
+    impl<St: State> State for SetSlug<St> {
+        type CreatedAt = St::CreatedAt;
+        type Content = St::Content;
+        type Slug = Set<members::slug>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `slug` field
-        pub struct slug(());
         ///Marker type for the `content` field
         pub struct content(());
+        ///Marker type for the `slug` field
+        pub struct slug(());
     }
 }
 
@@ -284,8 +284,8 @@ impl<S: BosStr, St> ContentBuilder<S, St>
 where
     St: content_state::State,
     St::CreatedAt: content_state::IsSet,
-    St::Slug: content_state::IsSet,
     St::Content: content_state::IsSet,
+    St::Slug: content_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Content<S> {

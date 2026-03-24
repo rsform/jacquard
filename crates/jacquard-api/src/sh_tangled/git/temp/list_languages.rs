@@ -188,51 +188,51 @@ pub mod language_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Percentage;
         type Size;
         type Name;
+        type Percentage;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Percentage = Unset;
         type Size = Unset;
         type Name = Unset;
-    }
-    ///State transition - sets the `percentage` field to Set
-    pub struct SetPercentage<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPercentage<St> {}
-    impl<St: State> State for SetPercentage<St> {
-        type Percentage = Set<members::percentage>;
-        type Size = St::Size;
-        type Name = St::Name;
+        type Percentage = Unset;
     }
     ///State transition - sets the `size` field to Set
     pub struct SetSize<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSize<St> {}
     impl<St: State> State for SetSize<St> {
-        type Percentage = St::Percentage;
         type Size = Set<members::size>;
         type Name = St::Name;
+        type Percentage = St::Percentage;
     }
     ///State transition - sets the `name` field to Set
     pub struct SetName<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetName<St> {}
     impl<St: State> State for SetName<St> {
-        type Percentage = St::Percentage;
         type Size = St::Size;
         type Name = Set<members::name>;
+        type Percentage = St::Percentage;
+    }
+    ///State transition - sets the `percentage` field to Set
+    pub struct SetPercentage<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPercentage<St> {}
+    impl<St: State> State for SetPercentage<St> {
+        type Size = St::Size;
+        type Name = St::Name;
+        type Percentage = Set<members::percentage>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `percentage` field
-        pub struct percentage(());
         ///Marker type for the `size` field
         pub struct size(());
         ///Marker type for the `name` field
         pub struct name(());
+        ///Marker type for the `percentage` field
+        pub struct percentage(());
     }
 }
 
@@ -367,9 +367,9 @@ where
 impl<S: BosStr, St> LanguageBuilder<S, St>
 where
     St: language_state::State,
-    St::Percentage: language_state::IsSet,
     St::Size: language_state::IsSet,
     St::Name: language_state::IsSet,
+    St::Percentage: language_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Language<S> {

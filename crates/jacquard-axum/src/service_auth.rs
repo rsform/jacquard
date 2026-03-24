@@ -44,6 +44,7 @@ use axum::{
     middleware::Next,
     response::{IntoResponse, Response},
 };
+use jacquard::deps::smol_str::SmolStr;
 use jacquard_common::{
     CowStr, IntoStatic,
     service_auth::{self, PublicKey},
@@ -527,7 +528,7 @@ where
             service_auth::verify_signature(&parsed, &signing_key)?;
 
             // Now validate claims (audience, expiration, etc.)
-            claims.validate(state.service_did())?;
+            claims.validate(&state.service_did())?;
 
             // Check method binding if required
             if state.require_lxm() && claims.lxm.is_none() {
@@ -549,7 +550,7 @@ where
 ///
 /// This looks for a key with type "atproto" or the first available key
 /// if no atproto-specific key is found.
-fn extract_signing_key(methods: &[VerificationMethod<SmolStr>]) -> Option<PublicKey> {
+fn extract_signing_key(methods: &[VerificationMethod<CowStr<'_>>]) -> Option<PublicKey> {
     // First try to find an atproto-specific key
     let atproto_method = methods
         .iter()

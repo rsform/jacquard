@@ -315,37 +315,37 @@ pub mod declaration_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CurrentKey;
         type Version;
+        type CurrentKey;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CurrentKey = Unset;
         type Version = Unset;
-    }
-    ///State transition - sets the `current_key` field to Set
-    pub struct SetCurrentKey<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCurrentKey<St> {}
-    impl<St: State> State for SetCurrentKey<St> {
-        type CurrentKey = Set<members::current_key>;
-        type Version = St::Version;
+        type CurrentKey = Unset;
     }
     ///State transition - sets the `version` field to Set
     pub struct SetVersion<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetVersion<St> {}
     impl<St: State> State for SetVersion<St> {
-        type CurrentKey = St::CurrentKey;
         type Version = Set<members::version>;
+        type CurrentKey = St::CurrentKey;
+    }
+    ///State transition - sets the `current_key` field to Set
+    pub struct SetCurrentKey<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCurrentKey<St> {}
+    impl<St: State> State for SetCurrentKey<St> {
+        type Version = St::Version;
+        type CurrentKey = Set<members::current_key>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `current_key` field
-        pub struct current_key(());
         ///Marker type for the `version` field
         pub struct version(());
+        ///Marker type for the `current_key` field
+        pub struct current_key(());
     }
 }
 
@@ -463,8 +463,8 @@ where
 impl<S: BosStr, St> DeclarationBuilder<S, St>
 where
     St: declaration_state::State,
-    St::CurrentKey: declaration_state::IsSet,
     St::Version: declaration_state::IsSet,
+    St::CurrentKey: declaration_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Declaration<S> {
@@ -630,37 +630,37 @@ pub mod message_me_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ShowButtonTo;
         type MessageMeUrl;
+        type ShowButtonTo;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ShowButtonTo = Unset;
         type MessageMeUrl = Unset;
-    }
-    ///State transition - sets the `show_button_to` field to Set
-    pub struct SetShowButtonTo<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetShowButtonTo<St> {}
-    impl<St: State> State for SetShowButtonTo<St> {
-        type ShowButtonTo = Set<members::show_button_to>;
-        type MessageMeUrl = St::MessageMeUrl;
+        type ShowButtonTo = Unset;
     }
     ///State transition - sets the `message_me_url` field to Set
     pub struct SetMessageMeUrl<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetMessageMeUrl<St> {}
     impl<St: State> State for SetMessageMeUrl<St> {
-        type ShowButtonTo = St::ShowButtonTo;
         type MessageMeUrl = Set<members::message_me_url>;
+        type ShowButtonTo = St::ShowButtonTo;
+    }
+    ///State transition - sets the `show_button_to` field to Set
+    pub struct SetShowButtonTo<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetShowButtonTo<St> {}
+    impl<St: State> State for SetShowButtonTo<St> {
+        type MessageMeUrl = St::MessageMeUrl;
+        type ShowButtonTo = Set<members::show_button_to>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `show_button_to` field
-        pub struct show_button_to(());
         ///Marker type for the `message_me_url` field
         pub struct message_me_url(());
+        ///Marker type for the `show_button_to` field
+        pub struct show_button_to(());
     }
 }
 
@@ -730,8 +730,8 @@ where
 impl<S: BosStr, St> MessageMeBuilder<S, St>
 where
     St: message_me_state::State,
-    St::ShowButtonTo: message_me_state::IsSet,
     St::MessageMeUrl: message_me_state::IsSet,
+    St::ShowButtonTo: message_me_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> MessageMe<S> {

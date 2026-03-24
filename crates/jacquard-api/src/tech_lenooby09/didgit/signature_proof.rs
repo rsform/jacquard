@@ -280,105 +280,105 @@ pub mod signature_proof_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Signer;
-        type ObjectType;
-        type ObjectId;
         type SignatureType;
-        type SignedAt;
         type Signature;
+        type SignedAt;
+        type ObjectId;
+        type ObjectType;
+        type Signer;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Signer = Unset;
-        type ObjectType = Unset;
-        type ObjectId = Unset;
         type SignatureType = Unset;
-        type SignedAt = Unset;
         type Signature = Unset;
-    }
-    ///State transition - sets the `signer` field to Set
-    pub struct SetSigner<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSigner<St> {}
-    impl<St: State> State for SetSigner<St> {
-        type Signer = Set<members::signer>;
-        type ObjectType = St::ObjectType;
-        type ObjectId = St::ObjectId;
-        type SignatureType = St::SignatureType;
-        type SignedAt = St::SignedAt;
-        type Signature = St::Signature;
-    }
-    ///State transition - sets the `object_type` field to Set
-    pub struct SetObjectType<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetObjectType<St> {}
-    impl<St: State> State for SetObjectType<St> {
-        type Signer = St::Signer;
-        type ObjectType = Set<members::object_type>;
-        type ObjectId = St::ObjectId;
-        type SignatureType = St::SignatureType;
-        type SignedAt = St::SignedAt;
-        type Signature = St::Signature;
-    }
-    ///State transition - sets the `object_id` field to Set
-    pub struct SetObjectId<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetObjectId<St> {}
-    impl<St: State> State for SetObjectId<St> {
-        type Signer = St::Signer;
-        type ObjectType = St::ObjectType;
-        type ObjectId = Set<members::object_id>;
-        type SignatureType = St::SignatureType;
-        type SignedAt = St::SignedAt;
-        type Signature = St::Signature;
+        type SignedAt = Unset;
+        type ObjectId = Unset;
+        type ObjectType = Unset;
+        type Signer = Unset;
     }
     ///State transition - sets the `signature_type` field to Set
     pub struct SetSignatureType<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSignatureType<St> {}
     impl<St: State> State for SetSignatureType<St> {
-        type Signer = St::Signer;
-        type ObjectType = St::ObjectType;
-        type ObjectId = St::ObjectId;
         type SignatureType = Set<members::signature_type>;
+        type Signature = St::Signature;
         type SignedAt = St::SignedAt;
-        type Signature = St::Signature;
-    }
-    ///State transition - sets the `signed_at` field to Set
-    pub struct SetSignedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSignedAt<St> {}
-    impl<St: State> State for SetSignedAt<St> {
-        type Signer = St::Signer;
-        type ObjectType = St::ObjectType;
         type ObjectId = St::ObjectId;
-        type SignatureType = St::SignatureType;
-        type SignedAt = Set<members::signed_at>;
-        type Signature = St::Signature;
+        type ObjectType = St::ObjectType;
+        type Signer = St::Signer;
     }
     ///State transition - sets the `signature` field to Set
     pub struct SetSignature<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSignature<St> {}
     impl<St: State> State for SetSignature<St> {
-        type Signer = St::Signer;
-        type ObjectType = St::ObjectType;
-        type ObjectId = St::ObjectId;
         type SignatureType = St::SignatureType;
-        type SignedAt = St::SignedAt;
         type Signature = Set<members::signature>;
+        type SignedAt = St::SignedAt;
+        type ObjectId = St::ObjectId;
+        type ObjectType = St::ObjectType;
+        type Signer = St::Signer;
+    }
+    ///State transition - sets the `signed_at` field to Set
+    pub struct SetSignedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSignedAt<St> {}
+    impl<St: State> State for SetSignedAt<St> {
+        type SignatureType = St::SignatureType;
+        type Signature = St::Signature;
+        type SignedAt = Set<members::signed_at>;
+        type ObjectId = St::ObjectId;
+        type ObjectType = St::ObjectType;
+        type Signer = St::Signer;
+    }
+    ///State transition - sets the `object_id` field to Set
+    pub struct SetObjectId<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetObjectId<St> {}
+    impl<St: State> State for SetObjectId<St> {
+        type SignatureType = St::SignatureType;
+        type Signature = St::Signature;
+        type SignedAt = St::SignedAt;
+        type ObjectId = Set<members::object_id>;
+        type ObjectType = St::ObjectType;
+        type Signer = St::Signer;
+    }
+    ///State transition - sets the `object_type` field to Set
+    pub struct SetObjectType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetObjectType<St> {}
+    impl<St: State> State for SetObjectType<St> {
+        type SignatureType = St::SignatureType;
+        type Signature = St::Signature;
+        type SignedAt = St::SignedAt;
+        type ObjectId = St::ObjectId;
+        type ObjectType = Set<members::object_type>;
+        type Signer = St::Signer;
+    }
+    ///State transition - sets the `signer` field to Set
+    pub struct SetSigner<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSigner<St> {}
+    impl<St: State> State for SetSigner<St> {
+        type SignatureType = St::SignatureType;
+        type Signature = St::Signature;
+        type SignedAt = St::SignedAt;
+        type ObjectId = St::ObjectId;
+        type ObjectType = St::ObjectType;
+        type Signer = Set<members::signer>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `signer` field
-        pub struct signer(());
-        ///Marker type for the `object_type` field
-        pub struct object_type(());
-        ///Marker type for the `object_id` field
-        pub struct object_id(());
         ///Marker type for the `signature_type` field
         pub struct signature_type(());
-        ///Marker type for the `signed_at` field
-        pub struct signed_at(());
         ///Marker type for the `signature` field
         pub struct signature(());
+        ///Marker type for the `signed_at` field
+        pub struct signed_at(());
+        ///Marker type for the `object_id` field
+        pub struct object_id(());
+        ///Marker type for the `object_type` field
+        pub struct object_type(());
+        ///Marker type for the `signer` field
+        pub struct signer(());
     }
 }
 
@@ -545,12 +545,12 @@ where
 impl<S: BosStr, St> SignatureProofBuilder<S, St>
 where
     St: signature_proof_state::State,
-    St::Signer: signature_proof_state::IsSet,
-    St::ObjectType: signature_proof_state::IsSet,
-    St::ObjectId: signature_proof_state::IsSet,
     St::SignatureType: signature_proof_state::IsSet,
-    St::SignedAt: signature_proof_state::IsSet,
     St::Signature: signature_proof_state::IsSet,
+    St::SignedAt: signature_proof_state::IsSet,
+    St::ObjectId: signature_proof_state::IsSet,
+    St::ObjectType: signature_proof_state::IsSet,
+    St::Signer: signature_proof_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> SignatureProof<S> {

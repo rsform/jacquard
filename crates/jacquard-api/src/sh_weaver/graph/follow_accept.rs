@@ -114,37 +114,37 @@ pub mod follow_accept_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
         type Follow;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
         type Follow = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type Follow = St::Follow;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `follow` field to Set
     pub struct SetFollow<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetFollow<St> {}
     impl<St: State> State for SetFollow<St> {
-        type CreatedAt = St::CreatedAt;
         type Follow = Set<members::follow>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Follow = St::Follow;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
         ///Marker type for the `follow` field
         pub struct follow(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -214,8 +214,8 @@ where
 impl<S: BosStr, St> FollowAcceptBuilder<S, St>
 where
     St: follow_accept_state::State,
-    St::CreatedAt: follow_accept_state::IsSet,
     St::Follow: follow_accept_state::IsSet,
+    St::CreatedAt: follow_accept_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> FollowAccept<S> {

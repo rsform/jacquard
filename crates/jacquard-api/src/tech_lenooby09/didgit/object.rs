@@ -253,37 +253,37 @@ pub mod object_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type ObjectType;
         type Content;
+        type ObjectType;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type ObjectType = Unset;
         type Content = Unset;
-    }
-    ///State transition - sets the `object_type` field to Set
-    pub struct SetObjectType<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetObjectType<St> {}
-    impl<St: State> State for SetObjectType<St> {
-        type ObjectType = Set<members::object_type>;
-        type Content = St::Content;
+        type ObjectType = Unset;
     }
     ///State transition - sets the `content` field to Set
     pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetContent<St> {}
     impl<St: State> State for SetContent<St> {
-        type ObjectType = St::ObjectType;
         type Content = Set<members::content>;
+        type ObjectType = St::ObjectType;
+    }
+    ///State transition - sets the `object_type` field to Set
+    pub struct SetObjectType<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetObjectType<St> {}
+    impl<St: State> State for SetObjectType<St> {
+        type Content = St::Content;
+        type ObjectType = Set<members::object_type>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `object_type` field
-        pub struct object_type(());
         ///Marker type for the `content` field
         pub struct content(());
+        ///Marker type for the `object_type` field
+        pub struct object_type(());
     }
 }
 
@@ -353,8 +353,8 @@ where
 impl<S: BosStr, St> ObjectBuilder<S, St>
 where
     St: object_state::State,
-    St::ObjectType: object_state::IsSet,
     St::Content: object_state::IsSet,
+    St::ObjectType: object_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Object<S> {

@@ -123,67 +123,67 @@ pub mod claim_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type CreatedAt;
-        type Cid;
-        type Content;
         type Pfp;
+        type Content;
+        type Cid;
+        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type CreatedAt = Unset;
-        type Cid = Unset;
-        type Content = Unset;
         type Pfp = Unset;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type CreatedAt = Set<members::created_at>;
-        type Cid = St::Cid;
-        type Content = St::Content;
-        type Pfp = St::Pfp;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCid<St> {}
-    impl<St: State> State for SetCid<St> {
-        type CreatedAt = St::CreatedAt;
-        type Cid = Set<members::cid>;
-        type Content = St::Content;
-        type Pfp = St::Pfp;
-    }
-    ///State transition - sets the `content` field to Set
-    pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetContent<St> {}
-    impl<St: State> State for SetContent<St> {
-        type CreatedAt = St::CreatedAt;
-        type Cid = St::Cid;
-        type Content = Set<members::content>;
-        type Pfp = St::Pfp;
+        type Content = Unset;
+        type Cid = Unset;
+        type CreatedAt = Unset;
     }
     ///State transition - sets the `pfp` field to Set
     pub struct SetPfp<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetPfp<St> {}
     impl<St: State> State for SetPfp<St> {
-        type CreatedAt = St::CreatedAt;
-        type Cid = St::Cid;
-        type Content = St::Content;
         type Pfp = Set<members::pfp>;
+        type Content = St::Content;
+        type Cid = St::Cid;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `content` field to Set
+    pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetContent<St> {}
+    impl<St: State> State for SetContent<St> {
+        type Pfp = St::Pfp;
+        type Content = Set<members::content>;
+        type Cid = St::Cid;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCid<St> {}
+    impl<St: State> State for SetCid<St> {
+        type Pfp = St::Pfp;
+        type Content = St::Content;
+        type Cid = Set<members::cid>;
+        type CreatedAt = St::CreatedAt;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Pfp = St::Pfp;
+        type Content = St::Content;
+        type Cid = St::Cid;
+        type CreatedAt = Set<members::created_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `cid` field
-        pub struct cid(());
-        ///Marker type for the `content` field
-        pub struct content(());
         ///Marker type for the `pfp` field
         pub struct pfp(());
+        ///Marker type for the `content` field
+        pub struct content(());
+        ///Marker type for the `cid` field
+        pub struct cid(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
     }
 }
 
@@ -310,10 +310,10 @@ impl<S: BosStr, St: claim_state::State> ClaimBuilder<S, St> {
 impl<S: BosStr, St> ClaimBuilder<S, St>
 where
     St: claim_state::State,
-    St::CreatedAt: claim_state::IsSet,
-    St::Cid: claim_state::IsSet,
-    St::Content: claim_state::IsSet,
     St::Pfp: claim_state::IsSet,
+    St::Content: claim_state::IsSet,
+    St::Cid: claim_state::IsSet,
+    St::CreatedAt: claim_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Claim<S> {

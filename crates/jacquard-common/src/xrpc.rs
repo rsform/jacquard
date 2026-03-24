@@ -146,7 +146,7 @@ pub trait XrpcRequest {
     /// Encode the request body for procedures.
     ///
     /// Default implementation serializes to JSON. Override for non-JSON encodings.
-    fn encode_body(&self, buffer: &mut [u8]) -> Result<(), EncodeError>
+    fn encode_body(&self, buffer: &mut Vec<u8>) -> Result<(), EncodeError>
     where
         Self: Serialize,
     {

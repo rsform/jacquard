@@ -544,8 +544,8 @@ pub mod document_state {
         type Title;
         type PublishedAt;
         type Content;
-        type Path;
         type Url;
+        type Path;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -554,8 +554,8 @@ pub mod document_state {
         type Title = Unset;
         type PublishedAt = Unset;
         type Content = Unset;
-        type Path = Unset;
         type Url = Unset;
+        type Path = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
@@ -564,8 +564,8 @@ pub mod document_state {
         type Title = Set<members::title>;
         type PublishedAt = St::PublishedAt;
         type Content = St::Content;
-        type Path = St::Path;
         type Url = St::Url;
+        type Path = St::Path;
     }
     ///State transition - sets the `published_at` field to Set
     pub struct SetPublishedAt<St: State = Empty>(PhantomData<fn() -> St>);
@@ -574,8 +574,8 @@ pub mod document_state {
         type Title = St::Title;
         type PublishedAt = Set<members::published_at>;
         type Content = St::Content;
-        type Path = St::Path;
         type Url = St::Url;
+        type Path = St::Path;
     }
     ///State transition - sets the `content` field to Set
     pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
@@ -584,18 +584,8 @@ pub mod document_state {
         type Title = St::Title;
         type PublishedAt = St::PublishedAt;
         type Content = Set<members::content>;
+        type Url = St::Url;
         type Path = St::Path;
-        type Url = St::Url;
-    }
-    ///State transition - sets the `path` field to Set
-    pub struct SetPath<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPath<St> {}
-    impl<St: State> State for SetPath<St> {
-        type Title = St::Title;
-        type PublishedAt = St::PublishedAt;
-        type Content = St::Content;
-        type Path = Set<members::path>;
-        type Url = St::Url;
     }
     ///State transition - sets the `url` field to Set
     pub struct SetUrl<St: State = Empty>(PhantomData<fn() -> St>);
@@ -604,8 +594,18 @@ pub mod document_state {
         type Title = St::Title;
         type PublishedAt = St::PublishedAt;
         type Content = St::Content;
-        type Path = St::Path;
         type Url = Set<members::url>;
+        type Path = St::Path;
+    }
+    ///State transition - sets the `path` field to Set
+    pub struct SetPath<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPath<St> {}
+    impl<St: State> State for SetPath<St> {
+        type Title = St::Title;
+        type PublishedAt = St::PublishedAt;
+        type Content = St::Content;
+        type Url = St::Url;
+        type Path = Set<members::path>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -616,10 +616,10 @@ pub mod document_state {
         pub struct published_at(());
         ///Marker type for the `content` field
         pub struct content(());
-        ///Marker type for the `path` field
-        pub struct path(());
         ///Marker type for the `url` field
         pub struct url(());
+        ///Marker type for the `path` field
+        pub struct path(());
     }
 }
 
@@ -866,8 +866,8 @@ where
     St::Title: document_state::IsSet,
     St::PublishedAt: document_state::IsSet,
     St::Content: document_state::IsSet,
-    St::Path: document_state::IsSet,
     St::Url: document_state::IsSet,
+    St::Path: document_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Document<S> {

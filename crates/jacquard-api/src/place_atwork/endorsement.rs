@@ -148,8 +148,8 @@ pub mod endorsement_state {
     pub trait State: sealed::Sealed {
         type Text;
         type CreatedAt;
-        type Receiver;
         type Giver;
+        type Receiver;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
@@ -157,8 +157,8 @@ pub mod endorsement_state {
     impl State for Empty {
         type Text = Unset;
         type CreatedAt = Unset;
-        type Receiver = Unset;
         type Giver = Unset;
+        type Receiver = Unset;
     }
     ///State transition - sets the `text` field to Set
     pub struct SetText<St: State = Empty>(PhantomData<fn() -> St>);
@@ -166,8 +166,8 @@ pub mod endorsement_state {
     impl<St: State> State for SetText<St> {
         type Text = Set<members::text>;
         type CreatedAt = St::CreatedAt;
-        type Receiver = St::Receiver;
         type Giver = St::Giver;
+        type Receiver = St::Receiver;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
@@ -175,17 +175,8 @@ pub mod endorsement_state {
     impl<St: State> State for SetCreatedAt<St> {
         type Text = St::Text;
         type CreatedAt = Set<members::created_at>;
+        type Giver = St::Giver;
         type Receiver = St::Receiver;
-        type Giver = St::Giver;
-    }
-    ///State transition - sets the `receiver` field to Set
-    pub struct SetReceiver<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetReceiver<St> {}
-    impl<St: State> State for SetReceiver<St> {
-        type Text = St::Text;
-        type CreatedAt = St::CreatedAt;
-        type Receiver = Set<members::receiver>;
-        type Giver = St::Giver;
     }
     ///State transition - sets the `giver` field to Set
     pub struct SetGiver<St: State = Empty>(PhantomData<fn() -> St>);
@@ -193,8 +184,17 @@ pub mod endorsement_state {
     impl<St: State> State for SetGiver<St> {
         type Text = St::Text;
         type CreatedAt = St::CreatedAt;
-        type Receiver = St::Receiver;
         type Giver = Set<members::giver>;
+        type Receiver = St::Receiver;
+    }
+    ///State transition - sets the `receiver` field to Set
+    pub struct SetReceiver<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetReceiver<St> {}
+    impl<St: State> State for SetReceiver<St> {
+        type Text = St::Text;
+        type CreatedAt = St::CreatedAt;
+        type Giver = St::Giver;
+        type Receiver = Set<members::receiver>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
@@ -203,10 +203,10 @@ pub mod endorsement_state {
         pub struct text(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
-        ///Marker type for the `receiver` field
-        pub struct receiver(());
         ///Marker type for the `giver` field
         pub struct giver(());
+        ///Marker type for the `receiver` field
+        pub struct receiver(());
     }
 }
 
@@ -335,8 +335,8 @@ where
     St: endorsement_state::State,
     St::Text: endorsement_state::IsSet,
     St::CreatedAt: endorsement_state::IsSet,
-    St::Receiver: endorsement_state::IsSet,
     St::Giver: endorsement_state::IsSet,
+    St::Receiver: endorsement_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Endorsement<S> {

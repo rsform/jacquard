@@ -246,37 +246,37 @@ pub mod git_sync1_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
         type Seq;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
         type Seq = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDid<St> {}
-    impl<St: State> State for SetDid<St> {
-        type Did = Set<members::did>;
-        type Seq = St::Seq;
+        type Did = Unset;
     }
     ///State transition - sets the `seq` field to Set
     pub struct SetSeq<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSeq<St> {}
     impl<St: State> State for SetSeq<St> {
-        type Did = St::Did;
         type Seq = Set<members::seq>;
+        type Did = St::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
+        type Seq = St::Seq;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `seq` field
         pub struct seq(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
@@ -346,8 +346,8 @@ where
 impl<S: BosStr, St> GitSync1Builder<S, St>
 where
     St: git_sync1_state::State,
-    St::Did: git_sync1_state::IsSet,
     St::Seq: git_sync1_state::IsSet,
+    St::Did: git_sync1_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> GitSync1<S> {
@@ -640,51 +640,51 @@ pub mod identity_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
-        type Seq;
         type Time;
+        type Seq;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
-        type Seq = Unset;
         type Time = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDid<St> {}
-    impl<St: State> State for SetDid<St> {
-        type Did = Set<members::did>;
-        type Seq = St::Seq;
-        type Time = St::Time;
-    }
-    ///State transition - sets the `seq` field to Set
-    pub struct SetSeq<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSeq<St> {}
-    impl<St: State> State for SetSeq<St> {
-        type Did = St::Did;
-        type Seq = Set<members::seq>;
-        type Time = St::Time;
+        type Seq = Unset;
+        type Did = Unset;
     }
     ///State transition - sets the `time` field to Set
     pub struct SetTime<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTime<St> {}
     impl<St: State> State for SetTime<St> {
-        type Did = St::Did;
-        type Seq = St::Seq;
         type Time = Set<members::time>;
+        type Seq = St::Seq;
+        type Did = St::Did;
+    }
+    ///State transition - sets the `seq` field to Set
+    pub struct SetSeq<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSeq<St> {}
+    impl<St: State> State for SetSeq<St> {
+        type Time = St::Time;
+        type Seq = Set<members::seq>;
+        type Did = St::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
+        type Time = St::Time;
+        type Seq = St::Seq;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
-        ///Marker type for the `seq` field
-        pub struct seq(());
         ///Marker type for the `time` field
         pub struct time(());
+        ///Marker type for the `seq` field
+        pub struct seq(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
@@ -773,9 +773,9 @@ where
 impl<S: BosStr, St> IdentityBuilder<S, St>
 where
     St: identity_state::State,
-    St::Did: identity_state::IsSet,
-    St::Seq: identity_state::IsSet,
     St::Time: identity_state::IsSet,
+    St::Seq: identity_state::IsSet,
+    St::Did: identity_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Identity<S> {

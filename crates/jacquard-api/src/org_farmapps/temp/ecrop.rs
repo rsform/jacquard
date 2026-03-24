@@ -61,37 +61,37 @@ pub mod code_type_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Code;
         type ListId;
+        type Code;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Code = Unset;
         type ListId = Unset;
-    }
-    ///State transition - sets the `code` field to Set
-    pub struct SetCode<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCode<St> {}
-    impl<St: State> State for SetCode<St> {
-        type Code = Set<members::code>;
-        type ListId = St::ListId;
+        type Code = Unset;
     }
     ///State transition - sets the `list_id` field to Set
     pub struct SetListId<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetListId<St> {}
     impl<St: State> State for SetListId<St> {
-        type Code = St::Code;
         type ListId = Set<members::list_id>;
+        type Code = St::Code;
+    }
+    ///State transition - sets the `code` field to Set
+    pub struct SetCode<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCode<St> {}
+    impl<St: State> State for SetCode<St> {
+        type ListId = St::ListId;
+        type Code = Set<members::code>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `code` field
-        pub struct code(());
         ///Marker type for the `list_id` field
         pub struct list_id(());
+        ///Marker type for the `code` field
+        pub struct code(());
     }
 }
 
@@ -161,8 +161,8 @@ where
 impl<S: BosStr, St> CodeTypeBuilder<S, St>
 where
     St: code_type_state::State,
-    St::Code: code_type_state::IsSet,
     St::ListId: code_type_state::IsSet,
+    St::Code: code_type_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> CodeType<S> {

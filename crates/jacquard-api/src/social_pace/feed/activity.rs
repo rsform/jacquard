@@ -180,67 +180,67 @@ pub mod activity_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type EndedAt;
         type Type;
         type CreatedAt;
         type StartedAt;
+        type EndedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type EndedAt = Unset;
         type Type = Unset;
         type CreatedAt = Unset;
         type StartedAt = Unset;
-    }
-    ///State transition - sets the `ended_at` field to Set
-    pub struct SetEndedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetEndedAt<St> {}
-    impl<St: State> State for SetEndedAt<St> {
-        type EndedAt = Set<members::ended_at>;
-        type Type = St::Type;
-        type CreatedAt = St::CreatedAt;
-        type StartedAt = St::StartedAt;
+        type EndedAt = Unset;
     }
     ///State transition - sets the `type` field to Set
     pub struct SetType<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetType<St> {}
     impl<St: State> State for SetType<St> {
-        type EndedAt = St::EndedAt;
         type Type = Set<members::r#type>;
         type CreatedAt = St::CreatedAt;
         type StartedAt = St::StartedAt;
+        type EndedAt = St::EndedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type EndedAt = St::EndedAt;
         type Type = St::Type;
         type CreatedAt = Set<members::created_at>;
         type StartedAt = St::StartedAt;
+        type EndedAt = St::EndedAt;
     }
     ///State transition - sets the `started_at` field to Set
     pub struct SetStartedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetStartedAt<St> {}
     impl<St: State> State for SetStartedAt<St> {
-        type EndedAt = St::EndedAt;
         type Type = St::Type;
         type CreatedAt = St::CreatedAt;
         type StartedAt = Set<members::started_at>;
+        type EndedAt = St::EndedAt;
+    }
+    ///State transition - sets the `ended_at` field to Set
+    pub struct SetEndedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetEndedAt<St> {}
+    impl<St: State> State for SetEndedAt<St> {
+        type Type = St::Type;
+        type CreatedAt = St::CreatedAt;
+        type StartedAt = St::StartedAt;
+        type EndedAt = Set<members::ended_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `ended_at` field
-        pub struct ended_at(());
         ///Marker type for the `type` field
         pub struct r#type(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `started_at` field
         pub struct started_at(());
+        ///Marker type for the `ended_at` field
+        pub struct ended_at(());
     }
 }
 
@@ -437,10 +437,10 @@ where
 impl<S: BosStr, St> ActivityBuilder<S, St>
 where
     St: activity_state::State,
-    St::EndedAt: activity_state::IsSet,
     St::Type: activity_state::IsSet,
     St::CreatedAt: activity_state::IsSet,
     St::StartedAt: activity_state::IsSet,
+    St::EndedAt: activity_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Activity<S> {

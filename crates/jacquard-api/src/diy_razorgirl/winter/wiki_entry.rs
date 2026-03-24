@@ -272,84 +272,84 @@ pub mod wiki_entry_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Title;
+        type Content;
+        type CreatedAt;
         type LastUpdated;
         type Slug;
-        type CreatedAt;
-        type Content;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Title = Unset;
+        type Content = Unset;
+        type CreatedAt = Unset;
         type LastUpdated = Unset;
         type Slug = Unset;
-        type CreatedAt = Unset;
-        type Content = Unset;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTitle<St> {}
     impl<St: State> State for SetTitle<St> {
         type Title = Set<members::title>;
+        type Content = St::Content;
+        type CreatedAt = St::CreatedAt;
         type LastUpdated = St::LastUpdated;
         type Slug = St::Slug;
-        type CreatedAt = St::CreatedAt;
-        type Content = St::Content;
-    }
-    ///State transition - sets the `last_updated` field to Set
-    pub struct SetLastUpdated<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetLastUpdated<St> {}
-    impl<St: State> State for SetLastUpdated<St> {
-        type Title = St::Title;
-        type LastUpdated = Set<members::last_updated>;
-        type Slug = St::Slug;
-        type CreatedAt = St::CreatedAt;
-        type Content = St::Content;
-    }
-    ///State transition - sets the `slug` field to Set
-    pub struct SetSlug<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetSlug<St> {}
-    impl<St: State> State for SetSlug<St> {
-        type Title = St::Title;
-        type LastUpdated = St::LastUpdated;
-        type Slug = Set<members::slug>;
-        type CreatedAt = St::CreatedAt;
-        type Content = St::Content;
-    }
-    ///State transition - sets the `created_at` field to Set
-    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
-    impl<St: State> State for SetCreatedAt<St> {
-        type Title = St::Title;
-        type LastUpdated = St::LastUpdated;
-        type Slug = St::Slug;
-        type CreatedAt = Set<members::created_at>;
-        type Content = St::Content;
     }
     ///State transition - sets the `content` field to Set
     pub struct SetContent<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetContent<St> {}
     impl<St: State> State for SetContent<St> {
         type Title = St::Title;
+        type Content = Set<members::content>;
+        type CreatedAt = St::CreatedAt;
         type LastUpdated = St::LastUpdated;
         type Slug = St::Slug;
+    }
+    ///State transition - sets the `created_at` field to Set
+    pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
+    impl<St: State> State for SetCreatedAt<St> {
+        type Title = St::Title;
+        type Content = St::Content;
+        type CreatedAt = Set<members::created_at>;
+        type LastUpdated = St::LastUpdated;
+        type Slug = St::Slug;
+    }
+    ///State transition - sets the `last_updated` field to Set
+    pub struct SetLastUpdated<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLastUpdated<St> {}
+    impl<St: State> State for SetLastUpdated<St> {
+        type Title = St::Title;
+        type Content = St::Content;
         type CreatedAt = St::CreatedAt;
-        type Content = Set<members::content>;
+        type LastUpdated = Set<members::last_updated>;
+        type Slug = St::Slug;
+    }
+    ///State transition - sets the `slug` field to Set
+    pub struct SetSlug<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetSlug<St> {}
+    impl<St: State> State for SetSlug<St> {
+        type Title = St::Title;
+        type Content = St::Content;
+        type CreatedAt = St::CreatedAt;
+        type LastUpdated = St::LastUpdated;
+        type Slug = Set<members::slug>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `title` field
         pub struct title(());
+        ///Marker type for the `content` field
+        pub struct content(());
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `last_updated` field
         pub struct last_updated(());
         ///Marker type for the `slug` field
         pub struct slug(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
-        ///Marker type for the `content` field
-        pub struct content(());
     }
 }
 
@@ -553,10 +553,10 @@ impl<S: BosStr, St> WikiEntryBuilder<S, St>
 where
     St: wiki_entry_state::State,
     St::Title: wiki_entry_state::IsSet,
+    St::Content: wiki_entry_state::IsSet,
+    St::CreatedAt: wiki_entry_state::IsSet,
     St::LastUpdated: wiki_entry_state::IsSet,
     St::Slug: wiki_entry_state::IsSet,
-    St::CreatedAt: wiki_entry_state::IsSet,
-    St::Content: wiki_entry_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> WikiEntry<S> {

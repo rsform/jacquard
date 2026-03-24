@@ -125,37 +125,37 @@ pub mod state_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type LastUpdated;
         type Cursor;
+        type LastUpdated;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type LastUpdated = Unset;
         type Cursor = Unset;
-    }
-    ///State transition - sets the `last_updated` field to Set
-    pub struct SetLastUpdated<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetLastUpdated<St> {}
-    impl<St: State> State for SetLastUpdated<St> {
-        type LastUpdated = Set<members::last_updated>;
-        type Cursor = St::Cursor;
+        type LastUpdated = Unset;
     }
     ///State transition - sets the `cursor` field to Set
     pub struct SetCursor<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCursor<St> {}
     impl<St: State> State for SetCursor<St> {
-        type LastUpdated = St::LastUpdated;
         type Cursor = Set<members::cursor>;
+        type LastUpdated = St::LastUpdated;
+    }
+    ///State transition - sets the `last_updated` field to Set
+    pub struct SetLastUpdated<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetLastUpdated<St> {}
+    impl<St: State> State for SetLastUpdated<St> {
+        type Cursor = St::Cursor;
+        type LastUpdated = Set<members::last_updated>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `last_updated` field
-        pub struct last_updated(());
         ///Marker type for the `cursor` field
         pub struct cursor(());
+        ///Marker type for the `last_updated` field
+        pub struct last_updated(());
     }
 }
 
@@ -225,8 +225,8 @@ where
 impl<S: BosStr, St> StateBuilder<S, St>
 where
     St: state_state::State,
-    St::LastUpdated: state_state::IsSet,
     St::Cursor: state_state::IsSet,
+    St::LastUpdated: state_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> State<S> {

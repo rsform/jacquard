@@ -81,37 +81,37 @@ pub mod start_livestream_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Streamer;
         type Livestream;
+        type Streamer;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Streamer = Unset;
         type Livestream = Unset;
-    }
-    ///State transition - sets the `streamer` field to Set
-    pub struct SetStreamer<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetStreamer<St> {}
-    impl<St: State> State for SetStreamer<St> {
-        type Streamer = Set<members::streamer>;
-        type Livestream = St::Livestream;
+        type Streamer = Unset;
     }
     ///State transition - sets the `livestream` field to Set
     pub struct SetLivestream<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetLivestream<St> {}
     impl<St: State> State for SetLivestream<St> {
-        type Streamer = St::Streamer;
         type Livestream = Set<members::livestream>;
+        type Streamer = St::Streamer;
+    }
+    ///State transition - sets the `streamer` field to Set
+    pub struct SetStreamer<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStreamer<St> {}
+    impl<St: State> State for SetStreamer<St> {
+        type Livestream = St::Livestream;
+        type Streamer = Set<members::streamer>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `streamer` field
-        pub struct streamer(());
         ///Marker type for the `livestream` field
         pub struct livestream(());
+        ///Marker type for the `streamer` field
+        pub struct streamer(());
     }
 }
 
@@ -194,8 +194,8 @@ where
 impl<S: BosStr, St> StartLivestreamBuilder<S, St>
 where
     St: start_livestream_state::State,
-    St::Streamer: start_livestream_state::IsSet,
     St::Livestream: start_livestream_state::IsSet,
+    St::Streamer: start_livestream_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> StartLivestream<S> {

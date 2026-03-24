@@ -8,6 +8,7 @@ use jacquard::oauth::loopback::LoopbackConfig;
 use jacquard::types::blob::MimeType;
 use jacquard::types::string::Datetime;
 use miette::IntoDiagnostic;
+use smol_str::SmolStr;
 use std::path::PathBuf;
 
 #[derive(Parser, Debug)]
@@ -55,18 +56,18 @@ async fn main() -> miette::Result<()> {
         Some("webp") => "image/webp",
         _ => "image/jpeg", // default
     };
-    let mime_type = MimeType::new_static(mime_str);
+    let mime_type = MimeType::new(mime_str);
 
     println!("Uploading image...");
     let blob = agent.upload_blob(image_data, mime_type).await?;
 
     // Create post with image embed
     let post = Post {
-        text: CowStr::from(args.text),
+        text: SmolStr::from(args.text),
         created_at: Datetime::now(),
         embed: Some(PostEmbed::Images(Box::new(Images {
             images: vec![Image {
-                alt: CowStr::from(args.alt.unwrap_or_default()),
+                alt: SmolStr::from(args.alt.unwrap_or_default()),
                 image: blob.into(),
                 aspect_ratio: None,
                 extra_data: Default::default(),

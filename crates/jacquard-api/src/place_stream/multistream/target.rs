@@ -129,51 +129,51 @@ pub mod target_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type CreatedAt;
         type Url;
         type Active;
-        type CreatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type CreatedAt = Unset;
         type Url = Unset;
         type Active = Unset;
-        type CreatedAt = Unset;
-    }
-    ///State transition - sets the `url` field to Set
-    pub struct SetUrl<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUrl<St> {}
-    impl<St: State> State for SetUrl<St> {
-        type Url = Set<members::url>;
-        type Active = St::Active;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `active` field to Set
-    pub struct SetActive<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetActive<St> {}
-    impl<St: State> State for SetActive<St> {
-        type Url = St::Url;
-        type Active = Set<members::active>;
-        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
+        type CreatedAt = Set<members::created_at>;
         type Url = St::Url;
         type Active = St::Active;
-        type CreatedAt = Set<members::created_at>;
+    }
+    ///State transition - sets the `url` field to Set
+    pub struct SetUrl<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUrl<St> {}
+    impl<St: State> State for SetUrl<St> {
+        type CreatedAt = St::CreatedAt;
+        type Url = Set<members::url>;
+        type Active = St::Active;
+    }
+    ///State transition - sets the `active` field to Set
+    pub struct SetActive<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetActive<St> {}
+    impl<St: State> State for SetActive<St> {
+        type CreatedAt = St::CreatedAt;
+        type Url = St::Url;
+        type Active = Set<members::active>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `created_at` field
+        pub struct created_at(());
         ///Marker type for the `url` field
         pub struct url(());
         ///Marker type for the `active` field
         pub struct active(());
-        ///Marker type for the `created_at` field
-        pub struct created_at(());
     }
 }
 
@@ -275,9 +275,9 @@ where
 impl<S: BosStr, St> TargetBuilder<S, St>
 where
     St: target_state::State,
+    St::CreatedAt: target_state::IsSet,
     St::Url: target_state::IsSet,
     St::Active: target_state::IsSet,
-    St::CreatedAt: target_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Target<S> {

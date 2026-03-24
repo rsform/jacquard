@@ -234,51 +234,51 @@ pub mod document_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Title;
         type Pages;
         type Author;
-        type Title;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Title = Unset;
         type Pages = Unset;
         type Author = Unset;
-        type Title = Unset;
-    }
-    ///State transition - sets the `pages` field to Set
-    pub struct SetPages<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetPages<St> {}
-    impl<St: State> State for SetPages<St> {
-        type Pages = Set<members::pages>;
-        type Author = St::Author;
-        type Title = St::Title;
-    }
-    ///State transition - sets the `author` field to Set
-    pub struct SetAuthor<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetAuthor<St> {}
-    impl<St: State> State for SetAuthor<St> {
-        type Pages = St::Pages;
-        type Author = Set<members::author>;
-        type Title = St::Title;
     }
     ///State transition - sets the `title` field to Set
     pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetTitle<St> {}
     impl<St: State> State for SetTitle<St> {
+        type Title = Set<members::title>;
         type Pages = St::Pages;
         type Author = St::Author;
-        type Title = Set<members::title>;
+    }
+    ///State transition - sets the `pages` field to Set
+    pub struct SetPages<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetPages<St> {}
+    impl<St: State> State for SetPages<St> {
+        type Title = St::Title;
+        type Pages = Set<members::pages>;
+        type Author = St::Author;
+    }
+    ///State transition - sets the `author` field to Set
+    pub struct SetAuthor<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAuthor<St> {}
+    impl<St: State> State for SetAuthor<St> {
+        type Title = St::Title;
+        type Pages = St::Pages;
+        type Author = Set<members::author>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `title` field
+        pub struct title(());
         ///Marker type for the `pages` field
         pub struct pages(());
         ///Marker type for the `author` field
         pub struct author(());
-        ///Marker type for the `title` field
-        pub struct title(());
     }
 }
 
@@ -483,9 +483,9 @@ where
 impl<S: BosStr, St> DocumentBuilder<S, St>
 where
     St: document_state::State,
+    St::Title: document_state::IsSet,
     St::Pages: document_state::IsSet,
     St::Author: document_state::IsSet,
-    St::Title: document_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Document<S> {

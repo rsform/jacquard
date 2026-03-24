@@ -117,50 +117,50 @@ pub mod step_state {
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
         type Steps;
-        type UpdatedAt;
         type CreatedAt;
+        type UpdatedAt;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
         type Steps = Unset;
-        type UpdatedAt = Unset;
         type CreatedAt = Unset;
+        type UpdatedAt = Unset;
     }
     ///State transition - sets the `steps` field to Set
     pub struct SetSteps<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSteps<St> {}
     impl<St: State> State for SetSteps<St> {
         type Steps = Set<members::steps>;
+        type CreatedAt = St::CreatedAt;
         type UpdatedAt = St::UpdatedAt;
-        type CreatedAt = St::CreatedAt;
-    }
-    ///State transition - sets the `updated_at` field to Set
-    pub struct SetUpdatedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetUpdatedAt<St> {}
-    impl<St: State> State for SetUpdatedAt<St> {
-        type Steps = St::Steps;
-        type UpdatedAt = Set<members::updated_at>;
-        type CreatedAt = St::CreatedAt;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
         type Steps = St::Steps;
-        type UpdatedAt = St::UpdatedAt;
         type CreatedAt = Set<members::created_at>;
+        type UpdatedAt = St::UpdatedAt;
+    }
+    ///State transition - sets the `updated_at` field to Set
+    pub struct SetUpdatedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetUpdatedAt<St> {}
+    impl<St: State> State for SetUpdatedAt<St> {
+        type Steps = St::Steps;
+        type CreatedAt = St::CreatedAt;
+        type UpdatedAt = Set<members::updated_at>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
         ///Marker type for the `steps` field
         pub struct steps(());
-        ///Marker type for the `updated_at` field
-        pub struct updated_at(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `updated_at` field
+        pub struct updated_at(());
     }
 }
 
@@ -250,8 +250,8 @@ impl<S: BosStr, St> StepBuilder<S, St>
 where
     St: step_state::State,
     St::Steps: step_state::IsSet,
-    St::UpdatedAt: step_state::IsSet,
     St::CreatedAt: step_state::IsSet,
+    St::UpdatedAt: step_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Step<S> {

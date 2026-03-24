@@ -131,49 +131,49 @@ pub mod langs_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Title;
         type Lang;
+        type Title;
         type Moderation;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Title = Unset;
         type Lang = Unset;
+        type Title = Unset;
         type Moderation = Unset;
-    }
-    ///State transition - sets the `title` field to Set
-    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetTitle<St> {}
-    impl<St: State> State for SetTitle<St> {
-        type Title = Set<members::title>;
-        type Lang = St::Lang;
-        type Moderation = St::Moderation;
     }
     ///State transition - sets the `lang` field to Set
     pub struct SetLang<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetLang<St> {}
     impl<St: State> State for SetLang<St> {
-        type Title = St::Title;
         type Lang = Set<members::lang>;
+        type Title = St::Title;
+        type Moderation = St::Moderation;
+    }
+    ///State transition - sets the `title` field to Set
+    pub struct SetTitle<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetTitle<St> {}
+    impl<St: State> State for SetTitle<St> {
+        type Lang = St::Lang;
+        type Title = Set<members::title>;
         type Moderation = St::Moderation;
     }
     ///State transition - sets the `moderation` field to Set
     pub struct SetModeration<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetModeration<St> {}
     impl<St: State> State for SetModeration<St> {
-        type Title = St::Title;
         type Lang = St::Lang;
+        type Title = St::Title;
         type Moderation = Set<members::moderation>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `title` field
-        pub struct title(());
         ///Marker type for the `lang` field
         pub struct lang(());
+        ///Marker type for the `title` field
+        pub struct title(());
         ///Marker type for the `moderation` field
         pub struct moderation(());
     }
@@ -277,8 +277,8 @@ where
 impl<S: BosStr, St> LangsBuilder<S, St>
 where
     St: langs_state::State,
-    St::Title: langs_state::IsSet,
     St::Lang: langs_state::IsSet,
+    St::Title: langs_state::IsSet,
     St::Moderation: langs_state::IsSet,
 {
     /// Build the final struct.

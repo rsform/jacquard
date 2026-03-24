@@ -131,85 +131,85 @@ pub mod block_view_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
+        type Uri;
+        type Record;
         type IndexedAt;
         type Cid;
         type Blocker;
-        type Record;
-        type Uri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
+        type Uri = Unset;
+        type Record = Unset;
         type IndexedAt = Unset;
         type Cid = Unset;
         type Blocker = Unset;
-        type Record = Unset;
-        type Uri = Unset;
-    }
-    ///State transition - sets the `indexed_at` field to Set
-    pub struct SetIndexedAt<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetIndexedAt<St> {}
-    impl<St: State> State for SetIndexedAt<St> {
-        type IndexedAt = Set<members::indexed_at>;
-        type Cid = St::Cid;
-        type Blocker = St::Blocker;
-        type Record = St::Record;
-        type Uri = St::Uri;
-    }
-    ///State transition - sets the `cid` field to Set
-    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetCid<St> {}
-    impl<St: State> State for SetCid<St> {
-        type IndexedAt = St::IndexedAt;
-        type Cid = Set<members::cid>;
-        type Blocker = St::Blocker;
-        type Record = St::Record;
-        type Uri = St::Uri;
-    }
-    ///State transition - sets the `blocker` field to Set
-    pub struct SetBlocker<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetBlocker<St> {}
-    impl<St: State> State for SetBlocker<St> {
-        type IndexedAt = St::IndexedAt;
-        type Cid = St::Cid;
-        type Blocker = Set<members::blocker>;
-        type Record = St::Record;
-        type Uri = St::Uri;
-    }
-    ///State transition - sets the `record` field to Set
-    pub struct SetRecord<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetRecord<St> {}
-    impl<St: State> State for SetRecord<St> {
-        type IndexedAt = St::IndexedAt;
-        type Cid = St::Cid;
-        type Blocker = St::Blocker;
-        type Record = Set<members::record>;
-        type Uri = St::Uri;
     }
     ///State transition - sets the `uri` field to Set
     pub struct SetUri<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetUri<St> {}
     impl<St: State> State for SetUri<St> {
+        type Uri = Set<members::uri>;
+        type Record = St::Record;
         type IndexedAt = St::IndexedAt;
         type Cid = St::Cid;
         type Blocker = St::Blocker;
+    }
+    ///State transition - sets the `record` field to Set
+    pub struct SetRecord<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetRecord<St> {}
+    impl<St: State> State for SetRecord<St> {
+        type Uri = St::Uri;
+        type Record = Set<members::record>;
+        type IndexedAt = St::IndexedAt;
+        type Cid = St::Cid;
+        type Blocker = St::Blocker;
+    }
+    ///State transition - sets the `indexed_at` field to Set
+    pub struct SetIndexedAt<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIndexedAt<St> {}
+    impl<St: State> State for SetIndexedAt<St> {
+        type Uri = St::Uri;
         type Record = St::Record;
-        type Uri = Set<members::uri>;
+        type IndexedAt = Set<members::indexed_at>;
+        type Cid = St::Cid;
+        type Blocker = St::Blocker;
+    }
+    ///State transition - sets the `cid` field to Set
+    pub struct SetCid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetCid<St> {}
+    impl<St: State> State for SetCid<St> {
+        type Uri = St::Uri;
+        type Record = St::Record;
+        type IndexedAt = St::IndexedAt;
+        type Cid = Set<members::cid>;
+        type Blocker = St::Blocker;
+    }
+    ///State transition - sets the `blocker` field to Set
+    pub struct SetBlocker<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetBlocker<St> {}
+    impl<St: State> State for SetBlocker<St> {
+        type Uri = St::Uri;
+        type Record = St::Record;
+        type IndexedAt = St::IndexedAt;
+        type Cid = St::Cid;
+        type Blocker = Set<members::blocker>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
+        ///Marker type for the `uri` field
+        pub struct uri(());
+        ///Marker type for the `record` field
+        pub struct record(());
         ///Marker type for the `indexed_at` field
         pub struct indexed_at(());
         ///Marker type for the `cid` field
         pub struct cid(());
         ///Marker type for the `blocker` field
         pub struct blocker(());
-        ///Marker type for the `record` field
-        pub struct record(());
-        ///Marker type for the `uri` field
-        pub struct uri(());
     }
 }
 
@@ -342,11 +342,11 @@ where
 impl<S: BosStr, St> BlockViewBuilder<S, St>
 where
     St: block_view_state::State,
+    St::Uri: block_view_state::IsSet,
+    St::Record: block_view_state::IsSet,
     St::IndexedAt: block_view_state::IsSet,
     St::Cid: block_view_state::IsSet,
     St::Blocker: block_view_state::IsSet,
-    St::Record: block_view_state::IsSet,
-    St::Uri: block_view_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> BlockView<S> {

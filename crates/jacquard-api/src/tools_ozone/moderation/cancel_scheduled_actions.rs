@@ -417,37 +417,37 @@ pub mod failed_cancellation_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Did;
         type Error;
+        type Did;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Did = Unset;
         type Error = Unset;
-    }
-    ///State transition - sets the `did` field to Set
-    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDid<St> {}
-    impl<St: State> State for SetDid<St> {
-        type Did = Set<members::did>;
-        type Error = St::Error;
+        type Did = Unset;
     }
     ///State transition - sets the `error` field to Set
     pub struct SetError<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetError<St> {}
     impl<St: State> State for SetError<St> {
-        type Did = St::Did;
         type Error = Set<members::error>;
+        type Did = St::Did;
+    }
+    ///State transition - sets the `did` field to Set
+    pub struct SetDid<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDid<St> {}
+    impl<St: State> State for SetDid<St> {
+        type Error = St::Error;
+        type Did = Set<members::did>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `did` field
-        pub struct did(());
         ///Marker type for the `error` field
         pub struct error(());
+        ///Marker type for the `did` field
+        pub struct did(());
     }
 }
 
@@ -530,8 +530,8 @@ impl<S: BosStr, St: failed_cancellation_state::State> FailedCancellationBuilder<
 impl<S: BosStr, St> FailedCancellationBuilder<S, St>
 where
     St: failed_cancellation_state::State,
-    St::Did: failed_cancellation_state::IsSet,
     St::Error: failed_cancellation_state::IsSet,
+    St::Did: failed_cancellation_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> FailedCancellation<S> {

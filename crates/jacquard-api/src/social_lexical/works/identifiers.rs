@@ -333,37 +333,37 @@ pub mod identifiers_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Identifiers;
         type Work;
+        type Identifiers;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Identifiers = Unset;
         type Work = Unset;
-    }
-    ///State transition - sets the `identifiers` field to Set
-    pub struct SetIdentifiers<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetIdentifiers<St> {}
-    impl<St: State> State for SetIdentifiers<St> {
-        type Identifiers = Set<members::identifiers>;
-        type Work = St::Work;
+        type Identifiers = Unset;
     }
     ///State transition - sets the `work` field to Set
     pub struct SetWork<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetWork<St> {}
     impl<St: State> State for SetWork<St> {
-        type Identifiers = St::Identifiers;
         type Work = Set<members::work>;
+        type Identifiers = St::Identifiers;
+    }
+    ///State transition - sets the `identifiers` field to Set
+    pub struct SetIdentifiers<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetIdentifiers<St> {}
+    impl<St: State> State for SetIdentifiers<St> {
+        type Work = St::Work;
+        type Identifiers = Set<members::identifiers>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `identifiers` field
-        pub struct identifiers(());
         ///Marker type for the `work` field
         pub struct work(());
+        ///Marker type for the `identifiers` field
+        pub struct identifiers(());
     }
 }
 
@@ -433,8 +433,8 @@ where
 impl<S: BosStr, St> IdentifiersBuilder<S, St>
 where
     St: identifiers_state::State,
-    St::Identifiers: identifiers_state::IsSet,
     St::Work: identifiers_state::IsSet,
+    St::Identifiers: identifiers_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Identifiers<S> {

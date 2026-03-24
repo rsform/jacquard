@@ -329,37 +329,37 @@ pub mod migration_result_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type GameUri;
         type Status;
+        type GameUri;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type GameUri = Unset;
         type Status = Unset;
-    }
-    ///State transition - sets the `game_uri` field to Set
-    pub struct SetGameUri<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetGameUri<St> {}
-    impl<St: State> State for SetGameUri<St> {
-        type GameUri = Set<members::game_uri>;
-        type Status = St::Status;
+        type GameUri = Unset;
     }
     ///State transition - sets the `status` field to Set
     pub struct SetStatus<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetStatus<St> {}
     impl<St: State> State for SetStatus<St> {
-        type GameUri = St::GameUri;
         type Status = Set<members::status>;
+        type GameUri = St::GameUri;
+    }
+    ///State transition - sets the `game_uri` field to Set
+    pub struct SetGameUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetGameUri<St> {}
+    impl<St: State> State for SetGameUri<St> {
+        type Status = St::Status;
+        type GameUri = Set<members::game_uri>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `game_uri` field
-        pub struct game_uri(());
         ///Marker type for the `status` field
         pub struct status(());
+        ///Marker type for the `game_uri` field
+        pub struct game_uri(());
     }
 }
 
@@ -460,8 +460,8 @@ where
 impl<S: BosStr, St> MigrationResultBuilder<S, St>
 where
     St: migration_result_state::State,
-    St::GameUri: migration_result_state::IsSet,
     St::Status: migration_result_state::IsSet,
+    St::GameUri: migration_result_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> MigrationResult<S> {

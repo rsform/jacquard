@@ -329,49 +329,49 @@ pub mod signature_ref_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type AtUri;
         type CreatedAt;
+        type AtUri;
         type Signature;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type AtUri = Unset;
         type CreatedAt = Unset;
+        type AtUri = Unset;
         type Signature = Unset;
-    }
-    ///State transition - sets the `at_uri` field to Set
-    pub struct SetAtUri<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetAtUri<St> {}
-    impl<St: State> State for SetAtUri<St> {
-        type AtUri = Set<members::at_uri>;
-        type CreatedAt = St::CreatedAt;
-        type Signature = St::Signature;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type AtUri = St::AtUri;
         type CreatedAt = Set<members::created_at>;
+        type AtUri = St::AtUri;
+        type Signature = St::Signature;
+    }
+    ///State transition - sets the `at_uri` field to Set
+    pub struct SetAtUri<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetAtUri<St> {}
+    impl<St: State> State for SetAtUri<St> {
+        type CreatedAt = St::CreatedAt;
+        type AtUri = Set<members::at_uri>;
         type Signature = St::Signature;
     }
     ///State transition - sets the `signature` field to Set
     pub struct SetSignature<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetSignature<St> {}
     impl<St: State> State for SetSignature<St> {
-        type AtUri = St::AtUri;
         type CreatedAt = St::CreatedAt;
+        type AtUri = St::AtUri;
         type Signature = Set<members::signature>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `at_uri` field
-        pub struct at_uri(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
+        ///Marker type for the `at_uri` field
+        pub struct at_uri(());
         ///Marker type for the `signature` field
         pub struct signature(());
     }
@@ -462,8 +462,8 @@ where
 impl<S: BosStr, St> SignatureRefBuilder<S, St>
 where
     St: signature_ref_state::State,
-    St::AtUri: signature_ref_state::IsSet,
     St::CreatedAt: signature_ref_state::IsSet,
+    St::AtUri: signature_ref_state::IsSet,
     St::Signature: signature_ref_state::IsSet,
 {
     /// Build the final struct.

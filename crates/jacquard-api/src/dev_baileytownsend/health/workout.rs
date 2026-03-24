@@ -121,105 +121,105 @@ pub mod workout_state {
     }
     /// State trait tracking which required fields have been set
     pub trait State: sealed::Sealed {
-        type Activity;
-        type EndTime;
-        type Duration;
-        type StartTime;
         type CreatedAt;
         type CaloriesBurned;
+        type Duration;
+        type EndTime;
+        type StartTime;
+        type Activity;
     }
     /// Empty state - all required fields are unset
     pub struct Empty(());
     impl sealed::Sealed for Empty {}
     impl State for Empty {
-        type Activity = Unset;
-        type EndTime = Unset;
-        type Duration = Unset;
-        type StartTime = Unset;
         type CreatedAt = Unset;
         type CaloriesBurned = Unset;
-    }
-    ///State transition - sets the `activity` field to Set
-    pub struct SetActivity<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetActivity<St> {}
-    impl<St: State> State for SetActivity<St> {
-        type Activity = Set<members::activity>;
-        type EndTime = St::EndTime;
-        type Duration = St::Duration;
-        type StartTime = St::StartTime;
-        type CreatedAt = St::CreatedAt;
-        type CaloriesBurned = St::CaloriesBurned;
-    }
-    ///State transition - sets the `end_time` field to Set
-    pub struct SetEndTime<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetEndTime<St> {}
-    impl<St: State> State for SetEndTime<St> {
-        type Activity = St::Activity;
-        type EndTime = Set<members::end_time>;
-        type Duration = St::Duration;
-        type StartTime = St::StartTime;
-        type CreatedAt = St::CreatedAt;
-        type CaloriesBurned = St::CaloriesBurned;
-    }
-    ///State transition - sets the `duration` field to Set
-    pub struct SetDuration<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetDuration<St> {}
-    impl<St: State> State for SetDuration<St> {
-        type Activity = St::Activity;
-        type EndTime = St::EndTime;
-        type Duration = Set<members::duration>;
-        type StartTime = St::StartTime;
-        type CreatedAt = St::CreatedAt;
-        type CaloriesBurned = St::CaloriesBurned;
-    }
-    ///State transition - sets the `start_time` field to Set
-    pub struct SetStartTime<St: State = Empty>(PhantomData<fn() -> St>);
-    impl<St: State> sealed::Sealed for SetStartTime<St> {}
-    impl<St: State> State for SetStartTime<St> {
-        type Activity = St::Activity;
-        type EndTime = St::EndTime;
-        type Duration = St::Duration;
-        type StartTime = Set<members::start_time>;
-        type CreatedAt = St::CreatedAt;
-        type CaloriesBurned = St::CaloriesBurned;
+        type Duration = Unset;
+        type EndTime = Unset;
+        type StartTime = Unset;
+        type Activity = Unset;
     }
     ///State transition - sets the `created_at` field to Set
     pub struct SetCreatedAt<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCreatedAt<St> {}
     impl<St: State> State for SetCreatedAt<St> {
-        type Activity = St::Activity;
-        type EndTime = St::EndTime;
-        type Duration = St::Duration;
-        type StartTime = St::StartTime;
         type CreatedAt = Set<members::created_at>;
         type CaloriesBurned = St::CaloriesBurned;
+        type Duration = St::Duration;
+        type EndTime = St::EndTime;
+        type StartTime = St::StartTime;
+        type Activity = St::Activity;
     }
     ///State transition - sets the `calories_burned` field to Set
     pub struct SetCaloriesBurned<St: State = Empty>(PhantomData<fn() -> St>);
     impl<St: State> sealed::Sealed for SetCaloriesBurned<St> {}
     impl<St: State> State for SetCaloriesBurned<St> {
-        type Activity = St::Activity;
-        type EndTime = St::EndTime;
-        type Duration = St::Duration;
-        type StartTime = St::StartTime;
         type CreatedAt = St::CreatedAt;
         type CaloriesBurned = Set<members::calories_burned>;
+        type Duration = St::Duration;
+        type EndTime = St::EndTime;
+        type StartTime = St::StartTime;
+        type Activity = St::Activity;
+    }
+    ///State transition - sets the `duration` field to Set
+    pub struct SetDuration<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetDuration<St> {}
+    impl<St: State> State for SetDuration<St> {
+        type CreatedAt = St::CreatedAt;
+        type CaloriesBurned = St::CaloriesBurned;
+        type Duration = Set<members::duration>;
+        type EndTime = St::EndTime;
+        type StartTime = St::StartTime;
+        type Activity = St::Activity;
+    }
+    ///State transition - sets the `end_time` field to Set
+    pub struct SetEndTime<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetEndTime<St> {}
+    impl<St: State> State for SetEndTime<St> {
+        type CreatedAt = St::CreatedAt;
+        type CaloriesBurned = St::CaloriesBurned;
+        type Duration = St::Duration;
+        type EndTime = Set<members::end_time>;
+        type StartTime = St::StartTime;
+        type Activity = St::Activity;
+    }
+    ///State transition - sets the `start_time` field to Set
+    pub struct SetStartTime<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetStartTime<St> {}
+    impl<St: State> State for SetStartTime<St> {
+        type CreatedAt = St::CreatedAt;
+        type CaloriesBurned = St::CaloriesBurned;
+        type Duration = St::Duration;
+        type EndTime = St::EndTime;
+        type StartTime = Set<members::start_time>;
+        type Activity = St::Activity;
+    }
+    ///State transition - sets the `activity` field to Set
+    pub struct SetActivity<St: State = Empty>(PhantomData<fn() -> St>);
+    impl<St: State> sealed::Sealed for SetActivity<St> {}
+    impl<St: State> State for SetActivity<St> {
+        type CreatedAt = St::CreatedAt;
+        type CaloriesBurned = St::CaloriesBurned;
+        type Duration = St::Duration;
+        type EndTime = St::EndTime;
+        type StartTime = St::StartTime;
+        type Activity = Set<members::activity>;
     }
     /// Marker types for field names
     #[allow(non_camel_case_types)]
     pub mod members {
-        ///Marker type for the `activity` field
-        pub struct activity(());
-        ///Marker type for the `end_time` field
-        pub struct end_time(());
-        ///Marker type for the `duration` field
-        pub struct duration(());
-        ///Marker type for the `start_time` field
-        pub struct start_time(());
         ///Marker type for the `created_at` field
         pub struct created_at(());
         ///Marker type for the `calories_burned` field
         pub struct calories_burned(());
+        ///Marker type for the `duration` field
+        pub struct duration(());
+        ///Marker type for the `end_time` field
+        pub struct end_time(());
+        ///Marker type for the `start_time` field
+        pub struct start_time(());
+        ///Marker type for the `activity` field
+        pub struct activity(());
     }
 }
 
@@ -386,12 +386,12 @@ where
 impl<S: BosStr, St> WorkoutBuilder<S, St>
 where
     St: workout_state::State,
-    St::Activity: workout_state::IsSet,
-    St::EndTime: workout_state::IsSet,
-    St::Duration: workout_state::IsSet,
-    St::StartTime: workout_state::IsSet,
     St::CreatedAt: workout_state::IsSet,
     St::CaloriesBurned: workout_state::IsSet,
+    St::Duration: workout_state::IsSet,
+    St::EndTime: workout_state::IsSet,
+    St::StartTime: workout_state::IsSet,
+    St::Activity: workout_state::IsSet,
 {
     /// Build the final struct.
     pub fn build(self) -> Workout<S> {
