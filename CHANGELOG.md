@@ -1,5 +1,75 @@
 # Changelog
 
+## [0.12.0-beta.1] - 2026-03-23
+
+### Breaking changes
+
+**Borrow-or-share (BOS) type system** (all crates)
+- All validated string types (`Did`, `Handle`, `Nsid`, `Rkey`, `AtUri`, `AtIdentifier`, `MimeType`, `Cid`, `CidLink`, `Blob`, `BlobRef`, `Data`, `Array`, `Object`, `DidDocument`, `RecordUri`, `UriValue`, `RepoPath`) are now parameterised on `S: BosStr = DefaultStr` instead of lifetimes
+- `DefaultStr = SmolStr`: owned, inline ≤23 bytes, `DeserializeOwned`
+- `&str`, `CowStr<'a>`, `String` all work as backing types via the `BosStr` trait
+- `SmolStr`-backed types satisfy `DeserializeOwned`, enabling use in async contexts, collections, and across thread boundaries without `IntoStatic` conversion
+- New `.borrow()` method on `Did`, `Handle`, `Nsid`, `Rkey`, `RecordKey` returns `Type<&str>` for cheap borrowing (analogous to `Uri::borrow()`)
+- New `.convert::<B>()` method for cross-backing-type conversion
+
+**XRPC trait changes** (`jacquard-common`)
+- `XrpcResp::Output<S: BosStr>`: GAT parameterised on backing type S, not lifetime
+- `XrpcResp::Err`: plain associated type, always `SmolStr`-backed and `DeserializeOwned`
+- `XrpcRequest` now requires `Serialize` bound
+- `XrpcEndpoint::Request<S: BosStr>`: GAT for server-side extraction
+- `SubscriptionResp::Message<S: BosStr>`, `SubscriptionEndpoint::Params<S: BosStr>`: updated GATs
+- `XrpcProcedureStream::Frame<S: BosStr>`, `XrpcStreamResp::Frame<S: BosStr>`: streaming frame GATs updated
+
+**Response parsing** (`jacquard-common`)
+- `Response::parse::<S>()`: caller chooses backing type via turbofish
+- `Response::into_output()`: returns `SmolStr`-backed owned types via `DeserializeOwned`
+- Zero-copy: `response.parse::<CowStr<'_>>()`; owned: `response.into_output()`
+
+**Generated API types** (`jacquard-api`, `jacquard-lexicon`)
+- All generated structs/enums: `Foo<S: BosStr = DefaultStr>` with `#[serde(bound(deserialize = "S: Deserialize<'de> + BosStr"))]`
+- `#[serde(borrow)]` removed from all generated code
+- String field defaults use `FromStaticStr::from_static()` for zero-alloc construction
+- Error enums: `SmolStr` message fields, no lifetime parameters
+- Type aliases: `<S = DefaultStr>` (no bounds, per rust type checker limitation)
+
+**OAuth types** (`jacquard-oauth`)
+- All session, metadata, token, scope, and JWT types parameterised on `S: BosStr = DefaultStr`
+- `OAuthMetadata<S>` parameterised so callers can borrow from stored metadata
+- `DpopDataSource` trait methods return `Option<&str>` (was `Option<CowStr<'_>>`)
+- DPoP proof building uses `&str` for zero-copy JWT construction
+- `build_dpop_proof` takes `&str` parameters, returns `SmolStr`
+
+**Identity resolution** (`jacquard-identity`)
+- `IdentityResolver::resolve_handle<S: BosStr + Sync>(&self, handle: &Handle<S>)`: generic over handle backing type
+- `IdentityResolver::resolve_did_doc<S: BosStr + Sync>(&self, did: &Did<S>)`: generic over DID backing type
+
+**Repository types** (`jacquard-repo`)
+- `Commit<S: BosStr = DefaultStr>`, `UnsignedCommit<S>`, `RecordClaim<S>`, `VerifyProofsOutput<S>` parameterised on S
+- `RecordWriteOp` now parameterised on both S (for string fields) and BS (for BlockStore)
+- `RawData<'a>` intentionally remains lifetime-based
+
+**Derive macros** (`jacquard-derive`)
+- `#[lexicon]` detects type param S, emits `Data<S>` for `extra_data`
+- `#[open_union]` detects type param S, emits `Unknown(Data<S>)`
+- `#[derive(IntoStatic)]` handles S-parameterised types
+- `#[derive(XrpcRequest)]` generates new `Output<S: BosStr>` and `Err` (not GAT) impls
+
+**Client types** (`jacquard`)
+- `AtpSession` fields `access_jwt`/`refresh_jwt` are now `SmolStr` (was `CowStr<'static>`)
+- `SessionKey` uses `Did` and `SmolStr` (was `Did<'static>` and `CowStr<'static>`)
+- `AgentSessionExt` record methods (`get_record`, `update_record`, etc.) take `AtUri<S>` / `RecordUri<S, R>` with generic S
+- Moderation types (`ModerationPrefs`, `LabelerDefs`, `Labeled` trait, etc.) parameterised on S
+
+### Removed
+
+- `jacquard-axum` temporarily removed from workspace (extractor needs redesign for BOS type params)
+
+### Changed
+
+**Codegen** (`jacquard-lexicon`)
+- Generated `XrpcResp` impls emit `Output<S: BosStr>` and `Err` (plain type, not GAT)
+- Generated `XrpcEndpoint` impls emit `Request<S: BosStr>`
+
 ## [0.11.0] - 2026-03-21
 
 ### Breaking changes

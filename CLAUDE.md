@@ -36,7 +36,7 @@ This is a Cargo workspace with several crates:
 - jacquard-common: Core AT Protocol types (DIDs, handles, at-URIs, NSIDs, TIDs, CIDs, etc.) and the `CowStr` type
 - jacquard-lexicon: Lexicon parsing and Rust code generation from lexicon schemas
 - jacquard-api: Generated API bindings from 646 lexicon schemas (ATProto, Bluesky, community lexicons)
-- jacquard-derive: Attribute macros (`#[lexicon]`, `#[open_union]`) and derive macros (`#[derive(IntoStatic)]`) for lexicon structures
+- jacquard-derive: Attribute macros (`#[lexicon]`, `#[open_union]`) and derive macros (`#[derive(IntoStatic)]`, `#[derive(XrpcRequest)]`) for lexicon structures
 - jacquard-oauth: OAuth/DPoP flow implementation with session management
 - jacquard-axum: Server-side XRPC handler extractors for Axum framework
 - jacquard-identity: Identity resolution (handle→DID, DID→Doc)
@@ -125,26 +125,28 @@ Examples:
 
 ## String Type Pattern
 
-All validated string types follow a consistent pattern:
-- Constructors: `new()`, `new_owned()`, `new_static()`, `raw()`, `unchecked()`, `as_str()`
-- Traits: `Serialize`, `Deserialize`, `FromStr`, `Display`, `Debug`, `PartialEq`, `Eq`, `Hash`, `Clone`, conversions to/from `String`/`CowStr`/`SmolStr`, `AsRef<str>`, `Deref<Target=str>`
-- Implementation notes: Prefer `#[repr(transparent)]` where possible; use `SmolStr` for short strings, `CowStr` for longer; implement or derive `IntoStatic` for owned conversion
+All validated string types (`Did`, `Handle`, `Nsid`, `Rkey`, `AtUri`, etc.) are parameterised on `S: BosStr = DefaultStr` where `DefaultStr = SmolStr`:
+- Constructors: `new(s: S)`, `new_owned(impl AsRef<str>)`, `new_static(&'static str)`, `raw()`, `unchecked()`
+- Borrowing: `borrow(&self) -> Type<&str>` — cheap borrow analogous to `Uri::borrow()`
+- Conversion: `convert<B: BosStr + From<S>>(self) -> Type<B>` — cross-type conversion
+- Traits: `Serialize`, `Deserialize`, `FromStr`, `Display`, `Debug`, `PartialEq`, `Eq`, `Hash`, `Clone`, `AsRef<str>`, `Deref<Target=str>`
+- Implementation notes: `#[repr(transparent)]` newtypes; `SmolStr` as default backing (inline ≤23 bytes, Arc for longer)
 - When constructing from a static string, use `new_static()` to avoid unnecessary allocations
+- `FromStaticStr::from_static()` for zero-alloc construction in generic contexts
 
-## Lifetimes and Zero-Copy Deserialization
+## Borrow-or-share type system
 
-All API types support borrowed deserialization via explicit lifetimes:
-- Request/output types: parameterised by `'de` lifetime (e.g., `GetAuthorFeed<'de>`, `GetAuthorFeedOutput<'de>`)
-- Fields use `#[serde(borrow)]` where possible (strings, nested objects with lifetimes)
-- `CowStr<'a>` enables efficient borrowing from input buffers or owning small strings inline (via `SmolStr`)
-- All types implement `IntoStatic` trait to convert borrowed data to owned (`'static`) variants
-- Code generator automatically propagates lifetimes through nested structures
+All API types are parameterised on `S: BosStr = DefaultStr`:
+- `SmolStr` (= `DefaultStr`): owned, `DeserializeOwned`, can cross async boundaries and be stored
+- `&str`: zero-copy borrowed access, cheapest possible
+- `CowStr<'a>`: borrow-or-own flexibility (still lifetime-based itself)
+- `String`: standard owned strings
 
-Response lifetime handling:
-- `Response::parse()` borrows from the response buffer for zero-copy parsing
-- `Response::into_output()` converts to owned data using `IntoStatic`
-- `Response::transmute()`: reinterpret response as different type (used for typed collection responses)
-- Both methods provide typed error handling
+Response handling:
+- `Response::parse::<S>()` — caller chooses backing type via turbofish (e.g., `parse::<CowStr<'_>>()` for zero-copy)
+- `Response::into_output()` — returns `SmolStr`-backed owned types (`DeserializeOwned`)
+- `Response::transmute()` — reinterpret response as different type (used for typed collection responses)
+- `SmolStr`-backed types satisfy `DeserializeOwned`, so they work in async contexts, collections, and across thread boundaries without `IntoStatic`
 
 ## API Coverage (jacquard-api)
 
@@ -155,38 +157,35 @@ Response lifetime handling:
 ## Value Types (jacquard-common)
 
 For working with loosely-typed atproto data:
-- `Data<'a>`: Validated, typed representation of atproto values
+- `Data<S: BosStr>`: Validated, typed representation of atproto values
 - `RawData<'a>`: Unvalidated raw values from deserialization
 - `from_data`, `from_raw_data`, `to_data`, `to_raw_data`: Convert between typed and untyped
 - Useful for second-stage deserialization of `type "unknown"` fields (e.g., `PostView.record`)
 
 Collection types:
 - `Collection` trait: Marker trait for record types with `NSID` constant and `Record` associated type
-- `RecordError<'a>`: Generic error type for record retrieval operations (RecordNotFound, Unknown)
+- `RecordError`: Generic error type for record retrieval operations (RecordNotFound, Unknown)
 
-## Lifetime Design Pattern
+## XRPC type design pattern
 
-Jacquard uses a specific pattern to enable zero-copy deserialization while avoiding HRTB issues and async lifetime problems:
-
-**GATs on associated types** instead of trait-level lifetimes:
+XRPC traits use GATs parameterised on `S: BosStr`:
 ```rust
 trait XrpcResp {
-    type Output<'de>: Deserialize<'de> + IntoStatic;  // GAT, not trait-level lifetime
+    type Output<S: BosStr>;  // GAT parameterised on backing type, not lifetime
+    type Err;                 // Plain associated type, always SmolStr-backed
 }
 ```
 
-**Method-level generic lifetimes** for trait methods that need them:
-```rust
-fn extract_vec<'s>(output: Self::Output<'s>) -> Vec<Item>
-```
-
-**Response wrapper owns buffer** to solve async lifetime issues:
+**Response wrapper owns buffer** — caller chooses backing type:
 ```rust
 async fn get_record<R>(&self, rkey: K) -> Result<Response<R>>
-// Caller chooses: response.parse() (borrow) or response.into_output() (owned)
+// response.parse::<CowStr<'_>>()  — zero-copy from buffer
+// response.into_output()           — SmolStr-backed, DeserializeOwned
 ```
 
-This pattern avoids `for<'any> Trait<'any>` bounds (which force `DeserializeOwned` semantics) while giving callers control over borrowing vs owning. See `jacquard-common` crate docs for detailed explanation.
+Error types (`Err`) are always `SmolStr`-backed and `DeserializeOwned` — no lifetime gymnastics for error handling.
+
+Generated error enums use `SmolStr` message fields and `#[serde(untagged)] Other { error, message }` catch-all.
 
 ## WASM Compatibility
 
@@ -201,7 +200,6 @@ Implementation approach:
 Test WASM compilation:
 ```bash
 just check-wasm
-# or: cargo build --target wasm32-unknown-unknown -p jacquard-common --no-default-features
 ```
 
 ## Client Architecture

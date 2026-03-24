@@ -120,13 +120,13 @@ path = "../../examples/moderated_timeline.rs"
 required-features = ["api_bluesky", "loopback"]
 
 [dependencies]
-jacquard-api = { version = "0.11", path = "../jacquard-api" }
-jacquard-common = { version = "0.11", path = "../jacquard-common", features = [
+jacquard-api = { version = "0.12.0-beta.1", path = "../jacquard-api" }
+jacquard-common = { version = "0.12.0-beta.1", path = "../jacquard-common", features = [
     "reqwest-client",
 ] }
-jacquard-oauth = { version = "0.11", path = "../jacquard-oauth" }
-jacquard-derive = { version = "0.11", path = "../jacquard-derive", optional = true }
-jacquard-identity = { version = "0.11", path = "../jacquard-identity" }
+jacquard-oauth = { version = "0.12.0-beta.1", path = "../jacquard-oauth" }
+jacquard-derive = { version = "0.12.0-beta.1", path = "../jacquard-derive", optional = true }
+jacquard-identity = { version = "0.12.0-beta.1", path = "../jacquard-identity" }
 
 
 
@@ -149,7 +149,7 @@ n0-future = { workspace = true, optional = true }
 
 
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
-jacquard-identity = { version = "0.11", path = "../jacquard-identity", features = ["cache"] }
+jacquard-identity = { version = "0.12.0-beta.1", path = "../jacquard-identity", features = ["cache"] }
 reqwest = { workspace = true, features = [
     "http2",
     "gzip",
