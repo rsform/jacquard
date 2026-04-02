@@ -1,0 +1,25 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "jacquard",
+  "version": "1.0.0",
+  "owner": {
+    "name": "Orual",
+    "url": "https://tangled.org/nonbinary.computer"
+  },
+  "metadata": {
+    "description": "Plugin marketplace for the Jacquard AT Protocol library"
+  },
+  "plugins": [
+    {
+      "name": "jacquard",
+      "version": "0.1.0",
+      "description": "Skill for working with the Jacquard AT Protocol library for Rust — teaches correct BosStr usage, borrow-first patterns, and common pitfalls",
+      "source": "./plugins/jacquard",
+      "category": "development",
+      "author": {
+        "name": "Orual",
+        "url": "https://tangled.org/nonbinary.computer"
+      }
+    }
+  ]
+}

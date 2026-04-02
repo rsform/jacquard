@@ -5,6 +5,9 @@
 !.tangled
 !.github
 !.cargo
+!.claude-plugin
+!.gitignore
+!.envrc
 /.pre-commit-config.yaml
 crates/jacquard-lexicon/target
 /plans

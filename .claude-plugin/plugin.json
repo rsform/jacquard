@@ -1,0 +1,13 @@
+{
+  "name": "jacquard",
+  "version": "0.1.0",
+  "description": "Skill for working with the Jacquard AT Protocol library for Rust — teaches correct BosStr usage, borrow-first patterns, and common pitfalls",
+  "author": {
+    "name": "Orual",
+    "url": "https://tangled.org/nonbinary.computer"
+  },
+  "homepage": "https://tangled.org/nonbinary.computer/jacquard",
+  "repository": "https://tangled.org/nonbinary.computer/jacquard",
+  "license": "MIT OR Apache-2.0",
+  "keywords": ["rust", "atproto", "bluesky", "jacquard"]
+}
