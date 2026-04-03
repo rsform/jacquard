@@ -60,6 +60,7 @@ multihash = { version = "0.19", default-features = false, features = ["alloc"] }
 dashmap = "6.1"
 mini-moka = "0.10"
 indexmap = { version = "*", default-features = false, features = ["alloc"] }
+smallvec = { version = "1", features = ["const_generics"] }
 
 # Proc macros
 proc-macro2 = "1.0"

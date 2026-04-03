@@ -30,7 +30,11 @@ pub static NSID_REGEX: Lazy<Regex> = Lazy::new(|| {
     Regex::new(r"^[a-zA-Z]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+(\.[a-zA-Z][a-zA-Z0-9]{0,62})$").unwrap()
 });
 
-pub(crate) fn validate_nsid(nsid: &str) -> Result<(), AtStrError> {
+/// Validate an NSID string without constructing an `Nsid<S>`.
+///
+/// Checks length (≤317) and format against `NSID_REGEX`. Returns `Ok(())`
+/// if valid. Use this when you need validation without allocation.
+pub fn validate_nsid(nsid: &str) -> Result<(), AtStrError> {
     if nsid.len() > 317 {
         Err(AtStrError::too_long("nsid", nsid, 317, nsid.len()))
     } else if !NSID_REGEX.is_match(nsid) {

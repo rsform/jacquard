@@ -43,7 +43,11 @@ fn strip_did_prefix(did: &str) -> &str {
     did.strip_prefix("at://").unwrap_or(did)
 }
 
-pub(crate) fn validate_did(did: &str) -> Result<(), AtStrError> {
+/// Validate a DID string without constructing a `Did<S>`.
+///
+/// Checks length (≤2048) and format against `DID_REGEX`. Returns `Ok(())`
+/// if valid. Use this when you need validation without allocation.
+pub fn validate_did(did: &str) -> Result<(), AtStrError> {
     if did.len() > 2048 {
         Err(AtStrError::too_long("did", did, 2048, did.len()))
     } else if !DID_REGEX.is_match(did) {

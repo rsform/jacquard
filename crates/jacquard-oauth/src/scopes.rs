@@ -25,12 +25,14 @@ use std::marker::PhantomData;
 use std::str::FromStr;
 
 use jacquard_common::bos::{BosStr, DefaultStr};
+use jacquard_common::deps::fluent_uri::pct_enc::{EString, encoder::Query as EncQuery};
 use jacquard_common::types::did::Did;
 use jacquard_common::types::nsid::Nsid;
 use jacquard_common::types::string::AtStrError;
 use jacquard_common::{Bos, FromStaticStr, IntoStatic};
 use serde::de::Visitor;
 use serde::{Deserialize, Serialize};
+use smallvec::SmallVec;
 use smol_str::{SmolStr, SmolStrBuilder, ToSmolStr, format_smolstr};
 
 /// Represents an AT Protocol OAuth scope
@@ -50,6 +52,8 @@ pub enum Scope<S: BosStr = DefaultStr> {
     Atproto,
     /// Transition scope for migration operations
     Transition(TransitionScope),
+    /// Include scope referencing a permission set
+    Include(IncludeScope<S>),
     /// OpenID Connect scope - required for OpenID Connect authentication
     OpenId,
     /// Profile scope - access to user profile information
@@ -115,6 +119,7 @@ where
             Scope::Rpc(scope) => Scope::Rpc(scope.into_static()),
             Scope::Atproto => Scope::Atproto,
             Scope::Transition(scope) => Scope::Transition(scope),
+            Scope::Include(scope) => Scope::Include(scope.into_static()),
             Scope::OpenId => Scope::OpenId,
             Scope::Profile => Scope::Profile,
             Scope::Email => Scope::Email,
@@ -167,6 +172,45 @@ pub enum TransitionScope {
     Generic,
     /// Email transition operations
     Email,
+    /// Chat transition scope for chat.bsky operations
+    ChatBsky,
+}
+
+/// Include scope referencing a permission set NSID with optional audience.
+///
+/// Represents `include:<nsid>[?aud=<did>]` scopes. The audience is a plain
+/// validated string — a DID optionally followed by `#fragment`. Stored in
+/// decoded form; `#` is percent-encoded as `%23` on serialisation.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct IncludeScope<S: BosStr = DefaultStr> {
+    /// The permission set NSID.
+    pub nsid: Nsid<S>,
+    /// Optional audience (decoded form). A DID optionally with a `#fragment`.
+    pub audience: Option<S>,
+}
+
+impl<S: BosStr> IncludeScope<S> {
+    /// Convert to an `IncludeScope` with a different backing type.
+    pub fn convert<B: Bos<str> + From<S> + AsRef<str> + FromStaticStr>(self) -> IncludeScope<B> {
+        IncludeScope {
+            nsid: self.nsid.convert(),
+            audience: self.audience.map(Into::into),
+        }
+    }
+}
+
+impl<S: BosStr + IntoStatic> IntoStatic for IncludeScope<S>
+where
+    S::Output: BosStr,
+{
+    type Output = IncludeScope<S::Output>;
+
+    fn into_static(self) -> Self::Output {
+        IncludeScope {
+            nsid: self.nsid.into_static(),
+            audience: self.audience.map(|s| s.into_static()),
+        }
+    }
 }
 
 /// Blob scope with mime type constraints
@@ -199,6 +243,40 @@ where
     }
 }
 
+/// The kind of MIME pattern, without carrying string data.
+/// Used by validate_mime_pattern() to return the discriminant.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum MimePatternKind {
+    All,
+    TypeWildcard,
+    Exact,
+}
+
+/// Validate a MIME pattern string without allocating.
+///
+/// Returns the pattern kind. Valid patterns:
+/// - `*/*` → `MimePatternKind::All`
+/// - `<type>/*` (e.g., `image/*`) → `MimePatternKind::TypeWildcard`
+/// - `<type>/<subtype>` (e.g., `image/png`) → `MimePatternKind::Exact`
+pub(crate) fn validate_mime_pattern(s: &str) -> Result<MimePatternKind, ParseError> {
+    if s == "*/*" {
+        Ok(MimePatternKind::All)
+    } else if let Some(slash) = s.find('/') {
+        let type_part = &s[..slash];
+        let subtype_part = &s[slash + 1..];
+        if type_part.is_empty() || subtype_part.is_empty() {
+            return Err(ParseError::InvalidMimeType(s.to_string()));
+        }
+        if subtype_part == "*" {
+            Ok(MimePatternKind::TypeWildcard)
+        } else {
+            Ok(MimePatternKind::Exact)
+        }
+    } else {
+        Err(ParseError::InvalidMimeType(s.to_string()))
+    }
+}
+
 /// MIME type pattern for blob scope
 #[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub enum MimePattern<S: BosStr = DefaultStr> {
@@ -217,6 +295,20 @@ impl<S: BosStr> MimePattern<S> {
             MimePattern::All => MimePattern::All,
             MimePattern::TypeWildcard(s) => MimePattern::TypeWildcard(s.into()),
             MimePattern::Exact(s) => MimePattern::Exact(s.into()),
+        }
+    }
+
+    /// Construct a MimePattern without validation.
+    ///
+    /// # Safety
+    ///
+    /// The caller must ensure `s` is a valid MIME pattern string
+    /// and `kind` matches the pattern.
+    pub(crate) unsafe fn unchecked(s: S, kind: MimePatternKind) -> Self {
+        match kind {
+            MimePatternKind::All => MimePattern::All,
+            MimePatternKind::TypeWildcard => MimePattern::TypeWildcard(s),
+            MimePatternKind::Exact => MimePattern::Exact(s),
         }
     }
 }
@@ -414,6 +506,112 @@ where
     }
 }
 
+// ============================================================================
+// Scope index types — internal infrastructure for Phase 2's Scopes<S> container.
+// All types are pub(crate), consumed by the Scopes<S> container.
+// ============================================================================
+
+/// Byte-range indices for a single scope within a `Scopes` buffer.
+#[derive(Debug, Clone)]
+pub(crate) struct ScopeIndices {
+    pub(crate) start: u16,
+    pub(crate) end: u16,
+    pub(crate) inner: ScopeInnerIndices,
+}
+
+/// Pre-parsed structure of a scope, storing only byte-range indices into the buffer.
+#[derive(Debug, Clone)]
+pub(crate) enum ScopeInnerIndices {
+    Account {
+        resource: AccountResource,
+        action: AccountAction,
+    },
+    Identity(IdentityScope),
+    Transition(TransitionScope),
+    Blob {
+        accept: SmallVec<[(u16, u16); 2]>,
+    },
+    Repo {
+        collection: Option<(u16, u16)>,
+        actions: RepoActionFlags,
+    },
+    Rpc {
+        lxm: SmallVec<[(u16, u16); 2]>,
+        aud: SmallVec<[(u16, u16); 2]>,
+    },
+    Include {
+        nsid: (u16, u16),
+        audience: Option<IncludeAudience>,
+    },
+    /// Unit scopes: atproto, openid, profile, email.
+    Unit(ScopeKind),
+}
+
+/// Discriminant for unit scopes (no string data).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum ScopeKind {
+    Atproto,
+    OpenId,
+    Profile,
+    Email,
+}
+
+/// Bitflag representation of repo actions for compact index storage.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) struct RepoActionFlags(u8);
+
+impl RepoActionFlags {
+    pub(crate) const CREATE: u8 = 0b001;
+    pub(crate) const UPDATE: u8 = 0b010;
+    pub(crate) const DELETE: u8 = 0b100;
+    pub(crate) const ALL: u8 = 0b111;
+
+    pub(crate) fn from_actions(actions: &BTreeSet<RepoAction>) -> Self {
+        let mut flags = 0u8;
+        for action in actions {
+            match action {
+                RepoAction::Create => flags |= Self::CREATE,
+                RepoAction::Update => flags |= Self::UPDATE,
+                RepoAction::Delete => flags |= Self::DELETE,
+            }
+        }
+        RepoActionFlags(flags)
+    }
+
+    pub(crate) fn contains(self, flag: u8) -> bool {
+        self.0 & flag != 0
+    }
+
+    pub(crate) fn to_actions(self) -> BTreeSet<RepoAction> {
+        let mut set = BTreeSet::new();
+        if self.contains(Self::CREATE) {
+            set.insert(RepoAction::Create);
+        }
+        if self.contains(Self::UPDATE) {
+            set.insert(RepoAction::Update);
+        }
+        if self.contains(Self::DELETE) {
+            set.insert(RepoAction::Delete);
+        }
+        set
+    }
+}
+
+/// Audience encoding state for include scope indices.
+///
+/// Both variants store byte ranges into the buffer. The discriminant
+/// tells `grants()` whether to decode before comparing, and tells
+/// `to_string_normalized()` whether the raw form needs encoding.
+#[derive(Debug, Clone)]
+pub(crate) enum IncludeAudience {
+    /// Audience in buffer is already decoded (no percent-encoding).
+    /// `grants()` can compare directly. Serialisation must encode `#` → `%23`.
+    Plain(u16, u16),
+    /// Audience in buffer contains percent-encoding (e.g., `%23`).
+    /// `grants()` must decode before comparing. Serialisation can pass through.
+    Encoded(u16, u16),
+}
+
 impl<S: BosStr + Ord> Scope<S> {
     /// Convert to a `Scope` with a different backing type.
     pub fn convert<B: Bos<str> + From<S> + AsRef<str> + FromStaticStr + Ord>(self) -> Scope<B> {
@@ -425,6 +623,7 @@ impl<S: BosStr + Ord> Scope<S> {
             Scope::Rpc(scope) => Scope::Rpc(scope.convert()),
             Scope::Atproto => Scope::Atproto,
             Scope::Transition(scope) => Scope::Transition(scope),
+            Scope::Include(scope) => Scope::Include(scope.convert()),
             Scope::OpenId => Scope::OpenId,
             Scope::Profile => Scope::Profile,
             Scope::Email => Scope::Email,
@@ -436,7 +635,8 @@ impl<S: BosStr + Ord> Scope<S> {
     /// # Examples
     /// ```
     /// # use jacquard_oauth::scopes::Scope;
-    /// let scopes = Scope::parse_multiple("atproto repo:*").unwrap();
+    /// # use smol_str::SmolStr;
+    /// let scopes = Scope::<SmolStr>::parse_multiple("atproto repo:*").unwrap();
     /// assert_eq!(scopes.len(), 2);
     /// ```
     pub fn parse_multiple<'a>(s: &'a str) -> Result<Vec<Self>, ParseError>
@@ -464,8 +664,9 @@ impl<S: BosStr + Ord> Scope<S> {
     /// # Examples
     /// ```
     /// # use jacquard_oauth::scopes::Scope;
+    /// # use smol_str::SmolStr;
     /// // repo:* grants repo:foo.bar, so only repo:* is kept
-    /// let scopes = Scope::parse_multiple_reduced("atproto repo:app.bsky.feed.post repo:*").unwrap();
+    /// let scopes = Scope::<SmolStr>::parse_multiple_reduced("atproto repo:app.bsky.feed.post repo:*").unwrap();
     /// assert_eq!(scopes.len(), 2); // atproto and repo:*
     /// ```
     pub fn parse_multiple_reduced<'a>(s: &'a str) -> Result<Vec<Self>, ParseError>
@@ -525,10 +726,11 @@ impl<S: BosStr + Ord> Scope<S> {
     /// # Examples
     /// ```
     /// # use jacquard_oauth::scopes::Scope;
+    /// # use smol_str::SmolStr;
     /// let scopes = vec![
-    ///     Scope::parse("repo:*").unwrap(),
-    ///     Scope::parse("atproto").unwrap(),
-    ///     Scope::parse("account:email").unwrap(),
+    ///     Scope::<SmolStr>::parse("repo:*").unwrap(),
+    ///     Scope::<SmolStr>::parse("atproto").unwrap(),
+    ///     Scope::<SmolStr>::parse("account:email").unwrap(),
     /// ];
     /// let result = Scope::serialize_multiple(&scopes);
     /// assert_eq!(result, "account:email atproto repo:*");
@@ -562,12 +764,13 @@ impl<S: BosStr + Ord> Scope<S> {
     /// # Examples
     /// ```
     /// # use jacquard_oauth::scopes::Scope;
+    /// # use smol_str::SmolStr;
     /// let scopes = vec![
-    ///     Scope::parse("repo:*").unwrap(),
-    ///     Scope::parse("atproto").unwrap(),
-    ///     Scope::parse("account:email").unwrap(),
+    ///     Scope::<SmolStr>::parse("repo:*").unwrap(),
+    ///     Scope::<SmolStr>::parse("atproto").unwrap(),
+    ///     Scope::<SmolStr>::parse("account:email").unwrap(),
     /// ];
-    /// let to_remove = Scope::parse("atproto").unwrap();
+    /// let to_remove = Scope::<SmolStr>::parse("atproto").unwrap();
     /// let result = Scope::remove_scope(&scopes, &to_remove);
     /// assert_eq!(result.len(), 2);
     /// assert!(!result.contains(&to_remove));
@@ -864,6 +1067,7 @@ impl<S: BosStr + Ord> Scope<S> {
         let scope = match suffix {
             Some("generic") => TransitionScope::Generic,
             Some("email") => TransitionScope::Email,
+            Some("chat.bsky") => TransitionScope::ChatBsky,
             Some(other) => return Err(ParseError::InvalidResource(other.to_string())),
             None => return Err(ParseError::MissingResource),
         };
@@ -1014,10 +1218,24 @@ impl<S: BosStr + Ord> Scope<S> {
                     }
                 }
             }
+            Scope::Include(scope) => {
+                if let Some(ref aud) = scope.audience {
+                    // Encode audience using fluent-uri Query encoder.
+                    // '#' is not in the Query table, so it gets encoded as %23.
+                    // DID-safe characters (:, ., etc.) are in the Query table
+                    // and pass through unencoded.
+                    let mut encoded = EString::<EncQuery>::new();
+                    encoded.encode_str::<EncQuery>(aud.as_ref());
+                    format_smolstr!("include:{}?aud={}", scope.nsid, encoded.as_str())
+                } else {
+                    format_smolstr!("include:{}", scope.nsid)
+                }
+            },
             Scope::Atproto => "atproto".to_smolstr(),
             Scope::Transition(scope) => match scope {
                 TransitionScope::Generic => "transition:generic".to_smolstr(),
                 TransitionScope::Email => "transition:email".to_smolstr(),
+                TransitionScope::ChatBsky => "transition:chat.bsky".to_smolstr(),
             },
             Scope::OpenId => "openid".to_smolstr(),
             Scope::Profile => "profile".to_smolstr(),
@@ -1038,6 +1256,17 @@ impl<S: BosStr + Ord> Scope<S> {
             // Other scopes don't grant transition scopes
             (_, Scope::Transition(_)) => false,
             (Scope::Transition(_), _) => false,
+            // Include scopes only grant exact match (opaque until resolved).
+            (Scope::Include(a), Scope::Include(b)) => {
+                a.nsid.as_ref() == b.nsid.as_ref()
+                    && match (&a.audience, &b.audience) {
+                        (Some(a_aud), Some(b_aud)) => a_aud.as_ref() == b_aud.as_ref(),
+                        (None, None) => true,
+                        _ => false,
+                    }
+            }
+            (_, Scope::Include(_)) => false,
+            (Scope::Include(_), _) => false,
             // OpenID Connect scopes only grant themselves
             (Scope::OpenId, Scope::OpenId) => true,
             (Scope::OpenId, _) => false,
@@ -1619,6 +1848,113 @@ mod tests {
             let scope = Scope::<SmolStr>::parse(input).unwrap();
             assert_eq!(scope.to_string_normalized(), expected);
         }
+    }
+
+    #[test]
+    fn test_transition_chat_bsky() {
+        // Test parsing.
+        let scope = Scope::<SmolStr>::parse("transition:chat.bsky").unwrap();
+        assert_eq!(scope, Scope::Transition(TransitionScope::ChatBsky));
+
+        // Test serialization.
+        assert_eq!(scope.to_string_normalized(), "transition:chat.bsky");
+
+        // Test grants itself.
+        let other: Scope<SmolStr> = Scope::Transition(TransitionScope::ChatBsky);
+        assert!(scope.grants(&other));
+
+        // Test doesn't grant other transition scopes.
+        let generic: Scope<SmolStr> = Scope::Transition(TransitionScope::Generic);
+        let email: Scope<SmolStr> = Scope::Transition(TransitionScope::Email);
+        assert!(!scope.grants(&generic));
+        assert!(!scope.grants(&email));
+
+        // Test other scopes don't grant ChatBsky.
+        assert!(!generic.grants(&scope));
+        assert!(!email.grants(&scope));
+
+        // Test typo is rejected.
+        assert!(matches!(
+            Scope::<SmolStr>::parse("transition:chat.bsk"),
+            Err(ParseError::InvalidResource(_))
+        ));
+    }
+
+    #[test]
+    fn test_include_scope_serialisation() {
+        // Test with audience containing '#' — should encode as %23.
+        let scope: Scope<SmolStr> = Scope::Include(IncludeScope {
+            nsid: Nsid::new_static("app.bsky.full").unwrap(),
+            audience: Some(SmolStr::new_static("did:web:api.example.com#svc_appview")),
+        });
+        assert_eq!(
+            scope.to_string_normalized(),
+            "include:app.bsky.full?aud=did:web:api.example.com%23svc_appview"
+        );
+
+        // Test without audience.
+        let scope: Scope<SmolStr> = Scope::Include(IncludeScope {
+            nsid: Nsid::new_static("app.bsky.authFull").unwrap(),
+            audience: None,
+        });
+        assert_eq!(scope.to_string_normalized(), "include:app.bsky.authFull");
+
+        // Test with simple audience (no '#').
+        let scope: Scope<SmolStr> = Scope::Include(IncludeScope {
+            nsid: Nsid::new_static("com.example.perm").unwrap(),
+            audience: Some(SmolStr::new_static("did:plc:yfvwmnlztr4dwkb7hwz55r2g")),
+        });
+        assert_eq!(
+            scope.to_string_normalized(),
+            "include:com.example.perm?aud=did:plc:yfvwmnlztr4dwkb7hwz55r2g"
+        );
+    }
+
+    #[test]
+    fn test_include_scope_grants() {
+        // Test identical include scopes grant each other.
+        let scope1: Scope<SmolStr> = Scope::Include(IncludeScope {
+            nsid: Nsid::new_static("app.bsky.full").unwrap(),
+            audience: Some(SmolStr::new_static("did:web:api.example.com")),
+        });
+        let scope2: Scope<SmolStr> = Scope::Include(IncludeScope {
+            nsid: Nsid::new_static("app.bsky.full").unwrap(),
+            audience: Some(SmolStr::new_static("did:web:api.example.com")),
+        });
+        assert!(scope1.grants(&scope2));
+
+        // Test different NSIDs don't grant.
+        let scope3: Scope<SmolStr> = Scope::Include(IncludeScope {
+            nsid: Nsid::new_static("app.bsky.authFull").unwrap(),
+            audience: Some(SmolStr::new_static("did:web:api.example.com")),
+        });
+        assert!(!scope1.grants(&scope3));
+
+        // Test same NSID but different audiences don't grant.
+        let scope4: Scope<SmolStr> = Scope::Include(IncludeScope {
+            nsid: Nsid::new_static("app.bsky.full").unwrap(),
+            audience: Some(SmolStr::new_static("did:plc:yfvwmnlztr4dwkb7hwz55r2g")),
+        });
+        assert!(!scope1.grants(&scope4));
+
+        // Test audience vs no audience don't grant.
+        let scope5: Scope<SmolStr> = Scope::Include(IncludeScope {
+            nsid: Nsid::new_static("app.bsky.full").unwrap(),
+            audience: None,
+        });
+        assert!(!scope1.grants(&scope5));
+
+        // Test no-audience scopes grant each other only if NSID matches.
+        let scope6: Scope<SmolStr> = Scope::Include(IncludeScope {
+            nsid: Nsid::new_static("app.bsky.full").unwrap(),
+            audience: None,
+        });
+        assert!(scope5.grants(&scope6));
+
+        // Test non-include scopes don't grant include scopes and vice versa.
+        let account = Scope::<SmolStr>::parse("account:email").unwrap();
+        assert!(!account.grants(&scope1));
+        assert!(!scope1.grants(&account));
     }
 
     #[test]
