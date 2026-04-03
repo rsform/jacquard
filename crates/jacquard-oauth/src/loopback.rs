@@ -260,15 +260,7 @@ where
         let redirect = Uri::parse(redirect_uri).unwrap();
 
         let scopes = if opts.scopes.is_empty() {
-            Some(
-                self.registry
-                    .client_data
-                    .config
-                    .scopes
-                    .iter()
-                    .cloned()
-                    .collect(),
-            )
+            Some(self.registry.client_data.config.scopes.clone())
         } else {
             Some(opts.scopes.clone())
         };

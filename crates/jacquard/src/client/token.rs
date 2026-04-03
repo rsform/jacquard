@@ -1,7 +1,7 @@
 use jacquard_common::deps::fluent_uri::Uri;
 use jacquard_common::session::{FileTokenStore, SessionStore, SessionStoreError};
 use jacquard_common::types::string::{Datetime, Did};
-use jacquard_oauth::scopes::Scope;
+use jacquard_oauth::scopes::Scopes;
 use jacquard_oauth::session::{AuthRequestData, ClientSessionData, DpopClientData, DpopReqData};
 use jacquard_oauth::types::OAuthTokenType;
 use jose_jwk::Key;
@@ -59,8 +59,8 @@ pub struct OAuthSession {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     authserver_revocation_endpoint: Option<String>,
 
-    /// Granted scopes
-    scopes: Vec<String>,
+    /// Granted scopes (space-separated, normalized).
+    scopes: String,
 
     /// Client DPoP key material
     pub dpop_key: Key,
@@ -101,11 +101,7 @@ impl<S: jacquard_common::bos::BosStr + Ord> From<ClientSessionData<S>> for OAuth
             authserver_revocation_endpoint: data
                 .authserver_revocation_endpoint
                 .map(|s| AsRef::<str>::as_ref(&s).to_owned()),
-            scopes: data
-                .scopes
-                .into_iter()
-                .map(|s| String::from(s.to_string_normalized()))
-                .collect(),
+            scopes: String::from(data.scopes.to_normalized_string()),
             dpop_key: data.dpop_data.dpop_key,
             dpop_authserver_nonce: AsRef::<str>::as_ref(&data.dpop_data.dpop_authserver_nonce)
                 .to_owned(),
@@ -139,11 +135,8 @@ impl From<OAuthSession> for ClientSessionData {
             authserver_revocation_endpoint: session
                 .authserver_revocation_endpoint
                 .map(SmolStr::from),
-            scopes: session
-                .scopes
-                .into_iter()
-                .map(|s| Scope::parse(&s).unwrap())
-                .collect(),
+            scopes: Scopes::new(SmolStr::from(session.scopes.as_str()))
+                .expect("stored scopes should be valid"),
             dpop_data: DpopClientData {
                 dpop_key: session.dpop_key,
                 dpop_authserver_nonce: SmolStr::from(session.dpop_authserver_nonce),
@@ -176,8 +169,8 @@ pub struct OAuthState {
     #[serde(skip_serializing_if = "std::option::Option::is_none")]
     pub account_did: Option<String>,
 
-    /// Requested scopes
-    pub scopes: Vec<String>,
+    /// Requested scopes (space-separated, normalized).
+    pub scopes: String,
 
     /// Request URI for the authorization step
     pub request_uri: String,
@@ -208,11 +201,7 @@ impl<S: jacquard_common::bos::BosStr + Ord> TryFrom<AuthRequestData<S>> for OAut
             account_did: value
                 .account_did
                 .map(|s| AsRef::<str>::as_ref(&s).to_owned()),
-            scopes: value
-                .scopes
-                .into_iter()
-                .map(|s| String::from(s.to_string_normalized()))
-                .collect(),
+            scopes: String::from(value.scopes.to_normalized_string()),
             request_uri: AsRef::<str>::as_ref(&value.request_uri).to_owned(),
             authserver_token_endpoint: AsRef::<str>::as_ref(&value.authserver_token_endpoint)
                 .to_owned(),
@@ -239,11 +228,8 @@ impl From<OAuthState> for AuthRequestData {
                 .account_did
                 .map(|s| Did::new_owned(s).expect("stored DID should be valid")),
             authserver_revocation_endpoint: value.authserver_revocation_endpoint.map(SmolStr::from),
-            scopes: value
-                .scopes
-                .into_iter()
-                .map(|s| Scope::parse(&s).unwrap())
-                .collect(),
+            scopes: Scopes::new(SmolStr::from(value.scopes.as_str()))
+                .expect("stored scopes should be valid"),
             request_uri: SmolStr::from(value.request_uri),
             authserver_token_endpoint: SmolStr::from(value.authserver_token_endpoint),
             pkce_verifier: SmolStr::from(value.pkce_verifier),

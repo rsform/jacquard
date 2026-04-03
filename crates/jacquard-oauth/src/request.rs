@@ -3,7 +3,7 @@ use std::str::FromStr;
 use chrono::{TimeDelta, Utc};
 use http::{Method, Request, StatusCode};
 use jacquard_common::{
-    CowStr, IntoStatic,
+    CowStr,
     bos::{BosStr, DefaultStr},
     http_client::HttpClient,
     session::SessionStoreError,
@@ -26,7 +26,7 @@ use crate::{
     jose::jwt::{RegisteredClaims, RegisteredClaimsAud},
     keyset::Keyset,
     resolver::OAuthResolver,
-    scopes::Scope,
+    scopes::Scopes,
     session::{
         AuthRequestData, ClientData, ClientSessionData, DpopClientData, DpopDataSource, DpopReqData,
     },
@@ -577,11 +577,10 @@ pub async fn par<
         .await?;
 
         let scopes = if let Some(scope) = &metadata.client_metadata.scope {
-            Scope::<SmolStr>::parse_multiple_reduced(scope.as_ref())
+            Scopes::new(SmolStr::from(scope.as_ref()))
                 .expect("Failed to parse scopes")
-                .into_static()
         } else {
-            vec![]
+            Scopes::empty()
         };
         let auth_req_data: AuthRequestData = AuthRequestData {
             state: state.into(),
@@ -1081,7 +1080,7 @@ mod tests {
             authserver_url: SmolStr::new_static("https://issuer"),
             authserver_token_endpoint: SmolStr::new_static("https://issuer/token"),
             authserver_revocation_endpoint: None,
-            scopes: vec![],
+            scopes: Scopes::empty(),
             dpop_data: DpopClientData {
                 dpop_key: crate::utils::generate_key(&[SmolStr::new_static("ES256")]).unwrap(),
                 dpop_authserver_nonce: SmolStr::default(),

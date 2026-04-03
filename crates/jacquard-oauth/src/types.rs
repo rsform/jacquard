@@ -4,7 +4,7 @@ mod request;
 mod response;
 mod token;
 
-use crate::scopes::Scope;
+use crate::scopes::Scopes;
 
 pub use self::client_metadata::*;
 pub use self::metadata::*;
@@ -59,29 +59,33 @@ impl From<AuthorizeOptionPrompt> for &'static str {
 
 /// Options for initiating an OAuth authorization request.
 #[derive(Debug)]
-pub struct AuthorizeOptions<S: BosStr = DefaultStr> {
+pub struct AuthorizeOptions<S: BosStr = DefaultStr>
+where
+    S: AsRef<str>,
+{
     /// Override the redirect URI registered in the client metadata.
     pub redirect_uri: Option<Uri<String>>,
     /// Scopes to request. Defaults to an empty list (server-defined defaults apply).
-    pub scopes: Vec<Scope<S>>,
+    pub scopes: Scopes<S>,
     /// Optional prompt hint for the authorization server's UI.
     pub prompt: Option<AuthorizeOptionPrompt>,
     /// Opaque client-provided state value, echoed back in the callback for CSRF protection.
     pub state: Option<S>,
 }
 
-impl<S: BosStr> Default for AuthorizeOptions<S> {
+impl<S: BosStr + AsRef<str> + From<SmolStr>> Default for AuthorizeOptions<S> {
     fn default() -> Self {
+        let empty_scopes: Scopes<S> = Scopes::empty().convert();
         Self {
             redirect_uri: None,
-            scopes: vec![],
+            scopes: empty_scopes,
             prompt: None,
             state: None,
         }
     }
 }
 
-impl<S: BosStr> AuthorizeOptions<S> {
+impl<S: BosStr + AsRef<str>> AuthorizeOptions<S> {
     /// Set the `prompt` parameter sent to the authorization server.
     pub fn with_prompt(mut self, prompt: AuthorizeOptionPrompt) -> Self {
         self.prompt = Some(prompt);
@@ -101,7 +105,7 @@ impl<S: BosStr> AuthorizeOptions<S> {
     }
 
     /// Set the OAuth scopes to request.
-    pub fn with_scopes(mut self, scopes: Vec<Scope<S>>) -> Self {
+    pub fn with_scopes(mut self, scopes: Scopes<S>) -> Self {
         self.scopes = scopes;
         self
     }

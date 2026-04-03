@@ -12,7 +12,7 @@ use jacquard_common::http_client::HttpClient;
 use jacquard_oauth::atproto::AtprotoClientMetadata;
 use jacquard_oauth::client::OAuthSession;
 use jacquard_oauth::resolver::OAuthResolver;
-use jacquard_oauth::scopes::Scope;
+use jacquard_oauth::scopes::Scopes;
 use jacquard_oauth::session::SessionRegistry;
 use jacquard_oauth::session::{ClientData, ClientSessionData, DpopClientData};
 use jacquard_oauth::types::{OAuthAuthorizationServerMetadata, OAuthTokenType, TokenSet};
@@ -211,7 +211,7 @@ async fn oauth_xrpc_invalid_token_triggers_refresh_and_retries() {
 
     let client_data = ClientData {
         keyset: None,
-        config: AtprotoClientMetadata::new_localhost(None, Some(vec![Scope::Atproto])),
+        config: AtprotoClientMetadata::new_localhost(None, Some(Scopes::new(SmolStr::new_static("atproto")).unwrap())),
     };
     use jacquard::IntoStatic;
     let session_data = ClientSessionData {
@@ -221,7 +221,7 @@ async fn oauth_xrpc_invalid_token_triggers_refresh_and_retries() {
         authserver_url: SmolStr::new_static("https://issuer"),
         authserver_token_endpoint: SmolStr::from("https://issuer/token"),
         authserver_revocation_endpoint: None,
-        scopes: vec![Scope::Atproto],
+        scopes: Scopes::new(SmolStr::new_static("atproto")).unwrap(),
         dpop_data: DpopClientData {
             dpop_key: jacquard_oauth::utils::generate_key(&[SmolStr::from("ES256")]).unwrap(),
             dpop_authserver_nonce: SmolStr::from(""),
@@ -249,7 +249,7 @@ async fn oauth_xrpc_invalid_token_triggers_refresh_and_retries() {
         authserver_url: SmolStr::new_static("https://issuer"),
         authserver_token_endpoint: SmolStr::from("https://issuer/token"),
         authserver_revocation_endpoint: None,
-        scopes: vec![Scope::Atproto],
+        scopes: Scopes::new(SmolStr::new_static("atproto")).unwrap(),
         dpop_data: DpopClientData {
             dpop_key: jacquard_oauth::utils::generate_key(&[SmolStr::from("ES256")]).unwrap(),
             dpop_authserver_nonce: SmolStr::from(""),
@@ -340,7 +340,7 @@ async fn oauth_xrpc_invalid_token_body_triggers_refresh_and_retries() {
 
     let client_data = ClientData {
         keyset: None,
-        config: AtprotoClientMetadata::new_localhost(None, Some(vec![Scope::Atproto])),
+        config: AtprotoClientMetadata::new_localhost(None, Some(Scopes::new(SmolStr::new_static("atproto")).unwrap())),
     };
     use jacquard::IntoStatic;
     let session_data = ClientSessionData {
@@ -350,7 +350,7 @@ async fn oauth_xrpc_invalid_token_body_triggers_refresh_and_retries() {
         authserver_url: SmolStr::new_static("https://issuer"),
         authserver_token_endpoint: SmolStr::from("https://issuer/token"),
         authserver_revocation_endpoint: None,
-        scopes: vec![Scope::Atproto],
+        scopes: Scopes::new(SmolStr::new_static("atproto")).unwrap(),
         dpop_data: DpopClientData {
             dpop_key: jacquard_oauth::utils::generate_key(&[SmolStr::from("ES256")]).unwrap(),
             dpop_authserver_nonce: SmolStr::from(""),

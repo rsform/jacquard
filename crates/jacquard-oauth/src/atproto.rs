@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
 use crate::types::OAuthClientMetadata;
-use crate::{keyset::Keyset, scopes::Scope};
+use crate::{keyset::Keyset, scopes::{Scope, Scopes}};
 use jacquard_common::deps::fluent_uri::Uri;
 use jacquard_common::{BosStr, IntoStatic};
 use serde::{Deserialize, Serialize};
@@ -145,7 +145,7 @@ where
     /// The grant types this client will use.
     pub grant_types: Vec<GrantType>,
     /// The OAuth scopes this client requests; must include `atproto`.
-    pub scopes: Vec<Scope<S>>,
+    pub scopes: Scopes<S>,
     /// URI pointing to the client's JWK Set; mutually exclusive with inline `jwks`.
     pub jwks_uri: Option<Uri<String>>,
     /// Human-readable display name for the client.
@@ -160,9 +160,9 @@ where
 
 impl<S> IntoStatic for AtprotoClientMetadata<S>
 where
-    S: BosStr + IntoStatic + Ord + FromStr,
+    S: BosStr + IntoStatic + Ord + FromStr + AsRef<str>,
     <S as FromStr>::Err: core::fmt::Debug,
-    S::Output: BosStr + FromStr + Ord,
+    S::Output: BosStr + FromStr + Ord + AsRef<str>,
     <S::Output as FromStr>::Err: core::fmt::Debug,
 {
     type Output = AtprotoClientMetadata<S::Output>;
@@ -212,14 +212,14 @@ where
     /// This is a convenience constructor for local development and CLI tools. The resulting
     /// metadata uses `http://localhost` as the `client_id` with both IPv4 and IPv6 loopback
     /// redirect URIs.
-    pub fn default_localhost() -> Self {
-        Self::new_localhost(
-            None,
-            Some(vec![
-                Scope::Atproto,
-                Scope::Transition(crate::scopes::TransitionScope::Generic),
-            ]),
-        )
+    pub fn default_localhost() -> Self
+    where
+        S: From<SmolStr> + AsRef<str>,
+    {
+        let scopes = Scopes::new(SmolStr::new_static("atproto transition:generic"))
+            .expect("valid scopes")
+            .convert();
+        Self::new_localhost(None, Some(scopes))
     }
 
     /// Create loopback client metadata with optional custom redirect URIs and scopes.
@@ -230,8 +230,11 @@ where
     /// are used.
     pub fn new_localhost(
         redirect_uris: Option<Vec<Uri<String>>>,
-        scopes: Option<Vec<Scope<S>>>,
-    ) -> AtprotoClientMetadata<S> {
+        scopes: Option<Scopes<S>>,
+    ) -> AtprotoClientMetadata<S>
+    where
+        S: From<SmolStr> + AsRef<str>,
+    {
         // determine client_id
         #[derive(serde::Serialize)]
         struct Parameters {
@@ -247,9 +250,7 @@ where
         });
         let query = serde_html_form::to_string(Parameters {
             redirect_uri: redir_str,
-            scope: scopes
-                .as_ref()
-                .map(|s| SmolStr::from(Scope::serialize_multiple(s.as_slice()).as_str())),
+            scope: scopes.as_ref().map(|s| s.to_normalized_string()),
         })
         .ok();
         let mut client_id = String::from("http://localhost/");
@@ -258,6 +259,9 @@ where
         {
             client_id.push_str(&format!("?{query}"));
         }
+        let default_scopes: Scopes<S> = Scopes::new(SmolStr::new_static("atproto"))
+            .expect("valid scopes")
+            .convert();
         AtprotoClientMetadata {
             client_id: Uri::parse(client_id).unwrap(),
             client_uri: None,
@@ -266,7 +270,7 @@ where
                 Uri::parse("http://[::1]".to_string()).unwrap(),
             ]),
             grant_types: vec![GrantType::AuthorizationCode, GrantType::RefreshToken],
-            scopes: scopes.unwrap_or(vec![Scope::Atproto]),
+            scopes: scopes.unwrap_or(default_scopes),
             jwks_uri: None,
             client_name: None,
             logo_uri: None,
@@ -303,7 +307,7 @@ where
     if !metadata.grant_types.contains(&GrantType::AuthorizationCode) {
         return Err(Error::InvalidGrantTypes);
     }
-    if !metadata.scopes.contains(&Scope::Atproto) {
+    if !metadata.scopes.grants(&Scope::<S>::Atproto) {
         return Err(Error::InvalidScope);
     }
     let (auth_method, jwks_uri, jwks) = if let Some(keyset) = keyset {
@@ -342,7 +346,7 @@ where
         ),
         response_types: vec![S::from_static("code")],
         scope: Some(
-            S::from_str(Scope::serialize_multiple(metadata.scopes.as_slice()).as_str()).unwrap(),
+            S::from_str(metadata.scopes.to_normalized_string().as_str()).unwrap(),
         ),
         dpop_bound_access_tokens: Some(true),
         jwks_uri,
@@ -370,8 +374,6 @@ where
 
 #[cfg(test)]
 mod tests {
-    use crate::scopes::TransitionScope;
-
     use super::*;
     use elliptic_curve::SecretKey;
     use jose_jwk::{Jwk, Key, Parameters};
@@ -424,11 +426,7 @@ gbGGr0pN+oSing7cZ0169JaRHTNh+0LNQXrFobInX6cj95FzEdRyT4T3
                         Uri::parse("http://127.0.0.1/callback".to_string()).unwrap(),
                         Uri::parse("http://[::1]/callback".to_string()).unwrap(),
                     ]),
-                    Some(vec![
-                        Scope::Atproto,
-                        Scope::Transition(TransitionScope::Generic),
-                        Scope::parse("account:email").unwrap()
-                    ])
+                    Some(Scopes::new(SmolStr::from("account:email atproto transition:generic")).unwrap())
                 ),
                 &None
             )
@@ -586,7 +584,7 @@ gbGGr0pN+oSing7cZ0169JaRHTNh+0LNQXrFobInX6cj95FzEdRyT4T3
             client_uri: Some(Uri::parse("https://example.com".to_string()).unwrap()),
             redirect_uris: vec![Uri::parse("https://example.com/callback".to_string()).unwrap()],
             grant_types: vec![GrantType::AuthorizationCode],
-            scopes: vec![Scope::Atproto],
+            scopes: Scopes::new(SmolStr::new_static("atproto")).unwrap(),
             jwks_uri: None,
             client_name: None,
             logo_uri: None,

@@ -11,7 +11,7 @@ use jacquard_oauth::atproto::AtprotoClientMetadata;
 use jacquard_oauth::authstore::ClientAuthStore;
 use jacquard_oauth::client::OAuthClient;
 use jacquard_oauth::resolver::OAuthResolver;
-use jacquard_oauth::scopes::Scope;
+use jacquard_oauth::scopes::Scopes;
 use jacquard_oauth::session::ClientData;
 use smol_str::SmolStr;
 
@@ -215,7 +215,7 @@ async fn oauth_end_to_end_mock_flow() {
 
     let client_data: ClientData<_> = ClientData {
         keyset: None,
-        config: AtprotoClientMetadata::new_localhost(None, Some(vec![Scope::Atproto])),
+        config: AtprotoClientMetadata::new_localhost(None, Some(Scopes::new(SmolStr::new_static("atproto")).unwrap())),
     };
     let client_arc = client.clone();
     let oauth = OAuthClient::new_from_resolver(store, (*client_arc).clone(), client_data);
@@ -225,7 +225,7 @@ async fn oauth_end_to_end_mock_flow() {
     let mut metadata = jacquard_oauth::request::OAuthMetadata {
         server_metadata,
         client_metadata: jacquard_oauth::atproto::atproto_client_metadata(
-            &AtprotoClientMetadata::new_localhost(None, Some(vec![Scope::Atproto])),
+            &AtprotoClientMetadata::new_localhost(None, Some(Scopes::new(SmolStr::new_static("atproto")).unwrap())),
             &None,
         )
         .unwrap(),

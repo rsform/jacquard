@@ -9,7 +9,7 @@ use crate::{
     keyset::Keyset,
     request::{OAuthMetadata, refresh},
     resolver::OAuthResolver,
-    scopes::Scope,
+    scopes::Scopes,
     types::TokenSet,
 };
 
@@ -51,7 +51,7 @@ pub trait DpopDataSource {
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(bound(
     serialize = "S: serde::Serialize + BosStr + Ord",
-    deserialize = "S: serde::Deserialize<'de> + BosStr, Scope<S>: serde::Deserialize<'de>"
+    deserialize = "S: serde::Deserialize<'de> + BosStr + AsRef<str>"
 ))]
 pub struct ClientSessionData<S: BosStr = DefaultStr> {
     /// DID of the authenticated account; serves as the primary key for session storage
@@ -77,7 +77,7 @@ pub struct ClientSessionData<S: BosStr = DefaultStr> {
     pub authserver_revocation_endpoint: Option<S>,
 
     /// The set of OAuth scopes approved for this session, as returned in the initial token response.
-    pub scopes: Vec<Scope<S>>,
+    pub scopes: Scopes<S>,
 
     /// DPoP key and nonce state for ongoing requests in this session.
     #[serde(flatten)]
@@ -88,9 +88,9 @@ pub struct ClientSessionData<S: BosStr = DefaultStr> {
     pub token_set: TokenSet<S>,
 }
 
-impl<S: BosStr + Ord + IntoStatic> IntoStatic for ClientSessionData<S>
+impl<S: BosStr + Ord + IntoStatic + AsRef<str>> IntoStatic for ClientSessionData<S>
 where
-    S::Output: BosStr + Ord,
+    S::Output: BosStr + Ord + AsRef<str>,
 {
     type Output = ClientSessionData<S::Output>;
 
@@ -111,7 +111,7 @@ where
     }
 }
 
-impl<S: BosStr + Ord> ClientSessionData<S> {
+impl<S: BosStr + Ord + AsRef<str>> ClientSessionData<S> {
     /// Update this session's token set and, if the new token set includes scopes, replace the scope list.
     ///
     /// Called after a successful token refresh so that any scope changes returned by the server
@@ -122,15 +122,14 @@ impl<S: BosStr + Ord> ClientSessionData<S> {
     /// not be refreshed in place.
     pub fn update_with_tokens(&mut self, token_set: &TokenSet<S>)
     where
-        S: FromStr + Clone,
+        S: FromStr + Clone + From<SmolStr> + AsRef<str>,
         S::Err: std::fmt::Debug,
     {
-        if let Some(Ok(scopes)) = token_set
-            .scope
-            .as_ref()
-            .map(|scope| Scope::<S>::parse_multiple_reduced(scope.as_ref()))
-        {
-            self.scopes = scopes.into_iter().map(|s| s.convert()).collect();
+        if let Some(scope_str) = token_set.scope.as_ref() {
+            // Parse scopes from the returned scope string, converting to the appropriate backing type
+            let scopes_smol = Scopes::new(SmolStr::from(scope_str.as_ref()))
+                .expect("server returned invalid scopes in token refresh");
+            self.scopes = scopes_smol.convert();
         }
         self.token_set = token_set.clone();
     }
@@ -180,7 +179,7 @@ impl DpopDataSource for DpopClientData {
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(bound(
     serialize = "S: serde::Serialize + BosStr + Ord",
-    deserialize = "S: serde::Deserialize<'de> + BosStr, Scope<S>: serde::Deserialize<'de>"
+    deserialize = "S: serde::Deserialize<'de> + BosStr + AsRef<str>"
 ))]
 pub struct AuthRequestData<S: BosStr = DefaultStr> {
     /// Random identifier generated for this authorization request; used as the primary key
@@ -196,7 +195,7 @@ pub struct AuthRequestData<S: BosStr = DefaultStr> {
     pub account_did: Option<Did<S>>,
 
     /// OAuth scopes requested for this authorization.
-    pub scopes: Vec<Scope<S>>,
+    pub scopes: Scopes<S>,
 
     /// The PAR `request_uri` returned by the authorization server; included in the redirect URL.
     pub request_uri: S,
@@ -217,9 +216,9 @@ pub struct AuthRequestData<S: BosStr = DefaultStr> {
     pub dpop_data: DpopReqData,
 }
 
-impl<S: BosStr + Ord + IntoStatic> IntoStatic for AuthRequestData<S>
+impl<S: BosStr + Ord + IntoStatic + AsRef<str>> IntoStatic for AuthRequestData<S>
 where
-    S::Output: BosStr + Ord,
+    S::Output: BosStr + Ord + AsRef<str>,
 {
     type Output = AuthRequestData<S::Output>;
 

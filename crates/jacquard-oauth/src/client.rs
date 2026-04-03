@@ -5,7 +5,7 @@ use crate::{
     error::{CallbackError, Result},
     request::{OAuthMetadata, exchange_code, par},
     resolver::OAuthResolver,
-    scopes::Scope,
+    scopes::Scopes,
     session::{ClientData, ClientSessionData, DpopClientData, SessionRegistry},
     types::{AuthorizeOptions, CallbackParams},
 };
@@ -291,11 +291,10 @@ where
         {
             Ok(token_set) => {
                 let scopes = if let Some(scope) = &token_set.scope {
-                    Scope::<SmolStr>::parse_multiple_reduced(scope.as_str())
-                        .expect("Failed to parse scopes")
-                        .into_static()
+                    Scopes::new(SmolStr::from(scope.as_str()))
+                        .expect("Failed to parse scopes from token response")
                 } else {
-                    vec![]
+                    Scopes::empty()
                 };
                 let client_data = ClientSessionData {
                     account_did: token_set.sub.clone(),
