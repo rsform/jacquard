@@ -136,25 +136,8 @@ pub struct AccountScope {
     pub action: AccountAction,
 }
 
-/// Account resource types
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum AccountResource {
-    /// Email access
-    Email,
-    /// Repository access
-    Repo,
-    /// Status access
-    Status,
-}
-
-/// Account action permissions
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum AccountAction {
-    /// Read-only access
-    Read,
-    /// Management access (includes read)
-    Manage,
-}
+// Re-export from common to avoid duplication and allow use in permission set types
+pub use jacquard_common::types::scope_primitives::{AccountAction, AccountResource, RepoAction};
 
 /// Identity scope attributes
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -394,17 +377,6 @@ where
             RepoCollection::Nsid(nsid) => RepoCollection::Nsid(nsid.into_static()),
         }
     }
-}
-
-/// Repository actions
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
-pub enum RepoAction {
-    /// Create records
-    Create,
-    /// Update records
-    Update,
-    /// Delete records
-    Delete,
 }
 
 /// RPC scope with lexicon method and audience constraints

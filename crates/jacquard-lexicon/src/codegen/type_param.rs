@@ -80,6 +80,7 @@ impl HasTypeParam for LexUserType<'_> {
                 true
             }
             LexUserType::Union(_) => true, // Union enums are always generated with <S>
+            LexUserType::PermissionSet(_) => true, // Permission sets are parameterized on S
         }
     }
 }

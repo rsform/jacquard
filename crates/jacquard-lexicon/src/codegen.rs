@@ -378,6 +378,11 @@ impl<'c> CodeGenerator<'c> {
                     resolved,
                 )
             }
+            LexUserType::PermissionSet(_perm_set) => {
+                // Permission sets are consumed at runtime by the permission set
+                // resolver (Phase 5), not generated as code.
+                Ok(GeneratedCode::default())
+            }
         }
     }
 }

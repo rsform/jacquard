@@ -4,11 +4,14 @@
 
 use jacquard_common::{
     CowStr, deps::smol_str::SmolStr, into_static::IntoStatic, types::blob::MimeType,
+    types::did::Did, types::nsid::Nsid,
+    types::scope_primitives::{RepoAction, AccountAction},
 };
 use serde::{Deserialize, Serialize};
 use serde_repr::{Deserialize_repr, Serialize_repr};
 use serde_with::skip_serializing_none;
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, HashMap};
+use thiserror::Error;
 
 #[derive(Debug, Serialize_repr, Deserialize_repr, PartialEq, Eq, Clone, Copy, Default)]
 #[repr(u8)]
@@ -394,6 +397,157 @@ pub struct LexRecord<'s> {
     pub record: LexRecordRecord<'s>,
 }
 
+// permission sets
+
+/// AT Protocol permission set lexicon type.
+///
+/// Contains a `permissions` array where each entry is a `LexPermission`
+/// with `"type": "permission"` and a `"resource"` discriminator carrying
+/// typed fields (NSIDs, DIDs, MIME types, action enums).
+#[skip_serializing_none]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+pub struct LexPermissionSet<'s> {
+    #[serde(borrow)]
+    pub title: Option<CowStr<'s>>,
+    #[serde(default, rename = "title:lang")]
+    pub title_lang: Option<HashMap<CowStr<'s>, CowStr<'s>>>,
+    pub detail: Option<CowStr<'s>>,
+    #[serde(default, rename = "detail:lang")]
+    pub detail_lang: Option<HashMap<CowStr<'s>, CowStr<'s>>>,
+    pub permissions: Vec<LexPermission<'s>>,
+}
+
+/// A permission entry within a permission set.
+///
+/// Single-variant enum: the `"type": "permission"` JSON tag selects the
+/// `Permission` variant, which wraps a `LexPermissionResource` discriminated
+/// by the `"resource"` field.
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[serde(tag = "type", rename_all = "kebab-case")]
+pub enum LexPermission<'s> {
+    /// A permission entry.
+    Permission {
+        #[serde(flatten, borrow)]
+        resource: LexPermissionResource<'s>,
+    },
+}
+
+/// Resource-specific permission data, discriminated by the `"resource"` field.
+#[skip_serializing_none]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
+#[serde(tag = "resource", rename_all = "kebab-case")]
+pub enum LexPermissionResource<'s> {
+    /// Repository resource permission.
+    Repo {
+        /// Collection NSIDs this permission applies to.
+        #[serde(borrow)]
+        collection: Vec<Nsid<CowStr<'s>>>,
+        /// Permitted actions (create, update, delete). None = all actions.
+        #[serde(default)]
+        action: Option<Vec<RepoAction>>,
+    },
+    /// RPC method permission.
+    Rpc {
+        /// Lexicon method NSIDs this permission applies to.
+        #[serde(borrow)]
+        lxm: Vec<Nsid<CowStr<'s>>>,
+        /// Audience DID for inter-service auth.
+        #[serde(borrow, default)]
+        aud: Option<Did<CowStr<'s>>>,
+        /// If true, inherits audience from the include scope's aud parameter.
+        #[serde(default, rename = "inheritAud")]
+        inherit_aud: Option<bool>,
+    },
+    /// Blob resource permission.
+    Blob {
+        /// Accepted MIME type patterns.
+        #[serde(borrow)]
+        accept: Vec<MimeType<CowStr<'s>>>,
+        /// Maximum blob size in bytes.
+        #[serde(default)]
+        max_size: Option<u64>,
+    },
+    /// Identity resource permission.
+    Identity {
+        /// Identity attribute (e.g., "handle").
+        #[serde(borrow)]
+        attr: CowStr<'s>,
+    },
+    /// Account resource permission.
+    Account {
+        /// Account attribute (e.g., "email").
+        #[serde(borrow)]
+        attr: CowStr<'s>,
+        /// Permitted actions (read, manage). None = read.
+        #[serde(default)]
+        action: Option<Vec<AccountAction>>,
+    },
+}
+
+/// Errors from permission set validation.
+#[derive(Debug, Error)]
+pub enum PermissionSetError {
+    #[error("permission set has empty permissions array")]
+    EmptyPermissions,
+
+    #[error("permission set {nsid} references out-of-namespace resource: {resource}")]
+    NamespaceViolation { nsid: String, resource: String },
+}
+
+impl<'s> LexPermissionSet<'s> {
+    /// Validate the permission set against its owning NSID.
+    ///
+    /// Checks:
+    /// 1. Permissions array is non-empty
+    /// 2. All NSID-scoped resources (collection, lxm) are within the
+    ///    owning NSID's namespace (first two segments)
+    pub fn validate(&self, owning_nsid: &str) -> Result<(), PermissionSetError> {
+        if self.permissions.is_empty() {
+            return Err(PermissionSetError::EmptyPermissions);
+        }
+
+        let namespace = {
+            let mut parts = owning_nsid.splitn(3, '.');
+            match (parts.next(), parts.next()) {
+                (Some(a), Some(b)) => format!("{}.{}", a, b),
+                _ => owning_nsid.to_string(),
+            }
+        };
+
+        for perm in &self.permissions {
+            let LexPermission::Permission { resource } = perm;
+            match resource {
+                LexPermissionResource::Repo { collection, .. } => {
+                    for col in collection {
+                        let col_str: &str = col.as_ref();
+                        if !col_str.starts_with(&format!("{}.", namespace)) {
+                            return Err(PermissionSetError::NamespaceViolation {
+                                nsid: owning_nsid.to_string(),
+                                resource: col_str.to_string(),
+                            });
+                        }
+                    }
+                }
+                LexPermissionResource::Rpc { lxm, .. } => {
+                    for l in lxm {
+                        let lxm_str: &str = l.as_ref();
+                        if !lxm_str.starts_with(&format!("{}.", namespace)) {
+                            return Err(PermissionSetError::NamespaceViolation {
+                                nsid: owning_nsid.to_string(),
+                                resource: lxm_str.to_string(),
+                            });
+                        }
+                    }
+                }
+                // Blob, Identity, Account don't have namespace-scoped NSID resources.
+                _ => {}
+            }
+        }
+
+        Ok(())
+    }
+}
+
 // core
 
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
@@ -433,6 +587,9 @@ pub enum LexUserType<'s> {
     Unknown(LexUnknown<'s>),
     // lexRefUnion
     Union(LexRefUnion<'s>),
+    // lexPermissionSet
+    #[serde(borrow)]
+    PermissionSet(LexPermissionSet<'s>),
 }
 
 // IntoStatic implementations for all lexicon types
@@ -826,6 +983,69 @@ impl IntoStatic for LexRecord<'_> {
     }
 }
 
+impl IntoStatic for LexPermissionResource<'_> {
+    type Output = LexPermissionResource<'static>;
+
+    fn into_static(self) -> Self::Output {
+        match self {
+            LexPermissionResource::Repo { collection, action } => LexPermissionResource::Repo {
+                collection: collection.into_iter().map(|n| n.into_static()).collect(),
+                action,
+            },
+            LexPermissionResource::Rpc {
+                lxm,
+                aud,
+                inherit_aud,
+            } => LexPermissionResource::Rpc {
+                lxm: lxm.into_iter().map(|n| n.into_static()).collect(),
+                aud: aud.map(|d| d.into_static()),
+                inherit_aud,
+            },
+            LexPermissionResource::Blob { accept, max_size } => LexPermissionResource::Blob {
+                accept: accept.into_iter().map(|a| a.into_static()).collect(),
+                max_size,
+            },
+            LexPermissionResource::Identity { attr } => LexPermissionResource::Identity {
+                attr: attr.into_static(),
+            },
+            LexPermissionResource::Account { attr, action } => LexPermissionResource::Account {
+                attr: attr.into_static(),
+                action,
+            },
+        }
+    }
+}
+
+impl IntoStatic for LexPermission<'_> {
+    type Output = LexPermission<'static>;
+
+    fn into_static(self) -> Self::Output {
+        match self {
+            LexPermission::Permission { resource } => LexPermission::Permission {
+                resource: resource.into_static(),
+            },
+        }
+    }
+}
+
+impl IntoStatic for LexPermissionSet<'_> {
+    type Output = LexPermissionSet<'static>;
+
+    fn into_static(self) -> Self::Output {
+        LexPermissionSet {
+            title: self.title.into_static(),
+            title_lang: self.title_lang.into_static(),
+            detail: self.detail.into_static(),
+            detail_lang: self.detail_lang.into_static(),
+            permissions: self
+                .permissions
+                .into_iter()
+                .map(|p| p.into_static())
+                .collect(),
+        }
+    }
+}
+
 impl IntoStatic for LexUserType<'_> {
     type Output = LexUserType<'static>;
     fn into_static(self) -> Self::Output {
@@ -845,6 +1065,7 @@ impl IntoStatic for LexUserType<'_> {
             Self::CidLink(x) => LexUserType::CidLink(x.into_static()),
             Self::Unknown(x) => LexUserType::Unknown(x.into_static()),
             Self::Union(x) => LexUserType::Union(x.into_static()),
+            Self::PermissionSet(x) => LexUserType::PermissionSet(x.into_static()),
         }
     }
 }
@@ -874,5 +1095,432 @@ mod tests {
         assert_eq!(doc.revision, None);
         assert_eq!(doc.description, None);
         assert_eq!(doc.defs.len(), 1);
+    }
+
+    // Permission set tests for oauth-scopes-rework.AC5
+
+    const PERMISSION_SET_SIMPLE: &str = r#"
+{
+  "lexicon": 1,
+  "id": "app.bsky.authFull",
+  "defs": {
+    "main": {
+      "type": "permission-set",
+      "title": "Full Bluesky Client Access",
+      "detail": "Allows reading and writing to Bluesky records",
+      "permissions": [
+        {
+          "type": "permission",
+          "resource": "repo",
+          "collection": ["app.bsky.feed.post"],
+          "action": ["create"]
+        }
+      ]
+    }
+  }
+}
+"#;
+
+    const PERMISSION_SET_FULL: &str = r#"
+{
+  "lexicon": 1,
+  "id": "app.bsky.authFull",
+  "defs": {
+    "main": {
+      "type": "permission-set",
+      "title": "Full Bluesky Client Access",
+      "title:lang": {
+        "es": "Acceso completo al cliente de Bluesky"
+      },
+      "detail": "Allows reading and writing to Bluesky records and making service calls",
+      "detail:lang": {
+        "es": "Permite leer y escribir registros de Bluesky y realizar llamadas de servicio"
+      },
+      "permissions": [
+        {
+          "type": "permission",
+          "resource": "repo",
+          "collection": ["app.bsky.feed.post", "app.bsky.feed.like"],
+          "action": ["create", "update", "delete"]
+        },
+        {
+          "type": "permission",
+          "resource": "repo",
+          "collection": ["app.bsky.actor.profile"],
+          "action": ["update"]
+        },
+        {
+          "type": "permission",
+          "resource": "rpc",
+          "lxm": ["app.bsky.feed.getLikes", "app.bsky.feed.getAuthorFeed"],
+          "inheritAud": true
+        },
+        {
+          "type": "permission",
+          "resource": "rpc",
+          "lxm": ["app.bsky.notification.listNotifications"],
+          "aud": "did:web:api.bsky.app"
+        },
+        {
+          "type": "permission",
+          "resource": "identity",
+          "attr": "handle"
+        },
+        {
+          "type": "permission",
+          "resource": "account",
+          "attr": "email",
+          "action": ["read"]
+        }
+      ]
+    }
+  }
+}
+"#;
+
+    #[test]
+    fn test_permission_set_deserialize_simple() {
+        let doc = serde_json::from_str::<LexiconDoc>(PERMISSION_SET_SIMPLE)
+            .expect("failed to deserialize");
+        assert_eq!(doc.id, "app.bsky.authFull");
+
+        let main_def = doc.defs.get("main").expect("main def exists");
+        match main_def {
+            LexUserType::PermissionSet(pset) => {
+                assert_eq!(pset.title.as_ref().map(|s| s.as_ref()), Some("Full Bluesky Client Access"));
+                assert_eq!(pset.permissions.len(), 1);
+
+                let perm = &pset.permissions[0];
+                match perm {
+                    LexPermission::Permission {
+                        resource: LexPermissionResource::Repo { collection, action },
+                    } => {
+                        assert_eq!(collection.len(), 1);
+                        assert_eq!(collection[0].as_ref(), "app.bsky.feed.post");
+                        assert_eq!(
+                            action.as_ref().map(|a| a.len()),
+                            Some(1),
+                            "has action vec"
+                        );
+                        if let Some(actions) = action {
+                            assert_eq!(actions[0], RepoAction::Create);
+                        }
+                    }
+                    _ => panic!("expected Repo permission"),
+                }
+            }
+            _ => panic!("expected PermissionSet"),
+        }
+    }
+
+    #[test]
+    fn test_permission_set_deserialize_full() {
+        let doc = serde_json::from_str::<LexiconDoc>(PERMISSION_SET_FULL)
+            .expect("failed to deserialize");
+        let main_def = doc.defs.get("main").expect("main def");
+
+        match main_def {
+            LexUserType::PermissionSet(pset) => {
+                assert_eq!(pset.title_lang.as_ref().map(|m| m.len()), Some(1));
+                assert_eq!(pset.detail_lang.as_ref().map(|m| m.len()), Some(1));
+                assert_eq!(pset.permissions.len(), 6, "has 6 permission entries");
+
+                // Entry 1: Repo with 2 collections and 3 actions
+                match &pset.permissions[0] {
+                    LexPermission::Permission {
+                        resource: LexPermissionResource::Repo { collection, action },
+                    } => {
+                        assert_eq!(collection.len(), 2);
+                        assert_eq!(
+                            action.as_ref().map(|a| a.len()),
+                            Some(3),
+                            "has 3 actions"
+                        );
+                    }
+                    _ => panic!("entry 0 should be Repo"),
+                }
+
+                // Entry 3: Rpc with inherit_aud
+                match &pset.permissions[2] {
+                    LexPermission::Permission {
+                        resource: LexPermissionResource::Rpc { lxm, inherit_aud, .. },
+                    } => {
+                        assert_eq!(lxm.len(), 2);
+                        assert_eq!(*inherit_aud, Some(true));
+                    }
+                    _ => panic!("entry 2 should be Rpc with inherit_aud"),
+                }
+
+                // Entry 4: Rpc with explicit aud
+                match &pset.permissions[3] {
+                    LexPermission::Permission {
+                        resource: LexPermissionResource::Rpc { aud, .. },
+                    } => {
+                        assert!(aud.is_some(), "has aud");
+                    }
+                    _ => panic!("entry 3 should be Rpc with aud"),
+                }
+
+                // Entry 5: Identity
+                match &pset.permissions[4] {
+                    LexPermission::Permission {
+                        resource: LexPermissionResource::Identity { attr },
+                    } => {
+                        assert_eq!(attr.as_ref(), "handle");
+                    }
+                    _ => panic!("entry 4 should be Identity"),
+                }
+
+                // Entry 6: Account with action
+                match &pset.permissions[5] {
+                    LexPermission::Permission {
+                        resource: LexPermissionResource::Account { attr, action },
+                    } => {
+                        assert_eq!(attr.as_ref(), "email");
+                        assert_eq!(
+                            action.as_ref().map(|a| a.len()),
+                            Some(1),
+                            "has 1 action"
+                        );
+                        if let Some(actions) = action {
+                            assert_eq!(actions[0], AccountAction::Read);
+                        }
+                    }
+                    _ => panic!("entry 5 should be Account"),
+                }
+            }
+            _ => panic!("expected PermissionSet"),
+        }
+    }
+
+    #[test]
+    fn test_permission_set_into_static() {
+        let doc = serde_json::from_str::<LexiconDoc>(PERMISSION_SET_FULL)
+            .expect("failed to deserialize");
+        let main_def = doc
+            .defs
+            .get("main")
+            .expect("main def")
+            .clone()
+            .into_static();
+
+        match main_def {
+            LexUserType::PermissionSet(pset) => {
+                assert_eq!(pset.permissions.len(), 6);
+                // Verify all borrowed fields are converted to 'static
+                assert!(pset.title.is_some());
+                assert!(pset.title_lang.is_some());
+            }
+            _ => panic!("expected PermissionSet"),
+        }
+    }
+
+    #[test]
+    fn test_permission_set_namespace_violation() {
+        let doc = serde_json::from_str::<LexiconDoc>(PERMISSION_SET_SIMPLE)
+            .expect("failed to deserialize");
+        let pset = match doc.defs.get("main").expect("main def") {
+            LexUserType::PermissionSet(p) => p,
+            _ => panic!("expected PermissionSet"),
+        };
+
+        // Valid: app.bsky.feed.post is in app.bsky namespace
+        assert!(pset.validate("app.bsky.authFull").is_ok());
+
+        // Invalid: com.atproto is out of namespace for app.bsky
+        let invalid_json = r#"
+{
+  "lexicon": 1,
+  "id": "app.bsky.authFull",
+  "defs": {
+    "main": {
+      "type": "permission-set",
+      "permissions": [
+        {
+          "type": "permission",
+          "resource": "repo",
+          "collection": ["com.atproto.repo.createRecord"],
+          "action": ["create"]
+        }
+      ]
+    }
+  }
+}
+"#;
+        let doc = serde_json::from_str::<LexiconDoc>(invalid_json).expect("deserialize");
+        let pset = match doc.defs.get("main").expect("main def") {
+            LexUserType::PermissionSet(p) => p,
+            _ => panic!("expected PermissionSet"),
+        };
+        let result = pset.validate("app.bsky.authFull");
+        assert!(result.is_err());
+        match result.unwrap_err() {
+            PermissionSetError::NamespaceViolation { nsid, resource } => {
+                assert_eq!(nsid, "app.bsky.authFull");
+                assert_eq!(resource, "com.atproto.repo.createRecord");
+            }
+            _ => panic!("expected NamespaceViolation"),
+        }
+    }
+
+    #[test]
+    fn test_permission_set_empty_permissions() {
+        let json = r#"
+{
+  "lexicon": 1,
+  "id": "app.bsky.authEmpty",
+  "defs": {
+    "main": {
+      "type": "permission-set",
+      "permissions": []
+    }
+  }
+}
+"#;
+        let doc = serde_json::from_str::<LexiconDoc>(json).expect("deserialize");
+        let pset = match doc.defs.get("main").expect("main def") {
+            LexUserType::PermissionSet(p) => p,
+            _ => panic!("expected PermissionSet"),
+        };
+        let result = pset.validate("app.bsky.authEmpty");
+        assert!(result.is_err());
+        match result.unwrap_err() {
+            PermissionSetError::EmptyPermissions => {}
+            _ => panic!("expected EmptyPermissions"),
+        }
+    }
+
+    #[test]
+    fn test_permission_set_serialize_roundtrip() {
+        let doc = serde_json::from_str::<LexiconDoc>(PERMISSION_SET_SIMPLE)
+            .expect("failed to deserialize");
+        let orig_pset = match doc.defs.get("main").expect("main") {
+            LexUserType::PermissionSet(p) => p,
+            _ => panic!("expected PermissionSet"),
+        };
+
+        // Serialize to JSON value and back
+        let serialized_str = serde_json::to_string(orig_pset).expect("serialize to string");
+        let deserialized_pset =
+            serde_json::from_str::<LexPermissionSet>(serialized_str.as_str())
+                .expect("roundtrip deserialize");
+
+        assert_eq!(orig_pset.permissions.len(), deserialized_pset.permissions.len());
+    }
+
+    #[test]
+    fn test_permission_set_invalid_nsid() {
+        let json = r#"
+{
+  "lexicon": 1,
+  "id": "app.bsky.authBad",
+  "defs": {
+    "main": {
+      "type": "permission-set",
+      "permissions": [
+        {
+          "type": "permission",
+          "resource": "repo",
+          "collection": ["invalid..nsid"],
+          "action": ["create"]
+        }
+      ]
+    }
+  }
+}
+"#;
+        // Invalid NSID should fail during deserialization
+        let result = serde_json::from_str::<LexiconDoc>(json);
+        assert!(result.is_err(), "invalid NSID should fail deserialization");
+    }
+
+    #[test]
+    fn test_permission_set_invalid_did() {
+        let json = r#"
+{
+  "lexicon": 1,
+  "id": "app.bsky.authBad",
+  "defs": {
+    "main": {
+      "type": "permission-set",
+      "permissions": [
+        {
+          "type": "permission",
+          "resource": "rpc",
+          "lxm": ["app.bsky.feed.getLikes"],
+          "aud": "not-a-did"
+        }
+      ]
+    }
+  }
+}
+"#;
+        // Invalid DID should fail during deserialization
+        let result = serde_json::from_str::<LexiconDoc>(json);
+        assert!(result.is_err(), "invalid DID should fail deserialization");
+    }
+
+    #[test]
+    fn test_permission_set_title_lang() {
+        let doc = serde_json::from_str::<LexiconDoc>(PERMISSION_SET_FULL)
+            .expect("failed to deserialize");
+        let pset = match doc.defs.get("main").expect("main def") {
+            LexUserType::PermissionSet(p) => p,
+            _ => panic!("expected PermissionSet"),
+        };
+
+        let title_lang = pset.title_lang.as_ref().expect("has title:lang");
+        assert_eq!(title_lang.len(), 1);
+        let es_title = title_lang
+            .iter()
+            .find(|(k, _)| k.as_ref() == "es")
+            .expect("has es translation");
+        assert_eq!(
+            es_title.1.as_ref(),
+            "Acceso completo al cliente de Bluesky"
+        );
+
+        // Roundtrip and verify title:lang survives
+        let serialized = serde_json::to_value(&pset).expect("serialize");
+        assert!(
+            serialized.get("title:lang").is_some(),
+            "title:lang field preserved in JSON"
+        );
+    }
+
+    #[test]
+    fn test_permission_set_rpc_namespace_violation() {
+        let json = r#"
+{
+  "lexicon": 1,
+  "id": "app.bsky.authBad",
+  "defs": {
+    "main": {
+      "type": "permission-set",
+      "permissions": [
+        {
+          "type": "permission",
+          "resource": "rpc",
+          "lxm": ["com.atproto.server.createAccount"],
+          "inheritAud": true
+        }
+      ]
+    }
+  }
+}
+"#;
+        let doc = serde_json::from_str::<LexiconDoc>(json).expect("deserialize");
+        let pset = match doc.defs.get("main").expect("main def") {
+            LexUserType::PermissionSet(p) => p,
+            _ => panic!("expected PermissionSet"),
+        };
+        let result = pset.validate("app.bsky.authBad");
+        assert!(result.is_err(), "rpc lxm out of namespace should fail");
+        match result.unwrap_err() {
+            PermissionSetError::NamespaceViolation { resource, .. } => {
+                assert_eq!(resource, "com.atproto.server.createAccount");
+            }
+            _ => panic!("expected NamespaceViolation"),
+        }
     }
 }

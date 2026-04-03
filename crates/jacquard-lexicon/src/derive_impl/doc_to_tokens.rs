@@ -283,6 +283,15 @@ fn user_type_to_tokens(
         LexUserType::Unknown(_) => quote! {
             #lex LexUserType::Unknown(#lex LexUnknown { ..Default::default() })
         },
+        LexUserType::PermissionSet(_) => quote! {
+            #lex LexUserType::PermissionSet(#lex LexPermissionSet {
+                title: None,
+                title_lang: None,
+                detail: None,
+                detail_lang: None,
+                permissions: vec![],
+            })
+        },
     }
 }
 

@@ -29,6 +29,8 @@ pub mod language;
 pub mod nsid;
 /// Record key types and validation
 pub mod recordkey;
+/// Scope action and resource enums for AT Protocol OAuth
+pub mod scope_primitives;
 /// String types with format validation
 pub mod string;
 /// Timestamp Identifier (TID) types and generation
